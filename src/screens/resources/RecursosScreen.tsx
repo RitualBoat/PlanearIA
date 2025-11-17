@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
-  SafeAreaView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -52,48 +51,46 @@ const RecursosScreen: React.FC<RecursosScreenProps> = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
 
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <Text style={styles.title}>Gestión de Recursos</Text>
-          <Text style={styles.subtitle}>
-            Administra materiales y recursos didácticos
-          </Text>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.title}>Gestión de Recursos</Text>
+        <Text style={styles.subtitle}>
+          Administra materiales y recursos didácticos
+        </Text>
 
-          <View style={styles.optionsContainer}>
-            <TouchableOpacity
-              style={styles.optionCard}
-              onPress={handleSubirRecurso}
-              activeOpacity={0.7}
+        <View style={styles.optionsContainer}>
+          <TouchableOpacity
+            style={styles.optionCard}
+            onPress={handleSubirRecurso}
+            activeOpacity={0.7}
+          >
+            <View
+              style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}
             >
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}
-              >
-                <MaterialIcons name="cloud-upload" size={60} color="white" />
-              </View>
-              <Text style={styles.optionTitle}>Subir Recurso</Text>
-              <Text style={styles.optionDescription}>
-                Agrega nuevos materiales y documentos
-              </Text>
-            </TouchableOpacity>
+              <MaterialIcons name="cloud-upload" size={60} color="white" />
+            </View>
+            <Text style={styles.optionTitle}>Subir Recurso</Text>
+            <Text style={styles.optionDescription}>
+              Agrega nuevos materiales y documentos
+            </Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.optionCard}
-              onPress={handleVerRecursos}
-              activeOpacity={0.7}
+          <TouchableOpacity
+            style={styles.optionCard}
+            onPress={handleVerRecursos}
+            activeOpacity={0.7}
+          >
+            <View
+              style={[styles.iconContainer, { backgroundColor: "#00BCD4" }]}
             >
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#00BCD4" }]}
-              >
-                <MaterialIcons name="folder-open" size={60} color="white" />
-              </View>
-              <Text style={styles.optionTitle}>Mis Recursos</Text>
-              <Text style={styles.optionDescription}>
-                Consulta tus materiales guardados
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
+              <MaterialIcons name="folder-open" size={60} color="white" />
+            </View>
+            <Text style={styles.optionTitle}>Mis Recursos</Text>
+            <Text style={styles.optionDescription}>
+              Consulta tus materiales guardados
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
 
       <BottomNavBar currentScreen="Recursos" />
     </View>
@@ -107,9 +104,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-  },
-  safeArea: {
-    flex: 1,
   },
   scrollContent: {
     padding: 20,

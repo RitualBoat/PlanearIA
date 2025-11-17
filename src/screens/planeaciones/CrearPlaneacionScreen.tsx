@@ -8,11 +8,13 @@ import {
   StatusBar,
   Modal,
   Pressable,
+  SafeAreaView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
+import BottomNavBar from "../../components/BottomNavBar";
 
 /**
  * Tipo para las props de navegación
@@ -73,51 +75,53 @@ const CrearPlaneacionScreen: React.FC<CrearPlaneacionScreenProps> = ({
     <View style={styles.container}>
       <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Título */}
-        <Text style={styles.title}>Crear Nueva Planeación</Text>
-        <Text style={styles.subtitle}>
-          Elige cómo deseas crear tu planeación
-        </Text>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Título */}
+          <Text style={styles.title}>Crear Nueva Planeación</Text>
+          <Text style={styles.subtitle}>
+            Elige cómo deseas crear tu planeación
+          </Text>
 
-        {/* Opciones */}
-        <View style={styles.optionsContainer}>
-          {/* Opción 1: Crear desde cero */}
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={handleCrearDesdeCero}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#FF9800" }]}
+          {/* Opciones */}
+          <View style={styles.optionsContainer}>
+            {/* Opción 1: Crear desde cero */}
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={handleCrearDesdeCero}
+              activeOpacity={0.7}
             >
-              <MaterialIcons name="edit" size={60} color="white" />
-            </View>
-            <Text style={styles.optionTitle}>Crear desde Cero</Text>
-            <Text style={styles.optionDescription}>
-              Crea tu planeación manualmente llenando todos los campos
-            </Text>
-          </TouchableOpacity>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#FF9800" }]}
+              >
+                <MaterialIcons name="edit" size={60} color="white" />
+              </View>
+              <Text style={styles.optionTitle}>Crear desde Cero</Text>
+              <Text style={styles.optionDescription}>
+                Crea tu planeación manualmente llenando todos los campos
+              </Text>
+            </TouchableOpacity>
 
-          {/* Opción 2: Generar con plantilla */}
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={handleGenerarPlantilla}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#9C27B0" }]}
+            {/* Opción 2: Generar con plantilla */}
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={handleGenerarPlantilla}
+              activeOpacity={0.7}
             >
-              <MaterialIcons name="auto-awesome" size={60} color="white" />
-            </View>
-            <Text style={styles.optionTitle}>Generar con IA</Text>
-            <Text style={styles.optionDescription}>
-              Genera una plantilla automáticamente usando inteligencia
-              artificial
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#9C27B0" }]}
+              >
+                <MaterialIcons name="auto-awesome" size={60} color="white" />
+              </View>
+              <Text style={styles.optionTitle}>Generar con IA</Text>
+              <Text style={styles.optionDescription}>
+                Genera una plantilla automáticamente usando inteligencia
+                artificial
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
 
       {/* Modal para seleccionar parámetros de plantilla */}
       <Modal
@@ -202,6 +206,8 @@ const CrearPlaneacionScreen: React.FC<CrearPlaneacionScreenProps> = ({
           </View>
         </View>
       </Modal>
+
+      <BottomNavBar currentScreen="Crear Planeación" />
     </View>
   );
 };
@@ -213,6 +219,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  safeArea: {
+    flex: 1,
   },
   scrollContent: {
     padding: 20,

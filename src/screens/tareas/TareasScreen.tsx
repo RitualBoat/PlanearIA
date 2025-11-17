@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  SafeAreaView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
+import BottomNavBar from "../../components/BottomNavBar";
 
 /**
  * Tipo para las props de navegación
@@ -50,46 +52,50 @@ const TareasScreen: React.FC<TareasScreenProps> = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Gestión de Tareas</Text>
-        <Text style={styles.subtitle}>
-          Administra tareas, exámenes y proyectos
-        </Text>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Text style={styles.title}>Gestión de Tareas</Text>
+          <Text style={styles.subtitle}>
+            Administra tareas, exámenes y proyectos
+          </Text>
 
-        <View style={styles.optionsContainer}>
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={handleCrearTarea}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#9C27B0" }]}
+          <View style={styles.optionsContainer}>
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={handleCrearTarea}
+              activeOpacity={0.7}
             >
-              <MaterialIcons name="add-task" size={60} color="white" />
-            </View>
-            <Text style={styles.optionTitle}>Crear Tarea</Text>
-            <Text style={styles.optionDescription}>
-              Asigna una nueva tarea o examen a tus alumnos
-            </Text>
-          </TouchableOpacity>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#9C27B0" }]}
+              >
+                <MaterialIcons name="add-task" size={60} color="white" />
+              </View>
+              <Text style={styles.optionTitle}>Crear Tarea</Text>
+              <Text style={styles.optionDescription}>
+                Asigna una nueva tarea o examen a tus alumnos
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={handleVerTareas}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={handleVerTareas}
+              activeOpacity={0.7}
             >
-              <MaterialIcons name="assignment" size={60} color="white" />
-            </View>
-            <Text style={styles.optionTitle}>Mis Tareas</Text>
-            <Text style={styles.optionDescription}>
-              Consulta y gestiona las tareas asignadas
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}
+              >
+                <MaterialIcons name="assignment" size={60} color="white" />
+              </View>
+              <Text style={styles.optionTitle}>Mis Tareas</Text>
+              <Text style={styles.optionDescription}>
+                Consulta y gestiona las tareas asignadas
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+
+      <BottomNavBar currentScreen="Tareas" />
     </View>
   );
 };
@@ -101,6 +107,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  safeArea: {
+    flex: 1,
   },
   scrollContent: {
     padding: 20,

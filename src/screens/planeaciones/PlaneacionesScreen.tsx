@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  SafeAreaView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
+import BottomNavBar from "../../components/BottomNavBar";
 
 /**
  * Tipo para las props de navegación
@@ -53,50 +55,54 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({
     <View style={styles.container}>
       <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Título */}
-        <Text style={styles.title}>Gestión de Planeaciones</Text>
-        <Text style={styles.subtitle}>
-          Selecciona una opción para continuar
-        </Text>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Título */}
+          <Text style={styles.title}>Gestión de Planeaciones</Text>
+          <Text style={styles.subtitle}>
+            Selecciona una opción para continuar
+          </Text>
 
-        {/* Opciones */}
-        <View style={styles.optionsContainer}>
-          {/* Opción 1: Crear Nueva Planeación */}
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={handleCrearNueva}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}
+          {/* Opciones */}
+          <View style={styles.optionsContainer}>
+            {/* Opción 1: Crear Nueva Planeación */}
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={handleCrearNueva}
+              activeOpacity={0.7}
             >
-              <MaterialIcons name="add-circle" size={60} color="white" />
-            </View>
-            <Text style={styles.optionTitle}>Crear Nueva Planeación</Text>
-            <Text style={styles.optionDescription}>
-              Crea una planeación desde cero o usando una plantilla
-            </Text>
-          </TouchableOpacity>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}
+              >
+                <MaterialIcons name="add-circle" size={60} color="white" />
+              </View>
+              <Text style={styles.optionTitle}>Crear Nueva Planeación</Text>
+              <Text style={styles.optionDescription}>
+                Crea una planeación desde cero o usando una plantilla
+              </Text>
+            </TouchableOpacity>
 
-          {/* Opción 2: Ver Planeaciones */}
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={handleVerPlaneaciones}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}
+            {/* Opción 2: Ver Planeaciones */}
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={handleVerPlaneaciones}
+              activeOpacity={0.7}
             >
-              <MaterialIcons name="folder-open" size={60} color="white" />
-            </View>
-            <Text style={styles.optionTitle}>Mis Planeaciones</Text>
-            <Text style={styles.optionDescription}>
-              Consulta y edita tus planeaciones guardadas
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}
+              >
+                <MaterialIcons name="folder-open" size={60} color="white" />
+              </View>
+              <Text style={styles.optionTitle}>Mis Planeaciones</Text>
+              <Text style={styles.optionDescription}>
+                Consulta y edita tus planeaciones guardadas
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+
+      <BottomNavBar currentScreen="Planeaciones" />
     </View>
   );
 };
@@ -108,6 +114,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  safeArea: {
+    flex: 1,
   },
   scrollContent: {
     padding: 20,

@@ -6,11 +6,14 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  SafeAreaView,
 } from "react-native";
+
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
+import BottomNavBar from "../../components/BottomNavBar";
 
 /**
  * Tipo para las props de navegación
@@ -50,46 +53,50 @@ const AlumnosScreen: React.FC<AlumnosScreenProps> = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Gestión de Alumnos</Text>
-        <Text style={styles.subtitle}>
-          Administra la información de tus estudiantes
-        </Text>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Text style={styles.title}>Gestión de Alumnos</Text>
+          <Text style={styles.subtitle}>
+            Administra la información de tus estudiantes
+          </Text>
 
-        <View style={styles.optionsContainer}>
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={handleAgregarAlumno}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}
+          <View style={styles.optionsContainer}>
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={handleAgregarAlumno}
+              activeOpacity={0.7}
             >
-              <MaterialIcons name="person-add" size={60} color="white" />
-            </View>
-            <Text style={styles.optionTitle}>Agregar Alumno</Text>
-            <Text style={styles.optionDescription}>
-              Registra un nuevo estudiante en el sistema
-            </Text>
-          </TouchableOpacity>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}
+              >
+                <MaterialIcons name="person-add" size={60} color="white" />
+              </View>
+              <Text style={styles.optionTitle}>Agregar Alumno</Text>
+              <Text style={styles.optionDescription}>
+                Registra un nuevo estudiante en el sistema
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={handleVerAlumnos}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={handleVerAlumnos}
+              activeOpacity={0.7}
             >
-              <MaterialIcons name="groups" size={60} color="white" />
-            </View>
-            <Text style={styles.optionTitle}>Mis Alumnos</Text>
-            <Text style={styles.optionDescription}>
-              Consulta y edita la información de tus alumnos
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}
+              >
+                <MaterialIcons name="groups" size={60} color="white" />
+              </View>
+              <Text style={styles.optionTitle}>Mis Alumnos</Text>
+              <Text style={styles.optionDescription}>
+                Consulta y edita la información de tus alumnos
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+
+      <BottomNavBar currentScreen="Alumnos" />
     </View>
   );
 };
@@ -101,6 +108,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  safeArea: {
+    flex: 1,
   },
   scrollContent: {
     padding: 20,

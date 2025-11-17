@@ -96,6 +96,7 @@ const StackNavigator: React.FC = () => {
         component={PlaneacionesScreen}
         options={{
           title: "Planeaciones",
+          headerShown: false,
         }}
       />
 
@@ -105,6 +106,7 @@ const StackNavigator: React.FC = () => {
         component={CrearPlaneacionScreen}
         options={{
           title: "Crear Planeación",
+          headerShown: false,
         }}
       />
 
@@ -114,6 +116,7 @@ const StackNavigator: React.FC = () => {
         component={AlumnosScreen}
         options={{
           title: "Alumnos",
+          headerShown: false,
         }}
       />
 
@@ -123,6 +126,7 @@ const StackNavigator: React.FC = () => {
         component={CalificacionesScreen}
         options={{
           title: "Calificaciones",
+          headerShown: false,
         }}
       />
 
@@ -132,6 +136,7 @@ const StackNavigator: React.FC = () => {
         component={TareasScreen}
         options={{
           title: "Tareas",
+          headerShown: false,
         }}
       />
 
@@ -141,6 +146,7 @@ const StackNavigator: React.FC = () => {
         component={RecursosScreen}
         options={{
           title: "Recursos",
+          headerShown: false,
         }}
       />
 
@@ -150,6 +156,7 @@ const StackNavigator: React.FC = () => {
         component={CuentaScreen}
         options={{
           title: "Cuenta y Seguridad",
+          headerShown: false,
         }}
       />
     </Stack.Navigator>

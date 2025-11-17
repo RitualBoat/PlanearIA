@@ -7,12 +7,14 @@ import {
   ScrollView,
   StatusBar,
   Alert,
+  SafeAreaView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { CommonActions } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
+import BottomNavBar from "../../components/BottomNavBar";
 
 /**
  * Tipo para las props de navegación
@@ -76,64 +78,68 @@ const CuentaScreen: React.FC<CuentaScreenProps> = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Cuenta y Seguridad</Text>
-        <Text style={styles.subtitle}>
-          Gestiona tu información personal y configuración
-        </Text>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Text style={styles.title}>Cuenta y Seguridad</Text>
+          <Text style={styles.subtitle}>
+            Gestiona tu información personal y configuración
+          </Text>
 
-        <View style={styles.optionsContainer}>
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={handleEditarPerfil}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}
+          <View style={styles.optionsContainer}>
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={handleEditarPerfil}
+              activeOpacity={0.7}
             >
-              <MaterialIcons name="person" size={60} color="white" />
-            </View>
-            <Text style={styles.optionTitle}>Editar Perfil</Text>
-            <Text style={styles.optionDescription}>
-              Actualiza tu información personal
-            </Text>
-          </TouchableOpacity>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}
+              >
+                <MaterialIcons name="person" size={60} color="white" />
+              </View>
+              <Text style={styles.optionTitle}>Editar Perfil</Text>
+              <Text style={styles.optionDescription}>
+                Actualiza tu información personal
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={handleCambiarContrasena}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#FF9800" }]}
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={handleCambiarContrasena}
+              activeOpacity={0.7}
             >
-              <MaterialIcons name="lock" size={60} color="white" />
-            </View>
-            <Text style={styles.optionTitle}>Cambiar Contraseña</Text>
-            <Text style={styles.optionDescription}>
-              Actualiza tu contraseña de acceso
-            </Text>
-          </TouchableOpacity>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#FF9800" }]}
+              >
+                <MaterialIcons name="lock" size={60} color="white" />
+              </View>
+              <Text style={styles.optionTitle}>Cambiar Contraseña</Text>
+              <Text style={styles.optionDescription}>
+                Actualiza tu contraseña de acceso
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.optionCard, styles.logoutCard]}
-            onPress={handleCerrarSesion}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#F44336" }]}
+            <TouchableOpacity
+              style={[styles.optionCard, styles.logoutCard]}
+              onPress={handleCerrarSesion}
+              activeOpacity={0.7}
             >
-              <MaterialIcons name="logout" size={60} color="white" />
-            </View>
-            <Text style={[styles.optionTitle, styles.logoutTitle]}>
-              Cerrar Sesión
-            </Text>
-            <Text style={styles.optionDescription}>
-              Sal de tu cuenta de forma segura
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#F44336" }]}
+              >
+                <MaterialIcons name="logout" size={60} color="white" />
+              </View>
+              <Text style={[styles.optionTitle, styles.logoutTitle]}>
+                Cerrar Sesión
+              </Text>
+              <Text style={styles.optionDescription}>
+                Sal de tu cuenta de forma segura
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+
+      <BottomNavBar currentScreen="Cuenta" />
     </View>
   );
 };
@@ -145,6 +151,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  safeArea: {
+    flex: 1,
   },
   scrollContent: {
     padding: 20,

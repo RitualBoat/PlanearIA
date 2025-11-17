@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  SafeAreaView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
+import BottomNavBar from "../../components/BottomNavBar";
 
 /**
  * Tipo para las props de navegación
@@ -52,46 +54,50 @@ const CalificacionesScreen: React.FC<CalificacionesScreenProps> = ({
     <View style={styles.container}>
       <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Gestión de Calificaciones</Text>
-        <Text style={styles.subtitle}>
-          Administra las calificaciones de tus alumnos
-        </Text>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Text style={styles.title}>Gestión de Calificaciones</Text>
+          <Text style={styles.subtitle}>
+            Administra las calificaciones de tus alumnos
+          </Text>
 
-        <View style={styles.optionsContainer}>
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={handleRegistrarCalificaciones}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}
+          <View style={styles.optionsContainer}>
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={handleRegistrarCalificaciones}
+              activeOpacity={0.7}
             >
-              <MaterialIcons name="edit-note" size={60} color="white" />
-            </View>
-            <Text style={styles.optionTitle}>Registrar Calificaciones</Text>
-            <Text style={styles.optionDescription}>
-              Captura las calificaciones de tus alumnos
-            </Text>
-          </TouchableOpacity>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}
+              >
+                <MaterialIcons name="edit-note" size={60} color="white" />
+              </View>
+              <Text style={styles.optionTitle}>Registrar Calificaciones</Text>
+              <Text style={styles.optionDescription}>
+                Captura las calificaciones de tus alumnos
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={handleVerCalificaciones}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#FF9800" }]}
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={handleVerCalificaciones}
+              activeOpacity={0.7}
             >
-              <MaterialIcons name="assessment" size={60} color="white" />
-            </View>
-            <Text style={styles.optionTitle}>Consultar Calificaciones</Text>
-            <Text style={styles.optionDescription}>
-              Revisa y analiza las calificaciones registradas
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#FF9800" }]}
+              >
+                <MaterialIcons name="assessment" size={60} color="white" />
+              </View>
+              <Text style={styles.optionTitle}>Consultar Calificaciones</Text>
+              <Text style={styles.optionDescription}>
+                Revisa y analiza las calificaciones registradas
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+
+      <BottomNavBar currentScreen="Calificaciones" />
     </View>
   );
 };
@@ -103,6 +109,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  safeArea: {
+    flex: 1,
   },
   scrollContent: {
     padding: 20,

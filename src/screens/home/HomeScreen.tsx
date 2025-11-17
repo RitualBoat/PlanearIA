@@ -9,6 +9,9 @@ import {
   SafeAreaView,
   StatusBar,
   Image,
+  Platform,
+  Dimensions,
+  ScrollView,
 } from "react-native";
 import { MaterialIcons, FontAwesome5, Entypo } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -16,6 +19,7 @@ import { CommonActions } from "@react-navigation/native";
 // Importamos los tipos
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
+import { isWeb, responsive, isLargeScreen } from "../../utils/responsive";
 /**
  * Tipo para las props de navegación de esta pantalla
  */
@@ -206,23 +210,28 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       </Modal>
       {/* Grid de opciones principales */}
       <SafeAreaView style={styles.contentContainer}>
-        <Text style={styles.welcomeText}>¡Bienvenido a PlanearIA!</Text>
-        <Text style={styles.instructionText}>
-          Selecciona una opción para comenzar
-        </Text>
-        <View style={styles.gridContainer}>
-          {menuOptions.map((option) => (
-            <TouchableOpacity
-              key={option.id}
-              style={styles.card}
-              onPress={() => handleNavigation(option)}
-              activeOpacity={0.7}
-            >
-              {renderIcon(option)}
-              <Text style={styles.cardText}>{option.title}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.welcomeText}>¡Bienvenido a PlanearIA!</Text>
+          <Text style={styles.instructionText}>
+            Selecciona una opción para comenzar
+          </Text>
+          <View style={styles.gridContainer}>
+            {menuOptions.map((option) => (
+              <TouchableOpacity
+                key={option.id}
+                style={styles.card}
+                onPress={() => handleNavigation(option)}
+                activeOpacity={0.7}
+              >
+                {renderIcon(option)}
+                <Text style={styles.cardText}>{option.title}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
       </SafeAreaView>
       {/* Header Bar - Movido a la parte de abajo */}
       <View style={styles.headerBar}>
@@ -233,7 +242,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <TouchableOpacity style={styles.iconButton} onPress={openMenu}>
           <MaterialIcons name="menu" size={24} color="white" />
         </TouchableOpacity>
-      </View>{" "}
+      </View>
     </View>
   );
 };
@@ -250,8 +259,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 30,
-    paddingVertical: 20,
+    paddingHorizontal: responsive(30, 40, 60),
+    paddingVertical: responsive(20, 22, 25),
     elevation: 4,
     shadowColor: COLORS.text,
     shadowOffset: {
@@ -262,9 +271,13 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   headerTitle: {
-    fontSize: FONT_SIZES.large,
+    fontSize: responsive(
+      FONT_SIZES.large,
+      FONT_SIZES.large + 2,
+      FONT_SIZES.large + 4
+    ),
     fontWeight: "bold",
-    color: COLORS.surface,
+    color: COLORS.background,
     flex: 1,
     textAlign: "center",
   },
@@ -274,49 +287,74 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    paddingTop: 20,
+  },
+  scrollContent: {
+    paddingTop: responsive(20, 30, 40),
+    paddingHorizontal: isWeb() ? 20 : 0,
+    alignItems: "center",
   },
   welcomeText: {
-    fontSize: FONT_SIZES.xlarge,
+    fontSize: responsive(
+      FONT_SIZES.xlarge,
+      FONT_SIZES.xlarge + 4,
+      FONT_SIZES.xlarge + 8
+    ),
     fontWeight: "bold",
     color: COLORS.primary,
     textAlign: "center",
-    marginBottom: 70,
+    marginBottom: responsive(30, 50, 60),
+    marginTop: responsive(30, 40, 50),
   },
   instructionText: {
-    fontSize: FONT_SIZES.medium,
+    fontSize: responsive(
+      FONT_SIZES.medium,
+      FONT_SIZES.medium + 2,
+      FONT_SIZES.medium + 4
+    ),
     color: COLORS.textSecondary,
     textAlign: "center",
-    marginBottom: 30,
+    marginBottom: responsive(30, 35, 40),
   },
   gridContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-around",
+    justifyContent: isLargeScreen() ? "center" : "space-around",
     paddingHorizontal: 20,
+    maxWidth: isWeb() ? 1200 : "100%",
+    width: "100%",
+    gap: isWeb() ? 20 : 0,
   },
   card: {
-    width: "42%",
+    width: isLargeScreen() ? (isWeb() ? "23%" : "30%") : "42%",
+    minWidth: isWeb() ? 200 : undefined,
     backgroundColor: COLORS.surface,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 35,
-    paddingHorizontal: 0,
+    paddingVertical: responsive(35, 40, 45),
+    paddingHorizontal: responsive(20, 25, 30),
     marginBottom: 15,
-    borderRadius: 12,
+    borderRadius: responsive(12, 14, 16),
     elevation: 3,
     shadowColor: COLORS.text,
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
+    ...(isWeb() && {
+      cursor: "pointer",
+      transition: "all 0.2s ease",
+    }),
   },
   iconImage: {
-    width: 60,
-    height: 60,
+    width: responsive(60, 70, 80),
+    height: responsive(60, 70, 80),
   },
   cardText: {
     marginTop: 12,
-    fontSize: FONT_SIZES.medium,
+    fontSize: responsive(
+      FONT_SIZES.medium,
+      FONT_SIZES.medium + 1,
+      FONT_SIZES.medium + 2
+    ),
     fontWeight: "600",
     color: COLORS.text,
     textAlign: "center",

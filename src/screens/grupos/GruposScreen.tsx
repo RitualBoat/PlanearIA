@@ -17,37 +17,35 @@ import BottomNavBar from "../../components/BottomNavBar";
 /**
  * Tipo para las props de navegación
  */
-type PlaneacionesScreenNavigationProp = StackNavigationProp<
+type GruposScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  "Planeaciones"
+  "Grupos"
 >;
 
 /**
  * Props del componente
  */
-interface PlaneacionesScreenProps {
-  navigation: PlaneacionesScreenNavigationProp;
+interface GruposScreenProps {
+  navigation: GruposScreenNavigationProp;
 }
 
 /**
- * Pantalla de Planeaciones
- * Muestra las opciones para gestionar planeaciones
+ * Pantalla principal de Grupos
+ * Menú central para gestionar grupos de alumnos
  */
-const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({
-  navigation,
-}) => {
+const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
   /**
-   * Navega a crear nueva planeación
+   * Navega a crear nuevo grupo
    */
-  const handleCrearNueva = (): void => {
-    navigation.navigate("CrearPlaneacion");
+  const handleCrearGrupo = (): void => {
+    navigation.navigate("CrearGrupo");
   };
 
   /**
-   * Función para ver planeaciones guardadas
+   * Navega a ver lista de grupos
    */
-  const handleVerPlaneaciones = (): void => {
-    navigation.navigate("ListaPlaneaciones");
+  const handleVerGrupos = (): void => {
+    navigation.navigate("ListaGrupos");
   };
 
   return (
@@ -56,52 +54,48 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({
 
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Título */}
-          <Text style={styles.title}>Gestión de Planeaciones</Text>
+          <Text style={styles.title}>Gestión de Grupos</Text>
           <Text style={styles.subtitle}>
-            Selecciona una opción para continuar
+            Administra tus grupos, alumnos, calificaciones y más
           </Text>
 
-          {/* Opciones */}
           <View style={styles.optionsContainer}>
-            {/* Opción 1: Crear Nueva Planeación */}
             <TouchableOpacity
               style={styles.optionCard}
-              onPress={handleCrearNueva}
+              onPress={handleCrearGrupo}
               activeOpacity={0.7}
             >
               <View
                 style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}
               >
-                <MaterialIcons name="add-circle" size={60} color="white" />
+                <MaterialIcons name="group-add" size={60} color="white" />
               </View>
-              <Text style={styles.optionTitle}>Crear Nueva Planeación</Text>
+              <Text style={styles.optionTitle}>Crear Nuevo Grupo</Text>
               <Text style={styles.optionDescription}>
-                Crea una planeación desde cero o usando una plantilla
+                Crea un nuevo grupo de alumnos para una materia
               </Text>
             </TouchableOpacity>
 
-            {/* Opción 2: Ver Planeaciones */}
             <TouchableOpacity
               style={styles.optionCard}
-              onPress={handleVerPlaneaciones}
+              onPress={handleVerGrupos}
               activeOpacity={0.7}
             >
               <View
                 style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}
               >
-                <MaterialIcons name="folder-open" size={60} color="white" />
+                <MaterialIcons name="groups" size={60} color="white" />
               </View>
-              <Text style={styles.optionTitle}>Mis Planeaciones</Text>
+              <Text style={styles.optionTitle}>Mis Grupos</Text>
               <Text style={styles.optionDescription}>
-                Consulta y edita tus planeaciones guardadas
+                Consulta y gestiona tus grupos existentes
               </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
 
-      <BottomNavBar currentScreen="Planeaciones" />
+      <BottomNavBar currentScreen="Grupos" />
     </View>
   );
 };
@@ -172,4 +166,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PlaneacionesScreen;
+export default GruposScreen;

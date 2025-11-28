@@ -45,19 +45,37 @@ export interface Planeacion extends BaseEntity {
 }
 
 /**
+ * Interfaz para Grupos
+ * Un grupo agrupa a los alumnos de una materia específica
+ */
+export interface Grupo extends BaseEntity {
+  nombre: string; // Ej: "7A - Matemáticas", "Grupo ISC 5to"
+  materia: string;
+  carrera: Carrera;
+  semestre: number;
+  periodo: string; // Ej: "Enero-Junio 2024"
+  profesorId: ID;
+  cantidadAlumnos: number;
+  estado: "activo" | "inactivo" | "finalizado";
+  fechaCreacion: Date;
+  horario?: string; // Ej: "Lun-Mie-Vie 7:00-9:00"
+}
+
+/**
  * Interfaz para Estudiantes/Alumnos
  */
 export interface Alumno extends BaseEntity {
   nombre: string;
   apellidos: string;
   numeroControl: string;
-  sem: string; // Semestre (ej: "7A", "8B")
+  grupoId?: ID; // Relación con el grupo
   carrera: Carrera;
   email?: string;
   telefono?: string;
   fechaNacimiento?: Date;
   fechaIngreso: Date;
   estado: "activo" | "inactivo" | "egresado" | "baja";
+  fotoPerfil?: string; // URL o ruta de la foto
 }
 
 /**
@@ -65,7 +83,7 @@ export interface Alumno extends BaseEntity {
  */
 export interface Calificacion extends BaseEntity {
   alumnoId: ID;
-  materiaId: ID;
+  grupoId: ID;
   periodo: string;
   parcial1?: number;
   parcial2?: number;
@@ -78,29 +96,80 @@ export interface Calificacion extends BaseEntity {
 }
 
 /**
+ * Interfaz para Asistencias
+ */
+export interface Asistencia extends BaseEntity {
+  alumnoId: ID;
+  grupoId: ID;
+  fecha: Date;
+  estado: "presente" | "ausente" | "retardo" | "justificada";
+  observaciones?: string;
+  hora?: string;
+}
+
+/**
+ * Interfaz para Comentarios/Notas sobre Alumnos
+ */
+export interface ComentarioAlumno extends BaseEntity {
+  alumnoId: ID;
+  grupoId: ID;
+  profesorId: ID;
+  comentario: string;
+  tipo: "academico" | "conductual" | "logro" | "area_mejora" | "general";
+  privado: boolean; // Si es privado solo el profesor lo ve
+  fecha: Date;
+}
+
+/**
  * Interfaz para Tareas/Exámenes
+ * ⭐ ACTUALIZADO: Ahora está relacionado con grupos, no materias
  */
 export interface Tarea extends BaseEntity {
   titulo: string;
   descripcion: string;
   tipo: "tarea" | "examen" | "proyecto" | "investigacion";
-  materiaId: ID;
+  grupoId: ID; // ⭐ Cambio: ahora relacionado con grupo específico
+  recursoId?: ID; // ⭐ Opcional: si la tarea está basada en un recurso (ej: examen)
   fechaAsignacion: Date;
   fechaEntrega: Date;
   valor: number; // Porcentaje o puntos
   instrucciones: string;
   recursosNecesarios?: string[];
-  estado: "asignada" | "en_progreso" | "entregada" | "calificada";
+  estado: "asignada" | "en_progreso" | "finalizada";
   calificacionMaxima: number;
+  profesorId: ID;
+  permitirEntregaTardia: boolean;
+  fechaLimiteEntregaTardia?: Date;
+}
+
+/**
+ * Interfaz para Entregas de Tareas
+ * ⭐ NUEVO: Representa la entrega individual de un alumno
+ */
+export interface EntregaTarea extends BaseEntity {
+  tareaId: ID;
+  alumnoId: ID;
+  fechaEntrega: Date;
+  archivo?: string; // Ruta o URL del archivo entregado
+  comentarioAlumno?: string;
+  calificacion?: number;
+  calificada: boolean;
+  retroalimentacion?: string; // Comentario del profesor
+  estado: "pendiente" | "entregada" | "tarde" | "calificada";
+  intentos: number; // Número de intentos de entrega
 }
 
 /**
  * Interfaz para Recursos Didácticos
+ * ⭐ ACTUALIZADO: Ahora con opciones de asignación y exportación
  */
 export interface Recurso extends BaseEntity {
   titulo: string;
   tipo:
-    | "diapositiva"
+    | "examen"
+    | "presentacion"
+    | "mapa_mental"
+    | "linea_tiempo"
     | "video"
     | "documento"
     | "imagen"
@@ -110,13 +179,19 @@ export interface Recurso extends BaseEntity {
   descripcion: string;
   archivo?: string; // Ruta del archivo
   url?: string; // Para enlaces externos
-  materiaId?: ID;
+  grupoId?: ID; // ⭐ Grupo al que está asignado (opcional)
+  asignadoComoTarea: boolean; // ⭐ NUEVO: Si está asignado como tarea
+  tareaId?: ID; // ⭐ NUEVO: ID de la tarea si está asignado
   tags: string[];
   fechaCreacion: Date;
   fechaModificacion: Date;
   tamaño?: number; // En bytes
   formato?: string; // Extensión del archivo
+  formatosExportacion?: string[]; // ⭐ NUEVO: ["pdf", "docx", "pptx", "png", "mp4"]
   acceso: "publico" | "privado" | "restringido";
+  origen: "manual" | "ia" | "plantilla"; // Cómo se creó
+  profesorId: ID;
+  versionActual: number; // Para control de versiones
 }
 
 /**
@@ -221,7 +296,7 @@ export interface AlumnoFormData {
   nombre: string;
   apellidos: string;
   numeroControl: string;
-  sem: string;
+  grupoId?: ID;
   carrera: Carrera;
   email?: string;
   telefono?: string;
@@ -230,11 +305,23 @@ export interface AlumnoFormData {
 }
 
 /**
+ * Datos del formulario de Grupo
+ */
+export interface GrupoFormData {
+  nombre: string;
+  materia: string;
+  carrera: Carrera;
+  semestre: number;
+  periodo: string;
+  horario?: string;
+}
+
+/**
  * Datos del formulario de Calificación
  */
 export interface CalificacionFormData {
   alumnoId: ID;
-  materiaId: ID;
+  grupoId: ID;
   periodo: string;
   parcial1?: number;
   parcial2?: number;
@@ -244,28 +331,80 @@ export interface CalificacionFormData {
 }
 
 /**
+ * Datos del formulario de Asistencia
+ */
+export interface AsistenciaFormData {
+  alumnoId: ID;
+  grupoId: ID;
+  fecha: string;
+  estado: "presente" | "ausente" | "retardo" | "justificada";
+  observaciones?: string;
+  hora?: string;
+}
+
+/**
+ * Datos del formulario de Comentario
+ */
+export interface ComentarioFormData {
+  alumnoId: ID;
+  grupoId: ID;
+  comentario: string;
+  tipo: "academico" | "conductual" | "logro" | "area_mejora" | "general";
+  privado: boolean;
+}
+
+/**
  * Datos del formulario de Tarea
+ * ⭐ ACTUALIZADO: Ahora con grupoId y recursoId opcional
  */
 export interface TareaFormData {
   titulo: string;
   descripcion: string;
   tipo: "tarea" | "examen" | "proyecto" | "investigacion";
-  materiaId: ID;
+  grupoId: ID; // ⭐ Específico del grupo
+  recursoId?: ID; // ⭐ Opcional: si se basa en un recurso
   fechaAsignacion: string;
   fechaEntrega: string;
   valor: number;
   instrucciones: string;
   recursosNecesarios?: string[];
   calificacionMaxima: number;
+  permitirEntregaTardia: boolean;
+  fechaLimiteEntregaTardia?: string;
+}
+
+/**
+ * Datos del formulario de Entrega de Tarea
+ * ⭐ NUEVO: Para cuando un alumno entrega una tarea
+ */
+export interface EntregaTareaFormData {
+  tareaId: ID;
+  alumnoId: ID;
+  archivo?: File;
+  comentarioAlumno?: string;
+}
+
+/**
+ * Datos del formulario de Calificación de Entrega
+ * ⭐ NUEVO: Para cuando el profesor califica una entrega
+ */
+export interface CalificarEntregaFormData {
+  entregaId: ID;
+  calificacion: number;
+  retroalimentacion?: string;
 }
 
 /**
  * Datos del formulario de Recurso
+ * ⭐ ACTUALIZADO: Con opciones de asignación a grupo
  */
 export interface RecursoFormData {
   titulo: string;
   tipo:
-    | "diapositiva"
+    | "examen"
+    | "presentacion"
+    | "mapa_mental"
+    | "linea_tiempo"
     | "video"
     | "documento"
     | "imagen"
@@ -275,9 +414,14 @@ export interface RecursoFormData {
   descripcion: string;
   archivo?: File; // Para subida de archivos
   url?: string;
-  materiaId?: ID;
   tags: string[];
   acceso: "publico" | "privado" | "restringido";
+  origen: "manual" | "ia" | "plantilla";
+  // ⭐ NUEVO: Opciones de asignación
+  asignarAGrupo: boolean; // Si se debe asignar directamente a un grupo
+  grupoId?: ID; // ID del grupo si se asigna
+  fechaEntrega?: string; // Fecha de entrega si se asigna como tarea
+  valorTarea?: number; // Valor en puntos si se asigna como tarea
 }
 
 /**

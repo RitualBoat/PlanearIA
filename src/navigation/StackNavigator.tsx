@@ -1,51 +1,99 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { COLORS } from "../../types";
-// Importación de pantallas
+import { NivelAcademico } from "../../types/planeacion";
+
+// Importación de pantallas de autenticación
 import LoginScreen from "../screens/auth/LoginScreen";
 import HomeScreen from "../screens/home/HomeScreen";
+
+// Importación de pantallas de Planeaciones
 import PlaneacionesScreen from "../screens/planeaciones/PlaneacionesScreen";
 import CrearPlaneacionScreen from "../screens/planeaciones/CrearPlaneacionScreen";
+import EditorPlaneacionScreen from "../screens/planeaciones/EditorPlaneacionScreen";
+import ListaPlaneacionesScreen from "../screens/planeaciones/ListaPlaneacionesScreen";
+
+// Importación de pantallas de Grupos (NUEVA ARQUITECTURA)
+import GruposScreen from "../screens/grupos/GruposScreen";
+import ListaGruposScreen from "../screens/grupos/ListaGruposScreen";
+import CrearGrupoScreen from "../screens/grupos/CrearGrupoScreen";
+import DetalleGrupoScreen from "../screens/grupos/DetalleGrupoScreen";
+
+// Importación de pantallas de Tareas dentro de Grupos ⭐ NUEVO
+import CrearTareaGrupoScreen from "../screens/grupos/tareas/CrearTareaGrupoScreen";
+import AsignarRecursoScreen from "../screens/grupos/tareas/AsignarRecursoScreen";
+import DetalleTareaScreen from "../screens/grupos/tareas/DetalleTareaScreen";
+import CalificarEntregasScreen from "../screens/grupos/tareas/CalificarEntregasScreen";
+
+// Importación de pantallas de Tareas (deprecated - será eliminado)
+import TareasScreen from "../screens/tareas/TareasScreen";
+
+// Importación de pantallas de Biblioteca de Recursos
+import RecursosDidacticosScreen from "../screens/biblioteca/RecursosDidacticosScreen";
+import ExamenesScreen from "../screens/biblioteca/ExamenesScreen";
+import PresentacionesScreen from "../screens/biblioteca/PresentacionesScreen";
+import MapasMentalesScreen from "../screens/biblioteca/MapasMentalesScreen";
+import LineasTiempoScreen from "../screens/biblioteca/LineasTiempoScreen";
+import ListaRecursosScreen from "../screens/biblioteca/ListaRecursosScreen";
+
+// Importación de pantallas de Cuenta
+import CuentaScreen from "../screens/cuenta/CuentaScreen";
+
+// Pantallas antiguas mantenidas por compatibilidad (deprecated)
 import AlumnosScreen from "../screens/alumnos/AlumnosScreen";
 import CalificacionesScreen from "../screens/calificaciones/CalificacionesScreen";
-import TareasScreen from "../screens/tareas/TareasScreen";
-import RecursosScreen from "../screens/recursos/RecursosScreen";
-import CuentaScreen from "../screens/cuenta/CuentaScreen";
 
 /**
  * Definición de los tipos para los parámetros de navegación
  * Esto ayuda a TypeScript a entender qué parámetros espera cada pantalla
  */
 export type RootStackParamList = {
+  // Autenticación
   Login: undefined;
   Home: undefined;
+
+  // Planeaciones (se mantiene igual)
   Planeaciones: undefined;
   CrearPlaneacion: undefined;
+  EditorPlaneacion: {
+    nivel: NivelAcademico;
+    modo: "crear" | "editar";
+    planeacionId?: string;
+  };
+  ListaPlaneaciones: undefined;
+
+  // NUEVA ARQUITECTURA: Grupos (reemplaza Alumnos y Calificaciones)
+  Grupos: undefined;
+  ListaGrupos: undefined;
+  CrearGrupo: undefined;
+  DetalleGrupo: {
+    grupoId: number;
+    grupoNombre: string;
+  };
+
+  // ⭐ NUEVO: Tareas dentro de Grupos (v3.0)
+  CrearTareaGrupo: { grupoId: number };
+  AsignarRecurso: { grupoId: number };
+  DetalleTarea: { tareaId: number; grupoId: number };
+  CalificarEntregas: { tareaId: number; grupoId: number };
+
+  // Tareas (deprecated - módulo standalone eliminado)
+  Tareas: undefined;
+
+  // NUEVA ARQUITECTURA: Recursos Didácticos (reemplaza Recursos)
+  RecursosDidacticos: undefined;
+  Examenes: undefined;
+  Presentaciones: undefined;
+  MapasMentales: undefined;
+  LineasTiempo: undefined;
+  ListaRecursos: undefined;
+
+  // Cuenta y Seguridad (se mantiene)
+  Cuenta: undefined;
+
+  // Rutas antiguas mantenidas por compatibilidad (deprecated)
   Alumnos: undefined;
   Calificaciones: undefined;
-  Tareas: undefined;
-  Recursos: undefined;
-  Cuenta: undefined;
-  AlumnoList: undefined;
-  AlumnoDetails: {
-    nombre: string;
-    id?: number;
-  };
-  ProfesorList: undefined;
-  ProfesorDetails: {
-    nombre: string;
-    id?: number;
-  };
-  MateriaList: undefined;
-  MateriaDetails: {
-    nombre: string;
-    id?: number;
-  };
-  GrupoList: undefined;
-  GrupoDetails: {
-    nombre: string;
-    id?: number;
-  };
 };
 /**
  * Creamos el Stack Navigator con tipado
@@ -70,27 +118,27 @@ const StackNavigator: React.FC = () => {
         },
       }}
     >
-      {/* Pantalla de Login */}
+      {/* ========== AUTENTICACIÓN ========== */}
       <Stack.Screen
         name="Login"
         component={LoginScreen}
         options={{
           title: "Iniciar Sesión",
-          headerShown: false, // Ocultamos el header en login
+          headerShown: false,
         }}
       />
-      {/* Pantalla Principal */}
+
       <Stack.Screen
         name="Home"
         component={HomeScreen}
         options={{
           title: "Sistema de planeación",
-          headerLeft: () => null, // Evitamos el botón de regreso
-          headerShown: false, // Ocultamos el header en home
+          headerLeft: () => null,
+          headerShown: false,
         }}
       />
 
-      {/* Pantalla de Planeaciones */}
+      {/* ========== PLANEACIONES ========== */}
       <Stack.Screen
         name="Planeaciones"
         component={PlaneacionesScreen}
@@ -100,7 +148,6 @@ const StackNavigator: React.FC = () => {
         }}
       />
 
-      {/* Pantalla de Crear Planeación */}
       <Stack.Screen
         name="CrearPlaneacion"
         component={CrearPlaneacionScreen}
@@ -110,27 +157,99 @@ const StackNavigator: React.FC = () => {
         }}
       />
 
-      {/* Pantalla de Alumnos */}
       <Stack.Screen
-        name="Alumnos"
-        component={AlumnosScreen}
+        name="EditorPlaneacion"
+        component={EditorPlaneacionScreen}
         options={{
-          title: "Alumnos",
+          title: "Editor de Planeación",
           headerShown: false,
         }}
       />
 
-      {/* Pantalla de Calificaciones */}
       <Stack.Screen
-        name="Calificaciones"
-        component={CalificacionesScreen}
+        name="ListaPlaneaciones"
+        component={ListaPlaneacionesScreen}
         options={{
-          title: "Calificaciones",
+          title: "Mis Planeaciones",
           headerShown: false,
         }}
       />
 
-      {/* Pantalla de Tareas */}
+      {/* ========== GRUPOS (NUEVA ARQUITECTURA) ========== */}
+      <Stack.Screen
+        name="Grupos"
+        component={GruposScreen}
+        options={{
+          title: "Grupos",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="ListaGrupos"
+        component={ListaGruposScreen}
+        options={{
+          title: "Mis Grupos",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="CrearGrupo"
+        component={CrearGrupoScreen}
+        options={{
+          title: "Crear Grupo",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="DetalleGrupo"
+        component={DetalleGrupoScreen}
+        options={{
+          title: "Detalle del Grupo",
+          headerShown: false,
+        }}
+      />
+
+      {/* ========== TAREAS EN GRUPOS (NUEVA ARQUITECTURA v3.0) ========== */}
+      <Stack.Screen
+        name="CrearTareaGrupo"
+        component={CrearTareaGrupoScreen}
+        options={{
+          title: "Crear Tarea",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="AsignarRecurso"
+        component={AsignarRecursoScreen}
+        options={{
+          title: "Asignar Recurso",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="DetalleTarea"
+        component={DetalleTareaScreen}
+        options={{
+          title: "Detalle de Tarea",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="CalificarEntregas"
+        component={CalificarEntregasScreen}
+        options={{
+          title: "Calificar Entregas",
+          headerShown: false,
+        }}
+      />
+
+      {/* ========== TAREAS (Deprecated) ========== */}
       <Stack.Screen
         name="Tareas"
         component={TareasScreen}
@@ -140,22 +259,95 @@ const StackNavigator: React.FC = () => {
         }}
       />
 
-      {/* Pantalla de Recursos */}
+      {/* ========== RECURSOS DIDÁCTICOS (NUEVA ARQUITECTURA) ========== */}
       <Stack.Screen
-        name="Recursos"
-        component={RecursosScreen}
+        name="RecursosDidacticos"
+        component={RecursosDidacticosScreen}
         options={{
-          title: "Recursos",
+          title: "Recursos Didácticos",
           headerShown: false,
         }}
       />
 
-      {/* Pantalla de Cuenta */}
+      <Stack.Screen
+        name="Examenes"
+        component={ExamenesScreen}
+        options={{
+          title: "Exámenes",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="Presentaciones"
+        component={PresentacionesScreen}
+        options={{
+          title: "Presentaciones",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="MapasMentales"
+        component={MapasMentalesScreen}
+        options={{
+          title: "Mapas Mentales",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="LineasTiempo"
+        component={LineasTiempoScreen}
+        options={{
+          title: "Líneas de Tiempo",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="ListaRecursos"
+        component={ListaRecursosScreen}
+        options={{
+          title: "Mis Recursos",
+          headerShown: false,
+        }}
+      />
+
+      {/* ========== CUENTA Y SEGURIDAD ========== */}
       <Stack.Screen
         name="Cuenta"
         component={CuentaScreen}
         options={{
           title: "Cuenta y Seguridad",
+          headerShown: false,
+        }}
+      />
+
+      {/* ========== PANTALLAS ANTIGUAS (Deprecated) ========== */}
+      <Stack.Screen
+        name="Alumnos"
+        component={AlumnosScreen}
+        options={{
+          title: "Alumnos",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="Calificaciones"
+        component={CalificacionesScreen}
+        options={{
+          title: "Calificaciones",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="Recursos"
+        component={RecursosScreen}
+        options={{
+          title: "Recursos",
           headerShown: false,
         }}
       />

@@ -14,107 +14,74 @@ import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
 import BottomNavBar from "../../components/BottomNavBar";
 
-/**
- * Tipo para las props de navegación
- */
-type RecursosScreenNavigationProp = StackNavigationProp<
+type LineasTiempoScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  "Recursos"
+  "LineasTiempo"
 >;
 
-/**
- * Props del componente
- */
-interface RecursosScreenProps {
-  navigation: RecursosScreenNavigationProp;
+interface LineasTiempoScreenProps {
+  navigation: LineasTiempoScreenNavigationProp;
 }
 
-/**
- * Pantalla de Recursos
- * Permite gestionar los recursos didácticos
- */
-const RecursosScreen: React.FC<RecursosScreenProps> = ({ navigation }) => {
-  /**
-   * Navega a subir recurso
-   */
-  const handleSubirRecurso = (): void => {
-    console.log("Subir nuevo recurso");
-  };
-
-  /**
-   * Navega a ver recursos
-   */
-  const handleVerRecursos = (): void => {
-    console.log("Ver recursos");
-  };
-
+const LineasTiempoScreen: React.FC<LineasTiempoScreenProps> = ({
+  navigation,
+}) => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
-
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <Text style={styles.title}>Gestión de Recursos</Text>
-          <Text style={styles.subtitle}>
-            Administra materiales y recursos didácticos
-          </Text>
+          <Text style={styles.title}>Crear Línea de Tiempo</Text>
+          <Text style={styles.subtitle}>Organiza eventos cronológicamente</Text>
 
           <View style={styles.optionsContainer}>
-            <TouchableOpacity
-              style={styles.optionCard}
-              onPress={handleSubirRecurso}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.optionCard} activeOpacity={0.7}>
               <View
-                style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}
+                style={[styles.iconContainer, { backgroundColor: "#9C27B020" }]}
               >
-                <MaterialIcons name="cloud-upload" size={60} color="white" />
+                <MaterialIcons name="auto-awesome" size={60} color="#9C27B0" />
               </View>
-              <Text style={styles.optionTitle}>Subir Recurso</Text>
+              <Text style={styles.optionTitle}>Generar con IA</Text>
               <Text style={styles.optionDescription}>
-                Agrega nuevos materiales y documentos
+                La IA organizará eventos históricos automáticamente
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.optionCard}
-              onPress={handleVerRecursos}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.optionCard} activeOpacity={0.7}>
               <View
-                style={[styles.iconContainer, { backgroundColor: "#00BCD4" }]}
+                style={[styles.iconContainer, { backgroundColor: "#2196F320" }]}
               >
-                <MaterialIcons name="folder-open" size={60} color="white" />
+                <MaterialIcons name="dashboard" size={60} color="#2196F3" />
               </View>
-              <Text style={styles.optionTitle}>Mis Recursos</Text>
+              <Text style={styles.optionTitle}>Usar Plantilla</Text>
               <Text style={styles.optionDescription}>
-                Consulta tus materiales guardados
+                Plantillas para historia, proyectos y más
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.optionCard} activeOpacity={0.7}>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#4CAF5020" }]}
+              >
+                <MaterialIcons name="edit" size={60} color="#4CAF50" />
+              </View>
+              <Text style={styles.optionTitle}>Crear Manualmente</Text>
+              <Text style={styles.optionDescription}>
+                Agrega eventos y fechas personalizadas
               </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
-
-      <BottomNavBar currentScreen="Recursos" />
+      <BottomNavBar currentScreen="Líneas de Tiempo" />
     </View>
   );
 };
 
-/**
- * Estilos del componente
- */
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
-  },
+  container: { flex: 1, backgroundColor: COLORS.background },
+  safeArea: { flex: 1 },
+  scrollContent: { padding: 20, paddingBottom: 40 },
   title: {
     fontSize: FONT_SIZES.xlarge,
     fontWeight: "bold",
@@ -129,9 +96,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 30,
   },
-  optionsContainer: {
-    gap: 20,
-  },
+  optionsContainer: { gap: 20 },
   optionCard: {
     backgroundColor: COLORS.surface,
     borderRadius: 15,
@@ -166,4 +131,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RecursosScreen;
+export default LineasTiempoScreen;

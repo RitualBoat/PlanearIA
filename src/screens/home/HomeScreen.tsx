@@ -52,6 +52,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [menuVisible, setMenuVisible] = useState<boolean>(false);
   /**
    * Opciones del menú principal
+   * ⭐ ACTUALIZADO v3.0: Eliminado módulo "Tareas" standalone (ahora dentro de Grupos)
    */
   const menuOptions: MenuOption[] = [
     {
@@ -62,35 +63,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       route: "Planeaciones",
     },
     {
-      id: "alumnos",
-      title: "Alumnos",
+      id: "grupos",
+      title: "Grupos",
       iconImage: require("../../../assets/alumnosIco.png"),
       color: "#4CAF50",
-      route: "Alumnos",
+      route: "Grupos",
     },
     {
-      id: "calificaciones",
-      title: "Calificaciones",
-      iconImage: require("../../../assets/calificacionesIco.png"),
-      color: "#FF9800",
-      route: "Calificaciones",
-    },
-    {
-      id: "tareas",
-      title: "Tareas",
-      iconImage: require("../../../assets/tareasIco.png"),
-      color: "#9C27B0",
-      route: "Tareas",
-    },
-    {
-      id: "recursos",
-      title: "Recursos",
+      id: "recursosDidacticos",
+      title: "Recursos Didácticos",
       iconImage: require("../../../assets/recursosIco.png"),
-      color: "#00BCD4",
-      route: "Recursos",
+      color: "#9C27B0",
+      route: "RecursosDidacticos",
     },
     {
-      id: "seguridad",
+      id: "cuenta",
       title: "Cuenta",
       iconImage: require("../../../assets/CuentaYseguridadIco.png"),
       color: "#F44336",
@@ -345,9 +332,9 @@ const styles = StyleSheet.create({
     }),
   },
   iconImage: {
-    width: responsive(60, 70, 80),
-    height: responsive(60, 70, 80),
-  },
+    width: 60,
+    height: 60,
+  } as const,
   cardText: {
     marginTop: 12,
     fontSize: responsive(

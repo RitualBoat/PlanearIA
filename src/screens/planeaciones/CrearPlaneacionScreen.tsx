@@ -15,6 +15,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
 import BottomNavBar from "../../components/BottomNavBar";
+import { NivelAcademico } from "../../../types/planeacion";
 
 /**
  * Tipo para las props de navegación
@@ -39,13 +40,62 @@ const CrearPlaneacionScreen: React.FC<CrearPlaneacionScreenProps> = ({
   navigation,
 }) => {
   const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [showNivelModal, setShowNivelModal] = useState(false);
 
   /**
-   * Maneja la creación desde cero
+   * Opciones de nivel académico
+   */
+  const nivelesAcademicos = [
+    {
+      nivel: NivelAcademico.PRIMARIA,
+      titulo: "Primaria",
+      descripcion: "1° a 6° grado",
+      icon: "school",
+      color: "#4CAF50",
+    },
+    {
+      nivel: NivelAcademico.SECUNDARIA,
+      titulo: "Secundaria",
+      descripcion: "1° a 3° grado",
+      icon: "menu-book",
+      color: "#2196F3",
+    },
+    {
+      nivel: NivelAcademico.PREPARATORIA,
+      titulo: "Preparatoria",
+      descripcion: "Bachillerato",
+      icon: "library-books",
+      color: "#FF9800",
+    },
+    {
+      nivel: NivelAcademico.UNIVERSIDAD,
+      titulo: "Universidad",
+      descripcion: "Licenciatura y posgrado",
+      icon: "account-balance",
+      color: "#9C27B0",
+    },
+  ];
+
+  /**
+   * Muestra el modal de selección de nivel académico
    */
   const handleCrearDesdeCero = (): void => {
-    console.log("Crear planeación desde cero");
-    // Aquí se navegará a la pantalla de edición manual
+    setShowNivelModal(true);
+  };
+
+  /**
+   * Navega a la pantalla de edición con el nivel seleccionado
+   */
+  const handleSeleccionarNivel = (nivel: NivelAcademico): void => {
+    setShowNivelModal(false);
+    navigation.navigate("EditorPlaneacion", { nivel, modo: "crear" });
+  };
+
+  /**
+   * Cierra el modal de nivel académico
+   */
+  const handleCloseNivelModal = (): void => {
+    setShowNivelModal(false);
   };
 
   /**
@@ -75,8 +125,12 @@ const CrearPlaneacionScreen: React.FC<CrearPlaneacionScreenProps> = ({
     <View style={styles.container}>
       <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
 
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={true}
+        bounces={false}
+      >
+        <SafeAreaView style={styles.safeArea}>
           {/* Título */}
           <Text style={styles.title}>Crear Nueva Planeación</Text>
           <Text style={styles.subtitle}>
@@ -120,8 +174,67 @@ const CrearPlaneacionScreen: React.FC<CrearPlaneacionScreenProps> = ({
               </Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
-      </SafeAreaView>
+        </SafeAreaView>
+      </ScrollView>
+
+      {/* Modal para seleccionar nivel académico */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showNivelModal}
+        onRequestClose={handleCloseNivelModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Selecciona el Nivel Académico</Text>
+            <Text style={styles.modalSubtitle}>
+              Elige el nivel educativo para tu planeación
+            </Text>
+
+            <ScrollView style={styles.modalContent}>
+              {nivelesAcademicos.map((item) => (
+                <TouchableOpacity
+                  key={item.nivel}
+                  style={styles.nivelCard}
+                  onPress={() => handleSeleccionarNivel(item.nivel)}
+                  activeOpacity={0.7}
+                >
+                  <View
+                    style={[
+                      styles.nivelIconContainer,
+                      { backgroundColor: item.color },
+                    ]}
+                  >
+                    <MaterialIcons
+                      name={item.icon as any}
+                      size={40}
+                      color="white"
+                    />
+                  </View>
+                  <View style={styles.nivelInfo}>
+                    <Text style={styles.nivelTitulo}>{item.titulo}</Text>
+                    <Text style={styles.nivelDescripcion}>
+                      {item.descripcion}
+                    </Text>
+                  </View>
+                  <MaterialIcons
+                    name="chevron-right"
+                    size={24}
+                    color={COLORS.textSecondary}
+                  />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={handleCloseNivelModal}
+            >
+              <Text style={styles.closeButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* Modal para seleccionar parámetros de plantilla */}
       <Modal
@@ -221,11 +334,11 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   safeArea: {
-    flex: 1,
+    paddingTop: 10,
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 40,
+    paddingBottom: 100,
   },
   title: {
     fontSize: FONT_SIZES.xlarge,
@@ -355,6 +468,52 @@ const styles = StyleSheet.create({
   },
   generateButtonText: {
     color: COLORS.surface,
+    fontSize: FONT_SIZES.medium,
+    fontWeight: "600",
+  },
+  nivelCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.surface,
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: COLORS.textSecondary + "20",
+  },
+  nivelIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 15,
+  },
+  nivelInfo: {
+    flex: 1,
+  },
+  nivelTitulo: {
+    fontSize: FONT_SIZES.large,
+    fontWeight: "bold",
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  nivelDescripcion: {
+    fontSize: FONT_SIZES.medium,
+    color: COLORS.textSecondary,
+  },
+  closeButton: {
+    alignSelf: "center",
+    marginTop: 15,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    backgroundColor: COLORS.background,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.textSecondary,
+  },
+  closeButtonText: {
+    color: COLORS.textSecondary,
     fontSize: FONT_SIZES.medium,
     fontWeight: "600",
   },

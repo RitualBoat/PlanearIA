@@ -342,15 +342,6 @@ const StackNavigator: React.FC = () => {
           headerShown: false,
         }}
       />
-
-      <Stack.Screen
-        name="Recursos"
-        component={RecursosScreen}
-        options={{
-          title: "Recursos",
-          headerShown: false,
-        }}
-      />
     </Stack.Navigator>
   );
 };

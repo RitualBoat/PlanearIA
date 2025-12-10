@@ -101,8 +101,8 @@ PlanearIA/
 └──────┬──────┘
        │
        ▼
-┌─────────────────────────────────────────────────────┐
-│                   HOME                              │
+┌────────────────────────────────────────────────────┐
+│                   HOME                             │
 │  ┌──────────┬──────────┬────────────┬────────────┐ │
 │  │Planeacio │  Grupos  │ Recursos   │  Tareas    │ │
 │  │   nes    │          │ Didácticos │            │ │
@@ -161,12 +161,12 @@ Home → Grupos → Opciones:
                                                         │
                       ┌─────────────────────────────────┴───────────────────────┐
                       │                 Pestañas del Grupo:                     │
-                      ├─→ Alumnos (agregar, editar, ver detalles)              │
-                      ├─→ Calificaciones (registrar, consultar)                │
-                      ├─→ Asistencias (pasar lista, estadísticas)              │
-                      ├─→ Comentarios (notas personalizadas por alumno)        │
-                      └─→ Gráficas (rendimiento, promedios, comparativas)      │
-                      └──────────────────────────────────────────────────────────┘
+                      ├─→ Alumnos (agregar, editar, ver detalles)               │
+                      ├─→ Calificaciones (registrar, consultar)                 │
+                      ├─→ Asistencias (pasar lista, estadísticas)               │
+                      ├─→ Comentarios (notas personalizadas por alumno)         │
+                      └─→ Gráficas (rendimiento, promedios, comparativas)       │
+                      └─────────────────────────────────────────────────────────┘
 ```
 
 **Características clave del flujo de Grupos:**
@@ -554,35 +554,35 @@ COLORS = {
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                         PlanearIA                            │
+│                         PlanearIA                           │
 ├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │  Login   │→ │   Home   │→ │  Grupos  │  │Planeacio │   │
-│  │          │  │          │  │          │  │   nes    │   │
-│  └──────────┘  └────┬─────┘  └────┬─────┘  └──────────┘   │
-│                     │              │                         │
+│                                                             │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐     │
+│  │  Login   │→ │   Home   │→ │  Grupos  │  │Planeacio │     │
+│  │          │  │          │  │          │  │   nes    │     │
+│  └──────────┘  └────┬─────┘  └────┬─────┘  └──────────┘     │
+│                     │              │                        │
 │                     ├──────────────┼─────────┐              │
 │                     ▼              ▼         ▼              │
-│              ┌──────────┐  ┌──────────┐  ┌──────────┐      │
-│              │ Recursos │  │  Tareas  │  │  Cuenta  │      │
-│              │Didácticos│  │          │  │          │      │
-│              └────┬─────┘  └──────────┘  └──────────┘      │
-│                   │                                          │
-│    ┌──────────────┼───────────────┐                        │
+│              ┌──────────┐  ┌──────────┐  ┌──────────┐       │
+│              │ Recursos │  │  Tareas  │  │  Cuenta  │       │
+│              │Didácticos│  │          │  │          │       │
+│              └────┬─────┘  └──────────┘  └──────────┘       │
+│                   │                                         │
+│    ┌──────────────┼───────────────┐                         │
 │    ▼              ▼               ▼                         │
-│ ┌────────┐  ┌─────────┐  ┌──────────┐                     │
-│ │Exámenes│  │Present. │  │MapasMent.│ ...                 │
-│ └────────┘  └─────────┘  └──────────┘                     │
-│                                                              │
+│ ┌────────┐  ┌─────────┐  ┌──────────┐                       │
+│ │Exámenes│  │Present. │  │MapasMent.│ ...                   │
+│ └────────┘  └─────────┘  └──────────┘                       │
+│                                                             │
 ├─────────────────────────────────────────────────────────────┤
-│                    Context & State Management                │
-│  ┌──────────────────┐  ┌─────────────────┐                │
-│  │PlaneacionesContext│  │GruposContext   │  (Futuro)       │
-│  └──────────────────┘  └─────────────────┘                │
+│                    Context & State Management               │
+│  ┌──────────────────┐  ┌─────────────────┐                  │
+│  │PlaneacionesContext│  │GruposContext   │  (Futuro)        │
+│  └──────────────────┘  └─────────────────┘                  │
 ├─────────────────────────────────────────────────────────────┤
-│                    Types & Models                            │
-│  Grupo | Alumno | Calificacion | Asistencia | Comentario   │
+│                    Types & Models                           │
+│  Grupo | Alumno | Calificacion | Asistencia | Comentario    │
 │  Recurso | Planeacion | Tarea | Usuario                     │
 └─────────────────────────────────────────────────────────────┘
 ```

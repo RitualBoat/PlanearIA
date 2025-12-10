@@ -16,6 +16,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
 import BottomNavBar from "../../components/BottomNavBar";
+import SyncIndicator from "../../components/SyncIndicator";
 import {
   NivelAcademico,
   Planeacion,
@@ -160,13 +161,21 @@ const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
   /**
    * Maneja el clonado de una planeación
    */
-  const handleClonar = (planeacionId: string) => {
+  const handleClonar = async (planeacionId: string) => {
     setMenuVisible(null);
-    clonarPlaneacion(planeacionId);
-    if (Platform.OS === "web") {
-      window.alert("Planeación clonada exitosamente");
-    } else {
-      Alert.alert("Éxito", "Planeación clonada exitosamente");
+    try {
+      await clonarPlaneacion(planeacionId);
+      if (Platform.OS === "web") {
+        window.alert("Planeación clonada exitosamente");
+      } else {
+        Alert.alert("Éxito", "Planeación clonada exitosamente");
+      }
+    } catch (error) {
+      if (Platform.OS === "web") {
+        window.alert("Error al clonar la planeación");
+      } else {
+        Alert.alert("Error", "No se pudo clonar la planeación");
+      }
     }
   };
 
@@ -178,12 +187,20 @@ const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
     confirmar(
       "Eliminar Planeación",
       "¿Estás seguro de que deseas eliminar esta planeación? Esta acción no se puede deshacer.",
-      () => {
-        eliminarPlaneacion(planeacionId);
-        if (Platform.OS === "web") {
-          window.alert("Planeación eliminada");
-        } else {
-          Alert.alert("Eliminada", "Planeación eliminada correctamente");
+      async () => {
+        try {
+          await eliminarPlaneacion(planeacionId);
+          if (Platform.OS === "web") {
+            window.alert("Planeación eliminada");
+          } else {
+            Alert.alert("Eliminada", "Planeación eliminada correctamente");
+          }
+        } catch (error) {
+          if (Platform.OS === "web") {
+            window.alert("Error al eliminar la planeación");
+          } else {
+            Alert.alert("Error", "No se pudo eliminar la planeación");
+          }
         }
       }
     );
@@ -352,7 +369,10 @@ const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
           <>
             {/* Header */}
             <View style={styles.header}>
-              <Text style={styles.title}>Mis Planeaciones</Text>
+              <View style={styles.headerLeft}>
+                <Text style={styles.title}>Mis Planeaciones</Text>
+                <SyncIndicator />
+              </View>
               <View style={styles.headerButtons}>
                 <TouchableOpacity
                   style={styles.iconButton}
@@ -518,6 +538,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     paddingBottom: 10,
+  },
+  headerLeft: {
+    gap: 8,
   },
   title: {
     fontSize: FONT_SIZES.xlarge,

@@ -19,6 +19,7 @@ import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
 import BottomNavBar from "../../components/BottomNavBar";
 import WebScrollView from "../../components/WebScrollView";
+import SyncIndicator from "../../components/SyncIndicator";
 import {
   NivelAcademico,
   Planeacion,
@@ -182,7 +183,10 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
   /**
    * Guarda la planeación
    */
-  const handleGuardar = () => {
+  /**
+   * Guarda la planeación
+   */
+  const handleGuardar = async () => {
     if (!validarFormulario()) {
       return;
     }
@@ -286,15 +290,20 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
         return;
     }
 
-    if (modo === "editar" && planeacionId) {
-      actualizarPlaneacion(planeacionId, planeacion);
-      mostrarAlerta("Planeación actualizada exitosamente");
-    } else {
-      agregarPlaneacion(planeacion);
-      mostrarAlerta("Planeación guardada exitosamente");
-    }
+    try {
+      if (modo === "editar" && planeacionId) {
+        await actualizarPlaneacion(planeacionId, planeacion);
+        mostrarAlerta("Planeación actualizada exitosamente");
+      } else {
+        await agregarPlaneacion(planeacion);
+        mostrarAlerta("Planeación guardada exitosamente");
+      }
 
-    navigation.navigate("ListaPlaneaciones");
+      navigation.navigate("ListaPlaneaciones");
+    } catch (error) {
+      mostrarAlerta("Error al guardar la planeación");
+      console.error(error);
+    }
   };
 
   /**
@@ -328,7 +337,10 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
         nestedScrollEnabled={true}
       >
         <SafeAreaView style={styles.safeArea}>
-          <Text style={styles.title}>{obtenerTitulo()}</Text>
+          <View style={styles.header}>
+            <Text style={styles.title}>{obtenerTitulo()}</Text>
+            <SyncIndicator />
+          </View>
           <Text style={styles.subtitle}>
             Completa todos los campos de tu planeación
           </Text>
@@ -750,6 +762,12 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     paddingTop: 10,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
   },
   scrollView: {
     flex: 1,

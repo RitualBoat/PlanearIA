@@ -22,6 +22,69 @@ export interface Actividad {
 }
 
 /**
+ * Configuración del curso universitario
+ */
+export interface ConfiguracionCurso {
+  duracionSemanas: 12 | 16 | 18;
+  horasTeoricas: number;
+  horasPracticas: number;
+  horasAutonomas: number;
+  creditos: number;
+  modalidad: "presencial" | "hibrida" | "virtual";
+}
+
+/**
+ * Tipos de evaluación universitaria
+ */
+export enum TipoEvaluacion {
+  EXAMEN = "examen",
+  PROYECTO = "proyecto",
+  TAREA = "tarea",
+  PRESENTACION = "presentacion",
+  PRACTICA = "practica",
+  PARTICIPACION = "participacion",
+  ENSAYO = "ensayo",
+  INVESTIGACION = "investigacion",
+}
+
+/**
+ * Evaluación del curso con criterios
+ */
+export interface Evaluacion {
+  id: string;
+  nombre: string;
+  tipo: TipoEvaluacion;
+  semana: number;
+  porcentaje: number;
+  descripcion: string;
+  criterios: string[];
+}
+
+/**
+ * Actividad presencial detallada
+ */
+export interface ActividadPresencial {
+  descripcion: string;
+  duracion: number; // minutos
+  metodologia: string; // ej: "Clase magistral", "Trabajo en equipo", "Laboratorio"
+}
+
+/**
+ * Semana del plan de estudios universitario
+ */
+export interface SemanaUniversitaria {
+  numero: number;
+  unidadTematica: string;
+  temas: string[];
+  objetivos: string[];
+  actividadesPresenciales: ActividadPresencial[];
+  actividadesAutonomas: string[];
+  recursos: string[];
+  entregables?: string;
+  evaluacion?: string; // referencia al id de evaluación si aplica
+}
+
+/**
  * Interfaz base para todas las planeaciones
  */
 export interface PlaneacionBase {
@@ -82,6 +145,11 @@ export interface PlaneacionUniversidad extends PlaneacionBase {
   objetivosAprendizaje: string[];
   bibliografia: string[];
   modalidad: "presencial" | "hibrida" | "virtual";
+
+  // Estructura detallada de semanas (si está configurado)
+  configuracionCurso?: ConfiguracionCurso;
+  semanas?: SemanaUniversitaria[];
+  evaluaciones?: Evaluacion[];
 }
 
 /**

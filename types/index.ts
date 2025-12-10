@@ -522,3 +522,14 @@ export const FONT_SIZES = {
   xlarge: 22,
   xxlarge: 24,
 };
+
+// ==========================================
+// EXPORTS FROM PLANEACION MODULE
+// ==========================================
+export {
+  SemanaUniversitaria,
+  ActividadPresencial,
+  ConfiguracionCurso,
+  Evaluacion,
+  TipoEvaluacion,
+} from "./planeacion";

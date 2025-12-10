@@ -20,6 +20,7 @@ import SyncIndicator from "../../components/SyncIndicator";
 import {
   NivelAcademico,
   Planeacion,
+  PlaneacionUniversidad,
   FiltrosPlaneacion,
 } from "../../../types/planeacion";
 import { usePlaneaciones } from "../../context/PlaneacionesContext";
@@ -223,6 +224,10 @@ const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
    */
   const renderPlaneacion = ({ item }: { item: Planeacion }) => {
     const isMenuOpen = menuVisible === item.id;
+    const isUniversidadDetallada =
+      item.nivelAcademico === NivelAcademico.UNIVERSIDAD &&
+      (item as PlaneacionUniversidad).semanas &&
+      (item as PlaneacionUniversidad).semanas!.length > 0;
 
     return (
       <View style={styles.card}>
@@ -237,6 +242,20 @@ const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
             {getTextoNivel(item.nivelAcademico)}
           </Text>
         </View>
+
+        {/* Badge de modo detallado para Universidad */}
+        {isUniversidadDetallada && (
+          <View style={[styles.badge, styles.badgeDetallado]}>
+            <Text style={styles.badgeText}>
+              📅{" "}
+              {
+                (item as PlaneacionUniversidad).configuracionCurso!
+                  .duracionSemanas
+              }{" "}
+              sem
+            </Text>
+          </View>
+        )}
 
         {/* Botón de menú */}
         <TouchableOpacity
@@ -301,6 +320,58 @@ const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
           <Text style={styles.cardTema} numberOfLines={2}>
             {item.temaSesion}
           </Text>
+
+          {/* Info adicional para Universidad detallada */}
+          {isUniversidadDetallada && (
+            <View style={styles.detalleCurso}>
+              <View style={styles.detalleItem}>
+                <MaterialIcons
+                  name="library-books"
+                  size={14}
+                  color={COLORS.textSecondary}
+                />
+                <Text style={styles.detalleText}>
+                  {(item as PlaneacionUniversidad).semanas!.length} semanas
+                </Text>
+              </View>
+              {(item as PlaneacionUniversidad).evaluaciones &&
+                (item as PlaneacionUniversidad).evaluaciones!.length > 0 && (
+                  <View style={styles.detalleItem}>
+                    <MaterialIcons
+                      name="assessment"
+                      size={14}
+                      color={COLORS.textSecondary}
+                    />
+                    <Text style={styles.detalleText}>
+                      {(item as PlaneacionUniversidad).evaluaciones!.length}{" "}
+                      evaluaciones (
+                      {(item as PlaneacionUniversidad).evaluaciones!.reduce(
+                        (sum, ev) => sum + ev.porcentaje,
+                        0
+                      )}
+                      %)
+                    </Text>
+                  </View>
+                )}
+              <View style={styles.detalleItem}>
+                <MaterialIcons
+                  name="schedule"
+                  size={14}
+                  color={COLORS.textSecondary}
+                />
+                <Text style={styles.detalleText}>
+                  {(item as PlaneacionUniversidad).configuracionCurso!
+                    .horasTeoricas +
+                    (item as PlaneacionUniversidad).configuracionCurso!
+                      .horasPracticas}{" "}
+                  hrs •{" "}
+                  {(item as PlaneacionUniversidad).configuracionCurso!.creditos}{" "}
+                  créditos
+                </Text>
+              </View>
+            </View>
+          )}
+
           <View style={styles.cardFooter}>
             <View style={styles.cardFooterItem}>
               <MaterialIcons
@@ -312,16 +383,18 @@ const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
                 {formatearFecha(item.fecha)}
               </Text>
             </View>
-            <View style={styles.cardFooterItem}>
-              <MaterialIcons
-                name="access-time"
-                size={16}
-                color={COLORS.textSecondary}
-              />
-              <Text style={styles.cardFooterText}>
-                {item.horaInicio} • {item.duracionTotal} min
-              </Text>
-            </View>
+            {!isUniversidadDetallada && (
+              <View style={styles.cardFooterItem}>
+                <MaterialIcons
+                  name="access-time"
+                  size={16}
+                  color={COLORS.textSecondary}
+                />
+                <Text style={styles.cardFooterText}>
+                  {item.horaInicio} • {item.duracionTotal} min
+                </Text>
+              </View>
+            )}
           </View>
         </TouchableOpacity>
       </View>
@@ -613,6 +686,10 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.small,
     fontWeight: "bold",
   },
+  badgeDetallado: {
+    left: 100,
+    backgroundColor: "#5c6bc0",
+  },
   menuButton: {
     position: "absolute",
     top: 10,
@@ -663,6 +740,22 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.medium,
     color: COLORS.text,
     marginBottom: 12,
+  },
+  detalleCurso: {
+    backgroundColor: "#f5f5f5",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 12,
+    gap: 6,
+  },
+  detalleItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  detalleText: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
   },
   cardFooter: {
     flexDirection: "row",

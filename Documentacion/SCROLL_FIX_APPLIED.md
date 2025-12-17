@@ -5,9 +5,9 @@
 
 ---
 
-## 📋 Problema Reportado
+## 📋 Problema detectado
 
-El usuario reportó que en la pantalla de **RecursosDidacticosScreen** en **web**, no se podían ver todos los tipos de recursos (4 tarjetas) sin hacer zoom en la página. El `ScrollView` nativo de React Native no mostraba una barra de scroll visible en web, dando la impresión de que el contenido estaba cortado.
+La pantalla de **RecursosDidacticosScreen** en **web**, no se podían ver todos los tipos de recursos (4 tarjetas) sin hacer zoom en la página. El `ScrollView` nativo de React Native no mostraba una barra de scroll visible en web, dando la impresión de que el contenido estaba cortado.
 
 **Requerimiento adicional:** Asegurar que el **BottomNavBar** siempre sea visible en todos los menús, tanto en app móvil como en web.
 

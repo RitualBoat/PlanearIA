@@ -1,0 +1,16 @@
+{
+  "name": "planearia-api",
+  "version": "1.0.0",
+  "description": "API serverless para PlanearIA - Sincronización con MongoDB Atlas",
+  "main": "api/index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "mongodb": "^6.3.0"
+  },
+  "devDependencies": {
+    "@vercel/node": "^3.0.0"
+  }
+}

@@ -2,7 +2,7 @@
 
 ## 📋 Análisis de Requerimientos
 
-### Cambios Solicitados por el Usuario
+### Cambios planeados
 
 1. **Integrar Tareas/Exámenes dentro de Grupos**
 

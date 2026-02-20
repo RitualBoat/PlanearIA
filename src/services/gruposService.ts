@@ -72,7 +72,7 @@ export const obtenerGrupos = async (): Promise<Partial<Grupo>[]> => {
     
     return gruposDefault;
   } catch (error) {
-    console.error("❌ Error obteniendo grupos:", error);
+    console.error(" Error obteniendo grupos:", error);
     throw new Error("No se pudieron cargar los grupos");
   }
 };
@@ -87,7 +87,7 @@ export const obtenerGrupoPorId = async (
     const grupos = await obtenerGrupos();
     return grupos.find((g) => g.id === id) || null;
   } catch (error) {
-    console.error(`❌ Error obteniendo grupo ${id}:`, error);
+    console.error(` Error obteniendo grupo ${id}:`, error);
     return null;
   }
 };
@@ -98,9 +98,9 @@ export const obtenerGrupoPorId = async (
 export const guardarGrupos = async (grupos: Partial<Grupo>[]): Promise<void> => {
   try {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(grupos));
-    console.log(`💾 Guardados ${grupos.length} grupos en storage`);
+    console.log(` Guardados ${grupos.length} grupos en storage`);
   } catch (error) {
-    console.error("❌ Error guardando grupos:", error);
+    console.error(" Error guardando grupos:", error);
     throw new Error("No se pudieron guardar los grupos");
   }
 };
@@ -115,9 +115,9 @@ export const agregarGrupo = async (grupo: Partial<Grupo>): Promise<void> => {
     const nuevoGrupo = { ...grupo, id: nuevoId };
     
     await guardarGrupos([...grupos, nuevoGrupo]);
-    console.log(`➕ Grupo agregado: ${nuevoGrupo.nombre}`);
+    console.log(` Grupo agregado: ${nuevoGrupo.nombre}`);
   } catch (error) {
-    console.error("❌ Error agregando grupo:", error);
+    console.error(" Error agregando grupo:", error);
     throw new Error("No se pudo agregar el grupo");
   }
 };
@@ -136,9 +136,9 @@ export const actualizarGrupo = async (
     );
     
     await guardarGrupos(nuevosGrupos);
-    console.log(`✏️ Grupo actualizado: ${id}`);
+    console.log(` Grupo actualizado: ${id}`);
   } catch (error) {
-    console.error("❌ Error actualizando grupo:", error);
+    console.error(" Error actualizando grupo:", error);
     throw new Error("No se pudo actualizar el grupo");
   }
 };
@@ -152,9 +152,9 @@ export const eliminarGrupo = async (id: number): Promise<void> => {
     const nuevosGrupos = grupos.filter((g) => g.id !== id);
     
     await guardarGrupos(nuevosGrupos);
-    console.log(`🗑️ Grupo eliminado: ${id}`);
+    console.log(` Grupo eliminado: ${id}`);
   } catch (error) {
-    console.error("❌ Error eliminando grupo:", error);
+    console.error(" Error eliminando grupo:", error);
     throw new Error("No se pudo eliminar el grupo");
   }
 };

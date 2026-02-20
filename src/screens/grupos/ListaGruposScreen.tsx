@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   StatusBar,
   SafeAreaView,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -14,6 +15,7 @@ import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES, Grupo } from "../../../types";
 import BottomNavBar from "../../components/BottomNavBar";
 import WebScrollView from "../../components/WebScrollView";
+import { useGrupos } from "../../hooks/useGrupos";
 
 /**
  * Tipo para las props de navegación
@@ -31,50 +33,32 @@ interface ListaGruposScreenProps {
 }
 
 /**
- * Pantalla de Lista de Grupos
- * Muestra todos los grupos del docente
+ * Pantalla de Lista de Grupos (REFACTORIZADA - PATRÓN MVVM)
+ * 
+ * RESPONSABILIDAD: Solo UI y presentación
+ * - Renderiza los datos proporcionados por el hook
+ * - Maneja eventos de usuario y los delega al ViewModel
+ * - No contiene lógica de negocio ni acceso a datos
+ * 
+ * LÓGICA Y DATOS: Delegados a:
+ * - Hook: useGrupos (ViewModel)
+ * - Servicio: gruposService (acceso a datos)
  */
 const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({
   navigation,
 }) => {
-  const [searchQuery, setSearchQuery] = useState<string>("");
-
-  // Datos de ejemplo - en producción vendrían de un context o API
-  const gruposEjemplo: Partial<Grupo>[] = [
-    {
-      id: 1,
-      nombre: "7A - Matemáticas Avanzadas",
-      materia: "Matemáticas Avanzadas",
-      carrera: "ISC",
-      semestre: 7,
-      cantidadAlumnos: 28,
-      estado: "activo",
-      periodo: "Enero-Junio 2024",
-    },
-    {
-      id: 2,
-      nombre: "5B - Programación Web",
-      materia: "Programación Web",
-      carrera: "ITICS",
-      semestre: 5,
-      cantidadAlumnos: 32,
-      estado: "activo",
-      periodo: "Enero-Junio 2024",
-    },
-    {
-      id: 3,
-      nombre: "3A - Estructuras de Datos",
-      materia: "Estructuras de Datos",
-      carrera: "ISC",
-      semestre: 3,
-      cantidadAlumnos: 25,
-      estado: "activo",
-      periodo: "Enero-Junio 2024",
-    },
-  ];
+  // ViewModel - toda la lógica y estado viene del hook
+  const {
+    gruposFiltrados,
+    isLoading,
+    error,
+    searchQuery,
+    setSearchQuery,
+    conteoGrupos,
+  } = useGrupos();
 
   /**
-   * Maneja el clic en un grupo
+   * Maneja el clic en un grupo (solo navegación, no lógica)
    */
   const handleGrupoPress = (grupo: Partial<Grupo>): void => {
     navigation.navigate("DetalleGrupo", {
@@ -83,12 +67,50 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({
     });
   };
 
+  // ==========================================
+  // RENDERIZADO DE ESTADOS
+  // ==========================================
+
   /**
-   * Filtra los grupos según la búsqueda
+   * Estado de carga
    */
-  const gruposFiltrados = gruposEjemplo.filter((grupo) =>
-    grupo.nombre?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.primary} />
+            <Text style={styles.loadingText}>Cargando grupos...</Text>
+          </View>
+        </SafeAreaView>
+        <BottomNavBar currentScreen="Lista de Grupos" />
+      </View>
+    );
+  }
+
+  /**
+   * Estado de error
+   */
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.errorContainer}>
+            <MaterialIcons name="error-outline" size={64} color="#F44336" />
+            <Text style={styles.errorTitle}>Error al cargar grupos</Text>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        </SafeAreaView>
+        <BottomNavBar currentScreen="Lista de Grupos" />
+      </View>
+    );
+  }
+
+  // ==========================================
+  // RENDERIZADO PRINCIPAL
+  // ==========================================
 
   return (
     <View style={styles.container}>
@@ -97,9 +119,7 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
           <Text style={styles.title}>Mis Grupos</Text>
-          <Text style={styles.subtitle}>
-            {gruposEjemplo.length} grupos activos
-          </Text>
+          <Text style={styles.subtitle}>{conteoGrupos} grupos activos</Text>
 
           {/* Barra de búsqueda */}
           <View style={styles.searchContainer}>
@@ -192,6 +212,36 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
+  // Estados de carga y error
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 15,
+    fontSize: FONT_SIZES.medium,
+    color: COLORS.textSecondary,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  errorTitle: {
+    fontSize: FONT_SIZES.large,
+    fontWeight: "bold",
+    color: "#F44336",
+    marginTop: 15,
+    marginBottom: 8,
+  },
+  errorText: {
+    fontSize: FONT_SIZES.medium,
+    color: COLORS.textSecondary,
+    textAlign: "center",
+  },
+  // Encabezado
   header: {
     padding: 20,
     paddingBottom: 10,
@@ -226,6 +276,7 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.medium,
     color: COLORS.text,
   },
+  // Contenido
   scrollContent: {
     padding: 20,
     paddingTop: 10,

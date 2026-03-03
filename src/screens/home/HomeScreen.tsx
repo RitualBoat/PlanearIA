@@ -6,14 +6,16 @@ import {
   TouchableOpacity,
   Modal,
   Pressable,
-  SafeAreaView,
   StatusBar,
   Image,
   Platform,
   Dimensions,
   ScrollView,
 } from "react-native";
-import { MaterialIcons, FontAwesome5, Entypo } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import Entypo from "@expo/vector-icons/Entypo";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { CommonActions } from "@react-navigation/native";
 // Importamos los tipos
@@ -44,6 +46,38 @@ interface MenuOption {
   onPress?: () => void;
 }
 /**
+ * Componente para renderizar el icono de una opción del menú
+ */
+const MenuOptionIcon: React.FC<{ option: MenuOption }> = React.memo(
+  ({ option }) => {
+    if (option.iconImage) {
+      return (
+        <Image
+          source={option.iconImage}
+          style={styles.iconImage}
+          resizeMode="contain"
+        />
+      );
+    }
+
+    const iconProps = {
+      size: 50,
+      color: option.color,
+    };
+    switch (option.iconLibrary) {
+      case "FontAwesome5":
+        return <FontAwesome5 name={option.icon as any} {...iconProps} />;
+      case "MaterialIcons":
+        return <MaterialIcons name={option.icon as any} {...iconProps} />;
+      case "Entypo":
+        return <Entypo name={option.icon as any} {...iconProps} />;
+      default:
+        return <MaterialIcons name="help-outline" {...iconProps} />;
+    }
+  },
+);
+
+/**
  * Pantalla principal del sistema
  * Muestra el menú principal con las opciones disponibles
  */
@@ -52,7 +86,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [menuVisible, setMenuVisible] = useState<boolean>(false);
   /**
    * Opciones del menú principal
-   * ⭐ ACTUALIZADO v3.0: Eliminado módulo "Tareas" standalone (ahora dentro de Grupos)
+   * UPDATED v3.0: Removed module "Tareas" standalone (ahora dentro de Grupos)
    */
   const menuOptions: MenuOption[] = [
     {
@@ -94,7 +128,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       CommonActions.reset({
         index: 0,
         routes: [{ name: "Login" }],
-      })
+      }),
     );
   };
   /**
@@ -133,37 +167,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       navigation.navigate(option.route as any);
     } else if (option.onPress) {
       option.onPress();
-    }
-  };
-  /**
-   * Renderiza un icono según la librería especificada o una imagen
-   */
-  const renderIcon = (option: MenuOption): React.JSX.Element => {
-    // Si tiene una imagen personalizada, la usamos
-    if (option.iconImage) {
-      return (
-        <Image
-          source={option.iconImage}
-          style={styles.iconImage}
-          resizeMode="contain"
-        />
-      );
-    }
-
-    // Si no, usamos iconos de la librería
-    const iconProps = {
-      size: 50,
-      color: option.color,
-    };
-    switch (option.iconLibrary) {
-      case "FontAwesome5":
-        return <FontAwesome5 name={option.icon as any} {...iconProps} />;
-      case "MaterialIcons":
-        return <MaterialIcons name={option.icon as any} {...iconProps} />;
-      case "Entypo":
-        return <Entypo name={option.icon as any} {...iconProps} />;
-      default:
-        return <MaterialIcons name="help-outline" {...iconProps} />;
     }
   };
   return (
@@ -213,7 +216,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 onPress={() => handleNavigation(option)}
                 activeOpacity={0.7}
               >
-                {renderIcon(option)}
+                <MenuOptionIcon option={option} />
                 <Text style={styles.cardText}>{option.title}</Text>
               </TouchableOpacity>
             ))}
@@ -248,20 +251,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     paddingHorizontal: responsive(30, 40, 60),
     paddingVertical: responsive(20, 22, 25),
-    elevation: 4,
-    shadowColor: COLORS.text,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    boxShadow: "0px 2px 3.84px rgba(26, 26, 26, 0.25)",
   },
   headerTitle: {
     fontSize: responsive(
       FONT_SIZES.large,
       FONT_SIZES.large + 2,
-      FONT_SIZES.large + 4
+      FONT_SIZES.large + 4,
     ),
     fontWeight: "bold",
     color: COLORS.background,
@@ -284,7 +280,7 @@ const styles = StyleSheet.create({
     fontSize: responsive(
       FONT_SIZES.xlarge,
       FONT_SIZES.xlarge + 4,
-      FONT_SIZES.xlarge + 8
+      FONT_SIZES.xlarge + 8,
     ),
     fontWeight: "bold",
     color: COLORS.primary,
@@ -296,7 +292,7 @@ const styles = StyleSheet.create({
     fontSize: responsive(
       FONT_SIZES.medium,
       FONT_SIZES.medium + 2,
-      FONT_SIZES.medium + 4
+      FONT_SIZES.medium + 4,
     ),
     color: COLORS.textSecondary,
     textAlign: "center",
@@ -321,11 +317,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: responsive(20, 25, 30),
     marginBottom: 15,
     borderRadius: responsive(12, 14, 16),
-    elevation: 3,
-    shadowColor: COLORS.text,
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
+    boxShadow: "0px 2px 5px rgba(26, 26, 26, 0.2)",
     ...(isWeb() && {
       cursor: "pointer",
       transition: "all 0.2s ease",
@@ -340,7 +332,7 @@ const styles = StyleSheet.create({
     fontSize: responsive(
       FONT_SIZES.medium,
       FONT_SIZES.medium + 1,
-      FONT_SIZES.medium + 2
+      FONT_SIZES.medium + 2,
     ),
     fontWeight: "600",
     color: COLORS.text,

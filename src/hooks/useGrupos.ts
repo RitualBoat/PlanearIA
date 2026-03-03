@@ -89,7 +89,7 @@ export const useGrupos = (): UseGruposResult => {
         err instanceof Error ? err.message : "Error desconocido";
       setError(errorMsg);
       setStatus("error");
-      console.error("❌ Error cargando grupos:", err);
+      console.error("[grupos] Error loading:", err);
     }
   };
 

@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   TextInput,
   StatusBar,
-  SafeAreaView,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../../navigation/StackNavigator";
@@ -108,7 +108,7 @@ const CrearTareaGrupoScreen: React.FC<CrearTareaGrupoScreenProps> = ({
                           | "tarea"
                           | "examen"
                           | "proyecto"
-                          | "investigacion"
+                          | "investigacion",
                       )
                     }
                   >
@@ -172,7 +172,7 @@ const CrearTareaGrupoScreen: React.FC<CrearTareaGrupoScreenProps> = ({
                 placeholderTextColor={COLORS.textSecondary}
               />
               <Text style={styles.hint}>
-                📅 Nota: En una versión futura se usará un selector de fecha
+                Nota: En una versión futura se usará un selector de fecha
               </Text>
             </View>
 

@@ -15,7 +15,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 
 //Ahora importamos los tipos que definimos
 import { RootStackParamList } from "../../navigation/StackNavigator";
-import { LoginFormData, COLORS, FONT_SIZES } from "../../../types/index";
+import { LoginFormData, COLORS, FONT_SIZES } from "../../../types";
 import { isWeb, responsive } from "../../utils/responsive";
 
 //Ahora se importa la imagen
@@ -107,7 +107,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
     if (Platform.OS === "web") {
       const confirmed = window.confirm(
-        `¿Desea iniciar sesión con el usuario: ${formData.username}?`
+        `¿Desea iniciar sesión con el usuario: ${formData.username}?`,
       );
       if (confirmed) {
         authenticateUser();
@@ -126,7 +126,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             onPress: authenticateUser,
           },
         ],
-        { cancelable: false }
+        { cancelable: false },
       );
     }
   };
@@ -139,7 +139,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       Alert.alert(
         "Recuperar Contraseña",
         "Esta funcionalidad estara disponible proximamente.",
-        [{ text: "Entendido" }]
+        [{ text: "Entendido" }],
       );
     }
   };
@@ -152,7 +152,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       Alert.alert(
         "Registro",
         "Esta funcionalidad estara disponible proximamente.",
-        [{ text: "Entendido" }]
+        [{ text: "Entendido" }],
       );
     }
   };
@@ -244,11 +244,7 @@ const styles = StyleSheet.create({
     padding: isWeb() ? 40 : 20,
     alignItems: "center",
     ...(isWeb() && {
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.1,
-      shadowRadius: 12,
-      elevation: 5,
+      boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
     }),
   },
   loginImage: {
@@ -261,7 +257,7 @@ const styles = StyleSheet.create({
     fontSize: responsive(
       FONT_SIZES.xxlarge,
       FONT_SIZES.xxlarge + 4,
-      FONT_SIZES.xxlarge + 8
+      FONT_SIZES.xxlarge + 8,
     ),
     fontWeight: "bold",
     color: COLORS.primary,
@@ -272,7 +268,7 @@ const styles = StyleSheet.create({
     fontSize: responsive(
       FONT_SIZES.large,
       FONT_SIZES.large + 2,
-      FONT_SIZES.large + 4
+      FONT_SIZES.large + 4,
     ),
     color: COLORS.textSecondary,
     textAlign: "center",
@@ -300,14 +296,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 10,
-    elevation: 2,
-    shadowColor: COLORS.text,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    boxShadow: "0px 2px 3.84px rgba(26, 26, 26, 0.25)",
   },
   loginButtonText: {
     color: COLORS.surface,

@@ -5,11 +5,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
-  SafeAreaView,
   TextInput,
   ActivityIndicator,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES, Grupo } from "../../../types";
@@ -34,12 +34,12 @@ interface ListaGruposScreenProps {
 
 /**
  * Pantalla de Lista de Grupos (REFACTORIZADA - PATRÓN MVVM)
- * 
+ *
  * RESPONSABILIDAD: Solo UI y presentación
  * - Renderiza los datos proporcionados por el hook
  * - Maneja eventos de usuario y los delega al ViewModel
  * - No contiene lógica de negocio ni acceso a datos
- * 
+ *
  * LÓGICA Y DATOS: Delegados a:
  * - Hook: useGrupos (ViewModel)
  * - Servicio: gruposService (acceso a datos)
@@ -264,11 +264,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 10,
-    elevation: 2,
-    shadowColor: COLORS.text,
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 3,
+    boxShadow: "0px 1px 3px rgba(26, 26, 26, 0.1)",
   },
   searchInput: {
     flex: 1,
@@ -286,11 +282,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 20,
     marginBottom: 15,
-    elevation: 3,
-    shadowColor: COLORS.text,
-    shadowOpacity: 0.15,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
+    boxShadow: "0px 2px 5px rgba(26, 26, 26, 0.15)",
   },
   grupoHeader: {
     flexDirection: "row",

@@ -1,12 +1,12 @@
-# 🧪 Guía de Pruebas - PlanearIA
+﻿# Guía de Pruebas - PlanearIA
 
-## 📋 Cómo Probar la Nueva Arquitectura
+## Cómo Probar la Nueva Arquitectura
 
 Esta guía te ayudará a verificar que toda la navegación y arquitectura funciona correctamente.
 
 ---
 
-## 🚀 Iniciar la Aplicación
+## Iniciar la Aplicación
 
 ### Opción 1: Expo (Recomendado)
 
@@ -37,9 +37,9 @@ npm run web
 
 ---
 
-## 🧭 Flujo de Pruebas Recomendado
+## Flujo de Pruebas Recomendado
 
-### 1. Verificar Login y Home ✅
+### 1. Verificar Login y Home
 
 **Ruta**: `Login` → `Home`
 
@@ -48,17 +48,17 @@ npm run web
 - [x] La pantalla de login se muestra correctamente
 - [x] Al hacer login se navega a Home
 - [x] Home muestra 5 opciones principales:
-  - Planeaciones
-  - Grupos ⭐
-  - Recursos Didácticos ⭐
-  - Tareas
-  - Cuenta
+- Planeaciones
+- Grupos
+- Recursos Didácticos
+- Tareas
+- Cuenta
 
 **Resultado esperado**: Menú principal con 5 cards visuales
 
 ---
 
-### 2. Probar Módulo de Grupos ⭐
+### 2. Probar Módulo de Grupos
 
 #### 2.1. Menú de Grupos
 
@@ -68,8 +68,8 @@ npm run web
 
 - [x] Se muestra GruposScreen
 - [x] 2 opciones visibles:
-  - Crear Nuevo Grupo
-  - Mis Grupos
+- Crear Nuevo Grupo
+- Mis Grupos
 
 #### 2.2. Lista de Grupos
 
@@ -80,15 +80,15 @@ npm run web
 - [x] Se muestra ListaGruposScreen
 - [x] Barra de búsqueda funciona
 - [x] Se muestran 3 grupos de ejemplo:
-  - 7A - Matemáticas Avanzadas
-  - 5B - Programación Web
-  - 3A - Estructuras de Datos
+- 7A - Matemáticas Avanzadas
+- 5B - Programación Web
+- 3A - Estructuras de Datos
 - [x] Cada card muestra:
-  - Nombre del grupo
-  - Materia
-  - Carrera y semestre
-  - Cantidad de alumnos
-  - Estado (activo)
+- Nombre del grupo
+- Materia
+- Carrera y semestre
+- Cantidad de alumnos
+- Estado (activo)
 
 #### 2.3. Detalle de Grupo (Pantalla Principal)
 
@@ -99,11 +99,11 @@ npm run web
 - [x] Se muestra DetalleGrupoScreen
 - [x] Header muestra nombre del grupo
 - [x] 5 pestañas horizontales visibles:
-  - Alumnos
-  - Calificaciones
-  - Asistencias
-  - Comentarios
-  - Gráficas
+- Alumnos
+- Calificaciones
+- Asistencias
+- Comentarios
+- Gráficas
 
 **Probar cada pestaña**:
 
@@ -116,15 +116,15 @@ npm run web
 **Pestaña CALIFICACIONES**:
 
 - [x] Estadísticas visibles:
-  - Promedio Grupal: 8.5
-  - Aprobación: 85%
+- Promedio Grupal: 8.5
+- Aprobación: 85%
 - [x] Botón "Registrar Calificaciones"
 
 **Pestaña ASISTENCIAS**:
 
 - [x] Estadísticas visibles:
-  - Asistencia Promedio: 92%
-  - Retardos Hoy: 3
+- Asistencia Promedio: 92%
+- Retardos Hoy: 3
 - [x] Botón "Pasar Lista"
 
 **Pestaña COMENTARIOS**:
@@ -137,10 +137,10 @@ npm run web
 
 - [x] Icono de gráfica placeholder
 - [x] Lista de tipos de gráficas disponibles:
-  - Promedio de calificaciones
-  - Evolución del grupo
-  - Porcentaje de asistencias
-  - Comparativa por alumno
+- Promedio de calificaciones
+- Evolución del grupo
+- Porcentaje de asistencias
+- Comparativa por alumno
 
 #### 2.4. Crear Grupo
 
@@ -149,19 +149,19 @@ npm run web
 **Qué probar**:
 
 - [x] Formulario visible con campos:
-  - Nombre del Grupo
-  - Materia
-  - Carrera (4 botones: ISC, IGE, ARQ, ITICS)
-  - Semestre
-  - Periodo
-  - Horario (opcional)
+- Nombre del Grupo
+- Materia
+- Carrera (4 botones: ISC, IGE, ARQ, ITICS)
+- Semestre
+- Periodo
+- Horario (opcional)
 - [x] Selección de carrera funciona (cambio de color)
 - [x] Botón "Crear Grupo"
 - [x] Botón "Cancelar"
 
 ---
 
-### 3. Probar Módulo de Recursos Didácticos ⭐
+### 3. Probar Módulo de Recursos Didácticos
 
 #### 3.1. Menú de Recursos
 
@@ -171,14 +171,14 @@ npm run web
 
 - [x] Se muestra RecursosDidacticosScreen
 - [x] 4 tipos de recursos visibles:
-  - 📝 Exámenes (naranja)
-  - 📊 Presentaciones (azul)
-  - 🧠 Mapas Mentales (morado)
-  - 📅 Líneas de Tiempo (verde)
+- Exámenes (naranja)
+- Presentaciones (azul)
+- Mapas Mentales (morado)
+- Líneas de Tiempo (verde)
 - [x] Cada card muestra 3 badges:
-  - IA
-  - Plantillas
-  - Manual
+- IA
+- Plantillas
+- Manual
 - [x] Botón "Ver Todos Mis Recursos" al final
 
 #### 3.2. Crear Examen
@@ -189,9 +189,9 @@ npm run web
 
 - [x] Se muestra ExamenesScreen
 - [x] 3 opciones de creación visibles:
-  - 🤖 Generar con IA (morado)
-  - 📋 Usar Plantilla (azul)
-  - ✏️ Crear Manualmente (verde)
+- Generar con IA (morado)
+- Usar Plantilla (azul)
+- Crear Manualmente (verde)
 - [x] Cada opción tiene descripción
 
 #### 3.3. Crear Presentación
@@ -233,15 +233,15 @@ npm run web
 - [x] Se muestra ListaRecursosScreen
 - [x] Barra de búsqueda funcional
 - [x] 3 recursos de ejemplo:
-  - Examen de Álgebra (naranja)
-  - Presentación: Revolución Mexicana (azul)
-  - Mapa Mental: Sistema Nervioso (morado)
+- Examen de Álgebra (naranja)
+- Presentación: Revolución Mexicana (azul)
+- Mapa Mental: Sistema Nervioso (morado)
 - [x] Cada card muestra:
-  - Icono según tipo
-  - Título
-  - Descripción
-  - Badge de tipo
-  - Badge de origen (IA/Plantilla/Manual)
+- Icono según tipo
+- Título
+- Descripción
+- Badge de tipo
+- Badge de origen (IA/Plantilla/Manual)
 
 ---
 
@@ -277,16 +277,16 @@ npm run web
 
 ---
 
-## 🎯 Verificación de Navegación
+## Verificación de Navegación
 
 ### BottomNavBar
 
 **En TODAS las pantallas excepto Login**:
 
 - [x] Barra inferior visible con:
-  - Botón "Atrás" (izquierda)
-  - Título de la pantalla (centro)
-  - Botón "Home" (derecha)
+- Botón "Atrás" (izquierda)
+- Título de la pantalla (centro)
+- Botón "Home" (derecha)
 - [x] Botón "Atrás" navega a pantalla anterior
 - [x] Botón "Home" navega al menú principal
 
@@ -307,7 +307,7 @@ npm run web
 
 ---
 
-## 🐛 Verificación de Errores Comunes
+## Verificación de Errores Comunes
 
 ### TypeScript
 
@@ -335,7 +335,7 @@ npm run lint
 
 ---
 
-## 📱 Pruebas por Plataforma
+## Pruebas por Plataforma
 
 ### iOS
 
@@ -360,7 +360,7 @@ npm run lint
 
 ---
 
-## ✅ Checklist Final
+## Checklist Final
 
 ### Módulo de Grupos
 
@@ -400,63 +400,64 @@ npm run lint
 
 ---
 
-## 🎬 Video de Prueba Recomendado
+## Video de Prueba Recomendado
 
 Graba un video probando este flujo:
 
 1. **Inicio (0:00-0:30)**
 
-   - Abrir app
-   - Login
-   - Ver Home con 5 opciones
+- Abrir app
+- Login
+- Ver Home con 5 opciones
 
 2. **Grupos (0:30-2:00)**
 
-   - Entrar a Grupos
-   - Ver Lista de Grupos
-   - Entrar a un grupo
-   - Cambiar entre las 5 pestañas
-   - Volver a Home
+- Entrar a Grupos
+- Ver Lista de Grupos
+- Entrar a un grupo
+- Cambiar entre las 5 pestañas
+- Volver a Home
 
 3. **Recursos Didácticos (2:00-3:30)**
 
-   - Entrar a Recursos Didácticos
-   - Ver los 4 tipos
-   - Entrar a Exámenes
-   - Ver las 3 opciones
-   - Ver Lista de Recursos
-   - Volver a Home
+- Entrar a Recursos Didácticos
+- Ver los 4 tipos
+- Entrar a Exámenes
+- Ver las 3 opciones
+- Ver Lista de Recursos
+- Volver a Home
 
 4. **Navegación (3:30-4:00)**
-   - Probar botón "Atrás" varias veces
-   - Probar botón "Home" desde pantalla profunda
-   - Verificar que todo funciona
+
+- Probar botón "Atrás" varias veces
+- Probar botón "Home" desde pantalla profunda
+- Verificar que todo funciona
 
 ---
 
-## 📊 Resultados Esperados
+## Resultados Esperados
 
 ### Sin Errores
 
 ```
-✅ TypeScript: 0 errores
-✅ React Native: 0 crashes
-✅ Navegación: 100% funcional
-✅ UI: Consistente y profesional
+ TypeScript: 0 errores
+ React Native: 0 crashes
+ Navegación: 100% funcional
+ UI: Consistente y profesional
 ```
 
 ### Performance
 
 ```
-✅ Tiempo de carga: < 2s
-✅ Transiciones: Fluidas
-✅ Scroll: Suave
-✅ Memoria: Uso normal
+ Tiempo de carga: < 2s
+ Transiciones: Fluidas
+ Scroll: Suave
+ Memoria: Uso normal
 ```
 
 ---
 
-## 🆘 Solución de Problemas
+## Solución de Problemas
 
 ### Error: "Cannot find module"
 
@@ -490,7 +491,7 @@ npm start -- --reset-cache
 
 ---
 
-## 📝 Notas para el Desarrollador
+## Notas para el Desarrollador
 
 1. **Datos de ejemplo**: Todas las pantallas usan datos mockeados. En producción vendrán de API/Context.
 
@@ -504,19 +505,19 @@ npm start -- --reset-cache
 
 ---
 
-## 🎉 Criterio de Éxito
+## Criterio de Éxito
 
-La arquitectura está **completamente funcional** si:
+La arquitectura se considera funcional si:
 
-✅ **Navegación**: Puedes llegar a todas las 23 pantallas desde Home  
-✅ **Pestañas**: Las 5 pestañas de DetalleGrupoScreen cambian correctamente  
-✅ **BottomNavBar**: Presente y funcional en todas las pantallas  
-✅ **Sin errores**: 0 errores de TypeScript, 0 crashes  
-✅ **UI Consistente**: Colores, iconos y estilos uniformes  
-✅ **Responsive**: Funciona en móvil, tablet y web
+**Navegación**: Puedes llegar a todas las 23 pantallas desde Home
+**Pestañas**: Las 5 pestañas de DetalleGrupoScreen cambian correctamente
+**BottomNavBar**: Presente y funcional en todas las pantallas
+**Sin errores**: 0 errores de TypeScript, 0 crashes
+**UI Consistente**: Colores, iconos y estilos uniformes
+**Responsive**: Funciona en móvil, tablet y web
 
 ---
 
-**Fecha**: Noviembre 28, 2025  
-**Versión**: 2.0  
-**Estado**: Lista para pruebas ✅
+**Fecha**: Noviembre 28, 2025
+**Versión**: 2.0
+**Estado**: Lista para pruebas

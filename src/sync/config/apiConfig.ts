@@ -2,19 +2,19 @@
  * Configuración del API de sincronización
  * Backend serverless en Vercel conectado a MongoDB Atlas
  *
- * ✅ 100% Gratuito (Vercel + MongoDB M0)
- * ✅ Offline-first con AsyncStorage
- * ✅ Sincronización automática
+ * Gratuito (Vercel + MongoDB M0)
+ * Offline-first con AsyncStorage
+ * Sincronizacion automatica
  */
 
 // =====================================
-// 🔧 CONFIGURACIÓN DE LA API
+// CONFIGURACION DE LA API
 // =====================================
 
 /**
  * Configuración del backend Vercel
  *
- * ⚠️ IMPORTANTE: Después de hacer deploy en Vercel,
+ * IMPORTANTE: Despues de hacer deploy en Vercel,
  * actualiza API_BASE_URL con tu URL de producción
  */
 export const API_CONFIG = {
@@ -24,7 +24,7 @@ export const API_CONFIG = {
    * Desarrollo local: http://localhost:3000
    * Producción: https://tu-proyecto.vercel.app
    */
-  baseUrl: "https://backend-eight-chi-54.vercel.app", // ✅ URL de producción
+  baseUrl: "https://backend-eight-chi-54.vercel.app", // URL de produccion
 
   /**
    * Clave secreta para autenticación
@@ -39,7 +39,7 @@ export const API_CONFIG = {
 };
 
 // =====================================
-// 📊 CONFIGURACIÓN DE SINCRONIZACIÓN
+// CONFIGURACION DE SINCRONIZACION
 // =====================================
 
 export const SYNC_CONFIG = {
@@ -76,7 +76,7 @@ export const SYNC_CONFIG = {
 };
 
 // =====================================
-// 🗄️ CLAVES DE STORAGE
+// CLAVES DE STORAGE
 // =====================================
 
 export const STORAGE_KEYS = {
@@ -97,7 +97,7 @@ export const STORAGE_KEYS = {
 };
 
 // =====================================
-// 🌐 CONFIGURACIÓN DE CONECTIVIDAD
+// CONFIGURACION DE CONECTIVIDAD
 // =====================================
 
 export const CONNECTIVITY_CONFIG = {
@@ -118,7 +118,7 @@ export const CONNECTIVITY_CONFIG = {
 };
 
 // =====================================
-// 🔍 VALIDACIÓN
+// VALIDACION
 // =====================================
 
 /**
@@ -137,10 +137,10 @@ export const isAPIConfigured = (): boolean => {
  */
 export const logConfigStatus = (): void => {
   if (isAPIConfigured()) {
-    console.log("✅ API de sincronización configurada");
+    console.log("[config] Sync API configured");
     console.log(`   URL: ${API_CONFIG.baseUrl}`);
   } else {
-    console.log("⚠️ API no configurada - usando solo modo local");
+    console.log("[config] API not configured, local-only mode");
     console.log("   Actualiza API_CONFIG.baseUrl después del deploy en Vercel");
   }
 };

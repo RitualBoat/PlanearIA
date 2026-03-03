@@ -8,11 +8,11 @@ import {
   TouchableOpacity,
   Alert,
   Platform,
-  SafeAreaView,
   StatusBar,
-  Dimensions,
+  useWindowDimensions,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/StackNavigator";
@@ -149,23 +149,23 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
       setCampoFormativo((planeacion as any).campoFormativo || "");
     } else if (planeacion.nivelAcademico === NivelAcademico.SECUNDARIA) {
       setCompetenciasDisciplinares(
-        (planeacion as any).competenciasDisciplinares?.join("\n") || ""
+        (planeacion as any).competenciasDisciplinares?.join("\n") || "",
       );
     } else if (planeacion.nivelAcademico === NivelAcademico.PREPARATORIA) {
       setCompetenciasGenericas(
-        (planeacion as any).competenciasGenericas?.join("\n") || ""
+        (planeacion as any).competenciasGenericas?.join("\n") || "",
       );
       setCompetenciasDisciplinares(
-        (planeacion as any).competenciasDisciplinares?.join("\n") || ""
+        (planeacion as any).competenciasDisciplinares?.join("\n") || "",
       );
       setBibliografia((planeacion as any).bibliografia?.join("\n") || "");
     } else if (planeacion.nivelAcademico === NivelAcademico.UNIVERSIDAD) {
       const planeacionUniv = planeacion as PlaneacionUniversidad;
       setCompetenciasProfesionales(
-        planeacionUniv.competenciasProfesionales?.join("\n") || ""
+        planeacionUniv.competenciasProfesionales?.join("\n") || "",
       );
       setObjetivosAprendizaje(
-        planeacionUniv.objetivosAprendizaje?.join("\n") || ""
+        planeacionUniv.objetivosAprendizaje?.join("\n") || "",
       );
       setBibliografia(planeacionUniv.bibliografia?.join("\n") || "");
       setModalidad(planeacionUniv.modalidad || "presencial");
@@ -213,7 +213,7 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
       "cambiarDuracionCurso llamado con:",
       nuevaDuracion,
       "actual:",
-      semanas.length
+      semanas.length,
     );
 
     const config = { ...configuracionCurso, duracionSemanas: nuevaDuracion };
@@ -251,7 +251,7 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
           console.log("Confirmado: reduciendo a", nuevaDuracion, "semanas");
           setSemanas([...semanas.slice(0, nuevaDuracion)]);
           setSemanasVersion((v) => v + 1);
-        }
+        },
       );
     }
   };
@@ -273,7 +273,7 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
           setModoDetallado(false);
           setSemanas([]);
           setEvaluaciones([]);
-        }
+        },
       );
     }
   };
@@ -283,7 +283,7 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
    */
   const actualizarSemana = (semana: SemanaUniversitaria) => {
     const nuevasSemanas = semanas.map((s) =>
-      s.numero === semana.numero ? { ...semana } : { ...s }
+      s.numero === semana.numero ? { ...semana } : { ...s },
     );
     setSemanas([...nuevasSemanas]);
     setSemanasVersion((v) => v + 1);
@@ -304,7 +304,7 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
           .map((s, index) => ({ ...s, numero: index + 1 }));
         console.log(
           "Nuevas semanas después de eliminar:",
-          nuevasSemanas.length
+          nuevasSemanas.length,
         );
         setSemanas([...nuevasSemanas]);
         setConfiguracionCurso({
@@ -312,7 +312,7 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
           duracionSemanas: nuevasSemanas.length as 12 | 16 | 18,
         });
         setSemanasVersion((v) => v + 1);
-      }
+      },
     );
   };
 
@@ -376,7 +376,7 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
   const confirmar = (
     titulo: string,
     mensaje: string,
-    onConfirm: () => void
+    onConfirm: () => void,
   ) => {
     if (Platform.OS === "web") {
       if (window.confirm(`${titulo}\n\n${mensaje}`)) {
@@ -540,7 +540,7 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
   };
 
   // Obtener dimensiones de la ventana
-  const windowHeight = Dimensions.get("window").height;
+  const { height: windowHeight } = useWindowDimensions();
   const navBarHeight = 80; // Altura aproximada del BottomNavBar
 
   return (
@@ -730,8 +730,8 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
                 <View style={styles.modoDetalladoInfo}>
                   <Text style={styles.modoDetalladoLabel}>
                     {modoDetallado
-                      ? "📅 Modo Detallado (Semana por Semana)"
-                      : "📝 Modo Simple"}
+                      ? "Modo Detallado (Semana por Semana)"
+                      : "Modo Simple"}
                   </Text>
                   <Text style={styles.modoDetalladoDesc}>
                     {modoDetallado
@@ -763,7 +763,7 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
                   {/* Configuración del curso */}
                   <View style={styles.configuracionCurso}>
                     <Text style={styles.subsectionTitle}>
-                      ⚙️ Configuración del Curso
+                      Configuración del Curso
                     </Text>
 
                     {/* Duración del curso */}
@@ -775,8 +775,8 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
                           cambiarDuracionCurso(
                             Math.max(
                               12,
-                              configuracionCurso.duracionSemanas - 1
-                            ) as 12 | 16 | 18
+                              configuracionCurso.duracionSemanas - 1,
+                            ) as 12 | 16 | 18,
                           )
                         }
                       >
@@ -794,8 +794,8 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
                           cambiarDuracionCurso(
                             Math.min(
                               18,
-                              configuracionCurso.duracionSemanas + 1
-                            ) as 12 | 16 | 18
+                              configuracionCurso.duracionSemanas + 1,
+                            ) as 12 | 16 | 18,
                           )
                         }
                       >
@@ -852,7 +852,7 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
 
                     {/* Créditos y modalidad */}
                     <View style={styles.row}>
-                      <View style={[styles.halfWidth]}>
+                      <View style={styles.halfWidth}>
                         <Text style={styles.label}>Créditos:</Text>
                         <TextInput
                           style={styles.input}
@@ -866,7 +866,7 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
                           keyboardType="numeric"
                         />
                       </View>
-                      <View style={[styles.halfWidth]}>
+                      <View style={styles.halfWidth}>
                         <Text style={styles.label}>Modalidad:</Text>
                         <View style={styles.modalidadContainerSmall}>
                           {["presencial", "hibrida", "virtual"].map((m) => (
@@ -903,7 +903,7 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
                   {/* Plan de evaluación */}
                   <View style={styles.evaluacionSection}>
                     <Text style={styles.subsectionTitle}>
-                      📊 Plan de Evaluación
+                      Plan de Evaluación
                     </Text>
                     <EvaluacionEditor
                       evaluaciones={evaluaciones}
@@ -918,7 +918,7 @@ const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
                     key={`semanas-${semanasVersion}`}
                   >
                     <Text style={styles.subsectionTitle}>
-                      📚 Planificación Semanal ({semanas.length} semanas)
+                      Planificación Semanal ({semanas.length} semanas)
                     </Text>
                     {semanas.map((semana) => (
                       <SemanaEditor
@@ -1330,11 +1330,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     gap: 10,
-    elevation: 3,
-    shadowColor: COLORS.text,
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
+    boxShadow: "0px 2px 4px rgba(26, 26, 26, 0.3)",
   },
   saveButtonText: {
     color: "white",

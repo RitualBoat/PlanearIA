@@ -38,7 +38,7 @@ interface PlaneacionesContextData {
   agregarPlaneacion: (planeacion: Planeacion) => Promise<void>;
   actualizarPlaneacion: (
     id: string,
-    planeacion: Partial<Planeacion>
+    planeacion: Partial<Planeacion>,
   ) => Promise<void>;
   eliminarPlaneacion: (id: string) => Promise<void>;
   obtenerPlaneacion: (id: string) => Planeacion | undefined;
@@ -53,7 +53,7 @@ interface PlaneacionesContextData {
  * Contexto de planeaciones
  */
 const PlaneacionesContext = createContext<PlaneacionesContextData | undefined>(
-  undefined
+  undefined,
 );
 
 /**
@@ -72,7 +72,7 @@ export const PlaneacionesProvider: React.FC<PlaneacionesProviderProps> = ({
 }) => {
   const [planeaciones, setPlaneaciones] = useState<Planeacion[]>([]);
   const [planeacionActual, setPlaneacionActual] = useState<Planeacion | null>(
-    null
+    null,
   );
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("loading");
   const [isLoading, setIsLoading] = useState(true);
@@ -106,14 +106,14 @@ export const PlaneacionesProvider: React.FC<PlaneacionesProviderProps> = ({
       if (stored) {
         const data: Planeacion[] = JSON.parse(stored);
         setPlaneaciones(data);
-        console.log(`✅ Cargadas ${data.length} planeaciones desde storage`);
+        console.log(`[planeaciones] Loaded ${data.length} from storage`);
       } else {
-        console.log("ℹ️ No hay planeaciones guardadas");
+        console.log("[planeaciones] No stored planeaciones found");
       }
 
       setSyncStatus("synced");
     } catch (error) {
-      console.error("❌ Error cargando planeaciones:", error);
+      console.error("[planeaciones] Load error:", error);
       setSyncStatus("error");
     } finally {
       setIsLoading(false);
@@ -127,16 +127,16 @@ export const PlaneacionesProvider: React.FC<PlaneacionesProviderProps> = ({
     try {
       await AsyncStorage.setItem(
         STORAGE_KEYS.PLANEACIONES,
-        JSON.stringify(data)
+        JSON.stringify(data),
       );
       await AsyncStorage.setItem(
         STORAGE_KEYS.LAST_SYNC,
-        new Date().toISOString()
+        new Date().toISOString(),
       );
       setSyncStatus("synced");
-      console.log(`💾 Guardadas ${data.length} planeaciones en storage`);
+      console.log(`[planeaciones] Saved ${data.length} to storage`);
     } catch (error) {
-      console.error("❌ Error guardando planeaciones:", error);
+      console.error("[planeaciones] Save error:", error);
       setSyncStatus("error");
     }
   };
@@ -155,9 +155,9 @@ export const PlaneacionesProvider: React.FC<PlaneacionesProviderProps> = ({
     try {
       setSyncStatus("loading");
       setPlaneaciones((prev) => [...prev, planeacion]);
-      console.log(`➕ Planeación agregada: ${planeacion.temaSesion}`);
+      console.log(`[planeaciones] Added: ${planeacion.temaSesion}`);
     } catch (error) {
-      console.error("❌ Error agregando planeación:", error);
+      console.error("[planeaciones] Add error:", error);
       setSyncStatus("error");
       throw error;
     }
@@ -168,7 +168,7 @@ export const PlaneacionesProvider: React.FC<PlaneacionesProviderProps> = ({
    */
   const actualizarPlaneacion = async (
     id: string,
-    actualizacion: Partial<Planeacion>
+    actualizacion: Partial<Planeacion>,
   ) => {
     try {
       setSyncStatus("loading");
@@ -180,12 +180,12 @@ export const PlaneacionesProvider: React.FC<PlaneacionesProviderProps> = ({
                 ...actualizacion,
                 fechaModificacion: new Date().toISOString(),
               } as Planeacion)
-            : p
-        )
+            : p,
+        ),
       );
-      console.log(`✏️ Planeación actualizada: ${id}`);
+      console.log(`[planeaciones] Updated: ${id}`);
     } catch (error) {
-      console.error("❌ Error actualizando planeación:", error);
+      console.error("[planeaciones] Update error:", error);
       setSyncStatus("error");
       throw error;
     }
@@ -198,9 +198,9 @@ export const PlaneacionesProvider: React.FC<PlaneacionesProviderProps> = ({
     try {
       setSyncStatus("loading");
       setPlaneaciones((prev) => prev.filter((p) => p.id !== id));
-      console.log(`🗑️ Planeación eliminada: ${id}`);
+      console.log(`[planeaciones] Deleted: ${id}`);
     } catch (error) {
-      console.error("❌ Error eliminando planeación:", error);
+      console.error("[planeaciones] Delete error:", error);
       setSyncStatus("error");
       throw error;
     }
@@ -229,10 +229,10 @@ export const PlaneacionesProvider: React.FC<PlaneacionesProviderProps> = ({
           temaSesion: `${planeacionOriginal.temaSesion} (Copia)`,
         };
         await agregarPlaneacion(nuevaPlaneacion);
-        console.log(`📋 Planeación clonada: ${nuevaPlaneacion.temaSesion}`);
+        console.log(`[planeaciones] Cloned: ${nuevaPlaneacion.temaSesion}`);
       }
     } catch (error) {
-      console.error("❌ Error clonando planeación:", error);
+      console.error("[planeaciones] Clone error:", error);
       setSyncStatus("error");
       throw error;
     }
@@ -281,9 +281,9 @@ export const PlaneacionesProvider: React.FC<PlaneacionesProviderProps> = ({
       await AsyncStorage.removeItem(STORAGE_KEYS.PLANEACIONES);
       await AsyncStorage.removeItem(STORAGE_KEYS.LAST_SYNC);
       setSyncStatus("synced");
-      console.log("🧹 Todas las planeaciones eliminadas");
+      console.log("[planeaciones] All cleared");
     } catch (error) {
-      console.error("❌ Error limpiando planeaciones:", error);
+      console.error("[planeaciones] Clear error:", error);
       setSyncStatus("error");
       throw error;
     }
@@ -319,7 +319,7 @@ export const usePlaneaciones = (): PlaneacionesContextData => {
   const context = useContext(PlaneacionesContext);
   if (context === undefined) {
     throw new Error(
-      "usePlaneaciones debe ser usado dentro de PlaneacionesProvider"
+      "usePlaneaciones debe ser usado dentro de PlaneacionesProvider",
     );
   }
   return context;

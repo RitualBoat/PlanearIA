@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Platform } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import NetInfo from "@react-native-community/netinfo";
 import { COLORS, FONT_SIZES } from "../../types";
 import { usePlaneaciones } from "../context/PlaneacionesContext";

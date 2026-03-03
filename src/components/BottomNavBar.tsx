@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/StackNavigator";
@@ -57,20 +57,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     paddingHorizontal: responsive(30, 40, 60),
     paddingVertical: responsive(20, 22, 25),
-    elevation: 4,
-    shadowColor: COLORS.text,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    boxShadow: "0px 2px 3.84px rgba(26, 26, 26, 0.25)",
   },
   headerTitle: {
     fontSize: responsive(
       FONT_SIZES.large,
       FONT_SIZES.large + 2,
-      FONT_SIZES.large + 4
+      FONT_SIZES.large + 4,
     ),
     fontWeight: "bold",
     color: COLORS.background,

@@ -44,10 +44,10 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
   const actualizarEvaluacion = (
     id: string,
     campo: keyof Evaluacion,
-    valor: any
+    valor: any,
   ) => {
     const nuevasEvaluaciones = evaluaciones.map((ev) =>
-      ev.id === id ? { ...ev, [campo]: valor } : ev
+      ev.id === id ? { ...ev, [campo]: valor } : ev,
     );
     onUpdate(nuevasEvaluaciones);
   };
@@ -63,13 +63,13 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
           style: "destructive",
           onPress: () => {
             const nuevasEvaluaciones = evaluaciones.filter(
-              (ev) => ev.id !== id
+              (ev) => ev.id !== id,
             );
             onUpdate(nuevasEvaluaciones);
             if (expandido === id) setExpandido(null);
           },
         },
-      ]
+      ],
     );
   };
 
@@ -86,7 +86,7 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
   const actualizarCriterio = (
     evaluacionId: string,
     index: number,
-    valor: string
+    valor: string,
   ) => {
     const evaluacion = evaluaciones.find((ev) => ev.id === evaluacionId);
     if (evaluacion) {
@@ -100,7 +100,7 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
     const evaluacion = evaluaciones.find((ev) => ev.id === evaluacionId);
     if (evaluacion) {
       const nuevosCriterios = evaluacion.criterios.filter(
-        (_, i) => i !== index
+        (_, i) => i !== index,
       );
       actualizarEvaluacion(evaluacionId, "criterios", nuevosCriterios);
     }
@@ -165,7 +165,7 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
       {!porcentajeValido && (
         <View style={styles.warningBox}>
           <Text style={styles.warningText}>
-            ⚠️ El porcentaje total debe sumar 100% (actual: {porcentajeTotal}%)
+            El porcentaje total debe sumar 100% (actual: {porcentajeTotal}%)
           </Text>
         </View>
       )}
@@ -256,7 +256,7 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
                             {getTipoLabel(tipo)}
                           </Text>
                         </TouchableOpacity>
-                      )
+                      ),
                     )}
                   </View>
                 </View>
@@ -272,7 +272,7 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
                           actualizarEvaluacion(
                             evaluacion.id,
                             "semana",
-                            Math.max(1, evaluacion.semana - 1)
+                            Math.max(1, evaluacion.semana - 1),
                           )
                         }
                       >
@@ -287,7 +287,7 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
                           actualizarEvaluacion(
                             evaluacion.id,
                             "semana",
-                            Math.min(duracionSemanas, evaluacion.semana + 1)
+                            Math.min(duracionSemanas, evaluacion.semana + 1),
                           )
                         }
                       >
@@ -305,7 +305,7 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
                           actualizarEvaluacion(
                             evaluacion.id,
                             "porcentaje",
-                            Math.max(0, evaluacion.porcentaje - 5)
+                            Math.max(0, evaluacion.porcentaje - 5),
                           )
                         }
                       >
@@ -318,7 +318,7 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
                           actualizarEvaluacion(
                             evaluacion.id,
                             "porcentaje",
-                            Math.min(100, Math.max(0, parseInt(text) || 0))
+                            Math.min(100, Math.max(0, parseInt(text) || 0)),
                           )
                         }
                         keyboardType="numeric"
@@ -329,7 +329,7 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
                           actualizarEvaluacion(
                             evaluacion.id,
                             "porcentaje",
-                            Math.min(100, evaluacion.porcentaje + 5)
+                            Math.min(100, evaluacion.porcentaje + 5),
                           )
                         }
                       >
@@ -360,7 +360,7 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
                     Criterios de evaluación:
                   </Text>
                   {evaluacion.criterios.map((criterio, index) => (
-                    <View key={index} style={styles.listItem}>
+                    <View key={`criterio-${index}`} style={styles.listItem}>
                       <Text style={styles.bulletPoint}>•</Text>
                       <TextInput
                         style={[styles.input, styles.listInput]}
@@ -374,7 +374,7 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
                       <TouchableOpacity
                         onPress={() => eliminarCriterio(evaluacion.id, index)}
                       >
-                        <Text style={styles.deleteItemButton}>✕</Text>
+                        <Text style={styles.deleteItemButton}>X</Text>
                       </TouchableOpacity>
                     </View>
                   ))}
@@ -392,7 +392,7 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
                   onPress={() => eliminarEvaluacion(evaluacion.id)}
                 >
                   <Text style={styles.deleteButtonText}>
-                    🗑️ Eliminar evaluación
+                    Eliminar evaluación
                   </Text>
                 </TouchableOpacity>
               </View>

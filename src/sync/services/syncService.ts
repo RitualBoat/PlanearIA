@@ -13,7 +13,7 @@ import {
 import { Planeacion } from "../../../types/planeacion";
 
 // =====================================
-// 📝 TIPOS
+// TIPOS
 // =====================================
 
 export interface PendingOperation {
@@ -34,7 +34,7 @@ export interface SyncResult {
 }
 
 // =====================================
-// 🔧 UTILIDADES
+// UTILIDADES
 // =====================================
 
 const generateId = (): string =>
@@ -59,7 +59,7 @@ export const checkConnectivity = async (): Promise<boolean> => {
 };
 
 // =====================================
-// 🌐 API CLIENT
+// API CLIENT
 // =====================================
 
 const apiRequest = async (
@@ -93,7 +93,7 @@ const apiRequest = async (
 };
 
 // =====================================
-// 💾 OPERACIONES LOCALES
+// OPERACIONES LOCALES
 // =====================================
 
 export const saveLocalPlaneaciones = async (
@@ -104,7 +104,7 @@ export const saveLocalPlaneaciones = async (
     JSON.stringify(planeaciones)
   );
   if (SYNC_CONFIG.debugMode) {
-    console.log(`💾 Guardadas ${planeaciones.length} planeaciones localmente`);
+    console.log(`[sync] Saved ${planeaciones.length} planeaciones locally`);
   }
 };
 
@@ -114,19 +114,19 @@ export const loadLocalPlaneaciones = async (): Promise<Planeacion[]> => {
     if (data) {
       const planeaciones = JSON.parse(data) as Planeacion[];
       if (SYNC_CONFIG.debugMode) {
-        console.log(`📂 Cargadas ${planeaciones.length} planeaciones locales`);
+        console.log(`[sync] Loaded ${planeaciones.length} local planeaciones`);
       }
       return planeaciones;
     }
     return [];
   } catch (error) {
-    console.error("❌ Error cargando planeaciones:", error);
+    console.error("[sync] Error loading planeaciones:", error);
     return [];
   }
 };
 
 // =====================================
-// 📋 OPERACIONES PENDIENTES
+// OPERACIONES PENDIENTES
 // =====================================
 
 export const getPendingOperations = async (): Promise<PendingOperation[]> => {
@@ -172,7 +172,7 @@ export const addPendingOperation = async (
   );
 
   if (SYNC_CONFIG.debugMode) {
-    console.log(`📝 Operación pendiente: ${operation.type}`);
+    console.log(`[sync] Pending operation: ${operation.type}`);
   }
 };
 
@@ -181,7 +181,7 @@ export const clearPendingOperations = async (): Promise<void> => {
 };
 
 // =====================================
-// 🔄 SINCRONIZACIÓN
+// SINCRONIZACION
 // =====================================
 
 /**
@@ -198,7 +198,7 @@ export const fullSync = async (): Promise<SyncResult> => {
   // Verificar si la API está configurada
   if (!isAPIConfigured()) {
     if (SYNC_CONFIG.debugMode) {
-      console.log("⚠️ API no configurada, usando solo modo local");
+      console.log("[sync] API not configured, local-only mode");
     }
     return result;
   }
@@ -206,7 +206,7 @@ export const fullSync = async (): Promise<SyncResult> => {
   // Verificar conectividad
   const isOnline = await checkConnectivity();
   if (!isOnline) {
-    console.log("📴 Sin conexión, sincronización pospuesta");
+    console.log("[sync] Offline, sync postponed");
     return { ...result, success: false };
   }
 
@@ -216,7 +216,7 @@ export const fullSync = async (): Promise<SyncResult> => {
     const pending = await getPendingOperations();
 
     console.log(
-      `🔄 Sincronizando... (${pending.length} operaciones pendientes)`
+      `[sync] Syncing... (${pending.length} pending operations)`
     );
 
     // Hacer request de sync
@@ -258,7 +258,7 @@ export const fullSync = async (): Promise<SyncResult> => {
       );
 
       console.log(
-        `✅ Sync completado: ${result.uploaded} subidos, ${result.downloaded} descargados`
+        `[sync] Done: ${result.uploaded} uploaded, ${result.downloaded} downloaded`
       );
     } else {
       throw new Error(data.error || "Error desconocido");
@@ -266,7 +266,7 @@ export const fullSync = async (): Promise<SyncResult> => {
 
     return result;
   } catch (error) {
-    console.error("❌ Error en sincronización:", error);
+    console.error("[sync] Sync error:", error);
     result.success = false;
     result.errors.push(String(error));
     return result;

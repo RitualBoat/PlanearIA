@@ -76,7 +76,7 @@ export const useSync = (): UseSyncResult => {
 
       return result;
     } catch (error) {
-      console.error("❌ Error en sync:", error);
+      console.error("[useSync] Sync error:", error);
       setSyncStatus("error");
       return {
         success: false,
@@ -89,7 +89,7 @@ export const useSync = (): UseSyncResult => {
 
   // Forzar sincronización
   const forceSync = useCallback(async (): Promise<SyncResult> => {
-    console.log("🔄 Sincronización manual iniciada");
+    console.log("[useSync] Manual sync started");
     return performSync();
   }, [performSync]);
 
@@ -105,7 +105,7 @@ export const useSync = (): UseSyncResult => {
       } else if (wasOffline.current) {
         wasOffline.current = false;
         setJustReconnected(true);
-        console.log("🌐 Reconectado - sincronizando...");
+        console.log("[useSync] Reconnected, syncing...");
 
         await performSync();
         setTimeout(() => setJustReconnected(false), 3000);

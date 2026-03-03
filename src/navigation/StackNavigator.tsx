@@ -19,7 +19,7 @@ import ListaGruposScreen from "../screens/grupos/ListaGruposScreen";
 import CrearGrupoScreen from "../screens/grupos/CrearGrupoScreen";
 import DetalleGrupoScreen from "../screens/grupos/DetalleGrupoScreen";
 
-// Importación de pantallas de Tareas dentro de Grupos ⭐ NUEVO
+// Pantallas de Tareas dentro de Grupos
 import CrearTareaGrupoScreen from "../screens/grupos/tareas/CrearTareaGrupoScreen";
 import AsignarRecursoScreen from "../screens/grupos/tareas/AsignarRecursoScreen";
 import DetalleTareaScreen from "../screens/grupos/tareas/DetalleTareaScreen";
@@ -71,7 +71,7 @@ export type RootStackParamList = {
     grupoNombre: string;
   };
 
-  // ⭐ NUEVO: Tareas dentro de Grupos (v3.0)
+  // Tareas dentro de Grupos (v3.0)
   CrearTareaGrupo: { grupoId: number };
   AsignarRecurso: { grupoId: number };
   DetalleTarea: { tareaId: number; grupoId: number };

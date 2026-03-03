@@ -1,190 +1,190 @@
-# Diagrama de Navegación - PlanearIA
+﻿# Diagrama de Navegación - PlanearIA
 
-## 📱 Flujo Visual Completo
+## Flujo Visual Completo
 
 ```
-                    ┌─────────────────┐
-                    │                 │
-                    │  LoginScreen    │
-                    │                 │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │                 │
-                    │   HomeScreen    │
-                    │  (Menú Principal)│
-                    │                 │
-                    └────┬───┬───┬────┘
-                         │   │   │
-         ┌───────────────┼───┼───┼───────────────┐
-         │               │   │   │               │
-         ▼               ▼   ▼   ▼               ▼
-   ┌──────────┐   ┌─────────────────┐   ┌──────────┐
-   │Planeacio-│   │     GRUPOS      │   │  Tareas  │
-   │   nes    │   │   ⭐ NUEVO ⭐    │   │          │
-   │          │   │                 │   │          │
-   └─────┬────┘   └────────┬────────┘   └──────────┘
-         │                 │
-         │        ┌────────┴────────┐
-         │        │                 │
-         │        ▼                 ▼
-         │  ┌──────────┐     ┌──────────┐
-         │  │  Lista   │     │  Crear   │
-         │  │  Grupos  │     │  Grupo   │
-         │  │          │     │          │
-         │  └─────┬────┘     └──────────┘
-         │        │
-         │        ▼
-         │  ┌───────────────────────────┐
-         │  │   DetalleGrupoScreen      │
-         │  │   ┌───────────────────┐   │
-         │  │   │ 📑 Pestañas:      │   │
-         │  │   ├─ Alumnos         │   │
-         │  │   ├─ Calificaciones  │   │
-         │  │   ├─ Asistencias     │   │
-         │  │   ├─ Comentarios     │   │
-         │  │   └─ Gráficas        │   │
-         │  │   └───────────────────┘   │
-         │  └───────────────────────────┘
-         │
-         ▼
-   ┌──────────────────────────────┐
-   │   RECURSOS DIDÁCTICOS        │
-   │      ⭐ NUEVO ⭐             │
-   └──────────┬───────────────────┘
-              │
-    ┌─────────┼─────────┬─────────┐
-    │         │         │         │
-    ▼         ▼         ▼         ▼
+ ┌─────────────────┐
+ │ │
+ │ LoginScreen │
+ │ │
+ └────────┬────────┘
+ │
+ ▼
+ ┌─────────────────┐
+ │ │
+ │ HomeScreen │
+ │ (Menú Principal)│
+ │ │
+ └────┬───┬───┬────┘
+ │ │ │
+ ┌───────────────┼───┼───┼───────────────┐
+ │ │ │ │ │
+ ▼ ▼ ▼ ▼ ▼
+ ┌──────────┐ ┌─────────────────┐ ┌──────────┐
+ │Planeacio-│ │ GRUPOS │ │ Tareas │
+ │ nes │ │ NUEVO │ │ │
+ │ │ │ │ │ │
+ └─────┬────┘ └────────┬────────┘ └──────────┘
+ │ │
+ │ ┌────────┴────────┐
+ │ │ │
+ │ ▼ ▼
+ │ ┌──────────┐ ┌──────────┐
+ │ │ Lista │ │ Crear │
+ │ │ Grupos │ │ Grupo │
+ │ │ │ │ │
+ │ └─────┬────┘ └──────────┘
+ │ │
+ │ ▼
+ │ ┌───────────────────────────┐
+ │ │ DetalleGrupoScreen │
+ │ │ ┌───────────────────┐ │
+ │ │ │ Pestañas: │ │
+ │ │ ├─ Alumnos │ │
+ │ │ ├─ Calificaciones │ │
+ │ │ ├─ Asistencias │ │
+ │ │ ├─ Comentarios │ │
+ │ │ └─ Gráficas │ │
+ │ │ └───────────────────┘ │
+ │ └───────────────────────────┘
+ │
+ ▼
+ ┌──────────────────────────────┐
+ │ RECURSOS DIDÁCTICOS │
+ │ NUEVO │
+ └──────────┬───────────────────┘
+ │
+ ┌─────────┼─────────┬─────────┐
+ │ │ │ │
+ ▼ ▼ ▼ ▼
 ┌─────────┐┌────────┐┌─────────┐┌─────────┐
-│Exámenes ││Present.││ Mapas   ││ Líneas  │
-│         ││        ││Mentales ││ Tiempo  │
+│Exámenes ││Present.││ Mapas ││ Líneas │
+│ ││ ││Mentales ││ Tiempo │
 └────┬────┘└───┬────┘└────┬────┘└────┬────┘
-     │         │          │          │
-     └─────────┴──────────┴──────────┘
-               │
-               ▼
-     ┌──────────────────────┐
-     │ Método de Creación:  │
-     ├──────────────────────┤
-     │ 🤖 Generar con IA   │
-     │ 📋 Usar Plantilla    │
-     │ ✏️  Crear Manualmente│
-     └──────────────────────┘
+ │ │ │ │
+ └─────────┴──────────┴──────────┘
+ │
+ ▼
+ ┌──────────────────────┐
+ │ Método de Creación: │
+ ├──────────────────────┤
+ │ Generar con IA │
+ │ Usar Plantilla │
+ │ Crear Manualmente│
+ └──────────────────────┘
 
-     Todos guardan en →  Lista de Recursos
+ Todos guardan en → Lista de Recursos
 ```
 
 ---
 
-## 🎯 Módulo de Grupos - Detalle
+## Módulo de Grupos - Detalle
 
 ### Flujo de DetalleGrupoScreen
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│            Detalle del Grupo: "7A - Matemáticas"       │
+│ Detalle del Grupo: "7A - Matemáticas" │
 ├─────────────────────────────────────────────────────────┤
 │ [Alumnos] [Calificaciones] [Asistencias] [Comentarios] [Gráficas] │
 ├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  Pestaña ALUMNOS:                                       │
-│  ┌───────────────────────────────────────────────────┐ │
-│  │ • Juan Pérez García         [Ver] [Editar]       │ │
-│  │ • María López Martínez      [Ver] [Editar]       │ │
-│  │ • Carlos Rodríguez Sánchez  [Ver] [Editar]       │ │
-│  │                                                   │ │
-│  │ [+ Agregar Nuevo Alumno]                         │ │
-│  └───────────────────────────────────────────────────┘ │
-│                                                         │
-│  Pestaña CALIFICACIONES:                                │
-│  ┌───────────────────────────────────────────────────┐ │
-│  │ Promedio Grupal: 8.5                              │ │
-│  │ Aprobación: 85%                                   │ │
-│  │                                                   │ │
-│  │ [Registrar Calificaciones]                        │ │
-│  │ [Ver Historial]                                   │ │
-│  └───────────────────────────────────────────────────┘ │
-│                                                         │
-│  Pestaña ASISTENCIAS:                                   │
-│  ┌───────────────────────────────────────────────────┐ │
-│  │ Asistencia Promedio: 92%                          │ │
-│  │ Retardos Hoy: 3                                   │ │
-│  │                                                   │ │
-│  │ [Pasar Lista Hoy]                                 │ │
-│  │ [Ver Historial de Asistencias]                    │ │
-│  └───────────────────────────────────────────────────┘ │
-│                                                         │
-│  Pestaña COMENTARIOS:                                   │
-│  ┌───────────────────────────────────────────────────┐ │
-│  │ Juan Pérez: "Excelente participación"            │ │
-│  │ María López: "Necesita mejorar en..."            │ │
-│  │                                                   │ │
-│  │ [+ Agregar Comentario]                            │ │
-│  └───────────────────────────────────────────────────┘ │
-│                                                         │
-│  Pestaña GRÁFICAS:                                      │
-│  ┌───────────────────────────────────────────────────┐ │
-│  │  📊 Gráfica de Promedios                          │ │
-│  │  📊 Evolución del Grupo                           │ │
-│  │  📊 Porcentaje de Asistencias                     │ │
-│  │  📊 Comparativa por Alumno                        │ │
-│  └───────────────────────────────────────────────────┘ │
+│ │
+│ Pestaña ALUMNOS: │
+│ ┌───────────────────────────────────────────────────┐ │
+│ │ • Juan Pérez García [Ver] [Editar] │ │
+│ │ • María López Martínez [Ver] [Editar] │ │
+│ │ • Carlos Rodríguez Sánchez [Ver] [Editar] │ │
+│ │ │ │
+│ │ [+ Agregar Nuevo Alumno] │ │
+│ └───────────────────────────────────────────────────┘ │
+│ │
+│ Pestaña CALIFICACIONES: │
+│ ┌───────────────────────────────────────────────────┐ │
+│ │ Promedio Grupal: 8.5 │ │
+│ │ Aprobación: 85% │ │
+│ │ │ │
+│ │ [Registrar Calificaciones] │ │
+│ │ [Ver Historial] │ │
+│ └───────────────────────────────────────────────────┘ │
+│ │
+│ Pestaña ASISTENCIAS: │
+│ ┌───────────────────────────────────────────────────┐ │
+│ │ Asistencia Promedio: 92% │ │
+│ │ Retardos Hoy: 3 │ │
+│ │ │ │
+│ │ [Pasar Lista Hoy] │ │
+│ │ [Ver Historial de Asistencias] │ │
+│ └───────────────────────────────────────────────────┘ │
+│ │
+│ Pestaña COMENTARIOS: │
+│ ┌───────────────────────────────────────────────────┐ │
+│ │ Juan Pérez: "Excelente participación" │ │
+│ │ María López: "Necesita mejorar en..." │ │
+│ │ │ │
+│ │ [+ Agregar Comentario] │ │
+│ └───────────────────────────────────────────────────┘ │
+│ │
+│ Pestaña GRÁFICAS: │
+│ ┌───────────────────────────────────────────────────┐ │
+│ │ Gráfica de Promedios │ │
+│ │ Evolución del Grupo │ │
+│ │ Porcentaje de Asistencias │ │
+│ │ Comparativa por Alumno │ │
+│ └───────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🎨 Módulo de Recursos Didácticos - Detalle
+## Módulo de Recursos Didácticos - Detalle
 
 ### Ejemplo: Crear un Examen
 
 ```
 RecursosDidacticosScreen
-         │
-         ▼
-    Seleccionar: EXÁMENES
-         │
-         ▼
+ │
+ ▼
+ Seleccionar: EXÁMENES
+ │
+ ▼
 ┌─────────────────────────────┐
-│   ExamenesScreen            │
-│                             │
-│  ¿Cómo quieres crear?       │
-│                             │
-│  ┌─────────────────────┐   │
-│  │  🤖 Generar con IA  │───┼──→ Ingresa tema y nivel
-│  └─────────────────────┘   │    IA genera preguntas
-│                             │    Vista previa
-│  ┌─────────────────────┐   │    Editar/Guardar
-│  │  📋 Usar Plantilla  │───┼──→ Elige plantilla
-│  └─────────────────────┘   │    (Opción múltiple, etc.)
-│                             │    Personaliza
-│  ┌─────────────────────┐   │    Guardar
-│  │  ✏️ Crear Manual    │───┼──→ Editor en blanco
-│  └─────────────────────┘   │    Agrega preguntas
-│                             │    Configura puntaje
-└─────────────────────────────┘    Guardar
-         │
-         ▼
-    GUARDAR EN
-  Lista de Recursos
+│ ExamenesScreen │
+│ │
+│ ¿Cómo quieres crear? │
+│ │
+│ ┌─────────────────────┐ │
+│ │ Generar con IA │───┼──→ Ingresa tema y nivel
+│ └─────────────────────┘ │ IA genera preguntas
+│ │ Vista previa
+│ ┌─────────────────────┐ │ Editar/Guardar
+│ │ Usar Plantilla │───┼──→ Elige plantilla
+│ └─────────────────────┘ │ (Opción múltiple, etc.)
+│ │ Personaliza
+│ ┌─────────────────────┐ │ Guardar
+│ │ Crear Manual │───┼──→ Editor en blanco
+│ └─────────────────────┘ │ Agrega preguntas
+│ │ Configura puntaje
+└─────────────────────────────┘ Guardar
+ │
+ ▼
+ GUARDAR EN
+ Lista de Recursos
 ```
 
 ### Tipos de Recursos Disponibles
 
-| Tipo                 | Icono | Métodos                 | Casos de Uso          |
+| Tipo | Icono | Métodos | Casos de Uso |
 | -------------------- | ----- | ----------------------- | --------------------- |
-| **Exámenes**         | 📝    | IA / Plantilla / Manual | Evaluaciones, quizzes |
-| **Presentaciones**   | 📊    | IA / Plantilla / Manual | Clases, exposiciones  |
-| **Mapas Mentales**   | 🧠    | IA / Plantilla / Manual | Organizar conceptos   |
-| **Líneas de Tiempo** | 📅    | IA / Plantilla / Manual | Historia, proyectos   |
+| **Exámenes** | | IA / Plantilla / Manual | Evaluaciones, quizzes |
+| **Presentaciones** | | IA / Plantilla / Manual | Clases, exposiciones |
+| **Mapas Mentales** | | IA / Plantilla / Manual | Organizar conceptos |
+| **Líneas de Tiempo** | | IA / Plantilla / Manual | Historia, proyectos |
 
 ---
 
-## 🔄 Comparación: Arquitectura Antigua vs Nueva
+## Comparación: Arquitectura Antigua vs Nueva
 
-### ❌ ANTIGUA (Separada y dispersa)
+### ANTIGUA (Separada y dispersa)
 
 ```
 Home
@@ -201,39 +201,39 @@ Home
 - Recursos básicos sin opciones de creación
 - Difícil seguimiento integral
 
-### ✅ NUEVA (Integrada y lógica)
+### NUEVA (Integrada y lógica)
 
 ```
 Home
  ├─ Grupos (TODO integrado)
- │   └─ Detalle Grupo
- │       ├─ Alumnos
- │       ├─ Calificaciones  } Todo en
- │       ├─ Asistencias     } UN SOLO
- │       ├─ Comentarios     } LUGAR
- │       └─ Gráficas        }
+ │ └─ Detalle Grupo
+ │ ├─ Alumnos
+ │ ├─ Calificaciones } Todo en
+ │ ├─ Asistencias } UN SOLO
+ │ ├─ Comentarios } LUGAR
+ │ └─ Gráficas }
  │
  └─ Recursos Didácticos (Creación avanzada)
-     ├─ Exámenes (IA/Plantillas/Manual)
-     ├─ Presentaciones (IA/Plantillas/Manual)
-     ├─ Mapas Mentales (IA/Plantillas/Manual)
-     └─ Líneas de Tiempo (IA/Plantillas/Manual)
+ ├─ Exámenes (IA/Plantillas/Manual)
+ ├─ Presentaciones (IA/Plantillas/Manual)
+ ├─ Mapas Mentales (IA/Plantillas/Manual)
+ └─ Líneas de Tiempo (IA/Plantillas/Manual)
 ```
 
 **Ventajas**:
 
-- ✅ Vista unificada por grupo
-- ✅ Gestión integral de alumnos
-- ✅ Seguimiento completo (notas, asistencia, comentarios)
-- ✅ Gráficas y estadísticas integradas
-- ✅ Recursos didácticos con IA
-- ✅ Flujo de trabajo natural del docente
+- Vista unificada por grupo
+- Gestión integral de alumnos
+- Seguimiento completo (notas, asistencia, comentarios)
+- Gráficas y estadísticas integradas
+- Recursos didácticos con IA
+- Flujo de trabajo natural del docente
 
 ---
 
-## 📋 Checklist de Navegación Implementada
+## Checklist de Navegación Implementada
 
-### ✅ Completado
+### Completado
 
 - [x] HomeScreen actualizado con 5 opciones principales
 - [x] Stack Navigator configurado con todas las rutas
@@ -244,7 +244,7 @@ Home
 - [x] Navegación tipada con TypeScript
 - [x] BottomNavBar en todas las pantallas
 
-### 🔄 Pendiente (Lógica de negocio)
+### Pendiente (Lógica de negocio)
 
 - [ ] Context API para estado de Grupos
 - [ ] Context API para estado de Recursos
@@ -256,15 +256,15 @@ Home
 
 ---
 
-## 🎓 Flujos de Uso Real del Docente
+## Flujos de Uso Real del Docente
 
 ### Caso de Uso 1: Inicio de Semestre
 
 ```
 1. Login → Home
 2. Crear Grupo para cada materia
-   - "7A - Matemáticas"
-   - "5B - Programación"
+ - "7A - Matemáticas"
+ - "5B - Programación"
 3. Agregar alumnos a cada grupo
 4. Configurar periodo y horarios
 ```
@@ -302,97 +302,97 @@ Home
 
 ---
 
-## 🗂️ Estructura de Carpetas Actualizada
+## Estructura de Carpetas Actualizada
 
 ```
 src/
 ├── screens/
-│   ├── auth/
-│   │   └── LoginScreen.tsx
-│   │
-│   ├── home/
-│   │   └── HomeScreen.tsx (Actualizado con 5 opciones)
-│   │
-│   ├── planeaciones/ (Mantiene 4 pantallas)
-│   │   ├── PlaneacionesScreen.tsx
-│   │   ├── CrearPlaneacionScreen.tsx
-│   │   ├── EditorPlaneacionScreen.tsx
-│   │   └── ListaPlaneacionesScreen.tsx
-│   │
-│   ├── grupos/ ⭐ NUEVO (4 pantallas)
-│   │   ├── GruposScreen.tsx
-│   │   ├── ListaGruposScreen.tsx
-│   │   ├── CrearGrupoScreen.tsx
-│   │   └── DetalleGrupoScreen.tsx (con pestañas)
-│   │
-│   ├── recursosDidacticos/ ⭐ NUEVO (6 pantallas)
-│   │   ├── RecursosDidacticosScreen.tsx
-│   │   ├── ExamenesScreen.tsx
-│   │   ├── PresentacionesScreen.tsx
-│   │   ├── MapasMentalesScreen.tsx
-│   │   ├── LineasTiempoScreen.tsx
-│   │   └── ListaRecursosScreen.tsx
-│   │
-│   ├── tareas/
-│   │   └── TareasScreen.tsx
-│   │
-│   ├── cuenta/
-│   │   └── CuentaScreen.tsx
-│   │
-│   └── [deprecated]/ (Mantener pero no usar)
-│       ├── alumnos/
-│       ├── calificaciones/
-│       └── recursos/
+│ ├── auth/
+│ │ └── LoginScreen.tsx
+│ │
+│ ├── home/
+│ │ └── HomeScreen.tsx (Actualizado con 5 opciones)
+│ │
+│ ├── planeaciones/ (Mantiene 4 pantallas)
+│ │ ├── PlaneacionesScreen.tsx
+│ │ ├── CrearPlaneacionScreen.tsx
+│ │ ├── EditorPlaneacionScreen.tsx
+│ │ └── ListaPlaneacionesScreen.tsx
+│ │
+│ ├── grupos/ NUEVO (4 pantallas)
+│ │ ├── GruposScreen.tsx
+│ │ ├── ListaGruposScreen.tsx
+│ │ ├── CrearGrupoScreen.tsx
+│ │ └── DetalleGrupoScreen.tsx (con pestañas)
+│ │
+│ ├── recursosDidacticos/ NUEVO (6 pantallas)
+│ │ ├── RecursosDidacticosScreen.tsx
+│ │ ├── ExamenesScreen.tsx
+│ │ ├── PresentacionesScreen.tsx
+│ │ ├── MapasMentalesScreen.tsx
+│ │ ├── LineasTiempoScreen.tsx
+│ │ └── ListaRecursosScreen.tsx
+│ │
+│ ├── tareas/
+│ │ └── TareasScreen.tsx
+│ │
+│ ├── cuenta/
+│ │ └── CuentaScreen.tsx
+│ │
+│ └── [deprecated]/ (Mantener pero no usar)
+│ ├── alumnos/
+│ ├── calificaciones/
+│ └── recursos/
 │
 ├── navigation/
-│   └── StackNavigator.tsx (Actualizado con 20+ rutas)
+│ └── StackNavigator.tsx (Actualizado con 20+ rutas)
 │
 ├── components/
-│   ├── BottomNavBar.tsx
-│   └── WebScrollView.tsx
+│ ├── BottomNavBar.tsx
+│ └── WebScrollView.tsx
 │
 ├── context/
-│   ├── PlaneacionesContext.tsx
-│   ├── GruposContext.tsx (Pendiente)
-│   └── RecursosContext.tsx (Pendiente)
+│ ├── PlaneacionesContext.tsx
+│ ├── GruposContext.tsx (Pendiente)
+│ └── RecursosContext.tsx (Pendiente)
 │
 └── utils/
-    └── responsive.ts
+ └── responsive.ts
 ```
 
 **Total de pantallas**: 23 pantallas funcionales
 
 ---
 
-## 🎯 Resumen de la Nueva Arquitectura
+## Resumen de la Nueva Arquitectura
 
 ### Principios Fundamentales
 
 1. **Centralización por Grupos**
 
-   - Todo gira en torno a los grupos de clase
-   - Vista unificada con pestañas
-   - Seguimiento integral del desempeño
+ - Todo gira en torno a los grupos de clase
+ - Vista unificada con pestañas
+ - Seguimiento integral del desempeño
 
 2. **Recursos Inteligentes**
 
-   - 3 métodos de creación (IA, Plantillas, Manual)
-   - 4 tipos principales de recursos educativos
-   - Almacenamiento centralizado
+ - 3 métodos de creación (IA, Plantillas, Manual)
+ - 4 tipos principales de recursos educativos
+ - Almacenamiento centralizado
 
 3. **Flujo Natural del Docente**
 
-   - Refleja el trabajo real día a día
-   - Menos clics para tareas comunes
-   - Información contextual
+ - Refleja el trabajo real día a día
+ - Menos clics para tareas comunes
+ - Información contextual
 
 4. **Escalabilidad**
-   - Fácil agregar nuevos tipos de recursos
-   - Nuevas pestañas en grupos si se necesitan
-   - Arquitectura modular
+ - Fácil agregar nuevos tipos de recursos
+ - Nuevas pestañas en grupos si se necesitan
+ - Arquitectura modular
 
 ---
 
-**Documento creado**: Noviembre 28, 2025  
-**Autor**: Equipo PlanearIA  
+**Documento creado**: Noviembre 28, 2025
+**Autor**: Equipo PlanearIA
 **Estado**: Arquitectura implementada, pendiente lógica de negocio

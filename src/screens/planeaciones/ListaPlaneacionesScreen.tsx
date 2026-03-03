@@ -8,10 +8,10 @@ import {
   Modal,
   Alert,
   Platform,
-  SafeAreaView,
   StatusBar,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
@@ -51,7 +51,7 @@ const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
 
   // Estados de filtros
   const [filtroNivel, setFiltroNivel] = useState<NivelAcademico | undefined>(
-    undefined
+    undefined,
   );
   const [filtroAsignatura, setFiltroAsignatura] = useState("");
   const [filtroGrado, setFiltroGrado] = useState("");
@@ -133,7 +133,7 @@ const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
   const confirmar = (
     titulo: string,
     mensaje: string,
-    onConfirm: () => void
+    onConfirm: () => void,
   ) => {
     if (Platform.OS === "web") {
       if (window.confirm(`${titulo}\n\n${mensaje}`)) {
@@ -203,7 +203,7 @@ const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
             Alert.alert("Error", "No se pudo eliminar la planeación");
           }
         }
-      }
+      },
     );
   };
 
@@ -247,7 +247,6 @@ const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
         {isUniversidadDetallada && (
           <View style={[styles.badge, styles.badgeDetallado]}>
             <Text style={styles.badgeText}>
-              📅{" "}
               {
                 (item as PlaneacionUniversidad).configuracionCurso!
                   .duracionSemanas
@@ -347,7 +346,7 @@ const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
                       evaluaciones (
                       {(item as PlaneacionUniversidad).evaluaciones!.reduce(
                         (sum, ev) => sum + ev.porcentaje,
-                        0
+                        0,
                       )}
                       %)
                     </Text>
@@ -666,11 +665,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 15,
     overflow: "visible",
-    elevation: 2,
-    shadowColor: COLORS.text,
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
+    boxShadow: "0px 2px 4px rgba(26, 26, 26, 0.1)",
   },
   badge: {
     position: "absolute",
@@ -703,11 +698,7 @@ const styles = StyleSheet.create({
     right: 10,
     backgroundColor: "white",
     borderRadius: 8,
-    elevation: 5,
-    shadowColor: COLORS.text,
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
+    boxShadow: "0px 2px 8px rgba(26, 26, 26, 0.3)",
     zIndex: 10,
     minWidth: 150,
   },

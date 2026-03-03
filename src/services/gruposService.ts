@@ -28,7 +28,7 @@ export const obtenerGrupos = async (): Promise<Partial<Grupo>[]> => {
     
     if (stored) {
       const grupos: Partial<Grupo>[] = JSON.parse(stored);
-      console.log(`📚 Cargados ${grupos.length} grupos desde storage`);
+      console.log(`[grupos] Loaded ${grupos.length} from storage`);
       return grupos;
     }
 

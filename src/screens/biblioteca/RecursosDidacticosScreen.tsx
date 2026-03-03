@@ -5,9 +5,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
-  SafeAreaView,
 } from "react-native";
-import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
@@ -40,6 +41,20 @@ interface RecursoOption {
   color: string;
   route: keyof RootStackParamList;
 }
+
+/**
+ * Componente para renderizar el icono de un recurso didáctico
+ */
+const RecursoIcon: React.FC<{ option: RecursoOption }> = React.memo(
+  ({ option }) => {
+    if (option.iconLibrary === "FontAwesome5") {
+      return <FontAwesome5 name={option.icon} size={50} color={option.color} />;
+    }
+    return (
+      <MaterialIcons name={option.icon as any} size={60} color={option.color} />
+    );
+  },
+);
 
 /**
  * Pantalla principal de Recursos Didácticos
@@ -93,18 +108,6 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({
     navigation.navigate(route as any);
   };
 
-  /**
-   * Renderiza el icono según la librería
-   */
-  const renderIcon = (option: RecursoOption) => {
-    if (option.iconLibrary === "FontAwesome5") {
-      return <FontAwesome5 name={option.icon} size={50} color={option.color} />;
-    }
-    return (
-      <MaterialIcons name={option.icon as any} size={60} color={option.color} />
-    );
-  };
-
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
@@ -130,7 +133,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({
                     { backgroundColor: `${option.color}20` },
                   ]}
                 >
-                  {renderIcon(option)}
+                  <RecursoIcon option={option} />
                 </View>
                 <Text style={styles.optionTitle}>{option.title}</Text>
                 <View style={styles.methodsContainer}>
@@ -219,11 +222,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 25,
     alignItems: "center",
-    elevation: 4,
-    shadowColor: COLORS.text,
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
+    boxShadow: "0px 2px 8px rgba(26, 26, 26, 0.2)",
   },
   iconContainer: {
     width: 100,
@@ -268,11 +267,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderRadius: 12,
-    elevation: 4,
-    shadowColor: COLORS.primary,
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
+    boxShadow: "0px 2px 8px rgba(33, 150, 243, 0.3)",
   },
   verTodosText: {
     color: "white",

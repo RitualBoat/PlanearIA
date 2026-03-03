@@ -1,4 +1,4 @@
-# Solución al Problema de Scroll en Web - EditorPlaneacionScreen
+﻿# Solución al Problema de Scroll en Web - EditorPlaneacionScreen
 
 ## Problema Identificado
 
@@ -15,21 +15,21 @@ React Native Web maneja el `ScrollView` de manera diferente al navegador. El com
 Creé un componente personalizado que:
 
 - **En Web**: Renderiza un `<div>` nativo HTML con:
-  - `maxHeight: calc(100vh - 80px)` - Calcula la altura disponible restando el navbar
-  - `overflow: auto` - Habilita scroll nativo del navegador
-  - `-webkit-overflow-scrolling: touch` - Mejora el comportamiento en dispositivos táctiles
+ - `maxHeight: calc(100vh - 80px)` - Calcula la altura disponible restando el navbar
+ - `overflow: auto` - Habilita scroll nativo del navegador
+ - `-webkit-overflow-scrolling: touch` - Mejora el comportamiento en dispositivos táctiles
 - **En Móvil**: Usa el `ScrollView` estándar de React Native sin modificaciones
 
 ```typescript
 // Pseudocódigo simplificado
 if (Platform.OS === "web") {
-  return (
-    <div with native scroll>
-      <View>{children}</View>
-    </div>
-  );
+ return (
+ <div with native scroll>
+ <View>{children}</View>
+ </div>
+ );
 } else {
-  return <ScrollView>{children}</ScrollView>;
+ return <ScrollView>{children}</ScrollView>;
 }
 ```
 
@@ -43,34 +43,34 @@ if (Platform.OS === "web") {
 
 1. **Nuevos archivos:**
 
-   - `src/components/WebScrollView.tsx` - Componente personalizado de scroll
+ - `src/components/WebScrollView.tsx` - Componente personalizado de scroll
 
 2. **Archivos modificados:**
-   - `src/screens/planeaciones/EditorPlaneacionScreen.tsx`
-     - Importación de `WebScrollView`
-     - Reemplazo de `ScrollView` por `WebScrollView`
-     - Importación de `Dimensions` (preparado para futuras mejoras)
+ - `src/screens/planeaciones/EditorPlaneacionScreen.tsx`
+ - Importación de `WebScrollView`
+ - Reemplazo de `ScrollView` por `WebScrollView`
+ - Importación de `Dimensions` (preparado para futuras mejoras)
 
 ## Beneficios de la Solución
 
-✅ **Funciona para todos los niveles académicos:**
+ **Funciona para todos los niveles académicos:**
 
 - Primaria (menos campos)
 - Secundaria (campos medios)
 - Preparatoria (más campos)
 - Universidad (máximos campos + modalidad)
 
-✅ **Performance mejorada:**
+ **Performance mejorada:**
 
 - Usa scroll nativo del navegador en web (más rápido)
 - No hay conflictos con el layout flex
 
-✅ **Responsive:**
+ **Responsive:**
 
 - Se adapta automáticamente a diferentes tamaños de ventana
 - Usa `calc(100vh - 80px)` para altura dinámica
 
-✅ **Mantenible:**
+ **Mantenible:**
 
 - Código limpio y bien documentado
 - Separación de responsabilidades (componente independiente)
@@ -82,25 +82,25 @@ if (Platform.OS === "web") {
 
 1. Iniciar el proyecto en modo web:
 
-   ```bash
-   npx expo start --web
-   ```
+ ```bash
+ npx expo start --web
+ ```
 
 2. Navegar a: Home → Planeaciones → Nueva Planeación → [Seleccionar Nivel]
 
 3. Probar con diferentes niveles:
 
-   - **Primaria**: Formulario más simple, menos scroll necesario
-   - **Secundaria**: Formulario medio
-   - **Preparatoria**: Formulario extenso con múltiples campos
-   - **Universidad**: Formulario más completo con modalidad y bibliografía
+ - **Primaria**: Formulario más simple, menos scroll necesario
+ - **Secundaria**: Formulario medio
+ - **Preparatoria**: Formulario extenso con múltiples campos
+ - **Universidad**: Formulario más completo con modalidad y bibliografía
 
 4. Verificar que:
-   - El scroll funciona con el mouse wheel
-   - El scroll funciona arrastrando la barra de desplazamiento
-   - Todos los campos son accesibles
-   - El botón "Guardar Planeación" es visible al final
-   - El BottomNavBar permanece fijo en la parte inferior
+ - El scroll funciona con el mouse wheel
+ - El scroll funciona arrastrando la barra de desplazamiento
+ - Todos los campos son accesibles
+ - El botón "Guardar Planeación" es visible al final
+ - El BottomNavBar permanece fijo en la parte inferior
 
 ### Escenarios de Prueba
 
@@ -117,11 +117,11 @@ if (Platform.OS === "web") {
 
 ## Compatibilidad
 
-- ✅ Web (Chrome, Firefox, Safari, Edge)
-- ✅ iOS
-- ✅ Android
-- ✅ React Native 0.81.5
-- ✅ Expo SDK 54
+- Web (Chrome, Firefox, Safari, Edge)
+- iOS
+- Android
+- React Native 0.81.5
+- Expo SDK 54
 
 ## Notas Técnicas
 
@@ -137,10 +137,10 @@ Se usa `80px` como altura estimada del `BottomNavBar`. Si esta altura cambia en 
 
 ### Alternativas Consideradas
 
-1. ❌ `height: 100%` en ScrollView - No funciona con flex containers
-2. ❌ `position: absolute` en ScrollView - Rompe el layout en móvil
-3. ❌ Usar `FlatList` - No apropiado para formularios
-4. ✅ **Componente híbrido con div nativo** - Solución elegida
+1. `height: 100%` en ScrollView - No funciona con flex containers
+2. `position: absolute` en ScrollView - Rompe el layout en móvil
+3. Usar `FlatList` - No apropiado para formularios
+4. **Componente híbrido con div nativo** - Solución elegida
 
 ## Próximos Pasos (Opcional)
 

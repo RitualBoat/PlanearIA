@@ -16,12 +16,14 @@ interface SemanaEditorProps {
   evaluaciones?: { id: string; nombre: string }[];
 }
 
+const EMPTY_EVALUACIONES: { id: string; nombre: string }[] = [];
+
 export const SemanaEditor: React.FC<SemanaEditorProps> = ({
   semana,
   onUpdate,
   onDelete,
   onClone,
-  evaluaciones = [],
+  evaluaciones = EMPTY_EVALUACIONES,
 }) => {
   const [expandido, setExpandido] = useState(false);
 
@@ -69,7 +71,7 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
   const actualizarActividadPresencial = (
     index: number,
     campo: keyof ActividadPresencial,
-    valor: any
+    valor: any,
   ) => {
     const nuevasActividades = [...semana.actividadesPresenciales];
     nuevasActividades[index] = { ...nuevasActividades[index], [campo]: valor };
@@ -78,7 +80,7 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
 
   const eliminarActividadPresencial = (index: number) => {
     const nuevasActividades = semana.actividadesPresenciales.filter(
-      (_, i) => i !== index
+      (_, i) => i !== index,
     );
     actualizarCampo("actividadesPresenciales", nuevasActividades);
   };
@@ -98,7 +100,7 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
 
   const eliminarActividadAutonoma = (index: number) => {
     const nuevasActividades = semana.actividadesAutonomas.filter(
-      (_, i) => i !== index
+      (_, i) => i !== index,
     );
     actualizarCampo("actividadesAutonomas", nuevasActividades);
   };
@@ -259,13 +261,13 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
               style={[styles.actionButton, styles.cloneButton]}
               onPress={onClone}
             >
-              <Text style={styles.actionButtonText}>📋 Clonar</Text>
+              <Text style={styles.actionButtonText}>Clonar</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.actionButton, styles.deleteButton]}
               onPress={onDelete}
             >
-              <Text style={styles.actionButtonText}>🗑️ Eliminar</Text>
+              <Text style={styles.actionButtonText}>Eliminar</Text>
             </TouchableOpacity>
           </View>
 
@@ -322,7 +324,7 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Temas:</Text>
             {semana.temas.map((tema, index) => (
-              <View key={index} style={styles.listItem}>
+              <View key={`tema-${index}`} style={styles.listItem}>
                 <TextInput
                   style={[styles.input, styles.listInput]}
                   value={tema}
@@ -331,7 +333,7 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
                   multiline
                 />
                 <TouchableOpacity onPress={() => eliminarTema(index)}>
-                  <Text style={styles.deleteItemButton}>✕</Text>
+                  <Text style={styles.deleteItemButton}>X</Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -344,7 +346,7 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Objetivos de aprendizaje:</Text>
             {semana.objetivos.map((objetivo, index) => (
-              <View key={index} style={styles.listItem}>
+              <View key={`objetivo-${index}`} style={styles.listItem}>
                 <TextInput
                   style={[styles.input, styles.listInput]}
                   value={objetivo}
@@ -353,7 +355,7 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
                   multiline
                 />
                 <TouchableOpacity onPress={() => eliminarObjetivo(index)}>
-                  <Text style={styles.deleteItemButton}>✕</Text>
+                  <Text style={styles.deleteItemButton}>X</Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -369,7 +371,7 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Actividades presenciales:</Text>
             {semana.actividadesPresenciales.map((actividad, index) => (
-              <View key={index} style={styles.actividadCard}>
+              <View key={`actPresencial-${index}`} style={styles.actividadCard}>
                 <TextInput
                   style={styles.input}
                   value={actividad.descripcion}
@@ -389,7 +391,7 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
                         actualizarActividadPresencial(
                           index,
                           "duracion",
-                          parseInt(text) || 0
+                          parseInt(text) || 0,
                         )
                       }
                       keyboardType="numeric"
@@ -405,7 +407,7 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
                         actualizarActividadPresencial(
                           index,
                           "metodologia",
-                          text
+                          text,
                         )
                       }
                       placeholder="Ej: Clase magistral"
@@ -436,7 +438,7 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Actividades autónomas:</Text>
             {semana.actividadesAutonomas.map((actividad, index) => (
-              <View key={index} style={styles.listItem}>
+              <View key={`actAutonoma-${index}`} style={styles.listItem}>
                 <TextInput
                   style={[styles.input, styles.listInput]}
                   value={actividad}
@@ -449,7 +451,7 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
                 <TouchableOpacity
                   onPress={() => eliminarActividadAutonoma(index)}
                 >
-                  <Text style={styles.deleteItemButton}>✕</Text>
+                  <Text style={styles.deleteItemButton}>X</Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -467,7 +469,7 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Recursos didácticos:</Text>
             {semana.recursos.map((recurso, index) => (
-              <View key={index} style={styles.listItem}>
+              <View key={`recurso-${index}`} style={styles.listItem}>
                 <TextInput
                   style={[styles.input, styles.listInput]}
                   value={recurso}
@@ -476,7 +478,7 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
                   multiline
                 />
                 <TouchableOpacity onPress={() => eliminarRecurso(index)}>
-                  <Text style={styles.deleteItemButton}>✕</Text>
+                  <Text style={styles.deleteItemButton}>X</Text>
                 </TouchableOpacity>
               </View>
             ))}

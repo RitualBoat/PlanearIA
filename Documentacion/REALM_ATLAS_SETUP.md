@@ -1,42 +1,42 @@
-# 🚀 Guía de Integración: Realm + MongoDB Atlas
+﻿# Guía de Integración: Realm + MongoDB Atlas
 
 ## Resumen de la Arquitectura Implementada
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    PlanearIA App (Expo)                          │
+│ PlanearIA App (Expo) │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌──────────────────┐    ┌──────────────────┐                   │
-│  │ RealmAppProvider │───▶│ PlaneacionesRealm│                   │
-│  │ (Autenticación)  │    │    (CRUD Hook)   │                   │
-│  └────────┬─────────┘    └────────┬─────────┘                   │
-│           │                       │                              │
-│           ▼                       ▼                              │
-│  ┌───────────────────────────────────────────┐                  │
-│  │           Realm SDK Local                  │                  │
-│  │    (Base de datos embebida offline)        │                  │
-│  └────────────────────┬──────────────────────┘                  │
-│                       │                                          │
-│           ┌───────────┴───────────┐                              │
-│           │  Atlas Device Sync    │                              │
-│           │  (Sync Automático)    │                              │
-│           └───────────┬───────────┘                              │
+│ │
+│ ┌──────────────────┐ ┌──────────────────┐ │
+│ │ RealmAppProvider │───▶│ PlaneacionesRealm│ │
+│ │ (Autenticación) │ │ (CRUD Hook) │ │
+│ └────────┬─────────┘ └────────┬─────────┘ │
+│ │ │ │
+│ ▼ ▼ │
+│ ┌───────────────────────────────────────────┐ │
+│ │ Realm SDK Local │ │
+│ │ (Base de datos embebida offline) │ │
+│ └────────────────────┬──────────────────────┘ │
+│ │ │
+│ ┌───────────┴───────────┐ │
+│ │ Atlas Device Sync │ │
+│ │ (Sync Automático) │ │
+│ └───────────┬───────────┘ │
 └───────────────────────┼──────────────────────────────────────────┘
-                        │
-                        ▼
-           ┌────────────────────────┐
-           │   MongoDB Atlas M0     │
-           │   (Cloud - GRATUITO)   │
-           │   512 MB Storage       │
-           └────────────────────────┘
+ │
+ ▼
+ ┌────────────────────────┐
+ │ MongoDB Atlas M0 │
+ │ (Cloud - GRATUITO) │
+ │ 512 MB Storage │
+ └────────────────────────┘
 ```
 
 ---
 
-## 📋 Checklist de Implementación
+## Checklist de Implementación
 
-### Paso 1: MongoDB Atlas (Cloud) ✅
+### Paso 1: MongoDB Atlas (Cloud)
 
 - [ ] Crear cuenta en [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register)
 - [ ] Crear cluster M0 (gratuito)
@@ -47,14 +47,14 @@
 - [ ] Habilitar autenticación anónima
 - [ ] Copiar el **App ID**
 
-### Paso 2: Configuración Local ✅
+### Paso 2: Configuración Local
 
 - [ ] Instalar dependencias: `npx expo install @realm/react realm`
 - [ ] Instalar expo-dev-client: `npx expo install expo-dev-client`
 - [ ] Actualizar [atlasConfig.ts](src/realm/config/atlasConfig.ts) con tu App ID
 - [ ] Ejecutar `npx expo prebuild` para crear build nativo
 
-### Paso 3: Verificar Integración ✅
+### Paso 3: Verificar Integración
 
 - [ ] Cambiar `App.tsx` por `App.realm.tsx`
 - [ ] Probar modo offline
@@ -62,34 +62,34 @@
 
 ---
 
-## 📦 Archivos Creados
+## Archivos Creados
 
 ```
 src/realm/
-├── index.ts                    # Exportaciones centralizadas
+├── index.ts # Exportaciones centralizadas
 ├── config/
-│   ├── atlasConfig.ts          # Configuración de Atlas (EDITAR)
-│   └── realmConfig.ts          # Configuración de Realm SDK
+│ ├── atlasConfig.ts # Configuración de Atlas (EDITAR)
+│ └── realmConfig.ts # Configuración de Realm SDK
 ├── schemas/
-│   └── PlaneacionSchema.ts     # Schemas de datos para Realm
+│ └── PlaneacionSchema.ts # Schemas de datos para Realm
 ├── providers/
-│   └── RealmAppProvider.tsx    # Provider principal de Realm
+│ └── RealmAppProvider.tsx # Provider principal de Realm
 ├── hooks/
-│   ├── useConnectivity.ts      # Hook de conectividad
-│   └── usePlaneacionesRealm.ts # Hook CRUD de planeaciones
+│ ├── useConnectivity.ts # Hook de conectividad
+│ └── usePlaneacionesRealm.ts # Hook CRUD de planeaciones
 └── utils/
-    ├── converters.ts           # Conversión de tipos
-    └── migration.ts            # Migración desde AsyncStorage
+ ├── converters.ts # Conversión de tipos
+ └── migration.ts # Migración desde AsyncStorage
 ```
 
 ---
 
-## 🔧 Configuración Requerida
+## Configuración Requerida
 
 ### 1. Editar `src/realm/config/atlasConfig.ts`
 
 ```typescript
-// ⚠️ IMPORTANTE: Reemplaza con tu App ID real
+// IMPORTANTE: Reemplaza con tu App ID real
 export const ATLAS_APP_ID = "planearia-sync-xxxxx"; // ← Tu App ID aquí
 ```
 
@@ -101,21 +101,21 @@ Reemplaza el contenido de `App.tsx` con el de `App.realm.tsx`:
 import { RealmAppProvider } from "./src/realm";
 
 const App: React.FC = () => {
-  return (
-    <RealmAppProvider fallback={<LoadingFallback />}>
-      <PlaneacionesProvider>
-        <NavigationContainer>
-          <StackNavigator />
-        </NavigationContainer>
-      </PlaneacionesProvider>
-    </RealmAppProvider>
-  );
+ return (
+ <RealmAppProvider fallback={<LoadingFallback />}>
+ <PlaneacionesProvider>
+ <NavigationContainer>
+ <StackNavigator />
+ </NavigationContainer>
+ </PlaneacionesProvider>
+ </RealmAppProvider>
+ );
 };
 ```
 
 ---
 
-## 🔄 Cómo Funciona la Sincronización
+## Cómo Funciona la Sincronización
 
 ### Offline-First
 
@@ -128,9 +128,9 @@ const App: React.FC = () => {
 
 ```
 Usuario edita → Realm Local → [Cola de Sync] → Atlas (cuando online)
-                    ↑                              │
-                    └──────────────────────────────┘
-                         (Cambios de otros dispositivos)
+ ↑ │
+ └──────────────────────────────┘
+ (Cambios de otros dispositivos)
 ```
 
 ### Reconexión Automática
@@ -143,7 +143,7 @@ El hook `useConnectivity` detecta cuando vuelves online y:
 
 ---
 
-## 📱 Migración de Datos Existentes
+## Migración de Datos Existentes
 
 La migración de AsyncStorage a Realm es automática:
 
@@ -161,15 +161,15 @@ await resetMigrationStatus();
 
 ---
 
-## 🆓 Límites del Plan Gratuito (M0)
+## Límites del Plan Gratuito (M0)
 
-| Recurso     | Límite      |
+| Recurso | Límite |
 | ----------- | ----------- |
-| Storage     | 512 MB      |
-| Connections | 500         |
-| Device Sync | ✅ Incluido |
-| RAM         | Shared      |
-| Backup      | No          |
+| Storage | 512 MB |
+| Connections | 500 |
+| Device Sync | Incluido |
+| RAM | Shared |
+| Backup | No |
 
 **Estimación para PlanearIA:**
 
@@ -179,7 +179,7 @@ await resetMigrationStatus();
 
 ---
 
-## 🛠️ Comandos Útiles
+## Comandos Útiles
 
 ```bash
 # Instalar dependencias
@@ -200,7 +200,7 @@ npx expo start --clear
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Error: "Realm is not configured"
 
@@ -224,7 +224,7 @@ npx expo start --clear
 
 ---
 
-## 🔐 Seguridad (Producción)
+## Seguridad (Producción)
 
 Para producción, considera:
 
@@ -235,7 +235,7 @@ Para producción, considera:
 
 ---
 
-## 📚 Referencias
+## Referencias
 
 - [MongoDB Atlas Docs](https://www.mongodb.com/docs/atlas/)
 - [Realm React Native SDK](https://www.mongodb.com/docs/realm/sdk/react-native/)

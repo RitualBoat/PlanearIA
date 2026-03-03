@@ -1,37 +1,37 @@
-# 🚀 Guía de Sincronización: MongoDB Atlas (Sin App Services)
+﻿# Guía de Sincronización: MongoDB Atlas (Sin App Services)
 
-## ✅ Solución Implementada
+## Solución Implementada
 
 Esta guía usa **MongoDB Atlas Data API** en lugar de App Services, que es más simple de configurar.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    PlanearIA App (Expo)                          │
+│ PlanearIA App (Expo) │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌──────────────────┐    ┌──────────────────┐                   │
-│  │   SyncProvider   │───▶│  AsyncStorage    │                   │
-│  │  (Offline-First) │    │  (Local DB)      │                   │
-│  └────────┬─────────┘    └──────────────────┘                   │
-│           │                                                      │
-│           ▼                                                      │
-│  ┌───────────────────────────────────────────┐                  │
-│  │         MongoDB Data API (REST)            │                  │
-│  │         Sincronización automática          │                  │
-│  └────────────────────┬──────────────────────┘                  │
+│ │
+│ ┌──────────────────┐ ┌──────────────────┐ │
+│ │ SyncProvider │───▶│ AsyncStorage │ │
+│ │ (Offline-First) │ │ (Local DB) │ │
+│ └────────┬─────────┘ └──────────────────┘ │
+│ │ │
+│ ▼ │
+│ ┌───────────────────────────────────────────┐ │
+│ │ MongoDB Data API (REST) │ │
+│ │ Sincronización automática │ │
+│ └────────────────────┬──────────────────────┘ │
 └───────────────────────┼──────────────────────────────────────────┘
-                        │
-                        ▼
-           ┌────────────────────────┐
-           │   MongoDB Atlas M0     │
-           │   (GRATUITO)           │
-           │   Tu cluster: PlanearIA│
-           └────────────────────────┘
+ │
+ ▼
+ ┌────────────────────────┐
+ │ MongoDB Atlas M0 │
+ │ (GRATUITO) │
+ │ Tu cluster: PlanearIA│
+ └────────────────────────┘
 ```
 
 ---
 
-## 📋 PASO 1: Habilitar Data API en Atlas
+## PASO 1: Habilitar Data API en Atlas
 
 ### 1.1 Acceder a Data API
 
@@ -52,19 +52,19 @@ Esta guía usa **MongoDB Atlas Data API** en lugar de App Services, que es más 
 2. Click **"Create API Key"**
 3. Nombre: `planearia-app-key`
 4. Click **"Generate API Key"**
-5. **⚠️ IMPORTANTE**: Copia la API Key ahora, no se mostrará de nuevo
+5. ** IMPORTANTE**: Copia la API Key ahora, no se mostrará de nuevo
 
 ### 1.4 Copiar la URL del Endpoint
 
 1. Ve a la pestaña **"Overview"** o **"URL Endpoint"**
 2. Copia la URL, se ve así:
-   ```
-   https://data.mongodb-api.com/app/data-xxxxx/endpoint/data/v1
-   ```
+ ```
+ https://data.mongodb-api.com/app/data-xxxxx/endpoint/data/v1
+ ```
 
 ---
 
-## 📋 PASO 2: Configurar la App
+## PASO 2: Configurar la App
 
 ### 2.1 Editar configuración
 
@@ -72,14 +72,14 @@ Abre el archivo `src/sync/config/mongoConfig.ts` y actualiza:
 
 ```typescript
 export const DATA_API_CONFIG = {
-  // Pega tu URL aquí (sin /action/xxx al final)
-  baseUrl: "https://data.mongodb-api.com/app/data-XXXXX/endpoint/data/v1",
+ // Pega tu URL aquí (sin /action/xxx al final)
+ baseUrl: "https://data.mongodb-api.com/app/data-XXXXX/endpoint/data/v1",
 
-  // Pega tu API Key aquí
-  apiKey: "TU_API_KEY_AQUI",
+ // Pega tu API Key aquí
+ apiKey: "TU_API_KEY_AQUI",
 
-  // Nombre de tu cluster
-  dataSource: "PlanearIA",
+ // Nombre de tu cluster
+ dataSource: "PlanearIA",
 };
 ```
 
@@ -91,18 +91,18 @@ Reemplaza el contenido de `App.tsx` con el de `App.sync.tsx`:
 import { SyncProvider } from "./src/sync";
 
 const App = () => (
-  <SyncProvider>
-    <NavigationContainer>
-      <StatusBar style="auto" />
-      <StackNavigator />
-    </NavigationContainer>
-  </SyncProvider>
+ <SyncProvider>
+ <NavigationContainer>
+ <StatusBar style="auto" />
+ <StackNavigator />
+ </NavigationContainer>
+ </SyncProvider>
 );
 ```
 
 ---
 
-## 📋 PASO 3: Usar el nuevo sistema
+## PASO 3: Usar el nuevo sistema
 
 ### En tus componentes
 
@@ -112,24 +112,24 @@ El hook `usePlaneaciones` ahora tiene campos extra:
 import { usePlaneaciones } from "../sync";
 
 const MiComponente = () => {
-  const {
-    // Datos (igual que antes)
-    planeaciones,
-    agregarPlaneacion,
-    actualizarPlaneacion,
-    eliminarPlaneacion,
+ const {
+ // Datos (igual que antes)
+ planeaciones,
+ agregarPlaneacion,
+ actualizarPlaneacion,
+ eliminarPlaneacion,
 
-    // NUEVO: Estado de sincronización
-    syncStatus,      // 'idle' | 'syncing' | 'synced' | 'error' | 'offline'
-    isOnline,        // true/false
-    pendingCount,    // número de operaciones pendientes
-    lastSync,        // timestamp de última sync
-    forceSync,       // función para forzar sync
-  } = usePlaneaciones();
+ // NUEVO: Estado de sincronización
+ syncStatus, // 'idle' | 'syncing' | 'synced' | 'error' | 'offline'
+ isOnline, // true/false
+ pendingCount, // número de operaciones pendientes
+ lastSync, // timestamp de última sync
+ forceSync, // función para forzar sync
+ } = usePlaneaciones();
 
-  return (
-    // ...
-  );
+ return (
+ // ...
+ );
 };
 ```
 
@@ -144,7 +144,7 @@ import SyncStatusBadge from "../components/SyncStatusBadge";
 
 ---
 
-## 🔄 Cómo Funciona la Sincronización
+## Cómo Funciona la Sincronización
 
 ### Flujo Offline-First
 
@@ -155,29 +155,29 @@ import SyncStatusBadge from "../components/SyncStatusBadge";
 
 ### Estados de Sincronización
 
-| Estado    | Significado         |
+| Estado | Significado |
 | --------- | ------------------- |
-| `idle`    | Sin actividad       |
+| `idle` | Sin actividad |
 | `syncing` | Sincronizando ahora |
-| `synced`  | Todo sincronizado   |
-| `error`   | Error en sync       |
-| `offline` | Sin conexión        |
+| `synced` | Todo sincronizado |
+| `error` | Error en sync |
+| `offline` | Sin conexión |
 
 ---
 
-## 🆓 Límites del Plan Gratuito
+## Límites del Plan Gratuito
 
-| Recurso           | Límite     |
+| Recurso | Límite |
 | ----------------- | ---------- |
-| Storage           | 512 MB     |
+| Storage | 512 MB |
 | Data API Requests | 10,000/mes |
-| Connections       | 500        |
+| Connections | 500 |
 
 **Nota**: 10,000 requests/mes es suficiente para uso personal/desarrollo.
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### "Data API no configurado"
 
@@ -202,29 +202,29 @@ import SyncStatusBadge from "../components/SyncStatusBadge";
 
 ---
 
-## 📁 Archivos Creados
+## Archivos Creados
 
 ```
 src/sync/
-├── index.ts                    # Exportaciones
+├── index.ts # Exportaciones
 ├── config/
-│   └── mongoConfig.ts          # ⚠️ CONFIGURAR
+│ └── mongoConfig.ts # CONFIGURAR
 ├── services/
-│   └── syncService.ts          # Lógica de sincronización
+│ └── syncService.ts # Lógica de sincronización
 ├── hooks/
-│   └── useSync.ts              # Hook de sync
+│ └── useSync.ts # Hook de sync
 └── providers/
-    └── SyncProvider.tsx        # Provider principal
+ └── SyncProvider.tsx # Provider principal
 
 src/components/
-└── SyncStatusBadge.tsx         # Indicador visual
+└── SyncStatusBadge.tsx # Indicador visual
 
-App.sync.tsx                    # Nueva versión de App.tsx
+App.sync.tsx # Nueva versión de App.tsx
 ```
 
 ---
 
-## 🔐 Seguridad (Producción)
+## Seguridad (Producción)
 
 Para producción, considera:
 

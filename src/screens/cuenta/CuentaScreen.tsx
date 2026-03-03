@@ -7,9 +7,9 @@ import {
   ScrollView,
   StatusBar,
   Alert,
-  SafeAreaView,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { CommonActions } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/StackNavigator";
@@ -67,7 +67,7 @@ const CuentaScreen: React.FC<CuentaScreenProps> = ({ navigation }) => {
             CommonActions.reset({
               index: 0,
               routes: [{ name: "Login" }],
-            })
+            }),
           );
         },
       },
@@ -181,11 +181,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 25,
     alignItems: "center",
-    elevation: 4,
-    shadowColor: COLORS.text,
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
+    boxShadow: "0px 2px 8px rgba(26, 26, 26, 0.2)",
   },
   logoutCard: {
     borderWidth: 1,

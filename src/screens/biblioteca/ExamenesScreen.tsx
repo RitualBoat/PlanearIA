@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
-  SafeAreaView,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
@@ -110,7 +110,7 @@ const ExamenesScreen: React.FC<ExamenesScreenProps> = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {/* ⭐ NUEVO: Vista previa de la opción de asignación */}
+          {/* Vista previa: opcion de asignacion */}
           <View style={styles.infoSection}>
             <MaterialIcons name="info" size={24} color={COLORS.primary} />
             <Text style={styles.infoText}>
@@ -121,7 +121,7 @@ const ExamenesScreen: React.FC<ExamenesScreenProps> = ({ navigation }) => {
 
           {/* Preview de la futura funcionalidad */}
           <View style={styles.previewCard}>
-            <Text style={styles.previewTitle}>💡 Próximamente disponible:</Text>
+            <Text style={styles.previewTitle}>Próximamente disponible:</Text>
             <View style={styles.previewOption}>
               <MaterialIcons
                 name="save"
@@ -185,11 +185,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 25,
     alignItems: "center",
-    elevation: 4,
-    shadowColor: COLORS.text,
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
+    boxShadow: "0px 2px 8px rgba(26, 26, 26, 0.2)",
   },
   iconContainer: {
     width: 100,
@@ -212,7 +208,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 20,
   },
-  // ⭐ NUEVOS ESTILOS PARA PREVIEW
+  // Estilos para preview
   infoSection: {
     flexDirection: "row",
     alignItems: "center",

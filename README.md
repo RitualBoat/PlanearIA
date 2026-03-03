@@ -1,4 +1,4 @@
-# 📚 PlanearIA - Planeación Educativa Inteligente
+﻿# PlanearIA - Planeación Educativa Inteligente
 
 <div align="center">
 
@@ -15,45 +15,45 @@
 
 ---
 
-## 🎯 Acerca del Proyecto
+## Acerca del Proyecto
 
 **PlanearIA** es una aplicación cross-platform (iOS, Android, Web) diseñada para facilitar la vida de los docentes mediante la gestión integral de:
 
-- 📝 **Planeaciones Académicas** - Crea y edita planeaciones por nivel educativo
-- 👥 **Grupos** - Administra grupos con alumnos, calificaciones, asistencias y tareas
-- 📚 **Biblioteca de Recursos** - Exámenes, presentaciones, mapas mentales y líneas de tiempo
-- ✅ **Tareas y Evaluaciones** - Sistema completo de asignación, seguimiento y calificación
-- 👤 **Perfil y Configuración** - Gestión de cuenta personal
+- **Planeaciones Académicas** - Crea y edita planeaciones por nivel educativo
+- **Grupos** - Administra grupos con alumnos, calificaciones, asistencias y tareas
+- **Biblioteca de Recursos** - Exámenes, presentaciones, mapas mentales y líneas de tiempo
+- **Tareas y Evaluaciones** - Sistema completo de asignación, seguimiento y calificación
+- **Perfil y Configuración** - Gestión de cuenta personal
 
 ---
 
-## ✨ Características v3.0
+## Características v3.0
 
-### 🆕 Novedades
+### Novedades
 
-- ✅ **Tareas integradas en Grupos** - Gestión completa dentro de cada grupo
-- ✅ **6 Módulos por Grupo** - Alumnos, Calificaciones, Asistencias, Comentarios, Tareas, Gráficas
-- ✅ **Asignación Directa** - Asigna recursos de tu biblioteca a grupos específicos
-- ✅ **Scroll Optimizado Web** - Interfaz fluida en navegadores con scrollbar personalizada
-- ✅ **Navegación Simplificada** - 4 módulos principales en home
+- **Tareas integradas en Grupos** - Gestión completa dentro de cada grupo
+- **6 Módulos por Grupo** - Alumnos, Calificaciones, Asistencias, Comentarios, Tareas, Gráficas
+- **Asignación Directa** - Asigna recursos de tu biblioteca a grupos específicos
+- **Scroll Optimizado Web** - Interfaz fluida en navegadores con scrollbar personalizada
+- **Navegación Simplificada** - 4 módulos principales en home
 
-### 🎨 Interfaz
+### Interfaz
 
-- 📱 **Responsive** - Adaptación automática a móvil, tablet y escritorio
-- 🎨 **Material Design** - Iconos y componentes modernos
-- 🌐 **Cross-Platform** - Una base de código para web, iOS y Android
-- ⚡ **Performance** - Optimizado para carga rápida y fluidez
+- **Responsive** - Adaptación automática a móvil, tablet y escritorio
+- **Material Design** - Iconos y componentes modernos
+- **Cross-Platform** - Una base de código para web, iOS y Android
+- **Performance** - Optimizado para carga rápida y fluidez
 
 ---
 
-## 🚀 Instalación
+## Instalación
 
 ### Prerequisitos
 
 ```bash
 # Verifica que tengas instalado:
-node --version   # >= 16.x
-npm --version    # >= 8.x
+node --version # >= 16.x
+npm --version # >= 8.x
 ```
 
 ### Pasos
@@ -67,14 +67,14 @@ cd PlanearIA
 npm install
 
 # 3. Ejecutar en desarrollo
-npm run web      # Para web (navegador)
-npm run ios      # Para iOS (requiere Mac + Xcode)
-npm run android  # Para Android (requiere Android Studio)
+npm run web # Para web (navegador)
+npm run ios # Para iOS (requiere Mac + Xcode)
+npm run android # Para Android (requiere Android Studio)
 ```
 
 ---
 
-## 📖 Uso
+## Uso
 
 ### Desarrollo Local
 
@@ -101,68 +101,69 @@ eas build --platform android
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 PlanearIA/
-├── 📱 App.tsx                    # Punto de entrada
-├── 📦 package.json               # Dependencias
-├── 📁 Documentacion/             # 📚 Documentación técnica completa
-├── 📁 src/
-│   ├── 🧩 components/            # Componentes reutilizables
-│   ├── 🎨 screens/               # Pantallas por módulo
-│   │   ├── auth/                # Login
-│   │   ├── home/                # Home principal
-│   │   ├── grupos/              # Grupos (con tareas integradas)
-│   │   ├── planeaciones/        # Planeaciones
-│   │   ├── biblioteca/          # Recursos didácticos
-│   │   └── cuenta/              # Perfil de usuario
-│   ├── 🧭 navigation/            # Rutas y navegación
-│   ├── 🔧 context/               # Contexts de React
-│   └── 🛠️ utils/                 # Utilidades
-├── 📁 types/                     # Tipos de TypeScript
-└── 📁 assets/                    # Imágenes e iconos
+├── App.tsx # Punto de entrada
+├── package.json # Dependencias
+├── Documentacion/ # Documentación técnica completa
+├── src/
+│ ├── components/ # Componentes reutilizables
+│ ├── screens/ # Pantallas por módulo
+│ │ ├── auth/ # Login
+│ │ ├── home/ # Home principal
+│ │ ├── grupos/ # Grupos (con tareas integradas)
+│ │ ├── planeaciones/ # Planeaciones
+│ │ ├── biblioteca/ # Recursos didácticos
+│ │ └── cuenta/ # Perfil de usuario
+│ ├── navigation/ # Rutas y navegación
+│ ├── context/ # Contexts de React
+│ └── utils/ # Utilidades
+├── types/ # Tipos de TypeScript
+└── assets/ # Imágenes e iconos
 ```
 
 ---
 
-## 📚 Documentación
+## Documentación
 
 La documentación técnica completa se encuentra en la carpeta [`Documentacion/`](./Documentacion/):
 
-| Documento                                                | Descripción                      |
-| -------------------------------------------------------- | -------------------------------- |
-| [📘 README](./Documentacion/README.md)                   | Índice completo de documentación |
-| [🏗️ ARQUITECTURA](./Documentacion/ARQUITECTURA.md)       | Estructura y decisiones técnicas |
-| [🗺️ NAVEGACION](./Documentacion/MAPA_NAVEGACION.md)      | Mapa de rutas y pantallas        |
-| [📋 CAMBIOS v3.0](./Documentacion/RESUMEN_CAMBIOS_V3.md) | Changelog de la versión 3.0      |
-| [🧪 PRUEBAS](./Documentacion/GUIA_PRUEBAS.md)            | Guía de testing                  |
+| Documento | Descripción |
+| --------------------------------------------------------------------- | ------------------------------------------------- |
+| [ README](./Documentacion/README.md) | Índice completo de documentación |
+| [ ARQUITECTURA](./Documentacion/ARQUITECTURA.md) | Estructura y decisiones técnicas |
+| [ FLUJO DE SINCRONIZACIÓN](./Documentacion/FLUJO_SINCRONIZACION.md) | **Flujo de datos y sincronización offline-first** |
+| [ NAVEGACION](./Documentacion/MAPA_NAVEGACION.md) | Mapa de rutas y pantallas |
+| [ CAMBIOS v3.0](./Documentacion/RESUMEN_CAMBIOS_V3.md) | Changelog de la versión 3.0 |
+| [ PRUEBAS](./Documentacion/GUIA_PRUEBAS.md) | Guía de testing |
 
 ---
 
-## 🛠️ Tecnologías
+## Tecnologías
 
-| Tecnología            | Versión | Uso                          |
+| Tecnología | Versión | Uso |
 | --------------------- | ------- | ---------------------------- |
-| **React Native**      | 0.81.5  | Framework principal          |
-| **Expo**              | 54.0.21 | Herramientas de desarrollo   |
-| **TypeScript**        | 5.9.2   | Tipado estático              |
-| **React Navigation**  | 7.x     | Navegación entre pantallas   |
-| **Expo Vector Icons** | -       | Iconografía (Material Icons) |
+| **React Native** | 0.81.5 | Framework principal |
+| **Expo** | 54.0.21 | Herramientas de desarrollo |
+| **TypeScript** | 5.9.2 | Tipado estático |
+| **React Navigation** | 7.x | Navegación entre pantallas |
+| **Expo Vector Icons** | - | Iconografía (Material Icons) |
 
 ---
 
-## 📱 Plataformas
+## Plataformas
 
-| Plataforma     | Estado       | Compatibilidad                |
+| Plataforma | Estado | Compatibilidad |
 | -------------- | ------------ | ----------------------------- |
-| 🌐 **Web**     | ✅ Probado   | Chrome, Firefox, Safari, Edge |
-| 🍎 **iOS**     | ✅ Funcional | iOS 13+                       |
-| 🤖 **Android** | ✅ Funcional | Android 8.0+                  |
+| **Web** | Probado | Chrome, Firefox, Safari, Edge |
+| **iOS** | Funcional | iOS 13+ |
+| **Android** | Funcional | Android 8.0+ |
 
 ---
 
-## 🔄 Roadmap
+## Roadmap
 
 ### v3.1 (Próximamente)
 
@@ -180,7 +181,7 @@ La documentación técnica completa se encuentra en la carpeta [`Documentacion/`
 
 ---
 
-## 👥 Contribución
+## Contribución
 
 Este es un proyecto en desarrollo activo. Para contribuir:
 
@@ -192,23 +193,23 @@ Este es un proyecto en desarrollo activo. Para contribuir:
 
 ---
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto es de código privado. Todos los derechos reservados.
 
 ---
 
-## 📞 Contacto
+## Contacto
 
-**Repositorio:** [github.com/RitualBoat/PlanearIA](https://github.com/RitualBoat/PlanearIA)  
+**Repositorio:** [github.com/RitualBoat/PlanearIA](https://github.com/RitualBoat/PlanearIA)
 **Branch Principal:** `development`
 
 ---
 
 <div align="center">
 
-**Desarrollado con ❤️ para facilitar la labor docente**
+**Desarrollado con para facilitar la labor docente**
 
-⭐ Si te gusta el proyecto, dale una estrella en GitHub
+ Si te gusta el proyecto, dale una estrella en GitHub
 
 </div>

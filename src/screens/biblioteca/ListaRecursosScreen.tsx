@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
-  SafeAreaView,
   TextInput,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES, Recurso } from "../../../types";
@@ -145,8 +145,8 @@ const ListaRecursosScreen: React.FC<ListaRecursosScreenProps> = ({
                           recurso.origen === "ia"
                             ? "auto-awesome"
                             : recurso.origen === "plantilla"
-                            ? "dashboard"
-                            : "edit"
+                              ? "dashboard"
+                              : "edit"
                         }
                         size={12}
                         color={COLORS.primary}
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 10,
-    elevation: 2,
+    boxShadow: "0px 1px 3px rgba(26, 26, 26, 0.1)",
   },
   searchInput: {
     flex: 1,
@@ -201,11 +201,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
-    elevation: 3,
-    shadowColor: COLORS.text,
-    shadowOpacity: 0.15,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
+    boxShadow: "0px 2px 5px rgba(26, 26, 26, 0.15)",
   },
   recursoHeader: { flexDirection: "row" },
   recursoIcon: {

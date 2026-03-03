@@ -23,7 +23,7 @@ import { useSync } from "../hooks/useSync";
 import { STORAGE_KEYS } from "../config/apiConfig";
 
 // =====================================
-// 📝 TIPOS
+// TIPOS
 // =====================================
 
 interface SyncContextData {
@@ -36,7 +36,7 @@ interface SyncContextData {
   agregarPlaneacion: (planeacion: Planeacion) => Promise<void>;
   actualizarPlaneacion: (
     id: string,
-    updates: Partial<Planeacion>
+    updates: Partial<Planeacion>,
   ) => Promise<void>;
   eliminarPlaneacion: (id: string) => Promise<void>;
   obtenerPlaneacion: (id: string) => Planeacion | undefined;
@@ -58,7 +58,7 @@ interface SyncContextData {
 const SyncContext = createContext<SyncContextData | undefined>(undefined);
 
 // =====================================
-// 🏠 PROVIDER
+// PROVIDER
 // =====================================
 
 interface SyncProviderProps {
@@ -68,7 +68,7 @@ interface SyncProviderProps {
 export const SyncProvider: React.FC<SyncProviderProps> = ({ children }) => {
   const [planeaciones, setPlaneaciones] = useState<Planeacion[]>([]);
   const [planeacionActual, setPlaneacionActual] = useState<Planeacion | null>(
-    null
+    null,
   );
   const [isLoading, setIsLoading] = useState(true);
 
@@ -84,11 +84,27 @@ export const SyncProvider: React.FC<SyncProviderProps> = ({ children }) => {
   } = useSync();
 
   /**
+   * Carga planeaciones desde storage
+   */
+  const loadFromStorage = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const data = await loadLocalPlaneaciones();
+      setPlaneaciones(data);
+      console.log(`[provider] Loaded ${data.length} planeaciones`);
+    } catch (error) {
+      console.error("[provider] Load error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  /**
    * Carga inicial de datos
    */
   useEffect(() => {
     loadFromStorage();
-  }, []);
+  }, [loadFromStorage]);
 
   /**
    * Recargar después de sync
@@ -97,30 +113,17 @@ export const SyncProvider: React.FC<SyncProviderProps> = ({ children }) => {
     if (justReconnected) {
       loadFromStorage();
     }
-  }, [justReconnected]);
-
-  /**
-   * Carga planeaciones desde storage
-   */
-  const loadFromStorage = async () => {
-    try {
-      setIsLoading(true);
-      const data = await loadLocalPlaneaciones();
-      setPlaneaciones(data);
-      console.log(`✅ Cargadas ${data.length} planeaciones`);
-    } catch (error) {
-      console.error("❌ Error cargando:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [justReconnected, loadFromStorage]);
 
   /**
    * Guarda y registra operación pendiente
    */
   const saveAndSync = async (
     newPlaneaciones: Planeacion[],
-    operation: { type: "create" | "update" | "delete"; data: Planeacion | null }
+    operation: {
+      type: "create" | "update" | "delete";
+      data: Planeacion | null;
+    },
   ) => {
     await saveLocalPlaneaciones(newPlaneaciones);
     setPlaneaciones(newPlaneaciones);
@@ -133,7 +136,7 @@ export const SyncProvider: React.FC<SyncProviderProps> = ({ children }) => {
   const agregarPlaneacion = async (planeacion: Planeacion) => {
     const newPlaneaciones = [...planeaciones, planeacion];
     await saveAndSync(newPlaneaciones, { type: "create", data: planeacion });
-    console.log(`➕ Planeación agregada: ${planeacion.temaSesion}`);
+    console.log(`[provider] Added: ${planeacion.temaSesion}`);
   };
 
   /**
@@ -141,7 +144,7 @@ export const SyncProvider: React.FC<SyncProviderProps> = ({ children }) => {
    */
   const actualizarPlaneacion = async (
     id: string,
-    updates: Partial<Planeacion>
+    updates: Partial<Planeacion>,
   ) => {
     const newPlaneaciones = planeaciones.map((p) =>
       p.id === id
@@ -150,14 +153,14 @@ export const SyncProvider: React.FC<SyncProviderProps> = ({ children }) => {
             ...updates,
             fechaModificacion: new Date().toISOString(),
           } as Planeacion)
-        : p
+        : p,
     );
     const updated = newPlaneaciones.find((p) => p.id === id);
     await saveAndSync(newPlaneaciones, {
       type: "update",
       data: updated || null,
     });
-    console.log(`✏️ Planeación actualizada: ${id}`);
+    console.log(`[provider] Updated: ${id}`);
   };
 
   /**
@@ -174,7 +177,7 @@ export const SyncProvider: React.FC<SyncProviderProps> = ({ children }) => {
     if (planeacionActual?.id === id) {
       setPlaneacionActual(null);
     }
-    console.log(`🗑️ Planeación eliminada: ${id}`);
+    console.log(`[provider] Deleted: ${id}`);
   };
 
   /**
@@ -228,7 +231,7 @@ export const SyncProvider: React.FC<SyncProviderProps> = ({ children }) => {
     setPlaneacionActual(null);
     await AsyncStorage.removeItem(STORAGE_KEYS.PLANEACIONES);
     await AsyncStorage.removeItem(STORAGE_KEYS.PENDING_OPERATIONS);
-    console.log("🧹 Planeaciones limpiadas");
+    console.log("[provider] All planeaciones cleared");
   };
 
   /**
@@ -271,7 +274,7 @@ export const SyncProvider: React.FC<SyncProviderProps> = ({ children }) => {
 };
 
 // =====================================
-// 🪝 HOOKS
+// HOOKS
 // =====================================
 
 export const useSyncPlaneaciones = (): SyncContextData => {

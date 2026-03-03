@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -10,54 +10,31 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES, Carrera } from "../../../types";
 import BottomNavBar from "../../components/BottomNavBar";
+import { useCrearGrupoViewModel } from "../../hooks/useCrearGrupoViewModel";
 
 /**
- * Tipo para las props de navegación
+ * Pantalla para Crear un Nuevo Grupo (View)
+ * Solo JSX y StyleSheet - la logica vive en useCrearGrupoViewModel
  */
-type CrearGrupoScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "CrearGrupo"
->;
-
-/**
- * Props del componente
- */
-interface CrearGrupoScreenProps {
-  navigation: CrearGrupoScreenNavigationProp;
-}
-
-/**
- * Pantalla para Crear un Nuevo Grupo
- */
-const CrearGrupoScreen: React.FC<CrearGrupoScreenProps> = ({ navigation }) => {
-  const [nombre, setNombre] = useState<string>("");
-  const [materia, setMateria] = useState<string>("");
-  const [carrera, setCarrera] = useState<Carrera>("ISC");
-  const [semestre, setSemestre] = useState<string>("");
-  const [periodo, setPeriodo] = useState<string>("");
-  const [horario, setHorario] = useState<string>("");
-
-  /**
-   * Maneja la creación del grupo
-   */
-  const handleCrearGrupo = (): void => {
-    // Aquí iría la lógica para guardar el grupo
-    console.log("Crear grupo:", {
-      nombre,
-      materia,
-      carrera,
-      semestre,
-      periodo,
-      horario,
-    });
-
-    // Navegar de regreso o mostrar confirmación
-    navigation.goBack();
-  };
+const CrearGrupoScreen: React.FC = () => {
+  const {
+    nombre,
+    setNombre,
+    materia,
+    setMateria,
+    carrera,
+    setCarrera,
+    semestre,
+    setSemestre,
+    periodo,
+    setPeriodo,
+    horario,
+    setHorario,
+    handleCrearGrupo,
+    handleCancelar,
+  } = useCrearGrupoViewModel();
 
   return (
     <View style={styles.container}>
@@ -169,7 +146,7 @@ const CrearGrupoScreen: React.FC<CrearGrupoScreenProps> = ({ navigation }) => {
 
             <TouchableOpacity
               style={styles.cancelButton}
-              onPress={() => navigation.goBack()}
+              onPress={handleCancelar}
               activeOpacity={0.8}
             >
               <Text style={styles.cancelButtonText}>Cancelar</Text>

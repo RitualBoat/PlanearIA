@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -9,77 +9,25 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RouteProp } from "@react-navigation/native";
-import { RootStackParamList } from "../../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../../types";
 import BottomNavBar from "../../../components/BottomNavBar";
 import WebScrollView from "../../../components/WebScrollView";
-
-type CalificarEntregasScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "CalificarEntregas"
->;
-
-type CalificarEntregasScreenRouteProp = RouteProp<
-  RootStackParamList,
-  "CalificarEntregas"
->;
-
-interface CalificarEntregasScreenProps {
-  navigation: CalificarEntregasScreenNavigationProp;
-  route: CalificarEntregasScreenRouteProp;
-}
-
-interface Calificacion {
-  alumnoId: number;
-  calificacion: string;
-  retroalimentacion: string;
-}
+import { useCalificarEntregasViewModel } from "../../../hooks/useCalificarEntregasViewModel";
 
 /**
- * Pantalla para calificar las entregas de una tarea
+ * Pantalla para calificar las entregas de una tarea (View)
+ * Solo JSX y StyleSheet - la logica vive en useCalificarEntregasViewModel
  */
-const CalificarEntregasScreen: React.FC<CalificarEntregasScreenProps> = ({
-  navigation,
-  route,
-}) => {
-  const { tareaId, grupoId } = route.params;
-
-  // Entregas a calificar
-  const entregas = [
-    { id: 1, alumnoId: 1, nombre: "Juan Pérez García" },
-    { id: 2, alumnoId: 2, nombre: "María López Martínez" },
-    { id: 3, alumnoId: 4, nombre: "Ana Torres Silva" },
-  ];
-
-  const [calificaciones, setCalificaciones] = useState<
-    Record<number, Calificacion>
-  >({});
-
-  const updateCalificacion = (
-    alumnoId: number,
-    field: keyof Calificacion,
-    value: string,
-  ) => {
-    setCalificaciones((prev) => ({
-      ...prev,
-      [alumnoId]: {
-        ...(prev[alumnoId] || {
-          alumnoId,
-          calificacion: "",
-          retroalimentacion: "",
-        }),
-        [field]: value,
-      },
-    }));
-  };
-
-  const handleGuardarCalificaciones = () => {
-    // TODO: Implementar lógica de guardado
-    console.log("Guardando calificaciones:", calificaciones);
-    navigation.goBack();
-  };
+const CalificarEntregasScreen: React.FC = () => {
+  const {
+    tareaId,
+    grupoId,
+    entregas,
+    calificaciones,
+    updateCalificacion,
+    handleGuardarCalificaciones,
+    handleCancelar,
+  } = useCalificarEntregasViewModel();
 
   return (
     <View style={styles.container}>
@@ -165,7 +113,7 @@ const CalificarEntregasScreen: React.FC<CalificarEntregasScreenProps> = ({
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[styles.button, styles.buttonSecondary]}
-              onPress={() => navigation.goBack()}
+              onPress={handleCancelar}
             >
               <Text style={styles.buttonTextSecondary}>Cancelar</Text>
             </TouchableOpacity>

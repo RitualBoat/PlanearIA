@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -6,156 +6,29 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  Alert,
   KeyboardAvoidingView,
   Platform,
-  Dimensions,
 } from "react-native";
-import { StackNavigationProp } from "@react-navigation/stack";
 
-//Ahora importamos los tipos que definimos
-import { RootStackParamList } from "../../navigation/StackNavigator";
-import { LoginFormData, COLORS, FONT_SIZES } from "../../../types";
+import { COLORS, FONT_SIZES } from "../../../types";
 import { isWeb, responsive } from "../../utils/responsive";
+import { useLoginViewModel } from "../../hooks/useLoginViewModel";
 
-//Ahora se importa la imagen
 const loginImage = require("../../../assets/PlanearIA.png");
-//Tipo para las props de navegación de esta pantalla
-type LoginScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "Login"
->;
 
-//Props que recibe el componente LoginScreen
-interface LoginScreenProps {
-  navigation: LoginScreenNavigationProp;
-}
-
-//Pantalla de inicio de sesion
-//Permite a los usuarios autenticar con su correo y contraseña
-const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
-  //Estados del formulario usando el tipo LoginFormData
-  const [formData, setFormData] = useState<LoginFormData>({
-    username: "",
-    password: "",
-  });
-
-  //Estado para controlar si esta cargando
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  //Actualiza los datos del formulario
-  //@param field - campo a actualizar ('username' o 'password')
-  //@param value - nuevo valor del campo
-  const updateFormData = (field: keyof LoginFormData, value: string): void => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [field]: value,
-    }));
-  };
-
-  //Valida que los campos del formulario no esten vacios
-  //@return true si los campos son validos, false en caso contrario
-  const validateForm = (): boolean => {
-    if (!formData.username.trim()) {
-      if (Platform.OS === "web") {
-        window.alert("Por favor ingrese su nombre de usuario");
-      } else {
-        Alert.alert("Error", "Por favor ingrese su nombre de usuario");
-      }
-      return false;
-    }
-    if (!formData.password.trim()) {
-      if (Platform.OS === "web") {
-        window.alert("Por favor ingrese su contraseña");
-      } else {
-        Alert.alert("Error", "Por favor ingrese su contraseña");
-      }
-      return false;
-    }
-    if (formData.password.length < 4) {
-      if (Platform.OS === "web") {
-        window.alert("La contraseña debe tener al menos 4 caracteres");
-      } else {
-        Alert.alert("Error", "La contraseña debe tener al menos 4 caracteres");
-      }
-      return false;
-    }
-    return true;
-  };
-
-  //Simula el proceso de autenticación del usuario
-  const authenticateUser = (): void => {
-    setIsLoading(true);
-
-    //Simulamos una peticion al servidor (2 segundos)
-    setTimeout(() => {
-      setIsLoading(false);
-
-      //Aqui iria la logica real de autenticacion
-      //por ahora, cualquier usuario/contraseña es valido
-      console.log("Usuario autenticado:", formData.username);
-      //Navegamos a la pantalla de Home
-      navigation.replace("Home");
-    }, 2000);
-  };
-
-  //Maneja el proceso de inicio de sesion
-  const handleLogin = (): void => {
-    if (!validateForm()) {
-      return;
-    }
-
-    if (Platform.OS === "web") {
-      const confirmed = window.confirm(
-        `¿Desea iniciar sesión con el usuario: ${formData.username}?`,
-      );
-      if (confirmed) {
-        authenticateUser();
-      }
-    } else {
-      Alert.alert(
-        "Confirmación de Inicio de Sesión",
-        `¿Desea iniciar sesión con el usuario: ${formData.username}?`,
-        [
-          {
-            text: "Cancelar",
-            style: "cancel",
-          },
-          {
-            text: "Aceptar",
-            onPress: authenticateUser,
-          },
-        ],
-        { cancelable: false },
-      );
-    }
-  };
-
-  //Maneja la recuperacion de contraseña
-  const handleForgotPassword = (): void => {
-    if (Platform.OS === "web") {
-      window.alert("Esta funcionalidad estará disponible próximamente.");
-    } else {
-      Alert.alert(
-        "Recuperar Contraseña",
-        "Esta funcionalidad estara disponible proximamente.",
-        [{ text: "Entendido" }],
-      );
-    }
-  };
-
-  //Maneja el registro de un nuevo usuario
-  const handleRegister = (): void => {
-    if (Platform.OS === "web") {
-      window.alert("Esta funcionalidad estará disponible próximamente.");
-    } else {
-      Alert.alert(
-        "Registro",
-        "Esta funcionalidad estara disponible proximamente.",
-        [{ text: "Entendido" }],
-      );
-    }
-  };
+/**
+ * Pantalla de inicio de sesion (View)
+ * Solo JSX y StyleSheet - la logica vive en useLoginViewModel
+ */
+const LoginScreen: React.FC = () => {
+  const {
+    formData,
+    isLoading,
+    updateFormData,
+    handleLogin,
+    handleForgotPassword,
+    handleRegister,
+  } = useLoginViewModel();
 
   return (
     <KeyboardAvoidingView

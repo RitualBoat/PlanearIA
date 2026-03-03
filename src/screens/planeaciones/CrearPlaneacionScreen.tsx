@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -7,119 +7,29 @@ import {
   ScrollView,
   StatusBar,
   Modal,
-  Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
 import BottomNavBar from "../../components/BottomNavBar";
-import { NivelAcademico } from "../../../types/planeacion";
+import { useCrearPlaneacionViewModel } from "../../hooks/useCrearPlaneacionViewModel";
 
 /**
- * Tipo para las props de navegación
+ * Pantalla para crear una nueva planeación (View)
+ * Solo JSX y StyleSheet - la logica vive en useCrearPlaneacionViewModel
  */
-type CrearPlaneacionScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "CrearPlaneacion"
->;
-
-/**
- * Props del componente
- */
-interface CrearPlaneacionScreenProps {
-  navigation: CrearPlaneacionScreenNavigationProp;
-}
-
-/**
- * Pantalla para crear una nueva planeación
- * Ofrece dos opciones: crear desde cero o generar con plantilla
- */
-const CrearPlaneacionScreen: React.FC<CrearPlaneacionScreenProps> = ({
-  navigation,
-}) => {
-  const [showTemplateModal, setShowTemplateModal] = useState(false);
-  const [showNivelModal, setShowNivelModal] = useState(false);
-
-  /**
-   * Opciones de nivel académico
-   */
-  const nivelesAcademicos = [
-    {
-      nivel: NivelAcademico.PRIMARIA,
-      titulo: "Primaria",
-      descripcion: "1° a 6° grado",
-      icon: "school",
-      color: "#4CAF50",
-    },
-    {
-      nivel: NivelAcademico.SECUNDARIA,
-      titulo: "Secundaria",
-      descripcion: "1° a 3° grado",
-      icon: "menu-book",
-      color: "#2196F3",
-    },
-    {
-      nivel: NivelAcademico.PREPARATORIA,
-      titulo: "Preparatoria",
-      descripcion: "Bachillerato",
-      icon: "library-books",
-      color: "#FF9800",
-    },
-    {
-      nivel: NivelAcademico.UNIVERSIDAD,
-      titulo: "Universidad",
-      descripcion: "Licenciatura y posgrado",
-      icon: "account-balance",
-      color: "#9C27B0",
-    },
-  ];
-
-  /**
-   * Muestra el modal de selección de nivel académico
-   */
-  const handleCrearDesdeCero = (): void => {
-    setShowNivelModal(true);
-  };
-
-  /**
-   * Navega a la pantalla de edición con el nivel seleccionado
-   */
-  const handleSeleccionarNivel = (nivel: NivelAcademico): void => {
-    setShowNivelModal(false);
-    navigation.navigate("EditorPlaneacion", { nivel, modo: "crear" });
-  };
-
-  /**
-   * Cierra el modal de nivel académico
-   */
-  const handleCloseNivelModal = (): void => {
-    setShowNivelModal(false);
-  };
-
-  /**
-   * Muestra el modal de selección de parámetros para plantilla
-   */
-  const handleGenerarPlantilla = (): void => {
-    setShowTemplateModal(true);
-  };
-
-  /**
-   * Cierra el modal de plantilla
-   */
-  const handleCloseModal = (): void => {
-    setShowTemplateModal(false);
-  };
-
-  /**
-   * Genera la plantilla con IA según los parámetros seleccionados
-   */
-  const handleGenerarConIA = (): void => {
-    console.log("Generando plantilla con IA");
-    setShowTemplateModal(false);
-    // Aquí se llamará a la IA y se navegará a la pantilla editable
-  };
+const CrearPlaneacionScreen: React.FC = () => {
+  const {
+    showTemplateModal,
+    showNivelModal,
+    nivelesAcademicos,
+    handleCrearDesdeCero,
+    handleSeleccionarNivel,
+    handleCloseNivelModal,
+    handleGenerarPlantilla,
+    handleCloseModal,
+    handleGenerarConIA,
+  } = useCrearPlaneacionViewModel();
 
   return (
     <View style={styles.container}>

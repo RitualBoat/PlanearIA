@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -8,43 +8,16 @@ import {
   Pressable,
   StatusBar,
   Image,
-  Platform,
-  Dimensions,
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Entypo from "@expo/vector-icons/Entypo";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { CommonActions } from "@react-navigation/native";
-// Importamos los tipos
-import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
 import { isWeb, responsive, isLargeScreen } from "../../utils/responsive";
-/**
- * Tipo para las props de navegación de esta pantalla
- */
-type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
-/**
- * Props que recibe el componente HomeScreen
- */
-interface HomeScreenProps {
-  navigation: HomeScreenNavigationProp;
-}
-/**
- * Interfaz para definir las opciones del menú principal
- */
-interface MenuOption {
-  id: string;
-  title: string;
-  iconImage?: any; // Para usar imágenes locales
-  icon?: string;
-  iconLibrary?: "FontAwesome5" | "MaterialIcons" | "Entypo";
-  color: string;
-  route?: keyof RootStackParamList;
-  onPress?: () => void;
-}
+import { useHomeViewModel, MenuOption } from "../../hooks/useHomeViewModel";
+
 /**
  * Componente para renderizar el icono de una opción del menú
  */
@@ -78,97 +51,19 @@ const MenuOptionIcon: React.FC<{ option: MenuOption }> = React.memo(
 );
 
 /**
- * Pantalla principal del sistema
- * Muestra el menú principal con las opciones disponibles
+ * Pantalla principal del sistema (View)
+ * Solo JSX y StyleSheet - la logica vive en useHomeViewModel
  */
-const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  // Estado para controlar la visibilidad del menú
-  const [menuVisible, setMenuVisible] = useState<boolean>(false);
-  /**
-   * Opciones del menú principal
-   * UPDATED v3.0: Removed module "Tareas" standalone (ahora dentro de Grupos)
-   */
-  const menuOptions: MenuOption[] = [
-    {
-      id: "planeaciones",
-      title: "Planeaciones",
-      iconImage: require("../../../assets/planeacionesIco.png"),
-      color: "#2196F3",
-      route: "Planeaciones",
-    },
-    {
-      id: "grupos",
-      title: "Grupos",
-      iconImage: require("../../../assets/alumnosIco.png"),
-      color: "#4CAF50",
-      route: "Grupos",
-    },
-    {
-      id: "recursosDidacticos",
-      title: "Recursos Didácticos",
-      iconImage: require("../../../assets/recursosIco.png"),
-      color: "#9C27B0",
-      route: "RecursosDidacticos",
-    },
-    {
-      id: "cuenta",
-      title: "Cuenta",
-      iconImage: require("../../../assets/CuentaYseguridadIco.png"),
-      color: "#F44336",
-      route: "Cuenta",
-    },
-  ];
-  /**
-   * Maneja el cierre de sesión
-   */
-  const handleLogout = (): void => {
-    setMenuVisible(false);
-    // Mostramos confirmación antes de cerrar sesión
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: "Login" }],
-      }),
-    );
-  };
-  /**
-   * Maneja la navegación al perfil del usuario
-   */
-  const handleProfile = (): void => {
-    console.log("Navegando a perfil de usuario");
-    setMenuVisible(false);
-    // Aquí iría la navegación al perfil cuando esté implementado
-    handleComingSoon("Perfil de Usuario");
-  };
-  /**
-   * Muestra mensaje de funcionalidad próximamente disponible
-   */
-  const handleComingSoon = (feature: string): void => {
-    // Implementación básica por ahora
-    console.log(`Funcionalidad: ${feature} - Próximamente disponible`);
-  };
-  /**
-   * Abre el menú de hamburguesa
-   */
-  const openMenu = (): void => {
-    setMenuVisible(true);
-  };
-  /**
-   * Cierra el menú de hamburguesa
-   */
-  const closeMenu = (): void => {
-    setMenuVisible(false);
-  };
-  /**
-   * Maneja la navegación a las diferentes pantallas
-   */
-  const handleNavigation = (option: MenuOption): void => {
-    if (option.route) {
-      navigation.navigate(option.route as any);
-    } else if (option.onPress) {
-      option.onPress();
-    }
-  };
+const HomeScreen: React.FC = () => {
+  const {
+    menuVisible,
+    menuOptions,
+    openMenu,
+    closeMenu,
+    handleLogout,
+    handleProfile,
+    handleNavigation,
+  } = useHomeViewModel();
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />

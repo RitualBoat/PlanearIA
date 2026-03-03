@@ -1,547 +1,106 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
   TextInput,
-  ScrollView,
   TouchableOpacity,
-  Alert,
-  Platform,
   StatusBar,
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RouteProp } from "@react-navigation/native";
-import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
 import BottomNavBar from "../../components/BottomNavBar";
 import WebScrollView from "../../components/WebScrollView";
 import SyncIndicator from "../../components/SyncIndicator";
 import { SemanaEditor } from "../../components/SemanaEditor";
 import { EvaluacionEditor } from "../../components/EvaluacionEditor";
-import {
-  NivelAcademico,
-  Planeacion,
-  PlaneacionBase,
-  PlaneacionUniversidad,
-  Actividad,
-  ConfiguracionCurso,
-  SemanaUniversitaria,
-  Evaluacion,
-} from "../../../types/planeacion";
-import { usePlaneaciones } from "../../context/PlaneacionesContext";
+import { NivelAcademico } from "../../../types/planeacion";
+import { useEditorPlaneacionViewModel } from "../../hooks/useEditorPlaneacionViewModel";
 
-type EditorPlaneacionScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "EditorPlaneacion"
->;
+/**
+ * Pantalla de editor de planeación (View)
+ * Solo JSX y StyleSheet - la logica vive en useEditorPlaneacionViewModel
+ */
+const EditorPlaneacionScreen: React.FC = () => {
+  const vm = useEditorPlaneacionViewModel();
 
-type EditorPlaneacionScreenRouteProp = RouteProp<
-  RootStackParamList,
-  "EditorPlaneacion"
->;
+  // Destructure for readability in JSX
+  const {
+    nivel,
+    modo,
+    asignatura,
+    grado,
+    grupo,
+    fecha,
+    horaInicio,
+    duracionTotal,
+    unidadTematica,
+    temaSesion,
+    aprendizajesEsperados,
+    actividadInicio,
+    duracionInicio,
+    actividadDesarrollo,
+    duracionDesarrollo,
+    actividadCierre,
+    duracionCierre,
+    recursos,
+    evaluacion,
+    evidencias,
+    observaciones,
+    campoFormativo,
+    competenciasDisciplinares,
+    competenciasGenericas,
+    competenciasProfesionales,
+    objetivosAprendizaje,
+    bibliografia,
+    modalidad,
+    modoDetallado,
+    configuracionCurso,
+    semanas,
+    evaluaciones,
+    semanasVersion,
+    setAsignatura,
+    setGrado,
+    setGrupo,
+    setFecha,
+    setHoraInicio,
+    setDuracionTotal,
+    setUnidadTematica,
+    setTemaSesion,
+    setAprendizajesEsperados,
+    setActividadInicio,
+    setDuracionInicio,
+    setActividadDesarrollo,
+    setDuracionDesarrollo,
+    setActividadCierre,
+    setDuracionCierre,
+    setRecursos,
+    setEvaluacion,
+    setEvidencias,
+    setObservaciones,
+    setCampoFormativo,
+    setCompetenciasDisciplinares,
+    setCompetenciasGenericas,
+    setCompetenciasProfesionales,
+    setObjetivosAprendizaje,
+    setBibliografia,
+    setModalidad,
+    setConfiguracionCurso,
+    setEvaluaciones,
+    toggleModoDetallado,
+    cambiarDuracionCurso,
+    actualizarSemana,
+    eliminarSemana,
+    clonarSemana,
+    handleGuardar,
+    obtenerTitulo,
+  } = vm;
 
-interface EditorPlaneacionScreenProps {
-  navigation: EditorPlaneacionScreenNavigationProp;
-  route: EditorPlaneacionScreenRouteProp;
-}
-
-const EditorPlaneacionScreen: React.FC<EditorPlaneacionScreenProps> = ({
-  navigation,
-  route,
-}) => {
-  const { nivel, modo, planeacionId } = route.params;
-  const { agregarPlaneacion, actualizarPlaneacion, obtenerPlaneacion } =
-    usePlaneaciones();
-
-  // Estado del formulario
-  const [asignatura, setAsignatura] = useState("");
-  const [grado, setGrado] = useState("");
-  const [grupo, setGrupo] = useState("");
-  const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]);
-  const [horaInicio, setHoraInicio] = useState("08:00");
-  const [duracionTotal, setDuracionTotal] = useState("50");
-  const [unidadTematica, setUnidadTematica] = useState("");
-  const [temaSesion, setTemaSesion] = useState("");
-  const [aprendizajesEsperados, setAprendizajesEsperados] = useState("");
-  const [actividadInicio, setActividadInicio] = useState("");
-  const [duracionInicio, setDuracionInicio] = useState("10");
-  const [actividadDesarrollo, setActividadDesarrollo] = useState("");
-  const [duracionDesarrollo, setDuracionDesarrollo] = useState("30");
-  const [actividadCierre, setActividadCierre] = useState("");
-  const [duracionCierre, setDuracionCierre] = useState("10");
-  const [recursos, setRecursos] = useState("");
-  const [evaluacion, setEvaluacion] = useState("");
-  const [evidencias, setEvidencias] = useState("");
-  const [observaciones, setObservaciones] = useState("");
-
-  // Campos específicos por nivel
-  const [campoFormativo, setCampoFormativo] = useState(""); // Primaria
-  const [competenciasDisciplinares, setCompetenciasDisciplinares] =
-    useState(""); // Secundaria/Preparatoria
-  const [competenciasGenericas, setCompetenciasGenericas] = useState(""); // Preparatoria
-  const [competenciasProfesionales, setCompetenciasProfesionales] =
-    useState(""); // Universidad
-  const [objetivosAprendizaje, setObjetivosAprendizaje] = useState(""); // Universidad
-  const [bibliografia, setBibliografia] = useState(""); // Preparatoria/Universidad
-  const [modalidad, setModalidad] = useState("presencial"); // Universidad
-
-  // Estado para modo detallado de Universidad
-  const [modoDetallado, setModoDetallado] = useState(false);
-  const [configuracionCurso, setConfiguracionCurso] =
-    useState<ConfiguracionCurso>({
-      duracionSemanas: 16,
-      horasTeoricas: 3,
-      horasPracticas: 2,
-      horasAutonomas: 5,
-      creditos: 8,
-      modalidad: "presencial",
-    });
-  const [semanas, setSemanas] = useState<SemanaUniversitaria[]>([]);
-  const [evaluaciones, setEvaluaciones] = useState<Evaluacion[]>([]);
-  const [semanasVersion, setSemanasVersion] = useState(0);
-
-  /**
-   * Carga datos si está en modo edición
-   */
-  useEffect(() => {
-    if (modo === "editar" && planeacionId) {
-      const planeacion = obtenerPlaneacion(planeacionId);
-      if (planeacion) {
-        cargarDatosPlaneacion(planeacion);
-      }
-    }
-  }, [modo, planeacionId]);
-
-  /**
-   * Carga los datos de una planeación existente
-   */
-  const cargarDatosPlaneacion = (planeacion: Planeacion) => {
-    setAsignatura(planeacion.asignatura);
-    setGrado(planeacion.grado);
-    setGrupo(planeacion.grupo);
-    setFecha(planeacion.fecha.split("T")[0]);
-    setHoraInicio(planeacion.horaInicio);
-    setDuracionTotal(planeacion.duracionTotal.toString());
-    setUnidadTematica(planeacion.unidadTematica);
-    setTemaSesion(planeacion.temaSesion);
-    setAprendizajesEsperados(planeacion.aprendizajesEsperados.join("\n"));
-
-    if (planeacion.actividades.length >= 3) {
-      setActividadInicio(planeacion.actividades[0].descripcion);
-      setDuracionInicio(planeacion.actividades[0].duracion.toString());
-      setActividadDesarrollo(planeacion.actividades[1].descripcion);
-      setDuracionDesarrollo(planeacion.actividades[1].duracion.toString());
-      setActividadCierre(planeacion.actividades[2].descripcion);
-      setDuracionCierre(planeacion.actividades[2].duracion.toString());
-    }
-
-    setRecursos(planeacion.recursos.join("\n"));
-    setEvaluacion(planeacion.evaluacion);
-    setEvidencias(planeacion.evidencias.join("\n"));
-    setObservaciones(planeacion.observaciones);
-
-    // Cargar campos específicos según el nivel
-    if (planeacion.nivelAcademico === NivelAcademico.PRIMARIA) {
-      setCampoFormativo((planeacion as any).campoFormativo || "");
-    } else if (planeacion.nivelAcademico === NivelAcademico.SECUNDARIA) {
-      setCompetenciasDisciplinares(
-        (planeacion as any).competenciasDisciplinares?.join("\n") || "",
-      );
-    } else if (planeacion.nivelAcademico === NivelAcademico.PREPARATORIA) {
-      setCompetenciasGenericas(
-        (planeacion as any).competenciasGenericas?.join("\n") || "",
-      );
-      setCompetenciasDisciplinares(
-        (planeacion as any).competenciasDisciplinares?.join("\n") || "",
-      );
-      setBibliografia((planeacion as any).bibliografia?.join("\n") || "");
-    } else if (planeacion.nivelAcademico === NivelAcademico.UNIVERSIDAD) {
-      const planeacionUniv = planeacion as PlaneacionUniversidad;
-      setCompetenciasProfesionales(
-        planeacionUniv.competenciasProfesionales?.join("\n") || "",
-      );
-      setObjetivosAprendizaje(
-        planeacionUniv.objetivosAprendizaje?.join("\n") || "",
-      );
-      setBibliografia(planeacionUniv.bibliografia?.join("\n") || "");
-      setModalidad(planeacionUniv.modalidad || "presencial");
-
-      // Cargar modo detallado si existe
-      if (planeacionUniv.configuracionCurso && planeacionUniv.semanas) {
-        setModoDetallado(true);
-        setConfiguracionCurso(planeacionUniv.configuracionCurso);
-        setSemanas(planeacionUniv.semanas);
-        setEvaluaciones(planeacionUniv.evaluaciones || []);
-      }
-    }
-  };
-
-  /**
-   * Inicializar semanas cuando se activa el modo detallado
-   */
-  const inicializarSemanas = (duracion: number) => {
-    const nuevasSemanas: SemanaUniversitaria[] = [];
-    for (let i = 1; i <= duracion; i++) {
-      nuevasSemanas.push({
-        numero: i,
-        unidadTematica: "",
-        temas: [""],
-        objetivos: [""],
-        actividadesPresenciales: [
-          {
-            descripcion: "",
-            duracion: 120,
-            metodologia: "",
-          },
-        ],
-        actividadesAutonomas: [""],
-        recursos: [""],
-      });
-    }
-    setSemanas(nuevasSemanas);
-  };
-
-  /**
-   * Cambiar duración del curso y ajustar semanas
-   */
-  const cambiarDuracionCurso = (nuevaDuracion: 12 | 16 | 18) => {
-    console.log(
-      "cambiarDuracionCurso llamado con:",
-      nuevaDuracion,
-      "actual:",
-      semanas.length,
-    );
-
-    const config = { ...configuracionCurso, duracionSemanas: nuevaDuracion };
-    setConfiguracionCurso(config);
-
-    // Ajustar array de semanas
-    if (nuevaDuracion > semanas.length) {
-      // Agregar semanas
-      const nuevasSemanas = [...semanas];
-      for (let i = semanas.length + 1; i <= nuevaDuracion; i++) {
-        nuevasSemanas.push({
-          numero: i,
-          unidadTematica: "",
-          temas: [""],
-          objetivos: [""],
-          actividadesPresenciales: [
-            { descripcion: "", duracion: 120, metodologia: "" },
-          ],
-          actividadesAutonomas: [""],
-          recursos: [""],
-        });
-      }
-      console.log("Agregando semanas, nuevo total:", nuevasSemanas.length);
-      setSemanas([...nuevasSemanas]);
-      setSemanasVersion((v) => v + 1);
-    } else if (nuevaDuracion < semanas.length) {
-      // Remover semanas
-      console.log("Intentando reducir semanas");
-      confirmar(
-        "Reducir duración",
-        `Esto eliminará las semanas ${nuevaDuracion + 1} a ${
-          semanas.length
-        }. ¿Continuar?`,
-        () => {
-          console.log("Confirmado: reduciendo a", nuevaDuracion, "semanas");
-          setSemanas([...semanas.slice(0, nuevaDuracion)]);
-          setSemanasVersion((v) => v + 1);
-        },
-      );
-    }
-  };
-
-  /**
-   * Activar/desactivar modo detallado
-   */
-  const toggleModoDetallado = () => {
-    if (!modoDetallado) {
-      // Activar modo detallado
-      inicializarSemanas(configuracionCurso.duracionSemanas);
-      setModoDetallado(true);
-    } else {
-      // Desactivar modo detallado
-      confirmar(
-        "Cambiar a modo simple",
-        "Esto descartará la planificación semanal detallada. ¿Continuar?",
-        () => {
-          setModoDetallado(false);
-          setSemanas([]);
-          setEvaluaciones([]);
-        },
-      );
-    }
-  };
-
-  /**
-   * Actualizar una semana
-   */
-  const actualizarSemana = (semana: SemanaUniversitaria) => {
-    const nuevasSemanas = semanas.map((s) =>
-      s.numero === semana.numero ? { ...semana } : { ...s },
-    );
-    setSemanas([...nuevasSemanas]);
-    setSemanasVersion((v) => v + 1);
-  };
-
-  /**
-   * Eliminar una semana y recalcular números
-   */
-  const eliminarSemana = (numero: number) => {
-    console.log("eliminarSemana llamado para semana:", numero);
-    confirmar(
-      "Eliminar semana",
-      `¿Estás seguro de eliminar la semana ${numero}?`,
-      () => {
-        console.log("Confirmado: eliminando semana", numero);
-        const nuevasSemanas = semanas
-          .filter((s) => s.numero !== numero)
-          .map((s, index) => ({ ...s, numero: index + 1 }));
-        console.log(
-          "Nuevas semanas después de eliminar:",
-          nuevasSemanas.length,
-        );
-        setSemanas([...nuevasSemanas]);
-        setConfiguracionCurso({
-          ...configuracionCurso,
-          duracionSemanas: nuevasSemanas.length as 12 | 16 | 18,
-        });
-        setSemanasVersion((v) => v + 1);
-      },
-    );
-  };
-
-  /**
-   * Clonar una semana
-   */
-  const clonarSemana = (numero: number) => {
-    const semanaAClonar = semanas.find((s) => s.numero === numero);
-    if (semanaAClonar) {
-      const nuevaSemana: SemanaUniversitaria = {
-        ...semanaAClonar,
-        numero: numero + 1,
-      };
-      const nuevasSemanas = [
-        ...semanas.slice(0, numero),
-        nuevaSemana,
-        ...semanas.slice(numero).map((s) => ({ ...s, numero: s.numero + 1 })),
-      ];
-      setSemanas([...nuevasSemanas]);
-      setConfiguracionCurso({
-        ...configuracionCurso,
-        duracionSemanas: nuevasSemanas.length as 12 | 16 | 18,
-      });
-      setSemanasVersion((v) => v + 1);
-    }
-  };
-
-  /**
-   * Valida el formulario
-   */
-  const validarFormulario = (): boolean => {
-    if (!asignatura.trim()) {
-      mostrarAlerta("Por favor ingresa la asignatura");
-      return false;
-    }
-    if (!grado.trim()) {
-      mostrarAlerta("Por favor ingresa el grado");
-      return false;
-    }
-    if (!temaSesion.trim()) {
-      mostrarAlerta("Por favor ingresa el tema de la sesión");
-      return false;
-    }
-    return true;
-  };
-
-  /**
-   * Muestra una alerta según la plataforma
-   */
-  const mostrarAlerta = (mensaje: string) => {
-    if (Platform.OS === "web") {
-      window.alert(mensaje);
-    } else {
-      Alert.alert("Atención", mensaje);
-    }
-  };
-
-  /**
-   * Muestra confirmación según la plataforma
-   */
-  const confirmar = (
-    titulo: string,
-    mensaje: string,
-    onConfirm: () => void,
-  ) => {
-    if (Platform.OS === "web") {
-      if (window.confirm(`${titulo}\n\n${mensaje}`)) {
-        onConfirm();
-      }
-    } else {
-      Alert.alert(titulo, mensaje, [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Confirmar", onPress: onConfirm },
-      ]);
-    }
-  };
-
-  /**
-   * Guarda la planeación
-   */
-  /**
-   * Guarda la planeación
-   */
-  const handleGuardar = async () => {
-    if (!validarFormulario()) {
-      return;
-    }
-
-    const actividades: Actividad[] = [
-      {
-        tipo: "inicio",
-        descripcion: actividadInicio,
-        duracion: parseInt(duracionInicio) || 10,
-      },
-      {
-        tipo: "desarrollo",
-        descripcion: actividadDesarrollo,
-        duracion: parseInt(duracionDesarrollo) || 30,
-      },
-      {
-        tipo: "cierre",
-        descripcion: actividadCierre,
-        duracion: parseInt(duracionCierre) || 10,
-      },
-    ];
-
-    const planeacionBase: PlaneacionBase = {
-      id:
-        modo === "editar" && planeacionId
-          ? planeacionId
-          : Date.now().toString(),
-      nivelAcademico: nivel,
-      asignatura,
-      grado,
-      grupo,
-      fecha: new Date(fecha).toISOString(),
-      horaInicio,
-      duracionTotal: parseInt(duracionTotal) || 50,
-      unidadTematica,
-      temaSesion,
-      aprendizajesEsperados: aprendizajesEsperados
-        .split("\n")
-        .filter((a) => a.trim()),
-      actividades,
-      recursos: recursos.split("\n").filter((r) => r.trim()),
-      evaluacion,
-      evidencias: evidencias.split("\n").filter((e) => e.trim()),
-      observaciones,
-      fechaCreacion:
-        modo === "editar" && planeacionId
-          ? obtenerPlaneacion(planeacionId)?.fechaCreacion ||
-            new Date().toISOString()
-          : new Date().toISOString(),
-      fechaModificacion: new Date().toISOString(),
-    };
-
-    let planeacion: Planeacion;
-
-    // Construir objeto específico según el nivel
-    switch (nivel) {
-      case NivelAcademico.PRIMARIA:
-        planeacion = {
-          ...planeacionBase,
-          nivelAcademico: NivelAcademico.PRIMARIA,
-          campoFormativo,
-        };
-        break;
-      case NivelAcademico.SECUNDARIA:
-        planeacion = {
-          ...planeacionBase,
-          nivelAcademico: NivelAcademico.SECUNDARIA,
-          competenciasDisciplinares: competenciasDisciplinares
-            .split("\n")
-            .filter((c) => c.trim()),
-        };
-        break;
-      case NivelAcademico.PREPARATORIA:
-        planeacion = {
-          ...planeacionBase,
-          nivelAcademico: NivelAcademico.PREPARATORIA,
-          competenciasGenericas: competenciasGenericas
-            .split("\n")
-            .filter((c) => c.trim()),
-          competenciasDisciplinares: competenciasDisciplinares
-            .split("\n")
-            .filter((c) => c.trim()),
-          bibliografia: bibliografia.split("\n").filter((b) => b.trim()),
-        };
-        break;
-      case NivelAcademico.UNIVERSIDAD:
-        const planeacionUniv: PlaneacionUniversidad = {
-          ...planeacionBase,
-          nivelAcademico: NivelAcademico.UNIVERSIDAD,
-          competenciasProfesionales: competenciasProfesionales
-            .split("\n")
-            .filter((c) => c.trim()),
-          objetivosAprendizaje: objetivosAprendizaje
-            .split("\n")
-            .filter((o) => o.trim()),
-          bibliografia: bibliografia.split("\n").filter((b) => b.trim()),
-          modalidad: modalidad as any,
-        };
-
-        // Agregar configuración detallada si está habilitada
-        if (modoDetallado && semanas.length > 0) {
-          planeacionUniv.configuracionCurso = configuracionCurso;
-          planeacionUniv.semanas = semanas;
-          planeacionUniv.evaluaciones = evaluaciones;
-        }
-
-        planeacion = planeacionUniv;
-        break;
-      default:
-        return;
-    }
-
-    try {
-      if (modo === "editar" && planeacionId) {
-        await actualizarPlaneacion(planeacionId, planeacion);
-        mostrarAlerta("Planeación actualizada exitosamente");
-      } else {
-        await agregarPlaneacion(planeacion);
-        mostrarAlerta("Planeación guardada exitosamente");
-      }
-
-      navigation.navigate("ListaPlaneaciones");
-    } catch (error) {
-      mostrarAlerta("Error al guardar la planeación");
-      console.error(error);
-    }
-  };
-
-  /**
-   * Obtiene el título según el nivel
-   */
-  const obtenerTitulo = (): string => {
-    const accion = modo === "editar" ? "Editar" : "Nueva";
-    const nivelTexto = {
-      [NivelAcademico.PRIMARIA]: "Primaria",
-      [NivelAcademico.SECUNDARIA]: "Secundaria",
-      [NivelAcademico.PREPARATORIA]: "Preparatoria",
-      [NivelAcademico.UNIVERSIDAD]: "Universidad",
-    };
-    return `${accion} Planeación - ${nivelTexto[nivel]}`;
-  };
-
-  // Obtener dimensiones de la ventana
+  // Obtain window dimensions for layout
   const { height: windowHeight } = useWindowDimensions();
-  const navBarHeight = 80; // Altura aproximada del BottomNavBar
+  const navBarHeight = 80;
 
   return (
     <View style={styles.container}>

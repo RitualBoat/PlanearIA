@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -9,65 +9,32 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RouteProp } from "@react-navigation/native";
-import { RootStackParamList } from "../../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../../types";
 import BottomNavBar from "../../../components/BottomNavBar";
 import WebScrollView from "../../../components/WebScrollView";
-
-type CrearTareaGrupoScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "CrearTareaGrupo"
->;
-
-type CrearTareaGrupoScreenRouteProp = RouteProp<
-  RootStackParamList,
-  "CrearTareaGrupo"
->;
-
-interface CrearTareaGrupoScreenProps {
-  navigation: CrearTareaGrupoScreenNavigationProp;
-  route: CrearTareaGrupoScreenRouteProp;
-}
+import { useCrearTareaGrupoViewModel } from "../../../hooks/useCrearTareaGrupoViewModel";
 
 /**
- * Pantalla para crear una nueva tarea en un grupo
+ * Pantalla para crear una nueva tarea en un grupo (View)
+ * Solo JSX y StyleSheet - la logica vive en useCrearTareaGrupoViewModel
  */
-const CrearTareaGrupoScreen: React.FC<CrearTareaGrupoScreenProps> = ({
-  navigation,
-  route,
-}) => {
-  const { grupoId } = route.params;
-
-  const [titulo, setTitulo] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [tipo, setTipo] = useState<
-    "tarea" | "examen" | "proyecto" | "investigacion"
-  >("tarea");
-  const [valor, setValor] = useState("");
-  const [fechaEntrega, setFechaEntrega] = useState("");
-
-  const tipoOptions = [
-    { value: "tarea", label: "Tarea", icon: "assignment" },
-    { value: "examen", label: "Examen", icon: "quiz" },
-    { value: "proyecto", label: "Proyecto", icon: "science" },
-    { value: "investigacion", label: "Investigación", icon: "search" },
-  ];
-
-  const handleGuardar = () => {
-    // TODO: Implementar lógica de guardado
-    console.log("Guardando tarea:", {
-      grupoId,
-      titulo,
-      descripcion,
-      tipo,
-      valor,
-      fechaEntrega,
-    });
-    // Volver a la pantalla anterior
-    navigation.goBack();
-  };
+const CrearTareaGrupoScreen: React.FC = () => {
+  const {
+    grupoId,
+    titulo,
+    setTitulo,
+    descripcion,
+    setDescripcion,
+    tipo,
+    setTipo,
+    valor,
+    setValor,
+    fechaEntrega,
+    setFechaEntrega,
+    tipoOptions,
+    handleGuardar,
+    handleCancelar,
+  } = useCrearTareaGrupoViewModel();
 
   return (
     <View style={styles.container}>
@@ -180,7 +147,7 @@ const CrearTareaGrupoScreen: React.FC<CrearTareaGrupoScreenProps> = ({
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[styles.button, styles.buttonSecondary]}
-                onPress={() => navigation.goBack()}
+                onPress={handleCancelar}
               >
                 <Text style={styles.buttonTextSecondary}>Cancelar</Text>
               </TouchableOpacity>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -6,14 +6,10 @@ import {
   FlatList,
   TouchableOpacity,
   Modal,
-  Alert,
-  Platform,
   StatusBar,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
 import BottomNavBar from "../../components/BottomNavBar";
 import SyncIndicator from "../../components/SyncIndicator";
@@ -21,203 +17,37 @@ import {
   NivelAcademico,
   Planeacion,
   PlaneacionUniversidad,
-  FiltrosPlaneacion,
 } from "../../../types/planeacion";
-import { usePlaneaciones } from "../../context/PlaneacionesContext";
+import { useListaPlaneacionesViewModel } from "../../hooks/useListaPlaneacionesViewModel";
 
-type ListaPlaneacionesScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "ListaPlaneaciones"
->;
-
-interface ListaPlaneacionesScreenProps {
-  navigation: ListaPlaneacionesScreenNavigationProp;
-}
-
-const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
-  navigation,
-}) => {
+/**
+ * Pantalla de lista de planeaciones (View)
+ * Solo JSX y StyleSheet - la logica vive en useListaPlaneacionesViewModel
+ */
+const ListaPlaneacionesScreen: React.FC = () => {
   const {
-    planeaciones,
-    filtrarPlaneaciones,
-    eliminarPlaneacion,
-    clonarPlaneacion,
-  } = usePlaneaciones();
-
-  const [planeacionesFiltradas, setPlaneacionesFiltradas] =
-    useState<Planeacion[]>(planeaciones);
-  const [showFiltros, setShowFiltros] = useState(false);
-  const [menuVisible, setMenuVisible] = useState<string | null>(null);
-
-  // Estados de filtros
-  const [filtroNivel, setFiltroNivel] = useState<NivelAcademico | undefined>(
-    undefined,
-  );
-  const [filtroAsignatura, setFiltroAsignatura] = useState("");
-  const [filtroGrado, setFiltroGrado] = useState("");
-
-  /**
-   * Actualiza la lista cuando cambian las planeaciones
-   */
-  useEffect(() => {
-    aplicarFiltros();
-  }, [planeaciones]);
-
-  /**
-   * Aplica los filtros seleccionados
-   */
-  const aplicarFiltros = () => {
-    const filtros: FiltrosPlaneacion = {
-      nivelAcademico: filtroNivel,
-      asignatura: filtroAsignatura || undefined,
-      grado: filtroGrado || undefined,
-    };
-
-    const resultado = filtrarPlaneaciones(filtros);
-    setPlaneacionesFiltradas(resultado);
-    setShowFiltros(false);
-  };
-
-  /**
-   * Limpia todos los filtros
-   */
-  const limpiarFiltros = () => {
-    setFiltroNivel(undefined);
-    setFiltroAsignatura("");
-    setFiltroGrado("");
-    setPlaneacionesFiltradas(planeaciones);
-    setShowFiltros(false);
-  };
-
-  /**
-   * Formatea la fecha
-   */
-  const formatearFecha = (fecha: string): string => {
-    const date = new Date(fecha);
-    return date.toLocaleDateString("es-MX", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  };
-
-  /**
-   * Obtiene el color del badge según el nivel
-   */
-  const getColorNivel = (nivel: NivelAcademico): string => {
-    const colores = {
-      [NivelAcademico.PRIMARIA]: "#4CAF50",
-      [NivelAcademico.SECUNDARIA]: "#2196F3",
-      [NivelAcademico.PREPARATORIA]: "#FF9800",
-      [NivelAcademico.UNIVERSIDAD]: "#9C27B0",
-    };
-    return colores[nivel];
-  };
-
-  /**
-   * Obtiene el texto del nivel
-   */
-  const getTextoNivel = (nivel: NivelAcademico): string => {
-    const textos = {
-      [NivelAcademico.PRIMARIA]: "Primaria",
-      [NivelAcademico.SECUNDARIA]: "Secundaria",
-      [NivelAcademico.PREPARATORIA]: "Preparatoria",
-      [NivelAcademico.UNIVERSIDAD]: "Universidad",
-    };
-    return textos[nivel];
-  };
-
-  /**
-   * Muestra confirmación según plataforma
-   */
-  const confirmar = (
-    titulo: string,
-    mensaje: string,
-    onConfirm: () => void,
-  ) => {
-    if (Platform.OS === "web") {
-      if (window.confirm(`${titulo}\n\n${mensaje}`)) {
-        onConfirm();
-      }
-    } else {
-      Alert.alert(titulo, mensaje, [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Confirmar", onPress: onConfirm },
-      ]);
-    }
-  };
-
-  /**
-   * Maneja la edición de una planeación
-   */
-  const handleEditar = (planeacion: Planeacion) => {
-    setMenuVisible(null);
-    navigation.navigate("EditorPlaneacion", {
-      nivel: planeacion.nivelAcademico,
-      modo: "editar",
-      planeacionId: planeacion.id,
-    });
-  };
-
-  /**
-   * Maneja el clonado de una planeación
-   */
-  const handleClonar = async (planeacionId: string) => {
-    setMenuVisible(null);
-    try {
-      await clonarPlaneacion(planeacionId);
-      if (Platform.OS === "web") {
-        window.alert("Planeación clonada exitosamente");
-      } else {
-        Alert.alert("Éxito", "Planeación clonada exitosamente");
-      }
-    } catch (error) {
-      if (Platform.OS === "web") {
-        window.alert("Error al clonar la planeación");
-      } else {
-        Alert.alert("Error", "No se pudo clonar la planeación");
-      }
-    }
-  };
-
-  /**
-   * Maneja la eliminación de una planeación
-   */
-  const handleEliminar = (planeacionId: string) => {
-    setMenuVisible(null);
-    confirmar(
-      "Eliminar Planeación",
-      "¿Estás seguro de que deseas eliminar esta planeación? Esta acción no se puede deshacer.",
-      async () => {
-        try {
-          await eliminarPlaneacion(planeacionId);
-          if (Platform.OS === "web") {
-            window.alert("Planeación eliminada");
-          } else {
-            Alert.alert("Eliminada", "Planeación eliminada correctamente");
-          }
-        } catch (error) {
-          if (Platform.OS === "web") {
-            window.alert("Error al eliminar la planeación");
-          } else {
-            Alert.alert("Error", "No se pudo eliminar la planeación");
-          }
-        }
-      },
-    );
-  };
-
-  /**
-   * Maneja la exportación (placeholder)
-   */
-  const handleExportar = (planeacionId: string) => {
-    setMenuVisible(null);
-    if (Platform.OS === "web") {
-      window.alert("Función de exportar próximamente disponible");
-    } else {
-      Alert.alert("Exportar", "Función de exportar próximamente disponible");
-    }
-  };
+    planeacionesFiltradas,
+    showFiltros,
+    setShowFiltros,
+    menuVisible,
+    setMenuVisible,
+    filtroNivel,
+    setFiltroNivel,
+    filtroAsignatura,
+    setFiltroAsignatura,
+    filtroGrado,
+    setFiltroGrado,
+    aplicarFiltros,
+    limpiarFiltros,
+    formatearFecha,
+    getColorNivel,
+    getTextoNivel,
+    handleEditar,
+    handleClonar,
+    handleEliminar,
+    handleExportar,
+    handleCrearNueva,
+  } = useListaPlaneacionesViewModel();
 
   /**
    * Renderiza una card de planeación
@@ -416,10 +246,7 @@ const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
           ? "No se encontraron planeaciones con los filtros aplicados"
           : "Crea tu primera planeación para comenzar"}
       </Text>
-      <TouchableOpacity
-        style={styles.createButton}
-        onPress={() => navigation.navigate("CrearPlaneacion")}
-      >
+      <TouchableOpacity style={styles.createButton} onPress={handleCrearNueva}>
         <MaterialIcons name="add" size={24} color="white" />
         <Text style={styles.createButtonText}>Nueva Planeación</Text>
       </TouchableOpacity>
@@ -458,7 +285,7 @@ const ListaPlaneacionesScreen: React.FC<ListaPlaneacionesScreenProps> = ({
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.iconButton}
-                  onPress={() => navigation.navigate("CrearPlaneacion")}
+                  onPress={handleCrearNueva}
                 >
                   <MaterialIcons
                     name="add-circle"

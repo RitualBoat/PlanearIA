@@ -6,73 +6,20 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { CommonActions } from "@react-navigation/native";
-import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
 import BottomNavBar from "../../components/BottomNavBar";
+import { useCuentaViewModel } from "../../hooks/useCuentaViewModel";
 
 /**
- * Tipo para las props de navegación
+ * Pantalla de Cuenta y Seguridad (View)
+ * Solo JSX y StyleSheet - la logica vive en useCuentaViewModel
  */
-type CuentaScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "Cuenta"
->;
-
-/**
- * Props del componente
- */
-interface CuentaScreenProps {
-  navigation: CuentaScreenNavigationProp;
-}
-
-/**
- * Pantalla de Cuenta y Seguridad
- * Permite gestionar la configuración del usuario
- */
-const CuentaScreen: React.FC<CuentaScreenProps> = ({ navigation }) => {
-  /**
-   * Navega a editar perfil
-   */
-  const handleEditarPerfil = (): void => {
-    console.log("Editar perfil");
-  };
-
-  /**
-   * Navega a cambiar contraseña
-   */
-  const handleCambiarContrasena = (): void => {
-    console.log("Cambiar contraseña");
-  };
-
-  /**
-   * Maneja el cierre de sesión
-   */
-  const handleCerrarSesion = (): void => {
-    Alert.alert("Cerrar Sesión", "¿Estás seguro de que deseas cerrar sesión?", [
-      {
-        text: "Cancelar",
-        style: "cancel",
-      },
-      {
-        text: "Cerrar Sesión",
-        style: "destructive",
-        onPress: () => {
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: "Login" }],
-            }),
-          );
-        },
-      },
-    ]);
-  };
+const CuentaScreen: React.FC = () => {
+  const { handleEditarPerfil, handleCambiarContrasena, handleCerrarSesion } =
+    useCuentaViewModel();
 
   return (
     <View style={styles.container}>

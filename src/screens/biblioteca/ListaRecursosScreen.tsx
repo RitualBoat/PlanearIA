@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -10,25 +10,17 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES, Recurso } from "../../../types";
 import BottomNavBar from "../../components/BottomNavBar";
+import { useListaRecursosViewModel } from "../../hooks/useListaRecursosViewModel";
 
-type ListaRecursosScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "ListaRecursos"
->;
-
-interface ListaRecursosScreenProps {
-  navigation: ListaRecursosScreenNavigationProp;
-}
-
-const ListaRecursosScreen: React.FC<ListaRecursosScreenProps> = ({
-  navigation,
-}) => {
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [filtroTipo, setFiltroTipo] = useState<string>("todos");
+/**
+ * Pantalla de Lista de Recursos (View)
+ * Solo JSX y StyleSheet - la logica vive en useListaRecursosViewModel
+ */
+const ListaRecursosScreen: React.FC = () => {
+  const { searchQuery, setSearchQuery, getIconByTipo, getColorByTipo } =
+    useListaRecursosViewModel();
 
   // Recursos de ejemplo
   const recursosEjemplo: Partial<Recurso>[] = [
@@ -57,36 +49,6 @@ const ListaRecursosScreen: React.FC<ListaRecursosScreenProps> = ({
       fechaCreacion: new Date(),
     },
   ];
-
-  const getIconByTipo = (tipo: string) => {
-    switch (tipo) {
-      case "examen":
-        return "assignment";
-      case "presentacion":
-        return "slideshow";
-      case "mapa_mental":
-        return "account-tree";
-      case "linea_tiempo":
-        return "timeline";
-      default:
-        return "description";
-    }
-  };
-
-  const getColorByTipo = (tipo: string) => {
-    switch (tipo) {
-      case "examen":
-        return "#FF9800";
-      case "presentacion":
-        return "#2196F3";
-      case "mapa_mental":
-        return "#9C27B0";
-      case "linea_tiempo":
-        return "#4CAF50";
-      default:
-        return COLORS.primary;
-    }
-  };
 
   return (
     <View style={styles.container}>

@@ -104,6 +104,42 @@ describe("useCrearPlaneacionViewModel", () => {
     expect((result.current.planeacionGeneradaIA as any)?.campoFormativo).toBeDefined();
   });
 
+  it("mapea respuesta de preparatoria y completa defaults faltantes", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: {
+          planeacion: {
+            asignatura: "Física",
+            competenciasGenericas: ["Piensa crítica y reflexivamente"],
+            competenciasDisciplinares: ["Explica fenómenos naturales"],
+          },
+        },
+      }),
+    });
+
+    const { result } = renderHook(() => useCrearPlaneacionViewModel());
+
+    act(() => {
+      result.current.setPromptIA("Genera una planeación de física para preparatoria");
+      result.current.setNivelIA(NivelAcademico.PREPARATORIA);
+    });
+
+    await act(async () => {
+      await result.current.handleGenerarConIA();
+    });
+
+    const planeacion = result.current.planeacionGeneradaIA;
+
+    expect(planeacion).not.toBeNull();
+    expect(planeacion?.nivelAcademico).toBe(NivelAcademico.PREPARATORIA);
+    expect(planeacion?.actividades).toHaveLength(3);
+    expect(planeacion?.evaluacion).toBe("Evaluación formativa");
+    expect((planeacion as any)?.competenciasGenericas).toEqual(["Piensa crítica y reflexivamente"]);
+    expect((planeacion as any)?.competenciasDisciplinares).toEqual(["Explica fenómenos naturales"]);
+  });
+
   it("muestra error cuando el backend responde error", async () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,

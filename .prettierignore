@@ -1,0 +1,7 @@
+node_modules
+.expo
+dist
+coverage
+package-lock.json
+backend/node_modules
+roadmap-context/*.csv

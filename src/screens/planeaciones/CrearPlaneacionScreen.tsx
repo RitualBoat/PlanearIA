@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, FONT_SIZES } from "../../../types";
 import BottomNavBar from "../../components/BottomNavBar";
+import GenerarPlaneacionIAForm from "../../components/GenerarPlaneacionIAForm";
 import { useCrearPlaneacionViewModel } from "../../hooks/useCrearPlaneacionViewModel";
 
 /**
@@ -22,7 +23,13 @@ const CrearPlaneacionScreen: React.FC = () => {
   const {
     showTemplateModal,
     showNivelModal,
+    promptIA,
+    nivelIA,
+    isGeneratingIA,
+    iaError,
     nivelesAcademicos,
+    setPromptIA,
+    setNivelIA,
     handleCrearDesdeCero,
     handleSeleccionarNivel,
     handleCloseNivelModal,
@@ -43,9 +50,7 @@ const CrearPlaneacionScreen: React.FC = () => {
         <SafeAreaView style={styles.safeArea}>
           {/* Título */}
           <Text style={styles.title}>Crear Nueva Planeación</Text>
-          <Text style={styles.subtitle}>
-            Elige cómo deseas crear tu planeación
-          </Text>
+          <Text style={styles.subtitle}>Elige cómo deseas crear tu planeación</Text>
 
           {/* Opciones */}
           <View style={styles.optionsContainer}>
@@ -55,9 +60,7 @@ const CrearPlaneacionScreen: React.FC = () => {
               onPress={handleCrearDesdeCero}
               activeOpacity={0.7}
             >
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#FF9800" }]}
-              >
+              <View style={[styles.iconContainer, { backgroundColor: "#FF9800" }]}>
                 <MaterialIcons name="edit" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Crear desde Cero</Text>
@@ -72,15 +75,12 @@ const CrearPlaneacionScreen: React.FC = () => {
               onPress={handleGenerarPlantilla}
               activeOpacity={0.7}
             >
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#9C27B0" }]}
-              >
+              <View style={[styles.iconContainer, { backgroundColor: "#9C27B0" }]}>
                 <MaterialIcons name="auto-awesome" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Generar con IA</Text>
               <Text style={styles.optionDescription}>
-                Genera una plantilla automáticamente usando inteligencia
-                artificial
+                Genera una plantilla automáticamente usando inteligencia artificial
               </Text>
             </TouchableOpacity>
           </View>
@@ -97,9 +97,7 @@ const CrearPlaneacionScreen: React.FC = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Selecciona el Nivel Académico</Text>
-            <Text style={styles.modalSubtitle}>
-              Elige el nivel educativo para tu planeación
-            </Text>
+            <Text style={styles.modalSubtitle}>Elige el nivel educativo para tu planeación</Text>
 
             <ScrollView style={styles.modalContent}>
               {nivelesAcademicos.map((item) => (
@@ -109,37 +107,19 @@ const CrearPlaneacionScreen: React.FC = () => {
                   onPress={() => handleSeleccionarNivel(item.nivel)}
                   activeOpacity={0.7}
                 >
-                  <View
-                    style={[
-                      styles.nivelIconContainer,
-                      { backgroundColor: item.color },
-                    ]}
-                  >
-                    <MaterialIcons
-                      name={item.icon as any}
-                      size={40}
-                      color="white"
-                    />
+                  <View style={[styles.nivelIconContainer, { backgroundColor: item.color }]}>
+                    <MaterialIcons name={item.icon as any} size={40} color="white" />
                   </View>
                   <View style={styles.nivelInfo}>
                     <Text style={styles.nivelTitulo}>{item.titulo}</Text>
-                    <Text style={styles.nivelDescripcion}>
-                      {item.descripcion}
-                    </Text>
+                    <Text style={styles.nivelDescripcion}>{item.descripcion}</Text>
                   </View>
-                  <MaterialIcons
-                    name="chevron-right"
-                    size={24}
-                    color={COLORS.textSecondary}
-                  />
+                  <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
                 </TouchableOpacity>
               ))}
             </ScrollView>
 
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={handleCloseNivelModal}
-            >
+            <TouchableOpacity style={styles.closeButton} onPress={handleCloseNivelModal}>
               <Text style={styles.closeButtonText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
@@ -156,59 +136,18 @@ const CrearPlaneacionScreen: React.FC = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Generar Plantilla con IA</Text>
-            <Text style={styles.modalSubtitle}>
-              Selecciona los parámetros para tu planeación
-            </Text>
+            <Text style={styles.modalSubtitle}>Escribe tu prompt y selecciona nivel académico</Text>
 
             <ScrollView style={styles.modalContent}>
-              {/* Aquí irían los campos de selección */}
-              <View style={styles.parameterSection}>
-                <Text style={styles.parameterLabel}>Materia</Text>
-                <TouchableOpacity style={styles.parameterInput}>
-                  <Text style={styles.parameterText}>Seleccionar materia</Text>
-                  <MaterialIcons
-                    name="arrow-drop-down"
-                    size={24}
-                    color={COLORS.textSecondary}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.parameterSection}>
-                <Text style={styles.parameterLabel}>Carrera</Text>
-                <TouchableOpacity style={styles.parameterInput}>
-                  <Text style={styles.parameterText}>Seleccionar carrera</Text>
-                  <MaterialIcons
-                    name="arrow-drop-down"
-                    size={24}
-                    color={COLORS.textSecondary}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.parameterSection}>
-                <Text style={styles.parameterLabel}>Semestre</Text>
-                <TouchableOpacity style={styles.parameterInput}>
-                  <Text style={styles.parameterText}>Seleccionar semestre</Text>
-                  <MaterialIcons
-                    name="arrow-drop-down"
-                    size={24}
-                    color={COLORS.textSecondary}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.parameterSection}>
-                <Text style={styles.parameterLabel}>Periodo</Text>
-                <TouchableOpacity style={styles.parameterInput}>
-                  <Text style={styles.parameterText}>Seleccionar periodo</Text>
-                  <MaterialIcons
-                    name="arrow-drop-down"
-                    size={24}
-                    color={COLORS.textSecondary}
-                  />
-                </TouchableOpacity>
-              </View>
+              <GenerarPlaneacionIAForm
+                prompt={promptIA}
+                nivelSeleccionado={nivelIA}
+                isGenerating={isGeneratingIA}
+                errorMessage={iaError}
+                onChangePrompt={setPromptIA}
+                onSelectNivel={setNivelIA}
+                onGenerate={handleGenerarConIA}
+              />
             </ScrollView>
 
             {/* Botones del modal */}
@@ -216,14 +155,9 @@ const CrearPlaneacionScreen: React.FC = () => {
               <TouchableOpacity
                 style={[styles.modalButton, styles.cancelButton]}
                 onPress={handleCloseModal}
+                disabled={isGeneratingIA}
               >
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.generateButton]}
-                onPress={handleGenerarConIA}
-              >
-                <Text style={styles.generateButtonText}>Generar</Text>
               </TouchableOpacity>
             </View>
           </View>

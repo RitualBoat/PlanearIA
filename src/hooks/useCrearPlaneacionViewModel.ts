@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { Platform, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
@@ -17,7 +18,13 @@ export interface NivelOption {
 export interface CrearPlaneacionViewModel {
   showTemplateModal: boolean;
   showNivelModal: boolean;
+  promptIA: string;
+  nivelIA: NivelAcademico;
+  isGeneratingIA: boolean;
+  iaError: string;
   nivelesAcademicos: NivelOption[];
+  setPromptIA: (value: string) => void;
+  setNivelIA: (value: NivelAcademico) => void;
   handleCrearDesdeCero: () => void;
   handleSeleccionarNivel: (nivel: NivelAcademico) => void;
   handleCloseNivelModal: () => void;
@@ -30,6 +37,10 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
   const navigation = useNavigation<Nav>();
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [showNivelModal, setShowNivelModal] = useState(false);
+  const [promptIA, setPromptIA] = useState("");
+  const [nivelIA, setNivelIA] = useState<NivelAcademico>(NivelAcademico.PRIMARIA);
+  const [isGeneratingIA, setIsGeneratingIA] = useState(false);
+  const [iaError, setIaError] = useState("");
 
   const nivelesAcademicos: NivelOption[] = [
     {
@@ -71,7 +82,7 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
       setShowNivelModal(false);
       navigation.navigate("EditorPlaneacion", { nivel, modo: "crear" });
     },
-    [navigation],
+    [navigation]
   );
 
   const handleCloseNivelModal = useCallback(() => {
@@ -79,6 +90,7 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
   }, []);
 
   const handleGenerarPlantilla = useCallback(() => {
+    setIaError("");
     setShowTemplateModal(true);
   }, []);
 
@@ -86,15 +98,52 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     setShowTemplateModal(false);
   }, []);
 
-  const handleGenerarConIA = useCallback(() => {
-    console.log("[planeacion] Generating AI template");
-    setShowTemplateModal(false);
-  }, []);
+  const handleGenerarConIA = useCallback(async () => {
+    const prompt = promptIA.trim();
+
+    if (!prompt) {
+      setIaError("Escribe un prompt para generar la planeación.");
+      return;
+    }
+
+    if (prompt.length < 10) {
+      setIaError("El prompt debe tener al menos 10 caracteres.");
+      return;
+    }
+
+    setIaError("");
+    setIsGeneratingIA(true);
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+
+      const message =
+        "La conexión completa con IA se implementará en la siguiente tarea. El prompt y nivel ya se capturan correctamente.";
+
+      if (Platform.OS === "web") {
+        window.alert(message);
+      } else {
+        Alert.alert("Generación IA", message);
+      }
+
+      console.log("[planeacion] Prompt IA:", prompt);
+      console.log("[planeacion] Nivel IA:", nivelIA);
+      setShowTemplateModal(false);
+    } finally {
+      setIsGeneratingIA(false);
+    }
+  }, [promptIA, nivelIA]);
 
   return {
     showTemplateModal,
     showNivelModal,
+    promptIA,
+    nivelIA,
+    isGeneratingIA,
+    iaError,
     nivelesAcademicos,
+    setPromptIA,
+    setNivelIA,
     handleCrearDesdeCero,
     handleSeleccionarNivel,
     handleCloseNivelModal,

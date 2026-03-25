@@ -3,6 +3,25 @@
 API serverless para sincronización de PlanearIA con MongoDB Atlas.
 Diseñado para desplegarse en Vercel (100% gratis).
 
+## 🤖 Integración IA (Task 1.2.1.2)
+
+- **Proveedor seleccionado:** OpenAI
+- **Modelo por defecto:** `gpt-4o-mini` (configurable con `OPENAI_MODEL`)
+- **Endpoint usado:** `POST /api/planeaciones/generar`
+- **API key en backend:** `OPENAI_API_KEY` (variable de entorno en Vercel, nunca hardcodeada en el endpoint)
+
+### Criterio de selección (resumen)
+
+- OpenAI se eligió por compatibilidad con salida JSON estructurada y buena latencia para generación breve de planeaciones.
+- El endpoint ya valida timeout (`OPENAI_TIMEOUT_MS`) y parsea JSON de forma robusta.
+
+### Evidencia de PoC
+
+- Flujo validado con pruebas automatizadas en frontend:
+  - `npm test -- --runTestsByPath src/__tests__/planeaciones/useCrearPlaneacionViewModel.test.tsx`
+  - Caso de éxito cubierto: `genera planeación con IA y mapea respuesta al modelo`
+  - Resultado actual: `6 passed, 6 total`
+
 ## 📋 Estructura
 
 ```
@@ -88,12 +107,18 @@ https://planearia-api-xxxxx.vercel.app
 
 ### Paso 7: Actualizar la app
 
-Edita `src/sync/config/apiConfig.ts` y actualiza:
+Configura en la app la variable pública para autenticación con backend:
+
+```bash
+EXPO_PUBLIC_API_SECRET=tu_api_secret
+```
+
+Luego verifica `src/sync/config/apiConfig.ts`:
 
 ```typescript
 export const API_CONFIG = {
   baseUrl: "https://tu-url-de-vercel.vercel.app", // ← Tu URL aquí
-  apiSecret: "planearia-dev-secret-2025",
+  apiSecret: process.env.EXPO_PUBLIC_API_SECRET,
   timeout: 15000,
 };
 ```

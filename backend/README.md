@@ -10,6 +10,8 @@ backend/
 ├── api/
 │   ├── health.js       # GET /api/health - Health check
 │   ├── planeaciones.js # CRUD /api/planeaciones
+│   ├── planeaciones/
+│   │   └── generar.js  # POST /api/planeaciones/generar - IA
 │   └── sync.js         # POST /api/sync - Sincronización batch
 ├── lib/
 │   ├── mongodb.js      # Conexión a MongoDB Atlas
@@ -57,6 +59,15 @@ vercel env add API_SECRET
 
 # Cuando pregunte el valor, usa:
 # planearia-dev-secret-2025
+
+# Configurar OpenAI API Key
+vercel env add OPENAI_API_KEY
+
+# Opcional: modelo de OpenAI
+vercel env add OPENAI_MODEL
+
+# Opcional: timeout en ms (default 20000)
+vercel env add OPENAI_TIMEOUT_MS
 ```
 
 ### Paso 5: Deploy
@@ -117,6 +128,23 @@ GET    /api/planeaciones?id=xxx  # Obtener una
 POST   /api/planeaciones         # Crear/Upsert
 PUT    /api/planeaciones         # Actualizar
 DELETE /api/planeaciones?id=xxx  # Eliminar
+```
+
+### Generación con IA
+
+```
+POST /api/planeaciones/generar
+Body: {
+  prompt: string,
+  nivelAcademico: "primaria" | "secundaria" | "preparatoria" | "universidad",
+  contexto?: {
+    asignatura?: string,
+    grado?: string,
+    grupo?: string,
+    fecha?: string,
+    horaInicio?: string
+  }
+}
 ```
 
 ### Sincronización Batch

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,9 @@ import {
   TouchableOpacity,
   StatusBar,
   useWindowDimensions,
+  Modal,
+  Alert,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -18,6 +21,13 @@ import { SemanaEditor } from "../../components/SemanaEditor";
 import { EvaluacionEditor } from "../../components/EvaluacionEditor";
 import { NivelAcademico } from "../../../types/planeacion";
 import { useEditorPlaneacionViewModel } from "../../hooks/useEditorPlaneacionViewModel";
+
+interface SugerenciaMejoraIA {
+  id: string;
+  campo: string;
+  valorActual: string;
+  valorSugerido: string;
+}
 
 /**
  * Pantalla de editor de planeación (View)
@@ -98,6 +108,95 @@ const EditorPlaneacionScreen: React.FC = () => {
     obtenerTitulo,
   } = vm;
 
+  const [showMejorasModal, setShowMejorasModal] = useState(false);
+  const [sugerenciasSeleccionadas, setSugerenciasSeleccionadas] = useState<
+    Record<string, boolean>
+  >({});
+
+  const sugerenciasIA = useMemo<SugerenciaMejoraIA[]>(
+    () => [
+      {
+        id: "tema",
+        campo: "Tema de la sesión",
+        valorActual: temaSesion || "Sin definir",
+        valorSugerido: temaSesion
+          ? `${temaSesion} con enfoque en aprendizaje activo`
+          : "Tema de sesión optimizado con enfoque activo",
+      },
+      {
+        id: "inicio",
+        campo: "Actividad de inicio",
+        valorActual: actividadInicio || "Sin definir",
+        valorSugerido: actividadInicio
+          ? `${actividadInicio}. Agregar pregunta detonadora para activar conocimientos previos.`
+          : "Dinámica breve de activación con pregunta detonadora y contextualización.",
+      },
+      {
+        id: "evaluacion",
+        campo: "Estrategia de evaluación",
+        valorActual: evaluacion || "Sin definir",
+        valorSugerido: evaluacion
+          ? `${evaluacion}. Incluir rúbrica simple y retroalimentación inmediata.`
+          : "Evaluación formativa con rúbrica breve, autoevaluación y retroalimentación inmediata.",
+      },
+    ],
+    [actividadInicio, evaluacion, temaSesion]
+  );
+
+  const abrirMejorasIA = () => {
+    const estadoInicial: Record<string, boolean> = {};
+    sugerenciasIA.forEach((sugerencia) => {
+      estadoInicial[sugerencia.id] = false;
+    });
+    setSugerenciasSeleccionadas(estadoInicial);
+    setShowMejorasModal(true);
+  };
+
+  const alternarSugerencia = (id: string) => {
+    setSugerenciasSeleccionadas((estadoPrevio) => ({
+      ...estadoPrevio,
+      [id]: !estadoPrevio[id],
+    }));
+  };
+
+  const aplicarSugerenciasSeleccionadas = () => {
+    const sugerenciasActivas = sugerenciasIA.filter(
+      (sugerencia) => sugerenciasSeleccionadas[sugerencia.id]
+    );
+
+    if (sugerenciasActivas.length === 0) {
+      if (Platform.OS === "web") {
+        window.alert("Selecciona al menos una sugerencia para aplicar.");
+      } else {
+        Alert.alert("Mejorar con IA", "Selecciona al menos una sugerencia para aplicar.");
+      }
+      return;
+    }
+
+    sugerenciasActivas.forEach((sugerencia) => {
+      if (sugerencia.id === "tema") {
+        setTemaSesion(sugerencia.valorSugerido);
+      }
+
+      if (sugerencia.id === "inicio") {
+        setActividadInicio(sugerencia.valorSugerido);
+      }
+
+      if (sugerencia.id === "evaluacion") {
+        setEvaluacion(sugerencia.valorSugerido);
+      }
+    });
+
+    setShowMejorasModal(false);
+
+    const mensaje = `Se aplicaron ${sugerenciasActivas.length} mejora(s) sugeridas por IA.`;
+    if (Platform.OS === "web") {
+      window.alert(mensaje);
+    } else {
+      Alert.alert("Mejorar con IA", mensaje);
+    }
+  };
+
   // Obtain window dimensions for layout
   const { height: windowHeight } = useWindowDimensions();
   const navBarHeight = 80;
@@ -122,6 +221,11 @@ const EditorPlaneacionScreen: React.FC = () => {
           <Text style={styles.subtitle}>
             Completa todos los campos de tu planeación
           </Text>
+
+          <TouchableOpacity style={styles.aiImproveButton} onPress={abrirMejorasIA}>
+            <MaterialIcons name="auto-fix-high" size={20} color={COLORS.primary} />
+            <Text style={styles.aiImproveButtonText}>Mejorar con IA</Text>
+          </TouchableOpacity>
 
           {/* Datos Generales */}
           <View style={styles.section}>
@@ -766,6 +870,60 @@ const EditorPlaneacionScreen: React.FC = () => {
         </SafeAreaView>
       </WebScrollView>
 
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showMejorasModal}
+        onRequestClose={() => setShowMejorasModal(false)}
+      >
+        <View style={styles.mejorasOverlay}>
+          <View style={styles.mejorasContainer}>
+            <Text style={styles.mejorasTitle}>Sugerencias de mejora con IA</Text>
+            <Text style={styles.mejorasSubtitle}>Acepta o rechaza cada cambio sugerido</Text>
+
+            <WebScrollView style={styles.mejorasList} contentContainerStyle={styles.mejorasListContent}>
+              {sugerenciasIA.map((sugerencia) => {
+                const estaSeleccionada = !!sugerenciasSeleccionadas[sugerencia.id];
+
+                return (
+                  <TouchableOpacity
+                    key={sugerencia.id}
+                    style={styles.sugerenciaCard}
+                    onPress={() => alternarSugerencia(sugerencia.id)}
+                    activeOpacity={0.8}
+                  >
+                    <View style={styles.sugerenciaHeader}>
+                      <Text style={styles.sugerenciaCampo}>{sugerencia.campo}</Text>
+                      <MaterialIcons
+                        name={estaSeleccionada ? "check-box" : "check-box-outline-blank"}
+                        size={24}
+                        color={estaSeleccionada ? COLORS.primary : COLORS.textSecondary}
+                      />
+                    </View>
+
+                    <Text style={styles.diffLabel}>Actual</Text>
+                    <Text style={styles.diffText}>{sugerencia.valorActual}</Text>
+
+                    <Text style={styles.diffLabel}>Sugerido</Text>
+                    <Text style={styles.diffText}>{sugerencia.valorSugerido}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </WebScrollView>
+
+            <View style={styles.mejorasButtonsRow}>
+              <TouchableOpacity style={styles.mejorasCloseButton} onPress={() => setShowMejorasModal(false)}>
+                <Text style={styles.mejorasCloseText}>Cerrar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.mejorasApplyButton} onPress={aplicarSugerenciasSeleccionadas}>
+                <Text style={styles.mejorasApplyText}>Aplicar seleccionadas</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <BottomNavBar currentScreen="Editor" />
     </View>
   );
@@ -801,6 +959,24 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.medium,
     color: COLORS.textSecondary,
     marginBottom: 20,
+  },
+  aiImproveButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.surface,
+    gap: 8,
+    marginBottom: 16,
+  },
+  aiImproveButtonText: {
+    color: COLORS.primary,
+    fontSize: FONT_SIZES.medium,
+    fontWeight: "600",
   },
   section: {
     marginBottom: 25,
@@ -1039,6 +1215,102 @@ const styles = StyleSheet.create({
   },
   semanasSection: {
     marginBottom: 20,
+  },
+  mejorasOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  mejorasContainer: {
+    width: "92%",
+    maxHeight: "85%",
+    backgroundColor: COLORS.surface,
+    borderRadius: 14,
+    padding: 16,
+  },
+  mejorasTitle: {
+    fontSize: FONT_SIZES.large,
+    fontWeight: "bold",
+    color: COLORS.text,
+    marginBottom: 6,
+  },
+  mejorasSubtitle: {
+    fontSize: FONT_SIZES.medium,
+    color: COLORS.textSecondary,
+    marginBottom: 14,
+  },
+  mejorasList: {
+    flexGrow: 0,
+  },
+  mejorasListContent: {
+    paddingBottom: 8,
+  },
+  sugerenciaCard: {
+    borderWidth: 1,
+    borderColor: COLORS.textSecondary + "44",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 10,
+    backgroundColor: COLORS.background,
+  },
+  sugerenciaHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 8,
+    gap: 8,
+  },
+  sugerenciaCampo: {
+    flex: 1,
+    fontSize: FONT_SIZES.medium,
+    fontWeight: "700",
+    color: COLORS.text,
+  },
+  diffLabel: {
+    fontSize: FONT_SIZES.small,
+    color: COLORS.textSecondary,
+    fontWeight: "700",
+    marginTop: 6,
+    marginBottom: 2,
+  },
+  diffText: {
+    fontSize: FONT_SIZES.medium,
+    color: COLORS.text,
+    lineHeight: 20,
+  },
+  mejorasButtonsRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 12,
+  },
+  mejorasCloseButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: COLORS.textSecondary,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    backgroundColor: COLORS.surface,
+  },
+  mejorasCloseText: {
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.medium,
+    fontWeight: "600",
+  },
+  mejorasApplyButton: {
+    flex: 1,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    backgroundColor: COLORS.primary,
+  },
+  mejorasApplyText: {
+    color: "white",
+    fontSize: FONT_SIZES.medium,
+    fontWeight: "700",
   },
 });
 

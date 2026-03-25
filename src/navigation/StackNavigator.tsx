@@ -25,9 +25,6 @@ import AsignarRecursoScreen from "../screens/grupos/tareas/AsignarRecursoScreen"
 import DetalleTareaScreen from "../screens/grupos/tareas/DetalleTareaScreen";
 import CalificarEntregasScreen from "../screens/grupos/tareas/CalificarEntregasScreen";
 
-// Importación de pantallas de Tareas (deprecated - será eliminado)
-import TareasScreen from "../screens/tareas/TareasScreen";
-
 // Importación de pantallas de Biblioteca de Recursos
 import RecursosDidacticosScreen from "../screens/biblioteca/RecursosDidacticosScreen";
 import ExamenesScreen from "../screens/biblioteca/ExamenesScreen";
@@ -38,10 +35,6 @@ import ListaRecursosScreen from "../screens/biblioteca/ListaRecursosScreen";
 
 // Importación de pantallas de Cuenta
 import CuentaScreen from "../screens/cuenta/CuentaScreen";
-
-// Pantallas antiguas mantenidas por compatibilidad (deprecated)
-import AlumnosScreen from "../screens/alumnos/AlumnosScreen";
-import CalificacionesScreen from "../screens/calificaciones/CalificacionesScreen";
 
 /**
  * Definición de los tipos para los parámetros de navegación
@@ -77,9 +70,6 @@ export type RootStackParamList = {
   DetalleTarea: { tareaId: number; grupoId: number };
   CalificarEntregas: { tareaId: number; grupoId: number };
 
-  // Tareas (deprecated - módulo standalone eliminado)
-  Tareas: undefined;
-
   // NUEVA ARQUITECTURA: Recursos Didácticos (reemplaza Recursos)
   RecursosDidacticos: undefined;
   Examenes: undefined;
@@ -90,10 +80,6 @@ export type RootStackParamList = {
 
   // Cuenta y Seguridad (se mantiene)
   Cuenta: undefined;
-
-  // Rutas antiguas mantenidas por compatibilidad (deprecated)
-  Alumnos: undefined;
-  Calificaciones: undefined;
 };
 /**
  * Creamos el Stack Navigator con tipado
@@ -249,16 +235,6 @@ const StackNavigator: React.FC = () => {
         }}
       />
 
-      {/* ========== TAREAS (Deprecated) ========== */}
-      <Stack.Screen
-        name="Tareas"
-        component={TareasScreen}
-        options={{
-          title: "Tareas",
-          headerShown: false,
-        }}
-      />
-
       {/* ========== RECURSOS DIDÁCTICOS (NUEVA ARQUITECTURA) ========== */}
       <Stack.Screen
         name="RecursosDidacticos"
@@ -320,25 +296,6 @@ const StackNavigator: React.FC = () => {
         component={CuentaScreen}
         options={{
           title: "Cuenta y Seguridad",
-          headerShown: false,
-        }}
-      />
-
-      {/* ========== PANTALLAS ANTIGUAS (Deprecated) ========== */}
-      <Stack.Screen
-        name="Alumnos"
-        component={AlumnosScreen}
-        options={{
-          title: "Alumnos",
-          headerShown: false,
-        }}
-      />
-
-      <Stack.Screen
-        name="Calificaciones"
-        component={CalificacionesScreen}
-        options={{
-          title: "Calificaciones",
           headerShown: false,
         }}
       />

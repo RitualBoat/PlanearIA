@@ -4,6 +4,9 @@ import { useCrearPlaneacionViewModel } from "../../hooks/useCrearPlaneacionViewM
 
 const mockNavigate = jest.fn();
 const mockFetch = jest.fn();
+const mockAgregarPlaneacion = jest.fn();
+const mockObtenerPlaneacion = jest.fn();
+const mockForceSync = jest.fn();
 
 (global as typeof globalThis & { fetch: typeof fetch }).fetch = mockFetch as typeof fetch;
 
@@ -19,9 +22,20 @@ jest.mock("../../sync/config/apiConfig", () => ({
   },
 }));
 
+jest.mock("../../sync/providers/SyncProvider", () => ({
+  usePlaneaciones: () => ({
+    agregarPlaneacion: mockAgregarPlaneacion,
+    obtenerPlaneacion: mockObtenerPlaneacion,
+    forceSync: mockForceSync,
+  }),
+}));
+
 describe("useCrearPlaneacionViewModel", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockObtenerPlaneacion.mockReturnValue(undefined);
+    mockForceSync.mockResolvedValue(undefined);
+    mockAgregarPlaneacion.mockResolvedValue(undefined);
   });
 
   it("abre modal de nivel y navega al editor al seleccionar nivel", () => {
@@ -86,6 +100,7 @@ describe("useCrearPlaneacionViewModel", () => {
     expect(result.current.iaError).toBe("");
     expect(result.current.planeacionGeneradaIA).not.toBeNull();
     expect(result.current.planeacionGeneradaIA?.nivelAcademico).toBe(NivelAcademico.PRIMARIA);
+    expect(result.current.showPreviewModal).toBe(true);
     expect((result.current.planeacionGeneradaIA as any)?.campoFormativo).toBeDefined();
   });
 
@@ -110,5 +125,85 @@ describe("useCrearPlaneacionViewModel", () => {
     });
 
     expect(result.current.iaError).toBe("Error IA");
+  });
+
+  it("guarda y sincroniza la planeación generada", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: {
+          planeacion: {
+            asignatura: "Historia",
+            actividades: [
+              { tipo: "inicio", descripcion: "Inicio", duracion: 10 },
+              { tipo: "desarrollo", descripcion: "Desarrollo", duracion: 30 },
+              { tipo: "cierre", descripcion: "Cierre", duracion: 10 },
+            ],
+          },
+        },
+      }),
+    });
+
+    const { result } = renderHook(() => useCrearPlaneacionViewModel());
+
+    act(() => {
+      result.current.setPromptIA("Genera una planeación de historia para secundaria");
+    });
+
+    await act(async () => {
+      await result.current.handleGenerarConIA();
+    });
+
+    await act(async () => {
+      await result.current.handleGuardarPlaneacionIA();
+    });
+
+    expect(mockAgregarPlaneacion).toHaveBeenCalledTimes(1);
+    expect(mockForceSync).toHaveBeenCalledTimes(1);
+    expect(result.current.showPreviewModal).toBe(false);
+  });
+
+  it("abre editor con la planeación IA generada", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: {
+          planeacion: {
+            asignatura: "Química",
+            actividades: [
+              { tipo: "inicio", descripcion: "Inicio", duracion: 10 },
+              { tipo: "desarrollo", descripcion: "Desarrollo", duracion: 30 },
+              { tipo: "cierre", descripcion: "Cierre", duracion: 10 },
+            ],
+          },
+        },
+      }),
+    });
+
+    const { result } = renderHook(() => useCrearPlaneacionViewModel());
+
+    act(() => {
+      result.current.setPromptIA("Genera una planeación de química para preparatoria");
+      result.current.setNivelIA(NivelAcademico.PREPARATORIA);
+    });
+
+    await act(async () => {
+      await result.current.handleGenerarConIA();
+    });
+
+    await act(async () => {
+      await result.current.handleEditarPlaneacionIA();
+    });
+
+    expect(mockAgregarPlaneacion).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "EditorPlaneacion",
+      expect.objectContaining({
+        nivel: NivelAcademico.PREPARATORIA,
+        modo: "editar",
+      })
+    );
   });
 });

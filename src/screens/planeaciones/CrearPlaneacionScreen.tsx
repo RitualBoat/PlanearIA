@@ -23,10 +23,12 @@ const CrearPlaneacionScreen: React.FC = () => {
   const {
     showTemplateModal,
     showNivelModal,
+    showPreviewModal,
     promptIA,
     nivelIA,
     isGeneratingIA,
     iaError,
+    planeacionGeneradaIA,
     nivelesAcademicos,
     setPromptIA,
     setNivelIA,
@@ -35,7 +37,11 @@ const CrearPlaneacionScreen: React.FC = () => {
     handleCloseNivelModal,
     handleGenerarPlantilla,
     handleCloseModal,
+    handleClosePreview,
     handleGenerarConIA,
+    handleGuardarPlaneacionIA,
+    handleEditarPlaneacionIA,
+    handleRegenerarPlaneacionIA,
   } = useCrearPlaneacionViewModel();
 
   return (
@@ -158,6 +164,82 @@ const CrearPlaneacionScreen: React.FC = () => {
                 disabled={isGeneratingIA}
               >
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showPreviewModal}
+        onRequestClose={handleClosePreview}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Vista previa de planeación IA</Text>
+            <Text style={styles.modalSubtitle}>Revisa antes de guardar</Text>
+
+            <ScrollView style={styles.modalContent}>
+              <View style={styles.previewCard}>
+                <Text style={styles.previewTitle}>
+                  {planeacionGeneradaIA?.temaSesion || "Sin tema"}
+                </Text>
+                <Text style={styles.previewLine}>
+                  <Text style={styles.previewLabel}>Asignatura: </Text>
+                  {planeacionGeneradaIA?.asignatura || "-"}
+                </Text>
+                <Text style={styles.previewLine}>
+                  <Text style={styles.previewLabel}>Grado/Grupo: </Text>
+                  {planeacionGeneradaIA?.grado || "-"} {planeacionGeneradaIA?.grupo || ""}
+                </Text>
+                <Text style={styles.previewLine}>
+                  <Text style={styles.previewLabel}>Nivel: </Text>
+                  {planeacionGeneradaIA?.nivelAcademico || "-"}
+                </Text>
+                <Text style={styles.previewLine}>
+                  <Text style={styles.previewLabel}>Actividades: </Text>
+                  {planeacionGeneradaIA?.actividades?.length || 0}
+                </Text>
+                <Text style={styles.previewLine}>
+                  <Text style={styles.previewLabel}>Evaluación: </Text>
+                  {planeacionGeneradaIA?.evaluacion || "-"}
+                </Text>
+              </View>
+            </ScrollView>
+
+            <View style={styles.modalButtonsColumn}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.generateButton]}
+                onPress={handleGuardarPlaneacionIA}
+                disabled={isGeneratingIA}
+              >
+                <Text style={styles.generateButtonText}>Guardar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalButton, styles.editButton]}
+                onPress={handleEditarPlaneacionIA}
+                disabled={isGeneratingIA}
+              >
+                <Text style={styles.editButtonText}>Editar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={handleRegenerarPlaneacionIA}
+                disabled={isGeneratingIA}
+              >
+                <Text style={styles.cancelButtonText}>Regenerar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={handleClosePreview}
+                disabled={isGeneratingIA}
+              >
+                <Text style={styles.cancelButtonText}>Cerrar</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -287,6 +369,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
     gap: 10,
   },
+  modalButtonsColumn: {
+    marginTop: 20,
+    gap: 10,
+  },
   modalButton: {
     flex: 1,
     paddingVertical: 12,
@@ -310,6 +396,39 @@ const styles = StyleSheet.create({
     color: COLORS.surface,
     fontSize: FONT_SIZES.medium,
     fontWeight: "600",
+  },
+  editButton: {
+    backgroundColor: COLORS.primary + "22",
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+  },
+  editButtonText: {
+    color: COLORS.primary,
+    fontSize: FONT_SIZES.medium,
+    fontWeight: "600",
+  },
+  previewCard: {
+    backgroundColor: COLORS.background,
+    borderRadius: 10,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: COLORS.textSecondary + "33",
+    gap: 6,
+  },
+  previewTitle: {
+    fontSize: FONT_SIZES.large,
+    fontWeight: "700",
+    color: COLORS.text,
+    marginBottom: 6,
+  },
+  previewLine: {
+    fontSize: FONT_SIZES.medium,
+    color: COLORS.text,
+    lineHeight: 20,
+  },
+  previewLabel: {
+    fontWeight: "700",
+    color: COLORS.text,
   },
   nivelCard: {
     flexDirection: "row",

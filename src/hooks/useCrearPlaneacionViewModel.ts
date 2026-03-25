@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
 import { API_CONFIG } from "../sync/config/apiConfig";
+import { usePlaneaciones } from "../sync/providers/SyncProvider";
 import {
   NivelAcademico,
   Planeacion,
@@ -26,6 +27,7 @@ export interface NivelOption {
 export interface CrearPlaneacionViewModel {
   showTemplateModal: boolean;
   showNivelModal: boolean;
+  showPreviewModal: boolean;
   promptIA: string;
   nivelIA: NivelAcademico;
   isGeneratingIA: boolean;
@@ -39,13 +41,19 @@ export interface CrearPlaneacionViewModel {
   handleCloseNivelModal: () => void;
   handleGenerarPlantilla: () => void;
   handleCloseModal: () => void;
+  handleClosePreview: () => void;
   handleGenerarConIA: () => Promise<void>;
+  handleGuardarPlaneacionIA: () => Promise<void>;
+  handleEditarPlaneacionIA: () => Promise<void>;
+  handleRegenerarPlaneacionIA: () => Promise<void>;
 }
 
 export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
   const navigation = useNavigation<Nav>();
+  const { agregarPlaneacion, obtenerPlaneacion, forceSync } = usePlaneaciones();
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [showNivelModal, setShowNivelModal] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [promptIA, setPromptIA] = useState("");
   const [nivelIA, setNivelIA] = useState<NivelAcademico>(NivelAcademico.PRIMARIA);
   const [isGeneratingIA, setIsGeneratingIA] = useState(false);
@@ -108,6 +116,10 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     setShowTemplateModal(false);
   }, []);
 
+  const handleClosePreview = useCallback(() => {
+    setShowPreviewModal(false);
+  }, []);
+
   const handleGenerarConIA = useCallback(async () => {
     const prompt = promptIA.trim();
 
@@ -167,16 +179,7 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
 
       setPlaneacionGeneradaIA(planeacionGenerada);
       setShowTemplateModal(false);
-      setPromptIA("");
-
-      const successMessage =
-        "Planeación generada correctamente. En la siguiente tarea se mostrará la vista previa antes de guardar.";
-
-      if (Platform.OS === "web") {
-        window.alert(successMessage);
-      } else {
-        Alert.alert("Generación IA", successMessage);
-      }
+      setShowPreviewModal(true);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Error inesperado al generar la planeación.";
@@ -186,9 +189,79 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     }
   }, [promptIA, nivelIA]);
 
+  const handleGuardarPlaneacionIA = useCallback(async () => {
+    if (!planeacionGeneradaIA) {
+      setIaError("No hay una planeación generada para guardar.");
+      return;
+    }
+
+    setIaError("");
+
+    try {
+      const existente = obtenerPlaneacion(planeacionGeneradaIA.id);
+      if (!existente) {
+        await agregarPlaneacion(planeacionGeneradaIA);
+      }
+
+      await forceSync();
+
+      setShowPreviewModal(false);
+      setShowTemplateModal(false);
+
+      if (Platform.OS === "web") {
+        window.alert("Planeación guardada y sincronizada correctamente.");
+      } else {
+        Alert.alert("Planeación IA", "Planeación guardada y sincronizada correctamente.");
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "No se pudo guardar/sincronizar la planeación generada.";
+      setIaError(errorMessage);
+    }
+  }, [agregarPlaneacion, forceSync, obtenerPlaneacion, planeacionGeneradaIA]);
+
+  const handleEditarPlaneacionIA = useCallback(async () => {
+    if (!planeacionGeneradaIA) {
+      setIaError("No hay una planeación generada para editar.");
+      return;
+    }
+
+    setIaError("");
+
+    try {
+      const existente = obtenerPlaneacion(planeacionGeneradaIA.id);
+      if (!existente) {
+        await agregarPlaneacion(planeacionGeneradaIA);
+      }
+
+      setShowPreviewModal(false);
+      setShowTemplateModal(false);
+
+      navigation.navigate("EditorPlaneacion", {
+        nivel: planeacionGeneradaIA.nivelAcademico,
+        modo: "editar",
+        planeacionId: planeacionGeneradaIA.id,
+      });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "No se pudo abrir el editor de la planeación generada.";
+      setIaError(errorMessage);
+    }
+  }, [agregarPlaneacion, navigation, obtenerPlaneacion, planeacionGeneradaIA]);
+
+  const handleRegenerarPlaneacionIA = useCallback(async () => {
+    setShowPreviewModal(false);
+    await handleGenerarConIA();
+  }, [handleGenerarConIA]);
+
   return {
     showTemplateModal,
     showNivelModal,
+    showPreviewModal,
     promptIA,
     nivelIA,
     isGeneratingIA,
@@ -202,7 +275,11 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     handleCloseNivelModal,
     handleGenerarPlantilla,
     handleCloseModal,
+    handleClosePreview,
     handleGenerarConIA,
+    handleGuardarPlaneacionIA,
+    handleEditarPlaneacionIA,
+    handleRegenerarPlaneacionIA,
   };
 };
 

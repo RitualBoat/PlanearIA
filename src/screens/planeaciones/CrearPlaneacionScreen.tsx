@@ -10,16 +10,21 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useNavigation } from "@react-navigation/native";
+import type { StackNavigationProp } from "@react-navigation/stack";
 import { COLORS, FONT_SIZES } from "../../../types";
 import BottomNavBar from "../../components/BottomNavBar";
 import GenerarPlaneacionIAForm from "../../components/GenerarPlaneacionIAForm";
 import { useCrearPlaneacionViewModel } from "../../hooks/useCrearPlaneacionViewModel";
+import type { RootStackParamList } from "../../navigation/StackNavigator";
 
 /**
  * Pantalla para crear una nueva planeación (View)
  * Solo JSX y StyleSheet - la logica vive en useCrearPlaneacionViewModel
  */
 const CrearPlaneacionScreen: React.FC = () => {
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+
   const {
     showTemplateModal,
     showNivelModal,
@@ -78,7 +83,7 @@ const CrearPlaneacionScreen: React.FC = () => {
             {/* Opción 2: Generar con plantilla */}
             <TouchableOpacity
               style={styles.optionCard}
-              onPress={handleGenerarPlantilla}
+              onPress={() => navigation.navigate("GenerarPlaneacionIA")}
               activeOpacity={0.7}
             >
               <View style={[styles.iconContainer, { backgroundColor: "#9C27B0" }]}>

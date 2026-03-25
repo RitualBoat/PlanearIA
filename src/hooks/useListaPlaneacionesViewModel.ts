@@ -3,12 +3,8 @@ import { Platform, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
-import {
-  NivelAcademico,
-  Planeacion,
-  FiltrosPlaneacion,
-} from "../../types/planeacion";
-import { usePlaneaciones } from "../context/PlaneacionesContext";
+import { NivelAcademico, Planeacion, FiltrosPlaneacion } from "../../types/planeacion";
+import { usePlaneaciones } from "../sync/providers/SyncProvider";
 
 type Nav = StackNavigationProp<RootStackParamList, "ListaPlaneaciones">;
 
@@ -41,20 +37,13 @@ export interface ListaPlaneacionesViewModel {
 
 export const useListaPlaneacionesViewModel = (): ListaPlaneacionesViewModel => {
   const navigation = useNavigation<Nav>();
-  const {
-    planeaciones,
-    filtrarPlaneaciones,
-    eliminarPlaneacion,
-    clonarPlaneacion,
-  } = usePlaneaciones();
+  const { planeaciones, filtrarPlaneaciones, eliminarPlaneacion, clonarPlaneacion } =
+    usePlaneaciones();
 
-  const [planeacionesFiltradas, setPlaneacionesFiltradas] =
-    useState<Planeacion[]>(planeaciones);
+  const [planeacionesFiltradas, setPlaneacionesFiltradas] = useState<Planeacion[]>(planeaciones);
   const [showFiltros, setShowFiltros] = useState(false);
   const [menuVisible, setMenuVisible] = useState<string | null>(null);
-  const [filtroNivel, setFiltroNivel] = useState<NivelAcademico | undefined>(
-    undefined,
-  );
+  const [filtroNivel, setFiltroNivel] = useState<NivelAcademico | undefined>(undefined);
   const [filtroAsignatura, setFiltroAsignatura] = useState("");
   const [filtroGrado, setFiltroGrado] = useState("");
 
@@ -114,21 +103,18 @@ export const useListaPlaneacionesViewModel = (): ListaPlaneacionesViewModel => {
     return textos[nivel];
   }, []);
 
-  const confirmar = useCallback(
-    (titulo: string, mensaje: string, onConfirm: () => void) => {
-      if (Platform.OS === "web") {
-        if (window.confirm(`${titulo}\n\n${mensaje}`)) {
-          onConfirm();
-        }
-      } else {
-        Alert.alert(titulo, mensaje, [
-          { text: "Cancelar", style: "cancel" },
-          { text: "Confirmar", onPress: onConfirm },
-        ]);
+  const confirmar = useCallback((titulo: string, mensaje: string, onConfirm: () => void) => {
+    if (Platform.OS === "web") {
+      if (window.confirm(`${titulo}\n\n${mensaje}`)) {
+        onConfirm();
       }
-    },
-    [],
-  );
+    } else {
+      Alert.alert(titulo, mensaje, [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Confirmar", onPress: onConfirm },
+      ]);
+    }
+  }, []);
 
   const showMessage = useCallback((title: string, message: string) => {
     if (Platform.OS === "web") {
@@ -147,7 +133,7 @@ export const useListaPlaneacionesViewModel = (): ListaPlaneacionesViewModel => {
         planeacionId: planeacion.id,
       });
     },
-    [navigation],
+    [navigation]
   );
 
   const handleClonar = useCallback(
@@ -160,7 +146,7 @@ export const useListaPlaneacionesViewModel = (): ListaPlaneacionesViewModel => {
         showMessage("Error", "No se pudo clonar la planeación");
       }
     },
-    [clonarPlaneacion, showMessage],
+    [clonarPlaneacion, showMessage]
   );
 
   const handleEliminar = useCallback(
@@ -176,10 +162,10 @@ export const useListaPlaneacionesViewModel = (): ListaPlaneacionesViewModel => {
           } catch {
             showMessage("Error", "No se pudo eliminar la planeación");
           }
-        },
+        }
       );
     },
-    [eliminarPlaneacion, confirmar, showMessage],
+    [eliminarPlaneacion, confirmar, showMessage]
   );
 
   const handleExportar = useCallback(
@@ -187,7 +173,7 @@ export const useListaPlaneacionesViewModel = (): ListaPlaneacionesViewModel => {
       setMenuVisible(null);
       showMessage("Exportar", "Función de exportar próximamente disponible");
     },
-    [showMessage],
+    [showMessage]
   );
 
   const handleCrearNueva = useCallback(() => {

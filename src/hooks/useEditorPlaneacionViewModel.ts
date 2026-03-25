@@ -14,7 +14,7 @@ import {
   SemanaUniversitaria,
   Evaluacion,
 } from "../../types/planeacion";
-import { usePlaneaciones } from "../context/PlaneacionesContext";
+import { usePlaneaciones } from "../sync/providers/SyncProvider";
 
 type Nav = StackNavigationProp<RootStackParamList, "EditorPlaneacion">;
 type Route = RouteProp<RootStackParamList, "EditorPlaneacion">;
@@ -109,8 +109,7 @@ export const useEditorPlaneacionViewModel = (): EditorPlaneacionViewModel => {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const { nivel, modo, planeacionId } = route.params;
-  const { agregarPlaneacion, actualizarPlaneacion, obtenerPlaneacion } =
-    usePlaneaciones();
+  const { agregarPlaneacion, actualizarPlaneacion, obtenerPlaneacion } = usePlaneaciones();
 
   // General fields
   const [asignatura, setAsignatura] = useState("");
@@ -139,26 +138,23 @@ export const useEditorPlaneacionViewModel = (): EditorPlaneacionViewModel => {
 
   // Level-specific
   const [campoFormativo, setCampoFormativo] = useState("");
-  const [competenciasDisciplinares, setCompetenciasDisciplinares] =
-    useState("");
+  const [competenciasDisciplinares, setCompetenciasDisciplinares] = useState("");
   const [competenciasGenericas, setCompetenciasGenericas] = useState("");
-  const [competenciasProfesionales, setCompetenciasProfesionales] =
-    useState("");
+  const [competenciasProfesionales, setCompetenciasProfesionales] = useState("");
   const [objetivosAprendizaje, setObjetivosAprendizaje] = useState("");
   const [bibliografia, setBibliografia] = useState("");
   const [modalidad, setModalidad] = useState("presencial");
 
   // University detailed mode
   const [modoDetallado, setModoDetallado] = useState(false);
-  const [configuracionCurso, setConfiguracionCurso] =
-    useState<ConfiguracionCurso>({
-      duracionSemanas: 16,
-      horasTeoricas: 3,
-      horasPracticas: 2,
-      horasAutonomas: 5,
-      creditos: 8,
-      modalidad: "presencial",
-    });
+  const [configuracionCurso, setConfiguracionCurso] = useState<ConfiguracionCurso>({
+    duracionSemanas: 16,
+    horasTeoricas: 3,
+    horasPracticas: 2,
+    horasAutonomas: 5,
+    creditos: 8,
+    modalidad: "presencial",
+  });
   const [semanas, setSemanas] = useState<SemanaUniversitaria[]>([]);
   const [evaluaciones, setEvaluaciones] = useState<Evaluacion[]>([]);
   const [semanasVersion, setSemanasVersion] = useState(0);
@@ -173,21 +169,18 @@ export const useEditorPlaneacionViewModel = (): EditorPlaneacionViewModel => {
     }
   }, []);
 
-  const confirmar = useCallback(
-    (titulo: string, mensaje: string, onConfirm: () => void) => {
-      if (Platform.OS === "web") {
-        if (window.confirm(`${titulo}\n\n${mensaje}`)) {
-          onConfirm();
-        }
-      } else {
-        Alert.alert(titulo, mensaje, [
-          { text: "Cancelar", style: "cancel" },
-          { text: "Confirmar", onPress: onConfirm },
-        ]);
+  const confirmar = useCallback((titulo: string, mensaje: string, onConfirm: () => void) => {
+    if (Platform.OS === "web") {
+      if (window.confirm(`${titulo}\n\n${mensaje}`)) {
+        onConfirm();
       }
-    },
-    [],
-  );
+    } else {
+      Alert.alert(titulo, mensaje, [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Confirmar", onPress: onConfirm },
+      ]);
+    }
+  }, []);
 
   // --- Load existing data ---
 
@@ -219,22 +212,14 @@ export const useEditorPlaneacionViewModel = (): EditorPlaneacionViewModel => {
     if (planeacion.nivelAcademico === NivelAcademico.PRIMARIA) {
       setCampoFormativo((planeacion as any).campoFormativo || "");
     } else if (planeacion.nivelAcademico === NivelAcademico.SECUNDARIA) {
-      setCompetenciasDisciplinares(
-        (planeacion as any).competenciasDisciplinares?.join("\n") || "",
-      );
+      setCompetenciasDisciplinares((planeacion as any).competenciasDisciplinares?.join("\n") || "");
     } else if (planeacion.nivelAcademico === NivelAcademico.PREPARATORIA) {
-      setCompetenciasGenericas(
-        (planeacion as any).competenciasGenericas?.join("\n") || "",
-      );
-      setCompetenciasDisciplinares(
-        (planeacion as any).competenciasDisciplinares?.join("\n") || "",
-      );
+      setCompetenciasGenericas((planeacion as any).competenciasGenericas?.join("\n") || "");
+      setCompetenciasDisciplinares((planeacion as any).competenciasDisciplinares?.join("\n") || "");
       setBibliografia((planeacion as any).bibliografia?.join("\n") || "");
     } else if (planeacion.nivelAcademico === NivelAcademico.UNIVERSIDAD) {
       const u = planeacion as PlaneacionUniversidad;
-      setCompetenciasProfesionales(
-        u.competenciasProfesionales?.join("\n") || "",
-      );
+      setCompetenciasProfesionales(u.competenciasProfesionales?.join("\n") || "");
       setObjetivosAprendizaje(u.objetivosAprendizaje?.join("\n") || "");
       setBibliografia(u.bibliografia?.join("\n") || "");
       setModalidad(u.modalidad || "presencial");
@@ -267,9 +252,7 @@ export const useEditorPlaneacionViewModel = (): EditorPlaneacionViewModel => {
         unidadTematica: "",
         temas: [""],
         objetivos: [""],
-        actividadesPresenciales: [
-          { descripcion: "", duracion: 120, metodologia: "" },
-        ],
+        actividadesPresenciales: [{ descripcion: "", duracion: 120, metodologia: "" }],
         actividadesAutonomas: [""],
         recursos: [""],
       });
@@ -290,9 +273,7 @@ export const useEditorPlaneacionViewModel = (): EditorPlaneacionViewModel => {
             unidadTematica: "",
             temas: [""],
             objetivos: [""],
-            actividadesPresenciales: [
-              { descripcion: "", duracion: 120, metodologia: "" },
-            ],
+            actividadesPresenciales: [{ descripcion: "", duracion: 120, metodologia: "" }],
             actividadesAutonomas: [""],
             recursos: [""],
           });
@@ -306,11 +287,11 @@ export const useEditorPlaneacionViewModel = (): EditorPlaneacionViewModel => {
           () => {
             setSemanas([...semanas.slice(0, nuevaDuracion)]);
             setSemanasVersion((v) => v + 1);
-          },
+          }
         );
       }
     },
-    [configuracionCurso, semanas, confirmar],
+    [configuracionCurso, semanas, confirmar]
   );
 
   const toggleModoDetallado = useCallback(() => {
@@ -325,46 +306,35 @@ export const useEditorPlaneacionViewModel = (): EditorPlaneacionViewModel => {
           setModoDetallado(false);
           setSemanas([]);
           setEvaluaciones([]);
-        },
+        }
       );
     }
-  }, [
-    modoDetallado,
-    configuracionCurso.duracionSemanas,
-    inicializarSemanas,
-    confirmar,
-  ]);
+  }, [modoDetallado, configuracionCurso.duracionSemanas, inicializarSemanas, confirmar]);
 
   const actualizarSemana = useCallback(
     (semana: SemanaUniversitaria) => {
-      const nuevas = semanas.map((s) =>
-        s.numero === semana.numero ? { ...semana } : { ...s },
-      );
+      const nuevas = semanas.map((s) => (s.numero === semana.numero ? { ...semana } : { ...s }));
       setSemanas([...nuevas]);
       setSemanasVersion((v) => v + 1);
     },
-    [semanas],
+    [semanas]
   );
 
   const eliminarSemana = useCallback(
     (numero: number) => {
-      confirmar(
-        "Eliminar semana",
-        `¿Estás seguro de eliminar la semana ${numero}?`,
-        () => {
-          const nuevas = semanas
-            .filter((s) => s.numero !== numero)
-            .map((s, idx) => ({ ...s, numero: idx + 1 }));
-          setSemanas([...nuevas]);
-          setConfiguracionCurso((prev) => ({
-            ...prev,
-            duracionSemanas: nuevas.length as 12 | 16 | 18,
-          }));
-          setSemanasVersion((v) => v + 1);
-        },
-      );
+      confirmar("Eliminar semana", `¿Estás seguro de eliminar la semana ${numero}?`, () => {
+        const nuevas = semanas
+          .filter((s) => s.numero !== numero)
+          .map((s, idx) => ({ ...s, numero: idx + 1 }));
+        setSemanas([...nuevas]);
+        setConfiguracionCurso((prev) => ({
+          ...prev,
+          duracionSemanas: nuevas.length as 12 | 16 | 18,
+        }));
+        setSemanasVersion((v) => v + 1);
+      });
     },
-    [semanas, confirmar],
+    [semanas, confirmar]
   );
 
   const clonarSemana = useCallback(
@@ -385,7 +355,7 @@ export const useEditorPlaneacionViewModel = (): EditorPlaneacionViewModel => {
         setSemanasVersion((v) => v + 1);
       }
     },
-    [semanas],
+    [semanas]
   );
 
   // --- Validation & Save ---
@@ -428,10 +398,7 @@ export const useEditorPlaneacionViewModel = (): EditorPlaneacionViewModel => {
     ];
 
     const planeacionBase: PlaneacionBase = {
-      id:
-        modo === "editar" && planeacionId
-          ? planeacionId
-          : Date.now().toString(),
+      id: modo === "editar" && planeacionId ? planeacionId : Date.now().toString(),
       nivelAcademico: nivel,
       asignatura,
       grado,
@@ -441,9 +408,7 @@ export const useEditorPlaneacionViewModel = (): EditorPlaneacionViewModel => {
       duracionTotal: parseInt(duracionTotal) || 50,
       unidadTematica,
       temaSesion,
-      aprendizajesEsperados: aprendizajesEsperados
-        .split("\n")
-        .filter((a) => a.trim()),
+      aprendizajesEsperados: aprendizajesEsperados.split("\n").filter((a) => a.trim()),
       actividades,
       recursos: recursos.split("\n").filter((r) => r.trim()),
       evaluacion,
@@ -451,8 +416,7 @@ export const useEditorPlaneacionViewModel = (): EditorPlaneacionViewModel => {
       observaciones,
       fechaCreacion:
         modo === "editar" && planeacionId
-          ? obtenerPlaneacion(planeacionId)?.fechaCreacion ||
-            new Date().toISOString()
+          ? obtenerPlaneacion(planeacionId)?.fechaCreacion || new Date().toISOString()
           : new Date().toISOString(),
       fechaModificacion: new Date().toISOString(),
     };
@@ -471,21 +435,15 @@ export const useEditorPlaneacionViewModel = (): EditorPlaneacionViewModel => {
         planeacion = {
           ...planeacionBase,
           nivelAcademico: NivelAcademico.SECUNDARIA,
-          competenciasDisciplinares: competenciasDisciplinares
-            .split("\n")
-            .filter((c) => c.trim()),
+          competenciasDisciplinares: competenciasDisciplinares.split("\n").filter((c) => c.trim()),
         };
         break;
       case NivelAcademico.PREPARATORIA:
         planeacion = {
           ...planeacionBase,
           nivelAcademico: NivelAcademico.PREPARATORIA,
-          competenciasGenericas: competenciasGenericas
-            .split("\n")
-            .filter((c) => c.trim()),
-          competenciasDisciplinares: competenciasDisciplinares
-            .split("\n")
-            .filter((c) => c.trim()),
+          competenciasGenericas: competenciasGenericas.split("\n").filter((c) => c.trim()),
+          competenciasDisciplinares: competenciasDisciplinares.split("\n").filter((c) => c.trim()),
           bibliografia: bibliografia.split("\n").filter((b) => b.trim()),
         };
         break;
@@ -493,12 +451,8 @@ export const useEditorPlaneacionViewModel = (): EditorPlaneacionViewModel => {
         const planeacionUniv: PlaneacionUniversidad = {
           ...planeacionBase,
           nivelAcademico: NivelAcademico.UNIVERSIDAD,
-          competenciasProfesionales: competenciasProfesionales
-            .split("\n")
-            .filter((c) => c.trim()),
-          objetivosAprendizaje: objetivosAprendizaje
-            .split("\n")
-            .filter((o) => o.trim()),
+          competenciasProfesionales: competenciasProfesionales.split("\n").filter((c) => c.trim()),
+          objetivosAprendizaje: objetivosAprendizaje.split("\n").filter((o) => o.trim()),
           bibliografia: bibliografia.split("\n").filter((b) => b.trim()),
           modalidad: modalidad as any,
         };

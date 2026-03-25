@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Platform } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import NetInfo from "@react-native-community/netinfo";
 import { COLORS, FONT_SIZES } from "../../types";
-import { usePlaneaciones } from "../context/PlaneacionesContext";
+import { usePlaneaciones } from "../sync/providers/SyncProvider";
 
 /**
  * Componente que muestra el estado de sincronización y conectividad

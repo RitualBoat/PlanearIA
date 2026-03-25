@@ -11,6 +11,8 @@
 // CONFIGURACION DE LA API
 // =====================================
 
+const API_SECRET_FROM_ENV = process.env.EXPO_PUBLIC_API_SECRET?.trim() ?? "";
+
 /**
  * Configuración del backend Vercel
  *
@@ -28,9 +30,10 @@ export const API_CONFIG = {
 
   /**
    * Clave secreta para autenticación
-   * Debe coincidir con API_SECRET en Vercel
+   * Debe coincidir con API_SECRET en Vercel.
+   * Se configura en variable de entorno: EXPO_PUBLIC_API_SECRET
    */
-  apiSecret: "planearia-dev-secret-2025",
+  apiSecret: API_SECRET_FROM_ENV,
 
   /**
    * Timeout para requests (ms)

@@ -1,11 +1,12 @@
 import { Alert } from "react-native";
-import { act, renderHook } from "@testing-library/react-native";
+import { act, renderHook, waitFor } from "@testing-library/react-native";
+import { NivelAcademico } from "../../../types/planeacion";
 import { useListaPlaneacionesViewModel } from "../../hooks/useListaPlaneacionesViewModel";
 
 const mockNavigate = jest.fn();
 const mockEliminarPlaneacion = jest.fn().mockResolvedValue(undefined);
 const mockFiltrarPlaneaciones = jest.fn();
-const mockPlaneaciones: any[] = [];
+let mockPlaneaciones: any[] = [];
 
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
@@ -23,7 +24,38 @@ jest.mock("../../sync/providers/SyncProvider", () => ({
 describe("useListaPlaneacionesViewModel - eliminación", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockFiltrarPlaneaciones.mockReturnValue(mockPlaneaciones);
+    mockPlaneaciones = [
+      {
+        id: "p1",
+        nivelAcademico: NivelAcademico.PRIMARIA,
+        asignatura: "Matemáticas",
+        grado: "3°",
+      },
+      {
+        id: "p2",
+        nivelAcademico: NivelAcademico.SECUNDARIA,
+        asignatura: "Historia",
+        grado: "1°",
+      },
+    ];
+
+    mockFiltrarPlaneaciones.mockImplementation((filtros: any) => {
+      return mockPlaneaciones.filter((item) => {
+        if (filtros.nivelAcademico && item.nivelAcademico !== filtros.nivelAcademico) {
+          return false;
+        }
+        if (
+          filtros.asignatura &&
+          !item.asignatura.toLowerCase().includes(String(filtros.asignatura).toLowerCase())
+        ) {
+          return false;
+        }
+        if (filtros.grado && item.grado !== filtros.grado) {
+          return false;
+        }
+        return true;
+      });
+    });
   });
 
   it("muestra diálogo de confirmación al eliminar", () => {
@@ -87,5 +119,39 @@ describe("useListaPlaneacionesViewModel - eliminación", () => {
     });
 
     expect(mockEliminarPlaneacion).not.toHaveBeenCalled();
+  });
+
+  it("aplica filtros por nivel", async () => {
+    const { result } = renderHook(() => useListaPlaneacionesViewModel());
+
+    act(() => {
+      result.current.setFiltroNivel(NivelAcademico.SECUNDARIA);
+    });
+
+    act(() => {
+      result.current.aplicarFiltros();
+    });
+
+    await waitFor(() => {
+      expect(result.current.planeacionesFiltradas).toHaveLength(1);
+      expect(result.current.planeacionesFiltradas[0].id).toBe("p2");
+    });
+  });
+
+  it("aplica búsqueda por asignatura", async () => {
+    const { result } = renderHook(() => useListaPlaneacionesViewModel());
+
+    act(() => {
+      result.current.setFiltroAsignatura("mate");
+    });
+
+    act(() => {
+      result.current.aplicarFiltros();
+    });
+
+    await waitFor(() => {
+      expect(result.current.planeacionesFiltradas).toHaveLength(1);
+      expect(result.current.planeacionesFiltradas[0].id).toBe("p1");
+    });
   });
 });

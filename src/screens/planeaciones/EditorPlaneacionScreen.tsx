@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,10 +10,12 @@ import {
   Modal,
   Alert,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, FONT_SIZES } from "../../../types";
+import { API_CONFIG } from "../../sync/config/apiConfig";
 import BottomNavBar from "../../components/BottomNavBar";
 import WebScrollView from "../../components/WebScrollView";
 import SyncIndicator from "../../components/SyncIndicator";
@@ -25,6 +27,8 @@ import { useEditorPlaneacionViewModel } from "../../hooks/useEditorPlaneacionVie
 interface SugerenciaMejoraIA {
   id: string;
   campo: string;
+  categoria: "ortografia" | "redaccion" | "contenido";
+  justificacion: string;
   valorActual: string;
   valorSugerido: string;
 }
@@ -109,47 +113,225 @@ const EditorPlaneacionScreen: React.FC = () => {
   } = vm;
 
   const [showMejorasModal, setShowMejorasModal] = useState(false);
-  const [sugerenciasSeleccionadas, setSugerenciasSeleccionadas] = useState<
-    Record<string, boolean>
-  >({});
-
-  const sugerenciasIA = useMemo<SugerenciaMejoraIA[]>(
-    () => [
-      {
-        id: "tema",
-        campo: "Tema de la sesión",
-        valorActual: temaSesion || "Sin definir",
-        valorSugerido: temaSesion
-          ? `${temaSesion} con enfoque en aprendizaje activo`
-          : "Tema de sesión optimizado con enfoque activo",
-      },
-      {
-        id: "inicio",
-        campo: "Actividad de inicio",
-        valorActual: actividadInicio || "Sin definir",
-        valorSugerido: actividadInicio
-          ? `${actividadInicio}. Agregar pregunta detonadora para activar conocimientos previos.`
-          : "Dinámica breve de activación con pregunta detonadora y contextualización.",
-      },
-      {
-        id: "evaluacion",
-        campo: "Estrategia de evaluación",
-        valorActual: evaluacion || "Sin definir",
-        valorSugerido: evaluacion
-          ? `${evaluacion}. Incluir rúbrica simple y retroalimentación inmediata.`
-          : "Evaluación formativa con rúbrica breve, autoevaluación y retroalimentación inmediata.",
-      },
-    ],
-    [actividadInicio, evaluacion, temaSesion]
+  const [isMejorandoIA, setIsMejorandoIA] = useState(false);
+  const [errorMejorasIA, setErrorMejorasIA] = useState("");
+  const [sugerenciasIA, setSugerenciasIA] = useState<SugerenciaMejoraIA[]>([]);
+  const [sugerenciasSeleccionadas, setSugerenciasSeleccionadas] = useState<Record<string, boolean>>(
+    {}
   );
 
-  const abrirMejorasIA = () => {
-    const estadoInicial: Record<string, boolean> = {};
-    sugerenciasIA.forEach((sugerencia) => {
-      estadoInicial[sugerencia.id] = false;
-    });
-    setSugerenciasSeleccionadas(estadoInicial);
+  const buildPlaneacionActual = () => {
+    const planeacionBase = {
+      nivelAcademico: nivel,
+      asignatura,
+      grado,
+      grupo,
+      fecha,
+      horaInicio,
+      duracionTotal: parseInt(duracionTotal) || 50,
+      unidadTematica,
+      temaSesion,
+      aprendizajesEsperados: aprendizajesEsperados.split("\n").filter((a) => a.trim()),
+      actividades: [
+        {
+          tipo: "inicio",
+          descripcion: actividadInicio,
+          duracion: parseInt(duracionInicio) || 10,
+        },
+        {
+          tipo: "desarrollo",
+          descripcion: actividadDesarrollo,
+          duracion: parseInt(duracionDesarrollo) || 30,
+        },
+        {
+          tipo: "cierre",
+          descripcion: actividadCierre,
+          duracion: parseInt(duracionCierre) || 10,
+        },
+      ],
+      recursos: recursos.split("\n").filter((r) => r.trim()),
+      evaluacion,
+      evidencias: evidencias.split("\n").filter((e) => e.trim()),
+      observaciones,
+    };
+
+    if (nivel === NivelAcademico.PRIMARIA) {
+      return {
+        ...planeacionBase,
+        campoFormativo,
+      };
+    }
+
+    if (nivel === NivelAcademico.SECUNDARIA) {
+      return {
+        ...planeacionBase,
+        competenciasDisciplinares: competenciasDisciplinares.split("\n").filter((c) => c.trim()),
+      };
+    }
+
+    if (nivel === NivelAcademico.PREPARATORIA) {
+      return {
+        ...planeacionBase,
+        competenciasGenericas: competenciasGenericas.split("\n").filter((c) => c.trim()),
+        competenciasDisciplinares: competenciasDisciplinares.split("\n").filter((c) => c.trim()),
+        bibliografia: bibliografia.split("\n").filter((b) => b.trim()),
+      };
+    }
+
+    return {
+      ...planeacionBase,
+      modalidad,
+      competenciasProfesionales: competenciasProfesionales.split("\n").filter((c) => c.trim()),
+      objetivosAprendizaje: objetivosAprendizaje.split("\n").filter((o) => o.trim()),
+      bibliografia: bibliografia.split("\n").filter((b) => b.trim()),
+      ...(modoDetallado
+        ? {
+            configuracionCurso,
+            semanas,
+            evaluaciones,
+          }
+        : {}),
+    };
+  };
+
+  const obtenerValorCampo = (campo: string): string => {
+    const normalized = campo.trim();
+    if (normalized === "temaSesion") return temaSesion;
+    if (normalized === "evaluacion") return evaluacion;
+    if (normalized === "unidadTematica") return unidadTematica;
+    if (normalized === "observaciones") return observaciones;
+    if (normalized === "asignatura") return asignatura;
+    if (normalized === "actividades[0].descripcion") return actividadInicio;
+    if (normalized === "actividades[1].descripcion") return actividadDesarrollo;
+    if (normalized === "actividades[2].descripcion") return actividadCierre;
+    return "Sin valor actual";
+  };
+
+  const aplicarMejoraCampo = (campo: string, valor: string): boolean => {
+    const normalized = campo.trim();
+
+    if (normalized === "temaSesion") {
+      setTemaSesion(valor);
+      return true;
+    }
+    if (normalized === "evaluacion") {
+      setEvaluacion(valor);
+      return true;
+    }
+    if (normalized === "unidadTematica") {
+      setUnidadTematica(valor);
+      return true;
+    }
+    if (normalized === "observaciones") {
+      setObservaciones(valor);
+      return true;
+    }
+    if (normalized === "asignatura") {
+      setAsignatura(valor);
+      return true;
+    }
+    if (normalized === "actividades[0].descripcion") {
+      setActividadInicio(valor);
+      return true;
+    }
+    if (normalized === "actividades[1].descripcion") {
+      setActividadDesarrollo(valor);
+      return true;
+    }
+    if (normalized === "actividades[2].descripcion") {
+      setActividadCierre(valor);
+      return true;
+    }
+
+    return false;
+  };
+
+  const abrirMejorasIA = async () => {
+    if (!API_CONFIG.baseUrl) {
+      const msg = "No hay URL de backend configurada para mejorar con IA.";
+      if (Platform.OS === "web") {
+        window.alert(msg);
+      } else {
+        Alert.alert("Mejorar con IA", msg);
+      }
+      return;
+    }
+
+    if (!API_CONFIG.apiSecret) {
+      const msg = "Falta configurar EXPO_PUBLIC_API_SECRET para usar mejorar con IA.";
+      if (Platform.OS === "web") {
+        window.alert(msg);
+      } else {
+        Alert.alert("Mejorar con IA", msg);
+      }
+      return;
+    }
+
     setShowMejorasModal(true);
+    setIsMejorandoIA(true);
+    setErrorMejorasIA("");
+    setSugerenciasIA([]);
+    setSugerenciasSeleccionadas({});
+
+    try {
+      const response = await fetch(`${API_CONFIG.baseUrl}/api/planeaciones/mejorar`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": API_CONFIG.apiSecret,
+        },
+        body: JSON.stringify({
+          planeacion: buildPlaneacionActual(),
+          maxSugerencias: 8,
+        }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok || !payload?.success) {
+        throw new Error(payload?.error || "No se pudieron obtener sugerencias de mejora.");
+      }
+
+      const sugerenciasRaw = Array.isArray(payload?.data?.sugerencias)
+        ? payload.data.sugerencias
+        : [];
+
+      const sugerenciasNormalizadas: SugerenciaMejoraIA[] = sugerenciasRaw.map(
+        (sugerencia: any, index: number) => {
+          const campo = String(sugerencia?.campo || "campo");
+          return {
+            id: `${campo}_${index}`,
+            campo,
+            categoria:
+              sugerencia?.categoria === "ortografia" ||
+              sugerencia?.categoria === "contenido" ||
+              sugerencia?.categoria === "redaccion"
+                ? sugerencia.categoria
+                : "redaccion",
+            justificacion: String(sugerencia?.justificacion || "Mejora sugerida por IA"),
+            valorActual: String(sugerencia?.original || obtenerValorCampo(campo) || ""),
+            valorSugerido: String(sugerencia?.mejorado || ""),
+          };
+        }
+      );
+
+      setSugerenciasIA(sugerenciasNormalizadas);
+
+      const estadoInicial: Record<string, boolean> = {};
+      sugerenciasNormalizadas.forEach((sugerencia) => {
+        estadoInicial[sugerencia.id] = false;
+      });
+      setSugerenciasSeleccionadas(estadoInicial);
+
+      if (sugerenciasNormalizadas.length === 0) {
+        setErrorMejorasIA("La IA no devolvió sugerencias aplicables para esta planeación.");
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Error inesperado al mejorar con IA.";
+      setErrorMejorasIA(msg);
+    } finally {
+      setIsMejorandoIA(false);
+    }
   };
 
   const alternarSugerencia = (id: string) => {
@@ -173,23 +355,24 @@ const EditorPlaneacionScreen: React.FC = () => {
       return;
     }
 
+    let aplicadas = 0;
+    let omitidas = 0;
+
     sugerenciasActivas.forEach((sugerencia) => {
-      if (sugerencia.id === "tema") {
-        setTemaSesion(sugerencia.valorSugerido);
-      }
-
-      if (sugerencia.id === "inicio") {
-        setActividadInicio(sugerencia.valorSugerido);
-      }
-
-      if (sugerencia.id === "evaluacion") {
-        setEvaluacion(sugerencia.valorSugerido);
+      const aplicada = aplicarMejoraCampo(sugerencia.campo, sugerencia.valorSugerido);
+      if (aplicada) {
+        aplicadas += 1;
+      } else {
+        omitidas += 1;
       }
     });
 
     setShowMejorasModal(false);
 
-    const mensaje = `Se aplicaron ${sugerenciasActivas.length} mejora(s) sugeridas por IA.`;
+    const mensaje =
+      omitidas > 0
+        ? `Se aplicaron ${aplicadas} mejora(s). ${omitidas} sugerencia(s) no se pudieron aplicar automáticamente.`
+        : `Se aplicaron ${aplicadas} mejora(s) sugeridas por IA.`;
     if (Platform.OS === "web") {
       window.alert(mensaje);
     } else {
@@ -218,13 +401,17 @@ const EditorPlaneacionScreen: React.FC = () => {
             <Text style={styles.title}>{obtenerTitulo()}</Text>
             <SyncIndicator />
           </View>
-          <Text style={styles.subtitle}>
-            Completa todos los campos de tu planeación
-          </Text>
+          <Text style={styles.subtitle}>Completa todos los campos de tu planeación</Text>
 
-          <TouchableOpacity style={styles.aiImproveButton} onPress={abrirMejorasIA}>
+          <TouchableOpacity
+            style={[styles.aiImproveButton, isMejorandoIA && styles.aiImproveButtonDisabled]}
+            onPress={abrirMejorasIA}
+            disabled={isMejorandoIA}
+          >
             <MaterialIcons name="auto-fix-high" size={20} color={COLORS.primary} />
-            <Text style={styles.aiImproveButtonText}>Mejorar con IA</Text>
+            <Text style={styles.aiImproveButtonText}>
+              {isMejorandoIA ? "Procesando mejoras..." : "Mejorar con IA"}
+            </Text>
           </TouchableOpacity>
 
           {/* Datos Generales */}
@@ -323,9 +510,7 @@ const EditorPlaneacionScreen: React.FC = () => {
               <Text style={styles.sectionTitle}>
                 <MaterialIcons name="workspace-premium" size={20} /> Secundaria
               </Text>
-              <Text style={styles.label}>
-                Competencias Disciplinares (una por línea)
-              </Text>
+              <Text style={styles.label}>Competencias Disciplinares (una por línea)</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
                 value={competenciasDisciplinares}
@@ -343,9 +528,7 @@ const EditorPlaneacionScreen: React.FC = () => {
               <Text style={styles.sectionTitle}>
                 <MaterialIcons name="school" size={20} /> Preparatoria
               </Text>
-              <Text style={styles.label}>
-                Competencias Genéricas (una por línea)
-              </Text>
+              <Text style={styles.label}>Competencias Genéricas (una por línea)</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
                 value={competenciasGenericas}
@@ -356,9 +539,7 @@ const EditorPlaneacionScreen: React.FC = () => {
                 placeholderTextColor={COLORS.textSecondary}
               />
 
-              <Text style={styles.label}>
-                Competencias Disciplinares (una por línea)
-              </Text>
+              <Text style={styles.label}>Competencias Disciplinares (una por línea)</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
                 value={competenciasDisciplinares}
@@ -392,9 +573,7 @@ const EditorPlaneacionScreen: React.FC = () => {
               <View style={styles.modoDetalladoContainer}>
                 <View style={styles.modoDetalladoInfo}>
                   <Text style={styles.modoDetalladoLabel}>
-                    {modoDetallado
-                      ? "Modo Detallado (Semana por Semana)"
-                      : "Modo Simple"}
+                    {modoDetallado ? "Modo Detallado (Semana por Semana)" : "Modo Simple"}
                   </Text>
                   <Text style={styles.modoDetalladoDesc}>
                     {modoDetallado
@@ -425,9 +604,7 @@ const EditorPlaneacionScreen: React.FC = () => {
                 <>
                   {/* Configuración del curso */}
                   <View style={styles.configuracionCurso}>
-                    <Text style={styles.subsectionTitle}>
-                      Configuración del Curso
-                    </Text>
+                    <Text style={styles.subsectionTitle}>Configuración del Curso</Text>
 
                     {/* Duración del curso */}
                     <Text style={styles.label}>Duración del curso:</Text>
@@ -436,10 +613,7 @@ const EditorPlaneacionScreen: React.FC = () => {
                         style={styles.duracionButton}
                         onPress={() =>
                           cambiarDuracionCurso(
-                            Math.max(
-                              12,
-                              configuracionCurso.duracionSemanas - 1,
-                            ) as 12 | 16 | 18,
+                            Math.max(12, configuracionCurso.duracionSemanas - 1) as 12 | 16 | 18
                           )
                         }
                       >
@@ -455,10 +629,7 @@ const EditorPlaneacionScreen: React.FC = () => {
                         style={styles.duracionButton}
                         onPress={() =>
                           cambiarDuracionCurso(
-                            Math.min(
-                              18,
-                              configuracionCurso.duracionSemanas + 1,
-                            ) as 12 | 16 | 18,
+                            Math.min(18, configuracionCurso.duracionSemanas + 1) as 12 | 16 | 18
                           )
                         }
                       >
@@ -565,9 +736,7 @@ const EditorPlaneacionScreen: React.FC = () => {
 
                   {/* Plan de evaluación */}
                   <View style={styles.evaluacionSection}>
-                    <Text style={styles.subsectionTitle}>
-                      Plan de Evaluación
-                    </Text>
+                    <Text style={styles.subsectionTitle}>Plan de Evaluación</Text>
                     <EvaluacionEditor
                       evaluaciones={evaluaciones}
                       onUpdate={setEvaluaciones}
@@ -576,10 +745,7 @@ const EditorPlaneacionScreen: React.FC = () => {
                   </View>
 
                   {/* Semanas */}
-                  <View
-                    style={styles.semanasSection}
-                    key={`semanas-${semanasVersion}`}
-                  >
+                  <View style={styles.semanasSection} key={`semanas-${semanasVersion}`}>
                     <Text style={styles.subsectionTitle}>
                       Planificación Semanal ({semanas.length} semanas)
                     </Text>
@@ -599,9 +765,7 @@ const EditorPlaneacionScreen: React.FC = () => {
                   </View>
 
                   {/* Bibliografía general */}
-                  <Text style={styles.label}>
-                    Bibliografía general (una por línea)
-                  </Text>
+                  <Text style={styles.label}>Bibliografía general (una por línea)</Text>
                   <TextInput
                     style={[styles.input, styles.textArea]}
                     value={bibliografia}
@@ -638,9 +802,7 @@ const EditorPlaneacionScreen: React.FC = () => {
                     ))}
                   </View>
 
-                  <Text style={styles.label}>
-                    Competencias Profesionales (una por línea)
-                  </Text>
+                  <Text style={styles.label}>Competencias Profesionales (una por línea)</Text>
                   <TextInput
                     style={[styles.input, styles.textArea]}
                     value={competenciasProfesionales}
@@ -651,9 +813,7 @@ const EditorPlaneacionScreen: React.FC = () => {
                     placeholderTextColor={COLORS.textSecondary}
                   />
 
-                  <Text style={styles.label}>
-                    Objetivos de Aprendizaje (uno por línea)
-                  </Text>
+                  <Text style={styles.label}>Objetivos de Aprendizaje (uno por línea)</Text>
                   <TextInput
                     style={[styles.input, styles.textArea]}
                     value={objetivosAprendizaje}
@@ -704,9 +864,7 @@ const EditorPlaneacionScreen: React.FC = () => {
                 placeholderTextColor={COLORS.textSecondary}
               />
 
-              <Text style={styles.label}>
-                Aprendizajes Esperados (uno por línea)
-              </Text>
+              <Text style={styles.label}>Aprendizajes Esperados (uno por línea)</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
                 value={aprendizajesEsperados}
@@ -723,8 +881,7 @@ const EditorPlaneacionScreen: React.FC = () => {
           {!(nivel === NivelAcademico.UNIVERSIDAD && modoDetallado) && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>
-                <MaterialIcons name="play-circle-outline" size={20} />{" "}
-                Actividades
+                <MaterialIcons name="play-circle-outline" size={20} /> Actividades
               </Text>
 
               <View style={styles.actividadCard}>
@@ -799,13 +956,10 @@ const EditorPlaneacionScreen: React.FC = () => {
           {!(nivel === NivelAcademico.UNIVERSIDAD && modoDetallado) && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>
-                <MaterialIcons name="inventory" size={20} /> Recursos y
-                Evaluación
+                <MaterialIcons name="inventory" size={20} /> Recursos y Evaluación
               </Text>
 
-              <Text style={styles.label}>
-                Recursos / Materiales (uno por línea)
-              </Text>
+              <Text style={styles.label}>Recursos / Materiales (uno por línea)</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
                 value={recursos}
@@ -881,7 +1035,25 @@ const EditorPlaneacionScreen: React.FC = () => {
             <Text style={styles.mejorasTitle}>Sugerencias de mejora con IA</Text>
             <Text style={styles.mejorasSubtitle}>Acepta o rechaza cada cambio sugerido</Text>
 
-            <WebScrollView style={styles.mejorasList} contentContainerStyle={styles.mejorasListContent}>
+            <WebScrollView
+              style={styles.mejorasList}
+              contentContainerStyle={styles.mejorasListContent}
+            >
+              {isMejorandoIA ? (
+                <View style={styles.mejorasLoadingState}>
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                  <Text style={styles.mejorasLoadingText}>Analizando planeación con IA...</Text>
+                </View>
+              ) : null}
+
+              {!isMejorandoIA && errorMejorasIA ? (
+                <Text style={styles.mejorasErrorText}>{errorMejorasIA}</Text>
+              ) : null}
+
+              {!isMejorandoIA && !errorMejorasIA && sugerenciasIA.length === 0 ? (
+                <Text style={styles.mejorasEmptyText}>No hay sugerencias para mostrar.</Text>
+              ) : null}
+
               {sugerenciasIA.map((sugerencia) => {
                 const estaSeleccionada = !!sugerenciasSeleccionadas[sugerencia.id];
 
@@ -901,6 +1073,10 @@ const EditorPlaneacionScreen: React.FC = () => {
                       />
                     </View>
 
+                    <Text style={styles.sugerenciaMeta}>
+                      {sugerencia.categoria.toUpperCase()} - {sugerencia.justificacion}
+                    </Text>
+
                     <Text style={styles.diffLabel}>Actual</Text>
                     <Text style={styles.diffText}>{sugerencia.valorActual}</Text>
 
@@ -912,11 +1088,18 @@ const EditorPlaneacionScreen: React.FC = () => {
             </WebScrollView>
 
             <View style={styles.mejorasButtonsRow}>
-              <TouchableOpacity style={styles.mejorasCloseButton} onPress={() => setShowMejorasModal(false)}>
+              <TouchableOpacity
+                style={styles.mejorasCloseButton}
+                onPress={() => setShowMejorasModal(false)}
+              >
                 <Text style={styles.mejorasCloseText}>Cerrar</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.mejorasApplyButton} onPress={aplicarSugerenciasSeleccionadas}>
+              <TouchableOpacity
+                style={styles.mejorasApplyButton}
+                onPress={aplicarSugerenciasSeleccionadas}
+                disabled={isMejorandoIA || sugerenciasIA.length === 0}
+              >
                 <Text style={styles.mejorasApplyText}>Aplicar seleccionadas</Text>
               </TouchableOpacity>
             </View>
@@ -977,6 +1160,9 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontSize: FONT_SIZES.medium,
     fontWeight: "600",
+  },
+  aiImproveButtonDisabled: {
+    opacity: 0.7,
   },
   section: {
     marginBottom: 25,
@@ -1266,6 +1452,33 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.medium,
     fontWeight: "700",
     color: COLORS.text,
+  },
+  sugerenciaMeta: {
+    fontSize: FONT_SIZES.small,
+    color: COLORS.textSecondary,
+    marginBottom: 4,
+  },
+  mejorasLoadingState: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 12,
+  },
+  mejorasLoadingText: {
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.medium,
+  },
+  mejorasErrorText: {
+    color: COLORS.error,
+    fontSize: FONT_SIZES.medium,
+    lineHeight: 20,
+    paddingVertical: 8,
+  },
+  mejorasEmptyText: {
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.medium,
+    lineHeight: 20,
+    paddingVertical: 8,
   },
   diffLabel: {
     fontSize: FONT_SIZES.small,

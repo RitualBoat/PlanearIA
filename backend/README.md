@@ -31,6 +31,7 @@ backend/
 │   ├── planeaciones.js # CRUD /api/planeaciones
 │   ├── planeaciones/
 │   │   └── generar.js  # POST /api/planeaciones/generar - IA
+│   │   └── mejorar.js  # POST /api/planeaciones/mejorar - Sugerencias IA
 │   └── sync.js         # POST /api/sync - Sincronización batch
 ├── lib/
 │   ├── mongodb.js      # Conexión a MongoDB Atlas
@@ -169,6 +170,28 @@ Body: {
     fecha?: string,
     horaInicio?: string
   }
+}
+```
+
+### Mejora de planeación con IA
+
+```
+POST /api/planeaciones/mejorar
+Body: {
+  planeacion: Planeacion,
+  maxSugerencias?: number
+}
+
+Response: {
+  sugerencias: [
+    {
+      campo: string,
+      categoria: "ortografia" | "redaccion" | "contenido",
+      original: string,
+      mejorado: string,
+      justificacion: string
+    }
+  ]
 }
 ```
 

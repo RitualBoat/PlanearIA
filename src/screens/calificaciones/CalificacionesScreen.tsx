@@ -12,7 +12,6 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
-import BottomNavBar from "../../components/BottomNavBar";
 
 /**
  * Tipo para las props de navegación
@@ -52,7 +51,7 @@ const CalificacionesScreen: React.FC<CalificacionesScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -96,8 +95,6 @@ const CalificacionesScreen: React.FC<CalificacionesScreenProps> = ({
           </View>
         </ScrollView>
       </SafeAreaView>
-
-      <BottomNavBar currentScreen="Calificaciones" />
     </View>
   );
 };
@@ -108,7 +105,7 @@ const CalificacionesScreen: React.FC<CalificacionesScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: "#EEF3FA",
   },
   safeArea: {
     flex: 1,

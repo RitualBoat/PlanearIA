@@ -1,21 +1,10 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  StatusBar,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, FONT_SIZES } from "../../../types";
-import BottomNavBar from "../../components/BottomNavBar";
 import WebScrollView from "../../components/WebScrollView";
-import {
-  useDetalleGrupoViewModel,
-  TabType,
-} from "../../hooks/useDetalleGrupoViewModel";
+import { useDetalleGrupoViewModel, TabType } from "../../hooks/useDetalleGrupoViewModel";
 
 /**
  * Componente que renderiza el contenido según la pestaña activa
@@ -26,12 +15,7 @@ const TabContent: React.FC<{
   navigateAsignarRecurso: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
 }> = React.memo(
-  ({
-    activeTab,
-    navigateCrearTarea,
-    navigateAsignarRecurso,
-    navigateDetalleTarea,
-  }) => {
+  ({ activeTab, navigateCrearTarea, navigateAsignarRecurso, navigateDetalleTarea }) => {
     switch (activeTab) {
       case "alumnos":
         return (
@@ -47,25 +31,15 @@ const TabContent: React.FC<{
 
             {/* Lista de ejemplo */}
             <View style={styles.listaContainer}>
-              {[
-                "Juan Pérez García",
-                "María López Martínez",
-                "Carlos Rodríguez Sánchez",
-              ].map((nombre) => (
-                <View key={nombre} style={styles.alumnoItem}>
-                  <MaterialIcons
-                    name="account-circle"
-                    size={40}
-                    color={COLORS.primary}
-                  />
-                  <Text style={styles.alumnoNombre}>{nombre}</Text>
-                  <MaterialIcons
-                    name="chevron-right"
-                    size={24}
-                    color={COLORS.textSecondary}
-                  />
-                </View>
-              ))}
+              {["Juan Pérez García", "María López Martínez", "Carlos Rodríguez Sánchez"].map(
+                (nombre) => (
+                  <View key={nombre} style={styles.alumnoItem}>
+                    <MaterialIcons name="account-circle" size={40} color={COLORS.primary} />
+                    <Text style={styles.alumnoNombre}>{nombre}</Text>
+                    <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
+                  </View>
+                )
+              )}
             </View>
           </View>
         );
@@ -79,9 +53,7 @@ const TabContent: React.FC<{
             </Text>
             <TouchableOpacity style={styles.actionButton}>
               <MaterialIcons name="edit-note" size={24} color="white" />
-              <Text style={styles.actionButtonText}>
-                Registrar Calificaciones
-              </Text>
+              <Text style={styles.actionButtonText}>Registrar Calificaciones</Text>
             </TouchableOpacity>
 
             {/* Resumen de ejemplo */}
@@ -141,9 +113,7 @@ const TabContent: React.FC<{
               <Text style={styles.sectionTitle}>Comentarios Recientes</Text>
               <View style={styles.comentarioItem}>
                 <Text style={styles.comentarioAlumno}>Juan Pérez García</Text>
-                <Text style={styles.comentarioTexto}>
-                  Excelente participación en clase
-                </Text>
+                <Text style={styles.comentarioTexto}>Excelente participación en clase</Text>
                 <Text style={styles.comentarioFecha}>Hace 2 días</Text>
               </View>
             </View>
@@ -185,11 +155,7 @@ const TabContent: React.FC<{
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[
-                  styles.actionButton,
-                  styles.actionButtonHalf,
-                  styles.actionButtonSecondary,
-                ]}
+                style={[styles.actionButton, styles.actionButtonHalf, styles.actionButtonSecondary]}
                 onPress={navigateAsignarRecurso}
               >
                 <MaterialIcons name="file-copy" size={20} color="white" />
@@ -202,25 +168,14 @@ const TabContent: React.FC<{
               <Text style={styles.sectionTitle}>Tareas Activas</Text>
 
               {/* Tarea ejemplo 1 */}
-              <TouchableOpacity
-                style={styles.tareaItem}
-                onPress={() => navigateDetalleTarea(1)}
-              >
+              <TouchableOpacity style={styles.tareaItem} onPress={() => navigateDetalleTarea(1)}>
                 <View style={styles.tareaHeader}>
                   <MaterialIcons name="assignment" size={24} color="#FF9800" />
                   <View style={styles.tareaInfo}>
-                    <Text style={styles.tareaTitulo}>
-                      Investigación sobre IA
-                    </Text>
-                    <Text style={styles.tareaMetadata}>
-                      Entrega: en 2 días | Valor: 20pts
-                    </Text>
+                    <Text style={styles.tareaTitulo}>Investigación sobre IA</Text>
+                    <Text style={styles.tareaMetadata}>Entrega: en 2 días | Valor: 20pts</Text>
                   </View>
-                  <MaterialIcons
-                    name="chevron-right"
-                    size={24}
-                    color={COLORS.textSecondary}
-                  />
+                  <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
                 </View>
                 <View style={styles.tareaProgress}>
                   <View style={styles.progressBar}>
@@ -231,23 +186,14 @@ const TabContent: React.FC<{
               </TouchableOpacity>
 
               {/* Tarea ejemplo 2 */}
-              <TouchableOpacity
-                style={styles.tareaItem}
-                onPress={() => navigateDetalleTarea(2)}
-              >
+              <TouchableOpacity style={styles.tareaItem} onPress={() => navigateDetalleTarea(2)}>
                 <View style={styles.tareaHeader}>
                   <MaterialIcons name="quiz" size={24} color="#2196F3" />
                   <View style={styles.tareaInfo}>
                     <Text style={styles.tareaTitulo}>Examen Parcial 2</Text>
-                    <Text style={styles.tareaMetadata}>
-                      Próximo: 30 Nov | Valor: 30pts
-                    </Text>
+                    <Text style={styles.tareaMetadata}>Próximo: 30 Nov | Valor: 30pts</Text>
                   </View>
-                  <MaterialIcons
-                    name="chevron-right"
-                    size={24}
-                    color={COLORS.textSecondary}
-                  />
+                  <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
                 </View>
                 <View style={styles.tareaProgress}>
                   <View style={styles.progressBar}>
@@ -258,23 +204,14 @@ const TabContent: React.FC<{
               </TouchableOpacity>
 
               {/* Tarea ejemplo 3 */}
-              <TouchableOpacity
-                style={styles.tareaItem}
-                onPress={() => navigateDetalleTarea(3)}
-              >
+              <TouchableOpacity style={styles.tareaItem} onPress={() => navigateDetalleTarea(3)}>
                 <View style={styles.tareaHeader}>
                   <MaterialIcons name="science" size={24} color="#9C27B0" />
                   <View style={styles.tareaInfo}>
                     <Text style={styles.tareaTitulo}>Proyecto Final</Text>
-                    <Text style={styles.tareaMetadata}>
-                      Entrega: en 15 días | Valor: 40pts
-                    </Text>
+                    <Text style={styles.tareaMetadata}>Entrega: en 15 días | Valor: 40pts</Text>
                   </View>
-                  <MaterialIcons
-                    name="chevron-right"
-                    size={24}
-                    color={COLORS.textSecondary}
-                  />
+                  <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
                 </View>
                 <View style={styles.tareaProgress}>
                   <View style={styles.progressBar}>
@@ -297,21 +234,11 @@ const TabContent: React.FC<{
 
             {/* Gráficas placeholder */}
             <View style={styles.graficaContainer}>
-              <MaterialIcons
-                name="bar-chart"
-                size={80}
-                color={COLORS.primary}
-              />
-              <Text style={styles.graficaText}>
-                Aquí se mostrarán gráficas de:
-              </Text>
-              <Text style={styles.graficaItem}>
-                • Promedio de calificaciones
-              </Text>
+              <MaterialIcons name="bar-chart" size={80} color={COLORS.primary} />
+              <Text style={styles.graficaText}>Aquí se mostrarán gráficas de:</Text>
+              <Text style={styles.graficaItem}>• Promedio de calificaciones</Text>
               <Text style={styles.graficaItem}>• Evolución del grupo</Text>
-              <Text style={styles.graficaItem}>
-                • Porcentaje de asistencias
-              </Text>
+              <Text style={styles.graficaItem}>• Porcentaje de asistencias</Text>
               <Text style={styles.graficaItem}>• Comparativa por alumno</Text>
             </View>
           </View>
@@ -320,7 +247,7 @@ const TabContent: React.FC<{
       default:
         return null;
     }
-  },
+  }
 );
 
 /**
@@ -341,7 +268,7 @@ const DetalleGrupoScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         {/* Header con info del grupo */}
@@ -366,16 +293,9 @@ const DetalleGrupoScreen: React.FC = () => {
               <MaterialIcons
                 name={tab.icon as any}
                 size={24}
-                color={
-                  activeTab === tab.id ? COLORS.primary : COLORS.textSecondary
-                }
+                color={activeTab === tab.id ? COLORS.primary : COLORS.textSecondary}
               />
-              <Text
-                style={[
-                  styles.tabLabel,
-                  activeTab === tab.id && styles.activeTabLabel,
-                ]}
-              >
+              <Text style={[styles.tabLabel, activeTab === tab.id && styles.activeTabLabel]}>
                 {tab.label}
               </Text>
             </TouchableOpacity>
@@ -392,8 +312,6 @@ const DetalleGrupoScreen: React.FC = () => {
           />
         </WebScrollView>
       </SafeAreaView>
-
-      <BottomNavBar currentScreen="Detalle de Grupo" />
     </View>
   );
 };
@@ -404,30 +322,32 @@ const DetalleGrupoScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: "#EEF3FA",
   },
   safeArea: {
     flex: 1,
   },
   header: {
-    backgroundColor: COLORS.primary,
-    padding: 20,
-    paddingTop: 10,
+    backgroundColor: "#FFFFFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E3EAF4",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   grupoNombre: {
     fontSize: FONT_SIZES.large,
     fontWeight: "bold",
-    color: "white",
+    color: "#1E2A3A",
   },
   grupoId: {
     fontSize: FONT_SIZES.small,
-    color: "rgba(255,255,255,0.8)",
+    color: "#6B7D96",
     marginTop: 4,
   },
   tabsContainer: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+    borderBottomColor: "#E3EAF4",
   },
   tabsContent: {
     paddingHorizontal: 10,
@@ -435,13 +355,13 @@ const styles = StyleSheet.create({
   tab: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     marginHorizontal: 4,
-    borderRadius: 8,
+    borderRadius: 10,
   },
   activeTab: {
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: "#EAF4FF",
   },
   tabLabel: {
     fontSize: FONT_SIZES.small,
@@ -457,7 +377,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   tabContent: {
-    padding: 20,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 110,
   },
   tabTitle: {
     fontSize: FONT_SIZES.xlarge,
@@ -479,6 +401,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 10,
     marginBottom: 20,
+    boxShadow: "0px 8px 18px rgba(22, 118, 210, 0.32)",
   },
   actionButtonText: {
     color: "white",
@@ -492,11 +415,13 @@ const styles = StyleSheet.create({
   alumnoItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.surface,
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 14,
+    borderRadius: 12,
     marginBottom: 10,
-    boxShadow: "0px 1px 3px rgba(26, 26, 26, 0.1)",
+    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
   },
   alumnoNombre: {
     flex: 1,
@@ -510,13 +435,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   statCard: {
-    backgroundColor: COLORS.surface,
-    padding: 20,
-    borderRadius: 15,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 18,
+    borderRadius: 12,
     alignItems: "center",
     flex: 1,
     marginHorizontal: 5,
-    boxShadow: "0px 2px 5px rgba(26, 26, 26, 0.1)",
+    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
   },
   statNumber: {
     fontSize: 32,
@@ -536,11 +463,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   comentarioItem: {
-    backgroundColor: COLORS.surface,
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 14,
+    borderRadius: 12,
     marginBottom: 10,
-    boxShadow: "0px 1px 3px rgba(26, 26, 26, 0.1)",
+    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
   },
   comentarioAlumno: {
     fontSize: FONT_SIZES.medium,
@@ -558,12 +487,14 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
   graficaContainer: {
-    backgroundColor: COLORS.surface,
-    padding: 30,
-    borderRadius: 15,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 24,
+    borderRadius: 12,
     alignItems: "center",
     marginTop: 10,
-    boxShadow: "0px 2px 4px rgba(26, 26, 26, 0.15)",
+    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
   },
   graficaText: {
     fontSize: FONT_SIZES.medium,
@@ -593,11 +524,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#9C27B0",
   },
   tareaItem: {
-    backgroundColor: COLORS.surface,
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 14,
+    borderRadius: 12,
     marginBottom: 12,
-    boxShadow: "0px 1px 3px rgba(26, 26, 26, 0.1)",
+    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
   },
   tareaHeader: {
     flexDirection: "row",

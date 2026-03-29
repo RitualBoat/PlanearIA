@@ -10,7 +10,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, FONT_SIZES } from "../../../../types";
-import BottomNavBar from "../../../components/BottomNavBar";
 import WebScrollView from "../../../components/WebScrollView";
 import { useCalificarEntregasViewModel } from "../../../hooks/useCalificarEntregasViewModel";
 
@@ -31,7 +30,7 @@ const CalificarEntregasScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <WebScrollView style={styles.content}>
@@ -128,8 +127,6 @@ const CalificarEntregasScreen: React.FC = () => {
           </View>
         </WebScrollView>
       </SafeAreaView>
-
-      <BottomNavBar currentScreen="Calificar Entregas" />
     </View>
   );
 };
@@ -137,7 +134,7 @@ const CalificarEntregasScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: "#EEF3FA",
   },
   safeArea: {
     flex: 1,
@@ -146,8 +143,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    padding: 20,
-    backgroundColor: COLORS.surface,
+    width: "100%",
+    maxWidth: 980,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 10,
+    backgroundColor: "transparent",
     marginBottom: 15,
   },
   pageTitle: {
@@ -161,15 +163,21 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
   calificacionesContainer: {
-    padding: 20,
+    width: "100%",
+    maxWidth: 980,
+    alignSelf: "center",
+    paddingHorizontal: 16,
     paddingTop: 0,
+    paddingBottom: 110,
   },
   entregaCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 12,
     marginBottom: 15,
-    boxShadow: "0px 1px 3px rgba(26, 26, 26, 0.1)",
+    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
   },
   alumnoHeader: {
     flexDirection: "row",
@@ -200,9 +208,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#F8FBFF",
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: "#DCE6F3",
     borderRadius: 8,
     padding: 12,
     fontSize: FONT_SIZES.medium,
@@ -226,7 +234,12 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     gap: 10,
-    padding: 20,
+    width: "100%",
+    maxWidth: 980,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+    paddingTop: 6,
+    paddingBottom: 20,
   },
   button: {
     flex: 1,
@@ -241,7 +254,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   buttonSecondary: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
     borderColor: COLORS.primary,
   },

@@ -12,7 +12,6 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../../types";
-import BottomNavBar from "../../../components/BottomNavBar";
 import WebScrollView from "../../../components/WebScrollView";
 
 type AsignarRecursoScreenNavigationProp = StackNavigationProp<
@@ -72,7 +71,7 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <WebScrollView style={styles.content}>
@@ -120,8 +119,6 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({
           </View>
         </WebScrollView>
       </SafeAreaView>
-
-      <BottomNavBar currentScreen="Asignar Examen" />
     </View>
   );
 };
@@ -129,7 +126,7 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: "#EEF3FA",
   },
   safeArea: {
     flex: 1,
@@ -138,7 +135,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    padding: 20,
+    width: "100%",
+    maxWidth: 960,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+    paddingTop: 14,
     paddingBottom: 10,
   },
   pageTitle: {
@@ -157,17 +158,23 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
   listaContainer: {
-    padding: 20,
+    width: "100%",
+    maxWidth: 960,
+    alignSelf: "center",
+    paddingHorizontal: 16,
     paddingTop: 10,
+    paddingBottom: 110,
   },
   recursoItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.surface,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 12,
     marginBottom: 12,
-    boxShadow: "0px 1px 3px rgba(26, 26, 26, 0.1)",
+    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
   },
   recursoInfo: {
     flex: 1,

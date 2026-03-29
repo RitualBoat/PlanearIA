@@ -10,7 +10,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, FONT_SIZES } from "../../../../types";
-import BottomNavBar from "../../../components/BottomNavBar";
 import WebScrollView from "../../../components/WebScrollView";
 import { useCrearTareaGrupoViewModel } from "../../../hooks/useCrearTareaGrupoViewModel";
 
@@ -38,7 +37,7 @@ const CrearTareaGrupoScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <WebScrollView style={styles.content}>
@@ -163,8 +162,6 @@ const CrearTareaGrupoScreen: React.FC = () => {
           </View>
         </WebScrollView>
       </SafeAreaView>
-
-      <BottomNavBar currentScreen="Crear Tarea" />
     </View>
   );
 };
@@ -172,7 +169,7 @@ const CrearTareaGrupoScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: "#EEF3FA",
   },
   safeArea: {
     flex: 1,
@@ -181,7 +178,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   formContainer: {
-    padding: 20,
+    width: "100%",
+    maxWidth: 960,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 110,
   },
   pageTitle: {
     fontSize: FONT_SIZES.xxlarge,
@@ -204,9 +206,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: "#F8FBFF",
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: "#DCE6F3",
     borderRadius: 10,
     padding: 15,
     fontSize: FONT_SIZES.medium,
@@ -229,12 +231,12 @@ const styles = StyleSheet.create({
   tipoButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.surface,
+    backgroundColor: "#FFFFFF",
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: "#DCE6F3",
     flex: 1,
     minWidth: "45%",
   },
@@ -269,7 +271,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   buttonSecondary: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
     borderColor: COLORS.primary,
   },

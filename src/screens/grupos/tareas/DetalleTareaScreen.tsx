@@ -12,7 +12,6 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../../types";
-import BottomNavBar from "../../../components/BottomNavBar";
 import WebScrollView from "../../../components/WebScrollView";
 
 type DetalleTareaScreenNavigationProp = StackNavigationProp<
@@ -90,7 +89,7 @@ const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <WebScrollView style={styles.content}>
@@ -206,8 +205,6 @@ const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({
           </TouchableOpacity>
         </WebScrollView>
       </SafeAreaView>
-
-      <BottomNavBar currentScreen="Detalle de Tarea" />
     </View>
   );
 };
@@ -215,7 +212,7 @@ const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: "#EEF3FA",
   },
   safeArea: {
     flex: 1,
@@ -224,8 +221,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   tareaInfoCard: {
-    backgroundColor: COLORS.surface,
-    padding: 20,
+    width: "100%",
+    maxWidth: 980,
+    alignSelf: "center",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 15,
   },
   tareaTitulo: {
@@ -255,8 +258,14 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    padding: 15,
-    backgroundColor: COLORS.surface,
+    width: "100%",
+    maxWidth: 980,
+    alignSelf: "center",
+    padding: 14,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    borderRadius: 12,
     marginBottom: 15,
   },
   statCard: {
@@ -273,7 +282,12 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
   entregasContainer: {
-    padding: 20,
+    width: "100%",
+    maxWidth: 980,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+    paddingTop: 2,
+    paddingBottom: 110,
   },
   sectionTitle: {
     fontSize: FONT_SIZES.large,
@@ -284,11 +298,13 @@ const styles = StyleSheet.create({
   entregaItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.surface,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 12,
     marginBottom: 10,
-    boxShadow: "0px 1px 2px rgba(26, 26, 26, 0.1)",
+    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
   },
   entregaInfo: {
     flex: 1,
@@ -310,9 +326,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: COLORS.primary,
     padding: 18,
-    borderRadius: 10,
+    borderRadius: 12,
     margin: 20,
     gap: 10,
+    boxShadow: "0px 8px 18px rgba(22, 118, 210, 0.32)",
   },
   calificarButtonText: {
     color: "white",

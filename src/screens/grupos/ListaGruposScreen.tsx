@@ -7,59 +7,29 @@ import {
   StatusBar,
   TextInput,
   ActivityIndicator,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
-import { COLORS, FONT_SIZES, Grupo } from "../../../types";
-import BottomNavBar from "../../components/BottomNavBar";
-import WebScrollView from "../../components/WebScrollView";
+import { COLORS, Grupo } from "../../../types";
 import { useGrupos } from "../../hooks/useGrupos";
+import { isWeb } from "../../utils/responsive";
+import WebScrollView from "../../components/WebScrollView";
 
-/**
- * Tipo para las props de navegación
- */
-type ListaGruposScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "ListaGrupos"
->;
+type ListaGruposScreenNavigationProp = StackNavigationProp<RootStackParamList, "ListaGrupos">;
 
-/**
- * Props del componente
- */
 interface ListaGruposScreenProps {
   navigation: ListaGruposScreenNavigationProp;
 }
 
-/**
- * Pantalla de Lista de Grupos (REFACTORIZADA - PATRÓN MVVM)
- *
- * RESPONSABILIDAD: Solo UI y presentación
- * - Renderiza los datos proporcionados por el hook
- * - Maneja eventos de usuario y los delega al ViewModel
- * - No contiene lógica de negocio ni acceso a datos
- *
- * LÓGICA Y DATOS: Delegados a:
- * - Hook: useGrupos (ViewModel)
- * - Servicio: gruposService (acceso a datos)
- */
-const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({
-  navigation,
-}) => {
-  // ViewModel - toda la lógica y estado viene del hook
-  const {
-    gruposFiltrados,
-    isLoading,
-    error,
-    searchQuery,
-    setSearchQuery,
-    conteoGrupos,
-  } = useGrupos();
+const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => {
+  const { width } = useWindowDimensions();
+  const wideLayout = width >= 920;
 
-  /**
-   * Maneja el clic en un grupo (solo navegación, no lógica)
-   */
+  const { gruposFiltrados, isLoading, error, searchQuery, setSearchQuery, conteoGrupos } = useGrupos();
+
   const handleGrupoPress = (grupo: Partial<Grupo>): void => {
     navigation.navigate("DetalleGrupo", {
       grupoId: grupo.id!,
@@ -67,115 +37,98 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({
     });
   };
 
-  // ==========================================
-  // RENDERIZADO DE ESTADOS
-  // ==========================================
-
-  /**
-   * Estado de carga
-   */
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+        <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
+            <ActivityIndicator size="large" color="#1676D2" />
             <Text style={styles.loadingText}>Cargando grupos...</Text>
           </View>
         </SafeAreaView>
-        <BottomNavBar currentScreen="Lista de Grupos" />
       </View>
     );
   }
 
-  /**
-   * Estado de error
-   */
   if (error) {
     return (
       <View style={styles.container}>
-        <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+        <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.errorContainer}>
-            <MaterialIcons name="error-outline" size={64} color="#F44336" />
+            <MaterialIcons name="error-outline" size={64} color="#D34553" />
             <Text style={styles.errorTitle}>Error al cargar grupos</Text>
             <Text style={styles.errorText}>{error}</Text>
           </View>
         </SafeAreaView>
-        <BottomNavBar currentScreen="Lista de Grupos" />
       </View>
     );
   }
 
-  // ==========================================
-  // RENDERIZADO PRINCIPAL
-  // ==========================================
-
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
           <Text style={styles.title}>Mis Grupos</Text>
           <Text style={styles.subtitle}>{conteoGrupos} grupos activos</Text>
 
-          {/* Barra de búsqueda */}
           <View style={styles.searchContainer}>
-            <MaterialIcons
-              name="search"
-              size={24}
-              color={COLORS.textSecondary}
-            />
+            <MaterialIcons name="search" size={20} color="#6B7D96" />
             <TextInput
               style={styles.searchInput}
               placeholder="Buscar grupo..."
               value={searchQuery}
               onChangeText={setSearchQuery}
-              placeholderTextColor={COLORS.textSecondary}
+              placeholderTextColor="#6B7D96"
             />
           </View>
         </View>
 
-        <WebScrollView contentContainerStyle={styles.scrollContent}>
+        <WebScrollView contentContainerStyle={[styles.scrollContent, wideLayout && styles.scrollContentWide]}>
           {gruposFiltrados.map((grupo) => (
             <TouchableOpacity
               key={grupo.id}
-              style={styles.grupoCard}
+              style={[styles.grupoCard, wideLayout && styles.grupoCardWide]}
               onPress={() => handleGrupoPress(grupo)}
-              activeOpacity={0.7}
+              activeOpacity={0.9}
             >
               <View style={styles.grupoHeader}>
                 <View style={styles.grupoIconContainer}>
-                  <MaterialIcons
-                    name="groups"
-                    size={40}
-                    color={COLORS.primary}
-                  />
+                  <MaterialIcons name="groups" size={26} color="#1676D2" />
                 </View>
+
                 <View style={styles.grupoInfo}>
                   <Text style={styles.grupoNombre}>{grupo.nombre}</Text>
                   <Text style={styles.grupoMateria}>{grupo.materia}</Text>
                   <Text style={styles.grupoDetalles}>
-                    {grupo.carrera} • Semestre {grupo.semestre}
+                    {grupo.carrera} · Semestre {grupo.semestre}
                   </Text>
                 </View>
+
+                <MaterialIcons name="chevron-right" size={22} color="#8A9AB1" />
               </View>
 
               <View style={styles.grupoFooter}>
                 <View style={styles.badge}>
-                  <MaterialIcons
-                    name="person"
-                    size={16}
-                    color={COLORS.primary}
-                  />
-                  <Text style={styles.badgeText}>
-                    {grupo.cantidadAlumnos} alumnos
-                  </Text>
+                  <MaterialIcons name="person" size={14} color="#1676D2" />
+                  <Text style={styles.badgeText}>{grupo.cantidadAlumnos} alumnos</Text>
                 </View>
-                <View style={[styles.badge, styles.estadoBadge]}>
-                  <Text style={styles.estadoText}>
+
+                <View
+                  style={[
+                    styles.badge,
+                    grupo.estado === "activo" ? styles.estadoActivoBadge : styles.estadoInactivoBadge,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.estadoText,
+                      grupo.estado === "activo" ? styles.estadoActivoText : styles.estadoInactivoText,
+                    ]}
+                  >
                     {grupo.estado === "activo" ? "Activo" : "Inactivo"}
                   </Text>
                 </View>
@@ -185,43 +138,34 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({
 
           {gruposFiltrados.length === 0 && (
             <View style={styles.emptyContainer}>
-              <MaterialIcons
-                name="search-off"
-                size={64}
-                color={COLORS.textSecondary}
-              />
-              <Text style={styles.emptyText}>No se encontraron grupos</Text>
+              <MaterialIcons name="search-off" size={56} color="#9AABBF" />
+              <Text style={styles.emptyTitle}>No se encontraron grupos</Text>
+              <Text style={styles.emptyText}>Prueba ajustando el texto de búsqueda.</Text>
             </View>
           )}
         </WebScrollView>
       </SafeAreaView>
-
-      <BottomNavBar currentScreen="Lista de Grupos" />
     </View>
   );
 };
 
-/**
- * Estilos del componente
- */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: "#EEF3FA",
   },
   safeArea: {
     flex: 1,
   },
-  // Estados de carga y error
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
   loadingText: {
-    marginTop: 15,
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.textSecondary,
+    marginTop: 12,
+    fontSize: 14,
+    color: "#6B7D96",
   },
   errorContainer: {
     flex: 1,
@@ -230,91 +174,111 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   errorTitle: {
-    fontSize: FONT_SIZES.large,
-    fontWeight: "bold",
-    color: "#F44336",
-    marginTop: 15,
-    marginBottom: 8,
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#D34553",
+    marginTop: 12,
+    marginBottom: 6,
   },
   errorText: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.textSecondary,
+    fontSize: 14,
+    color: "#5C6E86",
     textAlign: "center",
   },
-  // Encabezado
   header: {
-    padding: 20,
+    paddingHorizontal: 16,
+    paddingTop: 14,
     paddingBottom: 10,
+    width: "100%",
+    alignSelf: "center",
+    maxWidth: 1220,
   },
   title: {
-    fontSize: FONT_SIZES.xlarge,
-    fontWeight: "bold",
-    color: COLORS.primary,
-    marginBottom: 4,
+    fontSize: 34,
+    fontWeight: "800",
+    color: "#1E2A3A",
+    letterSpacing: -0.4,
   },
   subtitle: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.textSecondary,
-    marginBottom: 15,
+    marginTop: 2,
+    fontSize: 15,
+    color: "#5C6E86",
+    marginBottom: 10,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.surface,
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    boxShadow: "0px 1px 3px rgba(26, 26, 26, 0.1)",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    minHeight: 48,
+    boxShadow: "0px 8px 14px rgba(18, 44, 86, 0.06)",
   },
   searchInput: {
     flex: 1,
-    marginLeft: 10,
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.text,
+    marginLeft: 8,
+    fontSize: 15,
+    color: "#1E2A3A",
+    paddingVertical: 0,
   },
-  // Contenido
   scrollContent: {
-    padding: 20,
-    paddingTop: 10,
+    width: "100%",
+    maxWidth: 1220,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+    paddingBottom: isWeb() ? 28 : 110,
+    gap: 10,
+  },
+  scrollContentWide: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   grupoCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
-    boxShadow: "0px 2px 5px rgba(26, 26, 26, 0.15)",
+    width: "100%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 14,
+    gap: 10,
+    boxShadow: "0px 10px 22px rgba(33, 60, 109, 0.08)",
+  },
+  grupoCardWide: {
+    width: "49%",
   },
   grupoHeader: {
     flexDirection: "row",
-    marginBottom: 15,
+    alignItems: "center",
   },
   grupoIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: `${COLORS.primary}20`,
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: "#EAF4FF",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 15,
+    marginRight: 10,
   },
   grupoInfo: {
     flex: 1,
-    justifyContent: "center",
   },
   grupoNombre: {
-    fontSize: FONT_SIZES.large,
-    fontWeight: "bold",
-    color: COLORS.text,
-    marginBottom: 4,
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#1E2A3A",
   },
   grupoMateria: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.textSecondary,
-    marginBottom: 2,
+    fontSize: 14,
+    color: "#4D5D74",
+    marginTop: 1,
   },
   grupoDetalles: {
-    fontSize: FONT_SIZES.small,
-    color: COLORS.textSecondary,
+    marginTop: 1,
+    fontSize: 12,
+    color: "#7D8EA7",
   },
   grupoFooter: {
     flexDirection: "row",
@@ -324,34 +288,49 @@ const styles = StyleSheet.create({
   badge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: `${COLORS.primary}15`,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    backgroundColor: "#EAF4FF",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
+    gap: 5,
   },
   badgeText: {
-    fontSize: FONT_SIZES.small,
-    color: COLORS.primary,
-    marginLeft: 4,
-    fontWeight: "600",
-  },
-  estadoBadge: {
-    backgroundColor: "#4CAF5020",
+    fontSize: 12,
+    color: "#1676D2",
+    fontWeight: "700",
   },
   estadoText: {
-    fontSize: FONT_SIZES.small,
-    color: "#4CAF50",
-    fontWeight: "600",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  estadoActivoBadge: {
+    backgroundColor: "#E7F9F3",
+  },
+  estadoInactivoBadge: {
+    backgroundColor: "#FFF1E7",
+  },
+  estadoActivoText: {
+    color: "#0D9E70",
+  },
+  estadoInactivoText: {
+    color: "#C77A2B",
   },
   emptyContainer: {
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 60,
+    width: "100%",
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#4D5D74",
+    marginTop: 8,
   },
   emptyText: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.textSecondary,
-    marginTop: 15,
+    fontSize: 14,
+    color: "#7D8EA7",
+    marginTop: 3,
   },
 });
 

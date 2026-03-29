@@ -7,22 +7,20 @@ import {
   ScrollView,
   StatusBar,
   TextInput,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { COLORS, FONT_SIZES, Recurso } from "../../../types";
-import BottomNavBar from "../../components/BottomNavBar";
+import { COLORS, Recurso } from "../../../types";
 import { useListaRecursosViewModel } from "../../hooks/useListaRecursosViewModel";
+import { isWeb } from "../../utils/responsive";
 
-/**
- * Pantalla de Lista de Recursos (View)
- * Solo JSX y StyleSheet - la logica vive en useListaRecursosViewModel
- */
 const ListaRecursosScreen: React.FC = () => {
-  const { searchQuery, setSearchQuery, getIconByTipo, getColorByTipo } =
-    useListaRecursosViewModel();
+  const { width } = useWindowDimensions();
+  const wideLayout = width >= 920;
 
-  // Recursos de ejemplo
+  const { searchQuery, setSearchQuery, getIconByTipo, getColorByTipo } = useListaRecursosViewModel();
+
   const recursosEjemplo: Partial<Recurso>[] = [
     {
       id: 1,
@@ -52,31 +50,28 @@ const ListaRecursosScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
           <Text style={styles.title}>Mis Recursos</Text>
-          <Text style={styles.subtitle}>{recursosEjemplo.length} recursos</Text>
+          <Text style={styles.subtitle}>{recursosEjemplo.length} recursos disponibles</Text>
 
           <View style={styles.searchContainer}>
-            <MaterialIcons
-              name="search"
-              size={24}
-              color={COLORS.textSecondary}
-            />
+            <MaterialIcons name="search" size={20} color="#6B7D96" />
             <TextInput
               style={styles.searchInput}
               placeholder="Buscar recurso..."
               value={searchQuery}
               onChangeText={setSearchQuery}
-              placeholderTextColor={COLORS.textSecondary}
+              placeholderTextColor="#6B7D96"
             />
           </View>
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={[styles.scrollContent, wideLayout && styles.scrollContentWide]}>
           {recursosEjemplo.map((recurso) => (
-            <TouchableOpacity key={recurso.id} style={styles.recursoCard}>
+            <TouchableOpacity key={recurso.id} style={[styles.recursoCard, wideLayout && styles.recursoCardWide]} activeOpacity={0.9}>
               <View style={styles.recursoHeader}>
                 <View
                   style={[
@@ -86,20 +81,18 @@ const ListaRecursosScreen: React.FC = () => {
                 >
                   <MaterialIcons
                     name={getIconByTipo(recurso.tipo!) as any}
-                    size={30}
+                    size={24}
                     color={getColorByTipo(recurso.tipo!)}
                   />
                 </View>
+
                 <View style={styles.recursoInfo}>
                   <Text style={styles.recursoTitulo}>{recurso.titulo}</Text>
-                  <Text style={styles.recursoDescripcion}>
-                    {recurso.descripcion}
-                  </Text>
+                  <Text style={styles.recursoDescripcion}>{recurso.descripcion}</Text>
+
                   <View style={styles.recursoBadges}>
                     <View style={styles.badge}>
-                      <Text style={styles.badgeText}>
-                        {recurso.tipo?.replace("_", " ")}
-                      </Text>
+                      <Text style={styles.badgeText}>{recurso.tipo?.replace("_", " ")}</Text>
                     </View>
                     <View style={[styles.badge, styles.origenBadge]}>
                       <MaterialIcons
@@ -111,95 +104,139 @@ const ListaRecursosScreen: React.FC = () => {
                               : "edit"
                         }
                         size={12}
-                        color={COLORS.primary}
+                        color="#1676D2"
                       />
                       <Text style={styles.badgeText}>{recurso.origen}</Text>
                     </View>
                   </View>
                 </View>
+
+                <MaterialIcons name="chevron-right" size={22} color="#8A9AB1" />
               </View>
             </TouchableOpacity>
           ))}
         </ScrollView>
       </SafeAreaView>
-      <BottomNavBar currentScreen="Lista de Recursos" />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background },
-  safeArea: { flex: 1 },
-  header: { padding: 20, paddingBottom: 10 },
+  container: {
+    flex: 1,
+    backgroundColor: "#EEF3FA",
+  },
+  safeArea: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 10,
+    width: "100%",
+    alignSelf: "center",
+    maxWidth: 1220,
+  },
   title: {
-    fontSize: FONT_SIZES.xlarge,
-    fontWeight: "bold",
-    color: COLORS.primary,
-    marginBottom: 4,
+    fontSize: 34,
+    fontWeight: "800",
+    color: "#1E2A3A",
+    letterSpacing: -0.4,
   },
   subtitle: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.textSecondary,
-    marginBottom: 15,
+    marginTop: 2,
+    fontSize: 15,
+    color: "#5C6E86",
+    marginBottom: 10,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.surface,
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    boxShadow: "0px 1px 3px rgba(26, 26, 26, 0.1)",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    minHeight: 48,
+    boxShadow: "0px 8px 14px rgba(18, 44, 86, 0.06)",
   },
   searchInput: {
     flex: 1,
-    marginLeft: 10,
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.text,
+    marginLeft: 8,
+    fontSize: 15,
+    color: "#1E2A3A",
+    paddingVertical: 0,
   },
-  scrollContent: { padding: 20, paddingTop: 10 },
+  scrollContent: {
+    width: "100%",
+    maxWidth: 1220,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+    paddingBottom: isWeb() ? 28 : 110,
+    gap: 10,
+  },
+  scrollContentWide: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
   recursoCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 15,
-    boxShadow: "0px 2px 5px rgba(26, 26, 26, 0.15)",
+    width: "100%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 14,
+    boxShadow: "0px 10px 22px rgba(33, 60, 109, 0.08)",
   },
-  recursoHeader: { flexDirection: "row" },
+  recursoCardWide: {
+    width: "49%",
+  },
+  recursoHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   recursoIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 44,
+    height: 44,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: 10,
   },
-  recursoInfo: { flex: 1 },
+  recursoInfo: {
+    flex: 1,
+  },
   recursoTitulo: {
-    fontSize: FONT_SIZES.medium,
-    fontWeight: "bold",
-    color: COLORS.text,
-    marginBottom: 4,
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#1E2A3A",
+    marginBottom: 3,
   },
   recursoDescripcion: {
-    fontSize: FONT_SIZES.small,
-    color: COLORS.textSecondary,
-    marginBottom: 8,
+    fontSize: 13,
+    color: "#5C6E86",
+    marginBottom: 7,
   },
-  recursoBadges: { flexDirection: "row", gap: 8 },
+  recursoBadges: {
+    flexDirection: "row",
+    gap: 8,
+  },
   badge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: "#EAF4FF",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
-  origenBadge: { gap: 4 },
+  origenBadge: {
+    gap: 4,
+  },
   badgeText: {
-    fontSize: FONT_SIZES.small - 2,
-    color: COLORS.primary,
-    fontWeight: "600",
+    fontSize: 10,
+    color: "#1676D2",
+    fontWeight: "700",
     textTransform: "capitalize",
   },
 });

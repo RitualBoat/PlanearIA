@@ -11,6 +11,7 @@ import HomeScreen from "../screens/home/HomeScreen";
 import PlaneacionesScreen from "../screens/planeaciones/PlaneacionesScreen";
 import CrearPlaneacionScreen from "../screens/planeaciones/CrearPlaneacionScreen";
 import GenerarPlaneacionIAScreen from "../screens/planeaciones/GenerarPlaneacionIAScreen";
+import ImportarPlaneacionScreen from "../screens/planeaciones/ImportarPlaneacionScreen";
 import EditorPlaneacionScreen from "../screens/planeaciones/EditorPlaneacionScreen";
 import ListaPlaneacionesScreen from "../screens/planeaciones/ListaPlaneacionesScreen";
 
@@ -50,6 +51,7 @@ export type RootStackParamList = {
   Planeaciones: undefined;
   CrearPlaneacion: undefined;
   GenerarPlaneacionIA: undefined;
+  ImportarPlaneacion: undefined;
   EditorPlaneacion: {
     nivel: NivelAcademico;
     modo: "crear" | "editar";
@@ -150,6 +152,15 @@ const StackNavigator: React.FC = () => {
         component={GenerarPlaneacionIAScreen}
         options={{
           title: "Generar Planeación IA",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="ImportarPlaneacion"
+        component={ImportarPlaneacionScreen}
+        options={{
+          title: "Importar Planeación",
           headerShown: false,
         }}
       />

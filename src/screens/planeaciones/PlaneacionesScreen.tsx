@@ -50,6 +50,10 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({
     navigation.navigate("ListaPlaneaciones");
   };
 
+  const handleImportarPlaneacion = (): void => {
+    navigation.navigate("ImportarPlaneacion");
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
@@ -95,6 +99,22 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({
               <Text style={styles.optionTitle}>Mis Planeaciones</Text>
               <Text style={styles.optionDescription}>
                 Consulta y edita tus planeaciones guardadas
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.optionCard}
+              onPress={handleImportarPlaneacion}
+              activeOpacity={0.7}
+            >
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#1976D2" }]}
+              >
+                <MaterialIcons name="upload-file" size={60} color="white" />
+              </View>
+              <Text style={styles.optionTitle}>Importar Planeación</Text>
+              <Text style={styles.optionDescription}>
+                Importa una planeación desde PDF o DOCX para revisarla antes de guardar
               </Text>
             </TouchableOpacity>
           </View>

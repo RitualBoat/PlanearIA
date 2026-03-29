@@ -7,53 +7,77 @@ import {
   Modal,
   Pressable,
   StatusBar,
-  Image,
   ScrollView,
+  TextInput,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import Entypo from "@expo/vector-icons/Entypo";
-import { COLORS, FONT_SIZES } from "../../../types";
-import { isWeb, responsive, isLargeScreen } from "../../utils/responsive";
-import { useHomeViewModel, MenuOption } from "../../hooks/useHomeViewModel";
+import { COLORS } from "../../../types";
+import { isWeb } from "../../utils/responsive";
+import { useHomeViewModel } from "../../hooks/useHomeViewModel";
 
-/**
- * Componente para renderizar el icono de una opción del menú
- */
-const MenuOptionIcon: React.FC<{ option: MenuOption }> = React.memo(
-  ({ option }) => {
-    if (option.iconImage) {
-      return (
-        <Image
-          source={option.iconImage}
-          style={styles.iconImage}
-          resizeMode="contain"
-        />
-      );
-    }
+type NavOptionId = "planeaciones" | "grupos" | "recursosDidacticos" | "cuenta";
 
-    const iconProps = {
-      size: 50,
-      color: option.color,
-    };
-    switch (option.iconLibrary) {
-      case "FontAwesome5":
-        return <FontAwesome5 name={option.icon as any} {...iconProps} />;
-      case "MaterialIcons":
-        return <MaterialIcons name={option.icon as any} {...iconProps} />;
-      case "Entypo":
-        return <Entypo name={option.icon as any} {...iconProps} />;
-      default:
-        return <MaterialIcons name="help-outline" {...iconProps} />;
-    }
+const metricCards = [
+  {
+    id: "planeaciones",
+    title: "Total planeaciones",
+    value: "24",
+    badge: "+12%",
+    icon: "event-note" as const,
+    tone: "#147AD6",
   },
-);
+  {
+    id: "grupos",
+    title: "Grupos asignados",
+    value: "6",
+    badge: "Activo",
+    icon: "groups" as const,
+    tone: "#0E8B9A",
+  },
+  {
+    id: "sugerencias",
+    title: "Sugerencias IA",
+    value: "158",
+    badge: "Pro",
+    icon: "auto-awesome" as const,
+    tone: "#A6651A",
+  },
+  {
+    id: "pendientes",
+    title: "Tareas hoy",
+    value: "3",
+    badge: "Pendientes",
+    icon: "assignment-late" as const,
+    tone: "#D34553",
+  },
+];
 
-/**
- * Pantalla principal del sistema (View)
- * Solo JSX y StyleSheet - la logica vive en useHomeViewModel
- */
+const continueCards = [
+  {
+    id: "c1",
+    title: "Cálculo Diferencial: Límites y Continuidad",
+    tag: "MATEMÁTICAS",
+    updated: "Editado hace 2 horas",
+    progress: 75,
+  },
+  {
+    id: "c2",
+    title: "Mecánica Cuántica: Introducción a Partículas",
+    tag: "FÍSICA",
+    updated: "Editado ayer",
+    progress: 30,
+  },
+];
+
+const timeline = [
+  { id: "t1", title: "Planeación completada", detail: "Unidad 3 · Álgebra Lineal", time: "Hace 15 min" },
+  { id: "t2", title: "IA generó 5 ejercicios", detail: "Basado en el tema 'Límites'", time: "Hace 1 hora" },
+  { id: "t3", title: "Grupo 11-A actualizado", detail: "Se agregaron 2 nuevos alumnos", time: "Hace 3 horas" },
+  { id: "t4", title: "Sincronización exitosa", detail: "Google Classroom conectado", time: "Ayer, 18:30" },
+];
+
 const HomeScreen: React.FC = () => {
   const {
     menuVisible,
@@ -64,28 +88,42 @@ const HomeScreen: React.FC = () => {
     handleProfile,
     handleNavigation,
   } = useHomeViewModel();
+  const { width } = useWindowDimensions();
+
+  const webDesktop = isWeb() && width >= 1080;
+  const wideContent = width >= 860;
+
+  const sidebarItems = [
+    { id: "home", label: "Inicio", icon: "home" as const, active: true },
+    { id: "planeaciones", label: "Planeaciones", icon: "event-note" as const },
+    { id: "grupos", label: "Grupos", icon: "groups" as const },
+    { id: "recursosDidacticos", label: "Recursos", icon: "folder" as const },
+    { id: "cuenta", label: "Configuración", icon: "settings" as const },
+  ];
+
+  const onSidebarPress = (id: string) => {
+    if (id === "home") return;
+    const menuOption = menuOptions.find((option) => option.id === (id as NavOptionId));
+    if (menuOption) {
+      handleNavigation(menuOption);
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
-      {/* Modal del menú de hamburguesa */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={menuVisible}
-        onRequestClose={closeMenu}
-      >
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar backgroundColor="#F4F7FB" barStyle="dark-content" />
+
+      <Modal animationType="fade" transparent visible={menuVisible} onRequestClose={closeMenu}>
         <View style={styles.menuOverlay}>
           <View style={styles.menuContainer}>
-            <Text style={styles.menuTitle}>Menú de Usuario</Text>
+            <Text style={styles.menuTitle}>Cuenta</Text>
             <Pressable style={styles.menuOption} onPress={handleProfile}>
               <MaterialIcons name="person" size={20} color={COLORS.primary} />
-              <Text style={styles.menuText}>Mi Perfil</Text>
+              <Text style={styles.menuText}>Mi perfil</Text>
             </Pressable>
             <Pressable style={styles.menuOption} onPress={handleLogout}>
               <MaterialIcons name="logout" size={20} color={COLORS.error} />
-              <Text style={[styles.menuText, { color: COLORS.error }]}>
-                Cerrar Sesión
-              </Text>
+              <Text style={[styles.menuText, styles.menuTextDanger]}>Cerrar sesión</Text>
             </Pressable>
             <Pressable style={styles.closeMenuButton} onPress={closeMenu}>
               <Text style={styles.closeMenuText}>Cancelar</Text>
@@ -93,189 +131,669 @@ const HomeScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
-      {/* Grid de opciones principales */}
-      <SafeAreaView style={styles.contentContainer}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <Text style={styles.welcomeText}>¡Bienvenido a PlanearIA!</Text>
-          <Text style={styles.instructionText}>
-            Selecciona una opción para comenzar
-          </Text>
-          <View style={styles.gridContainer}>
-            {menuOptions.map((option) => (
-              <TouchableOpacity
-                key={option.id}
-                style={styles.card}
-                onPress={() => handleNavigation(option)}
-                activeOpacity={0.7}
-              >
-                <MenuOptionIcon option={option} />
-                <Text style={styles.cardText}>{option.title}</Text>
-              </TouchableOpacity>
-            ))}
+
+      <View style={styles.rootLayout}>
+        {webDesktop && (
+          <View style={styles.sidebar}>
+            <View>
+              <Text style={styles.logo}>PlanearIA</Text>
+              <Text style={styles.logoSub}>Cognitive sanctuary</Text>
+            </View>
+
+            <View style={styles.sidebarMenu}>
+              {sidebarItems.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={[styles.sidebarItem, item.active && styles.sidebarItemActive]}
+                  onPress={() => onSidebarPress(item.id)}
+                  activeOpacity={0.8}
+                >
+                  <MaterialIcons
+                    name={item.icon}
+                    size={18}
+                    color={item.active ? "#1E64CC" : "#7D8BA3"}
+                  />
+                  <Text style={[styles.sidebarText, item.active && styles.sidebarTextActive]}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TouchableOpacity
+              style={styles.sidebarCta}
+              activeOpacity={0.85}
+              onPress={() => onSidebarPress("planeaciones")}
+            >
+              <MaterialIcons name="add" size={18} color="#FFFFFF" />
+              <Text style={styles.sidebarCtaText}>Nueva Planeación</Text>
+            </TouchableOpacity>
           </View>
-        </ScrollView>
-      </SafeAreaView>
-      {/* Header Bar - Movido a la parte de abajo */}
-      <View style={styles.headerBar}>
-        <TouchableOpacity style={styles.iconButton}>
-          <MaterialIcons name="arrow-back" size={24} color="white" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Menú</Text>
-        <TouchableOpacity style={styles.iconButton} onPress={openMenu}>
-          <MaterialIcons name="menu" size={24} color="white" />
-        </TouchableOpacity>
+        )}
+
+        <View style={styles.mainArea}>
+          <View style={styles.topBar}>
+            {webDesktop ? (
+              <View style={styles.searchBar}>
+                <MaterialIcons name="search" size={18} color="#8A96AA" />
+                <TextInput
+                  placeholder="Buscar planeaciones, recursos o alumnos..."
+                  placeholderTextColor="#8A96AA"
+                  style={styles.searchInput}
+                />
+              </View>
+            ) : (
+              <View style={styles.mobileHeaderCopy}>
+                <Text style={styles.mobileHello}>Hola, Profe Ana</Text>
+                <Text style={styles.mobileSummary}>Resumen de tu semana académica</Text>
+              </View>
+            )}
+
+            <View style={styles.topActions}>
+              <TouchableOpacity style={styles.iconAction} activeOpacity={0.85}>
+                <MaterialIcons name="notifications-none" size={20} color="#4A5568" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.iconAction} activeOpacity={0.85}>
+                <MaterialIcons name="help-outline" size={20} color="#4A5568" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.profileBlock} activeOpacity={0.85} onPress={openMenu}>
+                <Text style={styles.profileText}>Hola, Profe Ana</Text>
+                <View style={styles.avatarCircle}>
+                  <MaterialIcons name="person" size={16} color="#FFFFFF" />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <ScrollView contentContainerStyle={styles.scrollBody} showsVerticalScrollIndicator={false}>
+            <View style={styles.titleRow}>
+              <Text style={styles.title}>Resumen del Día</Text>
+              <Text style={styles.subtitle}>
+                Tienes 3 clases programadas hoy y 2 planeaciones pendientes de revisión.
+              </Text>
+            </View>
+
+            <View style={[styles.metricsGrid, wideContent && styles.metricsGridWide]}>
+              {metricCards.map((metric) => (
+                <View key={metric.id} style={[styles.metricCard, wideContent && styles.metricCardWide]}>
+                  <View style={styles.metricHeader}>
+                    <View style={[styles.metricIconWrap, { backgroundColor: `${metric.tone}1A` }]}>
+                      <MaterialIcons name={metric.icon} size={18} color={metric.tone} />
+                    </View>
+                    <View style={[styles.metricBadge, { backgroundColor: `${metric.tone}21` }]}>
+                      <Text style={[styles.metricBadgeText, { color: metric.tone }]}>{metric.badge}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.metricTitle}>{metric.title}</Text>
+                  <Text style={styles.metricValue}>{metric.value}</Text>
+                </View>
+              ))}
+            </View>
+
+            <Text style={styles.sectionLabel}>ACCIONES RÁPIDAS</Text>
+
+            <ScrollView
+              horizontal={!wideContent}
+              contentContainerStyle={[
+                styles.quickActionsRow,
+                wideContent && styles.quickActionsRowWide,
+              ]}
+              showsHorizontalScrollIndicator={!wideContent}
+            >
+              <TouchableOpacity
+                style={[styles.quickActionCard, styles.quickActionPrimary]}
+                activeOpacity={0.85}
+                onPress={() => onSidebarPress("planeaciones")}
+              >
+                <MaterialIcons name="edit-document" size={22} color="#FFFFFF" />
+                <Text style={styles.quickActionPrimaryText}>Nueva Planeación</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.quickActionCard}
+                activeOpacity={0.85}
+                onPress={() => onSidebarPress("planeaciones")}
+              >
+                <MaterialIcons name="upload-file" size={22} color="#1E64CC" />
+                <Text style={styles.quickActionText}>Importar PDF</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.quickActionCard} activeOpacity={0.85}>
+                <MaterialIcons name="psychology" size={22} color="#1E64CC" />
+                <Text style={styles.quickActionText}>Asistente IA</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.quickActionCard} activeOpacity={0.85}>
+                <MaterialIcons name="share" size={22} color="#1E64CC" />
+                <Text style={styles.quickActionText}>Compartir Recurso</Text>
+              </TouchableOpacity>
+            </ScrollView>
+
+            <View style={[styles.lowerSection, wideContent && styles.lowerSectionWide]}>
+              <View style={styles.continueColumn}>
+                <View style={styles.sectionHeaderRow}>
+                  <Text style={styles.sectionTitle}>Continuar trabajando</Text>
+                  <TouchableOpacity activeOpacity={0.85} onPress={() => onSidebarPress("planeaciones")}>
+                    <Text style={styles.sectionLink}>Ver todo</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {continueCards.map((item) => (
+                  <TouchableOpacity key={item.id} style={styles.continueCard} activeOpacity={0.9}>
+                    <View style={styles.continueIcon}>
+                      <MaterialIcons name="functions" size={22} color="#1E64CC" />
+                    </View>
+                    <View style={styles.continueBody}>
+                      <View style={styles.continueMetaRow}>
+                        <Text style={styles.subjectBadge}>{item.tag}</Text>
+                        <Text style={styles.updatedText}>{item.updated}</Text>
+                      </View>
+                      <Text style={styles.continueTitle}>{item.title}</Text>
+                      <View style={styles.progressRow}>
+                        <View style={styles.progressTrack}>
+                          <View style={[styles.progressFill, { width: `${item.progress}%` }]} />
+                        </View>
+                        <Text style={styles.progressText}>{item.progress}%</Text>
+                      </View>
+                    </View>
+                    <MaterialIcons name="chevron-right" size={20} color="#7D8BA3" />
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <View style={styles.timelineColumn}>
+                <Text style={styles.sectionTitle}>Actividad reciente</Text>
+                <View style={styles.timelineCard}>
+                  {timeline.map((entry, index) => (
+                    <View key={entry.id} style={styles.timelineItem}>
+                      <View style={styles.timelineTrackWrap}>
+                        <View style={styles.timelineDot} />
+                        {index < timeline.length - 1 && <View style={styles.timelineLine} />}
+                      </View>
+                      <View style={styles.timelineTextWrap}>
+                        <Text style={styles.timelineTitle}>{entry.title}</Text>
+                        <Text style={styles.timelineDetail}>{entry.detail}</Text>
+                        <Text style={styles.timelineTime}>{entry.time}</Text>
+                      </View>
+                    </View>
+                  ))}
+
+                  <TouchableOpacity style={styles.historyButton} activeOpacity={0.85}>
+                    <Text style={styles.historyButtonText}>Ver historial completo</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </ScrollView>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
-/**
- * Estilos del componente
- */
+
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: "#EEF3FA",
   },
-  headerBar: {
+  rootLayout: {
+    flex: 1,
+    flexDirection: "row",
+  },
+  sidebar: {
+    width: 170,
+    backgroundColor: "#FFFFFF",
+    borderRightWidth: 1,
+    borderRightColor: "#E4EAF2",
+    paddingHorizontal: 12,
+    paddingVertical: 16,
+    justifyContent: "space-between",
+  },
+  logo: {
+    fontSize: 27,
+    fontWeight: "900",
+    color: "#1E64CC",
+    letterSpacing: -0.4,
+  },
+  logoSub: {
+    marginTop: -4,
+    fontSize: 10,
+    color: "#9AA9BF",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  sidebarMenu: {
+    marginTop: 18,
+    gap: 4,
+  },
+  sidebarItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+  },
+  sidebarItemActive: {
+    backgroundColor: "#ECF4FF",
+  },
+  sidebarText: {
+    fontSize: 14,
+    color: "#6E7C95",
+    fontWeight: "600",
+  },
+  sidebarTextActive: {
+    color: "#1E64CC",
+  },
+  sidebarCta: {
+    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    borderRadius: 10,
+    paddingVertical: 12,
+    backgroundColor: "#1E64CC",
+    boxShadow: "0px 10px 18px rgba(30, 100, 204, 0.3)",
+  },
+  sidebarCtaText: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  mainArea: {
+    flex: 1,
+  },
+  topBar: {
+    height: 76,
+    backgroundColor: "#FFFFFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E4EAF2",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 18,
+  },
+  searchBar: {
+    flex: 1,
+    maxWidth: 460,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "#F2F5FA",
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 13,
+    color: "#27364D",
+    paddingVertical: 0,
+  },
+  mobileHeaderCopy: {
+    flex: 1,
+  },
+  mobileHello: {
+    fontSize: 30,
+    fontWeight: "800",
+    color: "#1F2A3E",
+    letterSpacing: -0.4,
+  },
+  mobileSummary: {
+    marginTop: 2,
+    fontSize: 15,
+    color: "#667085",
+  },
+  topActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  iconAction: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#F2F5FA",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  profileBlock: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginLeft: 2,
+  },
+  profileText: {
+    fontSize: 12,
+    color: "#4A5568",
+    fontWeight: "600",
+  },
+  avatarCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#1E64CC",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scrollBody: {
+    paddingHorizontal: 18,
+    paddingTop: 16,
+    paddingBottom: 100,
+    gap: 18,
+  },
+  titleRow: {
+    gap: 4,
+  },
+  title: {
+    fontSize: 42,
+    fontWeight: "800",
+    color: "#1F2A3E",
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    fontSize: 15,
+    color: "#56657A",
+  },
+  metricsGrid: {
+    flexDirection: "column",
+    gap: 12,
+  },
+  metricsGridWide: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  metricCard: {
+    width: "100%",
+    borderRadius: 14,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E6ECF4",
+    padding: 14,
+    gap: 8,
+  },
+  metricCardWide: {
+    width: "24%",
+    minWidth: 180,
+  },
+  metricHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: responsive(30, 40, 60),
-    paddingVertical: responsive(20, 22, 25),
-    boxShadow: "0px 2px 3.84px rgba(26, 26, 26, 0.25)",
   },
-  headerTitle: {
-    fontSize: responsive(
-      FONT_SIZES.large,
-      FONT_SIZES.large + 2,
-      FONT_SIZES.large + 4,
-    ),
-    fontWeight: "bold",
-    color: COLORS.background,
-    flex: 1,
-    textAlign: "center",
-  },
-  iconButton: {
-    padding: 8,
-    borderRadius: 20,
-  },
-  contentContainer: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingTop: responsive(20, 30, 40),
-    paddingHorizontal: isWeb() ? 20 : 0,
-    alignItems: "center",
-  },
-  welcomeText: {
-    fontSize: responsive(
-      FONT_SIZES.xlarge,
-      FONT_SIZES.xlarge + 4,
-      FONT_SIZES.xlarge + 8,
-    ),
-    fontWeight: "bold",
-    color: COLORS.primary,
-    textAlign: "center",
-    marginBottom: responsive(30, 50, 60),
-    marginTop: responsive(30, 40, 50),
-  },
-  instructionText: {
-    fontSize: responsive(
-      FONT_SIZES.medium,
-      FONT_SIZES.medium + 2,
-      FONT_SIZES.medium + 4,
-    ),
-    color: COLORS.textSecondary,
-    textAlign: "center",
-    marginBottom: responsive(30, 35, 40),
-  },
-  gridContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: isLargeScreen() ? "center" : "space-around",
-    paddingHorizontal: 20,
-    maxWidth: isWeb() ? 1200 : "100%",
-    width: "100%",
-    gap: isWeb() ? 20 : 0,
-  },
-  card: {
-    width: isLargeScreen() ? (isWeb() ? "23%" : "30%") : "42%",
-    minWidth: isWeb() ? 200 : undefined,
-    backgroundColor: COLORS.surface,
+  metricIconWrap: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: responsive(35, 40, 45),
-    paddingHorizontal: responsive(20, 25, 30),
-    marginBottom: 15,
-    borderRadius: responsive(12, 14, 16),
-    boxShadow: "0px 2px 5px rgba(26, 26, 26, 0.2)",
-    ...(isWeb() && {
-      cursor: "pointer",
-      transition: "all 0.2s ease",
-    }),
   },
-  iconImage: {
-    width: 60,
-    height: 60,
-  } as const,
-  cardText: {
-    marginTop: 12,
-    fontSize: responsive(
-      FONT_SIZES.medium,
-      FONT_SIZES.medium + 1,
-      FONT_SIZES.medium + 2,
-    ),
+  metricBadge: {
+    borderRadius: 12,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+  },
+  metricBadgeText: {
+    fontSize: 10,
+    fontWeight: "700",
+  },
+  metricTitle: {
+    textTransform: "uppercase",
+    fontSize: 11,
+    color: "#71829A",
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  metricValue: {
+    fontSize: 39,
+    fontWeight: "800",
+    color: "#1F2A3E",
+    letterSpacing: -0.6,
+  },
+  sectionLabel: {
+    fontSize: 17,
+    color: "#5E6C81",
+    fontWeight: "800",
+    letterSpacing: 1.5,
+  },
+  quickActionsRow: {
+    gap: 10,
+    paddingRight: 8,
+  },
+  quickActionsRowWide: {
+    flexDirection: "row",
+  },
+  quickActionCard: {
+    minWidth: 170,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#DEE8F5",
+    backgroundColor: "#FFFFFF",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 14,
+  },
+  quickActionPrimary: {
+    backgroundColor: "#1E64CC",
+    borderColor: "#1E64CC",
+    boxShadow: "0px 8px 16px rgba(30, 100, 204, 0.3)",
+  },
+  quickActionPrimaryText: {
+    color: "#FFFFFF",
+    fontSize: 17,
+    fontWeight: "700",
+  },
+  quickActionText: {
+    color: "#1E2F4D",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  lowerSection: {
+    gap: 16,
+  },
+  lowerSectionWide: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  continueColumn: {
+    flex: 1,
+    gap: 12,
+  },
+  timelineColumn: {
+    width: "100%",
+    gap: 12,
+  },
+  sectionHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  sectionTitle: {
+    fontSize: 33,
+    fontWeight: "800",
+    color: "#1F2A3E",
+    letterSpacing: -0.4,
+  },
+  sectionLink: {
+    color: "#1E64CC",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  continueCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E4EBF4",
+    padding: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  continueIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 12,
+    backgroundColor: "#F0F5FD",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  continueBody: {
+    flex: 1,
+    gap: 7,
+  },
+  continueMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  subjectBadge: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#3D82D8",
+    backgroundColor: "#E8F3FF",
+    borderRadius: 6,
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+  },
+  updatedText: {
+    fontSize: 11,
+    color: "#8392A7",
+  },
+  continueTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#1E2F4D",
+  },
+  progressRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  progressTrack: {
+    flex: 1,
+    height: 6,
+    borderRadius: 999,
+    backgroundColor: "#E8EDF5",
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    borderRadius: 999,
+    backgroundColor: "#1E64CC",
+  },
+  progressText: {
+    fontSize: 11,
+    color: "#6D7B8F",
+    fontWeight: "700",
+    minWidth: 30,
+  },
+  timelineCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E4EBF4",
+    padding: 14,
+    gap: 10,
+  },
+  timelineItem: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  timelineTrackWrap: {
+    width: 18,
+    alignItems: "center",
+  },
+  timelineDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#1E64CC",
+    marginTop: 5,
+  },
+  timelineLine: {
+    width: 2,
+    flex: 1,
+    backgroundColor: "#DFE8F4",
+    marginTop: 4,
+  },
+  timelineTextWrap: {
+    flex: 1,
+    paddingBottom: 12,
+  },
+  timelineTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#1F2A3E",
+  },
+  timelineDetail: {
+    fontSize: 12,
+    color: "#6E7C95",
+  },
+  timelineTime: {
+    marginTop: 2,
+    fontSize: 12,
+    color: "#2C74D7",
     fontWeight: "600",
-    color: COLORS.text,
-    textAlign: "center",
+  },
+  historyButton: {
+    marginTop: 2,
+    borderRadius: 8,
+    backgroundColor: "#EFF4FB",
+    paddingVertical: 10,
+    alignItems: "center",
+  },
+  historyButtonText: {
+    fontSize: 13,
+    color: "#3275D9",
+    fontWeight: "700",
   },
   menuOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(19, 30, 49, 0.42)",
     justifyContent: "flex-end",
   },
   menuContainer: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: "#FFFFFF",
     padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    minHeight: 200,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
   },
   menuTitle: {
-    fontSize: FONT_SIZES.large,
-    fontWeight: "bold",
-    color: COLORS.text,
-    textAlign: "center",
-    marginBottom: 20,
+    fontSize: 19,
+    fontWeight: "700",
+    color: "#1F2A3E",
+    marginBottom: 14,
   },
   menuOption: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    marginBottom: 5,
+    gap: 10,
+    paddingVertical: 12,
   },
   menuText: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.text,
-    marginLeft: 15,
-    fontWeight: "500",
+    fontSize: 15,
+    color: "#354662",
+    fontWeight: "600",
+  },
+  menuTextDanger: {
+    color: COLORS.error,
   },
   closeMenuButton: {
-    alignSelf: "center",
-    marginTop: 15,
+    marginTop: 8,
+    alignItems: "center",
+    borderRadius: 10,
+    backgroundColor: "#F2F5FA",
     paddingVertical: 10,
-    paddingHorizontal: 20,
   },
   closeMenuText: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.textSecondary,
-    fontWeight: "500",
+    fontSize: 14,
+    color: "#5C6A80",
+    fontWeight: "700",
   },
 });
+
 export default HomeScreen;

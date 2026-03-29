@@ -12,7 +12,6 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
-import BottomNavBar from "../../components/BottomNavBar";
 
 type MapasMentalesScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -28,7 +27,7 @@ const MapasMentalesScreen: React.FC<MapasMentalesScreenProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.title}>Crear Mapa Mental</Text>
@@ -73,15 +72,21 @@ const MapasMentalesScreen: React.FC<MapasMentalesScreenProps> = ({
           </View>
         </ScrollView>
       </SafeAreaView>
-      <BottomNavBar currentScreen="Mapas Mentales" />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background },
+  container: { flex: 1, backgroundColor: "#EEF3FA" },
   safeArea: { flex: 1 },
-  scrollContent: { padding: 20, paddingBottom: 40 },
+  scrollContent: {
+    width: "100%",
+    maxWidth: 960,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 110,
+  },
   title: {
     fontSize: FONT_SIZES.xlarge,
     fontWeight: "bold",
@@ -98,11 +103,13 @@ const styles = StyleSheet.create({
   },
   optionsContainer: { gap: 20 },
   optionCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 15,
-    padding: 25,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 18,
     alignItems: "center",
-    boxShadow: "0px 2px 8px rgba(26, 26, 26, 0.2)",
+    boxShadow: "0px 10px 22px rgba(33, 60, 109, 0.08)",
   },
   iconContainer: {
     width: 100,

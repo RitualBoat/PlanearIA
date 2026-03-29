@@ -1,26 +1,15 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  StatusBar,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
-import BottomNavBar from "../../components/BottomNavBar";
 
 /**
  * Tipo para las props de navegación
  */
-type ExamenesScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "Examenes"
->;
+type ExamenesScreenNavigationProp = StackNavigationProp<RootStackParamList, "Examenes">;
 
 /**
  * Props del componente
@@ -48,14 +37,12 @@ const ExamenesScreen: React.FC<ExamenesScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.title}>Crear Examen</Text>
-          <Text style={styles.subtitle}>
-            Elige cómo quieres crear tu examen
-          </Text>
+          <Text style={styles.subtitle}>Elige cómo quieres crear tu examen</Text>
 
           <View style={styles.optionsContainer}>
             {/* Opción IA */}
@@ -64,9 +51,7 @@ const ExamenesScreen: React.FC<ExamenesScreenProps> = ({ navigation }) => {
               onPress={handleCrearConIA}
               activeOpacity={0.7}
             >
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#9C27B020" }]}
-              >
+              <View style={[styles.iconContainer, { backgroundColor: "#9C27B020" }]}>
                 <MaterialIcons name="auto-awesome" size={60} color="#9C27B0" />
               </View>
               <Text style={styles.optionTitle}>Generar con IA</Text>
@@ -81,9 +66,7 @@ const ExamenesScreen: React.FC<ExamenesScreenProps> = ({ navigation }) => {
               onPress={handleUsarPlantilla}
               activeOpacity={0.7}
             >
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#2196F320" }]}
-              >
+              <View style={[styles.iconContainer, { backgroundColor: "#2196F320" }]}>
                 <MaterialIcons name="dashboard" size={60} color="#2196F3" />
               </View>
               <Text style={styles.optionTitle}>Usar Plantilla</Text>
@@ -98,9 +81,7 @@ const ExamenesScreen: React.FC<ExamenesScreenProps> = ({ navigation }) => {
               onPress={handleCrearManual}
               activeOpacity={0.7}
             >
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#4CAF5020" }]}
-              >
+              <View style={[styles.iconContainer, { backgroundColor: "#4CAF5020" }]}>
                 <MaterialIcons name="edit" size={60} color="#4CAF50" />
               </View>
               <Text style={styles.optionTitle}>Crear Manualmente</Text>
@@ -114,8 +95,8 @@ const ExamenesScreen: React.FC<ExamenesScreenProps> = ({ navigation }) => {
           <View style={styles.infoSection}>
             <MaterialIcons name="info" size={24} color={COLORS.primary} />
             <Text style={styles.infoText}>
-              Al crear un examen, podrás elegir entre guardarlo en tu biblioteca
-              o asignarlo directamente a un grupo
+              Al crear un examen, podrás elegir entre guardarlo en tu biblioteca o asignarlo
+              directamente a un grupo
             </Text>
           </View>
 
@@ -123,30 +104,16 @@ const ExamenesScreen: React.FC<ExamenesScreenProps> = ({ navigation }) => {
           <View style={styles.previewCard}>
             <Text style={styles.previewTitle}>Próximamente disponible:</Text>
             <View style={styles.previewOption}>
-              <MaterialIcons
-                name="save"
-                size={20}
-                color={COLORS.textSecondary}
-              />
-              <Text style={styles.previewText}>
-                Solo guardar en Mis Recursos
-              </Text>
+              <MaterialIcons name="save" size={20} color={COLORS.textSecondary} />
+              <Text style={styles.previewText}>Solo guardar en Mis Recursos</Text>
             </View>
             <View style={styles.previewOption}>
-              <MaterialIcons
-                name="assignment-turned-in"
-                size={20}
-                color={COLORS.textSecondary}
-              />
-              <Text style={styles.previewText}>
-                Guardar y asignar a un grupo
-              </Text>
+              <MaterialIcons name="assignment-turned-in" size={20} color={COLORS.textSecondary} />
+              <Text style={styles.previewText}>Guardar y asignar a un grupo</Text>
             </View>
           </View>
         </ScrollView>
       </SafeAreaView>
-
-      <BottomNavBar currentScreen="Exámenes" />
     </View>
   );
 };
@@ -154,14 +121,18 @@ const ExamenesScreen: React.FC<ExamenesScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: "#EEF3FA",
   },
   safeArea: {
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
+    width: "100%",
+    maxWidth: 960,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 110,
   },
   title: {
     fontSize: FONT_SIZES.xlarge,
@@ -181,11 +152,13 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   optionCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 15,
-    padding: 25,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 18,
     alignItems: "center",
-    boxShadow: "0px 2px 8px rgba(26, 26, 26, 0.2)",
+    boxShadow: "0px 10px 22px rgba(33, 60, 109, 0.08)",
   },
   iconContainer: {
     width: 100,

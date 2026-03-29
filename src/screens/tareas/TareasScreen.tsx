@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  StatusBar,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -16,10 +9,7 @@ import { COLORS, FONT_SIZES } from "../../../types";
 /**
  * Tipo para las props de navegación
  */
-type TareasScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "Tareas"
->;
+type TareasScreenNavigationProp = StackNavigationProp<RootStackParamList, "Tareas">;
 
 /**
  * Props del componente
@@ -54,9 +44,7 @@ const TareasScreen: React.FC<TareasScreenProps> = ({ navigation }) => {
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.title}>Gestión de Tareas</Text>
-          <Text style={styles.subtitle}>
-            Administra tareas, exámenes y proyectos
-          </Text>
+          <Text style={styles.subtitle}>Administra tareas, exámenes y proyectos</Text>
 
           <View style={styles.optionsContainer}>
             <TouchableOpacity
@@ -64,9 +52,7 @@ const TareasScreen: React.FC<TareasScreenProps> = ({ navigation }) => {
               onPress={handleCrearTarea}
               activeOpacity={0.7}
             >
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#9C27B0" }]}
-              >
+              <View style={[styles.iconContainer, { backgroundColor: "#9C27B0" }]}>
                 <MaterialIcons name="add-task" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Crear Tarea</Text>
@@ -80,15 +66,11 @@ const TareasScreen: React.FC<TareasScreenProps> = ({ navigation }) => {
               onPress={handleVerTareas}
               activeOpacity={0.7}
             >
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}
-              >
+              <View style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}>
                 <MaterialIcons name="assignment" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Mis Tareas</Text>
-              <Text style={styles.optionDescription}>
-                Consulta y gestiona las tareas asignadas
-              </Text>
+              <Text style={styles.optionDescription}>Consulta y gestiona las tareas asignadas</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

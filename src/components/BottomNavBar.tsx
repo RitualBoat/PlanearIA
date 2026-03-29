@@ -12,10 +12,7 @@ interface BottomNavBarProps {
   showBackButton?: boolean;
 }
 
-const BottomNavBar: React.FC<BottomNavBarProps> = ({
-  currentScreen,
-  showBackButton = true,
-}) => {
+const BottomNavBar: React.FC<BottomNavBarProps> = ({ currentScreen, showBackButton = true }) => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   const handleBack = (): void => {
@@ -32,14 +29,8 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({
 
   return (
     <View style={styles.headerBar}>
-      <TouchableOpacity
-        style={styles.iconButton}
-        onPress={handleBack}
-        disabled={!showBackButton}
-      >
-        {showBackButton && (
-          <MaterialIcons name="arrow-back" size={24} color="white" />
-        )}
+      <TouchableOpacity style={styles.iconButton} onPress={handleBack} disabled={!showBackButton}>
+        {showBackButton && <MaterialIcons name="arrow-back" size={24} color="white" />}
       </TouchableOpacity>
       <Text style={styles.headerTitle}>{currentScreen}</Text>
       <TouchableOpacity style={styles.iconButton} onPress={handleMenu}>
@@ -60,11 +51,7 @@ const styles = StyleSheet.create({
     boxShadow: "0px 2px 3.84px rgba(26, 26, 26, 0.25)",
   },
   headerTitle: {
-    fontSize: responsive(
-      FONT_SIZES.large,
-      FONT_SIZES.large + 2,
-      FONT_SIZES.large + 4,
-    ),
+    fontSize: responsive(FONT_SIZES.large, FONT_SIZES.large + 2, FONT_SIZES.large + 4),
     fontWeight: "bold",
     color: COLORS.background,
     flex: 1,

@@ -62,7 +62,7 @@ export const useHomeViewModel = (): HomeViewModel => {
         route: "Cuenta" as keyof RootStackParamList,
       },
     ],
-    [],
+    []
   );
 
   const openMenu = useCallback(() => setMenuVisible(true), []);
@@ -74,7 +74,7 @@ export const useHomeViewModel = (): HomeViewModel => {
       CommonActions.reset({
         index: 0,
         routes: [{ name: "Login" }],
-      }),
+      })
     );
   }, [navigation]);
 
@@ -111,7 +111,7 @@ export const useHomeViewModel = (): HomeViewModel => {
         option.onPress();
       }
     },
-    [navigation],
+    [navigation]
   );
 
   return {

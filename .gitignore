@@ -36,6 +36,7 @@ expo-env.d.ts
 .env.*
 .env*.local
 *.pem
+devops_config.json
 
 # =============================================================================
 # AI Agents / Coding Assistants / Skills
@@ -44,6 +45,7 @@ expo-env.d.ts
 skills/
 skills-lock.json
 .agents/
+roadmap-context
 
 # AI coding tools (agent config directories)
 .adal/

@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  StatusBar,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -16,10 +9,7 @@ import { COLORS, FONT_SIZES } from "../../../types";
 /**
  * Tipo para las props de navegación
  */
-type CalificacionesScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "Calificaciones"
->;
+type CalificacionesScreenNavigationProp = StackNavigationProp<RootStackParamList, "Calificaciones">;
 
 /**
  * Props del componente
@@ -32,9 +22,7 @@ interface CalificacionesScreenProps {
  * Pantalla de Calificaciones
  * Permite gestionar las calificaciones de los alumnos
  */
-const CalificacionesScreen: React.FC<CalificacionesScreenProps> = ({
-  navigation,
-}) => {
+const CalificacionesScreen: React.FC<CalificacionesScreenProps> = ({ navigation }) => {
   /**
    * Navega a registrar calificaciones
    */
@@ -56,9 +44,7 @@ const CalificacionesScreen: React.FC<CalificacionesScreenProps> = ({
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.title}>Gestión de Calificaciones</Text>
-          <Text style={styles.subtitle}>
-            Administra las calificaciones de tus alumnos
-          </Text>
+          <Text style={styles.subtitle}>Administra las calificaciones de tus alumnos</Text>
 
           <View style={styles.optionsContainer}>
             <TouchableOpacity
@@ -66,9 +52,7 @@ const CalificacionesScreen: React.FC<CalificacionesScreenProps> = ({
               onPress={handleRegistrarCalificaciones}
               activeOpacity={0.7}
             >
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}
-              >
+              <View style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}>
                 <MaterialIcons name="edit-note" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Registrar Calificaciones</Text>
@@ -82,9 +66,7 @@ const CalificacionesScreen: React.FC<CalificacionesScreenProps> = ({
               onPress={handleVerCalificaciones}
               activeOpacity={0.7}
             >
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#FF9800" }]}
-              >
+              <View style={[styles.iconContainer, { backgroundColor: "#FF9800" }]}>
                 <MaterialIcons name="assessment" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Consultar Calificaciones</Text>

@@ -1,30 +1,18 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  StatusBar,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
 
-type LineasTiempoScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "LineasTiempo"
->;
+type LineasTiempoScreenNavigationProp = StackNavigationProp<RootStackParamList, "LineasTiempo">;
 
 interface LineasTiempoScreenProps {
   navigation: LineasTiempoScreenNavigationProp;
 }
 
-const LineasTiempoScreen: React.FC<LineasTiempoScreenProps> = ({
-  navigation,
-}) => {
+const LineasTiempoScreen: React.FC<LineasTiempoScreenProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
@@ -35,9 +23,7 @@ const LineasTiempoScreen: React.FC<LineasTiempoScreenProps> = ({
 
           <View style={styles.optionsContainer}>
             <TouchableOpacity style={styles.optionCard} activeOpacity={0.7}>
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#9C27B020" }]}
-              >
+              <View style={[styles.iconContainer, { backgroundColor: "#9C27B020" }]}>
                 <MaterialIcons name="auto-awesome" size={60} color="#9C27B0" />
               </View>
               <Text style={styles.optionTitle}>Generar con IA</Text>
@@ -47,9 +33,7 @@ const LineasTiempoScreen: React.FC<LineasTiempoScreenProps> = ({
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.optionCard} activeOpacity={0.7}>
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#2196F320" }]}
-              >
+              <View style={[styles.iconContainer, { backgroundColor: "#2196F320" }]}>
                 <MaterialIcons name="dashboard" size={60} color="#2196F3" />
               </View>
               <Text style={styles.optionTitle}>Usar Plantilla</Text>
@@ -59,15 +43,11 @@ const LineasTiempoScreen: React.FC<LineasTiempoScreenProps> = ({
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.optionCard} activeOpacity={0.7}>
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#4CAF5020" }]}
-              >
+              <View style={[styles.iconContainer, { backgroundColor: "#4CAF5020" }]}>
                 <MaterialIcons name="edit" size={60} color="#4CAF50" />
               </View>
               <Text style={styles.optionTitle}>Crear Manualmente</Text>
-              <Text style={styles.optionDescription}>
-                Agrega eventos y fechas personalizadas
-              </Text>
+              <Text style={styles.optionDescription}>Agrega eventos y fechas personalizadas</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

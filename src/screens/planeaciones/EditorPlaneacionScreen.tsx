@@ -16,7 +16,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, FONT_SIZES } from "../../../types";
 import { API_CONFIG } from "../../sync/config/apiConfig";
-import BottomNavBar from "../../components/BottomNavBar";
 import WebScrollView from "../../components/WebScrollView";
 import SyncIndicator from "../../components/SyncIndicator";
 import { SemanaEditor } from "../../components/SemanaEditor";
@@ -1019,8 +1018,7 @@ const EditorPlaneacionScreen: React.FC = () => {
             </Text>
           </TouchableOpacity>
 
-          {/* Espacio para el BottomNavBar */}
-          <View style={{ height: 100 }} />
+          <View style={{ height: 20 }} />
         </SafeAreaView>
       </WebScrollView>
 
@@ -1106,8 +1104,6 @@ const EditorPlaneacionScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
-
-      <BottomNavBar currentScreen="Editor" />
     </View>
   );
 };
@@ -1130,7 +1126,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 120,
+    paddingBottom: 28,
   },
   title: {
     fontSize: FONT_SIZES.xlarge,

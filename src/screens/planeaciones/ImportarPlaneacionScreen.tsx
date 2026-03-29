@@ -7,11 +7,11 @@ import {
   StatusBar,
   ScrollView,
   Alert,
-  Platform,
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import * as DocumentPicker from "expo-document-picker";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { COLORS } from "../../../types";
@@ -22,6 +22,11 @@ type Nav = StackNavigationProp<RootStackParamList, "ImportarPlaneacion">;
 const ImportarPlaneacionScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
   const { width } = useWindowDimensions();
+
+  const [selectedFileName, setSelectedFileName] = React.useState<string | null>(null);
+  const [selectedFileType, setSelectedFileType] = React.useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = React.useState(false);
+  const [importError, setImportError] = React.useState<string | null>(null);
 
   const wideLayout = width >= 980;
 
@@ -46,13 +51,70 @@ const ImportarPlaneacionScreen: React.FC = () => {
     []
   );
 
+  const previewSubject = React.useMemo(() => {
+    if (!selectedFileName) return "Matemáticas Aplicadas";
+    return selectedFileName
+      .replace(/\.(pdf|docx|doc)$/i, "")
+      .replace(/[\-_]+/g, " ")
+      .trim();
+  }, [selectedFileName]);
+
   const showPendingMessage = () => {
-    const msg = "La selección y parseo de archivos se implementará en la siguiente tarea.";
-    if (Platform.OS === "web") {
-      window.alert(msg);
+    Alert.alert("Importar planeación", "Opciones avanzadas disponibles en próximas tareas.");
+  };
+
+  const handleSelectFile = async () => {
+    try {
+      setImportError(null);
+
+      const result = await DocumentPicker.getDocumentAsync({
+        copyToCacheDirectory: true,
+        multiple: false,
+        type: [
+          "application/pdf",
+          "application/msword",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ],
+      });
+
+      if (result.canceled) {
+        return;
+      }
+
+      const asset = result.assets?.[0];
+      if (!asset?.name) {
+        setImportError("No se pudo leer el archivo seleccionado.");
+        return;
+      }
+
+      const isValidExtension = /\.(pdf|docx|doc)$/i.test(asset.name);
+      if (!isValidExtension) {
+        setImportError("Formato no compatible. Usa PDF o DOCX.");
+        return;
+      }
+
+      setSelectedFileName(asset.name);
+      setSelectedFileType(asset.mimeType || "Documento");
+      setIsProcessing(true);
+
+      await new Promise((resolve) => setTimeout(resolve, 850));
+      setIsProcessing(false);
+    } catch {
+      setIsProcessing(false);
+      setImportError("Ocurrió un error al seleccionar el archivo.");
+    }
+  };
+
+  const handleImportarYContinuar = () => {
+    if (!selectedFileName) {
+      Alert.alert("Importar planeación", "Selecciona primero un archivo PDF o DOCX.");
       return;
     }
-    Alert.alert("Importar planeación", msg);
+
+    Alert.alert(
+      "Importar planeación",
+      "Archivo seleccionado correctamente. El parseo estructurado se completará en la siguiente tarea."
+    );
   };
 
   return (
@@ -103,12 +165,22 @@ const ImportarPlaneacionScreen: React.FC = () => {
 
                 <TouchableOpacity
                   style={styles.primaryButton}
-                  onPress={showPendingMessage}
+                  onPress={handleSelectFile}
                   activeOpacity={0.9}
                 >
                   <MaterialIcons name="add" size={20} color="#FFFFFF" />
                   <Text style={styles.primaryButtonText}>Seleccionar archivo</Text>
                 </TouchableOpacity>
+
+                {selectedFileName ? (
+                  <View style={styles.selectedFileCard}>
+                    <MaterialIcons name="description" size={18} color="#1676D2" />
+                    <View style={styles.selectedFileTextWrap}>
+                      <Text style={styles.selectedFileName}>{selectedFileName}</Text>
+                      <Text style={styles.selectedFileMeta}>{selectedFileType || "Documento"}</Text>
+                    </View>
+                  </View>
+                ) : null}
 
                 <View style={styles.formatChipsRow}>
                   <View style={styles.formatChip}>
@@ -122,21 +194,39 @@ const ImportarPlaneacionScreen: React.FC = () => {
                 </View>
               </View>
 
-              <View style={styles.errorCard}>
-                <MaterialIcons name="warning-amber" size={24} color="#D34553" />
-                <Text style={styles.errorText}>
-                  El formato .jpg no es compatible. Por favor usa PDF o DOCX.
-                </Text>
-              </View>
+              {importError ? (
+                <View style={styles.errorCard}>
+                  <MaterialIcons name="warning-amber" size={24} color="#D34553" />
+                  <Text style={styles.errorText}>{importError}</Text>
+                </View>
+              ) : null}
 
               <View style={styles.card}>
                 <View style={styles.stateRow}>
                   <View style={styles.stateIconCircle}>
-                    <MaterialIcons name="sync" size={22} color="#1676D2" />
+                    <MaterialIcons
+                      name={
+                        isProcessing ? "sync" : selectedFileName ? "check-circle" : "hourglass-top"
+                      }
+                      size={22}
+                      color={isProcessing ? "#1676D2" : selectedFileName ? "#0BA5A5" : "#6B7D96"}
+                    />
                   </View>
                   <View style={styles.stateTextWrap}>
-                    <Text style={styles.stateTitle}>Procesando archivo...</Text>
-                    <Text style={styles.stateSubtitle}>Extrayendo contenido...</Text>
+                    <Text style={styles.stateTitle}>
+                      {isProcessing
+                        ? "Procesando archivo..."
+                        : selectedFileName
+                          ? "Archivo listo"
+                          : "Esperando archivo"}
+                    </Text>
+                    <Text style={styles.stateSubtitle}>
+                      {isProcessing
+                        ? "Extrayendo contenido..."
+                        : selectedFileName
+                          ? "Se cargó correctamente para vista previa"
+                          : "Selecciona PDF o DOCX para continuar"}
+                    </Text>
                   </View>
                 </View>
 
@@ -146,7 +236,11 @@ const ImportarPlaneacionScreen: React.FC = () => {
                   </View>
                   <View style={styles.stateTextWrap}>
                     <Text style={styles.stateTitleMuted}>Contenido extraído</Text>
-                    <Text style={styles.stateSubtitleMuted}>Correctamente procesado</Text>
+                    <Text style={styles.stateSubtitleMuted}>
+                      {selectedFileName
+                        ? "Vista previa inicial generada"
+                        : "Disponible despues de seleccionar archivo"}
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -163,7 +257,9 @@ const ImportarPlaneacionScreen: React.FC = () => {
               <View style={styles.card}>
                 <Text style={styles.fieldLabel}>ASIGNATURA</Text>
                 <View style={styles.fieldValueCardAccent}>
-                  <Text style={styles.fieldValueText}>Matemáticas Aplicadas</Text>
+                  <Text style={styles.fieldValueText}>
+                    {previewSubject || "Matemáticas Aplicadas"}
+                  </Text>
                 </View>
 
                 <Text style={styles.fieldLabel}>GRADO Y GRUPO</Text>
@@ -216,8 +312,11 @@ const ImportarPlaneacionScreen: React.FC = () => {
 
           <View style={[styles.footerActions, wideLayout && styles.footerActionsWide]}>
             <TouchableOpacity
-              style={styles.primaryButtonLarge}
-              onPress={showPendingMessage}
+              style={[
+                styles.primaryButtonLarge,
+                !selectedFileName && styles.primaryButtonLargeDisabled,
+              ]}
+              onPress={handleImportarYContinuar}
               activeOpacity={0.9}
             >
               <MaterialIcons name="save-alt" size={22} color="#FFFFFF" />
@@ -361,6 +460,29 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 15,
     fontWeight: "700",
+  },
+  selectedFileCard: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#D4E5F7",
+    backgroundColor: "#F2F8FF",
+    padding: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  selectedFileTextWrap: {
+    flex: 1,
+    gap: 1,
+  },
+  selectedFileName: {
+    color: "#1E2A3A",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  selectedFileMeta: {
+    color: "#5C6E86",
+    fontSize: 12,
   },
   formatChipsRow: {
     flexDirection: "row",
@@ -593,6 +715,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 8,
     flex: 1,
+  },
+  primaryButtonLargeDisabled: {
+    opacity: 0.6,
   },
   primaryButtonLargeText: {
     color: "#FFFFFF",

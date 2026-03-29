@@ -1,0 +1,178 @@
+import React from "react";
+import {
+  Animated,
+  Easing,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { NavigationContext } from "@react-navigation/native";
+
+interface AnimatedTopPillProps {
+  title: string;
+  subtitle?: string;
+  icon?: keyof typeof MaterialIcons.glyphMap;
+  size?: "default" | "large";
+  titleNumberOfLines?: number;
+  subtitleNumberOfLines?: number;
+  style?: StyleProp<ViewStyle>;
+  titleStyle?: StyleProp<TextStyle>;
+  subtitleStyle?: StyleProp<TextStyle>;
+  children?: React.ReactNode;
+}
+
+const AnimatedTopPill: React.FC<AnimatedTopPillProps> = ({
+  title,
+  subtitle = "",
+  icon = "auto-awesome",
+  size = "default",
+  titleNumberOfLines = 1,
+  subtitleNumberOfLines = 1,
+  style,
+  titleStyle,
+  subtitleStyle,
+  children,
+}) => {
+  const navigation = React.useContext(NavigationContext);
+  const ringShift = React.useRef(new Animated.Value(0)).current;
+  const ringOpacity = React.useRef(new Animated.Value(0)).current;
+
+  const runGlow = React.useCallback(() => {
+    ringShift.setValue(0);
+    ringOpacity.setValue(0.95);
+
+    Animated.parallel([
+      Animated.timing(ringShift, {
+        toValue: 1,
+        duration: 1400,
+        easing: Easing.linear,
+        useNativeDriver: false,
+      }),
+      Animated.timing(ringOpacity, {
+        toValue: 0,
+        duration: 1500,
+        delay: 250,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: false,
+      }),
+    ]).start();
+  }, [ringOpacity, ringShift]);
+
+  React.useEffect(() => {
+    runGlow();
+
+    if (!navigation) {
+      return;
+    }
+
+    const unsubscribeFocus = navigation.addListener("focus", runGlow);
+    return unsubscribeFocus;
+  }, [navigation, runGlow]);
+
+  const borderColor = ringShift.interpolate({
+    inputRange: [0, 0.16, 0.33, 0.5, 0.66, 0.83, 1],
+    outputRange: ["#FF5E5B", "#FF9F1C", "#FFE66D", "#2EC4B6", "#3A86FF", "#8338EC", "#FF5E5B"],
+  });
+
+  return (
+    <View style={styles.shell}>
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.rainbowRing, { borderColor, opacity: ringOpacity }]}
+      />
+
+      <View style={[styles.pill, size === "large" && styles.pillLarge, style]}>
+        <View style={styles.iconWrap}>
+          <MaterialIcons name={icon} size={18} color="#1E64CC" />
+        </View>
+        <View style={styles.textWrap}>
+          <Text
+            style={[styles.title, size === "large" && styles.titleLarge, titleStyle]}
+            numberOfLines={titleNumberOfLines}
+          >
+            {title}
+          </Text>
+          {children ? (
+            children
+          ) : (
+            <Text
+              style={[styles.subtitle, size === "large" && styles.subtitleLarge, subtitleStyle]}
+              numberOfLines={subtitleNumberOfLines}
+            >
+              {subtitle}
+            </Text>
+          )}
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  shell: {
+    position: "relative",
+  },
+  rainbowRing: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 22,
+    borderWidth: 2,
+    margin: -2,
+  },
+  pill: {
+    minHeight: 88,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#E2EAF4",
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    boxShadow: "0px 10px 22px rgba(22, 53, 99, 0.1)",
+  },
+  pillLarge: {
+    minHeight: 138,
+    alignItems: "flex-start",
+    paddingVertical: 18,
+  },
+  iconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: 11,
+    backgroundColor: "#EAF2FF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  textWrap: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
+  },
+  title: {
+    fontSize: 29,
+    fontWeight: "800",
+    color: "#1F2A3E",
+    letterSpacing: -0.45,
+    lineHeight: 34,
+  },
+  titleLarge: {
+    fontSize: 40,
+    lineHeight: 44,
+  },
+  subtitle: {
+    fontSize: 15,
+    color: "#64758E",
+    lineHeight: 20,
+  },
+  subtitleLarge: {
+    fontSize: 20,
+    lineHeight: 28,
+  },
+});
+
+export default AnimatedTopPill;

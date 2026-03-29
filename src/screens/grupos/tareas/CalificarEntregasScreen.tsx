@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  StatusBar,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, FONT_SIZES } from "../../../../types";
@@ -45,11 +38,7 @@ const CalificarEntregasScreen: React.FC = () => {
             {entregas.map((entrega) => (
               <View key={entrega.id} style={styles.entregaCard}>
                 <View style={styles.alumnoHeader}>
-                  <MaterialIcons
-                    name="account-circle"
-                    size={40}
-                    color={COLORS.primary}
-                  />
+                  <MaterialIcons name="account-circle" size={40} color={COLORS.primary} />
                   <View style={styles.alumnoInfo}>
                     <Text style={styles.alumnoNombre}>{entrega.nombre}</Text>
                     <Text style={styles.entregaInfo}>Entrega revisable</Text>
@@ -65,11 +54,7 @@ const CalificarEntregasScreen: React.FC = () => {
                     keyboardType="decimal-pad"
                     value={calificaciones[entrega.alumnoId]?.calificacion || ""}
                     onChangeText={(value) =>
-                      updateCalificacion(
-                        entrega.alumnoId,
-                        "calificacion",
-                        value,
-                      )
+                      updateCalificacion(entrega.alumnoId, "calificacion", value)
                     }
                     placeholderTextColor={COLORS.textSecondary}
                   />
@@ -83,15 +68,9 @@ const CalificarEntregasScreen: React.FC = () => {
                     placeholder="Comentarios para el alumno..."
                     multiline
                     numberOfLines={3}
-                    value={
-                      calificaciones[entrega.alumnoId]?.retroalimentacion || ""
-                    }
+                    value={calificaciones[entrega.alumnoId]?.retroalimentacion || ""}
                     onChangeText={(value) =>
-                      updateCalificacion(
-                        entrega.alumnoId,
-                        "retroalimentacion",
-                        value,
-                      )
+                      updateCalificacion(entrega.alumnoId, "retroalimentacion", value)
                     }
                     placeholderTextColor={COLORS.textSecondary}
                   />
@@ -100,9 +79,7 @@ const CalificarEntregasScreen: React.FC = () => {
                 {/* Ver archivo */}
                 <TouchableOpacity style={styles.verArchivoButton}>
                   <MaterialIcons name="attachment" size={20} color="#2196F3" />
-                  <Text style={styles.verArchivoText}>
-                    Ver archivo entregado
-                  </Text>
+                  <Text style={styles.verArchivoText}>Ver archivo entregado</Text>
                 </TouchableOpacity>
               </View>
             ))}

@@ -1,23 +1,10 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Modal,
-  StatusBar,
-} from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, FONT_SIZES } from "../../../types";
-import BottomNavBar from "../../components/BottomNavBar";
 import SyncIndicator from "../../components/SyncIndicator";
-import {
-  NivelAcademico,
-  Planeacion,
-  PlaneacionUniversidad,
-} from "../../../types/planeacion";
+import { NivelAcademico, Planeacion, PlaneacionUniversidad } from "../../../types/planeacion";
 import { useListaPlaneacionesViewModel } from "../../hooks/useListaPlaneacionesViewModel";
 
 /**
@@ -62,26 +49,15 @@ const ListaPlaneacionesScreen: React.FC = () => {
     return (
       <View style={styles.card}>
         {/* Badge de nivel */}
-        <View
-          style={[
-            styles.badge,
-            { backgroundColor: getColorNivel(item.nivelAcademico) },
-          ]}
-        >
-          <Text style={styles.badgeText}>
-            {getTextoNivel(item.nivelAcademico)}
-          </Text>
+        <View style={[styles.badge, { backgroundColor: getColorNivel(item.nivelAcademico) }]}>
+          <Text style={styles.badgeText}>{getTextoNivel(item.nivelAcademico)}</Text>
         </View>
 
         {/* Badge de modo detallado para Universidad */}
         {isUniversidadDetallada && (
           <View style={[styles.badge, styles.badgeDetallado]}>
             <Text style={styles.badgeText}>
-              {
-                (item as PlaneacionUniversidad).configuracionCurso!
-                  .duracionSemanas
-              }{" "}
-              sem
+              {(item as PlaneacionUniversidad).configuracionCurso!.duracionSemanas} sem
             </Text>
           </View>
         )}
@@ -97,40 +73,22 @@ const ListaPlaneacionesScreen: React.FC = () => {
         {/* Menu contextual */}
         {isMenuOpen && (
           <View style={styles.contextMenu}>
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => handleEditar(item)}
-            >
+            <TouchableOpacity style={styles.menuItem} onPress={() => handleEditar(item)}>
               <MaterialIcons name="edit" size={20} color={COLORS.primary} />
               <Text style={styles.menuItemText}>Editar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => handleClonar(item.id)}
-            >
-              <MaterialIcons
-                name="content-copy"
-                size={20}
-                color={COLORS.primary}
-              />
+            <TouchableOpacity style={styles.menuItem} onPress={() => handleClonar(item.id)}>
+              <MaterialIcons name="content-copy" size={20} color={COLORS.primary} />
               <Text style={styles.menuItemText}>Clonar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => handleEliminar(item.id)}
-            >
+            <TouchableOpacity style={styles.menuItem} onPress={() => handleEliminar(item.id)}>
               <MaterialIcons name="delete" size={20} color="#f44336" />
-              <Text style={[styles.menuItemText, { color: "#f44336" }]}>
-                Eliminar
-              </Text>
+              <Text style={[styles.menuItemText, { color: "#f44336" }]}>Eliminar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => handleExportar(item.id)}
-            >
+            <TouchableOpacity style={styles.menuItem} onPress={() => handleExportar(item.id)}>
               <MaterialIcons name="share" size={20} color={COLORS.primary} />
               <Text style={styles.menuItemText}>Exportar</Text>
             </TouchableOpacity>
@@ -138,10 +96,7 @@ const ListaPlaneacionesScreen: React.FC = () => {
         )}
 
         {/* Contenido de la card */}
-        <TouchableOpacity
-          style={styles.cardContent}
-          onPress={() => handleEditar(item)}
-        >
+        <TouchableOpacity style={styles.cardContent} onPress={() => handleEditar(item)}>
           <Text style={styles.cardAsignatura}>{item.asignatura}</Text>
           <Text style={styles.cardGrado}>
             {item.grado} {item.grupo && `"${item.grupo}"`}
@@ -154,11 +109,7 @@ const ListaPlaneacionesScreen: React.FC = () => {
           {isUniversidadDetallada && (
             <View style={styles.detalleCurso}>
               <View style={styles.detalleItem}>
-                <MaterialIcons
-                  name="library-books"
-                  size={14}
-                  color={COLORS.textSecondary}
-                />
+                <MaterialIcons name="library-books" size={14} color={COLORS.textSecondary} />
                 <Text style={styles.detalleText}>
                   {(item as PlaneacionUniversidad).semanas!.length} semanas
                 </Text>
@@ -166,36 +117,23 @@ const ListaPlaneacionesScreen: React.FC = () => {
               {(item as PlaneacionUniversidad).evaluaciones &&
                 (item as PlaneacionUniversidad).evaluaciones!.length > 0 && (
                   <View style={styles.detalleItem}>
-                    <MaterialIcons
-                      name="assessment"
-                      size={14}
-                      color={COLORS.textSecondary}
-                    />
+                    <MaterialIcons name="assessment" size={14} color={COLORS.textSecondary} />
                     <Text style={styles.detalleText}>
-                      {(item as PlaneacionUniversidad).evaluaciones!.length}{" "}
-                      evaluaciones (
+                      {(item as PlaneacionUniversidad).evaluaciones!.length} evaluaciones (
                       {(item as PlaneacionUniversidad).evaluaciones!.reduce(
                         (sum, ev) => sum + ev.porcentaje,
-                        0,
+                        0
                       )}
                       %)
                     </Text>
                   </View>
                 )}
               <View style={styles.detalleItem}>
-                <MaterialIcons
-                  name="schedule"
-                  size={14}
-                  color={COLORS.textSecondary}
-                />
+                <MaterialIcons name="schedule" size={14} color={COLORS.textSecondary} />
                 <Text style={styles.detalleText}>
-                  {(item as PlaneacionUniversidad).configuracionCurso!
-                    .horasTeoricas +
-                    (item as PlaneacionUniversidad).configuracionCurso!
-                      .horasPracticas}{" "}
-                  hrs •{" "}
-                  {(item as PlaneacionUniversidad).configuracionCurso!.creditos}{" "}
-                  créditos
+                  {(item as PlaneacionUniversidad).configuracionCurso!.horasTeoricas +
+                    (item as PlaneacionUniversidad).configuracionCurso!.horasPracticas}{" "}
+                  hrs • {(item as PlaneacionUniversidad).configuracionCurso!.creditos} créditos
                 </Text>
               </View>
             </View>
@@ -203,22 +141,12 @@ const ListaPlaneacionesScreen: React.FC = () => {
 
           <View style={styles.cardFooter}>
             <View style={styles.cardFooterItem}>
-              <MaterialIcons
-                name="calendar-today"
-                size={16}
-                color={COLORS.textSecondary}
-              />
-              <Text style={styles.cardFooterText}>
-                {formatearFecha(item.fecha)}
-              </Text>
+              <MaterialIcons name="calendar-today" size={16} color={COLORS.textSecondary} />
+              <Text style={styles.cardFooterText}>{formatearFecha(item.fecha)}</Text>
             </View>
             {!isUniversidadDetallada && (
               <View style={styles.cardFooterItem}>
-                <MaterialIcons
-                  name="access-time"
-                  size={16}
-                  color={COLORS.textSecondary}
-                />
+                <MaterialIcons name="access-time" size={16} color={COLORS.textSecondary} />
                 <Text style={styles.cardFooterText}>
                   {item.horaInicio} • {item.duracionTotal} min
                 </Text>
@@ -235,11 +163,7 @@ const ListaPlaneacionesScreen: React.FC = () => {
    */
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <MaterialIcons
-        name="description"
-        size={80}
-        color={COLORS.textSecondary}
-      />
+      <MaterialIcons name="description" size={80} color={COLORS.textSecondary} />
       <Text style={styles.emptyTitle}>No hay planeaciones</Text>
       <Text style={styles.emptySubtitle}>
         {planeacionesFiltradas.length === 0 && planeaciones.length > 0
@@ -273,25 +197,11 @@ const ListaPlaneacionesScreen: React.FC = () => {
                 <SyncIndicator />
               </View>
               <View style={styles.headerButtons}>
-                <TouchableOpacity
-                  style={styles.iconButton}
-                  onPress={() => setShowFiltros(true)}
-                >
-                  <MaterialIcons
-                    name="filter-list"
-                    size={24}
-                    color={COLORS.primary}
-                  />
+                <TouchableOpacity style={styles.iconButton} onPress={() => setShowFiltros(true)}>
+                  <MaterialIcons name="filter-list" size={24} color={COLORS.primary} />
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.iconButton}
-                  onPress={handleCrearNueva}
-                >
-                  <MaterialIcons
-                    name="add-circle"
-                    size={24}
-                    color={COLORS.primary}
-                  />
+                <TouchableOpacity style={styles.iconButton} onPress={handleCrearNueva}>
+                  <MaterialIcons name="add-circle" size={24} color={COLORS.primary} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -301,29 +211,17 @@ const ListaPlaneacionesScreen: React.FC = () => {
               <View style={styles.activeFilters}>
                 {filtroNivel && (
                   <View style={styles.filterChip}>
-                    <Text style={styles.filterChipText}>
-                      {getTextoNivel(filtroNivel)}
-                    </Text>
+                    <Text style={styles.filterChipText}>{getTextoNivel(filtroNivel)}</Text>
                     <TouchableOpacity onPress={() => setFiltroNivel(undefined)}>
-                      <MaterialIcons
-                        name="close"
-                        size={16}
-                        color={COLORS.text}
-                      />
+                      <MaterialIcons name="close" size={16} color={COLORS.text} />
                     </TouchableOpacity>
                   </View>
                 )}
                 {filtroAsignatura && (
                   <View style={styles.filterChip}>
-                    <Text style={styles.filterChipText}>
-                      {filtroAsignatura}
-                    </Text>
+                    <Text style={styles.filterChipText}>{filtroAsignatura}</Text>
                     <TouchableOpacity onPress={() => setFiltroAsignatura("")}>
-                      <MaterialIcons
-                        name="close"
-                        size={16}
-                        color={COLORS.text}
-                      />
+                      <MaterialIcons name="close" size={16} color={COLORS.text} />
                     </TouchableOpacity>
                   </View>
                 )}
@@ -331,18 +229,11 @@ const ListaPlaneacionesScreen: React.FC = () => {
                   <View style={styles.filterChip}>
                     <Text style={styles.filterChipText}>{filtroGrado}</Text>
                     <TouchableOpacity onPress={() => setFiltroGrado("")}>
-                      <MaterialIcons
-                        name="close"
-                        size={16}
-                        color={COLORS.text}
-                      />
+                      <MaterialIcons name="close" size={16} color={COLORS.text} />
                     </TouchableOpacity>
                   </View>
                 )}
-                <TouchableOpacity
-                  style={styles.clearFiltersButton}
-                  onPress={limpiarFiltros}
-                >
+                <TouchableOpacity style={styles.clearFiltersButton} onPress={limpiarFiltros}>
                   <Text style={styles.clearFiltersText}>Limpiar</Text>
                 </TouchableOpacity>
               </View>
@@ -381,9 +272,7 @@ const ListaPlaneacionesScreen: React.FC = () => {
                       backgroundColor: getColorNivel(nivel),
                     },
                   ]}
-                  onPress={() =>
-                    setFiltroNivel(filtroNivel === nivel ? undefined : nivel)
-                  }
+                  onPress={() => setFiltroNivel(filtroNivel === nivel ? undefined : nivel)}
                 >
                   <Text
                     style={[
@@ -403,9 +292,7 @@ const ListaPlaneacionesScreen: React.FC = () => {
                 style={[styles.modalButton, styles.modalButtonSecondary]}
                 onPress={limpiarFiltros}
               >
-                <Text style={styles.modalButtonTextSecondary}>
-                  Limpiar Filtros
-                </Text>
+                <Text style={styles.modalButtonTextSecondary}>Limpiar Filtros</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalButtonPrimary]}
@@ -417,8 +304,6 @@ const ListaPlaneacionesScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
-
-      <BottomNavBar currentScreen="Planeaciones" />
     </View>
   );
 };
@@ -485,7 +370,7 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 20,
     paddingTop: 10,
-    paddingBottom: 100,
+    paddingBottom: 28,
   },
   card: {
     backgroundColor: COLORS.surface,

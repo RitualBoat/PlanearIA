@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Animated,
   View,
   Text,
   StyleSheet,
@@ -16,6 +17,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS } from "../../../types";
 import { isWeb } from "../../utils/responsive";
 import { useHomeViewModel } from "../../hooks/useHomeViewModel";
+import AnimatedTopPill from "../../components/AnimatedTopPill";
 
 type NavOptionId = "planeaciones" | "grupos" | "recursosDidacticos" | "cuenta";
 
@@ -72,10 +74,30 @@ const continueCards = [
 ];
 
 const timeline = [
-  { id: "t1", title: "Planeación completada", detail: "Unidad 3 · Álgebra Lineal", time: "Hace 15 min" },
-  { id: "t2", title: "IA generó 5 ejercicios", detail: "Basado en el tema 'Límites'", time: "Hace 1 hora" },
-  { id: "t3", title: "Grupo 11-A actualizado", detail: "Se agregaron 2 nuevos alumnos", time: "Hace 3 horas" },
-  { id: "t4", title: "Sincronización exitosa", detail: "Google Classroom conectado", time: "Ayer, 18:30" },
+  {
+    id: "t1",
+    title: "Planeación completada",
+    detail: "Unidad 3 · Álgebra Lineal",
+    time: "Hace 15 min",
+  },
+  {
+    id: "t2",
+    title: "IA generó 5 ejercicios",
+    detail: "Basado en el tema 'Límites'",
+    time: "Hace 1 hora",
+  },
+  {
+    id: "t3",
+    title: "Grupo 11-A actualizado",
+    detail: "Se agregaron 2 nuevos alumnos",
+    time: "Hace 3 horas",
+  },
+  {
+    id: "t4",
+    title: "Sincronización exitosa",
+    detail: "Google Classroom conectado",
+    time: "Ayer, 18:30",
+  },
 ];
 
 const HomeScreen: React.FC = () => {
@@ -89,9 +111,24 @@ const HomeScreen: React.FC = () => {
     handleNavigation,
   } = useHomeViewModel();
   const { width } = useWindowDimensions();
+  const scrollY = React.useRef(new Animated.Value(0)).current;
 
   const webDesktop = isWeb() && width >= 1080;
   const wideContent = width >= 860;
+  const isNarrowMobile = !webDesktop && width < 420;
+  const quickActionCardWidth = !wideContent
+    ? Math.max(138, Math.floor((width - 36 - 10) / 2))
+    : undefined;
+  const greetingOpacity = scrollY.interpolate({
+    inputRange: [0, 22, 56],
+    outputRange: [1, 0.55, 0],
+    extrapolate: "clamp",
+  });
+  const greetingTranslateY = scrollY.interpolate({
+    inputRange: [0, 56],
+    outputRange: [0, -16],
+    extrapolate: "clamp",
+  });
 
   const sidebarItems = [
     { id: "home", label: "Inicio", icon: "home" as const, active: true },
@@ -172,8 +209,8 @@ const HomeScreen: React.FC = () => {
         )}
 
         <View style={styles.mainArea}>
-          <View style={styles.topBar}>
-            {webDesktop ? (
+          {webDesktop ? (
+            <View style={styles.topBar}>
               <View style={styles.searchBar}>
                 <MaterialIcons name="search" size={18} color="#8A96AA" />
                 <TextInput
@@ -182,46 +219,76 @@ const HomeScreen: React.FC = () => {
                   style={styles.searchInput}
                 />
               </View>
-            ) : (
-              <View style={styles.mobileHeaderCopy}>
-                <Text style={styles.mobileHello}>Hola, Profe Ana</Text>
-                <Text style={styles.mobileSummary}>Resumen de tu semana académica</Text>
-              </View>
-            )}
-
-            <View style={styles.topActions}>
-              <TouchableOpacity style={styles.iconAction} activeOpacity={0.85}>
-                <MaterialIcons name="notifications-none" size={20} color="#4A5568" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.iconAction} activeOpacity={0.85}>
-                <MaterialIcons name="help-outline" size={20} color="#4A5568" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.profileBlock} activeOpacity={0.85} onPress={openMenu}>
-                <Text style={styles.profileText}>Hola, Profe Ana</Text>
-                <View style={styles.avatarCircle}>
-                  <MaterialIcons name="person" size={16} color="#FFFFFF" />
+            </View>
+          ) : (
+            <>
+              <View style={styles.floatingActionsWrap}>
+                <View style={[styles.topActions, styles.topActionsCompact]}>
+                  <TouchableOpacity
+                    style={[styles.iconAction, styles.iconActionCompact]}
+                    activeOpacity={0.85}
+                  >
+                    <MaterialIcons name="notifications-none" size={20} color="#4A5568" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.iconAction, styles.iconActionCompact]}
+                    activeOpacity={0.85}
+                  >
+                    <MaterialIcons name="help-outline" size={20} color="#4A5568" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.profileBlock, styles.profileBlockCompact]}
+                    activeOpacity={0.85}
+                    onPress={openMenu}
+                  >
+                    <View style={styles.avatarCircle}>
+                      <MaterialIcons name="person" size={16} color="#FFFFFF" />
+                    </View>
+                  </TouchableOpacity>
                 </View>
-              </TouchableOpacity>
-            </View>
-          </View>
+              </View>
 
-          <ScrollView contentContainerStyle={styles.scrollBody} showsVerticalScrollIndicator={false}>
-            <View style={styles.titleRow}>
-              <Text style={styles.title}>Resumen del Día</Text>
-              <Text style={styles.subtitle}>
-                Tienes 3 clases programadas hoy y 2 planeaciones pendientes de revisión.
-              </Text>
-            </View>
+              <Animated.View
+                style={[
+                  styles.mobileGreetingOverlay,
+                  {
+                    opacity: greetingOpacity,
+                    transform: [{ translateY: greetingTranslateY }],
+                  },
+                ]}
+                pointerEvents="none"
+              >
+                <AnimatedTopPill
+                  icon="waving-hand"
+                  title="Hola, Profe Ana"
+                  subtitle="Resumen de tu semana académica"
+                />
+              </Animated.View>
+            </>
+          )}
 
+          <Animated.ScrollView
+            contentContainerStyle={[styles.scrollBody, !webDesktop && styles.scrollBodyMobile]}
+            showsVerticalScrollIndicator={false}
+            onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+              useNativeDriver: true,
+            })}
+            scrollEventThrottle={16}
+          >
             <View style={[styles.metricsGrid, wideContent && styles.metricsGridWide]}>
               {metricCards.map((metric) => (
-                <View key={metric.id} style={[styles.metricCard, wideContent && styles.metricCardWide]}>
+                <View
+                  key={metric.id}
+                  style={[styles.metricCard, wideContent && styles.metricCardWide]}
+                >
                   <View style={styles.metricHeader}>
                     <View style={[styles.metricIconWrap, { backgroundColor: `${metric.tone}1A` }]}>
                       <MaterialIcons name={metric.icon} size={18} color={metric.tone} />
                     </View>
                     <View style={[styles.metricBadge, { backgroundColor: `${metric.tone}21` }]}>
-                      <Text style={[styles.metricBadgeText, { color: metric.tone }]}>{metric.badge}</Text>
+                      <Text style={[styles.metricBadgeText, { color: metric.tone }]}>
+                        {metric.badge}
+                      </Text>
                     </View>
                   </View>
                   <Text style={styles.metricTitle}>{metric.title}</Text>
@@ -238,42 +305,65 @@ const HomeScreen: React.FC = () => {
                 styles.quickActionsRow,
                 wideContent && styles.quickActionsRowWide,
               ]}
-              showsHorizontalScrollIndicator={!wideContent}
+              showsHorizontalScrollIndicator={false}
             >
               <TouchableOpacity
-                style={[styles.quickActionCard, styles.quickActionPrimary]}
+                style={[
+                  styles.quickActionCard,
+                  styles.quickActionPrimary,
+                  !wideContent && { width: quickActionCardWidth },
+                ]}
                 activeOpacity={0.85}
                 onPress={() => onSidebarPress("planeaciones")}
               >
                 <MaterialIcons name="edit-document" size={22} color="#FFFFFF" />
-                <Text style={styles.quickActionPrimaryText}>Nueva Planeación</Text>
+                <Text style={styles.quickActionPrimaryText} numberOfLines={1}>
+                  Nueva Planeación
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.quickActionCard}
+                style={[styles.quickActionCard, !wideContent && { width: quickActionCardWidth }]}
                 activeOpacity={0.85}
                 onPress={() => onSidebarPress("planeaciones")}
               >
                 <MaterialIcons name="upload-file" size={22} color="#1E64CC" />
-                <Text style={styles.quickActionText}>Importar PDF</Text>
+                <Text style={styles.quickActionText} numberOfLines={1}>
+                  Importar PDF
+                </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.quickActionCard} activeOpacity={0.85}>
+              <TouchableOpacity
+                style={[styles.quickActionCard, !wideContent && { width: quickActionCardWidth }]}
+                activeOpacity={0.85}
+              >
                 <MaterialIcons name="psychology" size={22} color="#1E64CC" />
-                <Text style={styles.quickActionText}>Asistente IA</Text>
+                <Text style={styles.quickActionText} numberOfLines={1}>
+                  Asistente IA
+                </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.quickActionCard} activeOpacity={0.85}>
+              <TouchableOpacity
+                style={[styles.quickActionCard, !wideContent && { width: quickActionCardWidth }]}
+                activeOpacity={0.85}
+              >
                 <MaterialIcons name="share" size={22} color="#1E64CC" />
-                <Text style={styles.quickActionText}>Compartir Recurso</Text>
+                <Text style={styles.quickActionText} numberOfLines={1}>
+                  Compartir Recurso
+                </Text>
               </TouchableOpacity>
             </ScrollView>
 
             <View style={[styles.lowerSection, wideContent && styles.lowerSectionWide]}>
-              <View style={styles.continueColumn}>
+              <View style={[styles.continueColumn, wideContent && styles.continueColumnWide]}>
                 <View style={styles.sectionHeaderRow}>
-                  <Text style={styles.sectionTitle}>Continuar trabajando</Text>
-                  <TouchableOpacity activeOpacity={0.85} onPress={() => onSidebarPress("planeaciones")}>
+                  <Text style={[styles.sectionTitle, isNarrowMobile && styles.sectionTitleCompact]}>
+                    Continuar trabajando
+                  </Text>
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    onPress={() => onSidebarPress("planeaciones")}
+                  >
                     <Text style={styles.sectionLink}>Ver todo</Text>
                   </TouchableOpacity>
                 </View>
@@ -301,22 +391,31 @@ const HomeScreen: React.FC = () => {
                 ))}
               </View>
 
-              <View style={styles.timelineColumn}>
-                <Text style={styles.sectionTitle}>Actividad reciente</Text>
-                <View style={styles.timelineCard}>
-                  {timeline.map((entry, index) => (
-                    <View key={entry.id} style={styles.timelineItem}>
-                      <View style={styles.timelineTrackWrap}>
-                        <View style={styles.timelineDot} />
-                        {index < timeline.length - 1 && <View style={styles.timelineLine} />}
+              <View style={[styles.timelineColumn, wideContent && styles.timelineColumnWide]}>
+                <Text style={[styles.sectionTitle, isNarrowMobile && styles.sectionTitleCompact]}>
+                  Actividad reciente
+                </Text>
+                <View style={[styles.timelineCard, !wideContent && styles.timelineCardMobile]}>
+                  <ScrollView
+                    style={styles.timelineListScroll}
+                    contentContainerStyle={styles.timelineListContent}
+                    nestedScrollEnabled
+                    showsVerticalScrollIndicator={!wideContent}
+                  >
+                    {timeline.map((entry, index) => (
+                      <View key={entry.id} style={styles.timelineItem}>
+                        <View style={styles.timelineTrackWrap}>
+                          <View style={styles.timelineDot} />
+                          {index < timeline.length - 1 && <View style={styles.timelineLine} />}
+                        </View>
+                        <View style={styles.timelineTextWrap}>
+                          <Text style={styles.timelineTitle}>{entry.title}</Text>
+                          <Text style={styles.timelineDetail}>{entry.detail}</Text>
+                          <Text style={styles.timelineTime}>{entry.time}</Text>
+                        </View>
                       </View>
-                      <View style={styles.timelineTextWrap}>
-                        <Text style={styles.timelineTitle}>{entry.title}</Text>
-                        <Text style={styles.timelineDetail}>{entry.detail}</Text>
-                        <Text style={styles.timelineTime}>{entry.time}</Text>
-                      </View>
-                    </View>
-                  ))}
+                    ))}
+                  </ScrollView>
 
                   <TouchableOpacity style={styles.historyButton} activeOpacity={0.85}>
                     <Text style={styles.historyButtonText}>Ver historial completo</Text>
@@ -324,7 +423,7 @@ const HomeScreen: React.FC = () => {
                 </View>
               </View>
             </View>
-          </ScrollView>
+          </Animated.ScrollView>
         </View>
       </View>
     </SafeAreaView>
@@ -405,7 +504,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topBar: {
-    height: 76,
+    minHeight: 76,
     backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
     borderBottomColor: "#E4EAF2",
@@ -413,6 +512,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 18,
+    paddingVertical: 10,
+  },
+  floatingActionsWrap: {
+    position: "absolute",
+    top: 10,
+    right: 14,
+    zIndex: 20,
+  },
+  mobileGreetingOverlay: {
+    position: "absolute",
+    top: 54,
+    left: 16,
+    right: 16,
+    zIndex: 10,
+  },
+  topBarCompact: {
+    alignItems: "flex-start",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
   },
   searchBar: {
     flex: 1,
@@ -433,22 +551,45 @@ const styles = StyleSheet.create({
   },
   mobileHeaderCopy: {
     flex: 1,
+    minWidth: 0,
+  },
+  mobileGreetingPill: {
+    borderRadius: 22,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF3",
+    minHeight: 96,
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    boxShadow: "0px 12px 24px rgba(18, 45, 85, 0.11)",
   },
   mobileHello: {
-    fontSize: 30,
+    fontSize: 33,
     fontWeight: "800",
     color: "#1F2A3E",
-    letterSpacing: -0.4,
+    lineHeight: 37,
+    letterSpacing: -0.5,
+  },
+  mobileHelloCompact: {
+    fontSize: 30,
+    lineHeight: 34,
   },
   mobileSummary: {
-    marginTop: 2,
-    fontSize: 15,
+    marginTop: 5,
+    fontSize: 17,
     color: "#667085",
+  },
+  mobileSummaryCompact: {
+    fontSize: 15,
   },
   topActions: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+  },
+  topActionsCompact: {
+    gap: 6,
   },
   iconAction: {
     width: 36,
@@ -458,11 +599,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  iconActionCompact: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+  },
   profileBlock: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    marginLeft: 2,
+    marginLeft: 4,
+    backgroundColor: "#F4F7FC",
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "#E2EAF5",
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+    maxWidth: 150,
+  },
+  profileBlockCompact: {
+    marginLeft: 0,
+    paddingHorizontal: 2,
+    borderRadius: 16,
+    backgroundColor: "transparent",
+    borderWidth: 0,
   },
   profileText: {
     fontSize: 12,
@@ -470,31 +630,21 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   avatarCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: "#1E64CC",
     alignItems: "center",
     justifyContent: "center",
   },
   scrollBody: {
     paddingHorizontal: 18,
-    paddingTop: 16,
-    paddingBottom: 100,
+    paddingTop: 14,
+    paddingBottom: 28,
     gap: 18,
   },
-  titleRow: {
-    gap: 4,
-  },
-  title: {
-    fontSize: 42,
-    fontWeight: "800",
-    color: "#1F2A3E",
-    letterSpacing: -0.5,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: "#56657A",
+  scrollBodyMobile: {
+    paddingTop: 170,
   },
   metricsGrid: {
     flexDirection: "column",
@@ -559,13 +709,13 @@ const styles = StyleSheet.create({
   },
   quickActionsRow: {
     gap: 10,
-    paddingRight: 8,
+    paddingRight: 0,
   },
   quickActionsRowWide: {
     flexDirection: "row",
   },
   quickActionCard: {
-    minWidth: 170,
+    minWidth: 154,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#DEE8F5",
@@ -584,12 +734,12 @@ const styles = StyleSheet.create({
   },
   quickActionPrimaryText: {
     color: "#FFFFFF",
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: "700",
   },
   quickActionText: {
     color: "#1E2F4D",
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "700",
   },
   lowerSection: {
@@ -603,9 +753,18 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 12,
   },
+  continueColumnWide: {
+    minWidth: 380,
+  },
   timelineColumn: {
     width: "100%",
     gap: 12,
+  },
+  timelineColumnWide: {
+    width: "36%",
+    minWidth: 340,
+    maxWidth: 460,
+    flexShrink: 0,
   },
   sectionHeaderRow: {
     flexDirection: "row",
@@ -613,10 +772,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   sectionTitle: {
-    fontSize: 33,
+    fontSize: 25,
     fontWeight: "800",
     color: "#1F2A3E",
     letterSpacing: -0.4,
+  },
+  sectionTitleCompact: {
+    fontSize: 17,
   },
   sectionLink: {
     color: "#1E64CC",
@@ -698,6 +860,17 @@ const styles = StyleSheet.create({
     borderColor: "#E4EBF4",
     padding: 14,
     gap: 10,
+    overflow: "hidden",
+  },
+  timelineCardMobile: {
+    minHeight: 300,
+  },
+  timelineListScroll: {
+    flexGrow: 0,
+    maxHeight: 220,
+  },
+  timelineListContent: {
+    paddingBottom: 4,
   },
   timelineItem: {
     flexDirection: "row",

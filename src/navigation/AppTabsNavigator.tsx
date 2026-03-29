@@ -40,15 +40,16 @@ const AppTabsNavigator: React.FC = () => {
       initialRouteName="HomeTab"
       screenOptions={({ route }) => ({
         headerShown: false,
+        animation: "shift",
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: "#6B7280",
         tabBarShowLabel: !isCompact,
         tabBarHideOnKeyboard: true,
         tabBarActiveBackgroundColor: "#EEF5FF",
         tabBarStyle: {
-          height: isCompact ? 62 : 64,
-          paddingTop: 6,
-          paddingBottom: isCompact ? 6 : 8,
+          height: isCompact ? 68 : 72,
+          paddingTop: 8,
+          paddingBottom: isCompact ? 8 : 10,
           paddingHorizontal: 6,
           borderTopWidth: 1,
           borderTopColor: "#E5E7EB",
@@ -73,12 +74,12 @@ const AppTabsNavigator: React.FC = () => {
           marginHorizontal: 2,
         },
         tabBarLabelStyle: {
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: "700",
-          marginTop: -2,
+          marginTop: -1,
         },
         tabBarIconStyle: {
-          marginTop: isCompact ? 0 : 2,
+          marginTop: isCompact ? 1 : 2,
         },
         tabBarIcon: ({ color, size }) => {
           const iconByRoute: Record<keyof MainTabParamList, keyof typeof MaterialIcons.glyphMap> = {

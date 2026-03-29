@@ -274,6 +274,80 @@ Estado general: Fase 1 y gran parte de Fase 2 completadas.
 
 ### 13.5 Siguiente tramo recomendado
 
-1. Completar estandarizacion de pantallas legacy restantes con BottomNavBar heredado.
-2. Cerrar Fase 3 con checklist de accesibilidad web base por modulo.
-3. Ejecutar suite corta de navegacion e interaccion tras consolidar la limpieza final.
+1. ✅ Completar estandarizacion de pantallas legacy restantes con BottomNavBar heredado.
+2. ✅ Cerrar Fase 3 con checklist de accesibilidad web base por modulo.
+3. ✅ Ejecutar suite corta de navegacion e interaccion tras consolidar la limpieza final.
+
+### 13.6 Avance adicional (2026-03-29)
+
+- Home (mobile): animacion de fade/slide de la pildora de saludo refinada para transicion mas suave.
+- Home (web): correccion de layout en columnas para evitar solapamientos y colapso visual en seccion de actividad.
+- Planeaciones (legacy cleanup): retiro de BottomNavBar heredado en:
+  - CrearPlaneacionScreen
+  - ListaPlaneacionesScreen
+  - EditorPlaneacionScreen
+
+### 13.7 Avance adicional (2026-03-29, bloque 2)
+
+- Sistema de transicion entre tabs implementado con animacion lateral + fade para mejorar fluidez visual.
+- Pildora de titulo animada reutilizable implementada y aplicada en tabs raiz:
+  - Planeaciones
+  - Grupos
+  - Recursos
+  - Configuracion
+- Efecto visual de borde arcoiris temporal (entrada) agregado a la pildora superior para reforzar identidad visual al cargar cada pantalla.
+- Validacion rapida: pruebas smoke + planeaciones/importacion en estado OK.
+
+## 14) Configuracion - Alcance funcional futuro (backlog UX/UI)
+
+Objetivo: que la pantalla de Configuracion evolucione de un listado simple a un centro integral de preferencias y cuenta.
+
+Bloques funcionales previstos:
+
+- Accesibilidad:
+  - Daltonismo (filtros/ajustes de contraste por tipo)
+  - Tamano de fuente (pequena, media, grande, extra grande)
+  - Lectura de voz / texto a voz para contenido clave
+  - Reduccion de movimiento (animaciones minimizadas)
+- Preferencias de app:
+  - Modo oscuro / claro / sistema
+  - Idioma (espanol, ingles y futuros)
+  - Formato regional (fecha/hora)
+- Cuenta y perfil:
+  - Datos personales
+  - Avatar/foto
+  - Cambio de contrasena
+- Seguridad y sesiones:
+  - Sesiones iniciadas por dispositivo
+  - Cierre de sesion remota
+  - Notificaciones de inicio de sesion
+- Suscripcion y plan:
+  - Plan actual
+  - Beneficios y limites
+  - Gestion de pago/facturacion
+- Legal y transparencia:
+  - Aviso de privacidad
+  - Terminos y condiciones
+  - Permisos y uso de datos
+
+## 15) Cierre del Plan Maestro (2026-03-29)
+
+Estado final del plan maestro UX/UI: ✅ CERRADO EN SU ALCANCE ACTUAL.
+
+Resumen de cierre:
+
+- Fase 0 completada (fundaciones visuales y estructura base).
+- Fase 1 completada (tabs persistentes + stacks por modulo en shell principal).
+- Fase 2 completada en modulos raiz priorizados (Home, Planeaciones, Grupos, Recursos, Configuracion).
+- Fase 3 cerrada con checklist de accesibilidad web base en:
+  - `Documentacion/CHECKLIST_FASE3_ACCESIBILIDAD_WEB.md`
+- Fase 4 cerrada en su alcance actual con pulido visual, consistencia de pildoras y transiciones de tabs.
+
+Validacion tecnica de cierre:
+
+- Smoke test de Jest: OK.
+- Pruebas intervenidas de planeaciones/importacion: OK.
+
+Siguiente etapa activa:
+
+- Retomar ejecucion del roadmap principal en Azure DevOps (`ROADMAP_COMPLETO.md`) con sincronizacion por script al completar cada bloque real.

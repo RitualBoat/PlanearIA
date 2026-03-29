@@ -1,10 +1,10 @@
 import React from "react";
 import {
+  Animated,
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
   StatusBar,
   useWindowDimensions,
 } from "react-native";
@@ -15,6 +15,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS } from "../../../types";
 import { isWeb } from "../../utils/responsive";
+import AnimatedTopPill from "../../components/AnimatedTopPill";
 
 /**
  * Tipo para las props de navegación
@@ -60,6 +61,17 @@ const RecursoIcon: React.FC<{ option: RecursoOption }> = React.memo(({ option })
 const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ navigation }) => {
   const { width } = useWindowDimensions();
   const wideLayout = width >= 920;
+  const scrollY = React.useRef(new Animated.Value(0)).current;
+  const mobilePillOpacity = scrollY.interpolate({
+    inputRange: [0, 12, 34],
+    outputRange: [1, 0.45, 0],
+    extrapolate: "clamp",
+  });
+  const mobilePillTranslateY = scrollY.interpolate({
+    inputRange: [0, 34],
+    outputRange: [0, -14],
+    extrapolate: "clamp",
+  });
 
   /**
    * Opciones de recursos didácticos
@@ -111,15 +123,27 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
       <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView
+        <Animated.ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
+          onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+            useNativeDriver: true,
+          })}
+          scrollEventThrottle={16}
         >
           <View style={styles.headerBlock}>
-            <Text style={styles.title}>Recursos</Text>
-            <Text style={styles.subtitle}>
-              Crea y organiza exámenes, presentaciones y materiales en un solo flujo.
-            </Text>
+            <Animated.View
+              style={{
+                opacity: mobilePillOpacity,
+                transform: [{ translateY: mobilePillTranslateY }],
+              }}
+            >
+              <AnimatedTopPill
+                icon="menu-book"
+                title="Recursos"
+                subtitle="Crea y organiza trabajos o materiales"
+              />
+            </Animated.View>
           </View>
 
           <View style={[styles.quickPanel, wideLayout && styles.quickPanelWide]}>
@@ -193,7 +217,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
               de próxima actualización.
             </Text>
           </View>
-        </ScrollView>
+        </Animated.ScrollView>
       </SafeAreaView>
     </View>
   );
@@ -220,17 +244,7 @@ const styles = StyleSheet.create({
     maxWidth: 1220,
   },
   headerBlock: {
-    gap: 2,
-  },
-  title: {
-    fontSize: 34,
-    fontWeight: "800",
-    color: "#1E2A3A",
-    letterSpacing: -0.4,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: "#5C6E86",
+    marginBottom: 2,
   },
   quickPanel: {
     gap: 10,

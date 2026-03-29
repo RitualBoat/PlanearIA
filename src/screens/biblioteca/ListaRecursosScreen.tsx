@@ -19,7 +19,8 @@ const ListaRecursosScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const wideLayout = width >= 920;
 
-  const { searchQuery, setSearchQuery, getIconByTipo, getColorByTipo } = useListaRecursosViewModel();
+  const { searchQuery, setSearchQuery, getIconByTipo, getColorByTipo } =
+    useListaRecursosViewModel();
 
   const recursosEjemplo: Partial<Recurso>[] = [
     {
@@ -69,9 +70,15 @@ const ListaRecursosScreen: React.FC = () => {
           </View>
         </View>
 
-        <ScrollView contentContainerStyle={[styles.scrollContent, wideLayout && styles.scrollContentWide]}>
+        <ScrollView
+          contentContainerStyle={[styles.scrollContent, wideLayout && styles.scrollContentWide]}
+        >
           {recursosEjemplo.map((recurso) => (
-            <TouchableOpacity key={recurso.id} style={[styles.recursoCard, wideLayout && styles.recursoCardWide]} activeOpacity={0.9}>
+            <TouchableOpacity
+              key={recurso.id}
+              style={[styles.recursoCard, wideLayout && styles.recursoCardWide]}
+              activeOpacity={0.9}
+            >
               <View style={styles.recursoHeader}>
                 <View
                   style={[

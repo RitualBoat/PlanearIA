@@ -18,9 +18,7 @@ describe("PlaneacionesScreen - Importar", () => {
   it("navega a ImportarPlaneacion desde la nueva tarjeta", () => {
     const navigate = jest.fn();
 
-    const { getByText } = render(
-      <PlaneacionesScreen navigation={{ navigate } as any} />
-    );
+    const { getByText } = render(<PlaneacionesScreen navigation={{ navigate } as any} />);
 
     fireEvent.press(getByText("Importar Planeación"));
 

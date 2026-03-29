@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  StatusBar,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -14,15 +8,9 @@ import { RootStackParamList } from "../../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../../types";
 import WebScrollView from "../../../components/WebScrollView";
 
-type AsignarRecursoScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "AsignarRecurso"
->;
+type AsignarRecursoScreenNavigationProp = StackNavigationProp<RootStackParamList, "AsignarRecurso">;
 
-type AsignarRecursoScreenRouteProp = RouteProp<
-  RootStackParamList,
-  "AsignarRecurso"
->;
+type AsignarRecursoScreenRouteProp = RouteProp<RootStackParamList, "AsignarRecurso">;
 
 interface AsignarRecursoScreenProps {
   navigation: AsignarRecursoScreenNavigationProp;
@@ -32,10 +20,7 @@ interface AsignarRecursoScreenProps {
 /**
  * Pantalla para asignar un recurso existente (examen) a un grupo
  */
-const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({
-  navigation,
-  route,
-}) => {
+const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation, route }) => {
   const { grupoId } = route.params;
 
   // Recursos de ejemplo (tipo examen)
@@ -77,9 +62,7 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({
         <WebScrollView style={styles.content}>
           <View style={styles.header}>
             <Text style={styles.pageTitle}>Asignar Examen al Grupo</Text>
-            <Text style={styles.pageSubtitle}>
-              Selecciona un examen de tu biblioteca
-            </Text>
+            <Text style={styles.pageSubtitle}>Selecciona un examen de tu biblioteca</Text>
             <Text style={styles.info}>Grupo ID: {grupoId}</Text>
           </View>
 
@@ -97,24 +80,15 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({
                     {recurso.preguntas} preguntas • Creado: {recurso.fecha}
                   </Text>
                 </View>
-                <MaterialIcons
-                  name="chevron-right"
-                  size={24}
-                  color={COLORS.textSecondary}
-                />
+                <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
               </TouchableOpacity>
             ))}
           </View>
 
           <View style={styles.emptyStateContainer}>
-            <MaterialIcons
-              name="info-outline"
-              size={48}
-              color={COLORS.textSecondary}
-            />
+            <MaterialIcons name="info-outline" size={48} color={COLORS.textSecondary} />
             <Text style={styles.emptyStateText}>
-              Aquí se mostrarán los exámenes que hayas creado en la sección de
-              Recursos Didácticos
+              Aquí se mostrarán los exámenes que hayas creado en la sección de Recursos Didácticos
             </Text>
           </View>
         </WebScrollView>

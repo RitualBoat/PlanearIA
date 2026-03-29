@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  StatusBar,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, FONT_SIZES } from "../../../../types";
@@ -64,34 +57,18 @@ const CrearTareaGrupoScreen: React.FC = () => {
                 {tipoOptions.map((option) => (
                   <TouchableOpacity
                     key={option.value}
-                    style={[
-                      styles.tipoButton,
-                      tipo === option.value && styles.tipoButtonActive,
-                    ]}
+                    style={[styles.tipoButton, tipo === option.value && styles.tipoButtonActive]}
                     onPress={() =>
-                      setTipo(
-                        option.value as
-                          | "tarea"
-                          | "examen"
-                          | "proyecto"
-                          | "investigacion",
-                      )
+                      setTipo(option.value as "tarea" | "examen" | "proyecto" | "investigacion")
                     }
                   >
                     <MaterialIcons
                       name={option.icon as any}
                       size={24}
-                      color={
-                        tipo === option.value
-                          ? COLORS.primary
-                          : COLORS.textSecondary
-                      }
+                      color={tipo === option.value ? COLORS.primary : COLORS.textSecondary}
                     />
                     <Text
-                      style={[
-                        styles.tipoLabel,
-                        tipo === option.value && styles.tipoLabelActive,
-                      ]}
+                      style={[styles.tipoLabel, tipo === option.value && styles.tipoLabelActive]}
                     >
                       {option.label}
                     </Text>

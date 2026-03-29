@@ -13,7 +13,6 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { COLORS, FONT_SIZES } from "../../../types";
-import BottomNavBar from "../../components/BottomNavBar";
 import GenerarPlaneacionIAForm from "../../components/GenerarPlaneacionIAForm";
 import { useCrearPlaneacionViewModel } from "../../hooks/useCrearPlaneacionViewModel";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
@@ -250,8 +249,6 @@ const CrearPlaneacionScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
-
-      <BottomNavBar currentScreen="Crear Planeación" />
     </View>
   );
 };
@@ -269,7 +266,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 100,
+    paddingBottom: 28,
   },
   title: {
     fontSize: FONT_SIZES.xlarge,

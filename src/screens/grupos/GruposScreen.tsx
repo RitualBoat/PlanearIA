@@ -1,10 +1,10 @@
 import React from "react";
 import {
+  Animated,
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
   StatusBar,
   useWindowDimensions,
 } from "react-native";
@@ -14,14 +14,12 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS } from "../../../types";
 import { isWeb } from "../../utils/responsive";
+import AnimatedTopPill from "../../components/AnimatedTopPill";
 
 /**
  * Tipo para las props de navegación
  */
-type GruposScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "Grupos"
->;
+type GruposScreenNavigationProp = StackNavigationProp<RootStackParamList, "Grupos">;
 
 /**
  * Props del componente
@@ -37,6 +35,17 @@ interface GruposScreenProps {
 const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
   const { width } = useWindowDimensions();
   const wideLayout = width >= 920;
+  const scrollY = React.useRef(new Animated.Value(0)).current;
+  const mobilePillOpacity = scrollY.interpolate({
+    inputRange: [0, 22, 56],
+    outputRange: [1, 0.55, 0],
+    extrapolate: "clamp",
+  });
+  const mobilePillTranslateY = scrollY.interpolate({
+    inputRange: [0, 56],
+    outputRange: [0, -16],
+    extrapolate: "clamp",
+  });
 
   /**
    * Navega a crear nuevo grupo
@@ -81,10 +90,26 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
       <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Animated.ScrollView
+          contentContainerStyle={styles.scrollContent}
+          onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+            useNativeDriver: true,
+          })}
+          scrollEventThrottle={16}
+        >
           <View style={styles.headerBlock}>
-            <Text style={styles.title}>Grupos</Text>
-            <Text style={styles.subtitle}>Administra grupos, alumnos y tareas desde un panel central.</Text>
+            <Animated.View
+              style={{
+                opacity: mobilePillOpacity,
+                transform: [{ translateY: mobilePillTranslateY }],
+              }}
+            >
+              <AnimatedTopPill
+                icon="groups"
+                title="Grupos"
+                subtitle="Administra grupos, alumnos y tareas."
+              />
+            </Animated.View>
           </View>
 
           <View style={[styles.statsGrid, wideLayout && styles.statsGridWide]}>
@@ -142,10 +167,11 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
           <View style={styles.tipCard}>
             <MaterialIcons name="tips-and-updates" size={18} color="#0B6F86" />
             <Text style={styles.tipText}>
-              Consejo: desde el detalle de cada grupo puedes crear tareas, asignar recursos y calificar entregas.
+              Consejo: desde el detalle de cada grupo puedes crear tareas, asignar recursos y
+              calificar entregas.
             </Text>
           </View>
-        </ScrollView>
+        </Animated.ScrollView>
       </SafeAreaView>
     </View>
   );
@@ -172,17 +198,7 @@ const styles = StyleSheet.create({
     maxWidth: 1220,
   },
   headerBlock: {
-    gap: 2,
-  },
-  title: {
-    fontSize: 34,
-    fontWeight: "800",
-    color: "#1E2A3A",
-    letterSpacing: -0.4,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: "#5C6E86",
+    marginBottom: 2,
   },
   statsGrid: {
     flexDirection: "column",

@@ -28,7 +28,8 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
   const { width } = useWindowDimensions();
   const wideLayout = width >= 920;
 
-  const { gruposFiltrados, isLoading, error, searchQuery, setSearchQuery, conteoGrupos } = useGrupos();
+  const { gruposFiltrados, isLoading, error, searchQuery, setSearchQuery, conteoGrupos } =
+    useGrupos();
 
   const handleGrupoPress = (grupo: Partial<Grupo>): void => {
     navigation.navigate("DetalleGrupo", {
@@ -87,7 +88,9 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
           </View>
         </View>
 
-        <WebScrollView contentContainerStyle={[styles.scrollContent, wideLayout && styles.scrollContentWide]}>
+        <WebScrollView
+          contentContainerStyle={[styles.scrollContent, wideLayout && styles.scrollContentWide]}
+        >
           {gruposFiltrados.map((grupo) => (
             <TouchableOpacity
               key={grupo.id}
@@ -120,13 +123,17 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
                 <View
                   style={[
                     styles.badge,
-                    grupo.estado === "activo" ? styles.estadoActivoBadge : styles.estadoInactivoBadge,
+                    grupo.estado === "activo"
+                      ? styles.estadoActivoBadge
+                      : styles.estadoInactivoBadge,
                   ]}
                 >
                   <Text
                     style={[
                       styles.estadoText,
-                      grupo.estado === "activo" ? styles.estadoActivoText : styles.estadoInactivoText,
+                      grupo.estado === "activo"
+                        ? styles.estadoActivoText
+                        : styles.estadoInactivoText,
                     ]}
                   >
                     {grupo.estado === "activo" ? "Activo" : "Inactivo"}

@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  StatusBar,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -14,15 +8,9 @@ import { RootStackParamList } from "../../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../../types";
 import WebScrollView from "../../../components/WebScrollView";
 
-type DetalleTareaScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "DetalleTarea"
->;
+type DetalleTareaScreenNavigationProp = StackNavigationProp<RootStackParamList, "DetalleTarea">;
 
-type DetalleTareaScreenRouteProp = RouteProp<
-  RootStackParamList,
-  "DetalleTarea"
->;
+type DetalleTareaScreenRouteProp = RouteProp<RootStackParamList, "DetalleTarea">;
 
 interface DetalleTareaScreenProps {
   navigation: DetalleTareaScreenNavigationProp;
@@ -32,18 +20,14 @@ interface DetalleTareaScreenProps {
 /**
  * Pantalla de detalle de una tarea con lista de entregas
  */
-const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({
-  navigation,
-  route,
-}) => {
+const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({ navigation, route }) => {
   const { tareaId, grupoId } = route.params;
 
   // Datos de ejemplo
   const tarea = {
     titulo: "Investigación sobre IA",
     tipo: "tarea",
-    descripcion:
-      "Realizar una investigación detallada sobre Inteligencia Artificial",
+    descripcion: "Realizar una investigación detallada sobre Inteligencia Artificial",
     valor: 20,
     fechaAsignacion: "15 Nov 2025",
     fechaEntrega: "30 Nov 2025",
@@ -98,32 +82,16 @@ const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({
             <Text style={styles.tareaTitulo}>{tarea.titulo}</Text>
             <View style={styles.tareaMetadataContainer}>
               <View style={styles.metadataItem}>
-                <MaterialIcons
-                  name="assignment"
-                  size={18}
-                  color={COLORS.textSecondary}
-                />
+                <MaterialIcons name="assignment" size={18} color={COLORS.textSecondary} />
                 <Text style={styles.metadataText}>Tipo: {tarea.tipo}</Text>
               </View>
               <View style={styles.metadataItem}>
-                <MaterialIcons
-                  name="stars"
-                  size={18}
-                  color={COLORS.textSecondary}
-                />
-                <Text style={styles.metadataText}>
-                  Valor: {tarea.valor} pts
-                </Text>
+                <MaterialIcons name="stars" size={18} color={COLORS.textSecondary} />
+                <Text style={styles.metadataText}>Valor: {tarea.valor} pts</Text>
               </View>
               <View style={styles.metadataItem}>
-                <MaterialIcons
-                  name="event"
-                  size={18}
-                  color={COLORS.textSecondary}
-                />
-                <Text style={styles.metadataText}>
-                  Entrega: {tarea.fechaEntrega}
-                </Text>
+                <MaterialIcons name="event" size={18} color={COLORS.textSecondary} />
+                <Text style={styles.metadataText}>Entrega: {tarea.fechaEntrega}</Text>
               </View>
             </View>
             <Text style={styles.descripcion}>{tarea.descripcion}</Text>
@@ -147,27 +115,20 @@ const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({
 
           {/* Lista de entregas */}
           <View style={styles.entregasContainer}>
-            <Text style={styles.sectionTitle}>
-              Estado de Entregas ({entregas.length} alumnos)
-            </Text>
+            <Text style={styles.sectionTitle}>Estado de Entregas ({entregas.length} alumnos)</Text>
 
             {entregas.map((entrega) => {
               const icon = getEstadoIcon(entrega.estado);
               return (
                 <View key={entrega.id} style={styles.entregaItem}>
-                  <MaterialIcons
-                    name={icon.name as any}
-                    size={28}
-                    color={icon.color}
-                  />
+                  <MaterialIcons name={icon.name as any} size={28} color={icon.color} />
                   <View style={styles.entregaInfo}>
                     <Text style={styles.alumnoNombre}>{entrega.alumno}</Text>
                     <Text style={styles.entregaStatus}>
                       {entrega.estado === "entregada" &&
                         `Entregado: ${entrega.fecha} • ${entrega.calificacion}/10`}
                       {entrega.estado === "pendiente" && "Pendiente de entrega"}
-                      {entrega.estado === "tarde" &&
-                        `Entregado tarde: ${entrega.fecha}`}
+                      {entrega.estado === "tarde" && `Entregado tarde: ${entrega.fecha}`}
                     </Text>
                   </View>
                   {entrega.estado !== "pendiente" && (
@@ -179,11 +140,7 @@ const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({
                         });
                       }}
                     >
-                      <MaterialIcons
-                        name="edit"
-                        size={24}
-                        color={COLORS.primary}
-                      />
+                      <MaterialIcons name="edit" size={24} color={COLORS.primary} />
                     </TouchableOpacity>
                   )}
                 </View>
@@ -199,9 +156,7 @@ const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({
             }}
           >
             <MaterialIcons name="rate-review" size={24} color="white" />
-            <Text style={styles.calificarButtonText}>
-              Calificar Todas las Entregas
-            </Text>
+            <Text style={styles.calificarButtonText}>Calificar Todas las Entregas</Text>
           </TouchableOpacity>
         </WebScrollView>
       </SafeAreaView>

@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  StatusBar,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -17,10 +10,7 @@ import { COLORS, FONT_SIZES } from "../../../types";
 /**
  * Tipo para las props de navegación
  */
-type AlumnosScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "Alumnos"
->;
+type AlumnosScreenNavigationProp = StackNavigationProp<RootStackParamList, "Alumnos">;
 
 /**
  * Props del componente
@@ -55,9 +45,7 @@ const AlumnosScreen: React.FC<AlumnosScreenProps> = ({ navigation }) => {
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.title}>Gestión de Alumnos</Text>
-          <Text style={styles.subtitle}>
-            Administra la información de tus estudiantes
-          </Text>
+          <Text style={styles.subtitle}>Administra la información de tus estudiantes</Text>
 
           <View style={styles.optionsContainer}>
             <TouchableOpacity
@@ -65,9 +53,7 @@ const AlumnosScreen: React.FC<AlumnosScreenProps> = ({ navigation }) => {
               onPress={handleAgregarAlumno}
               activeOpacity={0.7}
             >
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}
-              >
+              <View style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}>
                 <MaterialIcons name="person-add" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Agregar Alumno</Text>
@@ -81,9 +67,7 @@ const AlumnosScreen: React.FC<AlumnosScreenProps> = ({ navigation }) => {
               onPress={handleVerAlumnos}
               activeOpacity={0.7}
             >
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}
-              >
+              <View style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}>
                 <MaterialIcons name="groups" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Mis Alumnos</Text>

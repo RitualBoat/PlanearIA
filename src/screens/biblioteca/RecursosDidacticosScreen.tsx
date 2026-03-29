@@ -4,16 +4,17 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
   StatusBar,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
-import { COLORS, FONT_SIZES } from "../../../types";
-import BottomNavBar from "../../components/BottomNavBar";
-import WebScrollView from "../../components/WebScrollView";
+import { COLORS } from "../../../types";
+import { isWeb } from "../../utils/responsive";
 
 /**
  * Tipo para las props de navegación
@@ -45,24 +46,21 @@ interface RecursoOption {
 /**
  * Componente para renderizar el icono de un recurso didáctico
  */
-const RecursoIcon: React.FC<{ option: RecursoOption }> = React.memo(
-  ({ option }) => {
-    if (option.iconLibrary === "FontAwesome5") {
-      return <FontAwesome5 name={option.icon} size={50} color={option.color} />;
-    }
-    return (
-      <MaterialIcons name={option.icon as any} size={60} color={option.color} />
-    );
-  },
-);
+const RecursoIcon: React.FC<{ option: RecursoOption }> = React.memo(({ option }) => {
+  if (option.iconLibrary === "FontAwesome5") {
+    return <FontAwesome5 name={option.icon} size={50} color={option.color} />;
+  }
+  return <MaterialIcons name={option.icon as any} size={60} color={option.color} />;
+});
 
 /**
  * Pantalla principal de Recursos Didácticos
  * Menú central para crear y gestionar recursos educativos
  */
-const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({
-  navigation,
-}) => {
+const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ navigation }) => {
+  const { width } = useWindowDimensions();
+  const wideLayout = width >= 920;
+
   /**
    * Opciones de recursos didácticos
    */
@@ -110,57 +108,69 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
-        <WebScrollView contentContainerStyle={styles.scrollContent}>
-          <Text style={styles.title}>Recursos Didácticos</Text>
-          <Text style={styles.subtitle}>
-            Crea recursos educativos con IA, plantillas o desde cero
-          </Text>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.headerBlock}>
+            <Text style={styles.title}>Recursos</Text>
+            <Text style={styles.subtitle}>
+              Crea y organiza exámenes, presentaciones y materiales en un solo flujo.
+            </Text>
+          </View>
 
-          <View style={styles.optionsContainer}>
+          <View style={[styles.quickPanel, wideLayout && styles.quickPanelWide]}>
+            <View style={styles.quickCard}>
+              <Text style={styles.quickValue}>46</Text>
+              <Text style={styles.quickLabel}>Recursos activos</Text>
+            </View>
+            <View style={styles.quickCard}>
+              <Text style={styles.quickValue}>12</Text>
+              <Text style={styles.quickLabel}>Generados con IA</Text>
+            </View>
+            <View style={styles.quickCard}>
+              <Text style={styles.quickValue}>8</Text>
+              <Text style={styles.quickLabel}>Asignados esta semana</Text>
+            </View>
+          </View>
+
+          <Text style={styles.sectionLabel}>TIPOS DE RECURSOS</Text>
+
+          <View style={[styles.optionsContainer, wideLayout && styles.optionsContainerWide]}>
             {recursosOptions.map((option) => (
               <TouchableOpacity
                 key={option.id}
-                style={styles.optionCard}
+                style={[styles.optionCard, wideLayout && styles.optionCardWide]}
                 onPress={() => handleRecursoPress(option.route)}
-                activeOpacity={0.7}
+                activeOpacity={0.85}
               >
-                <View
-                  style={[
-                    styles.iconContainer,
-                    { backgroundColor: `${option.color}20` },
-                  ]}
-                >
+                <View style={[styles.iconContainer, { backgroundColor: `${option.color}20` }]}>
                   <RecursoIcon option={option} />
                 </View>
                 <Text style={styles.optionTitle}>{option.title}</Text>
+                <Text style={styles.optionDescription}>
+                  Disponible en IA, plantillas y modo manual.
+                </Text>
                 <View style={styles.methodsContainer}>
                   <View style={styles.methodBadge}>
-                    <MaterialIcons
-                      name="auto-awesome"
-                      size={14}
-                      color={COLORS.primary}
-                    />
+                    <MaterialIcons name="auto-awesome" size={14} color={COLORS.primary} />
                     <Text style={styles.methodText}>IA</Text>
                   </View>
                   <View style={styles.methodBadge}>
-                    <MaterialIcons
-                      name="dashboard"
-                      size={14}
-                      color={COLORS.primary}
-                    />
+                    <MaterialIcons name="dashboard" size={14} color={COLORS.primary} />
                     <Text style={styles.methodText}>Plantillas</Text>
                   </View>
                   <View style={styles.methodBadge}>
-                    <MaterialIcons
-                      name="edit"
-                      size={14}
-                      color={COLORS.primary}
-                    />
+                    <MaterialIcons name="edit" size={14} color={COLORS.primary} />
                     <Text style={styles.methodText}>Manual</Text>
                   </View>
+                </View>
+                <View style={styles.optionFooter}>
+                  <Text style={styles.optionCta}>Abrir módulo</Text>
+                  <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
                 </View>
               </TouchableOpacity>
             ))}
@@ -175,10 +185,16 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({
             <MaterialIcons name="folder-open" size={24} color="white" />
             <Text style={styles.verTodosText}>Ver Todos Mis Recursos</Text>
           </TouchableOpacity>
-        </WebScrollView>
-      </SafeAreaView>
 
-      <BottomNavBar currentScreen="Recursos Didácticos" />
+          <View style={styles.tipCard}>
+            <MaterialIcons name="tips-and-updates" size={18} color="#0B6F86" />
+            <Text style={styles.tipText}>
+              Consejo: los módulos no implementados mantienen pantalla esqueleto y mostrarán aviso
+              de próxima actualización.
+            </Text>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </View>
   );
 };
@@ -189,91 +205,169 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: "#EEF3FA",
   },
   safeArea: {
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: isWeb() ? 28 : 110,
+    gap: 14,
+    width: "100%",
+    alignSelf: "center",
+    maxWidth: 1220,
+  },
+  headerBlock: {
+    gap: 2,
   },
   title: {
-    fontSize: FONT_SIZES.xlarge,
-    fontWeight: "bold",
-    color: COLORS.primary,
-    textAlign: "center",
-    marginBottom: 8,
-    marginTop: 10,
+    fontSize: 34,
+    fontWeight: "800",
+    color: "#1E2A3A",
+    letterSpacing: -0.4,
   },
   subtitle: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.textSecondary,
-    textAlign: "center",
-    marginBottom: 30,
-    paddingHorizontal: 20,
+    fontSize: 15,
+    color: "#5C6E86",
+  },
+  quickPanel: {
+    gap: 10,
+  },
+  quickPanelWide: {
+    flexDirection: "row",
+  },
+  quickCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 14,
+    flex: 1,
+  },
+  quickValue: {
+    fontSize: 32,
+    fontWeight: "800",
+    color: "#1E2A3A",
+    lineHeight: 36,
+  },
+  quickLabel: {
+    marginTop: 2,
+    fontSize: 13,
+    color: "#6B7D96",
+    fontWeight: "600",
+  },
+  sectionLabel: {
+    marginTop: 4,
+    fontSize: 13,
+    color: "#5D6F86",
+    fontWeight: "800",
+    letterSpacing: 1.1,
   },
   optionsContainer: {
-    gap: 20,
-    marginBottom: 30,
+    gap: 12,
+  },
+  optionsContainerWide: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   optionCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 15,
-    padding: 25,
-    alignItems: "center",
-    boxShadow: "0px 2px 8px rgba(26, 26, 26, 0.2)",
+    width: "100%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    gap: 8,
+    boxShadow: "0px 10px 22px rgba(33, 60, 109, 0.08)",
+  },
+  optionCardWide: {
+    width: "49%",
   },
   iconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 44,
+    height: 44,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 15,
   },
   optionTitle: {
-    fontSize: FONT_SIZES.large,
-    fontWeight: "bold",
-    color: COLORS.text,
-    marginBottom: 12,
-    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#1E2A3A",
+  },
+  optionDescription: {
+    fontSize: 14,
+    color: "#5C6E86",
+    lineHeight: 20,
   },
   methodsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     gap: 8,
   },
   methodBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: `${COLORS.primary}10`,
+    backgroundColor: "#EAF4FF",
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 15,
   },
   methodText: {
-    fontSize: FONT_SIZES.small,
+    fontSize: 12,
     color: COLORS.primary,
     marginLeft: 4,
     fontWeight: "600",
+  },
+  optionFooter: {
+    marginTop: 4,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#E8EEF6",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  optionCta: {
+    color: "#1676D2",
+    fontSize: 14,
+    fontWeight: "700",
   },
   verTodosButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: COLORS.primary,
-    paddingVertical: 16,
+    backgroundColor: "#1676D2",
+    paddingVertical: 15,
     paddingHorizontal: 20,
-    borderRadius: 12,
-    boxShadow: "0px 2px 8px rgba(33, 150, 243, 0.3)",
+    borderRadius: 14,
+    boxShadow: "0px 8px 18px rgba(22, 118, 210, 0.32)",
   },
   verTodosText: {
     color: "white",
-    fontSize: FONT_SIZES.medium,
+    fontSize: 16,
     fontWeight: "bold",
     marginLeft: 10,
+  },
+  tipCard: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#BBE7F0",
+    backgroundColor: "#EAF8FB",
+    padding: 12,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+  },
+  tipText: {
+    flex: 1,
+    fontSize: 13,
+    color: "#0B6F86",
+    lineHeight: 18,
   },
 });
 

@@ -22,12 +22,12 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate("Home");
+      navigation.navigate("MainTabs", { screen: "HomeTab" });
     }
   };
 
   const handleMenu = (): void => {
-    navigation.navigate("Home");
+    navigation.navigate("MainTabs", { screen: "HomeTab" });
   };
 
   return (

@@ -24,12 +24,9 @@ export const useLoginViewModel = (): LoginViewModel => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const updateFormData = useCallback(
-    (field: keyof LoginFormData, value: string) => {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-    },
-    [],
-  );
+  const updateFormData = useCallback((field: keyof LoginFormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  }, []);
 
   const showAlert = useCallback((title: string, message: string) => {
     if (Platform.OS === "web") {
@@ -60,7 +57,7 @@ export const useLoginViewModel = (): LoginViewModel => {
     setTimeout(() => {
       setIsLoading(false);
       console.log("[auth] Authenticated:", formData.username);
-      navigation.replace("Home");
+      navigation.replace("MainTabs");
     }, 2000);
   }, [formData.username, navigation]);
 
@@ -69,7 +66,7 @@ export const useLoginViewModel = (): LoginViewModel => {
 
     if (Platform.OS === "web") {
       const confirmed = window.confirm(
-        `¿Desea iniciar sesión con el usuario: ${formData.username}?`,
+        `¿Desea iniciar sesión con el usuario: ${formData.username}?`
       );
       if (confirmed) authenticateUser();
     } else {
@@ -80,16 +77,13 @@ export const useLoginViewModel = (): LoginViewModel => {
           { text: "Cancelar", style: "cancel" },
           { text: "Aceptar", onPress: authenticateUser },
         ],
-        { cancelable: false },
+        { cancelable: false }
       );
     }
   }, [formData.username, validateForm, authenticateUser]);
 
   const handleForgotPassword = useCallback(() => {
-    showAlert(
-      "Recuperar Contraseña",
-      "Esta funcionalidad estará disponible próximamente.",
-    );
+    showAlert("Recuperar Contraseña", "Esta funcionalidad estará disponible próximamente.");
   }, [showAlert]);
 
   const handleRegister = useCallback(() => {

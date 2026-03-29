@@ -1,7 +1,9 @@
 import React from "react";
+import { NavigatorScreenParams } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { COLORS } from "../../types";
 import { NivelAcademico } from "../../types/planeacion";
+import AppTabsNavigator, { MainTabParamList } from "./AppTabsNavigator";
 
 // Importación de pantallas de autenticación
 import LoginScreen from "../screens/auth/LoginScreen";
@@ -45,6 +47,7 @@ import CuentaScreen from "../screens/cuenta/CuentaScreen";
 export type RootStackParamList = {
   // Autenticación
   Login: undefined;
+  MainTabs: NavigatorScreenParams<MainTabParamList>;
   Home: undefined;
 
   // Planeaciones (se mantiene igual)
@@ -96,6 +99,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 const StackNavigator: React.FC = () => {
   return (
     <Stack.Navigator
+      id={undefined}
       initialRouteName="Login"
       screenOptions={{
         headerStyle: {
@@ -114,6 +118,14 @@ const StackNavigator: React.FC = () => {
         component={LoginScreen}
         options={{
           title: "Iniciar Sesión",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="MainTabs"
+        component={AppTabsNavigator}
+        options={{
           headerShown: false,
         }}
       />

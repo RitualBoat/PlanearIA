@@ -4,7 +4,7 @@ import { CommonActions } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
 
-type Nav = StackNavigationProp<RootStackParamList, "Home">;
+type Nav = StackNavigationProp<RootStackParamList>;
 
 export interface MenuOption {
   id: string;
@@ -85,6 +85,26 @@ export const useHomeViewModel = (): HomeViewModel => {
 
   const handleNavigation = useCallback(
     (option: MenuOption) => {
+      if (option.route === "Planeaciones") {
+        navigation.navigate("MainTabs", { screen: "PlaneacionesTab" });
+        return;
+      }
+
+      if (option.route === "Grupos") {
+        navigation.navigate("MainTabs", { screen: "GruposTab" });
+        return;
+      }
+
+      if (option.route === "RecursosDidacticos") {
+        navigation.navigate("MainTabs", { screen: "RecursosTab" });
+        return;
+      }
+
+      if (option.route === "Cuenta") {
+        navigation.navigate("MainTabs", { screen: "ConfiguracionTab" });
+        return;
+      }
+
       if (option.route) {
         navigation.navigate(option.route as any);
       } else if (option.onPress) {

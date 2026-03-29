@@ -8,18 +8,22 @@ import {
   ScrollView,
   Alert,
   Platform,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import { COLORS, FONT_SIZES } from "../../../types";
+import { COLORS } from "../../../types";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
 
 type Nav = StackNavigationProp<RootStackParamList, "ImportarPlaneacion">;
 
 const ImportarPlaneacionScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
+  const { width } = useWindowDimensions();
+
+  const wideLayout = width >= 980;
 
   const actividadesPreview = useMemo(
     () => [
@@ -53,157 +57,181 @@ const ImportarPlaneacionScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
+      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity
-            style={styles.headerIconButton}
-            onPress={() => navigation.goBack()}
-            accessibilityLabel="Regresar"
-          >
-            <MaterialIcons name="arrow-back" size={28} color={COLORS.primary} />
-          </TouchableOpacity>
-
-          <View style={styles.headerTitleWrap}>
-            <Text style={styles.headerTitle}>Importar Planeación</Text>
-            <Text style={styles.headerSubtitle}>Importa desde PDF o DOCX</Text>
-          </View>
-
-          <TouchableOpacity style={styles.headerIconButton} onPress={showPendingMessage}>
-            <MaterialIcons name="more-vert" size={24} color={COLORS.textSecondary} />
-          </TouchableOpacity>
-        </View>
-
         <ScrollView
           contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={true}
-          bounces={false}
+          showsVerticalScrollIndicator={false}
         >
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Seleccionar archivo</Text>
+          <View style={styles.headerRow}>
+            <TouchableOpacity
+              style={styles.headerIconButton}
+              onPress={() => navigation.goBack()}
+              accessibilityLabel="Regresar"
+              activeOpacity={0.8}
+            >
+              <MaterialIcons name="arrow-back" size={24} color="#1676D2" />
+            </TouchableOpacity>
 
-            <View style={styles.uploadZone}>
-              <View style={styles.uploadIconCircle}>
-                <MaterialIcons name="upload-file" size={28} color={COLORS.primary} />
-              </View>
-              <Text style={styles.uploadTitle}>Arrastra o selecciona un archivo</Text>
-              <Text style={styles.uploadSubtitle}>Formatos permitidos: PDF, DOCX</Text>
+            <View style={styles.headerTitleWrap}>
+              <Text style={styles.headerTitle}>Importar Planeación</Text>
+              <Text style={styles.headerSubtitle}>Importa desde PDF o DOCX</Text>
             </View>
 
-            <TouchableOpacity style={styles.primaryButton} onPress={showPendingMessage}>
-              <MaterialIcons name="add" size={22} color={COLORS.surface} />
-              <Text style={styles.primaryButtonText}>Seleccionar archivo</Text>
+            <TouchableOpacity
+              style={styles.headerIconButton}
+              onPress={showPendingMessage}
+              activeOpacity={0.8}
+            >
+              <MaterialIcons name="more-vert" size={22} color="#7A8BA3" />
             </TouchableOpacity>
           </View>
 
-          <View style={styles.formatChipsRow}>
-            <View style={styles.formatChip}>
-              <MaterialIcons name="picture-as-pdf" size={18} color={COLORS.primary} />
-              <Text style={styles.formatChipText}>PDF</Text>
-            </View>
-            <View style={styles.formatChip}>
-              <MaterialIcons name="description" size={18} color={COLORS.primary} />
-              <Text style={styles.formatChipText}>DOCX</Text>
-            </View>
-          </View>
+          <View style={[styles.mainLayout, wideLayout && styles.mainLayoutWide]}>
+            <View style={[styles.leftColumn, wideLayout && styles.leftColumnWide]}>
+              <View style={styles.card}>
+                <Text style={styles.sectionTitle}>Seleccionar archivo</Text>
 
-          <View style={styles.errorCard}>
-            <MaterialIcons name="warning-amber" size={28} color={COLORS.error} />
-            <Text style={styles.errorText}>El formato .jpg no es compatible. Por favor usa PDF o DOCX.</Text>
-          </View>
-
-          <View style={styles.card}>
-            <View style={styles.stateRow}>
-              <View style={styles.stateIconCircle}>
-                <MaterialIcons name="sync" size={24} color={COLORS.primary} />
-              </View>
-              <View style={styles.stateTextWrap}>
-                <Text style={styles.stateTitle}>Procesando archivo...</Text>
-                <Text style={styles.stateSubtitle}>Extrayendo contenido...</Text>
-              </View>
-            </View>
-
-            <View style={styles.stateRowMuted}>
-              <View style={[styles.stateIconCircle, styles.stateIconCircleMuted]}>
-                <MaterialIcons name="check-circle" size={24} color={COLORS.secondary} />
-              </View>
-              <View style={styles.stateTextWrap}>
-                <Text style={styles.stateTitleMuted}>Contenido extraído</Text>
-                <Text style={styles.stateSubtitleMuted}>Correctamente procesado</Text>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.previewHeaderRow}>
-            <Text style={styles.previewHeaderTitle}>Vista previa</Text>
-            <View style={styles.badgeDraft}>
-              <Text style={styles.badgeDraftText}>BORRADOR</Text>
-            </View>
-          </View>
-
-          <View style={styles.card}>
-            <Text style={styles.fieldLabel}>ASIGNATURA</Text>
-            <View style={styles.fieldValueCardAccent}>
-              <Text style={styles.fieldValueText}>Matemáticas Aplicadas</Text>
-            </View>
-
-            <Text style={styles.fieldLabel}>GRADO Y GRUPO</Text>
-            <View style={styles.fieldValueCard}>
-              <Text style={styles.fieldValueText}>3° Grado - Grupo B</Text>
-            </View>
-
-            <Text style={styles.fieldLabel}>TEMA DE LA SESIÓN</Text>
-            <View style={styles.fieldValueCard}>
-              <Text style={styles.fieldValueText}>Ecuaciones Cuadráticas Complejas</Text>
-            </View>
-
-            <View style={styles.structureTitleRow}>
-              <MaterialIcons name="format-list-bulleted" size={20} color={COLORS.textSecondary} />
-              <Text style={styles.structureTitle}>Estructura de Actividades</Text>
-            </View>
-
-            {actividadesPreview.map((item) => (
-              <View key={item.id} style={styles.activityCard}>
-                <View style={styles.activityIndexCircle}>
-                  <Text style={styles.activityIndexText}>{item.id}</Text>
+                <View style={styles.uploadZone}>
+                  <View style={styles.uploadIconCircle}>
+                    <MaterialIcons name="upload-file" size={28} color="#1676D2" />
+                  </View>
+                  <Text style={styles.uploadTitle}>Arrastra o selecciona un archivo</Text>
+                  <Text style={styles.uploadSubtitle}>Formatos permitidos: PDF, DOCX</Text>
                 </View>
-                <View style={styles.activityTextWrap}>
-                  <Text style={styles.activityTitle}>{item.titulo}</Text>
-                  <Text style={styles.activityDesc}>{item.descripcion}</Text>
+
+                <TouchableOpacity
+                  style={styles.primaryButton}
+                  onPress={showPendingMessage}
+                  activeOpacity={0.9}
+                >
+                  <MaterialIcons name="add" size={20} color="#FFFFFF" />
+                  <Text style={styles.primaryButtonText}>Seleccionar archivo</Text>
+                </TouchableOpacity>
+
+                <View style={styles.formatChipsRow}>
+                  <View style={styles.formatChip}>
+                    <MaterialIcons name="picture-as-pdf" size={16} color="#1676D2" />
+                    <Text style={styles.formatChipText}>PDF</Text>
+                  </View>
+                  <View style={styles.formatChip}>
+                    <MaterialIcons name="description" size={16} color="#1676D2" />
+                    <Text style={styles.formatChipText}>DOCX</Text>
+                  </View>
                 </View>
               </View>
-            ))}
 
-            <View style={styles.dualInfoRow}>
-              <View style={styles.infoMiniCardWarm}>
-                <Text style={styles.miniCardTitle}>Evaluación</Text>
-                <Text style={styles.miniCardText}>Lista de cotejo</Text>
+              <View style={styles.errorCard}>
+                <MaterialIcons name="warning-amber" size={24} color="#D34553" />
+                <Text style={styles.errorText}>
+                  El formato .jpg no es compatible. Por favor usa PDF o DOCX.
+                </Text>
               </View>
-              <View style={styles.infoMiniCardCool}>
-                <Text style={styles.miniCardTitle}>Recursos</Text>
-                <Text style={styles.miniCardText}>Libro, Pizarrón</Text>
+
+              <View style={styles.card}>
+                <View style={styles.stateRow}>
+                  <View style={styles.stateIconCircle}>
+                    <MaterialIcons name="sync" size={22} color="#1676D2" />
+                  </View>
+                  <View style={styles.stateTextWrap}>
+                    <Text style={styles.stateTitle}>Procesando archivo...</Text>
+                    <Text style={styles.stateSubtitle}>Extrayendo contenido...</Text>
+                  </View>
+                </View>
+
+                <View style={styles.stateRowMuted}>
+                  <View style={[styles.stateIconCircle, styles.stateIconCircleMuted]}>
+                    <MaterialIcons name="check-circle" size={22} color="#0BA5A5" />
+                  </View>
+                  <View style={styles.stateTextWrap}>
+                    <Text style={styles.stateTitleMuted}>Contenido extraído</Text>
+                    <Text style={styles.stateSubtitleMuted}>Correctamente procesado</Text>
+                  </View>
+                </View>
               </View>
             </View>
 
-            <View style={styles.infoNotice}>
-              <MaterialIcons name="info" size={22} color={COLORS.primary} />
-              <Text style={styles.infoNoticeText}>
-                Puedes ajustar estos datos antes de guardar definitivamente en tu repositorio.
-              </Text>
+            <View style={[styles.rightColumn, wideLayout && styles.rightColumnWide]}>
+              <View style={styles.previewHeaderRow}>
+                <Text style={styles.previewHeaderTitle}>Vista previa</Text>
+                <View style={styles.badgeDraft}>
+                  <Text style={styles.badgeDraftText}>BORRADOR</Text>
+                </View>
+              </View>
+
+              <View style={styles.card}>
+                <Text style={styles.fieldLabel}>ASIGNATURA</Text>
+                <View style={styles.fieldValueCardAccent}>
+                  <Text style={styles.fieldValueText}>Matemáticas Aplicadas</Text>
+                </View>
+
+                <Text style={styles.fieldLabel}>GRADO Y GRUPO</Text>
+                <View style={styles.fieldValueCard}>
+                  <Text style={styles.fieldValueText}>3° Grado - Grupo B</Text>
+                </View>
+
+                <Text style={styles.fieldLabel}>TEMA DE LA SESIÓN</Text>
+                <View style={styles.fieldValueCard}>
+                  <Text style={styles.fieldValueText}>Ecuaciones Cuadráticas Complejas</Text>
+                </View>
+
+                <View style={styles.structureTitleRow}>
+                  <MaterialIcons name="format-list-bulleted" size={18} color="#6B7D96" />
+                  <Text style={styles.structureTitle}>Estructura de Actividades</Text>
+                </View>
+
+                {actividadesPreview.map((item) => (
+                  <View key={item.id} style={styles.activityCard}>
+                    <View style={styles.activityIndexCircle}>
+                      <Text style={styles.activityIndexText}>{item.id}</Text>
+                    </View>
+                    <View style={styles.activityTextWrap}>
+                      <Text style={styles.activityTitle}>{item.titulo}</Text>
+                      <Text style={styles.activityDesc}>{item.descripcion}</Text>
+                    </View>
+                  </View>
+                ))}
+
+                <View style={styles.dualInfoRow}>
+                  <View style={styles.infoMiniCardWarm}>
+                    <Text style={styles.miniCardTitle}>Evaluación</Text>
+                    <Text style={styles.miniCardText}>Lista de cotejo</Text>
+                  </View>
+                  <View style={styles.infoMiniCardCool}>
+                    <Text style={styles.miniCardTitle}>Recursos</Text>
+                    <Text style={styles.miniCardText}>Libro, Pizarrón</Text>
+                  </View>
+                </View>
+
+                <View style={styles.infoNotice}>
+                  <MaterialIcons name="info" size={20} color="#1676D2" />
+                  <Text style={styles.infoNoticeText}>
+                    Puedes ajustar estos datos antes de guardar definitivamente en tu repositorio.
+                  </Text>
+                </View>
+              </View>
             </View>
           </View>
 
-          <TouchableOpacity style={styles.primaryButtonLarge} onPress={showPendingMessage}>
-            <MaterialIcons name="save-alt" size={22} color={COLORS.surface} />
-            <Text style={styles.primaryButtonLargeText}>Importar y continuar</Text>
-          </TouchableOpacity>
+          <View style={[styles.footerActions, wideLayout && styles.footerActionsWide]}>
+            <TouchableOpacity
+              style={styles.primaryButtonLarge}
+              onPress={showPendingMessage}
+              activeOpacity={0.9}
+            >
+              <MaterialIcons name="save-alt" size={22} color="#FFFFFF" />
+              <Text style={styles.primaryButtonLargeText}>Importar y continuar</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.cancelButtonText}>Cancelar</Text>
-          </TouchableOpacity>
-
-          <View style={styles.spacer} />
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.cancelButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       </SafeAreaView>
     </View>
@@ -213,97 +241,125 @@ const ImportarPlaneacionScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: "#EEF3FA",
   },
   safeArea: {
     flex: 1,
   },
+  scrollContent: {
+    width: "100%",
+    maxWidth: 1240,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 110,
+    gap: 12,
+  },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 14,
-    paddingTop: 4,
-    paddingBottom: 10,
     gap: 8,
   },
   headerIconButton: {
     width: 36,
     height: 36,
+    borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
   },
   headerTitleWrap: {
     flex: 1,
   },
   headerTitle: {
-    fontSize: 38 / 2,
-    fontWeight: "700",
-    color: COLORS.primary,
+    fontSize: 30,
+    fontWeight: "800",
+    color: "#1E2A3A",
+    letterSpacing: -0.4,
   },
   headerSubtitle: {
     marginTop: 2,
-    fontSize: FONT_SIZES.large,
-    color: COLORS.text,
+    fontSize: 14,
+    color: "#5C6E86",
   },
-  scrollContent: {
-    paddingHorizontal: 14,
-    paddingBottom: 34,
-    gap: 14,
-  },
-  card: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 18,
-    padding: 16,
+  mainLayout: {
     gap: 12,
   },
+  mainLayoutWide: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  leftColumn: {
+    gap: 12,
+  },
+  leftColumnWide: {
+    width: "35%",
+  },
+  rightColumn: {
+    gap: 10,
+  },
+  rightColumnWide: {
+    width: "65%",
+  },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 14,
+    gap: 10,
+    boxShadow: "0px 12px 22px rgba(18, 44, 86, 0.08)",
+  },
   sectionTitle: {
-    fontSize: 34 / 2,
+    fontSize: 20,
     fontWeight: "700",
-    color: COLORS.text,
+    color: "#1E2A3A",
   },
   uploadZone: {
     borderWidth: 1,
     borderStyle: "dashed",
-    borderColor: COLORS.textSecondary + "44",
-    borderRadius: 16,
-    minHeight: 230,
+    borderColor: "#BFD0E4",
+    borderRadius: 14,
+    minHeight: 175,
     alignItems: "center",
     justifyContent: "center",
-    padding: 16,
-    gap: 8,
-    backgroundColor: COLORS.background,
+    padding: 14,
+    gap: 7,
+    backgroundColor: "#F8FBFF",
   },
   uploadIconCircle: {
-    width: 82,
-    height: 82,
-    borderRadius: 41,
+    width: 68,
+    height: 68,
+    borderRadius: 34,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: COLORS.secondary,
+    backgroundColor: "#DFF1FF",
   },
   uploadTitle: {
     textAlign: "center",
-    color: COLORS.text,
-    fontSize: FONT_SIZES.xlarge,
+    color: "#1E2A3A",
+    fontSize: 16,
     fontWeight: "700",
   },
   uploadSubtitle: {
     textAlign: "center",
-    color: COLORS.textSecondary,
-    fontSize: FONT_SIZES.large,
+    color: "#6B7D96",
+    fontSize: 13,
   },
   primaryButton: {
-    minHeight: 64,
-    borderRadius: 16,
-    backgroundColor: COLORS.primary,
+    minHeight: 52,
+    borderRadius: 12,
+    backgroundColor: "#1676D2",
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
     gap: 8,
   },
   primaryButtonText: {
-    color: COLORS.surface,
-    fontSize: FONT_SIZES.xxlarge,
+    color: "#FFFFFF",
+    fontSize: 15,
     fontWeight: "700",
   },
   formatChipsRow: {
@@ -311,244 +367,252 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   formatChip: {
-    borderRadius: 22,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    borderRadius: 16,
+    paddingVertical: 7,
+    paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    backgroundColor: COLORS.secondary,
+    gap: 6,
+    backgroundColor: "#EAF4FF",
   },
   formatChipText: {
-    color: COLORS.text,
-    fontSize: FONT_SIZES.large,
+    color: "#1E2A3A",
+    fontSize: 12,
     fontWeight: "700",
   },
   errorCard: {
     borderWidth: 1,
-    borderColor: COLORS.error + "66",
-    borderRadius: 16,
-    padding: 14,
+    borderColor: "#F6C4CB",
+    borderRadius: 12,
+    padding: 12,
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    backgroundColor: "#fff7f7",
+    gap: 10,
+    backgroundColor: "#FFF7F7",
   },
   errorText: {
     flex: 1,
-    color: "#b3261e",
-    fontSize: FONT_SIZES.large,
-    lineHeight: 28,
+    color: "#B12635",
+    fontSize: 13,
+    lineHeight: 19,
     fontWeight: "600",
   },
   stateRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 10,
   },
   stateRowMuted: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    opacity: 0.65,
+    gap: 10,
+    opacity: 0.72,
   },
   stateIconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: COLORS.background,
+    backgroundColor: "#EAF4FF",
   },
   stateIconCircleMuted: {
-    backgroundColor: COLORS.secondary,
+    backgroundColor: "#DEF6F5",
   },
   stateTextWrap: {
     flex: 1,
   },
   stateTitle: {
-    fontSize: 36 / 2,
-    color: COLORS.text,
+    fontSize: 15,
+    color: "#1E2A3A",
     fontWeight: "700",
   },
   stateSubtitle: {
-    marginTop: 2,
-    fontSize: FONT_SIZES.xlarge,
-    color: COLORS.textSecondary,
+    marginTop: 1,
+    fontSize: 13,
+    color: "#6B7D96",
   },
   stateTitleMuted: {
-    fontSize: 36 / 2,
-    color: COLORS.textSecondary,
+    fontSize: 15,
+    color: "#4D5D74",
     fontWeight: "700",
   },
   stateSubtitleMuted: {
-    marginTop: 2,
-    fontSize: FONT_SIZES.xlarge,
-    color: COLORS.textSecondary,
+    marginTop: 1,
+    fontSize: 13,
+    color: "#6B7D96",
   },
   previewHeaderRow: {
-    marginTop: 8,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
   previewHeaderTitle: {
-    color: COLORS.text,
-    fontSize: 46 / 2,
-    fontWeight: "700",
+    color: "#1E2A3A",
+    fontSize: 24,
+    fontWeight: "800",
   },
   badgeDraft: {
     borderRadius: 10,
-    backgroundColor: COLORS.secondary,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    backgroundColor: "#DFF1FF",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
   },
   badgeDraftText: {
-    color: COLORS.primary,
-    fontSize: FONT_SIZES.small,
+    color: "#1676D2",
+    fontSize: 11,
     fontWeight: "800",
-    letterSpacing: 1,
+    letterSpacing: 0.7,
   },
   fieldLabel: {
-    color: COLORS.textSecondary,
-    fontSize: FONT_SIZES.medium,
+    color: "#6B7D96",
+    fontSize: 12,
     fontWeight: "700",
+    letterSpacing: 0.4,
   },
   fieldValueCard: {
-    borderRadius: 14,
-    backgroundColor: COLORS.background,
-    minHeight: 60,
-    paddingHorizontal: 14,
+    borderRadius: 12,
+    backgroundColor: "#F7FAFE",
+    minHeight: 50,
+    paddingHorizontal: 12,
     justifyContent: "center",
   },
   fieldValueCardAccent: {
-    borderRadius: 14,
-    backgroundColor: COLORS.background,
-    minHeight: 60,
-    paddingHorizontal: 14,
+    borderRadius: 12,
+    backgroundColor: "#F7FAFE",
+    minHeight: 50,
+    paddingHorizontal: 12,
     justifyContent: "center",
     borderLeftWidth: 4,
-    borderLeftColor: COLORS.primary,
+    borderLeftColor: "#1676D2",
   },
   fieldValueText: {
-    color: COLORS.text,
-    fontSize: FONT_SIZES.xxlarge,
+    color: "#1E2A3A",
+    fontSize: 15,
     fontWeight: "600",
   },
   structureTitleRow: {
-    marginTop: 8,
+    marginTop: 4,
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
   },
   structureTitle: {
-    color: COLORS.text,
-    fontSize: FONT_SIZES.xlarge,
+    color: "#1E2A3A",
+    fontSize: 15,
     fontWeight: "700",
   },
   activityCard: {
-    borderRadius: 16,
-    backgroundColor: COLORS.background,
-    padding: 14,
+    borderRadius: 12,
+    backgroundColor: "#F7FAFE",
+    padding: 10,
     flexDirection: "row",
-    gap: 12,
+    gap: 10,
   },
   activityIndexCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: COLORS.primary,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#1676D2",
     alignItems: "center",
     justifyContent: "center",
   },
   activityIndexText: {
-    color: COLORS.surface,
-    fontSize: FONT_SIZES.medium,
+    color: "#FFFFFF",
+    fontSize: 12,
     fontWeight: "700",
   },
   activityTextWrap: {
     flex: 1,
-    gap: 2,
+    gap: 1,
   },
   activityTitle: {
-    color: COLORS.text,
-    fontSize: FONT_SIZES.xxlarge,
+    color: "#1E2A3A",
+    fontSize: 14,
     fontWeight: "700",
   },
   activityDesc: {
-    color: COLORS.text,
-    fontSize: FONT_SIZES.large,
-    lineHeight: 30,
+    color: "#4D5D74",
+    fontSize: 12,
+    lineHeight: 17,
   },
   dualInfoRow: {
     flexDirection: "row",
-    gap: 10,
+    gap: 8,
   },
   infoMiniCardWarm: {
     flex: 1,
-    borderRadius: 16,
-    padding: 14,
-    backgroundColor: "#f3ece1",
-    gap: 6,
+    borderRadius: 12,
+    padding: 10,
+    backgroundColor: "#FFF4E8",
+    gap: 4,
   },
   infoMiniCardCool: {
     flex: 1,
-    borderRadius: 16,
-    padding: 14,
-    backgroundColor: COLORS.background,
-    gap: 6,
+    borderRadius: 12,
+    padding: 10,
+    backgroundColor: "#EAF4FF",
+    gap: 4,
   },
   miniCardTitle: {
-    color: COLORS.text,
-    fontSize: FONT_SIZES.xlarge,
+    color: "#1E2A3A",
+    fontSize: 13,
     fontWeight: "700",
   },
   miniCardText: {
-    color: COLORS.textSecondary,
-    fontSize: FONT_SIZES.large,
+    color: "#5C6E86",
+    fontSize: 12,
   },
   infoNotice: {
-    marginTop: 2,
-    borderRadius: 16,
-    padding: 14,
-    backgroundColor: COLORS.background,
+    borderRadius: 12,
+    padding: 11,
+    backgroundColor: "#EAF4FF",
     flexDirection: "row",
-    gap: 10,
+    gap: 8,
   },
   infoNoticeText: {
     flex: 1,
-    color: COLORS.primary,
-    fontSize: FONT_SIZES.xxlarge,
+    color: "#1676D2",
+    fontSize: 12,
     fontWeight: "700",
-    lineHeight: 32,
+    lineHeight: 16,
+  },
+  footerActions: {
+    gap: 10,
+  },
+  footerActionsWide: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   primaryButtonLarge: {
-    minHeight: 72,
-    borderRadius: 20,
-    backgroundColor: COLORS.primary,
+    minHeight: 54,
+    borderRadius: 14,
+    backgroundColor: "#1676D2",
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
-    gap: 10,
-    marginTop: 8,
+    gap: 8,
+    flex: 1,
   },
   primaryButtonLargeText: {
-    color: COLORS.surface,
-    fontSize: 40 / 2,
+    color: "#FFFFFF",
+    fontSize: 16,
     fontWeight: "700",
   },
   cancelButton: {
-    minHeight: 50,
+    minHeight: 52,
     alignItems: "center",
     justifyContent: "center",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#D6E0EE",
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 24,
   },
   cancelButtonText: {
-    color: COLORS.textSecondary,
-    fontSize: 40 / 2,
-    fontWeight: "600",
-  },
-  spacer: {
-    height: 22,
+    color: "#5C6E86",
+    fontSize: 15,
+    fontWeight: "700",
   },
 });
 

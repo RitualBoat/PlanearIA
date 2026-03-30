@@ -1,5 +1,5 @@
 import * as Print from "expo-print";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel } from "docx";
 import type { Planeacion } from "../../types/planeacion";
 
@@ -34,7 +34,7 @@ const slugify = (value: string): string =>
 
 export const buildPlaneacionPdfHtml = (
   planeacion: Planeacion,
-  options: PdfExportOptions,
+  options: PdfExportOptions
 ): string => {
   const fecha = new Date(planeacion.fecha).toLocaleDateString("es-MX", {
     day: "2-digit",
@@ -49,7 +49,7 @@ export const buildPlaneacionPdfHtml = (
         <strong>${toSafeText(actividad.tipo.toUpperCase())}</strong>
         <span>${toSafeText(actividad.descripcion)}</span>
         <em>${actividad.duracion} min</em>
-      </li>`,
+      </li>`
     )
     .join("");
 
@@ -151,7 +151,7 @@ export const buildPlaneacionPdfHtml = (
 
 export const exportPlaneacionToPdf = async (
   planeacion: Planeacion,
-  options: PdfExportOptions,
+  options: PdfExportOptions
 ): Promise<ExportedPdfFile> => {
   const html = buildPlaneacionPdfHtml(planeacion, options);
   const printResult = await Print.printToFileAsync({ html });
@@ -171,7 +171,7 @@ export const exportPlaneacionToPdf = async (
 
 export const exportPlaneacionToDocx = async (
   planeacion: Planeacion,
-  options: PdfExportOptions,
+  options: PdfExportOptions
 ): Promise<ExportedPdfFile> => {
   const doc = new Document({
     sections: [
@@ -185,19 +185,24 @@ export const exportPlaneacionToDocx = async (
                   heading: HeadingLevel.HEADING_1,
                 }),
                 new Paragraph({
-                  children: [new TextRun(`Generado por PlanearIA • ${new Date().toLocaleString("es-MX")}`)],
+                  children: [
+                    new TextRun(`Generado por PlanearIA • ${new Date().toLocaleString("es-MX")}`),
+                  ],
                 }),
               ]
             : []),
           new Paragraph({ text: " " }),
-          new Paragraph({ text: `Asignatura: ${planeacion.asignatura}`, heading: HeadingLevel.HEADING_2 }),
+          new Paragraph({
+            text: `Asignatura: ${planeacion.asignatura}`,
+            heading: HeadingLevel.HEADING_2,
+          }),
           new Paragraph({ text: `Grado y grupo: ${planeacion.grado} ${planeacion.grupo || ""}` }),
           new Paragraph({ text: `Unidad temática: ${planeacion.unidadTematica}` }),
           new Paragraph({ text: `Tema de sesión: ${planeacion.temaSesion}` }),
           new Paragraph({ text: " " }),
           new Paragraph({ text: "Aprendizajes esperados", heading: HeadingLevel.HEADING_2 }),
           ...((planeacion.aprendizajesEsperados || []).map(
-            (item) => new Paragraph({ text: `• ${item}` }),
+            (item) => new Paragraph({ text: `• ${item}` })
           ) || [new Paragraph({ text: "• Sin aprendizajes capturados" })]),
           ...(options.actividades
             ? [
@@ -207,7 +212,7 @@ export const exportPlaneacionToDocx = async (
                   (item) =>
                     new Paragraph({
                       text: `• ${item.tipo.toUpperCase()}: ${item.descripcion} (${item.duracion} min)`,
-                    }),
+                    })
                 ) || [new Paragraph({ text: "• Sin actividades registradas" })]),
               ]
             : []),

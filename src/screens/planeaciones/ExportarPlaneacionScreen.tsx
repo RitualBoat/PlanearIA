@@ -8,6 +8,9 @@ import {
   ScrollView,
   Switch,
   Modal,
+  Alert,
+  Linking,
+  Platform,
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,6 +20,7 @@ import type { RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
 import { usePlaneaciones } from "../../sync/providers/SyncProvider";
+import { exportPlaneacionToPdf } from "../../services/planeacionExportService";
 
 type Nav = StackNavigationProp<RootStackParamList, "ExportarPlaneacion">;
 type ExportarRoute = RouteProp<RootStackParamList, "ExportarPlaneacion">;
@@ -61,6 +65,18 @@ const ExportarPlaneacionScreen: React.FC = () => {
   });
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [showSuccess, setShowSuccess] = React.useState(false);
+  const [exportedFileUri, setExportedFileUri] = React.useState<string>("");
+  const [exportedFileName, setExportedFileName] = React.useState<string>("");
+  const [exportedFileSize, setExportedFileSize] = React.useState<string>("");
+
+  const showMessage = React.useCallback((title: string, message: string) => {
+    if (Platform.OS === "web") {
+      window.alert(message);
+      return;
+    }
+
+    Alert.alert(title, message);
+  }, []);
 
   const estimatedSize = React.useMemo(() => {
     const optionCount = Object.values(options).filter(Boolean).length;
@@ -82,16 +98,50 @@ const ExportarPlaneacionScreen: React.FC = () => {
   };
 
   const handleExportar = async () => {
-    setIsGenerating(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsGenerating(false);
-    setShowSuccess(true);
+    if (!planeacion) {
+      showMessage("Exportar", "No se encontró la planeación para exportar.");
+      return;
+    }
+
+    if (selectedFormat !== "pdf") {
+      showMessage("Exportar", "Word y Excel se habilitarán en la siguiente tarea.");
+      return;
+    }
+
+    try {
+      setIsGenerating(true);
+
+      const result = await exportPlaneacionToPdf(planeacion, options);
+      const sizeMb = (result.sizeBytes / (1024 * 1024)).toFixed(1);
+
+      setExportedFileUri(result.uri);
+      setExportedFileName(result.name);
+      setExportedFileSize(`${sizeMb} MB`);
+      setShowSuccess(true);
+    } catch (error) {
+      showMessage(
+        "Exportar",
+        error instanceof Error ? error.message : "No se pudo generar el archivo PDF.",
+      );
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleCompartir = () => {
-    // Flujo visual listo; compartir real se implementa en la tarea dedicada de expo-sharing.
-    if (typeof window !== "undefined") {
-      window.alert("Compartir de archivo se habilitará en la siguiente tarea.");
+    showMessage("Compartir", "La hoja de compartir se habilitará en la siguiente tarea.");
+  };
+
+  const handleOpenFile = async () => {
+    if (!exportedFileUri) {
+      showMessage("Exportar", "No hay archivo generado para abrir.");
+      return;
+    }
+
+    try {
+      await Linking.openURL(exportedFileUri);
+    } catch {
+      showMessage("Exportar", "No se pudo abrir el archivo generado.");
     }
   };
 
@@ -291,13 +341,15 @@ const ExportarPlaneacionScreen: React.FC = () => {
               <MaterialIcons name={formatIcon[selectedFormat]} size={22} color="#1676D2" />
               <View style={styles.fileCardTextWrap}>
                 <Text style={styles.fileCardTitle} numberOfLines={1}>
-                  Planeacion_{planeacion?.asignatura || "sin_asignatura"}.{selectedFormat}
+                  {exportedFileName || `Planeacion_${planeacion?.asignatura || "sin_asignatura"}.${selectedFormat}`}
                 </Text>
-                <Text style={styles.fileCardMeta}>{estimatedSize} • Creado ahora mismo</Text>
+                <Text style={styles.fileCardMeta}>
+                  {(exportedFileSize || estimatedSize) + " • Creado ahora mismo"}
+                </Text>
               </View>
             </View>
 
-            <TouchableOpacity style={styles.openButton} onPress={() => setShowSuccess(false)}>
+            <TouchableOpacity style={styles.openButton} onPress={handleOpenFile}>
               <Text style={styles.openButtonText}>Abrir archivo</Text>
             </TouchableOpacity>
 

@@ -7,6 +7,7 @@ import {
   StatusBar,
   ScrollView,
   Alert,
+  Platform,
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,48 +17,66 @@ import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { COLORS } from "../../../types";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
+import { usePlaneaciones } from "../../sync/providers/SyncProvider";
+import {
+  buildPlaneacionFromImportDraft,
+  parseImportedPlaneacionFile,
+  type PlaneacionImportDraft,
+} from "../../services/planeacionImportService";
 
 type Nav = StackNavigationProp<RootStackParamList, "ImportarPlaneacion">;
 
 const ImportarPlaneacionScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
+  const { agregarPlaneacion, forceSync } = usePlaneaciones();
   const { width } = useWindowDimensions();
 
   const [selectedFileName, setSelectedFileName] = React.useState<string | null>(null);
   const [selectedFileType, setSelectedFileType] = React.useState<string | null>(null);
+  const [selectedFileAsset, setSelectedFileAsset] =
+    React.useState<DocumentPicker.DocumentPickerAsset | null>(null);
+  const [importDraft, setImportDraft] = React.useState<PlaneacionImportDraft | null>(null);
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [importError, setImportError] = React.useState<string | null>(null);
 
   const wideLayout = width >= 980;
 
-  const actividadesPreview = useMemo(
-    () => [
+  const actividadesPreview = useMemo(() => {
+    if (importDraft?.actividades?.length) {
+      return importDraft.actividades.map((item, index) => ({
+        id: String(index + 1).padStart(2, "0"),
+        titulo: item.tipo.charAt(0).toUpperCase() + item.tipo.slice(1),
+        descripcion: item.descripcion,
+      }));
+    }
+
+    return [
       {
         id: "01",
         titulo: "Inicio",
-        descripcion: "Recuperación de conocimientos previos mediante lluvia de ideas.",
+        descripcion: "Activación de conocimientos previos.",
       },
       {
         id: "02",
         titulo: "Desarrollo",
-        descripcion: "Explicación de la fórmula general y resolución de 5 ejercicios prácticos.",
+        descripcion: "Desarrollo del tema con actividades guiadas.",
       },
       {
         id: "03",
         titulo: "Cierre",
-        descripcion: "Plenaria para aclarar dudas sobre los resultados obtenidos.",
+        descripcion: "Cierre y retroalimentación.",
       },
-    ],
-    []
-  );
+    ];
+  }, [importDraft]);
 
   const previewSubject = React.useMemo(() => {
+    if (importDraft?.asignatura) return importDraft.asignatura;
     if (!selectedFileName) return "Matemáticas Aplicadas";
     return selectedFileName
       .replace(/\.(pdf|docx|doc)$/i, "")
       .replace(/[\-_]+/g, " ")
       .trim();
-  }, [selectedFileName]);
+  }, [importDraft?.asignatura, selectedFileName]);
 
   const showPendingMessage = () => {
     Alert.alert("Importar planeación", "Opciones avanzadas disponibles en próximas tareas.");
@@ -66,6 +85,7 @@ const ImportarPlaneacionScreen: React.FC = () => {
   const handleSelectFile = async () => {
     try {
       setImportError(null);
+      setImportDraft(null);
 
       const result = await DocumentPicker.getDocumentAsync({
         copyToCacheDirectory: true,
@@ -95,26 +115,68 @@ const ImportarPlaneacionScreen: React.FC = () => {
 
       setSelectedFileName(asset.name);
       setSelectedFileType(asset.mimeType || "Documento");
+      setSelectedFileAsset(asset);
       setIsProcessing(true);
 
-      await new Promise((resolve) => setTimeout(resolve, 850));
+      const parsed = await parseImportedPlaneacionFile(asset);
+      setImportDraft(parsed);
       setIsProcessing(false);
-    } catch {
+    } catch (error) {
       setIsProcessing(false);
-      setImportError("Ocurrió un error al seleccionar el archivo.");
+      setImportError(
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al seleccionar o procesar el archivo."
+      );
     }
   };
 
-  const handleImportarYContinuar = () => {
+  const handleImportarYContinuar = async () => {
     if (!selectedFileName) {
       Alert.alert("Importar planeación", "Selecciona primero un archivo PDF o DOCX.");
       return;
     }
 
-    Alert.alert(
-      "Importar planeación",
-      "Archivo seleccionado correctamente. El parseo estructurado se completará en la siguiente tarea."
-    );
+    if (!importDraft || !selectedFileAsset) {
+      Alert.alert(
+        "Importar planeación",
+        "No hay contenido procesado todavía. Intenta seleccionar nuevamente el archivo."
+      );
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      setImportError(null);
+
+      const planeacionImportada = buildPlaneacionFromImportDraft(
+        importDraft,
+        selectedFileAsset.name
+      );
+
+      await agregarPlaneacion(planeacionImportada);
+      await forceSync();
+
+      setIsProcessing(false);
+
+      if (Platform.OS === "web") {
+        window.alert("Planeación importada, guardada y sincronizada correctamente.");
+      } else {
+        Alert.alert(
+          "Importar planeación",
+          "Planeación importada, guardada y sincronizada correctamente."
+        );
+      }
+
+      navigation.navigate("ListaPlaneaciones");
+    } catch (error) {
+      setIsProcessing(false);
+      setImportError(
+        error instanceof Error
+          ? error.message
+          : "No se pudo guardar o sincronizar la planeación importada."
+      );
+    }
   };
 
   return (
@@ -264,12 +326,18 @@ const ImportarPlaneacionScreen: React.FC = () => {
 
                 <Text style={styles.fieldLabel}>GRADO Y GRUPO</Text>
                 <View style={styles.fieldValueCard}>
-                  <Text style={styles.fieldValueText}>3° Grado - Grupo B</Text>
+                  <Text style={styles.fieldValueText}>
+                    {importDraft?.grado || ""}
+                    {importDraft?.grado && importDraft?.grupo ? " - " : ""}
+                    {importDraft?.grupo || "Por completar"}
+                  </Text>
                 </View>
 
                 <Text style={styles.fieldLabel}>TEMA DE LA SESIÓN</Text>
                 <View style={styles.fieldValueCard}>
-                  <Text style={styles.fieldValueText}>Ecuaciones Cuadráticas Complejas</Text>
+                  <Text style={styles.fieldValueText}>
+                    {importDraft?.temaSesion || "Por completar"}
+                  </Text>
                 </View>
 
                 <View style={styles.structureTitleRow}>
@@ -292,18 +360,26 @@ const ImportarPlaneacionScreen: React.FC = () => {
                 <View style={styles.dualInfoRow}>
                   <View style={styles.infoMiniCardWarm}>
                     <Text style={styles.miniCardTitle}>Evaluación</Text>
-                    <Text style={styles.miniCardText}>Lista de cotejo</Text>
+                    <Text style={styles.miniCardText}>
+                      {importDraft?.evaluacion || "Por completar"}
+                    </Text>
                   </View>
                   <View style={styles.infoMiniCardCool}>
                     <Text style={styles.miniCardTitle}>Recursos</Text>
-                    <Text style={styles.miniCardText}>Libro, Pizarrón</Text>
+                    <Text style={styles.miniCardText}>
+                      {importDraft?.recursos?.length
+                        ? importDraft.recursos.slice(0, 2).join(", ")
+                        : "Por completar"}
+                    </Text>
                   </View>
                 </View>
 
                 <View style={styles.infoNotice}>
                   <MaterialIcons name="info" size={20} color="#1676D2" />
                   <Text style={styles.infoNoticeText}>
-                    Puedes ajustar estos datos antes de guardar definitivamente en tu repositorio.
+                    {importDraft
+                      ? `Se extrajeron ${importDraft.sourceTextLength} caracteres. Los campos vacíos quedan listos para edición manual.`
+                      : "Puedes ajustar estos datos antes de guardar definitivamente en tu repositorio."}
                   </Text>
                 </View>
               </View>
@@ -314,9 +390,10 @@ const ImportarPlaneacionScreen: React.FC = () => {
             <TouchableOpacity
               style={[
                 styles.primaryButtonLarge,
-                !selectedFileName && styles.primaryButtonLargeDisabled,
+                (!selectedFileName || isProcessing) && styles.primaryButtonLargeDisabled,
               ]}
               onPress={handleImportarYContinuar}
+              disabled={!selectedFileName || isProcessing}
               activeOpacity={0.9}
             >
               <MaterialIcons name="save-alt" size={22} color="#FFFFFF" />

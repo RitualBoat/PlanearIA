@@ -36,6 +36,8 @@ const CrearGrupoScreen: React.FC = () => {
     setPeriodo,
     horario,
     setHorario,
+    validationError,
+    isSaving,
     handleCrearGrupo,
     handleCancelar,
   } = useCrearGrupoViewModel();
@@ -136,13 +138,18 @@ const CrearGrupoScreen: React.FC = () => {
             </View>
 
             {/* Botones de acción */}
+            {validationError ? <Text style={styles.errorText}>{validationError}</Text> : null}
+
             <TouchableOpacity
-              style={styles.submitButton}
-              onPress={handleCrearGrupo}
+              style={[styles.submitButton, isSaving && styles.submitButtonDisabled]}
+              onPress={() => void handleCrearGrupo()}
+              disabled={isSaving}
               activeOpacity={0.8}
             >
               <MaterialIcons name="check-circle" size={24} color="white" />
-              <Text style={styles.submitButtonText}>Crear Grupo</Text>
+              <Text style={styles.submitButtonText}>
+                {isSaving ? "Guardando..." : "Crear Grupo"}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -257,11 +264,25 @@ const styles = StyleSheet.create({
     marginTop: 10,
     boxShadow: "0px 8px 18px rgba(22, 118, 210, 0.32)",
   },
+  submitButtonDisabled: {
+    opacity: 0.7,
+  },
   submitButtonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
     marginLeft: 8,
+  },
+  errorText: {
+    color: "#B12635",
+    fontSize: 13,
+    fontWeight: "600",
+    backgroundColor: "#FFF1F2",
+    borderWidth: 1,
+    borderColor: "#F5C2C7",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
   },
   cancelButton: {
     alignItems: "center",

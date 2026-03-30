@@ -156,6 +156,16 @@ PUT    /api/planeaciones         # Actualizar
 DELETE /api/planeaciones?id=xxx  # Eliminar
 ```
 
+### Grupos CRUD
+
+```
+GET    /api/grupos         # Listar todos
+GET    /api/grupos?id=xxx  # Obtener uno
+POST   /api/grupos         # Crear
+PUT    /api/grupos         # Actualizar
+DELETE /api/grupos?id=xxx  # Eliminar
+```
+
 ### Generación con IA
 
 ```

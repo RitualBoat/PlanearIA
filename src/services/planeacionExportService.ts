@@ -1,5 +1,6 @@
 import * as Print from "expo-print";
 import * as FileSystem from "expo-file-system";
+import { Document, Packer, Paragraph, TextRun, HeadingLevel } from "docx";
 import type { Planeacion } from "../../types/planeacion";
 
 export interface PdfExportOptions {
@@ -166,4 +167,90 @@ export const exportPlaneacionToPdf = async (
     name,
     sizeBytes,
   };
+};
+
+export const exportPlaneacionToDocx = async (
+  planeacion: Planeacion,
+  options: PdfExportOptions,
+): Promise<ExportedPdfFile> => {
+  const doc = new Document({
+    sections: [
+      {
+        properties: {},
+        children: [
+          ...(options.portada
+            ? [
+                new Paragraph({
+                  text: "Planeación Didáctica",
+                  heading: HeadingLevel.HEADING_1,
+                }),
+                new Paragraph({
+                  children: [new TextRun(`Generado por PlanearIA • ${new Date().toLocaleString("es-MX")}`)],
+                }),
+              ]
+            : []),
+          new Paragraph({ text: " " }),
+          new Paragraph({ text: `Asignatura: ${planeacion.asignatura}`, heading: HeadingLevel.HEADING_2 }),
+          new Paragraph({ text: `Grado y grupo: ${planeacion.grado} ${planeacion.grupo || ""}` }),
+          new Paragraph({ text: `Unidad temática: ${planeacion.unidadTematica}` }),
+          new Paragraph({ text: `Tema de sesión: ${planeacion.temaSesion}` }),
+          new Paragraph({ text: " " }),
+          new Paragraph({ text: "Aprendizajes esperados", heading: HeadingLevel.HEADING_2 }),
+          ...((planeacion.aprendizajesEsperados || []).map(
+            (item) => new Paragraph({ text: `• ${item}` }),
+          ) || [new Paragraph({ text: "• Sin aprendizajes capturados" })]),
+          ...(options.actividades
+            ? [
+                new Paragraph({ text: " " }),
+                new Paragraph({ text: "Actividades", heading: HeadingLevel.HEADING_2 }),
+                ...((planeacion.actividades || []).map(
+                  (item) =>
+                    new Paragraph({
+                      text: `• ${item.tipo.toUpperCase()}: ${item.descripcion} (${item.duracion} min)`,
+                    }),
+                ) || [new Paragraph({ text: "• Sin actividades registradas" })]),
+              ]
+            : []),
+          new Paragraph({ text: " " }),
+          new Paragraph({ text: "Recursos", heading: HeadingLevel.HEADING_2 }),
+          ...((planeacion.recursos || []).map((item) => new Paragraph({ text: `• ${item}` })) || [
+            new Paragraph({ text: "• Sin recursos registrados" }),
+          ]),
+          ...(options.evaluacion
+            ? [
+                new Paragraph({ text: " " }),
+                new Paragraph({ text: "Evaluación", heading: HeadingLevel.HEADING_2 }),
+                new Paragraph({ text: planeacion.evaluacion || "Sin evaluación definida" }),
+              ]
+            : []),
+          new Paragraph({ text: " " }),
+          new Paragraph({ text: "Evidencias", heading: HeadingLevel.HEADING_2 }),
+          ...((planeacion.evidencias || []).map((item) => new Paragraph({ text: `• ${item}` })) || [
+            new Paragraph({ text: "• Sin evidencias registradas" }),
+          ]),
+          ...(options.observaciones
+            ? [
+                new Paragraph({ text: " " }),
+                new Paragraph({ text: "Observaciones", heading: HeadingLevel.HEADING_2 }),
+                new Paragraph({ text: planeacion.observaciones || "Sin observaciones" }),
+              ]
+            : []),
+        ],
+      },
+    ],
+  });
+
+  const timestamp = new Date().toISOString().slice(0, 10);
+  const name = `planeacion_${slugify(planeacion.asignatura)}_${timestamp}.docx`;
+  const uri = `${FileSystem.cacheDirectory || ""}${name}`;
+
+  const base64 = await Packer.toBase64String(doc);
+  await FileSystem.writeAsStringAsync(uri, base64, {
+    encoding: FileSystem.EncodingType.Base64,
+  });
+
+  const info = (await FileSystem.getInfoAsync(uri)) as { size?: number };
+  const sizeBytes = typeof info.size === "number" ? info.size : 0;
+
+  return { uri, name, sizeBytes };
 };

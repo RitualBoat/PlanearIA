@@ -20,7 +20,10 @@ import type { RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
 import { usePlaneaciones } from "../../sync/providers/SyncProvider";
-import { exportPlaneacionToPdf } from "../../services/planeacionExportService";
+import {
+  exportPlaneacionToPdf,
+  exportPlaneacionToDocx,
+} from "../../services/planeacionExportService";
 
 type Nav = StackNavigationProp<RootStackParamList, "ExportarPlaneacion">;
 type ExportarRoute = RouteProp<RootStackParamList, "ExportarPlaneacion">;
@@ -103,15 +106,21 @@ const ExportarPlaneacionScreen: React.FC = () => {
       return;
     }
 
-    if (selectedFormat !== "pdf") {
-      showMessage("Exportar", "Word y Excel se habilitarán en la siguiente tarea.");
-      return;
-    }
-
     try {
       setIsGenerating(true);
 
-      const result = await exportPlaneacionToPdf(planeacion, options);
+      const result =
+        selectedFormat === "pdf"
+          ? await exportPlaneacionToPdf(planeacion, options)
+          : selectedFormat === "docx"
+            ? await exportPlaneacionToDocx(planeacion, options)
+            : null;
+
+      if (!result) {
+        showMessage("Exportar", "Excel se habilitará en la siguiente tarea.");
+        return;
+      }
+
       const sizeMb = (result.sizeBytes / (1024 * 1024)).toFixed(1);
 
       setExportedFileUri(result.uri);

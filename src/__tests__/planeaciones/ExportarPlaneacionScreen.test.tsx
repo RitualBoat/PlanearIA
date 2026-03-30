@@ -1,7 +1,10 @@
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import ExportarPlaneacionScreen from "../../screens/planeaciones/ExportarPlaneacionScreen";
-import { exportPlaneacionToPdf } from "../../services/planeacionExportService";
+import {
+  exportPlaneacionToPdf,
+  exportPlaneacionToDocx,
+} from "../../services/planeacionExportService";
 
 const mockGoBack = jest.fn();
 const mockNavigate = jest.fn();
@@ -45,6 +48,7 @@ jest.mock("@expo/vector-icons/MaterialIcons", () => {
 
 jest.mock("../../services/planeacionExportService", () => ({
   exportPlaneacionToPdf: jest.fn(),
+  exportPlaneacionToDocx: jest.fn(),
 }));
 
 describe("ExportarPlaneacionScreen", () => {
@@ -54,6 +58,11 @@ describe("ExportarPlaneacionScreen", () => {
       uri: "file://tmp/planeacion.pdf",
       name: "planeacion_matematicas_2026-03-29.pdf",
       sizeBytes: 1_250_000,
+    });
+    (exportPlaneacionToDocx as jest.Mock).mockResolvedValue({
+      uri: "file://tmp/planeacion.docx",
+      name: "planeacion_matematicas_2026-03-29.docx",
+      sizeBytes: 980_000,
     });
   });
 
@@ -83,5 +92,17 @@ describe("ExportarPlaneacionScreen", () => {
     });
 
     expect(exportPlaneacionToPdf).toHaveBeenCalled();
+  });
+
+  it("exporta en formato Word cuando se selecciona DOCX", async () => {
+    const { getByText } = render(<ExportarPlaneacionScreen />);
+
+    fireEvent.press(getByText("Documento Word (.docx)"));
+    fireEvent.press(getByText("Exportar"));
+
+    await waitFor(() => {
+      expect(exportPlaneacionToDocx).toHaveBeenCalled();
+      expect(getByText("¡Planeación exportada!")).toBeTruthy();
+    }, { timeout: 3000 });
   });
 });

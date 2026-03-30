@@ -1,9 +1,9 @@
 import { act, renderHook } from "@testing-library/react-native";
 import { useCrearGrupoViewModel } from "../../hooks/useCrearGrupoViewModel";
-import { agregarGrupo } from "../../services/gruposService";
 
 const mockNavigate = jest.fn();
 const mockGoBack = jest.fn();
+const mockAgregarGrupo = jest.fn();
 
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({
@@ -12,14 +12,16 @@ jest.mock("@react-navigation/native", () => ({
   }),
 }));
 
-jest.mock("../../services/gruposService", () => ({
-  agregarGrupo: jest.fn(),
+jest.mock("../../context/GruposContext", () => ({
+  useGruposContext: () => ({
+    agregarGrupo: mockAgregarGrupo,
+  }),
 }));
 
 describe("useCrearGrupoViewModel", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (agregarGrupo as jest.Mock).mockResolvedValue(undefined);
+    mockAgregarGrupo.mockResolvedValue(undefined);
   });
 
   it("valida campos requeridos antes de guardar", async () => {
@@ -29,7 +31,7 @@ describe("useCrearGrupoViewModel", () => {
       await result.current.handleCrearGrupo();
     });
 
-    expect(agregarGrupo).not.toHaveBeenCalled();
+    expect(mockAgregarGrupo).not.toHaveBeenCalled();
     expect(result.current.validationError).toBe("El nombre del grupo es obligatorio.");
   });
 
@@ -49,7 +51,7 @@ describe("useCrearGrupoViewModel", () => {
       await result.current.handleCrearGrupo();
     });
 
-    expect(agregarGrupo).toHaveBeenCalledWith(
+    expect(mockAgregarGrupo).toHaveBeenCalledWith(
       expect.objectContaining({
         nombre: "7A - Matemáticas Avanzadas",
         materia: "Matemáticas Avanzadas",

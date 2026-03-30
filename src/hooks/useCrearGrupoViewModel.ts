@@ -3,7 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
 import type { Carrera } from "../../types";
-import { agregarGrupo } from "../services/gruposService";
+import { useGruposContext } from "../context/GruposContext";
 
 type Nav = StackNavigationProp<RootStackParamList, "CrearGrupo">;
 
@@ -28,6 +28,7 @@ export interface CrearGrupoViewModel {
 
 export const useCrearGrupoViewModel = (): CrearGrupoViewModel => {
   const navigation = useNavigation<Nav>();
+  const { agregarGrupo } = useGruposContext();
   const [nombre, setNombre] = useState("");
   const [materia, setMateria] = useState("");
   const [carrera, setCarrera] = useState<Carrera>("ISC");

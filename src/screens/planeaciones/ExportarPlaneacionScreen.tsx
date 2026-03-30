@@ -18,6 +18,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
+import * as Sharing from "expo-sharing";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
 import { usePlaneaciones } from "../../sync/providers/SyncProvider";
 import {
@@ -130,15 +131,36 @@ const ExportarPlaneacionScreen: React.FC = () => {
     } catch (error) {
       showMessage(
         "Exportar",
-        error instanceof Error ? error.message : "No se pudo generar el archivo PDF.",
+        error instanceof Error ? error.message : "No se pudo generar el archivo PDF."
       );
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const handleCompartir = () => {
-    showMessage("Compartir", "La hoja de compartir se habilitará en la siguiente tarea.");
+  const handleCompartir = async () => {
+    if (!exportedFileUri) {
+      showMessage("Compartir", "Primero exporta un archivo para poder compartirlo.");
+      return;
+    }
+
+    try {
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (!isAvailable) {
+        showMessage("Compartir", "Compartir no está disponible en este dispositivo.");
+        return;
+      }
+
+      await Sharing.shareAsync(exportedFileUri, {
+        mimeType:
+          selectedFormat === "pdf"
+            ? "application/pdf"
+            : "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        dialogTitle: "Compartir planeación",
+      });
+    } catch {
+      showMessage("Compartir", "No se pudo abrir el menú de compartir.");
+    }
   };
 
   const handleOpenFile = async () => {
@@ -350,7 +372,8 @@ const ExportarPlaneacionScreen: React.FC = () => {
               <MaterialIcons name={formatIcon[selectedFormat]} size={22} color="#1676D2" />
               <View style={styles.fileCardTextWrap}>
                 <Text style={styles.fileCardTitle} numberOfLines={1}>
-                  {exportedFileName || `Planeacion_${planeacion?.asignatura || "sin_asignatura"}.${selectedFormat}`}
+                  {exportedFileName ||
+                    `Planeacion_${planeacion?.asignatura || "sin_asignatura"}.${selectedFormat}`}
                 </Text>
                 <Text style={styles.fileCardMeta}>
                   {(exportedFileSize || estimatedSize) + " • Creado ahora mismo"}
@@ -367,7 +390,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
                 style={styles.successSecondaryButton}
                 onPress={() => {
                   setShowSuccess(false);
-                  handleCompartir();
+                  void handleCompartir();
                 }}
               >
                 <MaterialIcons name="share" size={18} color="#5C6E86" />

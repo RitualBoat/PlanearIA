@@ -5,6 +5,7 @@ import {
   exportPlaneacionToPdf,
   exportPlaneacionToDocx,
 } from "../../services/planeacionExportService";
+import * as Sharing from "expo-sharing";
 
 const mockGoBack = jest.fn();
 const mockNavigate = jest.fn();
@@ -51,6 +52,11 @@ jest.mock("../../services/planeacionExportService", () => ({
   exportPlaneacionToDocx: jest.fn(),
 }));
 
+jest.mock("expo-sharing", () => ({
+  isAvailableAsync: jest.fn(),
+  shareAsync: jest.fn(),
+}));
+
 describe("ExportarPlaneacionScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -64,6 +70,8 @@ describe("ExportarPlaneacionScreen", () => {
       name: "planeacion_matematicas_2026-03-29.docx",
       sizeBytes: 980_000,
     });
+    (Sharing.isAvailableAsync as jest.Mock).mockResolvedValue(true);
+    (Sharing.shareAsync as jest.Mock).mockResolvedValue(undefined);
   });
 
   it("renderiza secciones principales", () => {
@@ -84,12 +92,15 @@ describe("ExportarPlaneacionScreen", () => {
 
     expect(getByText("Generando archivo...")).toBeTruthy();
 
-    await waitFor(() => {
-      expect(queryByText("Generando archivo...")).toBeNull();
-      expect(getByText("¡Planeación exportada!")).toBeTruthy();
-    }, {
-      timeout: 3000,
-    });
+    await waitFor(
+      () => {
+        expect(queryByText("Generando archivo...")).toBeNull();
+        expect(getByText("¡Planeación exportada!")).toBeTruthy();
+      },
+      {
+        timeout: 3000,
+      }
+    );
 
     expect(exportPlaneacionToPdf).toHaveBeenCalled();
   });
@@ -100,9 +111,32 @@ describe("ExportarPlaneacionScreen", () => {
     fireEvent.press(getByText("Documento Word (.docx)"));
     fireEvent.press(getByText("Exportar"));
 
+    await waitFor(
+      () => {
+        expect(exportPlaneacionToDocx).toHaveBeenCalled();
+        expect(getByText("¡Planeación exportada!")).toBeTruthy();
+      },
+      { timeout: 3000 }
+    );
+  });
+
+  it("comparte el archivo generado", async () => {
+    const { getByText, getAllByText } = render(<ExportarPlaneacionScreen />);
+
+    fireEvent.press(getByText("Exportar"));
+
+    await waitFor(
+      () => {
+        expect(getByText("¡Planeación exportada!")).toBeTruthy();
+      },
+      { timeout: 3000 }
+    );
+
+    fireEvent.press(getAllByText("Compartir")[0]);
+
     await waitFor(() => {
-      expect(exportPlaneacionToDocx).toHaveBeenCalled();
-      expect(getByText("¡Planeación exportada!")).toBeTruthy();
-    }, { timeout: 3000 });
+      expect(Sharing.isAvailableAsync).toHaveBeenCalled();
+      expect(Sharing.shareAsync).toHaveBeenCalled();
+    });
   });
 });

@@ -154,4 +154,16 @@ describe("useListaPlaneacionesViewModel - eliminación", () => {
       expect(result.current.planeacionesFiltradas[0].id).toBe("p1");
     });
   });
+
+  it("navega a pantalla de exportación", () => {
+    const { result } = renderHook(() => useListaPlaneacionesViewModel());
+
+    act(() => {
+      result.current.handleExportar("p2");
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith("ExportarPlaneacion", {
+      planeacionId: "p2",
+    });
+  });
 });

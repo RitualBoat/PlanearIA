@@ -171,9 +171,9 @@ export const useListaPlaneacionesViewModel = (): ListaPlaneacionesViewModel => {
   const handleExportar = useCallback(
     (planeacionId: string) => {
       setMenuVisible(null);
-      showMessage("Exportar", "Función de exportar próximamente disponible");
+      navigation.navigate("ExportarPlaneacion", { planeacionId });
     },
-    [showMessage]
+    [navigation]
   );
 
   const handleCrearNueva = useCallback(() => {

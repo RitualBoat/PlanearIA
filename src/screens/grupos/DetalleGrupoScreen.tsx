@@ -212,7 +212,7 @@ const TabContent: React.FC<{
           <View style={styles.tabContent}>
             <Text style={styles.tabTitle}>Recursos Asignados</Text>
             <Text style={styles.tabDescription}>Recursos asociados al grupo seleccionado.</Text>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton} onPress={navigateAsignarRecurso}>
               <MaterialIcons name="file-copy" size={24} color="white" />
               <Text style={styles.actionButtonText}>Asignar Recurso</Text>
             </TouchableOpacity>

@@ -1,12 +1,31 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, StatusBar } from "react-native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  StatusBar,
+  ActivityIndicator,
+  Modal,
+  TextInput,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../../navigation/StackNavigator";
-import { COLORS, FONT_SIZES } from "../../../../types";
+import { COLORS } from "../../../../types";
 import WebScrollView from "../../../components/WebScrollView";
+import {
+  asignarEntregablesAGrupo,
+  asignarRecursosAGrupo,
+  AsignableItem,
+  desvincularEntregableDeGrupo,
+  desvincularRecursoDeGrupo,
+  listarAsignadosGrupo,
+  obtenerEntregables,
+  obtenerRecursos,
+} from "../../../services/grupoAsignacionesService";
 
 type AsignarRecursoScreenNavigationProp = StackNavigationProp<RootStackParamList, "AsignarRecurso">;
 
@@ -17,42 +36,200 @@ interface AsignarRecursoScreenProps {
   route: AsignarRecursoScreenRouteProp;
 }
 
+type SourceType = "recurso" | "entregable";
+
 /**
  * Pantalla para asignar un recurso existente (examen) a un grupo
  */
 const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation, route }) => {
   const { grupoId } = route.params;
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [successState, setSuccessState] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedType, setSelectedType] = useState<SourceType>("recurso");
+  const [confirmRemoveItem, setConfirmRemoveItem] = useState<AsignableItem | null>(null);
+  const [recursosDisponibles, setRecursosDisponibles] = useState<AsignableItem[]>([]);
+  const [entregablesDisponibles, setEntregablesDisponibles] = useState<AsignableItem[]>([]);
+  const [asignadosGrupo, setAsignadosGrupo] = useState<AsignableItem[]>([]);
 
-  // Recursos de ejemplo (tipo examen)
-  const recursosExamen = [
-    {
-      id: 1,
-      titulo: "Examen de Álgebra Lineal",
-      tipo: "examen",
-      fecha: "15 Nov 2025",
-      preguntas: 20,
-    },
-    {
-      id: 2,
-      titulo: "Evaluación de Cálculo Diferencial",
-      tipo: "examen",
-      fecha: "10 Nov 2025",
-      preguntas: 15,
-    },
-    {
-      id: 3,
-      titulo: "Quiz de Programación Orientada a Objetos",
-      tipo: "examen",
-      fecha: "8 Nov 2025",
-      preguntas: 10,
-    },
-  ];
+  const loadData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError("");
 
-  const handleAsignar = (recursoId: number) => {
-    // TODO: Implementar lógica de asignación
-    console.log("Asignando recurso", recursoId, "al grupo", grupoId);
-    navigation.goBack();
-  };
+      const [recursos, entregables, asignados] = await Promise.all([
+        obtenerRecursos(),
+        obtenerEntregables(),
+        listarAsignadosGrupo(grupoId),
+      ]);
+
+      setRecursosDisponibles(
+        recursos.map((item) => ({
+          id: item.id,
+          titulo: item.titulo,
+          tipo: "recurso",
+          subtipo: item.tipo,
+          grupoId: item.grupoId,
+        }))
+      );
+      setEntregablesDisponibles(
+        entregables.map((item) => ({
+          id: item.id,
+          titulo: item.titulo,
+          tipo: "entregable",
+          subtipo: item.tipo,
+          grupoId: item.grupoId,
+        }))
+      );
+      setAsignadosGrupo(asignados);
+    } catch {
+      setError("No se pudieron cargar recursos y entregables.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [grupoId]);
+
+  useEffect(() => {
+    void loadData();
+  }, [loadData]);
+
+  const totalEntregablesAsignados = useMemo(
+    () => asignadosGrupo.filter((item) => item.tipo === "entregable").length,
+    [asignadosGrupo]
+  );
+
+  const totalRecursosAsignados = useMemo(
+    () => asignadosGrupo.filter((item) => item.tipo === "recurso").length,
+    [asignadosGrupo]
+  );
+
+  const availableByType = useMemo(() => {
+    const source = selectedType === "recurso" ? recursosDisponibles : entregablesDisponibles;
+    const filtered = source.filter((item) => item.grupoId !== grupoId);
+    const query = searchQuery.trim().toLowerCase();
+
+    if (!query) return filtered;
+    return filtered.filter(
+      (item) =>
+        item.titulo.toLowerCase().includes(query) ||
+        (item.subtipo || "").toLowerCase().includes(query)
+    );
+  }, [selectedType, recursosDisponibles, entregablesDisponibles, grupoId, searchQuery]);
+
+  const openModal = useCallback((type: SourceType) => {
+    setSelectedType(type);
+    setSelectedIds([]);
+    setSearchQuery("");
+    setModalVisible(true);
+  }, []);
+
+  const toggleItem = useCallback((id: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  }, []);
+
+  const openConfirmAssign = useCallback(() => {
+    if (selectedIds.length === 0) return;
+    setConfirmVisible(true);
+  }, [selectedIds.length]);
+
+  const confirmAssign = useCallback(async () => {
+    if (selectedIds.length === 0) return;
+
+    try {
+      setIsSaving(true);
+      setError("");
+
+      if (selectedType === "recurso") {
+        await asignarRecursosAGrupo(grupoId, selectedIds);
+      } else {
+        await asignarEntregablesAGrupo(grupoId, selectedIds);
+      }
+
+      setConfirmVisible(false);
+      setModalVisible(false);
+      setSelectedIds([]);
+      setSuccessState(true);
+      await loadData();
+    } catch {
+      setError("No se pudo completar la asignación.");
+    } finally {
+      setIsSaving(false);
+    }
+  }, [grupoId, loadData, selectedIds, selectedType]);
+
+  const confirmRemove = useCallback(async () => {
+    if (!confirmRemoveItem) return;
+
+    try {
+      setIsSaving(true);
+      setError("");
+      if (confirmRemoveItem.tipo === "recurso") {
+        await desvincularRecursoDeGrupo(grupoId, confirmRemoveItem.id);
+      } else {
+        await desvincularEntregableDeGrupo(grupoId, confirmRemoveItem.id);
+      }
+      setConfirmRemoveItem(null);
+      await loadData();
+    } catch {
+      setError("No se pudo quitar la asignación.");
+    } finally {
+      setIsSaving(false);
+    }
+  }, [confirmRemoveItem, grupoId, loadData]);
+
+  const goCreateNew = useCallback(() => {
+    if (selectedType === "recurso") {
+      navigation.navigate("ListaRecursos");
+      return;
+    }
+    navigation.navigate("CrearTareaGrupo", { grupoId });
+  }, [grupoId, navigation, selectedType]);
+
+  if (successState) {
+    return (
+      <View style={styles.container}>
+        <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.successContainer}>
+            <View style={styles.successIconWrap}>
+              <MaterialIcons name="check" size={42} color="#1676D2" />
+            </View>
+            <Text style={styles.successTitle}>Asignación completada</Text>
+            <Text style={styles.successSubtitle}>
+              Los elementos fueron vinculados al grupo seleccionado.
+            </Text>
+
+            <View style={styles.infoCard}>
+              <MaterialIcons name="info-outline" size={18} color="#96510A" />
+              <Text style={styles.infoCardText}>
+                La asignación vincula al grupo y no duplica contenido.
+              </Text>
+            </View>
+
+            <TouchableOpacity style={styles.primaryAction} onPress={() => navigation.goBack()}>
+              <Text style={styles.primaryActionText}>Volver al detalle</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.secondaryAction}
+              onPress={() => {
+                setSuccessState(false);
+              }}
+            >
+              <Text style={styles.secondaryActionText}>Ver elementos asignados</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -61,37 +238,233 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
       <SafeAreaView style={styles.safeArea}>
         <WebScrollView style={styles.content}>
           <View style={styles.header}>
-            <Text style={styles.pageTitle}>Asignar Examen al Grupo</Text>
-            <Text style={styles.pageSubtitle}>Selecciona un examen de tu biblioteca</Text>
-            <Text style={styles.info}>Grupo ID: {grupoId}</Text>
+            <Text style={styles.pageTitle}>Recursos y Entregables</Text>
+            <Text style={styles.pageSubtitle}>Gestión de materiales pedagógicos</Text>
           </View>
+
+          <View style={styles.statsRow}>
+            <View style={styles.statCard}>
+              <Text style={styles.statValue}>{totalEntregablesAsignados}</Text>
+              <Text style={styles.statLabel}>Entregables</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={styles.statValue}>{totalRecursosAsignados}</Text>
+              <Text style={styles.statLabel}>Recursos</Text>
+            </View>
+          </View>
+
+          <View style={styles.actionStack}>
+            <TouchableOpacity style={styles.primaryAction} onPress={() => openModal("entregable")}>
+              <MaterialIcons name="playlist-add-check" size={20} color="#FFFFFF" />
+              <Text style={styles.primaryActionText}>Asignar entregable</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.secondaryAction} onPress={() => openModal("recurso")}>
+              <MaterialIcons name="note-add" size={20} color="#1676D2" />
+              <Text style={styles.secondaryActionText}>Asignar recurso</Text>
+            </TouchableOpacity>
+          </View>
+
+          {!!error ? (
+            <View style={styles.inlineError}>
+              <Text style={styles.inlineErrorText}>{error}</Text>
+            </View>
+          ) : null}
 
           <View style={styles.listaContainer}>
-            {recursosExamen.map((recurso) => (
-              <TouchableOpacity
-                key={recurso.id}
-                style={styles.recursoItem}
-                onPress={() => handleAsignar(recurso.id)}
-              >
-                <MaterialIcons name="quiz" size={40} color="#2196F3" />
-                <View style={styles.recursoInfo}>
-                  <Text style={styles.recursoTitulo}>{recurso.titulo}</Text>
-                  <Text style={styles.recursoMetadata}>
-                    {recurso.preguntas} preguntas • Creado: {recurso.fecha}
-                  </Text>
-                </View>
-                <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
-              </TouchableOpacity>
-            ))}
+            <Text style={styles.sectionTitle}>Elementos asignados</Text>
+
+            {isLoading ? (
+              <View style={styles.loadingWrap}>
+                <ActivityIndicator size="small" color="#1676D2" />
+                <Text style={styles.loadingText}>Cargando asignaciones...</Text>
+              </View>
+            ) : null}
+
+            {!isLoading && asignadosGrupo.length > 0
+              ? asignadosGrupo.map((item) => (
+                  <View key={`${item.tipo}-${item.id}`} style={styles.recursoItem}>
+                    <View style={styles.itemIconWrap}>
+                      <MaterialIcons
+                        name={item.tipo === "recurso" ? "description" : "assignment"}
+                        size={20}
+                        color={item.tipo === "recurso" ? "#2979C7" : "#D14B4B"}
+                      />
+                    </View>
+                    <View style={styles.recursoInfo}>
+                      <Text style={styles.recursoTitulo}>{item.titulo}</Text>
+                      <Text style={styles.recursoMetadata}>
+                        {item.tipo === "recurso" ? "Recurso" : "Entregable"} •{" "}
+                        {item.subtipo || "General"}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => setConfirmRemoveItem(item)}
+                      disabled={isSaving}
+                      style={styles.removeButton}
+                    >
+                      <MaterialIcons name="delete-outline" size={20} color="#6E7E96" />
+                    </TouchableOpacity>
+                  </View>
+                ))
+              : null}
           </View>
 
-          <View style={styles.emptyStateContainer}>
-            <MaterialIcons name="info-outline" size={48} color={COLORS.textSecondary} />
-            <Text style={styles.emptyStateText}>
-              Aquí se mostrarán los exámenes que hayas creado en la sección de Recursos Didácticos
+          {!isLoading && asignadosGrupo.length === 0 ? (
+            <View style={styles.emptyStateContainer}>
+              <MaterialIcons name="inventory-2" size={58} color="#C4D1E4" />
+              <Text style={styles.emptyStateTitle}>No hay elementos disponibles</Text>
+              <Text style={styles.emptyStateText}>
+                Aún no has añadido materiales para este grupo.
+              </Text>
+              <TouchableOpacity
+                style={styles.emptyStateButton}
+                onPress={() => openModal("recurso")}
+              >
+                <MaterialIcons name="add-circle-outline" size={18} color="#1B68B8" />
+                <Text style={styles.emptyStateButtonText}>Asignar primer recurso</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
+
+          <View style={styles.tipCard}>
+            <MaterialIcons name="tips-and-updates" size={18} color="#96510A" />
+            <Text style={styles.tipText}>
+              Puedes asignar recursos existentes o crear nuevos para vincularlos automáticamente.
             </Text>
           </View>
         </WebScrollView>
+
+        <Modal visible={modalVisible} animationType="slide" transparent>
+          <View style={styles.modalBackdrop}>
+            <View style={styles.modalCard}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>
+                  {selectedType === "recurso" ? "Asignar Recursos" : "Asignar Entregables"}
+                </Text>
+                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                  <MaterialIcons name="close" size={24} color="#60758E" />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.searchBox}>
+                <MaterialIcons name="search" size={18} color="#7A8DA8" />
+                <TextInput
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  placeholder={`Buscar ${selectedType === "recurso" ? "recursos" : "entregables"} por nombre o tipo`}
+                  placeholderTextColor="#90A1B8"
+                  style={styles.searchInput}
+                />
+              </View>
+
+              <WebScrollView style={{ maxHeight: 300 }}>
+                {availableByType.length === 0 ? (
+                  <Text style={styles.modalEmpty}>No hay elementos disponibles para asignar.</Text>
+                ) : (
+                  availableByType.map((item) => {
+                    const selected = selectedIds.includes(item.id);
+                    return (
+                      <TouchableOpacity
+                        key={`${item.tipo}-${item.id}`}
+                        style={[styles.modalItem, selected && styles.modalItemSelected]}
+                        onPress={() => toggleItem(item.id)}
+                      >
+                        <View style={styles.itemIconWrap}>
+                          <MaterialIcons
+                            name={selectedType === "recurso" ? "description" : "assignment"}
+                            size={18}
+                            color="#2979C7"
+                          />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.modalItemTitle}>{item.titulo}</Text>
+                          <Text style={styles.modalItemMeta}>{item.subtipo || "General"}</Text>
+                        </View>
+                        <MaterialIcons
+                          name={selected ? "check-circle" : "radio-button-unchecked"}
+                          size={22}
+                          color={selected ? "#1676D2" : "#9FB0C7"}
+                        />
+                      </TouchableOpacity>
+                    );
+                  })
+                )}
+              </WebScrollView>
+
+              <View style={styles.selectionRow}>
+                <Text style={styles.selectionText}>{selectedIds.length} seleccionados</Text>
+                <TouchableOpacity onPress={() => setSelectedIds([])}>
+                  <Text style={styles.clearText}>Limpiar selección</Text>
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity
+                style={[styles.primaryAction, selectedIds.length === 0 && styles.disabledAction]}
+                onPress={openConfirmAssign}
+                disabled={selectedIds.length === 0}
+              >
+                <Text style={styles.primaryActionText}>Asignar seleccionados</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.secondaryAction} onPress={goCreateNew}>
+                <Text style={styles.secondaryActionText}>Crear nuevo</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={confirmVisible} animationType="fade" transparent>
+          <View style={styles.modalBackdrop}>
+            <View style={styles.confirmCard}>
+              <MaterialIcons name="group-add" size={34} color="#1E77CE" />
+              <Text style={styles.confirmTitle}>Confirmar acción</Text>
+              <Text style={styles.confirmText}>
+                ¿Desea agregar {selectedIds.length} elemento(s) al grupo {grupoId}?
+              </Text>
+              <TouchableOpacity
+                style={styles.primaryAction}
+                onPress={() => void confirmAssign()}
+                disabled={isSaving}
+              >
+                <Text style={styles.primaryActionText}>
+                  {isSaving ? "Asignando..." : "Confirmar asignación"}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.secondaryAction}
+                onPress={() => setConfirmVisible(false)}
+              >
+                <Text style={styles.secondaryActionText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={!!confirmRemoveItem} animationType="fade" transparent>
+          <View style={styles.modalBackdrop}>
+            <View style={styles.confirmCard}>
+              <MaterialIcons name="remove-circle-outline" size={34} color="#CC5A12" />
+              <Text style={styles.confirmTitle}>Quitar asignación</Text>
+              <Text style={styles.confirmText}>
+                El elemento seguirá en el sistema y solo se desvinculará del grupo.
+              </Text>
+              <TouchableOpacity
+                style={styles.primaryAction}
+                onPress={() => void confirmRemove()}
+                disabled={isSaving}
+              >
+                <Text style={styles.primaryActionText}>Quitar del grupo</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.secondaryAction}
+                onPress={() => setConfirmRemoveItem(null)}
+              >
+                <Text style={styles.secondaryActionText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </View>
   );
@@ -114,30 +487,111 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     paddingHorizontal: 16,
     paddingTop: 14,
-    paddingBottom: 10,
+    paddingBottom: 8,
   },
   pageTitle: {
-    fontSize: FONT_SIZES.xxlarge,
-    fontWeight: "bold",
-    color: COLORS.text,
-    marginBottom: 8,
+    fontSize: 41,
+    fontWeight: "800",
+    color: "#1E2A3A",
+    marginBottom: 4,
+    letterSpacing: -0.4,
   },
   pageSubtitle: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.textSecondary,
-    marginBottom: 8,
+    fontSize: 24,
+    color: "#5E708A",
+    marginBottom: 10,
   },
-  info: {
-    fontSize: FONT_SIZES.small,
-    color: COLORS.textSecondary,
+  statsRow: {
+    flexDirection: "row",
+    gap: 10,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: "#EAF0FA",
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+  statValue: {
+    color: "#1D74CE",
+    fontWeight: "800",
+    fontSize: 40,
+  },
+  statLabel: {
+    color: "#5C6E86",
+    fontSize: 16,
+    textTransform: "uppercase",
+    fontWeight: "700",
+    letterSpacing: 0.3,
+  },
+  actionStack: {
+    paddingHorizontal: 16,
+    gap: 10,
+    marginBottom: 14,
+  },
+  primaryAction: {
+    borderRadius: 14,
+    backgroundColor: "#1676D2",
+    minHeight: 50,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    boxShadow: "0px 10px 20px rgba(22, 118, 210, 0.26)",
+  },
+  primaryActionText: {
+    color: "#FFFFFF",
+    fontWeight: "800",
+    fontSize: 18,
+  },
+  secondaryAction: {
+    borderRadius: 14,
+    backgroundColor: "#FFFFFF",
+    minHeight: 50,
+    borderWidth: 1,
+    borderColor: "#D7E2F1",
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  secondaryActionText: {
+    color: "#1B68B8",
+    fontWeight: "800",
+    fontSize: 18,
+  },
+  disabledAction: {
+    opacity: 0.5,
   },
   listaContainer: {
     width: "100%",
     maxWidth: 960,
     alignSelf: "center",
     paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 110,
+    paddingTop: 4,
+    paddingBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: "#5E708A",
+    textTransform: "uppercase",
+    marginBottom: 10,
+    letterSpacing: 0.5,
+  },
+  loadingWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 10,
+  },
+  loadingText: {
+    color: "#5E708A",
+    fontSize: 14,
   },
   recursoItem: {
     flexDirection: "row",
@@ -145,35 +599,278 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
     borderColor: "#E3EAF4",
-    padding: 15,
-    borderRadius: 12,
+    padding: 14,
+    borderRadius: 16,
     marginBottom: 12,
     boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
   },
+  itemIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: "#EDF3FB",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   recursoInfo: {
     flex: 1,
-    marginLeft: 15,
+    marginLeft: 10,
   },
   recursoTitulo: {
-    fontSize: FONT_SIZES.medium,
-    fontWeight: "600",
-    color: COLORS.text,
-    marginBottom: 4,
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#1E2A3A",
+    marginBottom: 2,
   },
   recursoMetadata: {
-    fontSize: FONT_SIZES.small,
-    color: COLORS.textSecondary,
+    fontSize: 13,
+    color: "#5C6E86",
+  },
+  removeButton: {
+    padding: 6,
+  },
+  inlineError: {
+    marginHorizontal: 16,
+    marginBottom: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#F3C8CF",
+    backgroundColor: "#FFF1F4",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  inlineErrorText: {
+    color: "#AD2A37",
+    fontWeight: "700",
+    fontSize: 13,
   },
   emptyStateContainer: {
-    padding: 40,
+    marginHorizontal: 16,
+    marginBottom: 14,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    borderRadius: 16,
+    padding: 24,
     alignItems: "center",
   },
+  emptyStateTitle: {
+    marginTop: 8,
+    marginBottom: 6,
+    color: "#1E2A3A",
+    fontSize: 30,
+    fontWeight: "800",
+  },
   emptyStateText: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.textSecondary,
+    fontSize: 20,
+    color: "#5C6E86",
     textAlign: "center",
-    marginTop: 15,
-    lineHeight: 22,
+    lineHeight: 29,
+    marginBottom: 14,
+  },
+  emptyStateButton: {
+    minHeight: 46,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#D7E2F1",
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    width: "100%",
+  },
+  emptyStateButtonText: {
+    color: "#1B68B8",
+    fontSize: 17,
+    fontWeight: "800",
+  },
+  tipCard: {
+    marginHorizontal: 16,
+    marginBottom: 120,
+    borderWidth: 1,
+    borderColor: "#F2D0B2",
+    backgroundColor: "#FFF8F1",
+    borderRadius: 14,
+    padding: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  tipText: {
+    flex: 1,
+    color: "#6E4B23",
+    fontSize: 14,
+    lineHeight: 21,
+    fontWeight: "600",
+  },
+  successContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 36,
+  },
+  successIconWrap: {
+    alignSelf: "center",
+    width: 130,
+    height: 130,
+    borderRadius: 999,
+    borderWidth: 10,
+    borderColor: "#FFFFFF",
+    backgroundColor: "#EAF3FF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 18,
+  },
+  successTitle: {
+    textAlign: "center",
+    color: "#1E2A3A",
+    fontSize: 46,
+    fontWeight: "800",
+    marginBottom: 8,
+  },
+  successSubtitle: {
+    textAlign: "center",
+    color: "#5C6E86",
+    fontSize: 18,
+    marginBottom: 18,
+  },
+  infoCard: {
+    borderWidth: 1,
+    borderColor: "#F2D0B2",
+    backgroundColor: "#FFF8F1",
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 16,
+  },
+  infoCardText: {
+    flex: 1,
+    color: "#6E4B23",
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: "600",
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(24, 35, 52, 0.42)",
+    justifyContent: "flex-end",
+  },
+  modalCard: {
+    backgroundColor: "#F7FAFF",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 26,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  modalTitle: {
+    color: "#1E2A3A",
+    fontSize: 26,
+    fontWeight: "800",
+  },
+  searchBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#DDE7F5",
+    paddingHorizontal: 12,
+    minHeight: 46,
+    marginBottom: 10,
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 8,
+    color: "#1E2A3A",
+    fontSize: 14,
+    paddingVertical: 0,
+  },
+  modalEmpty: {
+    color: "#6E7E96",
+    fontSize: 14,
+    textAlign: "center",
+    paddingVertical: 14,
+  },
+  modalItem: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#DDE7F5",
+    borderRadius: 14,
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 8,
+  },
+  modalItemSelected: {
+    borderColor: "#1676D2",
+    backgroundColor: "#EFF6FF",
+  },
+  modalItemTitle: {
+    color: "#1E2A3A",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  modalItemMeta: {
+    color: "#5C6E86",
+    fontSize: 13,
+    marginTop: 2,
+  },
+  selectionRow: {
+    marginVertical: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  selectionText: {
+    color: "#2C6CB8",
+    fontSize: 13,
+    fontWeight: "800",
+    textTransform: "uppercase",
+  },
+  clearText: {
+    color: "#4D7FB9",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  confirmCard: {
+    marginHorizontal: 24,
+    marginBottom: 140,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "#DDE7F5",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    gap: 10,
+    alignItems: "center",
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: 360,
+  },
+  confirmTitle: {
+    color: "#1E2A3A",
+    fontSize: 28,
+    fontWeight: "800",
+    textTransform: "capitalize",
+  },
+  confirmText: {
+    color: "#4E607B",
+    fontSize: 18,
+    textAlign: "center",
+    lineHeight: 26,
   },
 });
 

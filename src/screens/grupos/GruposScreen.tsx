@@ -61,6 +61,10 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
     navigation.navigate("ListaGrupos");
   };
 
+  const handleImportarGrupos = (): void => {
+    navigation.navigate("ImportarGrupos");
+  };
+
   const quickStats = [
     {
       id: "grupos",
@@ -159,6 +163,24 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Ver grupos</Text>
+                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
+              onPress={handleImportarGrupos}
+              activeOpacity={0.85}
+            >
+              <View style={[styles.iconContainer, { backgroundColor: "#0F6CC8" }]}>
+                <MaterialIcons name="file-upload" size={28} color="#FFFFFF" />
+              </View>
+              <Text style={styles.optionTitle}>Importar Grupos</Text>
+              <Text style={styles.optionDescription}>
+                Carga CSV o Excel, valida filas y agrega grupos válidos en un solo flujo.
+              </Text>
+              <View style={styles.optionFooter}>
+                <Text style={styles.optionCta}>Importar archivo</Text>
                 <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
               </View>
             </TouchableOpacity>

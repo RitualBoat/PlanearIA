@@ -24,6 +24,7 @@ import ListaGruposScreen from "../screens/grupos/ListaGruposScreen";
 import CrearGrupoScreen from "../screens/grupos/CrearGrupoScreen";
 import DetalleGrupoScreen from "../screens/grupos/DetalleGrupoScreen";
 import ReportesGrupoScreen from "../screens/grupos/ReportesGrupoScreen";
+import ImportarGruposScreen from "../screens/grupos/ImportarGruposScreen";
 
 // Pantallas de Tareas dentro de Grupos
 import CrearTareaGrupoScreen from "../screens/grupos/tareas/CrearTareaGrupoScreen";
@@ -82,6 +83,7 @@ export type RootStackParamList = {
     grupoId: number;
     grupoNombre: string;
   };
+  ImportarGrupos: undefined;
 
   // Tareas dentro de Grupos (v3.0)
   CrearTareaGrupo: { grupoId: number };
@@ -258,6 +260,15 @@ const StackNavigator: React.FC = () => {
         component={ReportesGrupoScreen}
         options={{
           title: "Reportes del Grupo",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="ImportarGrupos"
+        component={ImportarGruposScreen}
+        options={{
+          title: "Importar Grupos",
           headerShown: false,
         }}
       />

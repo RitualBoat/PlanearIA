@@ -9,12 +9,27 @@ import {
   Modal,
   ActivityIndicator,
   TextInput,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { LineChart } from "react-native-chart-kit";
 import { COLORS, FONT_SIZES } from "../../../types";
 import WebScrollView from "../../components/WebScrollView";
 import { useDetalleGrupoViewModel, TabType } from "../../hooks/useDetalleGrupoViewModel";
+
+const CHART_CONFIG = {
+  backgroundGradientFrom: "#FFFFFF",
+  backgroundGradientTo: "#FFFFFF",
+  decimalPlaces: 0,
+  color: (opacity = 1) => `rgba(22, 118, 210, ${opacity})`,
+  labelColor: (opacity = 1) => `rgba(65, 83, 109, ${opacity})`,
+  propsForDots: {
+    r: "4",
+    strokeWidth: "2",
+    stroke: "#FFFFFF",
+  },
+};
 
 /**
  * Componente que renderiza el contenido según la pestaña activa
@@ -26,6 +41,7 @@ const TabContent: React.FC<{
   recursos: Array<{ id: number; titulo: string; tipo: string }>;
   asistencias: Array<{ id: number; estado: string }>;
   calificaciones: Array<{ id: number; promedio: number; estado: string }>;
+  chartWidth: number;
   openAddStudentsModal: () => void;
   openRemoveStudentModal: (student: {
     id: number;
@@ -44,6 +60,7 @@ const TabContent: React.FC<{
     recursos,
     asistencias,
     calificaciones,
+    chartWidth,
     openAddStudentsModal,
     openRemoveStudentModal,
     navigateCrearTarea,
@@ -262,6 +279,25 @@ const TabContent: React.FC<{
         );
 
       case "graficas":
+        const promedioGrupal =
+          calificaciones.length > 0
+            ? calificaciones.reduce((acc, item) => acc + Number(item.promedio || 0), 0) /
+              calificaciones.length
+            : 0;
+        const aprobacion =
+          calificaciones.length > 0
+            ? (calificaciones.filter((item) => item.estado === "aprobado").length /
+                calificaciones.length) *
+              100
+            : 0;
+        const asistencia =
+          asistencias.length > 0
+            ? (asistencias.filter((item) => item.estado === "presente").length /
+                asistencias.length) *
+              100
+            : 0;
+        const indiceEntregas = tareas.length > 0 ? 100 : 0;
+
         return (
           <View style={styles.tabContent}>
             <Text style={styles.tabTitle}>Gráficas de Rendimiento</Text>
@@ -269,14 +305,29 @@ const TabContent: React.FC<{
               Visualiza estadísticas y el rendimiento del grupo
             </Text>
 
-            {/* Gráficas placeholder */}
             <View style={styles.graficaContainer}>
-              <MaterialIcons name="bar-chart" size={80} color={COLORS.primary} />
-              <Text style={styles.graficaText}>Aquí se mostrarán gráficas de:</Text>
-              <Text style={styles.graficaItem}>• Promedio de calificaciones</Text>
-              <Text style={styles.graficaItem}>• Evolución del grupo</Text>
-              <Text style={styles.graficaItem}>• Porcentaje de asistencias</Text>
-              <Text style={styles.graficaItem}>• Comparativa por alumno</Text>
+              <Text style={styles.graficaText}>Indicadores clave del grupo</Text>
+              <LineChart
+                data={{
+                  labels: ["Promedio", "Aprob.", "Asistencia", "Entregas"],
+                  datasets: [
+                    {
+                      data: [promedioGrupal * 10, aprobacion, asistencia, indiceEntregas],
+                    },
+                  ],
+                }}
+                width={chartWidth}
+                height={220}
+                yAxisSuffix="%"
+                fromZero
+                chartConfig={CHART_CONFIG}
+                bezier
+                style={styles.chart}
+              />
+              <Text style={styles.graficaItem}>Promedio: {promedioGrupal.toFixed(1)}/10</Text>
+              <Text style={styles.graficaItem}>Aprobación: {Math.round(aprobacion)}%</Text>
+              <Text style={styles.graficaItem}>Asistencia: {Math.round(asistencia)}%</Text>
+              <Text style={styles.graficaItem}>Entregas: {Math.round(indiceEntregas)}%</Text>
             </View>
           </View>
         );
@@ -292,6 +343,9 @@ const TabContent: React.FC<{
  * Solo JSX y StyleSheet - la logica vive en useDetalleGrupoViewModel
  */
 const DetalleGrupoScreen: React.FC = () => {
+  const { width } = useWindowDimensions();
+  const chartWidth = Math.max(280, Math.min(width - 56, 620));
+
   const {
     grupoId,
     grupoNombre,
@@ -420,6 +474,7 @@ const DetalleGrupoScreen: React.FC = () => {
             recursos={recursos}
             asistencias={asistencias}
             calificaciones={calificaciones}
+            chartWidth={chartWidth}
             openAddStudentsModal={openAddStudentsModal}
             openRemoveStudentModal={openRemoveStudentModal}
             navigateCrearTarea={navigateCrearTarea}
@@ -1000,6 +1055,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
     boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
+  },
+  chart: {
+    marginVertical: 8,
+    borderRadius: 12,
   },
   graficaText: {
     fontSize: FONT_SIZES.medium,

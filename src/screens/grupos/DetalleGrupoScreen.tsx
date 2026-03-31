@@ -8,6 +8,7 @@ import {
   StatusBar,
   Modal,
   ActivityIndicator,
+  TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -25,6 +26,7 @@ const TabContent: React.FC<{
   recursos: Array<{ id: number; titulo: string; tipo: string }>;
   asistencias: Array<{ id: number; estado: string }>;
   calificaciones: Array<{ id: number; promedio: number; estado: string }>;
+  openAddStudentsModal: () => void;
   navigateCrearTarea: () => void;
   navigateAsignarRecurso: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
@@ -36,6 +38,7 @@ const TabContent: React.FC<{
     recursos,
     asistencias,
     calificaciones,
+    openAddStudentsModal,
     navigateCrearTarea,
     navigateAsignarRecurso,
     navigateDetalleTarea,
@@ -46,7 +49,7 @@ const TabContent: React.FC<{
           <View style={styles.tabContent}>
             <Text style={styles.tabTitle}>Lista de Alumnos</Text>
             <Text style={styles.tabDescription}>Alumnos vinculados al grupo seleccionado.</Text>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton} onPress={openAddStudentsModal}>
               <MaterialIcons name="person-add" size={24} color="white" />
               <Text style={styles.actionButtonText}>Agregar Alumno</Text>
             </TouchableOpacity>
@@ -58,7 +61,9 @@ const TabContent: React.FC<{
                 alumnos.map((alumno) => (
                   <View key={String(alumno.id)} style={styles.alumnoItem}>
                     <MaterialIcons name="account-circle" size={40} color={COLORS.primary} />
-                    <Text style={styles.alumnoNombre}>{`${alumno.nombre} ${alumno.apellidos}`}</Text>
+                    <Text
+                      style={styles.alumnoNombre}
+                    >{`${alumno.nombre} ${alumno.apellidos}`}</Text>
                     <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
                   </View>
                 ))
@@ -226,7 +231,8 @@ const TabContent: React.FC<{
                       <View style={styles.tareaInfo}>
                         <Text style={styles.tareaTitulo}>{tarea.titulo}</Text>
                         <Text style={styles.tareaMetadata}>
-                          Entrega: {new Date(tarea.fechaEntrega).toLocaleDateString()} | Valor: {tarea.valor}
+                          Entrega: {new Date(tarea.fechaEntrega).toLocaleDateString()} | Valor:{" "}
+                          {tarea.valor}
                           pts
                         </Text>
                       </View>
@@ -281,6 +287,32 @@ const DetalleGrupoScreen: React.FC = () => {
     recursos,
     asistencias,
     calificaciones,
+    addStudentsModalVisible,
+    createStudentMode,
+    studentSearchQuery,
+    selectedStudentIds,
+    availableStudents,
+    isLinkingStudents,
+    addStudentsError,
+    addStudentsSuccessVisible,
+    createdAndAddedCount,
+    newStudentNombre,
+    newStudentApellidos,
+    newStudentNumeroControl,
+    newStudentCarrera,
+    setStudentSearchQuery,
+    openAddStudentsModal,
+    closeAddStudentsModal,
+    openCreateStudentMode,
+    closeCreateStudentMode,
+    toggleStudentSelection,
+    confirmAddSelectedStudents,
+    setNewStudentNombre,
+    setNewStudentApellidos,
+    setNewStudentNumeroControl,
+    setNewStudentCarrera,
+    createAndAddStudent,
+    closeAddStudentsSuccess,
     deleteModalVisible,
     deleteConfirmed,
     isDeleting,
@@ -365,11 +397,163 @@ const DetalleGrupoScreen: React.FC = () => {
             recursos={recursos}
             asistencias={asistencias}
             calificaciones={calificaciones}
+            openAddStudentsModal={openAddStudentsModal}
             navigateCrearTarea={navigateCrearTarea}
             navigateAsignarRecurso={navigateAsignarRecurso}
             navigateDetalleTarea={navigateDetalleTarea}
           />
         </WebScrollView>
+
+        <Modal
+          visible={addStudentsModalVisible}
+          animationType="slide"
+          transparent
+          onRequestClose={closeAddStudentsModal}
+        >
+          <View style={styles.modalBackdrop}>
+            <View style={styles.modalCard}>
+              <Text style={styles.modalTitle}>Agregar alumnos</Text>
+              <Text style={styles.modalSubtitle}>{grupoNombre}</Text>
+
+              {!createStudentMode ? (
+                <>
+                  <View style={styles.searchBox}>
+                    <MaterialIcons name="search" size={18} color="#7A8CA5" />
+                    <TextInput
+                      placeholder="Buscar por nombre o número de control"
+                      style={styles.searchInput}
+                      value={studentSearchQuery}
+                      onChangeText={setStudentSearchQuery}
+                      placeholderTextColor="#8DA0BA"
+                    />
+                  </View>
+
+                  <View style={styles.studentsList}>
+                    {availableStudents.length === 0 ? (
+                      <Text style={styles.modalEmptyText}>
+                        No hay alumnos disponibles para agregar.
+                      </Text>
+                    ) : (
+                      availableStudents.map((student) => {
+                        const selected = selectedStudentIds.includes(student.id);
+                        return (
+                          <TouchableOpacity
+                            key={String(student.id)}
+                            style={[styles.studentRow, selected && styles.studentRowSelected]}
+                            onPress={() => toggleStudentSelection(student.id)}
+                          >
+                            <View style={styles.studentAvatar}>
+                              <MaterialIcons name="person" size={16} color="#1676D2" />
+                            </View>
+                            <View style={{ flex: 1 }}>
+                              <Text
+                                style={styles.studentName}
+                              >{`${student.nombre} ${student.apellidos}`}</Text>
+                              <Text style={styles.studentMeta}>ID: {student.numeroControl}</Text>
+                            </View>
+                            <MaterialIcons
+                              name={selected ? "check-circle" : "radio-button-unchecked"}
+                              size={22}
+                              color={selected ? "#1676D2" : "#A8B8CF"}
+                            />
+                          </TouchableOpacity>
+                        );
+                      })
+                    )}
+                  </View>
+                </>
+              ) : (
+                <View style={styles.createStudentCard}>
+                  <Text style={styles.sectionTitle}>Registro rápido de alumno</Text>
+                  <TextInput
+                    style={styles.createInput}
+                    placeholder="Nombre"
+                    value={newStudentNombre}
+                    onChangeText={setNewStudentNombre}
+                  />
+                  <TextInput
+                    style={styles.createInput}
+                    placeholder="Apellidos"
+                    value={newStudentApellidos}
+                    onChangeText={setNewStudentApellidos}
+                  />
+                  <TextInput
+                    style={styles.createInput}
+                    placeholder="Número de control"
+                    value={newStudentNumeroControl}
+                    onChangeText={setNewStudentNumeroControl}
+                  />
+                  <TextInput
+                    style={styles.createInput}
+                    placeholder="Carrera (ISC, IGE, ARQ, ITICS)"
+                    value={newStudentCarrera}
+                    onChangeText={setNewStudentCarrera}
+                  />
+                </View>
+              )}
+
+              {addStudentsError ? (
+                <Text style={styles.deleteErrorText}>{addStudentsError}</Text>
+              ) : null}
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={styles.cancelModalButton}
+                  onPress={createStudentMode ? closeCreateStudentMode : closeAddStudentsModal}
+                >
+                  <Text style={styles.cancelModalButtonText}>Cancelar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.secondaryModalButton}
+                  onPress={
+                    createStudentMode ? () => void createAndAddStudent() : openCreateStudentMode
+                  }
+                >
+                  <Text style={styles.secondaryModalButtonText}>
+                    {createStudentMode ? "Crear y agregar" : "Nuevo ingreso"}
+                  </Text>
+                </TouchableOpacity>
+
+                {!createStudentMode ? (
+                  <TouchableOpacity
+                    style={styles.primaryModalButton}
+                    onPress={() => void confirmAddSelectedStudents()}
+                    disabled={isLinkingStudents}
+                  >
+                    <Text style={styles.primaryModalButtonText}>
+                      {isLinkingStudents
+                        ? "Agregando..."
+                        : `Agregar seleccionados (${selectedStudentIds.length})`}
+                    </Text>
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          visible={addStudentsSuccessVisible}
+          animationType="fade"
+          transparent
+          onRequestClose={closeAddStudentsSuccess}
+        >
+          <View style={styles.modalBackdrop}>
+            <View style={styles.successCard}>
+              <View style={styles.successIcon}>
+                <MaterialIcons name="check" size={26} color="#FFFFFF" />
+              </View>
+              <Text style={styles.successTitle}>¡Todo listo!</Text>
+              <Text style={styles.successText}>
+                Alumnos agregados correctamente. Total actual del grupo: {createdAndAddedCount}
+              </Text>
+              <TouchableOpacity style={styles.primaryModalButton} onPress={closeAddStudentsSuccess}>
+                <Text style={styles.primaryModalButtonText}>Volver al detalle del grupo</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         <Modal
           visible={deleteModalVisible}
@@ -808,6 +992,138 @@ const styles = StyleSheet.create({
   modalSubtitle: {
     fontSize: 16,
     color: "#4D5D74",
+  },
+  searchBox: {
+    borderWidth: 1,
+    borderColor: "#D8E3F2",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "#F9FBFF",
+  },
+  searchInput: {
+    flex: 1,
+    color: "#1E2A3A",
+    fontSize: 14,
+  },
+  studentsList: {
+    maxHeight: 320,
+    gap: 8,
+  },
+  modalEmptyText: {
+    color: "#5B6D86",
+    textAlign: "center",
+    paddingVertical: 12,
+    fontSize: 14,
+  },
+  studentRow: {
+    borderWidth: 1,
+    borderColor: "#E2E9F4",
+    borderRadius: 12,
+    padding: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: "#FFFFFF",
+  },
+  studentRowSelected: {
+    borderColor: "#1676D2",
+    backgroundColor: "#F2F8FF",
+  },
+  studentAvatar: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#E8F3FF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  studentName: {
+    color: "#1E2A3A",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  studentMeta: {
+    color: "#5B6D86",
+    fontSize: 12,
+    marginTop: 2,
+  },
+  createStudentCard: {
+    borderWidth: 1,
+    borderColor: "#DCE7F8",
+    borderRadius: 14,
+    padding: 12,
+    backgroundColor: "#F8FBFF",
+    gap: 8,
+  },
+  createInput: {
+    borderWidth: 1,
+    borderColor: "#D6E0F0",
+    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 10,
+    paddingVertical: 9,
+    fontSize: 14,
+    color: "#1E2A3A",
+  },
+  secondaryModalButton: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "#C8D8EE",
+    backgroundColor: "#F4F8FF",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
+  secondaryModalButtonText: {
+    color: "#245C9E",
+    fontWeight: "700",
+    fontSize: 14,
+  },
+  primaryModalButton: {
+    borderRadius: 999,
+    backgroundColor: "#1676D2",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
+  primaryModalButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "800",
+    fontSize: 14,
+  },
+  successCard: {
+    margin: 24,
+    marginBottom: 48,
+    borderRadius: 20,
+    backgroundColor: "#FFFFFF",
+    padding: 18,
+    alignItems: "center",
+    gap: 10,
+  },
+  successIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: "#22A45D",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  successTitle: {
+    color: "#1E2A3A",
+    fontSize: 22,
+    fontWeight: "800",
+  },
+  successText: {
+    color: "#4D5D74",
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 4,
   },
   impactCard: {
     borderWidth: 1,

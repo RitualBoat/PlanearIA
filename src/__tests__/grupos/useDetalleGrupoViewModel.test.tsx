@@ -3,8 +3,11 @@ import { useDetalleGrupoViewModel } from "../../hooks/useDetalleGrupoViewModel";
 
 const mockNavigate = jest.fn();
 const mockEliminarGrupo = jest.fn();
+const mockActualizarGrupo = jest.fn();
+const mockSetItem = jest.fn();
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
+  setItem: (...args: unknown[]) => mockSetItem(...args),
   getItem: jest.fn((key: string) => {
     if (key === "@planearia:alumnos") {
       return Promise.resolve(
@@ -54,6 +57,7 @@ jest.mock("../../context/GruposContext", () => ({
   useGruposContext: () => ({
     obtenerGrupo: () => ({ id: 7, cantidadAlumnos: 24 }),
     eliminarGrupo: mockEliminarGrupo,
+    actualizarGrupo: mockActualizarGrupo,
   }),
 }));
 
@@ -61,6 +65,8 @@ describe("useDetalleGrupoViewModel", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockEliminarGrupo.mockResolvedValue(undefined);
+    mockActualizarGrupo.mockResolvedValue(undefined);
+    mockSetItem.mockResolvedValue(undefined);
   });
 
   it("requiere confirmación antes de eliminar", async () => {
@@ -92,5 +98,60 @@ describe("useDetalleGrupoViewModel", () => {
 
     expect(mockEliminarGrupo).toHaveBeenCalledWith(7);
     expect(mockNavigate).toHaveBeenCalledWith("ListaGrupos");
+  });
+
+  it("agrega alumnos existentes seleccionados al grupo", async () => {
+    const { result } = renderHook(() => useDetalleGrupoViewModel());
+
+    await act(async () => {
+      await result.current.reloadDetalleData();
+    });
+
+    act(() => {
+      result.current.openAddStudentsModal();
+      result.current.toggleStudentSelection(2);
+    });
+
+    await act(async () => {
+      await result.current.confirmAddSelectedStudents();
+    });
+
+    expect(mockSetItem).toHaveBeenCalledWith("@planearia:alumnos", expect.any(String));
+    const lastPayload = JSON.parse(mockSetItem.mock.calls[mockSetItem.mock.calls.length - 1][1]);
+    const alumnoActualizado = lastPayload.find((alumno: { id: number }) => alumno.id === 2);
+
+    expect(alumnoActualizado.grupoId).toBe(7);
+    expect(mockActualizarGrupo).toHaveBeenCalledWith(7, { cantidadAlumnos: 2 });
+    expect(result.current.addStudentsSuccessVisible).toBe(true);
+  });
+
+  it("crea y agrega un nuevo alumno al grupo", async () => {
+    const { result } = renderHook(() => useDetalleGrupoViewModel());
+
+    await act(async () => {
+      await result.current.reloadDetalleData();
+    });
+
+    act(() => {
+      result.current.openAddStudentsModal();
+      result.current.openCreateStudentMode();
+      result.current.setNewStudentNombre("Mariana");
+      result.current.setNewStudentApellidos("García");
+      result.current.setNewStudentNumeroControl("A12345");
+      result.current.setNewStudentCarrera("ISC");
+    });
+
+    await act(async () => {
+      await result.current.createAndAddStudent();
+    });
+
+    const lastPayload = JSON.parse(mockSetItem.mock.calls[mockSetItem.mock.calls.length - 1][1]);
+    const alumnoNuevo = lastPayload.find(
+      (alumno: { numeroControl: string }) => alumno.numeroControl === "A12345"
+    );
+
+    expect(alumnoNuevo).toBeTruthy();
+    expect(alumnoNuevo.grupoId).toBe(7);
+    expect(result.current.addStudentsSuccessVisible).toBe(true);
   });
 });

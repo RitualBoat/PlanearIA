@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Grupo } from "../../types";
 import { filtrarGruposPorBusqueda } from "../services/gruposService";
 import { useGruposContext } from "../context/GruposContext";
+import type { GrupoSyncStatus } from "../services/gruposService";
 
 /**
  * Estados posibles del hook
@@ -22,6 +23,9 @@ export interface UseGruposResult {
   status: GruposStatus;
   error: string | null;
   isLoading: boolean;
+  syncStatus: GrupoSyncStatus;
+  pendingSyncCount: number;
+  isOnline: boolean;
 
   // Búsqueda y filtros
   searchQuery: string;
@@ -29,6 +33,7 @@ export interface UseGruposResult {
 
   // Acciones
   recargarGrupos: () => Promise<void>;
+  sincronizarGrupos: () => Promise<void>;
   agregarNuevoGrupo: (grupo: Partial<Grupo>) => Promise<void>;
   actualizarGrupoExistente: (id: number, actualizacion: Partial<Grupo>) => Promise<void>;
   eliminarGrupoExistente: (id: number) => Promise<void>;
@@ -43,8 +48,19 @@ export interface UseGruposResult {
  * Separa la lógica de negocio de la UI
  */
 export const useGrupos = (): UseGruposResult => {
-  const { grupos, isLoading, error, reloadGrupos, agregarGrupo, actualizarGrupo, eliminarGrupo } =
-    useGruposContext();
+  const {
+    grupos,
+    isLoading,
+    error,
+    syncStatus,
+    pendingSyncCount,
+    isOnline,
+    reloadGrupos,
+    syncGrupos,
+    agregarGrupo,
+    actualizarGrupo,
+    eliminarGrupo,
+  } = useGruposContext();
 
   // Estado local
   const [gruposFiltrados, setGruposFiltrados] = useState<Partial<Grupo>[]>([]);
@@ -126,6 +142,9 @@ export const useGrupos = (): UseGruposResult => {
     status,
     error,
     isLoading,
+    syncStatus,
+    pendingSyncCount,
+    isOnline,
 
     // Búsqueda
     searchQuery,
@@ -133,6 +152,7 @@ export const useGrupos = (): UseGruposResult => {
 
     // Acciones
     recargarGrupos,
+    sincronizarGrupos: syncGrupos,
     agregarNuevoGrupo,
     actualizarGrupoExistente,
     eliminarGrupoExistente,

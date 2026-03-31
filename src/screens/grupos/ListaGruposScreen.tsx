@@ -28,8 +28,28 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
   const { width } = useWindowDimensions();
   const wideLayout = width >= 920;
 
-  const { gruposFiltrados, isLoading, error, searchQuery, setSearchQuery, conteoGrupos } =
-    useGrupos();
+  const {
+    gruposFiltrados,
+    isLoading,
+    error,
+    searchQuery,
+    setSearchQuery,
+    conteoGrupos,
+    syncStatus,
+    pendingSyncCount,
+    isOnline,
+    sincronizarGrupos,
+  } = useGrupos();
+
+  const syncLabel = !isOnline
+    ? "Sin conexión"
+    : syncStatus === "syncing"
+      ? "Sincronizando..."
+      : syncStatus === "error"
+        ? "Error de sincronización"
+        : pendingSyncCount > 0
+          ? `${pendingSyncCount} pendientes`
+          : "Sincronizado";
 
   const handleGrupoPress = (grupo: Partial<Grupo>): void => {
     navigation.navigate("DetalleGrupo", {
@@ -75,6 +95,47 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
         <View style={styles.header}>
           <Text style={styles.title}>Mis Grupos</Text>
           <Text style={styles.subtitle}>{conteoGrupos} grupos activos</Text>
+
+          <View style={styles.syncRow}>
+            <View
+              style={[
+                styles.syncBadge,
+                !isOnline
+                  ? styles.syncOffline
+                  : syncStatus === "error"
+                    ? styles.syncError
+                    : pendingSyncCount > 0
+                      ? styles.syncPending
+                      : styles.syncOk,
+              ]}
+            >
+              <MaterialIcons
+                name={
+                  !isOnline ? "cloud-off" : pendingSyncCount > 0 ? "cloud-upload" : "cloud-done"
+                }
+                size={14}
+                color={
+                  !isOnline
+                    ? "#B87424"
+                    : syncStatus === "error"
+                      ? "#B12635"
+                      : pendingSyncCount > 0
+                        ? "#0C5DA8"
+                        : "#0D9E70"
+                }
+              />
+              <Text style={styles.syncText}>{syncLabel}</Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.syncButton}
+              onPress={() => void sincronizarGrupos()}
+              disabled={!isOnline || syncStatus === "syncing"}
+            >
+              <MaterialIcons name="sync" size={16} color="#1676D2" />
+              <Text style={styles.syncButtonText}>Sincronizar</Text>
+            </TouchableOpacity>
+          </View>
 
           <View style={styles.searchContainer}>
             <MaterialIcons name="search" size={20} color="#6B7D96" />
@@ -222,6 +283,59 @@ const styles = StyleSheet.create({
     borderColor: "#E3EAF4",
     minHeight: 48,
     boxShadow: "0px 8px 14px rgba(18, 44, 86, 0.06)",
+  },
+  syncRow: {
+    marginBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  syncBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderWidth: 1,
+    gap: 6,
+  },
+  syncOk: {
+    backgroundColor: "#E7F9F3",
+    borderColor: "#B8EAD8",
+  },
+  syncPending: {
+    backgroundColor: "#EAF4FF",
+    borderColor: "#CAE1FB",
+  },
+  syncError: {
+    backgroundColor: "#FFF1F2",
+    borderColor: "#F7CDD2",
+  },
+  syncOffline: {
+    backgroundColor: "#FFF5E9",
+    borderColor: "#F5D7B0",
+  },
+  syncText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#1E2A3A",
+  },
+  syncButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderWidth: 1,
+    borderColor: "#D0E2F6",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  syncButtonText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#1676D2",
   },
   searchInput: {
     flex: 1,

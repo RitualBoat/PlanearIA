@@ -85,6 +85,7 @@ export interface DetalleGrupoViewModel {
   navigateCrearTarea: () => void;
   navigateAsignarRecurso: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
+  navigateReportesGrupo: () => void;
 }
 
 export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
@@ -383,6 +384,13 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     [navigation, grupoId]
   );
 
+  const navigateReportesGrupo = useCallback(() => {
+    navigation.navigate("ReportesGrupo", {
+      grupoId,
+      grupoNombre,
+    });
+  }, [navigation, grupoId, grupoNombre]);
+
   const openDeleteModal = useCallback(() => {
     setDeleteError("");
     setDeleteConfirmed(false);
@@ -483,5 +491,6 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     navigateCrearTarea,
     navigateAsignarRecurso,
     navigateDetalleTarea,
+    navigateReportesGrupo,
   };
 };

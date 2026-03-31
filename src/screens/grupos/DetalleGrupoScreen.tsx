@@ -15,6 +15,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LineChart } from "react-native-chart-kit";
 import { COLORS, FONT_SIZES } from "../../../types";
+import type {
+  Alumno,
+  Asistencia,
+  Calificacion,
+  EntregaTarea,
+  Recurso,
+  Tarea,
+} from "../../../types";
 import WebScrollView from "../../components/WebScrollView";
 import { useDetalleGrupoViewModel, TabType } from "../../hooks/useDetalleGrupoViewModel";
 import { calcularEstadisticasGrupo } from "../../services/grupoReportesService";
@@ -37,12 +45,12 @@ const CHART_CONFIG = {
  */
 const TabContent: React.FC<{
   activeTab: TabType;
-  alumnos: Array<{ id: number; nombre: string; apellidos: string; numeroControl: string }>;
-  tareas: Array<{ id: number; titulo: string; fechaEntrega: Date | string; valor: number }>;
-  recursos: Array<{ id: number; titulo: string; tipo: string }>;
-  asistencias: Array<{ id: number; estado: string }>;
-  calificaciones: Array<{ id: number; promedio: number; estado: string }>;
-  entregas: Array<{ id: number; tareaId: number; estado: string; fechaEntrega: Date | string }>;
+  alumnos: Alumno[];
+  tareas: Tarea[];
+  recursos: Recurso[];
+  asistencias: Asistencia[];
+  calificaciones: Calificacion[];
+  entregas: EntregaTarea[];
   chartWidth: number;
   openAddStudentsModal: () => void;
   openRemoveStudentModal: (student: {
@@ -54,6 +62,7 @@ const TabContent: React.FC<{
   navigateCrearTarea: () => void;
   navigateAsignarRecurso: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
+  navigateReportesGrupo: () => void;
 }> = React.memo(
   ({
     activeTab,
@@ -69,6 +78,7 @@ const TabContent: React.FC<{
     navigateCrearTarea,
     navigateAsignarRecurso,
     navigateDetalleTarea,
+    navigateReportesGrupo,
   }) => {
     switch (activeTab) {
       case "alumnos":
@@ -342,6 +352,11 @@ const TabContent: React.FC<{
               <Text style={styles.graficaItem}>
                 No entregadas: {Math.round(stats.indiceNoEntregadas)}%
               </Text>
+
+              <TouchableOpacity style={styles.openReportButton} onPress={navigateReportesGrupo}>
+                <MaterialIcons name="insights" size={18} color="#FFFFFF" />
+                <Text style={styles.openReportButtonText}>Abrir reporte completo</Text>
+              </TouchableOpacity>
             </View>
           </View>
         );
@@ -420,6 +435,7 @@ const DetalleGrupoScreen: React.FC = () => {
     navigateCrearTarea,
     navigateAsignarRecurso,
     navigateDetalleTarea,
+    navigateReportesGrupo,
   } = useDetalleGrupoViewModel();
 
   return (
@@ -496,6 +512,7 @@ const DetalleGrupoScreen: React.FC = () => {
             navigateCrearTarea={navigateCrearTarea}
             navigateAsignarRecurso={navigateAsignarRecurso}
             navigateDetalleTarea={navigateDetalleTarea}
+            navigateReportesGrupo={navigateReportesGrupo}
           />
         </WebScrollView>
 
@@ -1075,6 +1092,22 @@ const styles = StyleSheet.create({
   chart: {
     marginVertical: 8,
     borderRadius: 12,
+  },
+  openReportButton: {
+    marginTop: 10,
+    borderRadius: 10,
+    backgroundColor: "#0C63B8",
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  openReportButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "800",
+    fontSize: 14,
   },
   graficaText: {
     fontSize: FONT_SIZES.medium,

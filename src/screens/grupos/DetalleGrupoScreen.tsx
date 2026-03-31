@@ -17,6 +17,7 @@ import { LineChart } from "react-native-chart-kit";
 import { COLORS, FONT_SIZES } from "../../../types";
 import WebScrollView from "../../components/WebScrollView";
 import { useDetalleGrupoViewModel, TabType } from "../../hooks/useDetalleGrupoViewModel";
+import { calcularEstadisticasGrupo } from "../../services/grupoReportesService";
 
 const CHART_CONFIG = {
   backgroundGradientFrom: "#FFFFFF",
@@ -41,6 +42,7 @@ const TabContent: React.FC<{
   recursos: Array<{ id: number; titulo: string; tipo: string }>;
   asistencias: Array<{ id: number; estado: string }>;
   calificaciones: Array<{ id: number; promedio: number; estado: string }>;
+  entregas: Array<{ id: number; tareaId: number; estado: string; fechaEntrega: Date | string }>;
   chartWidth: number;
   openAddStudentsModal: () => void;
   openRemoveStudentModal: (student: {
@@ -60,6 +62,7 @@ const TabContent: React.FC<{
     recursos,
     asistencias,
     calificaciones,
+    entregas,
     chartWidth,
     openAddStudentsModal,
     openRemoveStudentModal,
@@ -279,24 +282,13 @@ const TabContent: React.FC<{
         );
 
       case "graficas":
-        const promedioGrupal =
-          calificaciones.length > 0
-            ? calificaciones.reduce((acc, item) => acc + Number(item.promedio || 0), 0) /
-              calificaciones.length
-            : 0;
-        const aprobacion =
-          calificaciones.length > 0
-            ? (calificaciones.filter((item) => item.estado === "aprobado").length /
-                calificaciones.length) *
-              100
-            : 0;
-        const asistencia =
-          asistencias.length > 0
-            ? (asistencias.filter((item) => item.estado === "presente").length /
-                asistencias.length) *
-              100
-            : 0;
-        const indiceEntregas = tareas.length > 0 ? 100 : 0;
+        const stats = calcularEstadisticasGrupo({
+          alumnos,
+          calificaciones,
+          asistencias,
+          tareas,
+          entregas,
+        });
 
         return (
           <View style={styles.tabContent}>
@@ -312,7 +304,12 @@ const TabContent: React.FC<{
                   labels: ["Promedio", "Aprob.", "Asistencia", "Entregas"],
                   datasets: [
                     {
-                      data: [promedioGrupal * 10, aprobacion, asistencia, indiceEntregas],
+                      data: [
+                        stats.promedioGeneral * 10,
+                        stats.indiceAprobacion,
+                        stats.indiceAsistencia,
+                        stats.indiceEntregasATiempo,
+                      ],
                     },
                   ],
                 }}
@@ -324,10 +321,27 @@ const TabContent: React.FC<{
                 bezier
                 style={styles.chart}
               />
-              <Text style={styles.graficaItem}>Promedio: {promedioGrupal.toFixed(1)}/10</Text>
-              <Text style={styles.graficaItem}>Aprobación: {Math.round(aprobacion)}%</Text>
-              <Text style={styles.graficaItem}>Asistencia: {Math.round(asistencia)}%</Text>
-              <Text style={styles.graficaItem}>Entregas: {Math.round(indiceEntregas)}%</Text>
+              <Text style={styles.graficaItem}>
+                Promedio: {stats.promedioGeneral.toFixed(1)}/10
+              </Text>
+              <Text style={styles.graficaItem}>
+                Aprobación: {Math.round(stats.indiceAprobacion)}%
+              </Text>
+              <Text style={styles.graficaItem}>
+                Reprobación: {Math.round(stats.indiceReprobacion)}%
+              </Text>
+              <Text style={styles.graficaItem}>
+                Asistencia: {Math.round(stats.indiceAsistencia)}%
+              </Text>
+              <Text style={styles.graficaItem}>
+                Entregas a tiempo: {Math.round(stats.indiceEntregasATiempo)}%
+              </Text>
+              <Text style={styles.graficaItem}>
+                Entregas tarde: {Math.round(stats.indiceEntregasTarde)}%
+              </Text>
+              <Text style={styles.graficaItem}>
+                No entregadas: {Math.round(stats.indiceNoEntregadas)}%
+              </Text>
             </View>
           </View>
         );
@@ -357,6 +371,7 @@ const DetalleGrupoScreen: React.FC = () => {
     recursos,
     asistencias,
     calificaciones,
+    entregas,
     addStudentsModalVisible,
     createStudentMode,
     studentSearchQuery,
@@ -474,6 +489,7 @@ const DetalleGrupoScreen: React.FC = () => {
             recursos={recursos}
             asistencias={asistencias}
             calificaciones={calificaciones}
+            entregas={entregas}
             chartWidth={chartWidth}
             openAddStudentsModal={openAddStudentsModal}
             openRemoveStudentModal={openRemoveStudentModal}

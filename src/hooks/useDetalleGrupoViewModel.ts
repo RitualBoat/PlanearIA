@@ -5,7 +5,7 @@ import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RouteProp } from "@react-navigation/native";
 import type { RootStackParamList } from "../navigation/StackNavigator";
 import { useGruposContext } from "../context/GruposContext";
-import type { Alumno, Asistencia, Calificacion, Recurso, Tarea } from "../../types";
+import type { Alumno, Asistencia, Calificacion, EntregaTarea, Recurso, Tarea } from "../../types";
 
 type Nav = StackNavigationProp<RootStackParamList, "DetalleGrupo">;
 type Route = RouteProp<RootStackParamList, "DetalleGrupo">;
@@ -35,6 +35,7 @@ export interface DetalleGrupoViewModel {
   recursos: Recurso[];
   asistencias: Asistencia[];
   calificaciones: Calificacion[];
+  entregas: EntregaTarea[];
   reloadDetalleData: () => Promise<void>;
   addStudentsModalVisible: boolean;
   createStudentMode: boolean;
@@ -104,6 +105,7 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
   const [recursos, setRecursos] = useState<Recurso[]>([]);
   const [asistencias, setAsistencias] = useState<Asistencia[]>([]);
   const [calificaciones, setCalificaciones] = useState<Calificacion[]>([]);
+  const [entregas, setEntregas] = useState<EntregaTarea[]>([]);
   const [addStudentsModalVisible, setAddStudentsModalVisible] = useState(false);
   const [createStudentMode, setCreateStudentMode] = useState(false);
   const [studentSearchQuery, setStudentSearchQuery] = useState("");
@@ -148,14 +150,20 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
       setIsLoadingData(true);
       setLoadError("");
 
-      const [alumnosRaw, tareasRaw, recursosRaw, asistenciasRaw, calificacionesRaw] =
+      const [alumnosRaw, tareasRaw, recursosRaw, asistenciasRaw, calificacionesRaw, entregasRaw] =
         await Promise.all([
           readArray<Alumno>("@planearia:alumnos"),
           readArray<Tarea>("@planearia:tareas"),
           readArray<Recurso>("@planearia:recursos"),
           readArray<Asistencia>("@planearia:asistencias"),
           readArray<Calificacion>("@planearia:calificaciones"),
+          readArray<EntregaTarea>("@planearia:entregas"),
         ]);
+
+      const entregablesRaw =
+        entregasRaw.length > 0
+          ? entregasRaw
+          : await readArray<EntregaTarea>("@planearia:entregables");
 
       setAllAlumnos(alumnosRaw);
       setAlumnos(alumnosRaw.filter((alumno) => alumno.grupoId === grupoId));
@@ -165,6 +173,10 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
       setCalificaciones(
         calificacionesRaw.filter((calificacion) => calificacion.grupoId === grupoId)
       );
+      const tareasGrupoIds = new Set(
+        tareasRaw.filter((tarea) => tarea.grupoId === grupoId).map((t) => t.id)
+      );
+      setEntregas(entregablesRaw.filter((entrega) => tareasGrupoIds.has(entrega.tareaId)));
     } catch {
       setLoadError("No se pudieron cargar los datos del grupo.");
     } finally {
@@ -421,6 +433,7 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     recursos,
     asistencias,
     calificaciones,
+    entregas,
     reloadDetalleData,
     addStudentsModalVisible,
     createStudentMode,

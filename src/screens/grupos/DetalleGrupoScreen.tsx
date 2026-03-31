@@ -1,5 +1,14 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  StatusBar,
+  Modal,
+  ActivityIndicator,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, FONT_SIZES } from "../../../types";
@@ -258,9 +267,18 @@ const DetalleGrupoScreen: React.FC = () => {
   const {
     grupoId,
     grupoNombre,
+    cantidadAlumnos,
+    deleteModalVisible,
+    deleteConfirmed,
+    isDeleting,
+    deleteError,
     activeTab,
     tabs,
     setActiveTab,
+    openDeleteModal,
+    closeDeleteModal,
+    toggleDeleteConfirmed,
+    confirmDeleteGrupo,
     navigateEditarGrupo,
     navigateCrearTarea,
     navigateAsignarRecurso,
@@ -279,6 +297,10 @@ const DetalleGrupoScreen: React.FC = () => {
           <TouchableOpacity style={styles.editarButton} onPress={navigateEditarGrupo}>
             <MaterialIcons name="edit" size={16} color="#1676D2" />
             <Text style={styles.editarButtonText}>Editar grupo</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.eliminarButton} onPress={openDeleteModal}>
+            <MaterialIcons name="delete-outline" size={16} color="#C62828" />
+            <Text style={styles.eliminarButtonText}>Eliminar grupo</Text>
           </TouchableOpacity>
         </View>
 
@@ -316,6 +338,80 @@ const DetalleGrupoScreen: React.FC = () => {
             navigateDetalleTarea={navigateDetalleTarea}
           />
         </WebScrollView>
+
+        <Modal
+          visible={deleteModalVisible}
+          animationType="slide"
+          transparent
+          onRequestClose={closeDeleteModal}
+        >
+          <View style={styles.modalBackdrop}>
+            <View style={styles.modalCard}>
+              <Text style={styles.modalTitle}>Eliminar grupo</Text>
+              <Text style={styles.modalSubtitle}>
+                Esta acción eliminará permanentemente el grupo.
+              </Text>
+
+              <View style={styles.impactCard}>
+                <View style={styles.impactRow}>
+                  <MaterialIcons name="group" size={18} color="#1676D2" />
+                  <Text style={styles.impactText}>Alumnos asociados: {cantidadAlumnos}</Text>
+                </View>
+                <View style={styles.impactRow}>
+                  <MaterialIcons name="assignment" size={18} color="#1676D2" />
+                  <Text style={styles.impactText}>Tareas asociadas: 12</Text>
+                </View>
+                <View style={styles.impactRow}>
+                  <MaterialIcons name="history" size={18} color="#1676D2" />
+                  <Text style={styles.impactText}>Registros relacionados: 8</Text>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={[styles.confirmRow, deleteError ? styles.confirmRowError : undefined]}
+                onPress={toggleDeleteConfirmed}
+                activeOpacity={0.8}
+              >
+                <View style={[styles.checkbox, deleteConfirmed && styles.checkboxActive]}>
+                  {deleteConfirmed && <MaterialIcons name="check" size={14} color="#FFFFFF" />}
+                </View>
+                <Text style={styles.confirmText}>
+                  Confirmo que entiendo que esta acción no se puede deshacer.
+                </Text>
+              </TouchableOpacity>
+
+              {deleteError ? <Text style={styles.deleteErrorText}>{deleteError}</Text> : null}
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={styles.cancelModalButton}
+                  onPress={closeDeleteModal}
+                  disabled={isDeleting}
+                >
+                  <Text style={styles.cancelModalButtonText}>Cancelar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.deleteModalButton,
+                    (!deleteConfirmed || isDeleting) && styles.deleteModalButtonDisabled,
+                  ]}
+                  onPress={() => void confirmDeleteGrupo()}
+                  disabled={!deleteConfirmed || isDeleting}
+                >
+                  {isDeleting ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <MaterialIcons name="delete-forever" size={16} color="#FFFFFF" />
+                  )}
+                  <Text style={styles.deleteModalButtonText}>
+                    {isDeleting ? "Eliminando..." : "Eliminar grupo definitivamente"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </View>
   );
@@ -364,6 +460,24 @@ const styles = StyleSheet.create({
   },
   editarButtonText: {
     color: "#1676D2",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  eliminarButton: {
+    marginTop: 8,
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderWidth: 1,
+    borderColor: "#F5C2C7",
+    backgroundColor: "#FFF5F6",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  eliminarButtonText: {
+    color: "#C62828",
     fontSize: 13,
     fontWeight: "700",
   },
@@ -592,6 +706,125 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: FONT_SIZES.small,
     color: COLORS.textSecondary,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(14, 28, 52, 0.48)",
+    justifyContent: "flex-end",
+  },
+  modalCard: {
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 24,
+    gap: 12,
+  },
+  modalTitle: {
+    fontSize: 34,
+    fontWeight: "800",
+    color: "#1E2A3A",
+    letterSpacing: -0.4,
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: "#4D5D74",
+  },
+  impactCard: {
+    borderWidth: 1,
+    borderColor: "#D8E6F8",
+    borderRadius: 14,
+    backgroundColor: "#F6FAFF",
+    padding: 12,
+    gap: 10,
+  },
+  impactRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  impactText: {
+    fontSize: 16,
+    color: "#1E2A3A",
+    fontWeight: "700",
+  },
+  confirmRow: {
+    borderWidth: 1,
+    borderColor: "#E6EDF8",
+    backgroundColor: "#FBFDFF",
+    borderRadius: 12,
+    padding: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  confirmRowError: {
+    borderColor: "#E65151",
+    backgroundColor: "#FFF8F8",
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#B9C8DD",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+  },
+  checkboxActive: {
+    borderColor: "#1676D2",
+    backgroundColor: "#1676D2",
+  },
+  confirmText: {
+    flex: 1,
+    color: "#42536D",
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  deleteErrorText: {
+    color: "#C62828",
+    fontWeight: "700",
+    fontSize: 13,
+  },
+  modalActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  cancelModalButton: {
+    flex: 1,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "#DFE7F3",
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+  },
+  cancelModalButtonText: {
+    color: "#4D5D74",
+    fontWeight: "700",
+    fontSize: 15,
+  },
+  deleteModalButton: {
+    flex: 1.4,
+    borderRadius: 999,
+    backgroundColor: "#D62828",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    flexDirection: "row",
+    gap: 8,
+  },
+  deleteModalButtonDisabled: {
+    opacity: 0.65,
+  },
+  deleteModalButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "800",
+    fontSize: 14,
   },
 });
 

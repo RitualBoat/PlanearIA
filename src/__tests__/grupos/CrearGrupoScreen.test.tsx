@@ -6,9 +6,11 @@ jest.mock("@expo/vector-icons/MaterialIcons", () => "MaterialIcons");
 
 const mockHandleCrearGrupo = jest.fn().mockResolvedValue(undefined);
 const mockHandleCancelar = jest.fn();
+const mockSincronizarGrupos = jest.fn().mockResolvedValue(undefined);
 
 jest.mock("../../hooks/useCrearGrupoViewModel", () => ({
   useCrearGrupoViewModel: () => ({
+    modo: "crear",
     nombre: "",
     setNombre: jest.fn(),
     materia: "",
@@ -28,6 +30,15 @@ jest.mock("../../hooks/useCrearGrupoViewModel", () => ({
   }),
 }));
 
+jest.mock("../../hooks/useGrupos", () => ({
+  useGrupos: () => ({
+    syncStatus: "synced",
+    pendingSyncCount: 0,
+    isOnline: true,
+    sincronizarGrupos: mockSincronizarGrupos,
+  }),
+}));
+
 describe("CrearGrupoScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -41,6 +52,7 @@ describe("CrearGrupoScreen", () => {
     expect(getByText("Materia *")).toBeTruthy();
     expect(getByPlaceholderText("Ej: Enero-Junio 2024")).toBeTruthy();
     expect(getByText("Crear Grupo")).toBeTruthy();
+    expect(getByText("Sincronizado")).toBeTruthy();
   });
 
   it("ejecuta guardado al presionar crear", () => {

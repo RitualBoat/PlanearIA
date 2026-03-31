@@ -9,6 +9,7 @@ import {
   calcularEstadisticasGrupo,
   type EstadisticasGrupo,
 } from "../services/grupoReportesService";
+import { exportarReporteGrupoPDF } from "../services/reportesExportService";
 
 type Nav = StackNavigationProp<RootStackParamList, "ReportesGrupo">;
 type Route = RouteProp<RootStackParamList, "ReportesGrupo">;
@@ -26,6 +27,7 @@ export interface UseReportesGrupoViewModel {
   estadisticas: EstadisticasGrupo;
   serieTendencia: number[];
   recargar: () => Promise<void>;
+  exportarReporte: () => Promise<boolean>;
   goBack: () => void;
 }
 
@@ -151,6 +153,14 @@ export const useReportesGrupoViewModel = (): UseReportesGrupoViewModel => {
     navigation.goBack();
   }, [navigation]);
 
+  const exportarReporte = useCallback(async (): Promise<boolean> => {
+    return exportarReporteGrupoPDF({
+      grupoNombre,
+      periodo,
+      estadisticas,
+    });
+  }, [estadisticas, grupoNombre, periodo]);
+
   return {
     grupoId,
     grupoNombre,
@@ -161,6 +171,7 @@ export const useReportesGrupoViewModel = (): UseReportesGrupoViewModel => {
     estadisticas,
     serieTendencia,
     recargar,
+    exportarReporte,
     goBack,
   };
 };

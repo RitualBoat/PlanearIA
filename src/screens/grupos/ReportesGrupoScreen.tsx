@@ -48,16 +48,22 @@ const ReportesGrupoScreen: React.FC = () => {
     estadisticas,
     serieTendencia,
     recargar,
+    exportarReporte,
     goBack,
   } = useReportesGrupoViewModel();
 
-  const handleExportar = () => {
-    const message = "La exportación a imagen/PDF se implementará en la siguiente tarea.";
-    if (Platform.OS === "web") {
-      window.alert(message);
-      return;
+  const handleExportar = async () => {
+    try {
+      const ok = await exportarReporte();
+      if (!ok) {
+        throw new Error("No se pudo exportar");
+      }
+      if (Platform.OS !== "web") {
+        Alert.alert("Listo", "Reporte exportado correctamente.");
+      }
+    } catch {
+      Alert.alert("Error", "No se pudo exportar el reporte. Intenta nuevamente.");
     }
-    Alert.alert("Próximamente", message);
   };
 
   return (
@@ -72,7 +78,7 @@ const ReportesGrupoScreen: React.FC = () => {
             <Text style={styles.title}>Reportes del Grupo</Text>
             <Text style={styles.subtitle}>{grupoNombre} • Marzo 2026</Text>
           </View>
-          <TouchableOpacity onPress={handleExportar} style={styles.iconButton}>
+          <TouchableOpacity onPress={() => void handleExportar()} style={styles.iconButton}>
             <MaterialIcons name="file-download" size={22} color="#0C63B8" />
           </TouchableOpacity>
         </View>

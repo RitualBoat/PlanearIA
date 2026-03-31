@@ -5,6 +5,12 @@ const mockNavigate = jest.fn();
 const mockEliminarGrupo = jest.fn();
 const mockActualizarGrupo = jest.fn();
 const mockSetItem = jest.fn();
+const mockObtenerGrupo = jest.fn(() => ({
+  id: 7,
+  cantidadAlumnos: 24,
+  notasPersonales: "Nota inicial",
+  notasActualizadoEn: "2026-03-31T10:42:00.000Z",
+}));
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   setItem: (...args: unknown[]) => mockSetItem(...args),
@@ -55,7 +61,7 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("../../context/GruposContext", () => ({
   useGruposContext: () => ({
-    obtenerGrupo: () => ({ id: 7, cantidadAlumnos: 24 }),
+    obtenerGrupo: mockObtenerGrupo,
     eliminarGrupo: mockEliminarGrupo,
     actualizarGrupo: mockActualizarGrupo,
   }),
@@ -67,6 +73,60 @@ describe("useDetalleGrupoViewModel", () => {
     mockEliminarGrupo.mockResolvedValue(undefined);
     mockActualizarGrupo.mockResolvedValue(undefined);
     mockSetItem.mockResolvedValue(undefined);
+    mockObtenerGrupo.mockReturnValue({
+      id: 7,
+      cantidadAlumnos: 24,
+      notasPersonales: "Nota inicial",
+      notasActualizadoEn: "2026-03-31T10:42:00.000Z",
+    });
+  });
+
+  it("carga notas guardadas del grupo", () => {
+    const { result } = renderHook(() => useDetalleGrupoViewModel());
+
+    expect(result.current.grupoNotas).toBe("Nota inicial");
+    expect(result.current.notasEstado).toBe("sin-cambios");
+    expect(result.current.notasUltimaEdicion).toContain("31/03/2026");
+  });
+
+  it("guarda notas del grupo y actualiza estado", async () => {
+    const { result } = renderHook(() => useDetalleGrupoViewModel());
+
+    act(() => {
+      result.current.setGrupoNotas("Nueva observación del grupo");
+    });
+
+    expect(result.current.notasEstado).toBe("cambios-sin-guardar");
+
+    await act(async () => {
+      await result.current.guardarNotasGrupo();
+    });
+
+    expect(mockActualizarGrupo).toHaveBeenCalledWith(
+      7,
+      expect.objectContaining({
+        notasPersonales: "Nueva observación del grupo",
+        notasActualizadoEn: expect.any(String),
+      })
+    );
+    expect(result.current.notasEstado).toBe("guardado");
+  });
+
+  it("descarta cambios en notas y restaura valor guardado", () => {
+    const { result } = renderHook(() => useDetalleGrupoViewModel());
+
+    act(() => {
+      result.current.setGrupoNotas("Texto temporal");
+    });
+
+    expect(result.current.notasEstado).toBe("cambios-sin-guardar");
+
+    act(() => {
+      result.current.descartarCambiosNotas();
+    });
+
+    expect(result.current.grupoNotas).toBe("Nota inicial");
+    expect(result.current.notasEstado).toBe("sin-cambios");
   });
 
   it("requiere confirmación antes de eliminar", async () => {

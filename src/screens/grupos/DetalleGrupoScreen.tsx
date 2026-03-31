@@ -50,6 +50,10 @@ const TabContent: React.FC<{
   calificaciones: Calificacion[];
   entregas: EntregaTarea[];
   lastDataRefreshAt: Date | null;
+  grupoNotas: string;
+  notasUltimaEdicion: string;
+  notasEstado: "sin-cambios" | "cambios-sin-guardar" | "guardando" | "guardado" | "error";
+  notasError: string;
   chartWidth: number;
   openAddStudentsModal: () => void;
   openRemoveStudentModal: (student: {
@@ -62,6 +66,9 @@ const TabContent: React.FC<{
   navigateAsignarRecurso: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
   navigateReportesGrupo: () => void;
+  setGrupoNotas: (value: string) => void;
+  guardarNotasGrupo: () => Promise<void>;
+  descartarCambiosNotas: () => void;
 }> = React.memo(
   ({
     activeTab,
@@ -72,6 +79,10 @@ const TabContent: React.FC<{
     calificaciones,
     entregas,
     lastDataRefreshAt,
+    grupoNotas,
+    notasUltimaEdicion,
+    notasEstado,
+    notasError,
     chartWidth,
     openAddStudentsModal,
     openRemoveStudentModal,
@@ -79,6 +90,9 @@ const TabContent: React.FC<{
     navigateAsignarRecurso,
     navigateDetalleTarea,
     navigateReportesGrupo,
+    setGrupoNotas,
+    guardarNotasGrupo,
+    descartarCambiosNotas,
   }) => {
     switch (activeTab) {
       case "alumnos":
@@ -398,6 +412,106 @@ const TabContent: React.FC<{
           </View>
         );
 
+      case "notas":
+        return (
+          <View style={styles.tabContent}>
+            <View style={styles.notesSuggestionCard}>
+              <MaterialIcons name="lightbulb-outline" size={20} color="#1467B8" />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.notesSuggestionTitle}>Sugerencia pedagógica</Text>
+                <Text style={styles.notesSuggestionText}>
+                  Considera anotar acuerdos de seguimiento y pendientes de la próxima sesión.
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.notesCard}>
+              <View style={styles.notesHeaderRow}>
+                <View>
+                  <Text style={styles.tabTitle}>Notas personales</Text>
+                  <View style={styles.notesPrivateRow}>
+                    <MaterialIcons name="lock-outline" size={14} color="#71829A" />
+                    <Text style={styles.notesPrivateText}>Solo visible para ti</Text>
+                  </View>
+                </View>
+                <View style={styles.notesPrivateBadge}>
+                  <Text style={styles.notesPrivateBadgeText}>Modo privado</Text>
+                </View>
+              </View>
+
+              <TextInput
+                value={grupoNotas}
+                onChangeText={setGrupoNotas}
+                multiline
+                textAlignVertical="top"
+                placeholder="Escribe observaciones del grupo, acuerdos, pendientes o contexto relevante..."
+                placeholderTextColor="#A0ADBF"
+                style={styles.notesInput}
+              />
+
+              <View style={styles.notesMetaRow}>
+                <View style={styles.notesStatusRow}>
+                  <View
+                    style={[
+                      styles.notesStatusDot,
+                      notasEstado === "cambios-sin-guardar"
+                        ? styles.notesStatusDotWarning
+                        : notasEstado === "guardado"
+                          ? styles.notesStatusDotSuccess
+                          : notasEstado === "error"
+                            ? styles.notesStatusDotError
+                            : styles.notesStatusDotNeutral,
+                    ]}
+                  />
+                  <Text style={styles.notesStatusText}>
+                    {notasEstado === "guardando"
+                      ? "Guardando..."
+                      : notasEstado === "cambios-sin-guardar"
+                        ? "Cambios sin guardar"
+                        : notasEstado === "guardado"
+                          ? "Guardado"
+                          : notasEstado === "error"
+                            ? "Error al guardar"
+                            : "Sin cambios"}
+                  </Text>
+                </View>
+                <Text style={styles.notesTimestamp}>Última edición: {notasUltimaEdicion}</Text>
+              </View>
+
+              {notasError ? <Text style={styles.notesErrorText}>{notasError}</Text> : null}
+
+              <View style={styles.notesActionsRow}>
+                {notasEstado === "cambios-sin-guardar" ? (
+                  <TouchableOpacity
+                    style={styles.notesDiscardButton}
+                    onPress={descartarCambiosNotas}
+                  >
+                    <Text style={styles.notesDiscardButtonText}>Descartar cambios</Text>
+                  </TouchableOpacity>
+                ) : null}
+
+                <TouchableOpacity
+                  style={[
+                    styles.notesSaveButton,
+                    notasEstado !== "cambios-sin-guardar" && styles.notesSaveButtonDisabled,
+                  ]}
+                  onPress={() => void guardarNotasGrupo()}
+                  disabled={notasEstado !== "cambios-sin-guardar"}
+                >
+                  <Text style={styles.notesSaveButtonText}>
+                    {notasEstado === "guardando" ? "Guardando..." : "Guardar notas"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <Text style={styles.notesFooterText}>
+              Estas notas se guardan localmente y se sincronizan con tu nube docente para acceso
+              offline.
+            </Text>
+          </View>
+        );
+
       default:
         return null;
     }
@@ -425,6 +539,10 @@ const DetalleGrupoScreen: React.FC = () => {
     calificaciones,
     entregas,
     lastDataRefreshAt,
+    grupoNotas,
+    notasUltimaEdicion,
+    notasEstado,
+    notasError,
     addStudentsModalVisible,
     createStudentMode,
     studentSearchQuery,
@@ -474,6 +592,9 @@ const DetalleGrupoScreen: React.FC = () => {
     navigateAsignarRecurso,
     navigateDetalleTarea,
     navigateReportesGrupo,
+    setGrupoNotas,
+    guardarNotasGrupo,
+    descartarCambiosNotas,
   } = useDetalleGrupoViewModel();
 
   return (
@@ -545,6 +666,10 @@ const DetalleGrupoScreen: React.FC = () => {
             calificaciones={calificaciones}
             entregas={entregas}
             lastDataRefreshAt={lastDataRefreshAt}
+            grupoNotas={grupoNotas}
+            notasUltimaEdicion={notasUltimaEdicion}
+            notasEstado={notasEstado}
+            notasError={notasError}
             chartWidth={chartWidth}
             openAddStudentsModal={openAddStudentsModal}
             openRemoveStudentModal={openRemoveStudentModal}
@@ -552,6 +677,9 @@ const DetalleGrupoScreen: React.FC = () => {
             navigateAsignarRecurso={navigateAsignarRecurso}
             navigateDetalleTarea={navigateDetalleTarea}
             navigateReportesGrupo={navigateReportesGrupo}
+            setGrupoNotas={setGrupoNotas}
+            guardarNotasGrupo={guardarNotasGrupo}
+            descartarCambiosNotas={descartarCambiosNotas}
           />
         </WebScrollView>
 
@@ -1176,6 +1304,171 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "800",
     fontSize: 14,
+  },
+  notesSuggestionCard: {
+    backgroundColor: "#FFFFFF",
+    borderLeftWidth: 4,
+    borderLeftColor: "#1676D2",
+    borderWidth: 1,
+    borderColor: "#DCE8F6",
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 14,
+  },
+  notesSuggestionTitle: {
+    color: "#5D6E87",
+    fontSize: 14,
+    fontWeight: "700",
+    textTransform: "capitalize",
+  },
+  notesSuggestionText: {
+    color: "#24364E",
+    fontSize: 16,
+    fontWeight: "700",
+    marginTop: 3,
+    lineHeight: 23,
+  },
+  notesCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 16,
+    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
+  },
+  notesHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 12,
+    gap: 8,
+  },
+  notesPrivateRow: {
+    marginTop: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  notesPrivateText: {
+    color: "#71829A",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  notesPrivateBadge: {
+    backgroundColor: "#EAF1FB",
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  notesPrivateBadgeText: {
+    color: "#2E6EBB",
+    fontSize: 13,
+    fontWeight: "800",
+    textTransform: "uppercase",
+  },
+  notesInput: {
+    minHeight: 180,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#DFE7F2",
+    backgroundColor: "#F5F8FC",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    color: "#2B3D57",
+    fontSize: 22,
+    lineHeight: 32,
+    fontWeight: "500",
+  },
+  notesMetaRow: {
+    marginTop: 12,
+    marginBottom: 8,
+    gap: 4,
+  },
+  notesStatusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+  },
+  notesStatusDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 999,
+  },
+  notesStatusDotNeutral: {
+    backgroundColor: "#8EA0B7",
+  },
+  notesStatusDotWarning: {
+    backgroundColor: "#E2A400",
+  },
+  notesStatusDotSuccess: {
+    backgroundColor: "#15803D",
+  },
+  notesStatusDotError: {
+    backgroundColor: "#C62828",
+  },
+  notesStatusText: {
+    color: "#334861",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  notesTimestamp: {
+    color: "#74839A",
+    fontSize: 13,
+    fontWeight: "500",
+  },
+  notesErrorText: {
+    color: "#B12635",
+    fontSize: 13,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+  notesActionsRow: {
+    marginTop: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  notesDiscardButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#DAE4F2",
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+  },
+  notesDiscardButtonText: {
+    color: "#5E708A",
+    fontSize: 19,
+    fontWeight: "700",
+  },
+  notesSaveButton: {
+    flex: 1,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+    backgroundColor: "#1676D2",
+    boxShadow: "0px 8px 18px rgba(22, 118, 210, 0.3)",
+  },
+  notesSaveButtonDisabled: {
+    backgroundColor: "#8EBCE6",
+    boxShadow: "none",
+  },
+  notesSaveButtonText: {
+    color: "#FFFFFF",
+    fontSize: 22,
+    fontWeight: "800",
+  },
+  notesFooterText: {
+    color: "#6C7D95",
+    fontSize: 18,
+    fontWeight: "500",
+    lineHeight: 25,
+    textAlign: "center",
+    marginTop: 14,
   },
   // Estilos para tareas
   actionButtonsRow: {

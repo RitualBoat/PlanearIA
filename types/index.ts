@@ -59,6 +59,8 @@ export interface Grupo extends BaseEntity {
   estado: "activo" | "inactivo" | "finalizado";
   fechaCreacion: Date;
   horario?: string; // Ej: "Lun-Mie-Vie 7:00-9:00"
+  notasPersonales?: string;
+  notasActualizadoEn?: string;
 }
 
 /**

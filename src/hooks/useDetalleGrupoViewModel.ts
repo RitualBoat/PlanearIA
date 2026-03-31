@@ -16,7 +16,8 @@ export type TabType =
   | "asistencias"
   | "recursos"
   | "tareas"
-  | "graficas";
+  | "graficas"
+  | "notas";
 
 export interface Tab {
   id: TabType;
@@ -37,6 +38,10 @@ export interface DetalleGrupoViewModel {
   calificaciones: Calificacion[];
   entregas: EntregaTarea[];
   lastDataRefreshAt: Date | null;
+  grupoNotas: string;
+  notasUltimaEdicion: string;
+  notasEstado: "sin-cambios" | "cambios-sin-guardar" | "guardando" | "guardado" | "error";
+  notasError: string;
   reloadDetalleData: () => Promise<void>;
   addStudentsModalVisible: boolean;
   createStudentMode: boolean;
@@ -87,6 +92,9 @@ export interface DetalleGrupoViewModel {
   navigateAsignarRecurso: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
   navigateReportesGrupo: () => void;
+  setGrupoNotas: (value: string) => void;
+  guardarNotasGrupo: () => Promise<void>;
+  descartarCambiosNotas: () => void;
 }
 
 export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
@@ -109,6 +117,13 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
   const [calificaciones, setCalificaciones] = useState<Calificacion[]>([]);
   const [entregas, setEntregas] = useState<EntregaTarea[]>([]);
   const [lastDataRefreshAt, setLastDataRefreshAt] = useState<Date | null>(null);
+  const [savedGrupoNotas, setSavedGrupoNotas] = useState("");
+  const [grupoNotas, setGrupoNotasState] = useState("");
+  const [notasActualizadoEn, setNotasActualizadoEn] = useState<string | null>(null);
+  const [notasEstado, setNotasEstado] = useState<
+    "sin-cambios" | "cambios-sin-guardar" | "guardando" | "guardado" | "error"
+  >("sin-cambios");
+  const [notasError, setNotasError] = useState("");
   const [addStudentsModalVisible, setAddStudentsModalVisible] = useState(false);
   const [createStudentMode, setCreateStudentMode] = useState(false);
   const [studentSearchQuery, setStudentSearchQuery] = useState("");
@@ -128,6 +143,20 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
 
   const grupo = obtenerGrupo(grupoId);
   const cantidadAlumnos = grupo?.cantidadAlumnos ?? 0;
+  const notasUltimaEdicion = useMemo(() => {
+    if (!notasActualizadoEn) return "Sin ediciones";
+
+    const fecha = new Date(notasActualizadoEn);
+    if (Number.isNaN(fecha.getTime())) return "Sin ediciones";
+
+    return fecha.toLocaleString("es-MX", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }, [notasActualizadoEn]);
 
   const tabs: Tab[] = useMemo(
     () => [
@@ -137,9 +166,22 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
       { id: "recursos", label: "Recursos", icon: "folder" },
       { id: "tareas", label: "Tareas", icon: "assignment" },
       { id: "graficas", label: "Gráficas", icon: "analytics" },
+      { id: "notas", label: "Notas", icon: "note-alt" },
     ],
     []
   );
+
+  useEffect(() => {
+    const notasGuardadas = typeof grupo?.notasPersonales === "string" ? grupo.notasPersonales : "";
+    const notasActualizadas =
+      typeof grupo?.notasActualizadoEn === "string" ? grupo.notasActualizadoEn : null;
+
+    setSavedGrupoNotas(notasGuardadas);
+    setGrupoNotasState(notasGuardadas);
+    setNotasActualizadoEn(notasActualizadas);
+    setNotasEstado("sin-cambios");
+    setNotasError("");
+  }, [grupo?.id, grupo?.notasPersonales, grupo?.notasActualizadoEn]);
 
   const readArray = useCallback(async <T>(key: string): Promise<T[]> => {
     const raw = await AsyncStorage.getItem(key);
@@ -433,6 +475,46 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     }
   }, [deleteConfirmed, eliminarGrupo, grupoId, navigation]);
 
+  const setGrupoNotas = useCallback(
+    (value: string) => {
+      setGrupoNotasState(value);
+      setNotasEstado(value === savedGrupoNotas ? "sin-cambios" : "cambios-sin-guardar");
+      setNotasError("");
+    },
+    [savedGrupoNotas]
+  );
+
+  const descartarCambiosNotas = useCallback(() => {
+    setGrupoNotasState(savedGrupoNotas);
+    setNotasEstado("sin-cambios");
+    setNotasError("");
+  }, [savedGrupoNotas]);
+
+  const guardarNotasGrupo = useCallback(async () => {
+    if (grupoNotas === savedGrupoNotas) {
+      setNotasEstado("sin-cambios");
+      return;
+    }
+
+    try {
+      setNotasEstado("guardando");
+      setNotasError("");
+      const nowIso = new Date().toISOString();
+
+      await actualizarGrupo(grupoId, {
+        notasPersonales: grupoNotas,
+        notasActualizadoEn: nowIso,
+      });
+
+      setSavedGrupoNotas(grupoNotas);
+      setNotasActualizadoEn(nowIso);
+      setNotasEstado("guardado");
+    } catch {
+      setNotasEstado("error");
+      setNotasError("No se pudieron guardar las notas. Intenta nuevamente.");
+    }
+  }, [actualizarGrupo, grupoId, grupoNotas, savedGrupoNotas]);
+
   return {
     grupoId,
     grupoNombre,
@@ -446,6 +528,10 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     calificaciones,
     entregas,
     lastDataRefreshAt,
+    grupoNotas,
+    notasUltimaEdicion,
+    notasEstado,
+    notasError,
     reloadDetalleData,
     addStudentsModalVisible,
     createStudentMode,
@@ -496,5 +582,8 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     navigateAsignarRecurso,
     navigateDetalleTarea,
     navigateReportesGrupo,
+    setGrupoNotas,
+    guardarNotasGrupo,
+    descartarCambiosNotas,
   };
 };

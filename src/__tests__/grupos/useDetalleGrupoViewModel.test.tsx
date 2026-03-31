@@ -4,6 +4,34 @@ import { useDetalleGrupoViewModel } from "../../hooks/useDetalleGrupoViewModel";
 const mockNavigate = jest.fn();
 const mockEliminarGrupo = jest.fn();
 
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  getItem: jest.fn((key: string) => {
+    if (key === "@planearia:alumnos") {
+      return Promise.resolve(
+        JSON.stringify([
+          { id: 1, nombre: "Ana", apellidos: "López", grupoId: 7 },
+          { id: 2, nombre: "Luis", apellidos: "Pérez", grupoId: 9 },
+        ])
+      );
+    }
+    if (key === "@planearia:tareas") {
+      return Promise.resolve(
+        JSON.stringify([{ id: 1, titulo: "Tarea 1", grupoId: 7, fechaEntrega: new Date(), valor: 20 }])
+      );
+    }
+    if (key === "@planearia:recursos") {
+      return Promise.resolve(JSON.stringify([{ id: 1, titulo: "Guía", tipo: "documento", grupoId: 7 }]));
+    }
+    if (key === "@planearia:asistencias") {
+      return Promise.resolve(JSON.stringify([{ id: 1, grupoId: 7, estado: "presente" }]));
+    }
+    if (key === "@planearia:calificaciones") {
+      return Promise.resolve(JSON.stringify([{ id: 1, grupoId: 7, promedio: 9, estado: "aprobado" }]));
+    }
+    return Promise.resolve(null);
+  }),
+}));
+
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({
     navigate: mockNavigate,

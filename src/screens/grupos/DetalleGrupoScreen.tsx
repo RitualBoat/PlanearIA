@@ -20,34 +20,48 @@ import { useDetalleGrupoViewModel, TabType } from "../../hooks/useDetalleGrupoVi
  */
 const TabContent: React.FC<{
   activeTab: TabType;
+  alumnos: Array<{ id: number; nombre: string; apellidos: string }>;
+  tareas: Array<{ id: number; titulo: string; fechaEntrega: Date | string; valor: number }>;
+  recursos: Array<{ id: number; titulo: string; tipo: string }>;
+  asistencias: Array<{ id: number; estado: string }>;
+  calificaciones: Array<{ id: number; promedio: number; estado: string }>;
   navigateCrearTarea: () => void;
   navigateAsignarRecurso: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
 }> = React.memo(
-  ({ activeTab, navigateCrearTarea, navigateAsignarRecurso, navigateDetalleTarea }) => {
+  ({
+    activeTab,
+    alumnos,
+    tareas,
+    recursos,
+    asistencias,
+    calificaciones,
+    navigateCrearTarea,
+    navigateAsignarRecurso,
+    navigateDetalleTarea,
+  }) => {
     switch (activeTab) {
       case "alumnos":
         return (
           <View style={styles.tabContent}>
             <Text style={styles.tabTitle}>Lista de Alumnos</Text>
-            <Text style={styles.tabDescription}>
-              Aquí se mostrará la lista de alumnos del grupo
-            </Text>
+            <Text style={styles.tabDescription}>Alumnos vinculados al grupo seleccionado.</Text>
             <TouchableOpacity style={styles.actionButton}>
               <MaterialIcons name="person-add" size={24} color="white" />
               <Text style={styles.actionButtonText}>Agregar Alumno</Text>
             </TouchableOpacity>
 
-            {/* Lista de ejemplo */}
             <View style={styles.listaContainer}>
-              {["Juan Pérez García", "María López Martínez", "Carlos Rodríguez Sánchez"].map(
-                (nombre) => (
-                  <View key={nombre} style={styles.alumnoItem}>
+              {alumnos.length === 0 ? (
+                <Text style={styles.emptyText}>No hay alumnos vinculados a este grupo.</Text>
+              ) : (
+                alumnos.map((alumno) => (
+                  <View key={String(alumno.id)} style={styles.alumnoItem}>
                     <MaterialIcons name="account-circle" size={40} color={COLORS.primary} />
-                    <Text style={styles.alumnoNombre}>{nombre}</Text>
+                    <Text style={styles.alumnoNombre}>{`${alumno.nombre} ${alumno.apellidos}`}</Text>
                     <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
                   </View>
-                )
+                ))
               )}
             </View>
           </View>
@@ -65,14 +79,28 @@ const TabContent: React.FC<{
               <Text style={styles.actionButtonText}>Registrar Calificaciones</Text>
             </TouchableOpacity>
 
-            {/* Resumen de ejemplo */}
             <View style={styles.statsContainer}>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>8.5</Text>
+                <Text style={styles.statNumber}>
+                  {calificaciones.length > 0
+                    ? (
+                        calificaciones.reduce((acc, item) => acc + Number(item.promedio || 0), 0) /
+                        calificaciones.length
+                      ).toFixed(1)
+                    : "0.0"}
+                </Text>
                 <Text style={styles.statLabel}>Promedio Grupal</Text>
               </View>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>85%</Text>
+                <Text style={styles.statNumber}>
+                  {calificaciones.length > 0
+                    ? `${Math.round(
+                        (calificaciones.filter((c) => c.estado === "aprobado").length /
+                          calificaciones.length) *
+                          100
+                      )}%`
+                    : "0%"}
+                </Text>
                 <Text style={styles.statLabel}>Aprobación</Text>
               </View>
             </View>
@@ -91,40 +119,51 @@ const TabContent: React.FC<{
               <Text style={styles.actionButtonText}>Pasar Lista</Text>
             </TouchableOpacity>
 
-            {/* Estadísticas de ejemplo */}
             <View style={styles.statsContainer}>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>92%</Text>
+                <Text style={styles.statNumber}>
+                  {asistencias.length > 0
+                    ? `${Math.round(
+                        (asistencias.filter((a) => a.estado === "presente").length /
+                          asistencias.length) *
+                          100
+                      )}%`
+                    : "0%"}
+                </Text>
                 <Text style={styles.statLabel}>Asistencia Promedio</Text>
               </View>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>3</Text>
+                <Text style={styles.statNumber}>
+                  {asistencias.filter((a) => a.estado === "retardo").length}
+                </Text>
                 <Text style={styles.statLabel}>Retardos Hoy</Text>
               </View>
             </View>
           </View>
         );
 
-      case "comentarios":
+      case "recursos":
         return (
           <View style={styles.tabContent}>
-            <Text style={styles.tabTitle}>Comentarios y Notas</Text>
-            <Text style={styles.tabDescription}>
-              Registra observaciones personalizadas de tus alumnos
-            </Text>
+            <Text style={styles.tabTitle}>Recursos Asignados</Text>
+            <Text style={styles.tabDescription}>Recursos asociados al grupo seleccionado.</Text>
             <TouchableOpacity style={styles.actionButton}>
-              <MaterialIcons name="add-comment" size={24} color="white" />
-              <Text style={styles.actionButtonText}>Nuevo Comentario</Text>
+              <MaterialIcons name="file-copy" size={24} color="white" />
+              <Text style={styles.actionButtonText}>Asignar Recurso</Text>
             </TouchableOpacity>
 
-            {/* Comentarios recientes */}
             <View style={styles.listaContainer}>
-              <Text style={styles.sectionTitle}>Comentarios Recientes</Text>
-              <View style={styles.comentarioItem}>
-                <Text style={styles.comentarioAlumno}>Juan Pérez García</Text>
-                <Text style={styles.comentarioTexto}>Excelente participación en clase</Text>
-                <Text style={styles.comentarioFecha}>Hace 2 días</Text>
-              </View>
+              <Text style={styles.sectionTitle}>Recursos del grupo</Text>
+              {recursos.length === 0 ? (
+                <Text style={styles.emptyText}>Este grupo aún no tiene recursos asignados.</Text>
+              ) : (
+                recursos.map((recurso) => (
+                  <View key={String(recurso.id)} style={styles.comentarioItem}>
+                    <Text style={styles.comentarioAlumno}>{recurso.titulo}</Text>
+                    <Text style={styles.comentarioTexto}>Tipo: {recurso.tipo}</Text>
+                  </View>
+                ))
+              )}
             </View>
           </View>
         );
@@ -137,18 +176,17 @@ const TabContent: React.FC<{
               Gestiona las tareas, exámenes y proyectos del grupo
             </Text>
 
-            {/* Estadísticas de tareas */}
             <View style={styles.statsContainer}>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>75%</Text>
+                <Text style={styles.statNumber}>{tareas.length}</Text>
                 <Text style={styles.statLabel}>Entregado</Text>
               </View>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>8.5</Text>
+                <Text style={styles.statNumber}>--</Text>
                 <Text style={styles.statLabel}>Promedio</Text>
               </View>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>3</Text>
+                <Text style={styles.statNumber}>{tareas.length}</Text>
                 <Text style={styles.statLabel}>Pendientes</Text>
               </View>
             </View>
@@ -172,63 +210,31 @@ const TabContent: React.FC<{
               </TouchableOpacity>
             </View>
 
-            {/* Lista de tareas */}
             <View style={styles.listaContainer}>
               <Text style={styles.sectionTitle}>Tareas Activas</Text>
-
-              {/* Tarea ejemplo 1 */}
-              <TouchableOpacity style={styles.tareaItem} onPress={() => navigateDetalleTarea(1)}>
-                <View style={styles.tareaHeader}>
-                  <MaterialIcons name="assignment" size={24} color="#FF9800" />
-                  <View style={styles.tareaInfo}>
-                    <Text style={styles.tareaTitulo}>Investigación sobre IA</Text>
-                    <Text style={styles.tareaMetadata}>Entrega: en 2 días | Valor: 20pts</Text>
-                  </View>
-                  <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
-                </View>
-                <View style={styles.tareaProgress}>
-                  <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: "54%" }]} />
-                  </View>
-                  <Text style={styles.progressText}>15/28 entregados</Text>
-                </View>
-              </TouchableOpacity>
-
-              {/* Tarea ejemplo 2 */}
-              <TouchableOpacity style={styles.tareaItem} onPress={() => navigateDetalleTarea(2)}>
-                <View style={styles.tareaHeader}>
-                  <MaterialIcons name="quiz" size={24} color="#2196F3" />
-                  <View style={styles.tareaInfo}>
-                    <Text style={styles.tareaTitulo}>Examen Parcial 2</Text>
-                    <Text style={styles.tareaMetadata}>Próximo: 30 Nov | Valor: 30pts</Text>
-                  </View>
-                  <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
-                </View>
-                <View style={styles.tareaProgress}>
-                  <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: "0%" }]} />
-                  </View>
-                  <Text style={styles.progressText}>Aún no ha iniciado</Text>
-                </View>
-              </TouchableOpacity>
-
-              {/* Tarea ejemplo 3 */}
-              <TouchableOpacity style={styles.tareaItem} onPress={() => navigateDetalleTarea(3)}>
-                <View style={styles.tareaHeader}>
-                  <MaterialIcons name="science" size={24} color="#9C27B0" />
-                  <View style={styles.tareaInfo}>
-                    <Text style={styles.tareaTitulo}>Proyecto Final</Text>
-                    <Text style={styles.tareaMetadata}>Entrega: en 15 días | Valor: 40pts</Text>
-                  </View>
-                  <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
-                </View>
-                <View style={styles.tareaProgress}>
-                  <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: "25%" }]} />
-                  </View>
-                  <Text style={styles.progressText}>7/28 entregados</Text>
-                </View>
-              </TouchableOpacity>
+              {tareas.length === 0 ? (
+                <Text style={styles.emptyText}>No hay tareas asignadas a este grupo.</Text>
+              ) : (
+                tareas.map((tarea) => (
+                  <TouchableOpacity
+                    key={String(tarea.id)}
+                    style={styles.tareaItem}
+                    onPress={() => navigateDetalleTarea(tarea.id)}
+                  >
+                    <View style={styles.tareaHeader}>
+                      <MaterialIcons name="assignment" size={24} color="#FF9800" />
+                      <View style={styles.tareaInfo}>
+                        <Text style={styles.tareaTitulo}>{tarea.titulo}</Text>
+                        <Text style={styles.tareaMetadata}>
+                          Entrega: {new Date(tarea.fechaEntrega).toLocaleDateString()} | Valor: {tarea.valor}
+                          pts
+                        </Text>
+                      </View>
+                      <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
+                    </View>
+                  </TouchableOpacity>
+                ))
+              )}
             </View>
           </View>
         );
@@ -268,6 +274,13 @@ const DetalleGrupoScreen: React.FC = () => {
     grupoId,
     grupoNombre,
     cantidadAlumnos,
+    isLoadingData,
+    loadError,
+    alumnos,
+    tareas,
+    recursos,
+    asistencias,
+    calificaciones,
     deleteModalVisible,
     deleteConfirmed,
     isDeleting,
@@ -329,10 +342,29 @@ const DetalleGrupoScreen: React.FC = () => {
           ))}
         </ScrollView>
 
+        {isLoadingData ? (
+          <View style={styles.inlineState}>
+            <ActivityIndicator size="small" color="#1676D2" />
+            <Text style={styles.inlineStateText}>Cargando datos reales del grupo...</Text>
+          </View>
+        ) : null}
+
+        {!isLoadingData && loadError ? (
+          <View style={styles.inlineStateError}>
+            <MaterialIcons name="error-outline" size={18} color="#B12635" />
+            <Text style={styles.inlineStateErrorText}>{loadError}</Text>
+          </View>
+        ) : null}
+
         {/* Contenido de la pestaña activa */}
         <WebScrollView style={styles.content}>
           <TabContent
             activeTab={activeTab}
+            alumnos={alumnos}
+            tareas={tareas}
+            recursos={recursos}
+            asistencias={asistencias}
+            calificaciones={calificaciones}
             navigateCrearTarea={navigateCrearTarea}
             navigateAsignarRecurso={navigateAsignarRecurso}
             navigateDetalleTarea={navigateDetalleTarea}
@@ -513,6 +545,42 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
+  inlineState: {
+    marginHorizontal: 16,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: "#CFE2F7",
+    backgroundColor: "#F2F8FF",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  inlineStateText: {
+    fontSize: FONT_SIZES.small,
+    color: "#0C5DA8",
+    fontWeight: "600",
+  },
+  inlineStateError: {
+    marginHorizontal: 16,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: "#F7CDD2",
+    backgroundColor: "#FFF1F2",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  inlineStateErrorText: {
+    fontSize: FONT_SIZES.small,
+    color: "#B12635",
+    fontWeight: "700",
+  },
   tabContent: {
     paddingHorizontal: 16,
     paddingTop: 14,
@@ -528,6 +596,16 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.medium,
     color: COLORS.textSecondary,
     marginBottom: 20,
+  },
+  emptyText: {
+    fontSize: FONT_SIZES.medium,
+    color: COLORS.textSecondary,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
   },
   actionButton: {
     flexDirection: "row",

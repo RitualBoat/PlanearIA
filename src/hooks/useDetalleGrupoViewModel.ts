@@ -36,6 +36,7 @@ export interface DetalleGrupoViewModel {
   asistencias: Asistencia[];
   calificaciones: Calificacion[];
   entregas: EntregaTarea[];
+  lastDataRefreshAt: Date | null;
   reloadDetalleData: () => Promise<void>;
   addStudentsModalVisible: boolean;
   createStudentMode: boolean;
@@ -107,6 +108,7 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
   const [asistencias, setAsistencias] = useState<Asistencia[]>([]);
   const [calificaciones, setCalificaciones] = useState<Calificacion[]>([]);
   const [entregas, setEntregas] = useState<EntregaTarea[]>([]);
+  const [lastDataRefreshAt, setLastDataRefreshAt] = useState<Date | null>(null);
   const [addStudentsModalVisible, setAddStudentsModalVisible] = useState(false);
   const [createStudentMode, setCreateStudentMode] = useState(false);
   const [studentSearchQuery, setStudentSearchQuery] = useState("");
@@ -178,6 +180,7 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
         tareasRaw.filter((tarea) => tarea.grupoId === grupoId).map((t) => t.id)
       );
       setEntregas(entregablesRaw.filter((entrega) => tareasGrupoIds.has(entrega.tareaId)));
+      setLastDataRefreshAt(new Date());
     } catch {
       setLoadError("No se pudieron cargar los datos del grupo.");
     } finally {
@@ -442,6 +445,7 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     asistencias,
     calificaciones,
     entregas,
+    lastDataRefreshAt,
     reloadDetalleData,
     addStudentsModalVisible,
     createStudentMode,

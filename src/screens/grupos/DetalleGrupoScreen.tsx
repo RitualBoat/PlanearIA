@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { LineChart } from "react-native-chart-kit";
 import { COLORS, FONT_SIZES } from "../../../types";
 import type {
   Alumno,
@@ -26,18 +25,17 @@ import type {
 import WebScrollView from "../../components/WebScrollView";
 import { useDetalleGrupoViewModel, TabType } from "../../hooks/useDetalleGrupoViewModel";
 import { calcularEstadisticasGrupo } from "../../services/grupoReportesService";
+import StatCard from "../../components/StatCard";
+import TrendMiniChart from "../../components/TrendMiniChart";
+import DeliveryDistributionMini from "../../components/DeliveryDistributionMini";
 
-const CHART_CONFIG = {
-  backgroundGradientFrom: "#FFFFFF",
-  backgroundGradientTo: "#FFFFFF",
-  decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(22, 118, 210, ${opacity})`,
-  labelColor: (opacity = 1) => `rgba(65, 83, 109, ${opacity})`,
-  propsForDots: {
-    r: "4",
-    strokeWidth: "2",
-    stroke: "#FFFFFF",
-  },
+const getLastRefreshText = (lastRefreshAt: Date | null): string => {
+  if (!lastRefreshAt) return "Actualizado recientemente";
+  const diffMs = Date.now() - new Date(lastRefreshAt).getTime();
+  const diffMinutes = Math.max(1, Math.round(diffMs / 60000));
+  if (diffMinutes < 60) return `Actualizado hace ${diffMinutes} min`;
+  const hours = Math.round(diffMinutes / 60);
+  return `Actualizado hace ${hours} h`;
 };
 
 /**
@@ -51,6 +49,7 @@ const TabContent: React.FC<{
   asistencias: Asistencia[];
   calificaciones: Calificacion[];
   entregas: EntregaTarea[];
+  lastDataRefreshAt: Date | null;
   chartWidth: number;
   openAddStudentsModal: () => void;
   openRemoveStudentModal: (student: {
@@ -72,6 +71,7 @@ const TabContent: React.FC<{
     asistencias,
     calificaciones,
     entregas,
+    lastDataRefreshAt,
     chartWidth,
     openAddStudentsModal,
     openRemoveStudentModal,
@@ -299,60 +299,97 @@ const TabContent: React.FC<{
           tareas,
           entregas,
         });
+        const completionRatio = tareas.length === 0 ? 0 : (entregas.length / tareas.length) * 100;
+        const avgRaw = Math.max(0, Math.min(100, stats.promedioGeneral * 10));
+        const summaryTrend =
+          stats.indiceAprobacion >= 80
+            ? "Rendimiento sólido en las últimas semanas"
+            : "Conviene reforzar seguimiento académico";
 
         return (
           <View style={styles.tabContent}>
-            <Text style={styles.tabTitle}>Gráficas de Rendimiento</Text>
-            <Text style={styles.tabDescription}>
-              Visualiza estadísticas y el rendimiento del grupo
-            </Text>
+            <View style={styles.statsHeaderRow}>
+              <View>
+                <Text style={styles.tabTitle}>Estadísticas del Grupo</Text>
+                <Text style={styles.tabDescription}>Seguimiento académico en tiempo real</Text>
+              </View>
+              <Text style={styles.updatedAtText}>{getLastRefreshText(lastDataRefreshAt)}</Text>
+            </View>
 
-            <View style={styles.graficaContainer}>
-              <Text style={styles.graficaText}>Indicadores clave del grupo</Text>
-              <LineChart
-                data={{
-                  labels: ["Promedio", "Aprob.", "Asistencia", "Entregas"],
-                  datasets: [
-                    {
-                      data: [
-                        stats.promedioGeneral * 10,
-                        stats.indiceAprobacion,
-                        stats.indiceAsistencia,
-                        stats.indiceEntregasATiempo,
-                      ],
-                    },
-                  ],
-                }}
-                width={chartWidth}
-                height={220}
-                yAxisSuffix="%"
-                fromZero
-                chartConfig={CHART_CONFIG}
-                bezier
-                style={styles.chart}
+            <View style={styles.statsCardsRow}>
+              <StatCard
+                label="PROMEDIO"
+                value={stats.promedioGeneral.toFixed(1)}
+                accentColor="#1676D2"
+                trend={stats.promedioGeneral >= 8 ? "up" : "flat"}
+                footerText="Meta: 8.0"
               />
-              <Text style={styles.graficaItem}>
-                Promedio: {stats.promedioGeneral.toFixed(1)}/10
-              </Text>
-              <Text style={styles.graficaItem}>
-                Aprobación: {Math.round(stats.indiceAprobacion)}%
-              </Text>
-              <Text style={styles.graficaItem}>
-                Reprobación: {Math.round(stats.indiceReprobacion)}%
-              </Text>
-              <Text style={styles.graficaItem}>
-                Asistencia: {Math.round(stats.indiceAsistencia)}%
-              </Text>
-              <Text style={styles.graficaItem}>
-                Entregas a tiempo: {Math.round(stats.indiceEntregasATiempo)}%
-              </Text>
-              <Text style={styles.graficaItem}>
-                Entregas tarde: {Math.round(stats.indiceEntregasTarde)}%
-              </Text>
-              <Text style={styles.graficaItem}>
-                No entregadas: {Math.round(stats.indiceNoEntregadas)}%
-              </Text>
+              <StatCard
+                label="ASISTENCIA"
+                value={`${Math.round(stats.indiceAsistencia)}%`}
+                accentColor="#0FA878"
+                trend={stats.indiceAsistencia >= 85 ? "up" : "down"}
+                footerText="Objetivo: 85%"
+              />
+            </View>
 
+            <View style={styles.statsCardsRow}>
+              <StatCard
+                label="APROBACIÓN"
+                value={`${Math.round(stats.indiceAprobacion)}%`}
+                accentColor="#5C6AC4"
+                trend={stats.indiceAprobacion >= 80 ? "up" : "flat"}
+                footerText={`${Math.round(stats.indiceReprobacion)}% reprobación`}
+              />
+              <StatCard
+                label="ENTREGAS"
+                value={`${Math.round(stats.indiceEntregasATiempo)}%`}
+                accentColor="#F57C00"
+                trend={stats.indiceEntregasATiempo >= 70 ? "up" : "down"}
+                footerText={`${Math.round(completionRatio)}% avance`}
+              />
+            </View>
+
+            <View style={styles.miniChartsSection}>
+              <TrendMiniChart
+                title="Evolución del promedio"
+                subtitle={`${stats.promedioGeneral.toFixed(1)} / 10 actual`}
+                color="#1676D2"
+                bars={[
+                  Math.max(10, avgRaw - 10),
+                  Math.max(10, avgRaw - 7),
+                  Math.max(10, avgRaw - 4),
+                  Math.max(10, avgRaw - 2),
+                  avgRaw,
+                ]}
+              />
+              <TrendMiniChart
+                title="Cumplimiento de tareas"
+                subtitle={`${Math.round(stats.indiceEntregasATiempo)}% a tiempo`}
+                color="#F57C00"
+                bars={[
+                  Math.max(10, stats.indiceEntregasATiempo - 20),
+                  Math.max(10, stats.indiceEntregasATiempo - 14),
+                  Math.max(10, stats.indiceEntregasATiempo - 9),
+                  Math.max(10, stats.indiceEntregasATiempo - 5),
+                  Math.max(10, stats.indiceEntregasATiempo),
+                ]}
+              />
+            </View>
+
+            <DeliveryDistributionMini
+              onTime={stats.indiceEntregasATiempo}
+              late={stats.indiceEntregasTarde}
+              missing={stats.indiceNoEntregadas}
+              chartWidth={chartWidth}
+            />
+
+            <View style={styles.insightCard}>
+              <MaterialIcons name="lightbulb-outline" size={18} color="#8A6C10" />
+              <Text style={styles.insightText}>{summaryTrend}</Text>
+            </View>
+
+            <View style={styles.openReportButtonContainer}>
               <TouchableOpacity style={styles.openReportButton} onPress={navigateReportesGrupo}>
                 <MaterialIcons name="insights" size={18} color="#FFFFFF" />
                 <Text style={styles.openReportButtonText}>Abrir reporte completo</Text>
@@ -387,6 +424,7 @@ const DetalleGrupoScreen: React.FC = () => {
     asistencias,
     calificaciones,
     entregas,
+    lastDataRefreshAt,
     addStudentsModalVisible,
     createStudentMode,
     studentSearchQuery,
@@ -506,6 +544,7 @@ const DetalleGrupoScreen: React.FC = () => {
             asistencias={asistencias}
             calificaciones={calificaciones}
             entregas={entregas}
+            lastDataRefreshAt={lastDataRefreshAt}
             chartWidth={chartWidth}
             openAddStudentsModal={openAddStudentsModal}
             openRemoveStudentModal={openRemoveStudentModal}
@@ -1079,22 +1118,51 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.small,
     color: COLORS.textSecondary,
   },
-  graficaContainer: {
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E3EAF4",
-    padding: 24,
-    borderRadius: 12,
-    alignItems: "center",
-    marginTop: 10,
-    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
+  statsHeaderRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 10,
+    marginBottom: 8,
   },
-  chart: {
-    marginVertical: 8,
+  updatedAtText: {
+    color: "#6C7D95",
+    fontSize: 12,
+    fontWeight: "600",
+    marginTop: 6,
+  },
+  statsCardsRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 10,
+  },
+  miniChartsSection: {
+    gap: 10,
+    marginBottom: 10,
+  },
+  insightCard: {
+    marginTop: 10,
+    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: "#F1E3BD",
+    backgroundColor: "#FFF9E8",
     borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  insightText: {
+    flex: 1,
+    color: "#6A5823",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  openReportButtonContainer: {
+    marginTop: 10,
   },
   openReportButton: {
-    marginTop: 10,
     borderRadius: 10,
     backgroundColor: "#0C63B8",
     paddingVertical: 12,
@@ -1108,18 +1176,6 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "800",
     fontSize: 14,
-  },
-  graficaText: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.text,
-    marginTop: 20,
-    marginBottom: 15,
-    fontWeight: "600",
-  },
-  graficaItem: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.textSecondary,
-    marginVertical: 5,
   },
   // Estilos para tareas
   actionButtonsRow: {

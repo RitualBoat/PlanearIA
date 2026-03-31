@@ -62,6 +62,13 @@ export interface DetalleGrupoViewModel {
   setNewStudentCarrera: (value: string) => void;
   createAndAddStudent: () => Promise<void>;
   closeAddStudentsSuccess: () => void;
+  removeStudentModalVisible: boolean;
+  studentToRemove: Alumno | null;
+  isUnlinkingStudent: boolean;
+  removeStudentError: string;
+  openRemoveStudentModal: (student: Alumno) => void;
+  closeRemoveStudentModal: () => void;
+  confirmRemoveStudentFromGroup: () => Promise<void>;
   deleteModalVisible: boolean;
   deleteConfirmed: boolean;
   isDeleting: boolean;
@@ -109,6 +116,10 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
   const [newStudentApellidos, setNewStudentApellidos] = useState("");
   const [newStudentNumeroControl, setNewStudentNumeroControl] = useState("");
   const [newStudentCarrera, setNewStudentCarrera] = useState("");
+  const [removeStudentModalVisible, setRemoveStudentModalVisible] = useState(false);
+  const [studentToRemove, setStudentToRemove] = useState<Alumno | null>(null);
+  const [isUnlinkingStudent, setIsUnlinkingStudent] = useState(false);
+  const [removeStudentError, setRemoveStudentError] = useState("");
 
   const grupo = obtenerGrupo(grupoId);
   const cantidadAlumnos = grupo?.cantidadAlumnos ?? 0;
@@ -301,6 +312,43 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     setAddStudentsSuccessVisible(false);
   }, []);
 
+  const openRemoveStudentModal = useCallback((student: Alumno) => {
+    setStudentToRemove(student);
+    setRemoveStudentError("");
+    setRemoveStudentModalVisible(true);
+  }, []);
+
+  const closeRemoveStudentModal = useCallback(() => {
+    if (isUnlinkingStudent) return;
+    setRemoveStudentModalVisible(false);
+    setStudentToRemove(null);
+    setRemoveStudentError("");
+  }, [isUnlinkingStudent]);
+
+  const confirmRemoveStudentFromGroup = useCallback(async () => {
+    if (!studentToRemove) {
+      setRemoveStudentError("No se encontró el alumno para desvincular.");
+      return;
+    }
+
+    try {
+      setIsUnlinkingStudent(true);
+      setRemoveStudentError("");
+
+      const nextAlumnos = allAlumnos.map((alumno) =>
+        alumno.id === studentToRemove.id ? { ...alumno, grupoId: undefined } : alumno
+      );
+
+      await persistAlumnosAndCount(nextAlumnos);
+      setRemoveStudentModalVisible(false);
+      setStudentToRemove(null);
+    } catch {
+      setRemoveStudentError("No se pudo quitar al alumno del grupo. Intenta nuevamente.");
+    } finally {
+      setIsUnlinkingStudent(false);
+    }
+  }, [allAlumnos, persistAlumnosAndCount, studentToRemove]);
+
   const navigateCrearTarea = useCallback(() => {
     navigation.navigate("CrearTareaGrupo", { grupoId });
   }, [navigation, grupoId]);
@@ -400,6 +448,13 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     setNewStudentCarrera,
     createAndAddStudent,
     closeAddStudentsSuccess,
+    removeStudentModalVisible,
+    studentToRemove,
+    isUnlinkingStudent,
+    removeStudentError,
+    openRemoveStudentModal,
+    closeRemoveStudentModal,
+    confirmRemoveStudentFromGroup,
     deleteModalVisible,
     deleteConfirmed,
     isDeleting,

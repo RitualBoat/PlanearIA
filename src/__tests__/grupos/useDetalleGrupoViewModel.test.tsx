@@ -154,4 +154,47 @@ describe("useDetalleGrupoViewModel", () => {
     expect(alumnoNuevo.grupoId).toBe(7);
     expect(result.current.addStudentsSuccessVisible).toBe(true);
   });
+
+  it("desvincula alumno del grupo sin eliminarlo del sistema", async () => {
+    const { result } = renderHook(() => useDetalleGrupoViewModel());
+
+    await act(async () => {
+      await result.current.reloadDetalleData();
+    });
+
+    const alumnoDelGrupo = result.current.alumnos[0];
+
+    act(() => {
+      result.current.openRemoveStudentModal(alumnoDelGrupo);
+    });
+
+    await act(async () => {
+      await result.current.confirmRemoveStudentFromGroup();
+    });
+
+    const lastPayload = JSON.parse(mockSetItem.mock.calls[mockSetItem.mock.calls.length - 1][1]);
+    const alumnoActualizado = lastPayload.find((alumno: { id: number }) => alumno.id === 1);
+
+    expect(alumnoActualizado).toBeTruthy();
+    expect(alumnoActualizado.grupoId).toBeUndefined();
+    expect(result.current.alumnos.find((alumno) => alumno.id === 1)).toBeUndefined();
+  });
+
+  it("actualiza contador del grupo al quitar alumno", async () => {
+    const { result } = renderHook(() => useDetalleGrupoViewModel());
+
+    await act(async () => {
+      await result.current.reloadDetalleData();
+    });
+
+    act(() => {
+      result.current.openRemoveStudentModal(result.current.alumnos[0]);
+    });
+
+    await act(async () => {
+      await result.current.confirmRemoveStudentFromGroup();
+    });
+
+    expect(mockActualizarGrupo).toHaveBeenCalledWith(7, { cantidadAlumnos: 0 });
+  });
 });

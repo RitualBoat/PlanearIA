@@ -21,12 +21,18 @@ import { useDetalleGrupoViewModel, TabType } from "../../hooks/useDetalleGrupoVi
  */
 const TabContent: React.FC<{
   activeTab: TabType;
-  alumnos: Array<{ id: number; nombre: string; apellidos: string }>;
+  alumnos: Array<{ id: number; nombre: string; apellidos: string; numeroControl: string }>;
   tareas: Array<{ id: number; titulo: string; fechaEntrega: Date | string; valor: number }>;
   recursos: Array<{ id: number; titulo: string; tipo: string }>;
   asistencias: Array<{ id: number; estado: string }>;
   calificaciones: Array<{ id: number; promedio: number; estado: string }>;
   openAddStudentsModal: () => void;
+  openRemoveStudentModal: (student: {
+    id: number;
+    nombre: string;
+    apellidos: string;
+    numeroControl: string;
+  }) => void;
   navigateCrearTarea: () => void;
   navigateAsignarRecurso: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
@@ -39,6 +45,7 @@ const TabContent: React.FC<{
     asistencias,
     calificaciones,
     openAddStudentsModal,
+    openRemoveStudentModal,
     navigateCrearTarea,
     navigateAsignarRecurso,
     navigateDetalleTarea,
@@ -61,10 +68,19 @@ const TabContent: React.FC<{
                 alumnos.map((alumno) => (
                   <View key={String(alumno.id)} style={styles.alumnoItem}>
                     <MaterialIcons name="account-circle" size={40} color={COLORS.primary} />
-                    <Text
-                      style={styles.alumnoNombre}
-                    >{`${alumno.nombre} ${alumno.apellidos}`}</Text>
-                    <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
+                    <View style={styles.alumnoInfo}>
+                      <Text
+                        style={styles.alumnoNombre}
+                      >{`${alumno.nombre} ${alumno.apellidos}`}</Text>
+                      <Text style={styles.alumnoControl}>ID: {alumno.numeroControl}</Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.removeAlumnoButton}
+                      onPress={() => openRemoveStudentModal(alumno)}
+                    >
+                      <MaterialIcons name="person-remove" size={16} color="#C62828" />
+                      <Text style={styles.removeAlumnoButtonText}>Quitar</Text>
+                    </TouchableOpacity>
                   </View>
                 ))
               )}
@@ -313,6 +329,13 @@ const DetalleGrupoScreen: React.FC = () => {
     setNewStudentCarrera,
     createAndAddStudent,
     closeAddStudentsSuccess,
+    removeStudentModalVisible,
+    studentToRemove,
+    isUnlinkingStudent,
+    removeStudentError,
+    openRemoveStudentModal,
+    closeRemoveStudentModal,
+    confirmRemoveStudentFromGroup,
     deleteModalVisible,
     deleteConfirmed,
     isDeleting,
@@ -398,11 +421,70 @@ const DetalleGrupoScreen: React.FC = () => {
             asistencias={asistencias}
             calificaciones={calificaciones}
             openAddStudentsModal={openAddStudentsModal}
+            openRemoveStudentModal={openRemoveStudentModal}
             navigateCrearTarea={navigateCrearTarea}
             navigateAsignarRecurso={navigateAsignarRecurso}
             navigateDetalleTarea={navigateDetalleTarea}
           />
         </WebScrollView>
+
+        <Modal
+          visible={removeStudentModalVisible}
+          animationType="slide"
+          transparent
+          onRequestClose={closeRemoveStudentModal}
+        >
+          <View style={styles.modalBackdrop}>
+            <View style={styles.modalCard}>
+              <Text style={styles.modalTitle}>Quitar alumno</Text>
+              <Text style={styles.modalSubtitle}>
+                ¿Deseas quitar a {studentToRemove?.nombre} {studentToRemove?.apellidos} de este
+                grupo?
+              </Text>
+
+              <View style={styles.impactCard}>
+                <View style={styles.impactRow}>
+                  <MaterialIcons name="info-outline" size={18} color="#1676D2" />
+                  <Text style={styles.impactText}>
+                    El alumno seguirá existiendo en el sistema y podrá agregarse de nuevo.
+                  </Text>
+                </View>
+              </View>
+
+              {removeStudentError ? (
+                <Text style={styles.deleteErrorText}>{removeStudentError}</Text>
+              ) : null}
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={styles.cancelModalButton}
+                  onPress={closeRemoveStudentModal}
+                  disabled={isUnlinkingStudent}
+                >
+                  <Text style={styles.cancelModalButtonText}>Cancelar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.deleteModalButton,
+                    isUnlinkingStudent && styles.deleteModalButtonDisabled,
+                  ]}
+                  onPress={() => void confirmRemoveStudentFromGroup()}
+                  disabled={isUnlinkingStudent}
+                >
+                  {isUnlinkingStudent ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <MaterialIcons name="person-remove" size={16} color="#FFFFFF" />
+                  )}
+                  <Text style={styles.deleteModalButtonText}>
+                    {isUnlinkingStudent ? "Quitando..." : "Quitar del grupo"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
 
         <Modal
           visible={addStudentsModalVisible}
@@ -823,10 +905,34 @@ const styles = StyleSheet.create({
     boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
   },
   alumnoNombre: {
-    flex: 1,
     fontSize: FONT_SIZES.medium,
     color: COLORS.text,
+    fontWeight: "700",
+  },
+  alumnoInfo: {
+    flex: 1,
     marginLeft: 12,
+  },
+  alumnoControl: {
+    color: "#6B7D96",
+    fontSize: FONT_SIZES.small,
+    marginTop: 2,
+  },
+  removeAlumnoButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    borderWidth: 1,
+    borderColor: "#F7CDD2",
+    backgroundColor: "#FFF5F6",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+  },
+  removeAlumnoButtonText: {
+    color: "#C62828",
+    fontSize: 13,
+    fontWeight: "700",
   },
   statsContainer: {
     flexDirection: "row",

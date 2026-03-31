@@ -1,13 +1,16 @@
-import { useState, useCallback } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useState, useCallback, useEffect } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
+import type { RouteProp } from "@react-navigation/native";
 import type { RootStackParamList } from "../navigation/StackNavigator";
 import type { Carrera } from "../../types";
 import { useGruposContext } from "../context/GruposContext";
 
 type Nav = StackNavigationProp<RootStackParamList, "CrearGrupo">;
+type Route = RouteProp<RootStackParamList, "CrearGrupo">;
 
 export interface CrearGrupoViewModel {
+  modo: "crear" | "editar";
   nombre: string;
   materia: string;
   carrera: Carrera;
@@ -28,7 +31,11 @@ export interface CrearGrupoViewModel {
 
 export const useCrearGrupoViewModel = (): CrearGrupoViewModel => {
   const navigation = useNavigation<Nav>();
-  const { agregarGrupo } = useGruposContext();
+  const route = useRoute<Route>();
+  const { agregarGrupo, actualizarGrupo, obtenerGrupo } = useGruposContext();
+
+  const modo = route.params?.modo === "editar" ? "editar" : "crear";
+  const grupoId = route.params?.grupoId;
   const [nombre, setNombre] = useState("");
   const [materia, setMateria] = useState("");
   const [carrera, setCarrera] = useState<Carrera>("ISC");
@@ -37,6 +44,25 @@ export const useCrearGrupoViewModel = (): CrearGrupoViewModel => {
   const [horario, setHorario] = useState("");
   const [validationError, setValidationError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (modo !== "editar" || typeof grupoId !== "number") {
+      return;
+    }
+
+    const grupo = obtenerGrupo(grupoId);
+    if (!grupo) {
+      setValidationError("No se encontró el grupo para editar.");
+      return;
+    }
+
+    setNombre(grupo.nombre ?? "");
+    setMateria(grupo.materia ?? "");
+    setCarrera((grupo.carrera as Carrera) ?? "ISC");
+    setSemestre(String(grupo.semestre ?? ""));
+    setPeriodo(grupo.periodo ?? "");
+    setHorario(grupo.horario ?? "");
+  }, [modo, grupoId, obtenerGrupo]);
 
   const getValidationError = useCallback((): string => {
     if (!nombre.trim()) return "El nombre del grupo es obligatorio.";
@@ -63,18 +89,31 @@ export const useCrearGrupoViewModel = (): CrearGrupoViewModel => {
       setIsSaving(true);
       setValidationError("");
 
-      await agregarGrupo({
+      const payload = {
         nombre: nombre.trim(),
         materia: materia.trim(),
         carrera,
         semestre: Number(semestre),
         periodo: periodo.trim(),
         horario: horario.trim() || undefined,
-        cantidadAlumnos: 0,
-        estado: "activo",
-        profesorId: 1,
-        fechaCreacion: new Date(),
-      });
+      };
+
+      if (modo === "editar") {
+        if (typeof grupoId !== "number") {
+          setValidationError("No se pudo identificar el grupo a editar.");
+          return;
+        }
+
+        await actualizarGrupo(grupoId, payload);
+      } else {
+        await agregarGrupo({
+          ...payload,
+          cantidadAlumnos: 0,
+          estado: "activo",
+          profesorId: 1,
+          fechaCreacion: new Date(),
+        });
+      }
 
       navigation.navigate("ListaGrupos");
     } catch {
@@ -82,13 +121,27 @@ export const useCrearGrupoViewModel = (): CrearGrupoViewModel => {
     } finally {
       setIsSaving(false);
     }
-  }, [getValidationError, nombre, materia, carrera, semestre, periodo, horario, navigation]);
+  }, [
+    getValidationError,
+    nombre,
+    materia,
+    carrera,
+    semestre,
+    periodo,
+    horario,
+    modo,
+    grupoId,
+    actualizarGrupo,
+    agregarGrupo,
+    navigation,
+  ]);
 
   const handleCancelar = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
 
   return {
+    modo,
     nombre,
     materia,
     carrera,

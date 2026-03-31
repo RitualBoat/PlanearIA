@@ -261,6 +261,7 @@ const DetalleGrupoScreen: React.FC = () => {
     activeTab,
     tabs,
     setActiveTab,
+    navigateEditarGrupo,
     navigateCrearTarea,
     navigateAsignarRecurso,
     navigateDetalleTarea,
@@ -275,6 +276,10 @@ const DetalleGrupoScreen: React.FC = () => {
         <View style={styles.header}>
           <Text style={styles.grupoNombre}>{grupoNombre}</Text>
           <Text style={styles.grupoId}>ID: {grupoId}</Text>
+          <TouchableOpacity style={styles.editarButton} onPress={navigateEditarGrupo}>
+            <MaterialIcons name="edit" size={16} color="#1676D2" />
+            <Text style={styles.editarButtonText}>Editar grupo</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Tabs horizontales */}
@@ -343,6 +348,24 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.small,
     color: "#6B7D96",
     marginTop: 4,
+  },
+  editarButton: {
+    marginTop: 10,
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderWidth: 1,
+    borderColor: "#CFE2F7",
+    backgroundColor: "#F5FAFF",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  editarButtonText: {
+    color: "#1676D2",
+    fontSize: 13,
+    fontWeight: "700",
   },
   tabsContainer: {
     backgroundColor: "#FFFFFF",

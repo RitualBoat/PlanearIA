@@ -67,7 +67,12 @@ export type RootStackParamList = {
   // NUEVA ARQUITECTURA: Grupos (reemplaza Alumnos y Calificaciones)
   Grupos: undefined;
   ListaGrupos: undefined;
-  CrearGrupo: undefined;
+  CrearGrupo:
+    | undefined
+    | {
+        modo?: "crear" | "editar";
+        grupoId?: number;
+      };
   DetalleGrupo: {
     grupoId: number;
     grupoNombre: string;

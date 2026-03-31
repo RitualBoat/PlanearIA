@@ -27,6 +27,7 @@ export interface DetalleGrupoViewModel {
   activeTab: TabType;
   tabs: Tab[];
   setActiveTab: (tab: TabType) => void;
+  navigateEditarGrupo: () => void;
   navigateCrearTarea: () => void;
   navigateAsignarRecurso: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
@@ -47,11 +48,18 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
       { id: "tareas", label: "Tareas", icon: "assignment" },
       { id: "graficas", label: "Gráficas", icon: "analytics" },
     ],
-    [],
+    []
   );
 
   const navigateCrearTarea = useCallback(() => {
     navigation.navigate("CrearTareaGrupo", { grupoId });
+  }, [navigation, grupoId]);
+
+  const navigateEditarGrupo = useCallback(() => {
+    navigation.navigate("CrearGrupo", {
+      modo: "editar",
+      grupoId,
+    });
   }, [navigation, grupoId]);
 
   const navigateAsignarRecurso = useCallback(() => {
@@ -62,7 +70,7 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     (tareaId: number) => {
       navigation.navigate("DetalleTarea", { tareaId, grupoId });
     },
-    [navigation, grupoId],
+    [navigation, grupoId]
   );
 
   return {
@@ -71,6 +79,7 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     activeTab,
     tabs,
     setActiveTab,
+    navigateEditarGrupo,
     navigateCrearTarea,
     navigateAsignarRecurso,
     navigateDetalleTarea,

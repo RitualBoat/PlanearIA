@@ -14,6 +14,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, Carrera } from "../../../types";
 import { useCrearGrupoViewModel } from "../../hooks/useCrearGrupoViewModel";
 import { isWeb } from "../../utils/responsive";
+import { useGrupos } from "../../hooks/useGrupos";
 
 /**
  * Pantalla para Crear un Nuevo Grupo (View)
@@ -24,6 +25,7 @@ const CrearGrupoScreen: React.FC = () => {
   const wideLayout = width >= 900;
 
   const {
+    modo,
     nombre,
     setNombre,
     materia,
@@ -42,14 +44,72 @@ const CrearGrupoScreen: React.FC = () => {
     handleCancelar,
   } = useCrearGrupoViewModel();
 
+  const { syncStatus, pendingSyncCount, isOnline, sincronizarGrupos } = useGrupos();
+
+  const syncLabel = !isOnline
+    ? "Sin conexión"
+    : syncStatus === "syncing"
+      ? "Sincronizando cambios con la nube..."
+      : pendingSyncCount > 0
+        ? `${pendingSyncCount} pendientes`
+        : "Sincronizado";
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <Text style={styles.title}>Crear Nuevo Grupo</Text>
-          <Text style={styles.subtitle}>Completa la información base para registrar el grupo.</Text>
+          <Text style={styles.title}>
+            {modo === "editar" ? "Editar Grupo" : "Crear Nuevo Grupo"}
+          </Text>
+          <Text style={styles.subtitle}>
+            {modo === "editar"
+              ? "Actualiza la información del grupo seleccionado para mantener tus registros al día."
+              : "Completa la información base para registrar el grupo."}
+          </Text>
+
+          <View style={styles.syncRow}>
+            <View
+              style={[
+                styles.syncBadge,
+                !isOnline
+                  ? styles.syncOffline
+                  : syncStatus === "error"
+                    ? styles.syncError
+                    : pendingSyncCount > 0
+                      ? styles.syncPending
+                      : styles.syncOk,
+              ]}
+            >
+              <MaterialIcons
+                name={!isOnline ? "cloud-off" : pendingSyncCount > 0 ? "cloud-upload" : "sync"}
+                size={14}
+                color={
+                  !isOnline
+                    ? "#B87424"
+                    : syncStatus === "error"
+                      ? "#B12635"
+                      : pendingSyncCount > 0
+                        ? "#0C5DA8"
+                        : "#0D9E70"
+                }
+              />
+              <Text style={styles.syncText}>{syncLabel}</Text>
+            </View>
+
+            <TouchableOpacity
+              style={[
+                styles.syncButton,
+                (!isOnline || syncStatus === "syncing") && styles.syncButtonDisabled,
+              ]}
+              onPress={() => void sincronizarGrupos()}
+              disabled={!isOnline || syncStatus === "syncing"}
+            >
+              <MaterialIcons name="sync" size={16} color="#1676D2" />
+              <Text style={styles.syncButtonText}>Sincronizar ahora</Text>
+            </TouchableOpacity>
+          </View>
 
           {/* Formulario */}
           <View style={[styles.form, wideLayout && styles.formWide]}>
@@ -148,7 +208,7 @@ const CrearGrupoScreen: React.FC = () => {
             >
               <MaterialIcons name="check-circle" size={24} color="white" />
               <Text style={styles.submitButtonText}>
-                {isSaving ? "Guardando..." : "Crear Grupo"}
+                {isSaving ? "Guardando..." : modo === "editar" ? "Guardar cambios" : "Crear Grupo"}
               </Text>
             </TouchableOpacity>
 
@@ -196,6 +256,62 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#5C6E86",
     marginBottom: 14,
+  },
+  syncRow: {
+    marginBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  syncBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderWidth: 1,
+    gap: 6,
+  },
+  syncOk: {
+    backgroundColor: "#E7F9F3",
+    borderColor: "#B8EAD8",
+  },
+  syncPending: {
+    backgroundColor: "#EAF4FF",
+    borderColor: "#CAE1FB",
+  },
+  syncError: {
+    backgroundColor: "#FFF1F2",
+    borderColor: "#F7CDD2",
+  },
+  syncOffline: {
+    backgroundColor: "#FFF5E9",
+    borderColor: "#F5D7B0",
+  },
+  syncText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#1E2A3A",
+  },
+  syncButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderWidth: 1,
+    borderColor: "#D0E2F6",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  syncButtonDisabled: {
+    opacity: 0.6,
+  },
+  syncButtonText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#1676D2",
   },
   form: {
     gap: 12,

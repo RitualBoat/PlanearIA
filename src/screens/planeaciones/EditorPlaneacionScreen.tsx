@@ -1260,7 +1260,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 20,
     borderWidth: 2,
-    borderColor: "#5c6bc0",
+    borderColor: COLORS.indigo,
   },
   modoDetalladoInfo: {
     marginBottom: 12,
@@ -1273,29 +1273,29 @@ const styles = StyleSheet.create({
   },
   modoDetalladoDesc: {
     fontSize: 13,
-    color: "#666",
+    color: COLORS.textMuted,
   },
   modoDetalladoToggle: {
     padding: 12,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.surface,
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: "#5c6bc0",
+    borderColor: COLORS.indigo,
     alignItems: "center",
   },
   modoDetalladoToggleActive: {
-    backgroundColor: "#5c6bc0",
+    backgroundColor: COLORS.indigo,
   },
   modoDetalladoToggleText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#5c6bc0",
+    color: COLORS.indigo,
   },
   modoDetalladoToggleTextActive: {
-    color: "#fff",
+    color: COLORS.surface,
   },
   configuracionCurso: {
-    backgroundColor: "#f5f5f5",
+    backgroundColor: COLORS.surfaceTertiary,
     padding: 16,
     borderRadius: 8,
     marginBottom: 20,
@@ -1303,7 +1303,7 @@ const styles = StyleSheet.create({
   subsectionTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: COLORS.text,
     marginBottom: 12,
   },
   duracionSelector: {
@@ -1322,7 +1322,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   duracionButtonText: {
-    color: "#fff",
+    color: COLORS.surface,
     fontSize: 24,
     fontWeight: "bold",
   },
@@ -1336,7 +1336,7 @@ const styles = StyleSheet.create({
   },
   duracionLabel: {
     fontSize: 14,
-    color: "#666",
+    color: COLORS.textMuted,
   },
   horasContainer: {
     flexDirection: "row",
@@ -1349,17 +1349,17 @@ const styles = StyleSheet.create({
   },
   horaLabel: {
     fontSize: 12,
-    color: "#666",
+    color: COLORS.textMuted,
     marginBottom: 4,
   },
   horaInput: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: COLORS.divider,
     borderRadius: 6,
     padding: 10,
     fontSize: 16,
     textAlign: "center",
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.surface,
     width: "100%",
   },
   modalidadContainerSmall: {
@@ -1388,12 +1388,12 @@ const styles = StyleSheet.create({
     color: "white",
   },
   evaluacionSection: {
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.surface,
     padding: 16,
     borderRadius: 8,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: COLORS.divider,
   },
   semanasSection: {
     marginBottom: 20,

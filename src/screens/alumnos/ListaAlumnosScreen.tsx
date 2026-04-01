@@ -19,6 +19,7 @@ import type { RootStackParamList } from "../../navigation/StackNavigator";
 import { useAlumnos } from "../../context/AlumnosContext";
 import type { Alumno } from "../../../types";
 import WebScrollView from "../../components/WebScrollView";
+import { COLORS } from "../../../types";
 
 type Nav = StackNavigationProp<RootStackParamList, "ListaAlumnos">;
 
@@ -108,7 +109,7 @@ const ListaAlumnosScreen: React.FC = () => {
       <View style={styles.mobileCard}>
         <View style={styles.mobileCardHead}>
           <View style={styles.mobileAvatar}>
-            <MaterialIcons name="person" size={20} color="#1676D2" />
+            <MaterialIcons name="person" size={20} color={COLORS.primary} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.mobileName}>{nombreCompleto}</Text>
@@ -165,7 +166,7 @@ const ListaAlumnosScreen: React.FC = () => {
             style={styles.emptyPrimaryBtn}
             onPress={() => navigation.navigate("CrearAlumno")}
           >
-            <MaterialIcons name="add-circle" size={18} color="#FFFFFF" />
+            <MaterialIcons name="add-circle" size={18} color={COLORS.surface} />
             <Text style={styles.emptyPrimaryBtnText}>Crear primer alumno</Text>
           </TouchableOpacity>
         </View>
@@ -193,7 +194,7 @@ const ListaAlumnosScreen: React.FC = () => {
           onPress={() => navigation.navigate("CrearAlumno")}
           activeOpacity={0.9}
         >
-          <MaterialIcons name="person-add" size={24} color="#FFFFFF" />
+          <MaterialIcons name="person-add" size={24} color={COLORS.surface} />
         </TouchableOpacity>
       </>
     );
@@ -229,7 +230,7 @@ const ListaAlumnosScreen: React.FC = () => {
                   style={styles.webPrimaryBtn}
                   onPress={() => navigation.navigate("CrearAlumno")}
                 >
-                  <MaterialIcons name="person-add" size={16} color="#FFFFFF" />
+                  <MaterialIcons name="person-add" size={16} color={COLORS.surface} />
                   <Text style={styles.webPrimaryBtnText}>Registrar primer alumno</Text>
                 </TouchableOpacity>
               </View>
@@ -250,7 +251,7 @@ const ListaAlumnosScreen: React.FC = () => {
             style={styles.webPrimaryBtn}
             onPress={() => navigation.navigate("CrearAlumno")}
           >
-            <MaterialIcons name="add" size={18} color="#FFFFFF" />
+            <MaterialIcons name="add" size={18} color={COLORS.surface} />
             <Text style={styles.webPrimaryBtnText}>Nuevo Alumno</Text>
           </TouchableOpacity>
         </View>
@@ -341,7 +342,7 @@ const ListaAlumnosScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
       <SafeAreaView style={styles.safeArea}>
         {isDesktopWeb ? (
           <View style={styles.webLayout}>
@@ -442,7 +443,7 @@ const SideItem: React.FC<{
   active?: boolean;
 }> = ({ label, icon, active = false }) => (
   <View style={[styles.sideItem, active && styles.sideItemActive]}>
-    <MaterialIcons name={icon} size={16} color={active ? "#1A71BA" : "#6A7D97"} />
+    <MaterialIcons name={icon} size={16} color={active ? COLORS.primaryDark : "#6A7D97"} />
     <Text style={[styles.sideItemText, active && styles.sideItemTextActive]}>{label}</Text>
   </View>
 );
@@ -470,7 +471,7 @@ const LoadingSkeletonWeb: React.FC = () => (
 );
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#EEF3FA" },
+  container: { flex: 1, backgroundColor: COLORS.background },
   safeArea: { flex: 1 },
 
   headerMobile: {
@@ -489,7 +490,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#D8E4F4",
     borderRadius: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
@@ -507,7 +508,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: "#D7E3F2",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     paddingHorizontal: 10,
     paddingVertical: 8,
     flexDirection: "row",
@@ -521,8 +522,8 @@ const styles = StyleSheet.create({
   mobileCard: {
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#DFE8F4",
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.borderLight,
+    backgroundColor: COLORS.surface,
     padding: 12,
     marginTop: 10,
   },
@@ -564,7 +565,7 @@ const styles = StyleSheet.create({
 
   stateCard: {
     marginTop: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#DDE8F7",
@@ -573,18 +574,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   stateTitle: { fontSize: 15, fontWeight: "700", color: "#2D3E57" },
-  stateText: { fontSize: 13, color: "#6E809A", textAlign: "center" },
+  stateText: { fontSize: 13, color: COLORS.textTertiary, textAlign: "center" },
 
   emptyWrap: { alignItems: "center", paddingHorizontal: 28, paddingTop: 28 },
   emptyCircle: {
     width: 190,
     height: 190,
     borderRadius: 95,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "#E2EAF5",
+    borderColor: COLORS.border,
   },
   emptyTitle: {
     marginTop: 20,
@@ -603,19 +604,19 @@ const styles = StyleSheet.create({
   emptyPrimaryBtn: {
     marginTop: 20,
     borderRadius: 999,
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 22,
     paddingVertical: 13,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
   },
-  emptyPrimaryBtnText: { color: "#FFFFFF", fontWeight: "800", fontSize: 16 },
+  emptyPrimaryBtnText: { color: COLORS.surface, fontWeight: "800", fontSize: 16 },
 
   skeletonWrap: { paddingHorizontal: 12, paddingTop: 8, gap: 10 },
   skeletonCard: {
     borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: "#E2EAF4",
     padding: 12,
@@ -623,15 +624,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
-  skeletonAvatar: { width: 38, height: 38, borderRadius: 19, backgroundColor: "#E7EDF6" },
+  skeletonAvatar: { width: 38, height: 38, borderRadius: 19, backgroundColor: COLORS.border },
   skeletonLineLg: {
     width: "75%",
     height: 12,
     borderRadius: 8,
-    backgroundColor: "#E7EDF6",
+    backgroundColor: COLORS.border,
     marginBottom: 8,
   },
-  skeletonLineSm: { width: "45%", height: 10, borderRadius: 8, backgroundColor: "#E7EDF6" },
+  skeletonLineSm: { width: "45%", height: 10, borderRadius: 8, backgroundColor: COLORS.border },
 
   webLayout: { flex: 1, flexDirection: "row" },
   webSidebar: {
@@ -653,7 +654,7 @@ const styles = StyleSheet.create({
   },
   sideItemActive: { backgroundColor: "#E8F2FF" },
   sideItemText: { color: "#6D7F99", fontWeight: "700" },
-  sideItemTextActive: { color: "#1A71BA" },
+  sideItemTextActive: { color: COLORS.primaryDark },
 
   webMain: { flex: 1, padding: 16 },
   webPanel: {
@@ -661,7 +662,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: "#DEE7F4",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     padding: 16,
   },
   webPanelHeader: {
@@ -671,14 +672,14 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   webTitle: { color: "#25384F", fontSize: 40, fontWeight: "800" },
-  webSubtitle: { color: "#6E809A", marginTop: 4 },
+  webSubtitle: { color: COLORS.textTertiary, marginTop: 4 },
   webFiltersRow: { flexDirection: "row", gap: 10, marginBottom: 12 },
   webFilterSelect: {
     width: 200,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#DCE6F4",
-    backgroundColor: "#F8FBFF",
+    backgroundColor: COLORS.backgroundSoft,
     paddingHorizontal: 10,
     paddingVertical: 10,
     flexDirection: "row",
@@ -690,14 +691,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#DCE6F4",
-    backgroundColor: "#F8FBFF",
+    backgroundColor: COLORS.backgroundSoft,
     paddingHorizontal: 14,
     justifyContent: "center",
   },
   webClearBtnText: { color: "#5D7391", fontWeight: "700" },
   webPrimaryBtn: {
     borderRadius: 999,
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 18,
     paddingVertical: 10,
     flexDirection: "row",
@@ -705,17 +706,17 @@ const styles = StyleSheet.create({
     gap: 6,
     alignSelf: "flex-start",
   },
-  webPrimaryBtnText: { color: "#FFFFFF", fontWeight: "800" },
+  webPrimaryBtnText: { color: COLORS.surface, fontWeight: "800" },
 
   tableCard: {
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#E0E8F4",
+    borderColor: COLORS.border,
     overflow: "hidden",
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#F6FAFF",
+    backgroundColor: COLORS.backgroundSoft,
     paddingHorizontal: 10,
     paddingVertical: 10,
     borderBottomWidth: 1,
@@ -727,7 +728,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#EEF3FA",
+    borderBottomColor: COLORS.background,
   },
   tableCell: { color: "#2F435D", fontWeight: "600" },
   colAlumno: { width: 210 },
@@ -741,12 +742,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#D4E0EF",
-    backgroundColor: "#F6FAFF",
+    backgroundColor: COLORS.backgroundSoft,
     paddingHorizontal: 8,
     paddingVertical: 5,
   },
   tableActionText: { color: "#1E6DB2", fontWeight: "700", fontSize: 12 },
-  tableActionDanger: { color: "#C62828", fontWeight: "700", fontSize: 12 },
+  tableActionDanger: { color: COLORS.error, fontWeight: "700", fontSize: 12 },
 
   webSkeletonWrap: { marginTop: 16, gap: 12 },
   webSkeletonLine: {
@@ -761,8 +762,8 @@ const styles = StyleSheet.create({
     height: 280,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#E0E8F3",
-    backgroundColor: "#F8FBFF",
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.backgroundSoft,
     alignItems: "center",
     justifyContent: "center",
   },

@@ -75,7 +75,7 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({ navigation }) =
       label: "Planeaciones",
       value: "24",
       icon: "event-note" as const,
-      tone: "#1976D2",
+      tone: COLORS.primary,
     },
     {
       id: "borradores",
@@ -89,13 +89,13 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({ navigation }) =
       label: "Esta semana",
       value: "12",
       icon: "calendar-month" as const,
-      tone: "#0EA5A5",
+      tone: COLORS.tealLight,
     },
   ];
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <Animated.ScrollView
@@ -140,8 +140,8 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({ navigation }) =
               onPress={handleCrearNueva}
               activeOpacity={0.85}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#1676D2" }]}>
-                <MaterialIcons name="add-circle" size={28} color="#ffffff" />
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.primary }]}>
+                <MaterialIcons name="add-circle" size={28} color={COLORS.surface} />
               </View>
               <Text style={styles.optionTitle}>Crear Nueva Planeación</Text>
               <Text style={styles.optionDescription}>
@@ -149,7 +149,7 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({ navigation }) =
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Comenzar</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
 
@@ -158,8 +158,8 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({ navigation }) =
               onPress={handleVerPlaneaciones}
               activeOpacity={0.85}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#0EA5A5" }]}>
-                <MaterialIcons name="folder-open" size={28} color="#ffffff" />
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.tealLight }]}>
+                <MaterialIcons name="folder-open" size={28} color={COLORS.surface} />
               </View>
               <Text style={styles.optionTitle}>Mis Planeaciones</Text>
               <Text style={styles.optionDescription}>
@@ -167,7 +167,7 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({ navigation }) =
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Abrir biblioteca</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
 
@@ -176,8 +176,8 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({ navigation }) =
               onPress={handleImportarPlaneacion}
               activeOpacity={0.85}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#1976D2" }]}>
-                <MaterialIcons name="upload-file" size={28} color="#ffffff" />
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.primary }]}>
+                <MaterialIcons name="upload-file" size={28} color={COLORS.surface} />
               </View>
               <Text style={styles.optionTitle}>Importar Planeación</Text>
               <Text style={styles.optionDescription}>
@@ -186,7 +186,7 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({ navigation }) =
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Importar ahora</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
 
@@ -196,7 +196,7 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({ navigation }) =
               activeOpacity={0.85}
             >
               <View style={[styles.iconContainer, { backgroundColor: "#5B8BD5" }]}>
-                <MaterialIcons name="download" size={28} color="#ffffff" />
+                <MaterialIcons name="download" size={28} color={COLORS.surface} />
               </View>
               <Text style={styles.optionTitle}>Exportar Planeación</Text>
               <Text style={styles.optionDescription}>
@@ -204,13 +204,13 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({ navigation }) =
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Exportar ahora</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
           </View>
 
           <View style={styles.tipCard}>
-            <MaterialIcons name="tips-and-updates" size={18} color="#0B6F86" />
+            <MaterialIcons name="tips-and-updates" size={18} color={COLORS.teal} />
             <Text style={styles.tipText}>
               Consejo: importa una planeación previa y usa la función de mejora IA para optimizarla
               antes de asignarla.
@@ -228,7 +228,7 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({ navigation }) =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -255,9 +255,9 @@ const styles = StyleSheet.create({
   statCard: {
     width: "100%",
     borderRadius: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
   },
   statCardWide: {
@@ -274,19 +274,19 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 32,
     fontWeight: "800",
-    color: "#1E2A3A",
+    color: COLORS.text,
     lineHeight: 36,
   },
   statLabel: {
     marginTop: 2,
     fontSize: 13,
-    color: "#6B7D96",
+    color: COLORS.textTertiary,
     fontWeight: "600",
   },
   sectionLabel: {
     marginTop: 4,
     fontSize: 13,
-    color: "#5D6F86",
+    color: COLORS.textSecondary,
     fontWeight: "800",
     letterSpacing: 1.1,
   },
@@ -300,11 +300,11 @@ const styles = StyleSheet.create({
   },
   optionCard: {
     width: "100%",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     gap: 8,
     boxShadow: "0px 10px 22px rgba(33, 60, 109, 0.08)",
   },
@@ -321,24 +321,24 @@ const styles = StyleSheet.create({
   optionTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#1E2A3A",
+    color: COLORS.text,
   },
   optionDescription: {
     fontSize: 14,
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     lineHeight: 20,
   },
   optionFooter: {
     marginTop: 4,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: "#E8EEF6",
+    borderTopColor: COLORS.border,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   optionCta: {
-    color: "#1676D2",
+    color: COLORS.primary,
     fontSize: 14,
     fontWeight: "700",
   },
@@ -346,8 +346,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#BBE7F0",
-    backgroundColor: "#EAF8FB",
+    borderColor: COLORS.primaryTint,
+    backgroundColor: COLORS.primaryTint,
     padding: 12,
     flexDirection: "row",
     alignItems: "flex-start",
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   tipText: {
     flex: 1,
     fontSize: 13,
-    color: "#0B6F86",
+    color: COLORS.teal,
     lineHeight: 18,
   },
 });

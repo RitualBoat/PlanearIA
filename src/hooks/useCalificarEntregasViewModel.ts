@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
+import logger from "../utils/logger";
 
 type Nav = StackNavigationProp<RootStackParamList, "CalificarEntregas">;
 
@@ -67,7 +68,7 @@ export const useCalificarEntregasViewModel = (
 
   const handleGuardarCalificaciones = useCallback(() => {
     // TODO: Integrate with a calificaciones service
-    console.log("[calificaciones] Saving:", calificaciones);
+    logger.log("[calificaciones] Saving:", calificaciones);
     navigation.goBack();
   }, [calificaciones, navigation]);
 

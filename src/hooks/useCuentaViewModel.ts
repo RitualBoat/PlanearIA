@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { CommonActions } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
+import logger from "../utils/logger";
 
 type Nav = StackNavigationProp<RootStackParamList, "Cuenta">;
 
@@ -17,11 +18,11 @@ export const useCuentaViewModel = (): CuentaViewModel => {
   const navigation = useNavigation<Nav>();
 
   const handleEditarPerfil = useCallback(() => {
-    console.log("[cuenta] Edit profile");
+    logger.log("[cuenta] Edit profile");
   }, []);
 
   const handleCambiarContrasena = useCallback(() => {
-    console.log("[cuenta] Change password");
+    logger.log("[cuenta] Change password");
   }, []);
 
   const handleCerrarSesion = useCallback(() => {

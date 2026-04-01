@@ -144,7 +144,7 @@ const StackNavigator: React.FC = () => {
         headerStyle: {
           backgroundColor: COLORS.primary,
         },
-        headerTintColor: "#ffffff",
+        headerTintColor: COLORS.surface,
         headerTitleStyle: {
           fontWeight: "bold",
           fontSize: 18,

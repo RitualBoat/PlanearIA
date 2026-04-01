@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import WebScrollView from "../../components/WebScrollView";
+import { COLORS } from "../../../types";
 import {
   type CategoriaNotaAlumno,
   type FiltroNotasAlumno,
@@ -35,8 +36,8 @@ const tipoBadge = {
   academico: { label: "MATEMÁTICAS", bg: "#FCE9D8", color: "#A45B2A" },
   conductual: { label: "ATENCIÓN", bg: "#FBE7EA", color: "#B94A60" },
   logro: { label: "PROGRESO", bg: "#DFF4F8", color: "#267B92" },
-  area_mejora: { label: "MEJORA", bg: "#E8EDF5", color: "#496180" },
-  general: { label: "GENERAL", bg: "#E8EDF5", color: "#496180" },
+  area_mejora: { label: "MEJORA", bg: COLORS.progressTrack, color: "#496180" },
+  general: { label: "GENERAL", bg: COLORS.progressTrack, color: "#496180" },
 };
 
 const formatDate = (date: Date): string => {
@@ -108,7 +109,7 @@ const NotasAlumnoScreen: React.FC = () => {
         <Text style={styles.studentGroup}>{grupoNombre}</Text>
       </View>
       <View style={styles.avatarCircle}>
-        <MaterialIcons name="person" size={28} color="#FFFFFF" />
+        <MaterialIcons name="person" size={28} color={COLORS.surface} />
       </View>
     </View>
   );
@@ -172,7 +173,7 @@ const NotasAlumnoScreen: React.FC = () => {
             disabled={guardando}
           >
             <Text style={styles.saveButtonText}>{guardando ? "Guardando..." : "Guardar Nota"}</Text>
-            <MaterialIcons name="arrow-forward" size={18} color="#FFFFFF" />
+            <MaterialIcons name="arrow-forward" size={18} color={COLORS.surface} />
           </TouchableOpacity>
         </View>
       </View>
@@ -252,7 +253,7 @@ const NotasAlumnoScreen: React.FC = () => {
       <View style={styles.skeletonListItem} />
       <View style={styles.skeletonListItem} />
       <View style={styles.fabSkeleton}>
-        <MaterialIcons name="add" size={26} color="#FFFFFF" />
+        <MaterialIcons name="add" size={26} color={COLORS.surface} />
       </View>
     </View>
   );
@@ -267,7 +268,7 @@ const NotasAlumnoScreen: React.FC = () => {
         Captura observaciones importantes, progresos y reflexiones personalizadas.
       </Text>
       <TouchableOpacity style={styles.startButton} onPress={() => setNotaDraft(" ")}>
-        <MaterialIcons name="add" size={18} color="#FFFFFF" />
+        <MaterialIcons name="add" size={18} color={COLORS.surface} />
         <Text style={styles.startButtonText}>Empezar a escribir</Text>
       </TouchableOpacity>
       <View style={styles.ideaCard}>
@@ -286,14 +287,14 @@ const NotasAlumnoScreen: React.FC = () => {
     <View style={styles.centerStateWrap}>
       <View style={styles.errorCard}>
         <View style={styles.errorIconCircle}>
-          <MaterialIcons name="warning" size={42} color="#C62828" />
+          <MaterialIcons name="warning" size={42} color={COLORS.error} />
         </View>
         <Text style={styles.centerStateTitle}>No se pudieron cargar las notas</Text>
         <Text style={styles.centerStateText}>
           Hubo un problema de conexión con el servidor. Verifica tu red e inténtalo de nuevo.
         </Text>
         <TouchableOpacity style={styles.retryButton} onPress={() => void recargar()}>
-          <MaterialIcons name="refresh" size={18} color="#FFFFFF" />
+          <MaterialIcons name="refresh" size={18} color={COLORS.surface} />
           <Text style={styles.retryButtonText}>Reintentar</Text>
         </TouchableOpacity>
       </View>
@@ -327,7 +328,7 @@ const NotasAlumnoScreen: React.FC = () => {
       <View style={styles.desktopSidebar}>
         <Text style={styles.desktopBrand}>The Atelier</Text>
         <TouchableOpacity style={styles.desktopNewButton}>
-          <MaterialIcons name="add" size={18} color="#FFFFFF" />
+          <MaterialIcons name="add" size={18} color={COLORS.surface} />
           <Text style={styles.desktopNewButtonText}>New Entry</Text>
         </TouchableOpacity>
         <DesktopMenu label="Dashboard" icon="dashboard" />
@@ -387,7 +388,7 @@ const NotasAlumnoScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
       <SafeAreaView style={styles.safeArea}>
         {isDesktop ? (
           renderDesktop()
@@ -417,7 +418,11 @@ const BottomTab: React.FC<{ icon: string; label: string; active?: boolean }> = (
 }) => (
   <View style={styles.bottomTabItem}>
     <View style={[styles.bottomTabIconWrap, active && styles.bottomTabIconWrapActive]}>
-      <MaterialIcons name={icon as never} size={19} color={active ? "#2E6CD0" : "#9AA8BC"} />
+      <MaterialIcons
+        name={icon as never}
+        size={19}
+        color={active ? COLORS.primaryMuted : "#9AA8BC"}
+      />
     </View>
     <Text style={[styles.bottomTabLabel, active && styles.bottomTabLabelActive]}>{label}</Text>
   </View>
@@ -429,18 +434,22 @@ const DesktopMenu: React.FC<{ label: string; icon: string; active?: boolean }> =
   active,
 }) => (
   <TouchableOpacity style={[styles.desktopMenuItem, active && styles.desktopMenuItemActive]}>
-    <MaterialIcons name={icon as never} size={18} color={active ? "#1A6BC1" : "#5A6679"} />
+    <MaterialIcons
+      name={icon as never}
+      size={18}
+      color={active ? COLORS.primaryDark : COLORS.textSecondary}
+    />
     <Text style={[styles.desktopMenuText, active && styles.desktopMenuTextActive]}>{label}</Text>
   </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#EEF3FA" },
+  container: { flex: 1, backgroundColor: COLORS.background },
   safeArea: { flex: 1 },
   content: { paddingHorizontal: 18 },
   header: {
     height: 56,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderBottomWidth: 1,
     borderBottomColor: "#E3E9F3",
     paddingHorizontal: 8,
@@ -473,13 +482,13 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 27,
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
   },
   editorCard: {
     marginTop: 18,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 24,
     padding: 16,
     borderWidth: 1,
@@ -492,15 +501,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 14,
-    backgroundColor: "#EEF2F7",
+    backgroundColor: COLORS.skeleton,
   },
   categoryChipActive: { backgroundColor: "#136FC4" },
   categoryChipText: { color: "#5B6B81", fontSize: 12, fontWeight: "700" },
-  categoryChipTextActive: { color: "#FFFFFF" },
+  categoryChipTextActive: { color: COLORS.surface },
   editorInput: {
     minHeight: 130,
     borderRadius: 16,
-    backgroundColor: "#EDF1F7",
+    backgroundColor: COLORS.skeleton,
     paddingHorizontal: 14,
     paddingVertical: 12,
     color: "#2B3A52",
@@ -532,7 +541,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   saveButtonDisabled: { opacity: 0.65 },
-  saveButtonText: { color: "#FFFFFF", fontWeight: "700", fontSize: 22 },
+  saveButtonText: { color: COLORS.surface, fontWeight: "700", fontSize: 22 },
   filtersRow: {
     marginTop: 16,
     flexDirection: "row",
@@ -544,9 +553,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: "#E3E8EF",
   },
-  filterChipActive: { backgroundColor: "#0A6FC4" },
+  filterChipActive: { backgroundColor: COLORS.primaryDark },
   filterChipText: { color: "#5F6D80", fontSize: 16, fontWeight: "700" },
-  filterChipTextActive: { color: "#FFFFFF" },
+  filterChipTextActive: { color: COLORS.surface },
   historyHeadRow: {
     marginTop: 16,
     marginBottom: 10,
@@ -560,7 +569,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     borderColor: "#DEE7F4",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     padding: 14,
     marginBottom: 12,
   },
@@ -583,9 +592,9 @@ const styles = StyleSheet.create({
   noteBadgeText: { fontSize: 11, fontWeight: "700" },
   bottomTabs: {
     height: 80,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderTopWidth: 1,
-    borderTopColor: "#E0E8F4",
+    borderTopColor: COLORS.border,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
@@ -600,7 +609,7 @@ const styles = StyleSheet.create({
   },
   bottomTabIconWrapActive: { backgroundColor: "#E9F1FF" },
   bottomTabLabel: { marginTop: 4, fontSize: 10, color: "#9BA8BA", fontWeight: "700" },
-  bottomTabLabelActive: { color: "#2E6CD0" },
+  bottomTabLabelActive: { color: COLORS.primaryMuted },
   loadingWrap: { marginTop: 16 },
   skeletonHeaderLine: {
     height: 16,
@@ -633,7 +642,7 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 27,
-    backgroundColor: "#0A6FC4",
+    backgroundColor: COLORS.primaryDark,
     alignItems: "center",
     justifyContent: "center",
     ...Platform.select({
@@ -672,33 +681,33 @@ const styles = StyleSheet.create({
     height: 52,
     width: "100%",
     borderRadius: 12,
-    backgroundColor: "#0A6FC4",
+    backgroundColor: COLORS.primaryDark,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
     gap: 8,
   },
-  startButtonText: { color: "#FFFFFF", fontSize: 24, fontWeight: "700" },
+  startButtonText: { color: COLORS.surface, fontSize: 24, fontWeight: "700" },
   ideaCard: {
     marginTop: 16,
     width: "100%",
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#DCE6F3",
-    backgroundColor: "#F7FAFF",
+    borderColor: COLORS.borderLight,
+    backgroundColor: COLORS.backgroundSoft,
     padding: 12,
     flexDirection: "row",
     gap: 8,
     alignItems: "flex-start",
   },
-  ideaTitle: { color: "#33445C", fontWeight: "700", fontSize: 14 },
+  ideaTitle: { color: COLORS.textDark, fontWeight: "700", fontSize: 14 },
   ideaText: { color: "#718199", marginTop: 2, fontSize: 13 },
   errorCard: {
     width: "100%",
     borderRadius: 16,
     borderWidth: 1,
     borderColor: "#E7E1E2",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     padding: 18,
     alignItems: "center",
   },
@@ -716,13 +725,13 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 50,
     borderRadius: 12,
-    backgroundColor: "#0A6FC4",
+    backgroundColor: COLORS.primaryDark,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
     gap: 8,
   },
-  retryButtonText: { color: "#FFFFFF", fontWeight: "700", fontSize: 18 },
+  retryButtonText: { color: COLORS.surface, fontWeight: "700", fontSize: 18 },
   errorCode: { marginTop: 18, fontSize: 12, letterSpacing: 1, color: "#7A8799", fontWeight: "700" },
   infoBox: {
     marginTop: 16,
@@ -756,12 +765,12 @@ const styles = StyleSheet.create({
     width: 220,
     backgroundColor: "#EFF3F9",
     borderRightWidth: 1,
-    borderRightColor: "#DCE5F2",
+    borderRightColor: COLORS.borderLight,
     padding: 16,
   },
   desktopBrand: { fontSize: 20, fontWeight: "800", color: "#25374E", marginBottom: 18 },
   desktopNewButton: {
-    backgroundColor: "#0A6FC4",
+    backgroundColor: COLORS.primaryDark,
     borderRadius: 10,
     paddingVertical: 10,
     alignItems: "center",
@@ -770,7 +779,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 18,
   },
-  desktopNewButtonText: { color: "#FFFFFF", fontWeight: "700" },
+  desktopNewButtonText: { color: COLORS.surface, fontWeight: "700" },
   desktopMenuItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -781,30 +790,30 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   desktopMenuItemActive: { backgroundColor: "#E5EFFC" },
-  desktopMenuText: { color: "#5A6679", fontWeight: "600" },
-  desktopMenuTextActive: { color: "#1A6BC1" },
+  desktopMenuText: { color: COLORS.textSecondary, fontWeight: "600" },
+  desktopMenuTextActive: { color: COLORS.primaryDark },
   desktopContent: { flex: 1, paddingHorizontal: 18, paddingTop: 12 },
   desktopTopBar: {
     height: 52,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#DCE5F2",
+    borderColor: COLORS.borderLight,
     paddingHorizontal: 14,
     alignItems: "center",
     flexDirection: "row",
     gap: 14,
   },
-  desktopTitle: { color: "#1A6BC1", fontSize: 16, fontWeight: "700" },
+  desktopTitle: { color: COLORS.primaryDark, fontSize: 16, fontWeight: "700" },
   desktopSubTitle: { color: "#677A93", fontSize: 13, fontWeight: "600" },
   desktopExportButton: {
     marginLeft: "auto",
-    backgroundColor: "#0A6FC4",
+    backgroundColor: COLORS.primaryDark,
     borderRadius: 999,
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
-  desktopExportButtonText: { color: "#FFFFFF", fontWeight: "700", fontSize: 12 },
+  desktopExportButtonText: { color: COLORS.surface, fontWeight: "700", fontSize: 12 },
   desktopStudentName: { marginTop: 16, fontSize: 44, fontWeight: "800", color: "#172538" },
   desktopStudentSub: { marginTop: 6, color: "#647790", fontSize: 14 },
   desktopColumns: { flex: 1, marginTop: 14, flexDirection: "row", gap: 16 },
@@ -812,7 +821,7 @@ const styles = StyleSheet.create({
   desktopRightCol: { flex: 1 },
   focusCard: {
     marginTop: 12,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: "#DCE6F2",
@@ -825,9 +834,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingBottom: 8,
     borderBottomWidth: 1,
-    borderBottomColor: "#EEF2F7",
+    borderBottomColor: COLORS.skeleton,
   },
-  focusText: { color: "#33445C", fontSize: 13 },
+  focusText: { color: COLORS.textDark, fontSize: 13 },
   focusStrong: { color: "#0F7ABF", fontSize: 12, fontWeight: "700" },
   focusWarning: { color: "#A7652B", fontSize: 12, fontWeight: "700" },
   desktopLogHeader: {

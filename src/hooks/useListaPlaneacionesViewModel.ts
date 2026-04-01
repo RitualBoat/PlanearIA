@@ -5,6 +5,7 @@ import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
 import { NivelAcademico, Planeacion, FiltrosPlaneacion } from "../../types/planeacion";
 import { usePlaneaciones } from "../sync/providers/SyncProvider";
+import { COLORS } from "../../types";
 
 type Nav = StackNavigationProp<RootStackParamList, "ListaPlaneaciones">;
 
@@ -85,10 +86,10 @@ export const useListaPlaneacionesViewModel = (): ListaPlaneacionesViewModel => {
 
   const getColorNivel = useCallback((nivel: NivelAcademico): string => {
     const colores = {
-      [NivelAcademico.PRIMARIA]: "#4CAF50",
-      [NivelAcademico.SECUNDARIA]: "#2196F3",
-      [NivelAcademico.PREPARATORIA]: "#FF9800",
-      [NivelAcademico.UNIVERSIDAD]: "#9C27B0",
+      [NivelAcademico.PRIMARIA]: COLORS.success,
+      [NivelAcademico.SECUNDARIA]: COLORS.primaryLight,
+      [NivelAcademico.PREPARATORIA]: COLORS.warning,
+      [NivelAcademico.UNIVERSIDAD]: COLORS.purple,
     };
     return colores[nivel];
   }, []);

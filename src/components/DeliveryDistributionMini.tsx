@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { ProgressChart } from "react-native-chart-kit";
+import { COLORS } from "../../types";
 
 interface DeliveryDistributionMiniProps {
   onTime: number;
@@ -10,10 +11,10 @@ interface DeliveryDistributionMiniProps {
 }
 
 const chartConfig = {
-  backgroundGradientFrom: "#FFFFFF",
-  backgroundGradientTo: "#FFFFFF",
+  backgroundGradientFrom: COLORS.surface,
+  backgroundGradientTo: COLORS.surface,
   color: (opacity = 1) => `rgba(12, 99, 184, ${opacity})`,
-  labelColor: () => "#2E3E57",
+  labelColor: () => COLORS.textDark,
 };
 
 const DeliveryDistributionMini: React.FC<DeliveryDistributionMiniProps> = ({
@@ -60,14 +61,14 @@ const DeliveryDistributionMini: React.FC<DeliveryDistributionMiniProps> = ({
 const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
-    borderColor: "#E3EAF4",
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
     borderRadius: 16,
     padding: 14,
     gap: 10,
   },
   title: {
-    color: "#2A3B56",
+    color: COLORS.textDark,
     fontSize: 31,
     fontWeight: "800",
     letterSpacing: -0.3,
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
   centerValue: {
     position: "absolute",
     top: 66,
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 30,
     fontWeight: "800",
   },
@@ -98,12 +99,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   value: {
-    color: "#2E3E57",
+    color: COLORS.textDark,
     fontSize: 13,
     fontWeight: "700",
   },
   dotBlue: {
-    color: "#0C63B8",
+    color: COLORS.primaryDark,
     fontSize: 14,
     fontWeight: "700",
   },
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   dotRed: {
-    color: "#C62828",
+    color: COLORS.error,
     fontSize: 14,
     fontWeight: "700",
   },

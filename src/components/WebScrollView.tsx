@@ -1,6 +1,7 @@
 import React from "react";
 import { ScrollView, Platform, View, StyleSheet } from "react-native";
 import type { ScrollViewProps } from "react-native";
+import { COLORS } from "../../types";
 
 interface WebScrollViewProps extends ScrollViewProps {
   children: React.ReactNode;
@@ -43,11 +44,11 @@ const WebScrollView: React.FC<WebScrollViewProps> = ({
             background: "#f0f0f0",
           },
           "::-webkit-scrollbar-thumb": {
-            background: "#2196F3",
+            background: COLORS.primaryLight,
             borderRadius: "4px",
           },
           "::-webkit-scrollbar-thumb:hover": {
-            background: "#1976D2",
+            background: COLORS.primary,
           },
         }}
       >

@@ -15,7 +15,7 @@ interface PresentacionesScreenProps {
 const PresentacionesScreen: React.FC<PresentacionesScreenProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.title}>Crear Presentación</Text>
@@ -24,7 +24,7 @@ const PresentacionesScreen: React.FC<PresentacionesScreenProps> = ({ navigation 
           <View style={styles.optionsContainer}>
             <TouchableOpacity style={styles.optionCard} activeOpacity={0.7}>
               <View style={[styles.iconContainer, { backgroundColor: "#9C27B020" }]}>
-                <MaterialIcons name="auto-awesome" size={60} color="#9C27B0" />
+                <MaterialIcons name="auto-awesome" size={60} color={COLORS.purple} />
               </View>
               <Text style={styles.optionTitle}>Generar con IA</Text>
               <Text style={styles.optionDescription}>
@@ -34,7 +34,7 @@ const PresentacionesScreen: React.FC<PresentacionesScreenProps> = ({ navigation 
 
             <TouchableOpacity style={styles.optionCard} activeOpacity={0.7}>
               <View style={[styles.iconContainer, { backgroundColor: "#2196F320" }]}>
-                <MaterialIcons name="dashboard" size={60} color="#2196F3" />
+                <MaterialIcons name="dashboard" size={60} color={COLORS.primaryLight} />
               </View>
               <Text style={styles.optionTitle}>Usar Plantilla</Text>
               <Text style={styles.optionDescription}>Elige un diseño profesional prediseñado</Text>
@@ -42,7 +42,7 @@ const PresentacionesScreen: React.FC<PresentacionesScreenProps> = ({ navigation 
 
             <TouchableOpacity style={styles.optionCard} activeOpacity={0.7}>
               <View style={[styles.iconContainer, { backgroundColor: "#4CAF5020" }]}>
-                <MaterialIcons name="edit" size={60} color="#4CAF50" />
+                <MaterialIcons name="edit" size={60} color={COLORS.success} />
               </View>
               <Text style={styles.optionTitle}>Crear Manualmente</Text>
               <Text style={styles.optionDescription}>Diseña tu presentación desde cero</Text>
@@ -55,7 +55,7 @@ const PresentacionesScreen: React.FC<PresentacionesScreenProps> = ({ navigation 
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#EEF3FA" },
+  container: { flex: 1, backgroundColor: COLORS.background },
   safeArea: { flex: 1 },
   scrollContent: {
     width: "100%",
@@ -81,10 +81,10 @@ const styles = StyleSheet.create({
   },
   optionsContainer: { gap: 20 },
   optionCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 18,
     alignItems: "center",
     boxShadow: "0px 10px 22px rgba(33, 60, 109, 0.08)",

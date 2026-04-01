@@ -6,6 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import { Grupo } from "../../types";
 import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
+import logger from "../utils/logger";
 
 const STORAGE_KEY = "@planearia:grupos";
 const PENDING_SYNC_KEY = "@planearia:grupos_pending_ops";
@@ -265,7 +266,7 @@ export const obtenerGrupos = async (): Promise<Partial<Grupo>[]> => {
 
     if (stored) {
       const grupos: Partial<Grupo>[] = JSON.parse(stored);
-      console.log(`[grupos] Loaded ${grupos.length} from storage`);
+      logger.log(`[grupos] Loaded ${grupos.length} from storage`);
       return grupos;
     }
 
@@ -309,7 +310,7 @@ export const obtenerGrupos = async (): Promise<Partial<Grupo>[]> => {
 
     return gruposDefault;
   } catch (error) {
-    console.error(" Error obteniendo grupos:", error);
+    logger.error(" Error obteniendo grupos:", error);
     throw new Error("No se pudieron cargar los grupos");
   }
 };
@@ -322,7 +323,7 @@ export const obtenerGrupoPorId = async (id: number): Promise<Partial<Grupo> | nu
     const grupos = await obtenerGrupos();
     return grupos.find((g) => g.id === id) || null;
   } catch (error) {
-    console.error(` Error obteniendo grupo ${id}:`, error);
+    logger.error(` Error obteniendo grupo ${id}:`, error);
     return null;
   }
 };
@@ -333,9 +334,9 @@ export const obtenerGrupoPorId = async (id: number): Promise<Partial<Grupo> | nu
 export const guardarGrupos = async (grupos: Partial<Grupo>[]): Promise<void> => {
   try {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(grupos));
-    console.log(` Guardados ${grupos.length} grupos en storage`);
+    logger.log(` Guardados ${grupos.length} grupos en storage`);
   } catch (error) {
-    console.error(" Error guardando grupos:", error);
+    logger.error(" Error guardando grupos:", error);
     throw new Error("No se pudieron guardar los grupos");
   }
 };
@@ -355,9 +356,9 @@ export const agregarGrupo = async (grupo: Partial<Grupo>): Promise<void> => {
 
     await guardarGrupos([...grupos, nuevoGrupo]);
     await syncSingleOperation("create", nuevoGrupo);
-    console.log(` Grupo agregado: ${nuevoGrupo.nombre}`);
+    logger.log(` Grupo agregado: ${nuevoGrupo.nombre}`);
   } catch (error) {
-    console.error(" Error agregando grupo:", error);
+    logger.error(" Error agregando grupo:", error);
     throw new Error("No se pudo agregar el grupo");
   }
 };
@@ -379,9 +380,9 @@ export const actualizarGrupo = async (id: number, actualizacion: Partial<Grupo>)
 
     await guardarGrupos(nuevosGrupos);
     await syncSingleOperation("update", merged);
-    console.log(` Grupo actualizado: ${id}`);
+    logger.log(` Grupo actualizado: ${id}`);
   } catch (error) {
-    console.error(" Error actualizando grupo:", error);
+    logger.error(" Error actualizando grupo:", error);
     throw new Error("No se pudo actualizar el grupo");
   }
 };
@@ -396,9 +397,9 @@ export const eliminarGrupo = async (id: number): Promise<void> => {
 
     await guardarGrupos(nuevosGrupos);
     await syncSingleOperation("delete", { id });
-    console.log(` Grupo eliminado: ${id}`);
+    logger.log(` Grupo eliminado: ${id}`);
   } catch (error) {
-    console.error(" Error eliminando grupo:", error);
+    logger.error(" Error eliminando grupo:", error);
     throw new Error("No se pudo eliminar el grupo");
   }
 };

@@ -14,6 +14,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AnimatedTopPill from "../../components/AnimatedTopPill";
 import { isWeb } from "../../utils/responsive";
 import { useCuentaViewModel } from "../../hooks/useCuentaViewModel";
+import { COLORS } from "../../../types";
 
 const CuentaScreen: React.FC = () => {
   const { width } = useWindowDimensions();
@@ -52,7 +53,7 @@ const CuentaScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <Animated.ScrollView
@@ -97,13 +98,13 @@ const CuentaScreen: React.FC = () => {
                   onPress={() => setOpenAccesibilidad((prev) => !prev)}
                 >
                   <View style={styles.sectionTitleWrap}>
-                    <MaterialIcons name="accessibility-new" size={20} color="#0A6AB0" />
+                    <MaterialIcons name="accessibility-new" size={20} color={COLORS.primaryDark} />
                     <Text style={styles.sectionTitle}>Accesibilidad</Text>
                   </View>
                   <MaterialIcons
                     name={openAccesibilidad ? "expand-less" : "expand-more"}
                     size={26}
-                    color="#4A5E78"
+                    color={COLORS.textDark}
                   />
                 </TouchableOpacity>
 
@@ -170,7 +171,7 @@ const CuentaScreen: React.FC = () => {
                           Deuteranopia
                         </Text>
                         {daltonismo === "Deuteranopia" ? (
-                          <MaterialIcons name="check-circle" size={20} color="#0A6AB0" />
+                          <MaterialIcons name="check-circle" size={20} color={COLORS.primaryDark} />
                         ) : null}
                       </TouchableOpacity>
 
@@ -191,7 +192,7 @@ const CuentaScreen: React.FC = () => {
                           Protanopia
                         </Text>
                         {daltonismo === "Protanopia" ? (
-                          <MaterialIcons name="check-circle" size={20} color="#0A6AB0" />
+                          <MaterialIcons name="check-circle" size={20} color={COLORS.primaryDark} />
                         ) : null}
                       </TouchableOpacity>
                     </View>
@@ -234,13 +235,13 @@ const CuentaScreen: React.FC = () => {
                   onPress={() => setOpenPreferencias((prev) => !prev)}
                 >
                   <View style={styles.sectionTitleWrap}>
-                    <MaterialIcons name="tune" size={20} color="#0A6AB0" />
+                    <MaterialIcons name="tune" size={20} color={COLORS.primaryDark} />
                     <Text style={styles.sectionTitle}>Preferencias de app</Text>
                   </View>
                   <MaterialIcons
                     name={openPreferencias ? "expand-less" : "expand-more"}
                     size={26}
-                    color="#4A5E78"
+                    color={COLORS.textDark}
                   />
                 </TouchableOpacity>
 
@@ -249,7 +250,7 @@ const CuentaScreen: React.FC = () => {
                     <View style={styles.surfaceCard}>
                       <View style={styles.preferenceRow}>
                         <View style={styles.prefIconWrap}>
-                          <MaterialIcons name="dark-mode" size={19} color="#4E5A70" />
+                          <MaterialIcons name="dark-mode" size={19} color={COLORS.textDark} />
                         </View>
                         <View style={styles.prefTextWrap}>
                           <Text style={styles.prefTitle}>Modo oscuro</Text>
@@ -268,7 +269,7 @@ const CuentaScreen: React.FC = () => {
 
                       <TouchableOpacity style={styles.preferenceRow} activeOpacity={0.82}>
                         <View style={styles.prefIconWrap}>
-                          <MaterialIcons name="translate" size={19} color="#4E5A70" />
+                          <MaterialIcons name="translate" size={19} color={COLORS.textDark} />
                         </View>
                         <View style={styles.prefTextWrap}>
                           <Text style={styles.prefTitle}>Idioma</Text>
@@ -288,13 +289,13 @@ const CuentaScreen: React.FC = () => {
                   onPress={() => setOpenCuenta((prev) => !prev)}
                 >
                   <View style={styles.sectionTitleWrap}>
-                    <MaterialIcons name="manage-accounts" size={20} color="#0A6AB0" />
+                    <MaterialIcons name="manage-accounts" size={20} color={COLORS.primaryDark} />
                     <Text style={styles.sectionTitle}>Cuenta y seguridad</Text>
                   </View>
                   <MaterialIcons
                     name={openCuenta ? "expand-less" : "expand-more"}
                     size={26}
-                    color="#4A5E78"
+                    color={COLORS.textDark}
                   />
                 </TouchableOpacity>
 
@@ -312,7 +313,7 @@ const CuentaScreen: React.FC = () => {
                       </View>
 
                       <TouchableOpacity style={styles.primaryAction} onPress={handleEditarPerfil}>
-                        <MaterialIcons name="person" size={18} color="#FFFFFF" />
+                        <MaterialIcons name="person" size={18} color={COLORS.surface} />
                         <Text style={styles.primaryActionText}>Cuenta y perfil</Text>
                       </TouchableOpacity>
 
@@ -320,27 +321,27 @@ const CuentaScreen: React.FC = () => {
                         style={styles.secondaryAction}
                         onPress={handleCambiarContrasena}
                       >
-                        <MaterialIcons name="lock" size={18} color="#4E5A70" />
+                        <MaterialIcons name="lock" size={18} color={COLORS.textDark} />
                         <Text style={styles.secondaryActionText}>Cambiar contrasena</Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity style={styles.secondaryAction} activeOpacity={0.82}>
-                        <MaterialIcons name="workspace-premium" size={18} color="#4E5A70" />
+                        <MaterialIcons name="workspace-premium" size={18} color={COLORS.textDark} />
                         <Text style={styles.secondaryActionText}>Suscripcion y plan</Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity style={styles.secondaryAction} activeOpacity={0.82}>
-                        <MaterialIcons name="devices" size={18} color="#4E5A70" />
+                        <MaterialIcons name="devices" size={18} color={COLORS.textDark} />
                         <Text style={styles.secondaryActionText}>Sesiones iniciadas</Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity style={styles.secondaryAction} activeOpacity={0.82}>
-                        <MaterialIcons name="policy" size={18} color="#4E5A70" />
+                        <MaterialIcons name="policy" size={18} color={COLORS.textDark} />
                         <Text style={styles.secondaryActionText}>Privacidad y terminos</Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity style={styles.logoutButton} onPress={handleCerrarSesion}>
-                        <MaterialIcons name="logout" size={18} color="#FFFFFF" />
+                        <MaterialIcons name="logout" size={18} color={COLORS.surface} />
                         <Text style={styles.logoutButtonText}>Cerrar sesion</Text>
                       </TouchableOpacity>
                     </View>
@@ -372,7 +373,7 @@ const CuentaScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -397,7 +398,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 18,
     paddingVertical: 18,
-    backgroundColor: "#09589E",
+    backgroundColor: COLORS.bannerBg,
     minHeight: 130,
     justifyContent: "flex-end",
   },
@@ -405,14 +406,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "800",
     letterSpacing: 1.1,
-    color: "#A8D6FF",
+    color: COLORS.bannerAccent,
   },
   aiBannerTitle: {
     marginTop: 4,
     fontSize: 24,
     lineHeight: 30,
     fontWeight: "800",
-    color: "#FFFFFF",
+    color: COLORS.surface,
   },
   layoutGrid: {
     gap: 12,
@@ -437,7 +438,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     borderColor: "#DFE7F2",
-    backgroundColor: "#ECF1F8",
+    backgroundColor: COLORS.surfaceSecondary,
     overflow: "hidden",
   },
   sectionHeader: {
@@ -464,9 +465,9 @@ const styles = StyleSheet.create({
   },
   surfaceCard: {
     borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
     gap: 9,
   },
@@ -479,11 +480,11 @@ const styles = StyleSheet.create({
   blockTitle: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#15243B",
+    color: COLORS.text,
   },
   segmentedBar: {
     borderRadius: 999,
-    backgroundColor: "#E9EEF5",
+    backgroundColor: COLORS.progressTrack,
     padding: 5,
     flexDirection: "row",
     alignItems: "center",
@@ -497,7 +498,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   segmentOptionActive: {
-    backgroundColor: "#0C74C6",
+    backgroundColor: COLORS.toggleActive,
     boxShadow: "0px 8px 16px rgba(13, 97, 178, 0.24)",
   },
   segmentText: {
@@ -506,7 +507,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   segmentTextActive: {
-    color: "#FFFFFF",
+    color: COLORS.surface,
     fontWeight: "800",
   },
   rowBetween: {
@@ -522,12 +523,12 @@ const styles = StyleSheet.create({
   rowTitle: {
     fontSize: 21,
     fontWeight: "700",
-    color: "#15243B",
+    color: COLORS.text,
     lineHeight: 26,
   },
   rowSubtitle: {
     fontSize: 14,
-    color: "#5A6E88",
+    color: COLORS.textSecondary,
     lineHeight: 19,
   },
   toggleTrack: {
@@ -539,13 +540,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   toggleTrackOn: {
-    backgroundColor: "#0C74C6",
+    backgroundColor: COLORS.toggleActive,
   },
   toggleThumb: {
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
   },
   toggleThumbOn: {
     alignSelf: "flex-end",
@@ -553,8 +554,8 @@ const styles = StyleSheet.create({
   radioRow: {
     borderRadius: 13,
     borderWidth: 1,
-    borderColor: "#D8E2F0",
-    backgroundColor: "#F7FAFF",
+    borderColor: COLORS.borderStrong,
+    backgroundColor: COLORS.backgroundSoft,
     paddingHorizontal: 13,
     paddingVertical: 11,
     flexDirection: "row",
@@ -567,18 +568,18 @@ const styles = StyleSheet.create({
   },
   radioText: {
     fontSize: 20,
-    color: "#5A6E88",
+    color: COLORS.textSecondary,
     fontWeight: "500",
   },
   radioTextActive: {
-    color: "#0C74C6",
+    color: COLORS.toggleActive,
     fontWeight: "700",
   },
   surfaceRowCard: {
     borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     paddingHorizontal: 14,
     paddingVertical: 12,
     flexDirection: "row",
@@ -595,7 +596,7 @@ const styles = StyleSheet.create({
   surfaceRowTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#15243B",
+    color: COLORS.text,
   },
   preferenceRow: {
     flexDirection: "row",
@@ -606,7 +607,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: "#EDF1F7",
+    backgroundColor: COLORS.skeleton,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -617,11 +618,11 @@ const styles = StyleSheet.create({
   prefTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#15243B",
+    color: COLORS.text,
   },
   prefSubtitle: {
     fontSize: 14,
-    color: "#5A6E88",
+    color: COLORS.textSecondary,
   },
   rowDivider: {
     height: 1,
@@ -630,7 +631,7 @@ const styles = StyleSheet.create({
   },
   profileCard: {
     borderRadius: 16,
-    backgroundColor: "#E9EEF5",
+    backgroundColor: COLORS.progressTrack,
     borderWidth: 1,
     borderColor: "#DEE7F2",
     padding: 12,
@@ -638,7 +639,7 @@ const styles = StyleSheet.create({
   },
   identityCard: {
     borderRadius: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     paddingVertical: 10,
     paddingHorizontal: 12,
     flexDirection: "row",
@@ -665,7 +666,7 @@ const styles = StyleSheet.create({
   identityRole: {
     marginTop: 1,
     fontSize: 15,
-    color: "#5A6E88",
+    color: COLORS.textSecondary,
   },
   primaryAction: {
     borderRadius: 13,
@@ -677,7 +678,7 @@ const styles = StyleSheet.create({
     gap: 9,
   },
   primaryActionText: {
-    color: "#FFFFFF",
+    color: COLORS.surface,
     fontSize: 17,
     fontWeight: "700",
   },
@@ -697,7 +698,7 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     borderRadius: 13,
-    backgroundColor: "#D34553",
+    backgroundColor: COLORS.danger,
     paddingVertical: 12,
     paddingHorizontal: 13,
     flexDirection: "row",
@@ -706,7 +707,7 @@ const styles = StyleSheet.create({
     gap: 9,
   },
   logoutButtonText: {
-    color: "#FFFFFF",
+    color: COLORS.surface,
     fontSize: 17,
     fontWeight: "700",
   },
@@ -720,14 +721,14 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: "#E1E9F3",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     padding: 14,
     gap: 10,
   },
   webCardTitle: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#2A3B56",
+    color: COLORS.textDark,
   },
   webSummaryText: {
     fontSize: 14,

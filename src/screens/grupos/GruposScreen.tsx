@@ -91,14 +91,14 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
       label: "Grupos activos",
       value: "8",
       icon: "groups" as const,
-      tone: "#1676D2",
+      tone: COLORS.primary,
     },
     {
       id: "alumnos",
       label: "Alumnos",
       value: "246",
       icon: "school" as const,
-      tone: "#0EA5A5",
+      tone: COLORS.tealLight,
     },
     {
       id: "pendientes",
@@ -111,7 +111,7 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <Animated.ScrollView
@@ -156,8 +156,8 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               onPress={handleCrearGrupo}
               activeOpacity={0.85}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#1676D2" }]}>
-                <MaterialIcons name="group-add" size={28} color="#FFFFFF" />
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.primary }]}>
+                <MaterialIcons name="group-add" size={28} color={COLORS.surface} />
               </View>
               <Text style={styles.optionTitle}>Crear Nuevo Grupo</Text>
               <Text style={styles.optionDescription}>
@@ -165,7 +165,7 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Crear grupo</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
 
@@ -174,8 +174,8 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               onPress={handleVerGrupos}
               activeOpacity={0.85}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#0EA5A5" }]}>
-                <MaterialIcons name="groups" size={28} color="#FFFFFF" />
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.tealLight }]}>
+                <MaterialIcons name="groups" size={28} color={COLORS.surface} />
               </View>
               <Text style={styles.optionTitle}>Mis Grupos</Text>
               <Text style={styles.optionDescription}>
@@ -183,7 +183,7 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Ver grupos</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
 
@@ -192,8 +192,8 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               onPress={handleImportarGrupos}
               activeOpacity={0.85}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#0F6CC8" }]}>
-                <MaterialIcons name="file-upload" size={28} color="#FFFFFF" />
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.primaryDark }]}>
+                <MaterialIcons name="file-upload" size={28} color={COLORS.surface} />
               </View>
               <Text style={styles.optionTitle}>Importar Grupos</Text>
               <Text style={styles.optionDescription}>
@@ -201,7 +201,7 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Importar archivo</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
 
@@ -211,7 +211,7 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               activeOpacity={0.85}
             >
               <View style={[styles.iconContainer, { backgroundColor: "#6A8FDD" }]}>
-                <MaterialIcons name="file-download" size={28} color="#FFFFFF" />
+                <MaterialIcons name="file-download" size={28} color={COLORS.surface} />
               </View>
               <Text style={styles.optionTitle}>Exportar Grupos</Text>
               <Text style={styles.optionDescription}>
@@ -219,13 +219,13 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Ir a exportación</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
           </View>
 
           <View style={styles.tipCard}>
-            <MaterialIcons name="tips-and-updates" size={18} color="#0B6F86" />
+            <MaterialIcons name="tips-and-updates" size={18} color={COLORS.teal} />
             <Text style={styles.tipText}>
               Consejo: desde el detalle de cada grupo puedes crear tareas, asignar recursos y
               calificar entregas.
@@ -248,8 +248,8 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               onPress={handleCrearAlumno}
               activeOpacity={0.85}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#1676D2" }]}>
-                <MaterialIcons name="person-add" size={28} color="#FFFFFF" />
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.primary }]}>
+                <MaterialIcons name="person-add" size={28} color={COLORS.surface} />
               </View>
               <Text style={styles.optionTitle}>Crear Nuevo Alumno</Text>
               <Text style={styles.optionDescription}>
@@ -257,7 +257,7 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Crear alumno</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
 
@@ -266,8 +266,8 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               onPress={handleVerAlumnos}
               activeOpacity={0.85}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#0EA5A5" }]}>
-                <MaterialIcons name="groups" size={28} color="#FFFFFF" />
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.tealLight }]}>
+                <MaterialIcons name="groups" size={28} color={COLORS.surface} />
               </View>
               <Text style={styles.optionTitle}>Mis Alumnos</Text>
               <Text style={styles.optionDescription}>
@@ -275,7 +275,7 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Ver alumnos</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
 
@@ -284,8 +284,8 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               onPress={handleImportarAlumnos}
               activeOpacity={0.85}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#0F6CC8" }]}>
-                <MaterialIcons name="file-upload" size={28} color="#FFFFFF" />
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.primaryDark }]}>
+                <MaterialIcons name="file-upload" size={28} color={COLORS.surface} />
               </View>
               <Text style={styles.optionTitle}>Importar Alumnos</Text>
               <Text style={styles.optionDescription}>
@@ -293,7 +293,7 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Importar archivo</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
 
@@ -303,7 +303,7 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               activeOpacity={0.85}
             >
               <View style={[styles.iconContainer, { backgroundColor: "#7A57D1" }]}>
-                <MaterialIcons name="file-download" size={28} color="#FFFFFF" />
+                <MaterialIcons name="file-download" size={28} color={COLORS.surface} />
               </View>
               <Text style={styles.optionTitle}>Exportar Alumnos</Text>
               <Text style={styles.optionDescription}>
@@ -311,13 +311,13 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Exportar archivo</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
           </View>
 
           <View style={styles.tipCard}>
-            <MaterialIcons name="auto-awesome" size={18} color="#0B6F86" />
+            <MaterialIcons name="auto-awesome" size={18} color={COLORS.teal} />
             <Text style={styles.tipText}>
               Consejo: mantendremos este flujo continuo para que Grupos y Alumnos se gestionen en
               una sola experiencia de scroll.
@@ -335,7 +335,7 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -366,9 +366,9 @@ const styles = StyleSheet.create({
   statCard: {
     width: "100%",
     borderRadius: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
   },
   statCardWide: {
@@ -385,19 +385,19 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 32,
     fontWeight: "800",
-    color: "#1E2A3A",
+    color: COLORS.text,
     lineHeight: 36,
   },
   statLabel: {
     marginTop: 2,
     fontSize: 13,
-    color: "#6B7D96",
+    color: COLORS.textTertiary,
     fontWeight: "600",
   },
   sectionLabel: {
     marginTop: 4,
     fontSize: 13,
-    color: "#5D6F86",
+    color: COLORS.textSecondary,
     fontWeight: "800",
     letterSpacing: 1.1,
   },
@@ -410,11 +410,11 @@ const styles = StyleSheet.create({
   },
   optionCard: {
     width: "100%",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     gap: 8,
     boxShadow: "0px 10px 22px rgba(33, 60, 109, 0.08)",
   },
@@ -431,24 +431,24 @@ const styles = StyleSheet.create({
   optionTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#1E2A3A",
+    color: COLORS.text,
   },
   optionDescription: {
     fontSize: 14,
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     lineHeight: 20,
   },
   optionFooter: {
     marginTop: 4,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: "#E8EEF6",
+    borderTopColor: COLORS.border,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   optionCta: {
-    color: "#1676D2",
+    color: COLORS.primary,
     fontSize: 14,
     fontWeight: "700",
   },
@@ -456,8 +456,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#BBE7F0",
-    backgroundColor: "#EAF8FB",
+    borderColor: COLORS.primaryTint,
+    backgroundColor: COLORS.primaryTint,
     padding: 12,
     flexDirection: "row",
     alignItems: "flex-start",
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   tipText: {
     flex: 1,
     fontSize: 13,
-    color: "#0B6F86",
+    color: COLORS.teal,
     lineHeight: 18,
   },
 });

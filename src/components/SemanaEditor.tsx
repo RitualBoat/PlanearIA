@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { SemanaUniversitaria, ActividadPresencial } from "../../types";
+import { COLORS, SemanaUniversitaria, ActividadPresencial } from "../../types";
 
 interface SemanaEditorProps {
   semana: SemanaUniversitaria;
@@ -519,10 +519,10 @@ export const SemanaEditor: React.FC<SemanaEditorProps> = ({
 const styles = StyleSheet.create({
   container: {
     marginBottom: 12,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.surface,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: COLORS.divider,
     overflow: "hidden",
   },
   header: {
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: COLORS.surfaceTertiary,
   },
   headerLeft: {
     flex: 1,
@@ -538,22 +538,22 @@ const styles = StyleSheet.create({
   semanaNumero: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#2196F3",
+    color: COLORS.primaryLight,
     marginBottom: 4,
   },
   unidadTematica: {
     fontSize: 14,
-    color: "#333",
+    color: COLORS.text,
     marginBottom: 2,
   },
   summary: {
     fontSize: 12,
-    color: "#666",
+    color: COLORS.textMuted,
     fontStyle: "italic",
   },
   expandIcon: {
     fontSize: 20,
-    color: "#666",
+    color: COLORS.textMuted,
     marginLeft: 8,
   },
   content: {
@@ -571,13 +571,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cloneButton: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: COLORS.success,
   },
   deleteButton: {
-    backgroundColor: "#f44336",
+    backgroundColor: COLORS.errorLight,
   },
   actionButtonText: {
-    color: "#fff",
+    color: COLORS.surface,
     fontWeight: "600",
   },
   section: {
@@ -586,16 +586,16 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#333",
+    color: COLORS.text,
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: COLORS.divider,
     borderRadius: 6,
     padding: 10,
     fontSize: 14,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.surface,
     minHeight: 40,
   },
   listItem: {
@@ -609,18 +609,18 @@ const styles = StyleSheet.create({
   },
   deleteItemButton: {
     fontSize: 20,
-    color: "#f44336",
+    color: COLORS.errorLight,
     padding: 8,
   },
   addButton: {
     padding: 10,
-    backgroundColor: "#e3f2fd",
+    backgroundColor: COLORS.primaryTint,
     borderRadius: 6,
     alignItems: "center",
     marginTop: 8,
   },
   addButtonText: {
-    color: "#2196F3",
+    color: COLORS.primaryLight,
     fontWeight: "600",
   },
   actividadCard: {
@@ -629,7 +629,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: COLORS.divider,
   },
   actividadRow: {
     flexDirection: "row",
@@ -643,15 +643,15 @@ const styles = StyleSheet.create({
   },
   fieldLabel: {
     fontSize: 12,
-    color: "#666",
+    color: COLORS.textMuted,
   },
   inputSmall: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: COLORS.divider,
     borderRadius: 4,
     padding: 6,
     fontSize: 14,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.surface,
     minWidth: 60,
   },
   deleteCardButton: {
@@ -660,7 +660,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   deleteCardButtonText: {
-    color: "#f44336",
+    color: COLORS.errorLight,
     fontSize: 12,
   },
   templateButtons: {

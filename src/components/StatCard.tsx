@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { COLORS } from "../../types";
 
 interface StatCardProps {
   label: string;
@@ -43,17 +44,17 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     minWidth: 150,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     borderLeftWidth: 4,
     paddingHorizontal: 14,
     paddingVertical: 12,
     gap: 8,
   },
   label: {
-    color: "#74839A",
+    color: COLORS.textTertiary,
     fontSize: 12,
     fontWeight: "700",
     letterSpacing: 0.4,
@@ -64,7 +65,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   value: {
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 42,
     fontWeight: "800",
     letterSpacing: -0.6,
@@ -76,7 +77,7 @@ const styles = StyleSheet.create({
   progressTrack: {
     height: 6,
     borderRadius: 999,
-    backgroundColor: "#E9EEF5",
+    backgroundColor: COLORS.progressTrack,
     overflow: "hidden",
   },
   progressFill: {
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   footer: {
-    color: "#8A97AA",
+    color: COLORS.textMuted,
     fontSize: 12,
     fontWeight: "600",
   },

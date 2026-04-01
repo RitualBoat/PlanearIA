@@ -21,6 +21,7 @@ import {
 } from "../services/syncService";
 import { useSync } from "../hooks/useSync";
 import { STORAGE_KEYS } from "../config/apiConfig";
+import logger from "../../utils/logger";
 
 // =====================================
 // TIPOS
@@ -91,9 +92,9 @@ export const SyncProvider: React.FC<SyncProviderProps> = ({ children }) => {
       setIsLoading(true);
       const data = await loadLocalPlaneaciones();
       setPlaneaciones(data);
-      console.log(`[provider] Loaded ${data.length} planeaciones`);
+      logger.log(`[provider] Loaded ${data.length} planeaciones`);
     } catch (error) {
-      console.error("[provider] Load error:", error);
+      logger.error("[provider] Load error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -136,7 +137,7 @@ export const SyncProvider: React.FC<SyncProviderProps> = ({ children }) => {
   const agregarPlaneacion = async (planeacion: Planeacion) => {
     const newPlaneaciones = [...planeaciones, planeacion];
     await saveAndSync(newPlaneaciones, { type: "create", data: planeacion });
-    console.log(`[provider] Added: ${planeacion.temaSesion}`);
+    logger.log(`[provider] Added: ${planeacion.temaSesion}`);
   };
 
   /**
@@ -160,7 +161,7 @@ export const SyncProvider: React.FC<SyncProviderProps> = ({ children }) => {
       type: "update",
       data: updated || null,
     });
-    console.log(`[provider] Updated: ${id}`);
+    logger.log(`[provider] Updated: ${id}`);
   };
 
   /**
@@ -177,7 +178,7 @@ export const SyncProvider: React.FC<SyncProviderProps> = ({ children }) => {
     if (planeacionActual?.id === id) {
       setPlaneacionActual(null);
     }
-    console.log(`[provider] Deleted: ${id}`);
+    logger.log(`[provider] Deleted: ${id}`);
   };
 
   /**
@@ -231,7 +232,7 @@ export const SyncProvider: React.FC<SyncProviderProps> = ({ children }) => {
     setPlaneacionActual(null);
     await AsyncStorage.removeItem(STORAGE_KEYS.PLANEACIONES);
     await AsyncStorage.removeItem(STORAGE_KEYS.PENDING_OPERATIONS);
-    console.log("[provider] All planeaciones cleared");
+    logger.log("[provider] All planeaciones cleared");
   };
 
   /**

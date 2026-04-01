@@ -82,7 +82,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
       title: "Exámenes",
       icon: "assignment",
       iconLibrary: "MaterialIcons",
-      color: "#FF9800",
+      color: COLORS.warning,
       route: "Examenes",
     },
     {
@@ -90,7 +90,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
       title: "Presentaciones",
       icon: "slideshow",
       iconLibrary: "MaterialIcons",
-      color: "#2196F3",
+      color: COLORS.primaryLight,
       route: "Presentaciones",
     },
     {
@@ -98,7 +98,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
       title: "Mapas Mentales",
       icon: "brain",
       iconLibrary: "FontAwesome5",
-      color: "#9C27B0",
+      color: COLORS.purple,
       route: "MapasMentales",
     },
     {
@@ -106,7 +106,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
       title: "Líneas de Tiempo",
       icon: "timeline",
       iconLibrary: "MaterialIcons",
-      color: "#4CAF50",
+      color: COLORS.success,
       route: "LineasTiempo",
     },
   ];
@@ -136,7 +136,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <Animated.ScrollView
@@ -210,7 +210,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
                 </View>
                 <View style={styles.optionFooter}>
                   <Text style={styles.optionCta}>Abrir módulo</Text>
-                  <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                  <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
                 </View>
               </TouchableOpacity>
             ))}
@@ -227,7 +227,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
           </TouchableOpacity>
 
           <View style={styles.tipCard}>
-            <MaterialIcons name="tips-and-updates" size={18} color="#0B6F86" />
+            <MaterialIcons name="tips-and-updates" size={18} color={COLORS.teal} />
             <Text style={styles.tipText}>
               Consejo: los módulos no implementados mantienen pantalla esqueleto y mostrarán aviso
               de próxima actualización.
@@ -251,7 +251,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
               activeOpacity={0.85}
             >
               <View style={[styles.iconContainer, { backgroundColor: "#1676D220" }]}>
-                <MaterialIcons name="add-task" size={28} color="#1676D2" />
+                <MaterialIcons name="add-task" size={28} color={COLORS.primary} />
               </View>
               <Text style={styles.optionTitle}>Crear Entregable</Text>
               <Text style={styles.optionDescription}>
@@ -259,7 +259,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Nuevo entregable</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
 
@@ -269,7 +269,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
               activeOpacity={0.85}
             >
               <View style={[styles.iconContainer, { backgroundColor: "#0EA5A520" }]}>
-                <MaterialIcons name="fact-check" size={28} color="#0EA5A5" />
+                <MaterialIcons name="fact-check" size={28} color={COLORS.tealLight} />
               </View>
               <Text style={styles.optionTitle}>Mis Entregables</Text>
               <Text style={styles.optionDescription}>
@@ -277,7 +277,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Ver entregables</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
 
@@ -287,7 +287,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
               activeOpacity={0.85}
             >
               <View style={[styles.iconContainer, { backgroundColor: "#0F6CC820" }]}>
-                <MaterialIcons name="file-upload" size={28} color="#0F6CC8" />
+                <MaterialIcons name="file-upload" size={28} color={COLORS.primaryDark} />
               </View>
               <Text style={styles.optionTitle}>Importar Entregables</Text>
               <Text style={styles.optionDescription}>
@@ -295,7 +295,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Importar archivo</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
 
@@ -313,7 +313,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Exportar archivo</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
           </View>
@@ -329,7 +329,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -357,29 +357,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   quickCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
     flex: 1,
   },
   quickValue: {
     fontSize: 32,
     fontWeight: "800",
-    color: "#1E2A3A",
+    color: COLORS.text,
     lineHeight: 36,
   },
   quickLabel: {
     marginTop: 2,
     fontSize: 13,
-    color: "#6B7D96",
+    color: COLORS.textTertiary,
     fontWeight: "600",
   },
   sectionLabel: {
     marginTop: 4,
     fontSize: 13,
-    color: "#5D6F86",
+    color: COLORS.textSecondary,
     fontWeight: "800",
     letterSpacing: 1.1,
   },
@@ -393,11 +393,11 @@ const styles = StyleSheet.create({
   },
   optionCard: {
     width: "100%",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     gap: 8,
     boxShadow: "0px 10px 22px rgba(33, 60, 109, 0.08)",
   },
@@ -414,11 +414,11 @@ const styles = StyleSheet.create({
   optionTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#1E2A3A",
+    color: COLORS.text,
   },
   optionDescription: {
     fontSize: 14,
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     lineHeight: 20,
   },
   methodsContainer: {
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
   methodBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#EAF4FF",
+    backgroundColor: COLORS.primaryTint,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 15,
@@ -445,13 +445,13 @@ const styles = StyleSheet.create({
     marginTop: 4,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: "#E8EEF6",
+    borderTopColor: COLORS.border,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   optionCta: {
-    color: "#1676D2",
+    color: COLORS.primary,
     fontSize: 14,
     fontWeight: "700",
   },
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 14,
@@ -474,8 +474,8 @@ const styles = StyleSheet.create({
   tipCard: {
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#BBE7F0",
-    backgroundColor: "#EAF8FB",
+    borderColor: COLORS.primaryTint,
+    backgroundColor: COLORS.primaryTint,
     padding: 12,
     flexDirection: "row",
     alignItems: "flex-start",
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
   tipText: {
     flex: 1,
     fontSize: 13,
-    color: "#0B6F86",
+    color: COLORS.teal,
     lineHeight: 18,
   },
 });

@@ -5,6 +5,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
+import logger from "../../utils/logger";
 
 /**
  * Tipo para las props de navegación
@@ -27,19 +28,19 @@ const CalificacionesScreen: React.FC<CalificacionesScreenProps> = ({ navigation 
    * Navega a registrar calificaciones
    */
   const handleRegistrarCalificaciones = (): void => {
-    console.log("Registrar calificaciones");
+    logger.log("Registrar calificaciones");
   };
 
   /**
    * Navega a ver calificaciones
    */
   const handleVerCalificaciones = (): void => {
-    console.log("Ver calificaciones");
+    logger.log("Ver calificaciones");
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -52,7 +53,7 @@ const CalificacionesScreen: React.FC<CalificacionesScreenProps> = ({ navigation 
               onPress={handleRegistrarCalificaciones}
               activeOpacity={0.7}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}>
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.success }]}>
                 <MaterialIcons name="edit-note" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Registrar Calificaciones</Text>
@@ -66,7 +67,7 @@ const CalificacionesScreen: React.FC<CalificacionesScreenProps> = ({ navigation 
               onPress={handleVerCalificaciones}
               activeOpacity={0.7}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#FF9800" }]}>
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.warning }]}>
                 <MaterialIcons name="assessment" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Consultar Calificaciones</Text>
@@ -87,7 +88,7 @@ const CalificacionesScreen: React.FC<CalificacionesScreenProps> = ({ navigation 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,

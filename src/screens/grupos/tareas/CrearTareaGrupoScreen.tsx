@@ -33,7 +33,7 @@ const CrearTareaGrupoScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <WebScrollView style={styles.content}>
@@ -149,7 +149,7 @@ const CrearTareaGrupoScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -186,9 +186,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: "#F8FBFF",
+    backgroundColor: COLORS.backgroundSoft,
     borderWidth: 1,
-    borderColor: "#DCE6F3",
+    borderColor: COLORS.borderLight,
     borderRadius: 10,
     padding: 15,
     fontSize: FONT_SIZES.medium,
@@ -211,12 +211,12 @@ const styles = StyleSheet.create({
   tipoButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#DCE6F3",
+    borderColor: COLORS.borderLight,
     flex: 1,
     minWidth: "45%",
   },
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   buttonSecondary: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.primary,
   },

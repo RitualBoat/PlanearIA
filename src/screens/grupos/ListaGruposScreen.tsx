@@ -61,10 +61,10 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+        <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#1676D2" />
+            <ActivityIndicator size="large" color={COLORS.primary} />
             <Text style={styles.loadingText}>Cargando grupos...</Text>
           </View>
         </SafeAreaView>
@@ -75,10 +75,10 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
   if (error) {
     return (
       <View style={styles.container}>
-        <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+        <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.errorContainer}>
-            <MaterialIcons name="error-outline" size={64} color="#D34553" />
+            <MaterialIcons name="error-outline" size={64} color={COLORS.danger} />
             <Text style={styles.errorTitle}>Error al cargar grupos</Text>
             <Text style={styles.errorText}>{error}</Text>
           </View>
@@ -89,7 +89,7 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
@@ -118,10 +118,10 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
                   !isOnline
                     ? "#B87424"
                     : syncStatus === "error"
-                      ? "#B12635"
+                      ? COLORS.dangerDark
                       : pendingSyncCount > 0
-                        ? "#0C5DA8"
-                        : "#0D9E70"
+                        ? COLORS.primaryDark
+                        : COLORS.successLight
                 }
               />
               <Text style={styles.syncText}>{syncLabel}</Text>
@@ -132,19 +132,19 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
               onPress={() => void sincronizarGrupos()}
               disabled={!isOnline || syncStatus === "syncing"}
             >
-              <MaterialIcons name="sync" size={16} color="#1676D2" />
+              <MaterialIcons name="sync" size={16} color={COLORS.primary} />
               <Text style={styles.syncButtonText}>Sincronizar</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.searchContainer}>
-            <MaterialIcons name="search" size={20} color="#6B7D96" />
+            <MaterialIcons name="search" size={20} color={COLORS.textTertiary} />
             <TextInput
               style={styles.searchInput}
               placeholder="Buscar grupo..."
               value={searchQuery}
               onChangeText={setSearchQuery}
-              placeholderTextColor="#6B7D96"
+              placeholderTextColor={COLORS.textTertiary}
             />
           </View>
         </View>
@@ -161,7 +161,7 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
             >
               <View style={styles.grupoHeader}>
                 <View style={styles.grupoIconContainer}>
-                  <MaterialIcons name="groups" size={26} color="#1676D2" />
+                  <MaterialIcons name="groups" size={26} color={COLORS.primary} />
                 </View>
 
                 <View style={styles.grupoInfo}>
@@ -177,7 +177,7 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
 
               <View style={styles.grupoFooter}>
                 <View style={styles.badge}>
-                  <MaterialIcons name="person" size={14} color="#1676D2" />
+                  <MaterialIcons name="person" size={14} color={COLORS.primary} />
                   <Text style={styles.badgeText}>{grupo.cantidadAlumnos} alumnos</Text>
                 </View>
 
@@ -220,7 +220,7 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: "#6B7D96",
+    color: COLORS.textTertiary,
   },
   errorContainer: {
     flex: 1,
@@ -244,13 +244,13 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#D34553",
+    color: COLORS.danger,
     marginTop: 12,
     marginBottom: 6,
   },
   errorText: {
     fontSize: 14,
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     textAlign: "center",
   },
   header: {
@@ -264,23 +264,23 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 34,
     fontWeight: "800",
-    color: "#1E2A3A",
+    color: COLORS.text,
     letterSpacing: -0.4,
   },
   subtitle: {
     marginTop: 2,
     fontSize: 15,
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     marginBottom: 10,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 12,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     minHeight: 48,
     boxShadow: "0px 8px 14px rgba(18, 44, 86, 0.06)",
   },
@@ -301,16 +301,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   syncOk: {
-    backgroundColor: "#E7F9F3",
+    backgroundColor: COLORS.successTint,
     borderColor: "#B8EAD8",
   },
   syncPending: {
-    backgroundColor: "#EAF4FF",
+    backgroundColor: COLORS.primaryTint,
     borderColor: "#CAE1FB",
   },
   syncError: {
-    backgroundColor: "#FFF1F2",
-    borderColor: "#F7CDD2",
+    backgroundColor: COLORS.errorTint,
+    borderColor: COLORS.errorTint,
   },
   syncOffline: {
     backgroundColor: "#FFF5E9",
@@ -319,15 +319,15 @@ const styles = StyleSheet.create({
   syncText: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#1E2A3A",
+    color: COLORS.text,
   },
   syncButton: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     borderWidth: 1,
-    borderColor: "#D0E2F6",
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.borderLight,
+    backgroundColor: COLORS.surface,
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -335,13 +335,13 @@ const styles = StyleSheet.create({
   syncButtonText: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#1676D2",
+    color: COLORS.primary,
   },
   searchInput: {
     flex: 1,
     marginLeft: 8,
     fontSize: 15,
-    color: "#1E2A3A",
+    color: COLORS.text,
     paddingVertical: 0,
   },
   scrollContent: {
@@ -359,10 +359,10 @@ const styles = StyleSheet.create({
   },
   grupoCard: {
     width: "100%",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
     gap: 10,
     boxShadow: "0px 10px 22px rgba(33, 60, 109, 0.08)",
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: "#EAF4FF",
+    backgroundColor: COLORS.primaryTint,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 10,
@@ -389,11 +389,11 @@ const styles = StyleSheet.create({
   grupoNombre: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#1E2A3A",
+    color: COLORS.text,
   },
   grupoMateria: {
     fontSize: 14,
-    color: "#4D5D74",
+    color: COLORS.textDark,
     marginTop: 1,
   },
   grupoDetalles: {
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
   badge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#EAF4FF",
+    backgroundColor: COLORS.primaryTint,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 14,
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 12,
-    color: "#1676D2",
+    color: COLORS.primary,
     fontWeight: "700",
   },
   estadoText: {
@@ -425,13 +425,13 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   estadoActivoBadge: {
-    backgroundColor: "#E7F9F3",
+    backgroundColor: COLORS.successTint,
   },
   estadoInactivoBadge: {
     backgroundColor: "#FFF1E7",
   },
   estadoActivoText: {
-    color: "#0D9E70",
+    color: COLORS.successLight,
   },
   estadoInactivoText: {
     color: "#C77A2B",
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#4D5D74",
+    color: COLORS.textDark,
     marginTop: 8,
   },
   emptyText: {

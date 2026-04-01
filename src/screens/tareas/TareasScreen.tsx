@@ -5,6 +5,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
+import logger from "../../utils/logger";
 
 /**
  * Tipo para las props de navegación
@@ -27,19 +28,19 @@ const TareasScreen: React.FC<TareasScreenProps> = ({ navigation }) => {
    * Navega a crear nueva tarea
    */
   const handleCrearTarea = (): void => {
-    console.log("Crear nueva tarea");
+    logger.log("Crear nueva tarea");
   };
 
   /**
    * Navega a ver tareas
    */
   const handleVerTareas = (): void => {
-    console.log("Ver tareas");
+    logger.log("Ver tareas");
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -52,7 +53,7 @@ const TareasScreen: React.FC<TareasScreenProps> = ({ navigation }) => {
               onPress={handleCrearTarea}
               activeOpacity={0.7}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#9C27B0" }]}>
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.purple }]}>
                 <MaterialIcons name="add-task" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Crear Tarea</Text>
@@ -66,7 +67,7 @@ const TareasScreen: React.FC<TareasScreenProps> = ({ navigation }) => {
               onPress={handleVerTareas}
               activeOpacity={0.7}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}>
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.primaryLight }]}>
                 <MaterialIcons name="assignment" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Mis Tareas</Text>
@@ -85,7 +86,7 @@ const TareasScreen: React.FC<TareasScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,

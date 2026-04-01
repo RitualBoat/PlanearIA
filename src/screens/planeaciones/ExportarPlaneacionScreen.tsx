@@ -21,6 +21,7 @@ import type { StackNavigationProp } from "@react-navigation/stack";
 import * as Sharing from "expo-sharing";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
 import { usePlaneaciones } from "../../sync/providers/SyncProvider";
+import { COLORS } from "../../../types";
 import {
   exportPlaneacionToPdf,
   exportPlaneacionToDocx,
@@ -178,7 +179,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <ScrollView
@@ -187,7 +188,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
         >
           <View style={styles.headerRow}>
             <TouchableOpacity style={styles.headerIconButton} onPress={() => navigation.goBack()}>
-              <MaterialIcons name="arrow-back" size={24} color="#1676D2" />
+              <MaterialIcons name="arrow-back" size={24} color={COLORS.primary} />
             </TouchableOpacity>
 
             <View style={styles.headerTitleWrap}>
@@ -196,7 +197,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
             </View>
 
             <TouchableOpacity style={styles.headerIconButton}>
-              <MaterialIcons name="more-vert" size={22} color="#7A8BA3" />
+              <MaterialIcons name="more-vert" size={22} color={COLORS.textTertiary} />
             </TouchableOpacity>
           </View>
 
@@ -298,7 +299,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
                 </View>
 
                 <View style={styles.previewBody}>
-                  <MaterialIcons name="description" size={42} color="#1676D2" />
+                  <MaterialIcons name="description" size={42} color={COLORS.primary} />
                   <Text style={styles.previewBodyText}>
                     El documento se generará con formato profesional listo para compartir o
                     imprimir.
@@ -322,12 +323,12 @@ const ExportarPlaneacionScreen: React.FC = () => {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.shareButton} onPress={handleCompartir}>
-              <MaterialIcons name="share" size={20} color="#5C6E86" />
+              <MaterialIcons name="share" size={20} color={COLORS.textSecondary} />
               <Text style={styles.shareButtonText}>Compartir</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.exportButton} onPress={handleExportar}>
-              <MaterialIcons name="download" size={20} color="#FFFFFF" />
+              <MaterialIcons name="download" size={20} color={COLORS.surface} />
               <Text style={styles.exportButtonText}>Exportar</Text>
             </TouchableOpacity>
           </View>
@@ -338,7 +339,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
         <View style={styles.overlay}>
           <View style={styles.loadingCard}>
             <View style={styles.loadingIconCircle}>
-              <MaterialIcons name="description" size={34} color="#1676D2" />
+              <MaterialIcons name="description" size={34} color={COLORS.primary} />
             </View>
             <Text style={styles.loadingTitle}>Generando archivo...</Text>
             <Text style={styles.loadingSubtitle}>
@@ -360,7 +361,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
         <View style={styles.overlay}>
           <View style={styles.successCard}>
             <View style={styles.successIconWrap}>
-              <MaterialIcons name="check" size={34} color="#FFFFFF" />
+              <MaterialIcons name="check" size={34} color={COLORS.surface} />
             </View>
             <Text style={styles.successTitle}>¡Planeación exportada!</Text>
             <Text style={styles.successSubtitle}>
@@ -369,7 +370,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
             </Text>
 
             <View style={styles.fileCard}>
-              <MaterialIcons name={formatIcon[selectedFormat]} size={22} color="#1676D2" />
+              <MaterialIcons name={formatIcon[selectedFormat]} size={22} color={COLORS.primary} />
               <View style={styles.fileCardTextWrap}>
                 <Text style={styles.fileCardTitle} numberOfLines={1}>
                   {exportedFileName ||
@@ -393,7 +394,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
                   void handleCompartir();
                 }}
               >
-                <MaterialIcons name="share" size={18} color="#5C6E86" />
+                <MaterialIcons name="share" size={18} color={COLORS.textSecondary} />
                 <Text style={styles.successSecondaryButtonText}>Compartir</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -403,7 +404,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
                   navigation.navigate("Planeaciones");
                 }}
               >
-                <MaterialIcons name="home" size={18} color="#5C6E86" />
+                <MaterialIcons name="home" size={18} color={COLORS.textSecondary} />
                 <Text style={styles.successSecondaryButtonText}>Volver al inicio</Text>
               </TouchableOpacity>
             </View>
@@ -415,7 +416,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#EEF3FA" },
+  container: { flex: 1, backgroundColor: COLORS.background },
   safeArea: { flex: 1 },
   scrollContent: {
     width: "100%",
@@ -433,13 +434,13 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
   },
   headerTitleWrap: { flex: 1 },
-  headerTitle: { fontSize: 30, fontWeight: "800", color: "#1E2A3A", letterSpacing: -0.4 },
-  headerSubtitle: { marginTop: 2, fontSize: 14, color: "#5C6E86" },
+  headerTitle: { fontSize: 30, fontWeight: "800", color: COLORS.text, letterSpacing: -0.4 },
+  headerSubtitle: { marginTop: 2, fontSize: 14, color: COLORS.textSecondary },
   mainLayout: { gap: 12 },
   mainLayoutWide: { flexDirection: "row", alignItems: "flex-start" },
   leftColumn: { gap: 12 },
@@ -447,14 +448,14 @@ const styles = StyleSheet.create({
   rightColumn: { gap: 10 },
   rightColumnWide: { width: "60%" },
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
     gap: 10,
   },
-  sectionTitle: { fontSize: 24, fontWeight: "800", color: "#1E2A3A" },
+  sectionTitle: { fontSize: 24, fontWeight: "800", color: COLORS.text },
   formatOption: {
     minHeight: 52,
     borderRadius: 12,
@@ -462,7 +463,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#EDF2F8",
     justifyContent: "center",
   },
-  formatOptionActive: { backgroundColor: "#DCE8F8", borderWidth: 1, borderColor: "#C2D6F2" },
+  formatOptionActive: {
+    backgroundColor: COLORS.borderLight,
+    borderWidth: 1,
+    borderColor: "#C2D6F2",
+  },
   formatOptionLeft: { flexDirection: "row", alignItems: "center", gap: 10 },
   radio: {
     width: 12,
@@ -470,7 +475,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: "#D6DFEA",
   },
-  radioActive: { backgroundColor: "#1676D2" },
+  radioActive: { backgroundColor: COLORS.primary },
   formatText: { fontSize: 16, color: "#3A4A5E", fontWeight: "600" },
   formatTextActive: { color: "#1D2A3A", fontWeight: "700" },
   switchRow: {
@@ -485,13 +490,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: "#DCE8F8",
+    backgroundColor: COLORS.borderLight,
   },
   readyBadgeText: { color: "#2F5A90", fontSize: 12, fontWeight: "800", letterSpacing: 0.5 },
   infoGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   infoItem: { width: "48%", gap: 2 },
-  infoLabel: { color: "#6B7D96", fontSize: 11, fontWeight: "800", letterSpacing: 0.8 },
-  infoValue: { color: "#1E2A3A", fontSize: 16, fontWeight: "700" },
+  infoLabel: { color: COLORS.textTertiary, fontSize: 11, fontWeight: "800", letterSpacing: 0.8 },
+  infoValue: { color: COLORS.text, fontSize: 16, fontWeight: "700" },
   previewBody: {
     borderRadius: 12,
     padding: 20,
@@ -501,15 +506,15 @@ const styles = StyleSheet.create({
     gap: 10,
     backgroundColor: "#E8EFF7",
   },
-  previewBodyText: { color: "#4D5D74", fontSize: 15, textAlign: "center", lineHeight: 21 },
+  previewBodyText: { color: COLORS.textDark, fontSize: 15, textAlign: "center", lineHeight: 21 },
   sectionChips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   sectionChip: {
     borderRadius: 8,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
-  sectionChipText: { color: "#4D5D74", fontSize: 12, fontWeight: "700" },
+  sectionChipText: { color: COLORS.textDark, fontSize: 12, fontWeight: "700" },
   footerActions: { gap: 10 },
   footerActionsWide: {
     flexDirection: "row",
@@ -535,7 +540,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#DDE3EC",
   },
-  shareButtonText: { color: "#5C6E86", fontSize: 16, fontWeight: "700" },
+  shareButtonText: { color: COLORS.textSecondary, fontSize: 16, fontWeight: "700" },
   exportButton: {
     minHeight: 52,
     borderRadius: 14,
@@ -544,9 +549,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
     gap: 8,
     flexDirection: "row",
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
   },
-  exportButtonText: { color: "#FFFFFF", fontSize: 16, fontWeight: "700" },
+  exportButtonText: { color: COLORS.surface, fontSize: 16, fontWeight: "700" },
   overlay: {
     flex: 1,
     alignItems: "center",
@@ -560,7 +565,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     gap: 10,
   },
   loadingIconCircle: {
@@ -569,12 +574,12 @@ const styles = StyleSheet.create({
     borderRadius: 38,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#EAF4FF",
+    backgroundColor: COLORS.primaryTint,
   },
   loadingTitle: { fontSize: 34, color: "#1D2736", fontWeight: "800", textAlign: "center" },
   loadingSubtitle: {
     fontSize: 16,
-    color: "#4D5D74",
+    color: COLORS.textDark,
     textAlign: "center",
     lineHeight: 22,
   },
@@ -588,14 +593,14 @@ const styles = StyleSheet.create({
   progressFill: {
     width: "62%",
     height: "100%",
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
   },
   successCard: {
     width: "100%",
     maxWidth: 380,
     borderRadius: 22,
     padding: 22,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     alignItems: "center",
     gap: 12,
   },
@@ -611,7 +616,7 @@ const styles = StyleSheet.create({
   successSubtitle: {
     fontSize: 16,
     lineHeight: 23,
-    color: "#4D5D74",
+    color: COLORS.textDark,
     textAlign: "center",
   },
   fileCard: {
@@ -624,18 +629,18 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   fileCardTextWrap: { flex: 1 },
-  fileCardTitle: { fontSize: 15, color: "#1E2A3A", fontWeight: "700" },
+  fileCardTitle: { fontSize: 15, color: COLORS.text, fontWeight: "700" },
   fileCardMeta: { marginTop: 2, color: "#6C7B90", fontSize: 12 },
   openButton: {
     marginTop: 4,
     width: "100%",
     minHeight: 50,
     borderRadius: 12,
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
   },
-  openButtonText: { color: "#FFFFFF", fontSize: 18, fontWeight: "800" },
+  openButtonText: { color: COLORS.surface, fontSize: 18, fontWeight: "800" },
   successActionsRow: {
     width: "100%",
     flexDirection: "row",

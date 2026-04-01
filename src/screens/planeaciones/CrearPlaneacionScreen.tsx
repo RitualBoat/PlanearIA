@@ -70,7 +70,7 @@ const CrearPlaneacionScreen: React.FC = () => {
               onPress={handleCrearDesdeCero}
               activeOpacity={0.7}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#FF9800" }]}>
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.warning }]}>
                 <MaterialIcons name="edit" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Crear desde Cero</Text>
@@ -85,7 +85,7 @@ const CrearPlaneacionScreen: React.FC = () => {
               onPress={() => navigation.navigate("GenerarPlaneacionIA")}
               activeOpacity={0.7}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#9C27B0" }]}>
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.purple }]}>
                 <MaterialIcons name="auto-awesome" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Generar con IA</Text>

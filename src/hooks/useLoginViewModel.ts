@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
 import type { LoginFormData } from "../../types";
+import logger from "../utils/logger";
 
 type Nav = StackNavigationProp<RootStackParamList, "Login">;
 
@@ -56,7 +57,7 @@ export const useLoginViewModel = (): LoginViewModel => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      console.log("[auth] Authenticated:", formData.username);
+      logger.log("[auth] Authenticated:", formData.username);
       navigation.replace("MainTabs");
     }, 2000);
   }, [formData.username, navigation]);

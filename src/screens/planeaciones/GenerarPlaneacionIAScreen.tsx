@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   previewLine: {
     flex: 1,
     height: 2,
-    backgroundColor: COLORS.secondary,
+    backgroundColor: COLORS.primaryTint,
   },
   blockCardHighlighted: {
     backgroundColor: COLORS.surface,

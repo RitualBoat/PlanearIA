@@ -36,9 +36,9 @@ const SyncIndicator: React.FC = () => {
    * Obtiene el color según el estado
    */
   const getColor = () => {
-    if (!isOnline) return "#FF9800"; // Naranja para offline
-    if (syncStatus === "error") return "#f44336"; // Rojo para error
-    if (syncStatus === "synced") return "#4CAF50"; // Verde para synced
+    if (!isOnline) return COLORS.warning; // Naranja para offline
+    if (syncStatus === "error") return COLORS.errorLight; // Rojo para error
+    if (syncStatus === "synced") return COLORS.success; // Verde para synced
     return COLORS.textSecondary; // Gris para loading
   };
 
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   offlineBadge: {
-    backgroundColor: "#FF9800",
+    backgroundColor: COLORS.warning,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,

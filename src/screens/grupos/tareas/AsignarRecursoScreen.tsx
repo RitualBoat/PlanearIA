@@ -195,11 +195,11 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
   if (successState) {
     return (
       <View style={styles.container}>
-        <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+        <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.successContainer}>
             <View style={styles.successIconWrap}>
-              <MaterialIcons name="check" size={42} color="#1676D2" />
+              <MaterialIcons name="check" size={42} color={COLORS.primary} />
             </View>
             <Text style={styles.successTitle}>Asignación completada</Text>
             <Text style={styles.successSubtitle}>
@@ -233,7 +233,7 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <WebScrollView style={styles.content}>
@@ -255,12 +255,12 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
 
           <View style={styles.actionStack}>
             <TouchableOpacity style={styles.primaryAction} onPress={() => openModal("entregable")}>
-              <MaterialIcons name="playlist-add-check" size={20} color="#FFFFFF" />
+              <MaterialIcons name="playlist-add-check" size={20} color={COLORS.surface} />
               <Text style={styles.primaryActionText}>Asignar entregable</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.secondaryAction} onPress={() => openModal("recurso")}>
-              <MaterialIcons name="note-add" size={20} color="#1676D2" />
+              <MaterialIcons name="note-add" size={20} color={COLORS.primary} />
               <Text style={styles.secondaryActionText}>Asignar recurso</Text>
             </TouchableOpacity>
           </View>
@@ -276,7 +276,7 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
 
             {isLoading ? (
               <View style={styles.loadingWrap}>
-                <ActivityIndicator size="small" color="#1676D2" />
+                <ActivityIndicator size="small" color={COLORS.primary} />
                 <Text style={styles.loadingText}>Cargando asignaciones...</Text>
               </View>
             ) : null}
@@ -321,7 +321,7 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
                 style={styles.emptyStateButton}
                 onPress={() => openModal("recurso")}
               >
-                <MaterialIcons name="add-circle-outline" size={18} color="#1B68B8" />
+                <MaterialIcons name="add-circle-outline" size={18} color={COLORS.primaryDark} />
                 <Text style={styles.emptyStateButtonText}>Asignar primer recurso</Text>
               </TouchableOpacity>
             </View>
@@ -384,7 +384,7 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
                         <MaterialIcons
                           name={selected ? "check-circle" : "radio-button-unchecked"}
                           size={22}
-                          color={selected ? "#1676D2" : "#9FB0C7"}
+                          color={selected ? COLORS.primary : "#9FB0C7"}
                         />
                       </TouchableOpacity>
                     );
@@ -473,7 +473,7 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -492,13 +492,13 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 41,
     fontWeight: "800",
-    color: "#1E2A3A",
+    color: COLORS.text,
     marginBottom: 4,
     letterSpacing: -0.4,
   },
   pageSubtitle: {
     fontSize: 24,
-    color: "#5E708A",
+    color: COLORS.textSecondary,
     marginBottom: 10,
   },
   statsRow: {
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: "#EAF0FA",
+    backgroundColor: COLORS.primaryTint,
     borderRadius: 18,
     paddingHorizontal: 14,
     paddingVertical: 14,
@@ -520,7 +520,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
   },
   statLabel: {
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     fontSize: 16,
     textTransform: "uppercase",
     fontWeight: "700",
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
   },
   primaryAction: {
     borderRadius: 14,
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
     minHeight: 50,
     paddingHorizontal: 14,
     flexDirection: "row",
@@ -543,13 +543,13 @@ const styles = StyleSheet.create({
     boxShadow: "0px 10px 20px rgba(22, 118, 210, 0.26)",
   },
   primaryActionText: {
-    color: "#FFFFFF",
+    color: COLORS.surface,
     fontWeight: "800",
     fontSize: 18,
   },
   secondaryAction: {
     borderRadius: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     minHeight: 50,
     borderWidth: 1,
     borderColor: "#D7E2F1",
@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   secondaryActionText: {
-    color: "#1B68B8",
+    color: COLORS.primaryDark,
     fontWeight: "800",
     fontSize: 18,
   },
@@ -578,7 +578,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: "800",
-    color: "#5E708A",
+    color: COLORS.textSecondary,
     textTransform: "uppercase",
     marginBottom: 10,
     letterSpacing: 0.5,
@@ -590,15 +590,15 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   loadingText: {
-    color: "#5E708A",
+    color: COLORS.textSecondary,
     fontSize: 14,
   },
   recursoItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
     borderRadius: 16,
     marginBottom: 12,
@@ -619,12 +619,12 @@ const styles = StyleSheet.create({
   recursoTitulo: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#1E2A3A",
+    color: COLORS.text,
     marginBottom: 2,
   },
   recursoMetadata: {
     fontSize: 13,
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
   },
   removeButton: {
     padding: 6,
@@ -647,9 +647,9 @@ const styles = StyleSheet.create({
   emptyStateContainer: {
     marginHorizontal: 16,
     marginBottom: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     borderRadius: 16,
     padding: 24,
     alignItems: "center",
@@ -657,13 +657,13 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     marginTop: 8,
     marginBottom: 6,
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 30,
     fontWeight: "800",
   },
   emptyStateText: {
     fontSize: 20,
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     textAlign: "center",
     lineHeight: 29,
     marginBottom: 14,
@@ -673,7 +673,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#D7E2F1",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     paddingHorizontal: 14,
     flexDirection: "row",
     alignItems: "center",
@@ -682,7 +682,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   emptyStateButtonText: {
-    color: "#1B68B8",
+    color: COLORS.primaryDark,
     fontSize: 17,
     fontWeight: "800",
   },
@@ -691,7 +691,7 @@ const styles = StyleSheet.create({
     marginBottom: 120,
     borderWidth: 1,
     borderColor: "#F2D0B2",
-    backgroundColor: "#FFF8F1",
+    backgroundColor: COLORS.warningTint,
     borderRadius: 14,
     padding: 12,
     flexDirection: "row",
@@ -716,7 +716,7 @@ const styles = StyleSheet.create({
     height: 130,
     borderRadius: 999,
     borderWidth: 10,
-    borderColor: "#FFFFFF",
+    borderColor: COLORS.surface,
     backgroundColor: "#EAF3FF",
     alignItems: "center",
     justifyContent: "center",
@@ -724,21 +724,21 @@ const styles = StyleSheet.create({
   },
   successTitle: {
     textAlign: "center",
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 46,
     fontWeight: "800",
     marginBottom: 8,
   },
   successSubtitle: {
     textAlign: "center",
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     fontSize: 18,
     marginBottom: 18,
   },
   infoCard: {
     borderWidth: 1,
     borderColor: "#F2D0B2",
-    backgroundColor: "#FFF8F1",
+    backgroundColor: COLORS.warningTint,
     borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -760,7 +760,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalCard: {
-    backgroundColor: "#F7FAFF",
+    backgroundColor: COLORS.backgroundSoft,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 16,
@@ -774,17 +774,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   modalTitle: {
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 26,
     fontWeight: "800",
   },
   searchBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#DDE7F5",
+    borderColor: COLORS.borderLight,
     paddingHorizontal: 12,
     minHeight: 46,
     marginBottom: 10,
@@ -792,7 +792,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     marginLeft: 8,
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 14,
     paddingVertical: 0,
   },
@@ -803,9 +803,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   modalItem: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#DDE7F5",
+    borderColor: COLORS.borderLight,
     borderRadius: 14,
     paddingHorizontal: 10,
     paddingVertical: 12,
@@ -815,16 +815,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   modalItemSelected: {
-    borderColor: "#1676D2",
+    borderColor: COLORS.primary,
     backgroundColor: "#EFF6FF",
   },
   modalItemTitle: {
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 16,
     fontWeight: "700",
   },
   modalItemMeta: {
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     fontSize: 13,
     marginTop: 2,
   },
@@ -848,10 +848,10 @@ const styles = StyleSheet.create({
   confirmCard: {
     marginHorizontal: 24,
     marginBottom: 140,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "#DDE7F5",
+    borderColor: COLORS.borderLight,
     paddingHorizontal: 16,
     paddingVertical: 16,
     gap: 10,
@@ -861,7 +861,7 @@ const styles = StyleSheet.create({
     maxWidth: 360,
   },
   confirmTitle: {
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 28,
     fontWeight: "800",
     textTransform: "capitalize",

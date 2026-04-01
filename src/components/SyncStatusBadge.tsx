@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useSyncPlaneaciones } from "../sync";
+import { COLORS } from "../../types";
 
 /**
  * Props del componente
@@ -48,10 +49,10 @@ const SyncStatusBadge: React.FC<SyncStatusBadgeProps> = ({
    * Obtiene el color según el estado
    */
   const getColor = (): string => {
-    if (!isOnline) return "#FF9800"; // Naranja
-    if (syncStatus === "error") return "#F44336"; // Rojo
-    if (syncStatus === "synced" && pendingCount === 0) return "#4CAF50"; // Verde
-    if (pendingCount > 0) return "#2196F3"; // Azul
+    if (!isOnline) return COLORS.warning; // Naranja
+    if (syncStatus === "error") return COLORS.errorLight; // Rojo
+    if (syncStatus === "synced" && pendingCount === 0) return COLORS.success; // Verde
+    if (pendingCount > 0) return COLORS.primaryLight; // Azul
     return "#9E9E9E"; // Gris
   };
 
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   badgeText: {
-    color: "#FFF",
+    color: COLORS.surface,
     fontSize: 10,
     fontWeight: "bold",
   },

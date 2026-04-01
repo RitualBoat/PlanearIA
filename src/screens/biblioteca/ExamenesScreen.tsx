@@ -5,6 +5,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
+import logger from "../../utils/logger";
 
 /**
  * Tipo para las props de navegación
@@ -24,20 +25,20 @@ interface ExamenesScreenProps {
  */
 const ExamenesScreen: React.FC<ExamenesScreenProps> = ({ navigation }) => {
   const handleCrearConIA = (): void => {
-    console.log("Crear examen con IA");
+    logger.log("Crear examen con IA");
   };
 
   const handleUsarPlantilla = (): void => {
-    console.log("Usar plantilla de examen");
+    logger.log("Usar plantilla de examen");
   };
 
   const handleCrearManual = (): void => {
-    console.log("Crear examen manualmente");
+    logger.log("Crear examen manualmente");
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -52,7 +53,7 @@ const ExamenesScreen: React.FC<ExamenesScreenProps> = ({ navigation }) => {
               activeOpacity={0.7}
             >
               <View style={[styles.iconContainer, { backgroundColor: "#9C27B020" }]}>
-                <MaterialIcons name="auto-awesome" size={60} color="#9C27B0" />
+                <MaterialIcons name="auto-awesome" size={60} color={COLORS.purple} />
               </View>
               <Text style={styles.optionTitle}>Generar con IA</Text>
               <Text style={styles.optionDescription}>
@@ -67,7 +68,7 @@ const ExamenesScreen: React.FC<ExamenesScreenProps> = ({ navigation }) => {
               activeOpacity={0.7}
             >
               <View style={[styles.iconContainer, { backgroundColor: "#2196F320" }]}>
-                <MaterialIcons name="dashboard" size={60} color="#2196F3" />
+                <MaterialIcons name="dashboard" size={60} color={COLORS.primaryLight} />
               </View>
               <Text style={styles.optionTitle}>Usar Plantilla</Text>
               <Text style={styles.optionDescription}>
@@ -82,7 +83,7 @@ const ExamenesScreen: React.FC<ExamenesScreenProps> = ({ navigation }) => {
               activeOpacity={0.7}
             >
               <View style={[styles.iconContainer, { backgroundColor: "#4CAF5020" }]}>
-                <MaterialIcons name="edit" size={60} color="#4CAF50" />
+                <MaterialIcons name="edit" size={60} color={COLORS.success} />
               </View>
               <Text style={styles.optionTitle}>Crear Manualmente</Text>
               <Text style={styles.optionDescription}>
@@ -121,7 +122,7 @@ const ExamenesScreen: React.FC<ExamenesScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -152,10 +153,10 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   optionCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 18,
     alignItems: "center",
     boxShadow: "0px 10px 22px rgba(33, 60, 109, 0.08)",
@@ -198,12 +199,12 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   previewCard: {
-    backgroundColor: "#f5f5f5",
+    backgroundColor: COLORS.surfaceTertiary,
     padding: 20,
     borderRadius: 10,
     marginTop: 15,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: COLORS.divider,
     borderStyle: "dashed",
   },
   previewTitle: {

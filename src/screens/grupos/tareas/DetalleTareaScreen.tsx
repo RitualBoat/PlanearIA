@@ -61,11 +61,11 @@ const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({ navigation, rou
   const getEstadoIcon = (estado: string) => {
     switch (estado) {
       case "entregada":
-        return { name: "check-circle", color: "#4CAF50" };
+        return { name: "check-circle", color: COLORS.success };
       case "pendiente":
         return { name: "schedule", color: "#FFC107" };
       case "tarde":
-        return { name: "warning", color: "#F44336" };
+        return { name: "warning", color: COLORS.errorLight };
       default:
         return { name: "help", color: COLORS.textSecondary };
     }
@@ -73,7 +73,7 @@ const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({ navigation, rou
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <WebScrollView style={styles.content}>
@@ -167,7 +167,7 @@ const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({ navigation, rou
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -179,9 +179,9 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 980,
     alignSelf: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     borderRadius: 12,
     padding: 16,
     marginBottom: 15,
@@ -217,9 +217,9 @@ const styles = StyleSheet.create({
     maxWidth: 980,
     alignSelf: "center",
     padding: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     borderRadius: 12,
     marginBottom: 15,
   },
@@ -253,9 +253,9 @@ const styles = StyleSheet.create({
   entregaItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 15,
     borderRadius: 12,
     marginBottom: 10,

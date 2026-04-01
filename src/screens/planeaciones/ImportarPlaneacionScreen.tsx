@@ -181,7 +181,7 @@ const ImportarPlaneacionScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <ScrollView
@@ -195,7 +195,7 @@ const ImportarPlaneacionScreen: React.FC = () => {
               accessibilityLabel="Regresar"
               activeOpacity={0.8}
             >
-              <MaterialIcons name="arrow-back" size={24} color="#1676D2" />
+              <MaterialIcons name="arrow-back" size={24} color={COLORS.primary} />
             </TouchableOpacity>
 
             <View style={styles.headerTitleWrap}>
@@ -208,7 +208,7 @@ const ImportarPlaneacionScreen: React.FC = () => {
               onPress={showPendingMessage}
               activeOpacity={0.8}
             >
-              <MaterialIcons name="more-vert" size={22} color="#7A8BA3" />
+              <MaterialIcons name="more-vert" size={22} color={COLORS.textTertiary} />
             </TouchableOpacity>
           </View>
 
@@ -219,7 +219,7 @@ const ImportarPlaneacionScreen: React.FC = () => {
 
                 <View style={styles.uploadZone}>
                   <View style={styles.uploadIconCircle}>
-                    <MaterialIcons name="upload-file" size={28} color="#1676D2" />
+                    <MaterialIcons name="upload-file" size={28} color={COLORS.primary} />
                   </View>
                   <Text style={styles.uploadTitle}>Arrastra o selecciona un archivo</Text>
                   <Text style={styles.uploadSubtitle}>Formatos permitidos: PDF, DOCX</Text>
@@ -230,13 +230,13 @@ const ImportarPlaneacionScreen: React.FC = () => {
                   onPress={handleSelectFile}
                   activeOpacity={0.9}
                 >
-                  <MaterialIcons name="add" size={20} color="#FFFFFF" />
+                  <MaterialIcons name="add" size={20} color={COLORS.surface} />
                   <Text style={styles.primaryButtonText}>Seleccionar archivo</Text>
                 </TouchableOpacity>
 
                 {selectedFileName ? (
                   <View style={styles.selectedFileCard}>
-                    <MaterialIcons name="description" size={18} color="#1676D2" />
+                    <MaterialIcons name="description" size={18} color={COLORS.primary} />
                     <View style={styles.selectedFileTextWrap}>
                       <Text style={styles.selectedFileName}>{selectedFileName}</Text>
                       <Text style={styles.selectedFileMeta}>{selectedFileType || "Documento"}</Text>
@@ -246,11 +246,11 @@ const ImportarPlaneacionScreen: React.FC = () => {
 
                 <View style={styles.formatChipsRow}>
                   <View style={styles.formatChip}>
-                    <MaterialIcons name="picture-as-pdf" size={16} color="#1676D2" />
+                    <MaterialIcons name="picture-as-pdf" size={16} color={COLORS.primary} />
                     <Text style={styles.formatChipText}>PDF</Text>
                   </View>
                   <View style={styles.formatChip}>
-                    <MaterialIcons name="description" size={16} color="#1676D2" />
+                    <MaterialIcons name="description" size={16} color={COLORS.primary} />
                     <Text style={styles.formatChipText}>DOCX</Text>
                   </View>
                 </View>
@@ -258,7 +258,7 @@ const ImportarPlaneacionScreen: React.FC = () => {
 
               {importError ? (
                 <View style={styles.errorCard}>
-                  <MaterialIcons name="warning-amber" size={24} color="#D34553" />
+                  <MaterialIcons name="warning-amber" size={24} color={COLORS.danger} />
                   <Text style={styles.errorText}>{importError}</Text>
                 </View>
               ) : null}
@@ -271,7 +271,7 @@ const ImportarPlaneacionScreen: React.FC = () => {
                         isProcessing ? "sync" : selectedFileName ? "check-circle" : "hourglass-top"
                       }
                       size={22}
-                      color={isProcessing ? "#1676D2" : selectedFileName ? "#0BA5A5" : "#6B7D96"}
+                      color={isProcessing ? COLORS.primary : selectedFileName ? "#0BA5A5" : COLORS.textTertiary}
                     />
                   </View>
                   <View style={styles.stateTextWrap}>
@@ -341,7 +341,7 @@ const ImportarPlaneacionScreen: React.FC = () => {
                 </View>
 
                 <View style={styles.structureTitleRow}>
-                  <MaterialIcons name="format-list-bulleted" size={18} color="#6B7D96" />
+                  <MaterialIcons name="format-list-bulleted" size={18} color={COLORS.textTertiary} />
                   <Text style={styles.structureTitle}>Estructura de Actividades</Text>
                 </View>
 
@@ -375,7 +375,7 @@ const ImportarPlaneacionScreen: React.FC = () => {
                 </View>
 
                 <View style={styles.infoNotice}>
-                  <MaterialIcons name="info" size={20} color="#1676D2" />
+                  <MaterialIcons name="info" size={20} color={COLORS.primary} />
                   <Text style={styles.infoNoticeText}>
                     {importDraft
                       ? `Se extrajeron ${importDraft.sourceTextLength} caracteres. Los campos vacíos quedan listos para edición manual.`
@@ -396,7 +396,7 @@ const ImportarPlaneacionScreen: React.FC = () => {
               disabled={!selectedFileName || isProcessing}
               activeOpacity={0.9}
             >
-              <MaterialIcons name="save-alt" size={22} color="#FFFFFF" />
+              <MaterialIcons name="save-alt" size={22} color={COLORS.surface} />
               <Text style={styles.primaryButtonLargeText}>Importar y continuar</Text>
             </TouchableOpacity>
 
@@ -417,7 +417,7 @@ const ImportarPlaneacionScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -442,9 +442,9 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
   },
   headerTitleWrap: {
     flex: 1,
@@ -452,13 +452,13 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 30,
     fontWeight: "800",
-    color: "#1E2A3A",
+    color: COLORS.text,
     letterSpacing: -0.4,
   },
   headerSubtitle: {
     marginTop: 2,
     fontSize: 14,
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
   },
   mainLayout: {
     gap: 12,
@@ -480,10 +480,10 @@ const styles = StyleSheet.create({
     width: "65%",
   },
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
     gap: 10,
     boxShadow: "0px 12px 22px rgba(18, 44, 86, 0.08)",
@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#1E2A3A",
+    color: COLORS.text,
   },
   uploadZone: {
     borderWidth: 1,
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 14,
     gap: 7,
-    backgroundColor: "#F8FBFF",
+    backgroundColor: COLORS.backgroundSoft,
   },
   uploadIconCircle: {
     width: 68,
@@ -515,26 +515,26 @@ const styles = StyleSheet.create({
   },
   uploadTitle: {
     textAlign: "center",
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 16,
     fontWeight: "700",
   },
   uploadSubtitle: {
     textAlign: "center",
-    color: "#6B7D96",
+    color: COLORS.textTertiary,
     fontSize: 13,
   },
   primaryButton: {
     minHeight: 52,
     borderRadius: 12,
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
     gap: 8,
   },
   primaryButtonText: {
-    color: "#FFFFFF",
+    color: COLORS.surface,
     fontSize: 15,
     fontWeight: "700",
   },
@@ -542,7 +542,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#D4E5F7",
-    backgroundColor: "#F2F8FF",
+    backgroundColor: COLORS.backgroundSoft,
     padding: 10,
     flexDirection: "row",
     alignItems: "center",
@@ -553,12 +553,12 @@ const styles = StyleSheet.create({
     gap: 1,
   },
   selectedFileName: {
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 13,
     fontWeight: "700",
   },
   selectedFileMeta: {
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     fontSize: 12,
   },
   formatChipsRow: {
@@ -572,10 +572,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#EAF4FF",
+    backgroundColor: COLORS.primaryTint,
   },
   formatChipText: {
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 12,
     fontWeight: "700",
   },
@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     flex: 1,
-    color: "#B12635",
+    color: COLORS.dangerDark,
     fontSize: 13,
     lineHeight: 19,
     fontWeight: "600",
@@ -613,7 +613,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#EAF4FF",
+    backgroundColor: COLORS.primaryTint,
   },
   stateIconCircleMuted: {
     backgroundColor: "#DEF6F5",
@@ -623,23 +623,23 @@ const styles = StyleSheet.create({
   },
   stateTitle: {
     fontSize: 15,
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontWeight: "700",
   },
   stateSubtitle: {
     marginTop: 1,
     fontSize: 13,
-    color: "#6B7D96",
+    color: COLORS.textTertiary,
   },
   stateTitleMuted: {
     fontSize: 15,
-    color: "#4D5D74",
+    color: COLORS.textDark,
     fontWeight: "700",
   },
   stateSubtitleMuted: {
     marginTop: 1,
     fontSize: 13,
-    color: "#6B7D96",
+    color: COLORS.textTertiary,
   },
   previewHeaderRow: {
     flexDirection: "row",
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   previewHeaderTitle: {
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 24,
     fontWeight: "800",
   },
@@ -658,35 +658,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   badgeDraftText: {
-    color: "#1676D2",
+    color: COLORS.primary,
     fontSize: 11,
     fontWeight: "800",
     letterSpacing: 0.7,
   },
   fieldLabel: {
-    color: "#6B7D96",
+    color: COLORS.textTertiary,
     fontSize: 12,
     fontWeight: "700",
     letterSpacing: 0.4,
   },
   fieldValueCard: {
     borderRadius: 12,
-    backgroundColor: "#F7FAFE",
+    backgroundColor: COLORS.backgroundSoft,
     minHeight: 50,
     paddingHorizontal: 12,
     justifyContent: "center",
   },
   fieldValueCardAccent: {
     borderRadius: 12,
-    backgroundColor: "#F7FAFE",
+    backgroundColor: COLORS.backgroundSoft,
     minHeight: 50,
     paddingHorizontal: 12,
     justifyContent: "center",
     borderLeftWidth: 4,
-    borderLeftColor: "#1676D2",
+    borderLeftColor: COLORS.primary,
   },
   fieldValueText: {
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 15,
     fontWeight: "600",
   },
@@ -697,13 +697,13 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   structureTitle: {
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 15,
     fontWeight: "700",
   },
   activityCard: {
     borderRadius: 12,
-    backgroundColor: "#F7FAFE",
+    backgroundColor: COLORS.backgroundSoft,
     padding: 10,
     flexDirection: "row",
     gap: 10,
@@ -712,12 +712,12 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
   },
   activityIndexText: {
-    color: "#FFFFFF",
+    color: COLORS.surface,
     fontSize: 12,
     fontWeight: "700",
   },
@@ -726,12 +726,12 @@ const styles = StyleSheet.create({
     gap: 1,
   },
   activityTitle: {
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 14,
     fontWeight: "700",
   },
   activityDesc: {
-    color: "#4D5D74",
+    color: COLORS.textDark,
     fontSize: 12,
     lineHeight: 17,
   },
@@ -750,28 +750,28 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 12,
     padding: 10,
-    backgroundColor: "#EAF4FF",
+    backgroundColor: COLORS.primaryTint,
     gap: 4,
   },
   miniCardTitle: {
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 13,
     fontWeight: "700",
   },
   miniCardText: {
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     fontSize: 12,
   },
   infoNotice: {
     borderRadius: 12,
     padding: 11,
-    backgroundColor: "#EAF4FF",
+    backgroundColor: COLORS.primaryTint,
     flexDirection: "row",
     gap: 8,
   },
   infoNoticeText: {
     flex: 1,
-    color: "#1676D2",
+    color: COLORS.primary,
     fontSize: 12,
     fontWeight: "700",
     lineHeight: 16,
@@ -786,7 +786,7 @@ const styles = StyleSheet.create({
   primaryButtonLarge: {
     minHeight: 54,
     borderRadius: 14,
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
@@ -797,7 +797,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   primaryButtonLargeText: {
-    color: "#FFFFFF",
+    color: COLORS.surface,
     fontSize: 16,
     fontWeight: "700",
   },
@@ -808,11 +808,11 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: "#D6E0EE",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     paddingHorizontal: 24,
   },
   cancelButtonText: {
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     fontSize: 15,
     fontWeight: "700",
   },

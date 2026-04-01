@@ -3,6 +3,8 @@ import { useNavigation } from "@react-navigation/native";
 import { CommonActions } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
+import { COLORS } from "../../types";
+import logger from "../utils/logger";
 
 type Nav = StackNavigationProp<RootStackParamList>;
 
@@ -37,28 +39,28 @@ export const useHomeViewModel = (): HomeViewModel => {
         id: "planeaciones",
         title: "Planeaciones",
         iconImage: require("../../assets/planeacionesIco.png"),
-        color: "#2196F3",
+        color: COLORS.primaryLight,
         route: "Planeaciones" as keyof RootStackParamList,
       },
       {
         id: "grupos",
         title: "Grupos",
         iconImage: require("../../assets/alumnosIco.png"),
-        color: "#4CAF50",
+        color: COLORS.success,
         route: "Grupos" as keyof RootStackParamList,
       },
       {
         id: "recursosDidacticos",
         title: "Recursos Didácticos",
         iconImage: require("../../assets/recursosIco.png"),
-        color: "#9C27B0",
+        color: COLORS.purple,
         route: "RecursosDidacticos" as keyof RootStackParamList,
       },
       {
         id: "cuenta",
         title: "Cuenta",
         iconImage: require("../../assets/CuentaYseguridadIco.png"),
-        color: "#F44336",
+        color: COLORS.errorLight,
         route: "Cuenta" as keyof RootStackParamList,
       },
     ],
@@ -79,7 +81,7 @@ export const useHomeViewModel = (): HomeViewModel => {
   }, [navigation]);
 
   const handleProfile = useCallback(() => {
-    console.log("[home] Navigate to profile");
+    logger.log("[home] Navigate to profile");
     setMenuVisible(false);
   }, []);
 

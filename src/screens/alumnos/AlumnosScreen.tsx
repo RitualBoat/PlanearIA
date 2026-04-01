@@ -41,7 +41,7 @@ const AlumnosScreen: React.FC<AlumnosScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
       <BottomNavBar currentScreen="Alumnos" showBackButton={false} />
 
       <SafeAreaView style={styles.safeArea}>
@@ -55,7 +55,7 @@ const AlumnosScreen: React.FC<AlumnosScreenProps> = ({ navigation }) => {
               onPress={handleAgregarAlumno}
               activeOpacity={0.7}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#4CAF50" }]}>
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.success }]}>
                 <MaterialIcons name="person-add" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Agregar Alumno</Text>
@@ -69,7 +69,7 @@ const AlumnosScreen: React.FC<AlumnosScreenProps> = ({ navigation }) => {
               onPress={handleVerAlumnos}
               activeOpacity={0.7}
             >
-              <View style={[styles.iconContainer, { backgroundColor: "#2196F3" }]}>
+              <View style={[styles.iconContainer, { backgroundColor: COLORS.primaryLight }]}>
                 <MaterialIcons name="groups" size={60} color="white" />
               </View>
               <Text style={styles.optionTitle}>Mis Alumnos</Text>
@@ -90,7 +90,7 @@ const AlumnosScreen: React.FC<AlumnosScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,

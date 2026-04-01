@@ -8,7 +8,7 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
-import { Evaluacion, TipoEvaluacion } from "../../types";
+import { COLORS, Evaluacion, TipoEvaluacion } from "../../types";
 
 interface EvaluacionEditorProps {
   evaluaciones: Evaluacion[];
@@ -108,11 +108,11 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
 
   const getTipoBadgeColor = (tipo: TipoEvaluacion) => {
     const colores: Record<TipoEvaluacion, string> = {
-      [TipoEvaluacion.EXAMEN]: "#f44336",
-      [TipoEvaluacion.PROYECTO]: "#9c27b0",
-      [TipoEvaluacion.TAREA]: "#2196F3",
-      [TipoEvaluacion.PRESENTACION]: "#ff9800",
-      [TipoEvaluacion.PRACTICA]: "#4caf50",
+      [TipoEvaluacion.EXAMEN]: COLORS.errorLight,
+      [TipoEvaluacion.PROYECTO]: COLORS.purple,
+      [TipoEvaluacion.TAREA]: COLORS.primaryLight,
+      [TipoEvaluacion.PRESENTACION]: COLORS.warning,
+      [TipoEvaluacion.PRACTICA]: COLORS.success,
       [TipoEvaluacion.PARTICIPACION]: "#00bcd4",
       [TipoEvaluacion.ENSAYO]: "#795548",
       [TipoEvaluacion.INVESTIGACION]: "#607d8b",
@@ -239,7 +239,7 @@ export const EvaluacionEditor: React.FC<EvaluacionEditorProps> = ({
                               borderColor:
                                 evaluacion.tipo === tipo
                                   ? getTipoBadgeColor(tipo)
-                                  : "#ddd",
+                                  : COLORS.divider,
                             },
                           ]}
                           onPress={() =>
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333",
+    color: COLORS.text,
   },
   porcentajeBadge: {
     paddingHorizontal: 16,
@@ -442,10 +442,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   porcentajeTextValido: {
-    color: "#4caf50",
+    color: COLORS.success,
   },
   porcentajeTextInvalido: {
-    color: "#f44336",
+    color: COLORS.errorLight,
   },
   warningBox: {
     backgroundColor: "#fff3cd",
@@ -464,10 +464,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   evaluacionCard: {
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.surface,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: COLORS.divider,
     marginBottom: 12,
     overflow: "hidden",
   },
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   tipoBadgeText: {
-    color: "#fff",
+    color: COLORS.surface,
     fontSize: 12,
     fontWeight: "600",
   },
@@ -500,16 +500,16 @@ const styles = StyleSheet.create({
   evaluacionNombre: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#333",
+    color: COLORS.text,
     marginBottom: 2,
   },
   evaluacionDetalle: {
     fontSize: 12,
-    color: "#666",
+    color: COLORS.textMuted,
   },
   expandIcon: {
     fontSize: 16,
-    color: "#666",
+    color: COLORS.textMuted,
     marginLeft: 8,
   },
   evaluacionContent: {
@@ -521,16 +521,16 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#333",
+    color: COLORS.text,
     marginBottom: 6,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: COLORS.divider,
     borderRadius: 6,
     padding: 10,
     fontSize: 14,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.surface,
   },
   textArea: {
     minHeight: 70,
@@ -546,18 +546,18 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: "#ddd",
+    borderColor: COLORS.divider,
   },
   tipoOptionSelected: {
     borderWidth: 2,
   },
   tipoOptionText: {
     fontSize: 12,
-    color: "#666",
+    color: COLORS.textMuted,
   },
   tipoOptionTextSelected: {
     fontWeight: "600",
-    color: "#333",
+    color: COLORS.text,
   },
   row: {
     flexDirection: "row",
@@ -572,26 +572,26 @@ const styles = StyleSheet.create({
   numberButton: {
     width: 32,
     height: 32,
-    backgroundColor: "#e3f2fd",
+    backgroundColor: COLORS.primaryTint,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
   },
   numberButtonText: {
     fontSize: 18,
-    color: "#2196F3",
+    color: COLORS.primaryLight,
     fontWeight: "600",
   },
   numberDisplay: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#333",
+    color: COLORS.text,
     minWidth: 40,
     textAlign: "center",
   },
   numberInput: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: COLORS.divider,
     borderRadius: 6,
     padding: 6,
     fontSize: 16,
@@ -607,7 +607,7 @@ const styles = StyleSheet.create({
   },
   bulletPoint: {
     fontSize: 20,
-    color: "#666",
+    color: COLORS.textMuted,
     marginTop: 8,
   },
   listInput: {
@@ -615,18 +615,18 @@ const styles = StyleSheet.create({
   },
   deleteItemButton: {
     fontSize: 20,
-    color: "#f44336",
+    color: COLORS.errorLight,
     padding: 8,
   },
   addButton: {
     padding: 10,
-    backgroundColor: "#e3f2fd",
+    backgroundColor: COLORS.primaryTint,
     borderRadius: 6,
     alignItems: "center",
     marginTop: 4,
   },
   addButtonText: {
-    color: "#2196F3",
+    color: COLORS.primaryLight,
     fontWeight: "600",
     fontSize: 13,
   },
@@ -638,17 +638,17 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   deleteButtonText: {
-    color: "#f44336",
+    color: COLORS.errorLight,
     fontWeight: "600",
   },
   agregarButton: {
     padding: 16,
-    backgroundColor: "#2196F3",
+    backgroundColor: COLORS.primaryLight,
     borderRadius: 8,
     alignItems: "center",
   },
   agregarButtonText: {
-    color: "#fff",
+    color: COLORS.surface,
     fontSize: 16,
     fontWeight: "600",
   },

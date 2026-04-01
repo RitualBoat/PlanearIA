@@ -124,7 +124,7 @@ const TabContent: React.FC<{
                       style={styles.removeAlumnoButton}
                       onPress={() => openRemoveStudentModal(alumno)}
                     >
-                      <MaterialIcons name="person-remove" size={16} color="#C62828" />
+                      <MaterialIcons name="person-remove" size={16} color={COLORS.error} />
                       <Text style={styles.removeAlumnoButtonText}>Quitar</Text>
                     </TouchableOpacity>
                   </View>
@@ -289,7 +289,7 @@ const TabContent: React.FC<{
                     onPress={() => navigateDetalleTarea(tarea.id)}
                   >
                     <View style={styles.tareaHeader}>
-                      <MaterialIcons name="assignment" size={24} color="#FF9800" />
+                      <MaterialIcons name="assignment" size={24} color={COLORS.warning} />
                       <View style={styles.tareaInfo}>
                         <Text style={styles.tareaTitulo}>{tarea.titulo}</Text>
                         <Text style={styles.tareaMetadata}>
@@ -336,7 +336,7 @@ const TabContent: React.FC<{
               <StatCard
                 label="PROMEDIO"
                 value={stats.promedioGeneral.toFixed(1)}
-                accentColor="#1676D2"
+                accentColor={COLORS.primary}
                 trend={stats.promedioGeneral >= 8 ? "up" : "flat"}
                 footerText="Meta: 8.0"
               />
@@ -360,7 +360,7 @@ const TabContent: React.FC<{
               <StatCard
                 label="ENTREGAS"
                 value={`${Math.round(stats.indiceEntregasATiempo)}%`}
-                accentColor="#F57C00"
+                accentColor={COLORS.warning}
                 trend={stats.indiceEntregasATiempo >= 70 ? "up" : "down"}
                 footerText={`${Math.round(completionRatio)}% avance`}
               />
@@ -370,7 +370,7 @@ const TabContent: React.FC<{
               <TrendMiniChart
                 title="Evolución del promedio"
                 subtitle={`${stats.promedioGeneral.toFixed(1)} / 10 actual`}
-                color="#1676D2"
+                color={COLORS.primary}
                 bars={[
                   Math.max(10, avgRaw - 10),
                   Math.max(10, avgRaw - 7),
@@ -382,7 +382,7 @@ const TabContent: React.FC<{
               <TrendMiniChart
                 title="Cumplimiento de tareas"
                 subtitle={`${Math.round(stats.indiceEntregasATiempo)}% a tiempo`}
-                color="#F57C00"
+                color={COLORS.warning}
                 bars={[
                   Math.max(10, stats.indiceEntregasATiempo - 20),
                   Math.max(10, stats.indiceEntregasATiempo - 14),
@@ -407,7 +407,7 @@ const TabContent: React.FC<{
 
             <View style={styles.openReportButtonContainer}>
               <TouchableOpacity style={styles.openReportButton} onPress={navigateReportesGrupo}>
-                <MaterialIcons name="insights" size={18} color="#FFFFFF" />
+                <MaterialIcons name="insights" size={18} color={COLORS.surface} />
                 <Text style={styles.openReportButtonText}>Abrir reporte completo</Text>
               </TouchableOpacity>
             </View>
@@ -432,7 +432,7 @@ const TabContent: React.FC<{
                 <View>
                   <Text style={styles.tabTitle}>Notas personales</Text>
                   <View style={styles.notesPrivateRow}>
-                    <MaterialIcons name="lock-outline" size={14} color="#71829A" />
+                    <MaterialIcons name="lock-outline" size={14} color={COLORS.textTertiary} />
                     <Text style={styles.notesPrivateText}>Solo visible para ti</Text>
                   </View>
                 </View>
@@ -642,7 +642,7 @@ const DetalleGrupoScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         {/* Header con info del grupo */}
@@ -650,7 +650,7 @@ const DetalleGrupoScreen: React.FC = () => {
           <Text style={styles.grupoNombre}>{grupoNombre}</Text>
           <Text style={styles.grupoId}>ID: {grupoId}</Text>
           <TouchableOpacity style={styles.editarButton} onPress={navigateEditarGrupo}>
-            <MaterialIcons name="edit" size={16} color="#1676D2" />
+            <MaterialIcons name="edit" size={16} color={COLORS.primary} />
             <Text style={styles.editarButtonText}>Editar grupo</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.exportarButton} onPress={handleExport}>
@@ -658,7 +658,7 @@ const DetalleGrupoScreen: React.FC = () => {
             <Text style={styles.exportarButtonText}>Exportar grupo</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.eliminarButton} onPress={openDeleteModal}>
-            <MaterialIcons name="delete-outline" size={16} color="#C62828" />
+            <MaterialIcons name="delete-outline" size={16} color={COLORS.error} />
             <Text style={styles.eliminarButtonText}>Eliminar grupo</Text>
           </TouchableOpacity>
         </View>
@@ -690,14 +690,14 @@ const DetalleGrupoScreen: React.FC = () => {
 
         {isLoadingData ? (
           <View style={styles.inlineState}>
-            <ActivityIndicator size="small" color="#1676D2" />
+            <ActivityIndicator size="small" color={COLORS.primary} />
             <Text style={styles.inlineStateText}>Cargando datos reales del grupo...</Text>
           </View>
         ) : null}
 
         {!isLoadingData && loadError ? (
           <View style={styles.inlineStateError}>
-            <MaterialIcons name="error-outline" size={18} color="#B12635" />
+            <MaterialIcons name="error-outline" size={18} color={COLORS.dangerDark} />
             <Text style={styles.inlineStateErrorText}>{loadError}</Text>
           </View>
         ) : null}
@@ -746,7 +746,7 @@ const DetalleGrupoScreen: React.FC = () => {
 
               <View style={styles.impactCard}>
                 <View style={styles.impactRow}>
-                  <MaterialIcons name="info-outline" size={18} color="#1676D2" />
+                  <MaterialIcons name="info-outline" size={18} color={COLORS.primary} />
                   <Text style={styles.impactText}>
                     El alumno seguirá existiendo en el sistema y podrá agregarse de nuevo.
                   </Text>
@@ -775,9 +775,9 @@ const DetalleGrupoScreen: React.FC = () => {
                   disabled={isUnlinkingStudent}
                 >
                   {isUnlinkingStudent ? (
-                    <ActivityIndicator size="small" color="#FFFFFF" />
+                    <ActivityIndicator size="small" color={COLORS.surface} />
                   ) : (
-                    <MaterialIcons name="person-remove" size={16} color="#FFFFFF" />
+                    <MaterialIcons name="person-remove" size={16} color={COLORS.surface} />
                   )}
                   <Text style={styles.deleteModalButtonText}>
                     {isUnlinkingStudent ? "Quitando..." : "Quitar del grupo"}
@@ -827,7 +827,7 @@ const DetalleGrupoScreen: React.FC = () => {
                             onPress={() => toggleStudentSelection(student.id)}
                           >
                             <View style={styles.studentAvatar}>
-                              <MaterialIcons name="person" size={16} color="#1676D2" />
+                              <MaterialIcons name="person" size={16} color={COLORS.primary} />
                             </View>
                             <View style={{ flex: 1 }}>
                               <Text
@@ -838,7 +838,7 @@ const DetalleGrupoScreen: React.FC = () => {
                             <MaterialIcons
                               name={selected ? "check-circle" : "radio-button-unchecked"}
                               size={22}
-                              color={selected ? "#1676D2" : "#A8B8CF"}
+                              color={selected ? COLORS.primary : "#A8B8CF"}
                             />
                           </TouchableOpacity>
                         );
@@ -926,7 +926,7 @@ const DetalleGrupoScreen: React.FC = () => {
           <View style={styles.modalBackdrop}>
             <View style={styles.successCard}>
               <View style={styles.successIcon}>
-                <MaterialIcons name="check" size={26} color="#FFFFFF" />
+                <MaterialIcons name="check" size={26} color={COLORS.surface} />
               </View>
               <Text style={styles.successTitle}>¡Todo listo!</Text>
               <Text style={styles.successText}>
@@ -954,15 +954,15 @@ const DetalleGrupoScreen: React.FC = () => {
 
               <View style={styles.impactCard}>
                 <View style={styles.impactRow}>
-                  <MaterialIcons name="group" size={18} color="#1676D2" />
+                  <MaterialIcons name="group" size={18} color={COLORS.primary} />
                   <Text style={styles.impactText}>Alumnos asociados: {cantidadAlumnos}</Text>
                 </View>
                 <View style={styles.impactRow}>
-                  <MaterialIcons name="assignment" size={18} color="#1676D2" />
+                  <MaterialIcons name="assignment" size={18} color={COLORS.primary} />
                   <Text style={styles.impactText}>Tareas asociadas: 12</Text>
                 </View>
                 <View style={styles.impactRow}>
-                  <MaterialIcons name="history" size={18} color="#1676D2" />
+                  <MaterialIcons name="history" size={18} color={COLORS.primary} />
                   <Text style={styles.impactText}>Registros relacionados: 8</Text>
                 </View>
               </View>
@@ -973,7 +973,7 @@ const DetalleGrupoScreen: React.FC = () => {
                 activeOpacity={0.8}
               >
                 <View style={[styles.checkbox, deleteConfirmed && styles.checkboxActive]}>
-                  {deleteConfirmed && <MaterialIcons name="check" size={14} color="#FFFFFF" />}
+                  {deleteConfirmed && <MaterialIcons name="check" size={14} color={COLORS.surface} />}
                 </View>
                 <Text style={styles.confirmText}>
                   Confirmo que entiendo que esta acción no se puede deshacer.
@@ -1000,9 +1000,9 @@ const DetalleGrupoScreen: React.FC = () => {
                   disabled={!deleteConfirmed || isDeleting}
                 >
                   {isDeleting ? (
-                    <ActivityIndicator size="small" color="#FFFFFF" />
+                    <ActivityIndicator size="small" color={COLORS.surface} />
                   ) : (
-                    <MaterialIcons name="delete-forever" size={16} color="#FFFFFF" />
+                    <MaterialIcons name="delete-forever" size={16} color={COLORS.surface} />
                   )}
                   <Text style={styles.deleteModalButtonText}>
                     {isDeleting ? "Eliminando..." : "Eliminar grupo definitivamente"}
@@ -1023,26 +1023,26 @@ const DetalleGrupoScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
   },
   header: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderBottomWidth: 1,
-    borderBottomColor: "#E3EAF4",
+    borderBottomColor: COLORS.border,
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
   grupoNombre: {
     fontSize: FONT_SIZES.large,
     fontWeight: "bold",
-    color: "#1E2A3A",
+    color: COLORS.text,
   },
   grupoId: {
     fontSize: FONT_SIZES.small,
-    color: "#6B7D96",
+    color: COLORS.textTertiary,
     marginTop: 4,
   },
   editarButton: {
@@ -1052,14 +1052,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
     borderWidth: 1,
-    borderColor: "#CFE2F7",
-    backgroundColor: "#F5FAFF",
+    borderColor: COLORS.primaryTint,
+    backgroundColor: COLORS.backgroundSoft,
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
   editarButtonText: {
-    color: "#1676D2",
+    color: COLORS.primary,
     fontSize: 13,
     fontWeight: "700",
   },
@@ -1088,21 +1088,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
     borderWidth: 1,
-    borderColor: "#F5C2C7",
+    borderColor: COLORS.errorTint,
     backgroundColor: "#FFF5F6",
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
   eliminarButtonText: {
-    color: "#C62828",
+    color: COLORS.error,
     fontSize: 13,
     fontWeight: "700",
   },
   tabsContainer: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderBottomWidth: 1,
-    borderBottomColor: "#E3EAF4",
+    borderBottomColor: COLORS.border,
   },
   tabsContent: {
     paddingHorizontal: 10,
@@ -1116,7 +1116,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   activeTab: {
-    backgroundColor: "#EAF4FF",
+    backgroundColor: COLORS.primaryTint,
   },
   tabLabel: {
     fontSize: FONT_SIZES.small,
@@ -1135,8 +1135,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 10,
     borderWidth: 1,
-    borderColor: "#CFE2F7",
-    backgroundColor: "#F2F8FF",
+    borderColor: COLORS.primaryTint,
+    backgroundColor: COLORS.backgroundSoft,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -1146,15 +1146,15 @@ const styles = StyleSheet.create({
   },
   inlineStateText: {
     fontSize: FONT_SIZES.small,
-    color: "#0C5DA8",
+    color: COLORS.primaryDark,
     fontWeight: "600",
   },
   inlineStateError: {
     marginHorizontal: 16,
     marginTop: 10,
     borderWidth: 1,
-    borderColor: "#F7CDD2",
-    backgroundColor: "#FFF1F2",
+    borderColor: COLORS.errorTint,
+    backgroundColor: COLORS.errorTint,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -1164,7 +1164,7 @@ const styles = StyleSheet.create({
   },
   inlineStateErrorText: {
     fontSize: FONT_SIZES.small,
-    color: "#B12635",
+    color: COLORS.dangerDark,
     fontWeight: "700",
   },
   tabContent: {
@@ -1186,9 +1186,9 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: FONT_SIZES.medium,
     color: COLORS.textSecondary,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
@@ -1216,9 +1216,9 @@ const styles = StyleSheet.create({
   alumnoItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
     borderRadius: 12,
     marginBottom: 10,
@@ -1234,7 +1234,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   alumnoControl: {
-    color: "#6B7D96",
+    color: COLORS.textTertiary,
     fontSize: FONT_SIZES.small,
     marginTop: 2,
   },
@@ -1243,14 +1243,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 4,
     borderWidth: 1,
-    borderColor: "#F7CDD2",
+    borderColor: COLORS.errorTint,
     backgroundColor: "#FFF5F6",
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 7,
   },
   removeAlumnoButtonText: {
-    color: "#C62828",
+    color: COLORS.error,
     fontSize: 13,
     fontWeight: "700",
   },
@@ -1260,9 +1260,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   statCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 18,
     borderRadius: 12,
     alignItems: "center",
@@ -1288,9 +1288,9 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   comentarioItem: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
     borderRadius: 12,
     marginBottom: 10,
@@ -1357,7 +1357,7 @@ const styles = StyleSheet.create({
   },
   openReportButton: {
     borderRadius: 10,
-    backgroundColor: "#0C63B8",
+    backgroundColor: COLORS.primaryDark,
     paddingVertical: 12,
     paddingHorizontal: 14,
     flexDirection: "row",
@@ -1366,14 +1366,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   openReportButtonText: {
-    color: "#FFFFFF",
+    color: COLORS.surface,
     fontWeight: "800",
     fontSize: 14,
   },
   notesSuggestionCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderLeftWidth: 4,
-    borderLeftColor: "#1676D2",
+    borderLeftColor: COLORS.primary,
     borderWidth: 1,
     borderColor: "#DCE8F6",
     borderRadius: 14,
@@ -1397,10 +1397,10 @@ const styles = StyleSheet.create({
     lineHeight: 23,
   },
   notesCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 16,
     boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
   },
@@ -1418,7 +1418,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   notesPrivateText: {
-    color: "#71829A",
+    color: COLORS.textTertiary,
     fontSize: 14,
     fontWeight: "600",
   },
@@ -1439,7 +1439,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#DFE7F2",
-    backgroundColor: "#F5F8FC",
+    backgroundColor: COLORS.surfaceHover,
     paddingHorizontal: 14,
     paddingVertical: 12,
     color: "#2B3D57",
@@ -1472,7 +1472,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#15803D",
   },
   notesStatusDotError: {
-    backgroundColor: "#C62828",
+    backgroundColor: COLORS.error,
   },
   notesStatusText: {
     color: "#334861",
@@ -1480,12 +1480,12 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   notesTimestamp: {
-    color: "#74839A",
+    color: COLORS.textTertiary,
     fontSize: 13,
     fontWeight: "500",
   },
   notesErrorText: {
-    color: "#B12635",
+    color: COLORS.dangerDark,
     fontSize: 13,
     fontWeight: "700",
     marginBottom: 8,
@@ -1503,10 +1503,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
   },
   notesDiscardButtonText: {
-    color: "#5E708A",
+    color: COLORS.textSecondary,
     fontSize: 19,
     fontWeight: "700",
   },
@@ -1515,7 +1515,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: "center",
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
     boxShadow: "0px 8px 18px rgba(22, 118, 210, 0.3)",
   },
   notesSaveButtonDisabled: {
@@ -1523,7 +1523,7 @@ const styles = StyleSheet.create({
     boxShadow: "none",
   },
   notesSaveButtonText: {
-    color: "#FFFFFF",
+    color: COLORS.surface,
     fontSize: 22,
     fontWeight: "800",
   },
@@ -1548,12 +1548,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   actionButtonSecondary: {
-    backgroundColor: "#9C27B0",
+    backgroundColor: COLORS.purple,
   },
   tareaItem: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
     borderRadius: 12,
     marginBottom: 12,
@@ -1583,14 +1583,14 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 6,
-    backgroundColor: "#e0e0e0",
+    backgroundColor: COLORS.divider,
     borderRadius: 3,
     overflow: "hidden",
     marginBottom: 6,
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#4CAF50",
+    backgroundColor: COLORS.success,
     borderRadius: 3,
   },
   progressText: {
@@ -1603,7 +1603,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 18,
@@ -1614,12 +1614,12 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 34,
     fontWeight: "800",
-    color: "#1E2A3A",
+    color: COLORS.text,
     letterSpacing: -0.4,
   },
   modalSubtitle: {
     fontSize: 16,
-    color: "#4D5D74",
+    color: COLORS.textDark,
   },
   searchBox: {
     borderWidth: 1,
@@ -1634,7 +1634,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 14,
   },
   studentsList: {
@@ -1655,22 +1655,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
   },
   studentRowSelected: {
-    borderColor: "#1676D2",
-    backgroundColor: "#F2F8FF",
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.backgroundSoft,
   },
   studentAvatar: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: "#E8F3FF",
+    backgroundColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
   },
   studentName: {
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 14,
     fontWeight: "700",
   },
@@ -1684,24 +1684,24 @@ const styles = StyleSheet.create({
     borderColor: "#DCE7F8",
     borderRadius: 14,
     padding: 12,
-    backgroundColor: "#F8FBFF",
+    backgroundColor: COLORS.backgroundSoft,
     gap: 8,
   },
   createInput: {
     borderWidth: 1,
     borderColor: "#D6E0F0",
     borderRadius: 10,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     paddingHorizontal: 10,
     paddingVertical: 9,
     fontSize: 14,
-    color: "#1E2A3A",
+    color: COLORS.text,
   },
   secondaryModalButton: {
     borderRadius: 999,
     borderWidth: 1,
     borderColor: "#C8D8EE",
-    backgroundColor: "#F4F8FF",
+    backgroundColor: COLORS.backgroundSoft,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 12,
@@ -1714,14 +1714,14 @@ const styles = StyleSheet.create({
   },
   primaryModalButton: {
     borderRadius: 999,
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 12,
     paddingHorizontal: 14,
   },
   primaryModalButtonText: {
-    color: "#FFFFFF",
+    color: COLORS.surface,
     fontWeight: "800",
     fontSize: 14,
   },
@@ -1729,7 +1729,7 @@ const styles = StyleSheet.create({
     margin: 24,
     marginBottom: 48,
     borderRadius: 20,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     padding: 18,
     alignItems: "center",
     gap: 10,
@@ -1743,12 +1743,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   successTitle: {
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 22,
     fontWeight: "800",
   },
   successText: {
-    color: "#4D5D74",
+    color: COLORS.textDark,
     fontSize: 14,
     textAlign: "center",
     marginBottom: 4,
@@ -1757,7 +1757,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#D8E6F8",
     borderRadius: 14,
-    backgroundColor: "#F6FAFF",
+    backgroundColor: COLORS.backgroundSoft,
     padding: 12,
     gap: 10,
   },
@@ -1768,7 +1768,7 @@ const styles = StyleSheet.create({
   },
   impactText: {
     fontSize: 16,
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontWeight: "700",
   },
   confirmRow: {
@@ -1793,11 +1793,11 @@ const styles = StyleSheet.create({
     borderColor: "#B9C8DD",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
   },
   checkboxActive: {
-    borderColor: "#1676D2",
-    backgroundColor: "#1676D2",
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.primary,
   },
   confirmText: {
     flex: 1,
@@ -1806,7 +1806,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   deleteErrorText: {
-    color: "#C62828",
+    color: COLORS.error,
     fontWeight: "700",
     fontSize: 13,
   },
@@ -1819,14 +1819,14 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: "#DFE7F3",
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.borderLight,
+    backgroundColor: COLORS.surface,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 12,
   },
   cancelModalButtonText: {
-    color: "#4D5D74",
+    color: COLORS.textDark,
     fontWeight: "700",
     fontSize: 15,
   },
@@ -1844,7 +1844,7 @@ const styles = StyleSheet.create({
     opacity: 0.65,
   },
   deleteModalButtonText: {
-    color: "#FFFFFF",
+    color: COLORS.surface,
     fontWeight: "800",
     fontSize: 14,
   },

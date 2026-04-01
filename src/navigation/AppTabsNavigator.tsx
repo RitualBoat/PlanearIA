@@ -53,7 +53,7 @@ const AppTabsNavigator: React.FC = () => {
           paddingHorizontal: 6,
           borderTopWidth: 1,
           borderTopColor: "#E5E7EB",
-          backgroundColor: "#FFFFFF",
+          backgroundColor: COLORS.surface,
           ...(useFloatingWebBar
             ? {
                 width: "100%",

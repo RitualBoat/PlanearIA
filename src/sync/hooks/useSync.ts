@@ -13,6 +13,7 @@ import {
   SyncResult,
 } from "../services/syncService";
 import { SYNC_CONFIG, isAPIConfigured } from "../config/apiConfig";
+import logger from "../../utils/logger";
 
 export interface UseSyncResult {
   syncStatus: SyncStatus;
@@ -76,7 +77,7 @@ export const useSync = (): UseSyncResult => {
 
       return result;
     } catch (error) {
-      console.error("[useSync] Sync error:", error);
+      logger.error("[useSync] Sync error:", error);
       setSyncStatus("error");
       return {
         success: false,
@@ -89,7 +90,7 @@ export const useSync = (): UseSyncResult => {
 
   // Forzar sincronización
   const forceSync = useCallback(async (): Promise<SyncResult> => {
-    console.log("[useSync] Manual sync started");
+    logger.log("[useSync] Manual sync started");
     return performSync();
   }, [performSync]);
 
@@ -105,7 +106,7 @@ export const useSync = (): UseSyncResult => {
       } else if (wasOffline.current) {
         wasOffline.current = false;
         setJustReconnected(true);
-        console.log("[useSync] Reconnected, syncing...");
+        logger.log("[useSync] Reconnected, syncing...");
 
         await performSync();
         setTimeout(() => setJustReconnected(false), 3000);

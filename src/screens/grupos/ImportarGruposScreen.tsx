@@ -17,6 +17,7 @@ import type { RouteProp } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import WebScrollView from "../../components/WebScrollView";
 import { useGrupos } from "../../hooks/useGrupos";
+import { COLORS } from "../../../types";
 import {
   buildGrupoFromDraft,
   GrupoImportResult,
@@ -128,7 +129,7 @@ const ImportarGruposScreen: React.FC<ImportarGruposScreenProps> = ({ navigation 
   const renderIdle = () => (
     <View style={styles.card}>
       <View style={styles.heroIconWrap}>
-        <MaterialIcons name="upload-file" size={34} color="#1676D2" />
+        <MaterialIcons name="upload-file" size={34} color={COLORS.primary} />
       </View>
       <Text style={styles.cardTitle}>Subir listado de grupos</Text>
       <Text style={styles.cardText}>
@@ -136,12 +137,12 @@ const ImportarGruposScreen: React.FC<ImportarGruposScreenProps> = ({ navigation 
       </Text>
 
       <TouchableOpacity style={styles.primaryButton} onPress={() => void handleSelectFile()}>
-        <MaterialIcons name="file-upload" size={18} color="#FFFFFF" />
+        <MaterialIcons name="file-upload" size={18} color={COLORS.surface} />
         <Text style={styles.primaryButtonText}>Seleccionar archivo</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.linkButton} onPress={handleDownloadTemplate}>
-        <MaterialIcons name="download" size={16} color="#1676D2" />
+        <MaterialIcons name="download" size={16} color={COLORS.primary} />
         <Text style={styles.linkButtonText}>Descargar plantilla</Text>
       </TouchableOpacity>
     </View>
@@ -149,7 +150,7 @@ const ImportarGruposScreen: React.FC<ImportarGruposScreenProps> = ({ navigation 
 
   const renderProcessing = () => (
     <View style={styles.card}>
-      <ActivityIndicator size="large" color="#1676D2" />
+      <ActivityIndicator size="large" color={COLORS.primary} />
       <Text style={styles.cardTitle}>Procesando archivo y validando datos...</Text>
       <View style={styles.progressTrack}>
         <View style={styles.progressFill} />
@@ -235,7 +236,7 @@ const ImportarGruposScreen: React.FC<ImportarGruposScreenProps> = ({ navigation 
   const renderSuccess = () => (
     <View style={styles.card}>
       <View style={[styles.heroIconWrap, { backgroundColor: "#EAF3FF" }]}>
-        <MaterialIcons name="check" size={38} color="#1676D2" />
+        <MaterialIcons name="check" size={38} color={COLORS.primary} />
       </View>
       <Text style={styles.successTitle}>Importación completada</Text>
       <Text style={styles.cardText}>
@@ -258,7 +259,7 @@ const ImportarGruposScreen: React.FC<ImportarGruposScreenProps> = ({ navigation 
   const renderError = () => (
     <View style={styles.card}>
       <View style={[styles.heroIconWrap, { backgroundColor: "#FEECEC" }]}>
-        <MaterialIcons name="error" size={32} color="#C62828" />
+        <MaterialIcons name="error" size={32} color={COLORS.error} />
       </View>
       <Text style={styles.errorTitle}>No se pudo procesar el archivo</Text>
       <Text style={styles.cardText}>
@@ -276,12 +277,12 @@ const ImportarGruposScreen: React.FC<ImportarGruposScreenProps> = ({ navigation 
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
       <SafeAreaView style={styles.safeArea}>
         <WebScrollView style={styles.content}>
           <View style={styles.headerRow}>
             <TouchableOpacity style={styles.headerIconButton} onPress={() => navigation.goBack()}>
-              <MaterialIcons name="arrow-back" size={22} color="#1676D2" />
+              <MaterialIcons name="arrow-back" size={22} color={COLORS.primary} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Importar Grupos</Text>
           </View>
@@ -303,7 +304,7 @@ const ImportarGruposScreen: React.FC<ImportarGruposScreenProps> = ({ navigation 
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#EEF3FA" },
+  container: { flex: 1, backgroundColor: COLORS.background },
   safeArea: { flex: 1 },
   content: { flex: 1, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 110 },
   headerRow: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 10 },
@@ -313,17 +314,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: "#D9E4F3",
   },
-  headerTitle: { color: "#1676D2", fontSize: 30, fontWeight: "800" },
-  pageTitle: { color: "#1E2A3A", fontSize: 48, fontWeight: "800", marginBottom: 6 },
-  pageSubtitle: { color: "#5E708A", fontSize: 30, lineHeight: 40, marginBottom: 12 },
+  headerTitle: { color: COLORS.primary, fontSize: 30, fontWeight: "800" },
+  pageTitle: { color: COLORS.text, fontSize: 48, fontWeight: "800", marginBottom: 6 },
+  pageSubtitle: { color: COLORS.textSecondary, fontSize: 30, lineHeight: 40, marginBottom: 12 },
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     borderRadius: 18,
     padding: 16,
     alignItems: "center",
@@ -334,16 +335,16 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 999,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
     alignItems: "center",
     justifyContent: "center",
   },
-  cardTitle: { color: "#1E2A3A", fontSize: 34, fontWeight: "800", textAlign: "center" },
-  cardText: { color: "#5E708A", fontSize: 25, textAlign: "center", lineHeight: 34 },
+  cardTitle: { color: COLORS.text, fontSize: 34, fontWeight: "800", textAlign: "center" },
+  cardText: { color: COLORS.textSecondary, fontSize: 25, textAlign: "center", lineHeight: 34 },
   primaryButton: {
     minHeight: 50,
     borderRadius: 12,
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 14,
     alignItems: "center",
     justifyContent: "center",
@@ -351,9 +352,9 @@ const styles = StyleSheet.create({
     gap: 8,
     width: "100%",
   },
-  primaryButtonText: { color: "#FFFFFF", fontSize: 22, fontWeight: "800" },
+  primaryButtonText: { color: COLORS.surface, fontSize: 22, fontWeight: "800" },
   linkButton: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 4 },
-  linkButtonText: { color: "#1676D2", fontSize: 20, fontWeight: "700" },
+  linkButtonText: { color: COLORS.primary, fontSize: 20, fontWeight: "700" },
   progressTrack: {
     width: "100%",
     height: 8,
@@ -361,11 +362,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#D9E2EF",
     overflow: "hidden",
   },
-  progressFill: { width: "60%", height: "100%", borderRadius: 999, backgroundColor: "#1676D2" },
+  progressFill: {
+    width: "60%",
+    height: "100%",
+    borderRadius: 999,
+    backgroundColor: COLORS.primary,
+  },
   fileRow: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     borderRadius: 14,
     padding: 12,
     flexDirection: "row",
@@ -377,13 +383,13 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: "#EAF0FA",
+    backgroundColor: COLORS.primaryTint,
     alignItems: "center",
     justifyContent: "center",
   },
-  fileName: { color: "#1E2A3A", fontSize: 20, fontWeight: "700" },
-  changeFileText: { color: "#1676D2", fontSize: 18, fontWeight: "700" },
-  previewTitle: { color: "#1E2A3A", fontSize: 38, fontWeight: "800", marginBottom: 8 },
+  fileName: { color: COLORS.text, fontSize: 20, fontWeight: "700" },
+  changeFileText: { color: COLORS.primary, fontSize: 18, fontWeight: "700" },
+  previewTitle: { color: COLORS.text, fontSize: 38, fontWeight: "800", marginBottom: 8 },
   statsRow: { flexDirection: "row", gap: 8, marginBottom: 10 },
   validBadge: {
     backgroundColor: "#DEF7E8",
@@ -402,39 +408,44 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
-  invalidText: { color: "#B12635", fontSize: 16, fontWeight: "800" },
+  invalidText: { color: COLORS.dangerDark, fontSize: 16, fontWeight: "800" },
   tableCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     borderRadius: 14,
     overflow: "hidden",
     marginBottom: 12,
   },
   tableHead: {
     flexDirection: "row",
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
     paddingHorizontal: 10,
     paddingVertical: 8,
     gap: 6,
   },
-  colHead: { color: "#5E708A", fontSize: 12, textTransform: "uppercase", fontWeight: "800" },
+  colHead: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    textTransform: "uppercase",
+    fontWeight: "800",
+  },
   tableRow: {
     flexDirection: "row",
     paddingHorizontal: 10,
     paddingVertical: 10,
     borderTopWidth: 1,
-    borderTopColor: "#EEF3FA",
+    borderTopColor: COLORS.background,
     gap: 6,
   },
   errorRow: { backgroundColor: "#FFF3F3" },
-  colValue: { color: "#1E2A3A", fontSize: 18, fontWeight: "600" },
-  errorCellText: { color: "#B12635", fontWeight: "700" },
-  rowErrorDetail: { color: "#B12635", fontSize: 14, marginTop: 2 },
+  colValue: { color: COLORS.text, fontSize: 18, fontWeight: "600" },
+  errorCellText: { color: COLORS.dangerDark, fontWeight: "700" },
+  rowErrorDetail: { color: COLORS.dangerDark, fontSize: 14, marginTop: 2 },
   actionsCard: {
-    backgroundColor: "#EAF0FA",
+    backgroundColor: COLORS.primaryTint,
     borderWidth: 1,
-    borderColor: "#D8E2F0",
+    borderColor: COLORS.borderStrong,
     borderRadius: 14,
     padding: 12,
     marginBottom: 12,
@@ -445,7 +456,7 @@ const styles = StyleSheet.create({
     minHeight: 48,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#D8E2F0",
+    borderColor: COLORS.borderStrong,
     backgroundColor: "#F1F4F9",
     alignItems: "center",
     justifyContent: "center",
@@ -455,24 +466,24 @@ const styles = StyleSheet.create({
     flex: 1.6,
     minHeight: 48,
     borderRadius: 12,
-    backgroundColor: "#1676D2",
+    backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
   },
-  importButtonText: { color: "#FFFFFF", fontSize: 20, fontWeight: "800" },
-  successTitle: { color: "#1E2A3A", fontSize: 45, fontWeight: "800", textAlign: "center" },
+  importButtonText: { color: COLORS.surface, fontSize: 20, fontWeight: "800" },
+  successTitle: { color: COLORS.text, fontSize: 45, fontWeight: "800", textAlign: "center" },
   secondaryButton: {
     minHeight: 46,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#D8E2F0",
+    borderColor: COLORS.borderStrong,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 12,
     width: "100%",
   },
   secondaryButtonText: { color: "#5A7090", fontSize: 20, fontWeight: "700" },
-  errorTitle: { color: "#1E2A3A", fontSize: 45, fontWeight: "800", textAlign: "center" },
+  errorTitle: { color: COLORS.text, fontSize: 45, fontWeight: "800", textAlign: "center" },
 });
 
 export default ImportarGruposScreen;

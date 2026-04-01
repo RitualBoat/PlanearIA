@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { NavigationContext } from "@react-navigation/native";
+import { COLORS } from "../../types";
 
 interface AnimatedTopPillProps {
   title: string;
@@ -75,7 +76,7 @@ const AnimatedTopPill: React.FC<AnimatedTopPillProps> = ({
 
   const borderColor = ringShift.interpolate({
     inputRange: [0, 0.16, 0.33, 0.5, 0.66, 0.83, 1],
-    outputRange: ["#FF5E5B", "#FF9F1C", "#FFE66D", "#2EC4B6", "#3A86FF", "#8338EC", "#FF5E5B"],
+    outputRange: [COLORS.errorLight, "#FF9F1C", "#FFE66D", "#2EC4B6", "#3A86FF", "#8338EC", COLORS.errorLight],
   });
 
   return (
@@ -87,7 +88,7 @@ const AnimatedTopPill: React.FC<AnimatedTopPillProps> = ({
 
       <View style={[styles.pill, size === "large" && styles.pillLarge, style]}>
         <View style={styles.iconWrap}>
-          <MaterialIcons name={icon} size={18} color="#1E64CC" />
+          <MaterialIcons name={icon} size={18} color={COLORS.primaryMuted} />
         </View>
         <View style={styles.textWrap}>
           <Text
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: "#E2EAF4",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     paddingHorizontal: 16,
     paddingVertical: 14,
     flexDirection: "row",
@@ -144,7 +145,7 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 11,
-    backgroundColor: "#EAF2FF",
+    backgroundColor: COLORS.primaryTint,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 29,
     fontWeight: "800",
-    color: "#1F2A3E",
+    color: COLORS.text,
     letterSpacing: -0.45,
     lineHeight: 34,
   },

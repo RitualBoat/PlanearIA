@@ -4,6 +4,7 @@ import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system/legacy";
 import type { EstadisticasGrupo } from "./grupoReportesService";
 import type { EstadisticasAlumno } from "./alumnoReportesService";
+import { COLORS } from "../../types";
 
 interface ExportParams {
   grupoNombre: string;
@@ -225,31 +226,31 @@ const buildAlumnoReportSvg = ({
   const p = (n: number) => Math.round(Math.max(0, Math.min(100, n)));
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#EEF3FA" />
-  <rect x="36" y="36" width="1128" height="558" rx="22" fill="#FFFFFF" />
-  <text x="72" y="98" font-family="Arial" font-size="44" font-weight="700" fill="#0C63B8">Reporte del Alumno</text>
+  <rect width="1200" height="630" fill=COLORS.background />
+  <rect x="36" y="36" width="1128" height="558" rx="22" fill=COLORS.surface />
+  <text x="72" y="98" font-family="Arial" font-size="44" font-weight="700" fill=COLORS.primaryDark>Reporte del Alumno</text>
   <text x="72" y="140" font-family="Arial" font-size="24" fill="#60748F">${alumnoNombre} • ${periodo}</text>
 
-  <rect x="72" y="184" width="240" height="150" rx="14" fill="#F8FBFF" stroke="#DDE7F5" />
-  <text x="92" y="224" font-family="Arial" font-size="20" fill="#74839A">Promedio</text>
-  <text x="92" y="292" font-family="Arial" font-size="62" font-weight="700" fill="#1E2A3A">${estadisticas.promedioGeneral.toFixed(1)}</text>
+  <rect x="72" y="184" width="240" height="150" rx="14" fill=COLORS.backgroundSoft stroke=COLORS.borderLight />
+  <text x="92" y="224" font-family="Arial" font-size="20" fill=COLORS.textTertiary>Promedio</text>
+  <text x="92" y="292" font-family="Arial" font-size="62" font-weight="700" fill=COLORS.text>${estadisticas.promedioGeneral.toFixed(1)}</text>
 
-  <rect x="336" y="184" width="240" height="150" rx="14" fill="#F8FBFF" stroke="#DDE7F5" />
-  <text x="356" y="224" font-family="Arial" font-size="20" fill="#74839A">Asistencia</text>
-  <text x="356" y="292" font-family="Arial" font-size="56" font-weight="700" fill="#1E2A3A">${p(estadisticas.indiceAsistencia)}%</text>
+  <rect x="336" y="184" width="240" height="150" rx="14" fill=COLORS.backgroundSoft stroke=COLORS.borderLight />
+  <text x="356" y="224" font-family="Arial" font-size="20" fill=COLORS.textTertiary>Asistencia</text>
+  <text x="356" y="292" font-family="Arial" font-size="56" font-weight="700" fill=COLORS.text>${p(estadisticas.indiceAsistencia)}%</text>
 
-  <rect x="600" y="184" width="240" height="150" rx="14" fill="#F8FBFF" stroke="#DDE7F5" />
-  <text x="620" y="224" font-family="Arial" font-size="20" fill="#74839A">A tiempo</text>
-  <text x="620" y="292" font-family="Arial" font-size="56" font-weight="700" fill="#1E2A3A">${p(estadisticas.indiceEntregasATiempo)}%</text>
+  <rect x="600" y="184" width="240" height="150" rx="14" fill=COLORS.backgroundSoft stroke=COLORS.borderLight />
+  <text x="620" y="224" font-family="Arial" font-size="20" fill=COLORS.textTertiary>A tiempo</text>
+  <text x="620" y="292" font-family="Arial" font-size="56" font-weight="700" fill=COLORS.text>${p(estadisticas.indiceEntregasATiempo)}%</text>
 
-  <rect x="864" y="184" width="240" height="150" rx="14" fill="#F8FBFF" stroke="#DDE7F5" />
-  <text x="884" y="224" font-family="Arial" font-size="20" fill="#74839A">No entregadas</text>
-  <text x="884" y="292" font-family="Arial" font-size="56" font-weight="700" fill="#1E2A3A">${p(estadisticas.indiceNoEntregadas)}%</text>
+  <rect x="864" y="184" width="240" height="150" rx="14" fill=COLORS.backgroundSoft stroke=COLORS.borderLight />
+  <text x="884" y="224" font-family="Arial" font-size="20" fill=COLORS.textTertiary>No entregadas</text>
+  <text x="884" y="292" font-family="Arial" font-size="56" font-weight="700" fill=COLORS.text>${p(estadisticas.indiceNoEntregadas)}%</text>
 
-  <text x="72" y="404" font-family="Arial" font-size="24" font-weight="700" fill="#2A3B56">Distribución de entregas</text>
-  <text x="72" y="448" font-family="Arial" font-size="22" fill="#0C63B8">• A tiempo: ${p(estadisticas.indiceEntregasATiempo)}%</text>
-  <text x="72" y="488" font-family="Arial" font-size="22" fill="#F58026">• Tarde: ${p(estadisticas.indiceEntregasTarde)}%</text>
-  <text x="72" y="528" font-family="Arial" font-size="22" fill="#C62828">• No entregadas: ${p(estadisticas.indiceNoEntregadas)}%</text>
+  <text x="72" y="404" font-family="Arial" font-size="24" font-weight="700" fill=COLORS.textDark>Distribución de entregas</text>
+  <text x="72" y="448" font-family="Arial" font-size="22" fill=COLORS.primaryDark>• A tiempo: ${p(estadisticas.indiceEntregasATiempo)}%</text>
+  <text x="72" y="488" font-family="Arial" font-size="22" fill=COLORS.amber>• Tarde: ${p(estadisticas.indiceEntregasTarde)}%</text>
+  <text x="72" y="528" font-family="Arial" font-size="22" fill=COLORS.error>• No entregadas: ${p(estadisticas.indiceNoEntregadas)}%</text>
 </svg>`;
 };
 

@@ -91,7 +91,7 @@ jest.mock("../../hooks/useListaPlaneacionesViewModel", () => ({
     aplicarFiltros: jest.fn(),
     limpiarFiltros: jest.fn(),
     formatearFecha: jest.fn(() => "10 jun 2024"),
-    getColorNivel: jest.fn(() => "#4CAF50"),
+    getColorNivel: jest.fn(() => "#4caf50"),
     getTextoNivel: jest.fn((nivel) => (nivel === "primaria" ? "Primaria" : "Secundaria")),
     handleEditar: jest.fn(),
     handleClonar: jest.fn(),

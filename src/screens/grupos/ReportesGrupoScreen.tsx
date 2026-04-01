@@ -14,21 +14,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LineChart, ProgressChart } from "react-native-chart-kit";
 import WebScrollView from "../../components/WebScrollView";
+import { COLORS } from "../../../types";
 import {
   useReportesGrupoViewModel,
   type PeriodoReporte,
 } from "../../hooks/useReportesGrupoViewModel";
 
 const chartConfig = {
-  backgroundGradientFrom: "#FFFFFF",
-  backgroundGradientTo: "#FFFFFF",
+  backgroundGradientFrom: COLORS.surface,
+  backgroundGradientTo: COLORS.surface,
   color: (opacity = 1) => `rgba(12, 99, 184, ${opacity})`,
   labelColor: (opacity = 1) => `rgba(82, 96, 118, ${opacity})`,
   decimalPlaces: 0,
   propsForDots: {
     r: "4",
     strokeWidth: "2",
-    stroke: "#FFFFFF",
+    stroke: COLORS.surface,
   },
 };
 
@@ -68,18 +69,18 @@ const ReportesGrupoScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
           <TouchableOpacity onPress={goBack} style={styles.iconButton}>
-            <MaterialIcons name="arrow-back" size={22} color="#2B3A54" />
+            <MaterialIcons name="arrow-back" size={22} color={COLORS.textDark} />
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>Reportes del Grupo</Text>
             <Text style={styles.subtitle}>{grupoNombre} • Marzo 2026</Text>
           </View>
           <TouchableOpacity onPress={() => void handleExportar()} style={styles.iconButton}>
-            <MaterialIcons name="file-download" size={22} color="#0C63B8" />
+            <MaterialIcons name="file-download" size={22} color={COLORS.primaryDark} />
           </TouchableOpacity>
         </View>
 
@@ -102,7 +103,7 @@ const ReportesGrupoScreen: React.FC = () => {
 
           {estado === "loading" ? (
             <View style={styles.stateCard}>
-              <ActivityIndicator size="large" color="#0C63B8" />
+              <ActivityIndicator size="large" color={COLORS.primaryDark} />
               <Text style={styles.stateTitle}>Cargando reportes...</Text>
               <Text style={styles.stateText}>Analizando métricas del grupo</Text>
             </View>
@@ -118,7 +119,7 @@ const ReportesGrupoScreen: React.FC = () => {
                 No pudimos obtener la información en este momento. Verifica tu conexión.
               </Text>
               <TouchableOpacity style={styles.retryButton} onPress={() => void recargar()}>
-                <MaterialIcons name="refresh" size={18} color="#FFFFFF" />
+                <MaterialIcons name="refresh" size={18} color={COLORS.surface} />
                 <Text style={styles.retryButtonText}>Reintentar</Text>
               </TouchableOpacity>
               <Text style={styles.errorCode}>CÓDIGO: {errorCodigo}</Text>
@@ -128,14 +129,14 @@ const ReportesGrupoScreen: React.FC = () => {
           {estado === "empty" ? (
             <View style={styles.stateCard}>
               <View style={styles.emptyIconCircle}>
-                <MaterialIcons name="search-off" size={34} color="#0C63B8" />
+                <MaterialIcons name="search-off" size={34} color={COLORS.primaryDark} />
               </View>
               <Text style={styles.stateTitle}>No hay datos en este periodo</Text>
               <Text style={styles.stateText}>
                 Intenta cambiar los filtros para ver actividad del grupo.
               </Text>
               <TouchableOpacity style={styles.retryButton} onPress={() => setPeriodo("Bimestre")}>
-                <MaterialIcons name="filter-alt" size={18} color="#FFFFFF" />
+                <MaterialIcons name="filter-alt" size={18} color={COLORS.surface} />
                 <Text style={styles.retryButtonText}>Cambiar filtros</Text>
               </TouchableOpacity>
             </View>
@@ -144,7 +145,7 @@ const ReportesGrupoScreen: React.FC = () => {
           {estado === "success" ? (
             <>
               <View style={styles.insightCard}>
-                <MaterialIcons name="auto-awesome" size={18} color="#FFFFFF" />
+                <MaterialIcons name="auto-awesome" size={18} color={COLORS.surface} />
                 <Text style={styles.insightText}>
                   La aprobación aumentó 4% respecto al mes pasado. La asistencia se mantiene
                   estable.
@@ -255,7 +256,7 @@ const ReportesGrupoScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#EEF3FA" },
+  container: { flex: 1, backgroundColor: COLORS.background },
   safeArea: { flex: 1 },
   header: {
     flexDirection: "row",
@@ -264,8 +265,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#E3EAF4",
-    backgroundColor: "#FFFFFF",
+    borderBottomColor: COLORS.border,
+    backgroundColor: COLORS.surface,
   },
   iconButton: {
     width: 34,
@@ -273,10 +274,10 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#F2F6FB",
+    backgroundColor: COLORS.surfaceTertiary,
   },
-  title: { fontSize: 36, color: "#1E2A3A", fontWeight: "800", letterSpacing: -0.4 },
-  subtitle: { marginTop: 2, color: "#73839B", fontSize: 16, fontWeight: "500" },
+  title: { fontSize: 36, color: COLORS.text, fontWeight: "800", letterSpacing: -0.4 },
+  subtitle: { marginTop: 2, color: COLORS.textTertiary, fontSize: 16, fontWeight: "500" },
   content: { flex: 1 },
   periodsRow: {
     paddingHorizontal: 16,
@@ -289,43 +290,43 @@ const styles = StyleSheet.create({
   periodChip: {
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: "#D7E1EF",
-    backgroundColor: "#E9EEF5",
+    borderColor: COLORS.borderStrong,
+    backgroundColor: COLORS.progressTrack,
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
-  periodChipActive: { backgroundColor: "#0C63B8", borderColor: "#0C63B8" },
-  periodChipText: { color: "#4C5C74", fontWeight: "700" },
-  periodChipTextActive: { color: "#FFFFFF" },
+  periodChipActive: { backgroundColor: COLORS.primaryDark, borderColor: COLORS.primaryDark },
+  periodChipText: { color: COLORS.textDark, fontWeight: "700" },
+  periodChipTextActive: { color: COLORS.surface },
   insightCard: {
     marginHorizontal: 16,
-    backgroundColor: "#0C63B8",
+    backgroundColor: COLORS.primaryDark,
     borderRadius: 14,
     padding: 14,
     flexDirection: "row",
     gap: 10,
     alignItems: "flex-start",
   },
-  insightText: { color: "#FFFFFF", flex: 1, fontSize: 15, fontWeight: "600", lineHeight: 21 },
+  insightText: { color: COLORS.surface, flex: 1, fontSize: 15, fontWeight: "600", lineHeight: 21 },
   kpiGrid: { paddingHorizontal: 16, paddingTop: 14, gap: 10 },
   kpiGridDesktop: { flexDirection: "row", flexWrap: "wrap" },
   kpiCard: {
-    backgroundColor: "#F8FBFF",
+    backgroundColor: COLORS.backgroundSoft,
     borderWidth: 1,
-    borderColor: "#DDE7F5",
+    borderColor: COLORS.borderLight,
     borderRadius: 14,
     padding: 14,
     minHeight: 92,
     justifyContent: "center",
   },
-  kpiBlue: { borderLeftWidth: 4, borderLeftColor: "#0C63B8" },
+  kpiBlue: { borderLeftWidth: 4, borderLeftColor: COLORS.primaryDark },
   kpiGreen: { borderLeftWidth: 4, borderLeftColor: "#12A05B" },
-  kpiOrange: { borderLeftWidth: 4, borderLeftColor: "#F58026" },
+  kpiOrange: { borderLeftWidth: 4, borderLeftColor: COLORS.amber },
   kpiTeal: { borderLeftWidth: 4, borderLeftColor: "#13A8C4" },
-  kpiLabel: { color: "#74839A", fontWeight: "700", fontSize: 12, letterSpacing: 0.6 },
+  kpiLabel: { color: COLORS.textTertiary, fontWeight: "700", fontSize: 12, letterSpacing: 0.6 },
   kpiValue: {
     marginTop: 4,
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontSize: 46,
     fontWeight: "800",
     letterSpacing: -0.6,
@@ -333,35 +334,35 @@ const styles = StyleSheet.create({
   blockCard: {
     marginHorizontal: 16,
     marginTop: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     borderRadius: 14,
     padding: 14,
   },
   blockHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  blockTitle: { color: "#1E2A3A", fontWeight: "800", fontSize: 17 },
+  blockTitle: { color: COLORS.text, fontWeight: "800", fontSize: 17 },
   trendBadge: {
-    backgroundColor: "#E7F0FF",
+    backgroundColor: COLORS.border,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  trendBadgeText: { color: "#0C63B8", fontWeight: "700", fontSize: 12 },
+  trendBadgeText: { color: COLORS.primaryDark, fontWeight: "700", fontSize: 12 },
   chart: { marginTop: 8, borderRadius: 12 },
   progressWrap: { alignItems: "center", justifyContent: "center", marginTop: 8, minHeight: 190 },
   progressCenterText: {
     position: "absolute",
     top: 74,
     fontSize: 32,
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontWeight: "800",
   },
   progressCenterSubText: {
     position: "absolute",
     top: 112,
     fontSize: 12,
-    color: "#76879E",
+    color: COLORS.textTertiary,
     fontWeight: "700",
     letterSpacing: 0.4,
   },
@@ -371,24 +372,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  legendValue: { color: "#2E3E57", fontWeight: "700" },
-  legendDotBlue: { color: "#0C63B8", fontWeight: "700" },
-  legendDotOrange: { color: "#F58026", fontWeight: "700" },
-  legendDotRed: { color: "#C62828", fontWeight: "700" },
+  legendValue: { color: COLORS.textDark, fontWeight: "700" },
+  legendDotBlue: { color: COLORS.primaryDark, fontWeight: "700" },
+  legendDotOrange: { color: COLORS.amber, fontWeight: "700" },
+  legendDotRed: { color: COLORS.error, fontWeight: "700" },
   stateCard: {
     marginHorizontal: 16,
     marginTop: 24,
     borderRadius: 18,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     alignItems: "center",
     padding: 20,
     gap: 10,
   },
-  stateTitle: { color: "#1E2A3A", fontWeight: "800", fontSize: 22, textAlign: "center" },
+  stateTitle: { color: COLORS.text, fontWeight: "800", fontSize: 22, textAlign: "center" },
   stateText: {
-    color: "#73839B",
+    color: COLORS.textTertiary,
     fontSize: 16,
     textAlign: "center",
     lineHeight: 24,
@@ -406,21 +407,21 @@ const styles = StyleSheet.create({
     width: 86,
     height: 86,
     borderRadius: 43,
-    backgroundColor: "#E7F0FF",
+    backgroundColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
   },
   retryButton: {
     marginTop: 8,
     borderRadius: 12,
-    backgroundColor: "#0C63B8",
+    backgroundColor: COLORS.primaryDark,
     paddingHorizontal: 20,
     paddingVertical: 12,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
   },
-  retryButtonText: { color: "#FFFFFF", fontWeight: "800", fontSize: 16 },
+  retryButtonText: { color: COLORS.surface, fontWeight: "800", fontSize: 16 },
   errorCode: { marginTop: 8, color: "#8B95A8", letterSpacing: 0.5, fontWeight: "700" },
 });
 

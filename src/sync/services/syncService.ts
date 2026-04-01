@@ -11,6 +11,7 @@ import {
   isAPIConfigured,
 } from "../config/apiConfig";
 import { Planeacion } from "../../../types/planeacion";
+import logger from "../../utils/logger";
 
 // =====================================
 // TIPOS
@@ -104,7 +105,7 @@ export const saveLocalPlaneaciones = async (
     JSON.stringify(planeaciones)
   );
   if (SYNC_CONFIG.debugMode) {
-    console.log(`[sync] Saved ${planeaciones.length} planeaciones locally`);
+    logger.log(`[sync] Saved ${planeaciones.length} planeaciones locally`);
   }
 };
 
@@ -114,13 +115,13 @@ export const loadLocalPlaneaciones = async (): Promise<Planeacion[]> => {
     if (data) {
       const planeaciones = JSON.parse(data) as Planeacion[];
       if (SYNC_CONFIG.debugMode) {
-        console.log(`[sync] Loaded ${planeaciones.length} local planeaciones`);
+        logger.log(`[sync] Loaded ${planeaciones.length} local planeaciones`);
       }
       return planeaciones;
     }
     return [];
   } catch (error) {
-    console.error("[sync] Error loading planeaciones:", error);
+    logger.error("[sync] Error loading planeaciones:", error);
     return [];
   }
 };
@@ -172,7 +173,7 @@ export const addPendingOperation = async (
   );
 
   if (SYNC_CONFIG.debugMode) {
-    console.log(`[sync] Pending operation: ${operation.type}`);
+    logger.log(`[sync] Pending operation: ${operation.type}`);
   }
 };
 
@@ -198,7 +199,7 @@ export const fullSync = async (): Promise<SyncResult> => {
   // Verificar si la API está configurada
   if (!isAPIConfigured()) {
     if (SYNC_CONFIG.debugMode) {
-      console.log("[sync] API not configured, local-only mode");
+      logger.log("[sync] API not configured, local-only mode");
     }
     return result;
   }
@@ -206,7 +207,7 @@ export const fullSync = async (): Promise<SyncResult> => {
   // Verificar conectividad
   const isOnline = await checkConnectivity();
   if (!isOnline) {
-    console.log("[sync] Offline, sync postponed");
+    logger.log("[sync] Offline, sync postponed");
     return { ...result, success: false };
   }
 
@@ -215,7 +216,7 @@ export const fullSync = async (): Promise<SyncResult> => {
     const lastSync = await AsyncStorage.getItem(STORAGE_KEYS.LAST_SYNC);
     const pending = await getPendingOperations();
 
-    console.log(
+    logger.log(
       `[sync] Syncing... (${pending.length} pending operations)`
     );
 
@@ -257,7 +258,7 @@ export const fullSync = async (): Promise<SyncResult> => {
         data.data.serverTime || new Date().toISOString()
       );
 
-      console.log(
+      logger.log(
         `[sync] Done: ${result.uploaded} uploaded, ${result.downloaded} downloaded`
       );
     } else {
@@ -266,7 +267,7 @@ export const fullSync = async (): Promise<SyncResult> => {
 
     return result;
   } catch (error) {
-    console.error("[sync] Sync error:", error);
+    logger.error("[sync] Sync error:", error);
     result.success = false;
     result.errors.push(String(error));
     return result;

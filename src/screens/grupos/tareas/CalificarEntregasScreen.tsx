@@ -26,7 +26,7 @@ const CalificarEntregasScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <WebScrollView style={styles.content}>
@@ -81,7 +81,7 @@ const CalificarEntregasScreen: React.FC = () => {
 
                 {/* Ver archivo */}
                 <TouchableOpacity style={styles.verArchivoButton}>
-                  <MaterialIcons name="attachment" size={20} color="#2196F3" />
+                  <MaterialIcons name="attachment" size={20} color={COLORS.primaryLight} />
                   <Text style={styles.verArchivoText}>Ver archivo entregado</Text>
                 </TouchableOpacity>
               </View>
@@ -114,7 +114,7 @@ const CalificarEntregasScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -151,9 +151,9 @@ const styles = StyleSheet.create({
     paddingBottom: 110,
   },
   entregaCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 20,
     borderRadius: 12,
     marginBottom: 15,
@@ -188,9 +188,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: "#F8FBFF",
+    backgroundColor: COLORS.backgroundSoft,
     borderWidth: 1,
-    borderColor: "#DCE6F3",
+    borderColor: COLORS.borderLight,
     borderRadius: 8,
     padding: 12,
     fontSize: FONT_SIZES.medium,
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   },
   verArchivoText: {
     fontSize: FONT_SIZES.medium,
-    color: "#2196F3",
+    color: COLORS.primaryLight,
     fontWeight: "500",
   },
   buttonContainer: {
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   buttonSecondary: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.primary,
   },

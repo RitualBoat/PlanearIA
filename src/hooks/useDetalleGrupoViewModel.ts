@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
@@ -15,6 +15,9 @@ import type {
   Tarea,
 } from "../../types";
 import { exportarGrupoArchivo, type GrupoExportFormat } from "../services/grupoExportService";
+import { useAddStudentsModal } from "./useAddStudentsModal";
+import { useRemoveStudentModal } from "./useRemoveStudentModal";
+import { useGrupoNotas } from "./useGrupoNotas";
 
 type Nav = StackNavigationProp<RootStackParamList, "DetalleGrupo">;
 type Route = RouteProp<RootStackParamList, "DetalleGrupo">;
@@ -127,71 +130,38 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
   const [calificaciones, setCalificaciones] = useState<Calificacion[]>([]);
   const [entregas, setEntregas] = useState<EntregaTarea[]>([]);
   const [lastDataRefreshAt, setLastDataRefreshAt] = useState<Date | null>(null);
-  const [savedGrupoNotas, setSavedGrupoNotas] = useState("");
-  const [grupoNotas, setGrupoNotasState] = useState("");
-  const [notasActualizadoEn, setNotasActualizadoEn] = useState<string | null>(null);
-  const [notasEstado, setNotasEstado] = useState<
-    "sin-cambios" | "cambios-sin-guardar" | "guardando" | "guardado" | "error"
-  >("sin-cambios");
-  const [notasError, setNotasError] = useState("");
-  const [addStudentsModalVisible, setAddStudentsModalVisible] = useState(false);
-  const [createStudentMode, setCreateStudentMode] = useState(false);
-  const [studentSearchQuery, setStudentSearchQuery] = useState("");
-  const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([]);
-  const [isLinkingStudents, setIsLinkingStudents] = useState(false);
-  const [addStudentsError, setAddStudentsError] = useState("");
-  const [addStudentsSuccessVisible, setAddStudentsSuccessVisible] = useState(false);
-  const [createdAndAddedCount, setCreatedAndAddedCount] = useState(0);
-  const [newStudentNombre, setNewStudentNombre] = useState("");
-  const [newStudentApellidos, setNewStudentApellidos] = useState("");
-  const [newStudentNumeroControl, setNewStudentNumeroControl] = useState("");
-  const [newStudentCarrera, setNewStudentCarrera] = useState("");
-  const [removeStudentModalVisible, setRemoveStudentModalVisible] = useState(false);
-  const [studentToRemove, setStudentToRemove] = useState<Alumno | null>(null);
-  const [isUnlinkingStudent, setIsUnlinkingStudent] = useState(false);
-  const [removeStudentError, setRemoveStudentError] = useState("");
 
   const grupo = obtenerGrupo(grupoId);
   const cantidadAlumnos = grupo?.cantidadAlumnos ?? 0;
-  const notasUltimaEdicion = useMemo(() => {
-    if (!notasActualizadoEn) return "Sin ediciones";
 
-    const fecha = new Date(notasActualizadoEn);
-    if (Number.isNaN(fecha.getTime())) return "Sin ediciones";
+  const tabs: Tab[] = [
+    { id: "alumnos", label: "Alumnos", icon: "people" },
+    { id: "calificaciones", label: "Calificaciones", icon: "grade" },
+    { id: "asistencias", label: "Asistencias", icon: "event-available" },
+    { id: "recursos", label: "Recursos", icon: "folder" },
+    { id: "tareas", label: "Tareas", icon: "assignment" },
+    { id: "graficas", label: "Gráficas", icon: "analytics" },
+    { id: "notas", label: "Notas", icon: "note-alt" },
+  ];
 
-    return fecha.toLocaleString("es-MX", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }, [notasActualizadoEn]);
+  // --- Notes sub-hook ---
+  const notasHook = useGrupoNotas(grupoId, grupo, actualizarGrupo);
 
-  const tabs: Tab[] = useMemo(
-    () => [
-      { id: "alumnos", label: "Alumnos", icon: "people" },
-      { id: "calificaciones", label: "Calificaciones", icon: "grade" },
-      { id: "asistencias", label: "Asistencias", icon: "event-available" },
-      { id: "recursos", label: "Recursos", icon: "folder" },
-      { id: "tareas", label: "Tareas", icon: "assignment" },
-      { id: "graficas", label: "Gráficas", icon: "analytics" },
-      { id: "notas", label: "Notas", icon: "note-alt" },
-    ],
-    []
+  // --- Shared persistence for student management ---
+  const persistAlumnosAndCount = useCallback(
+    async (nextAlumnos: Alumno[]) => {
+      await AsyncStorage.setItem("@planearia:alumnos", JSON.stringify(nextAlumnos));
+      setAllAlumnos(nextAlumnos);
+      const alumnosDelGrupo = nextAlumnos.filter((alumno) => alumno.grupoId === grupoId);
+      setAlumnos(alumnosDelGrupo);
+      await actualizarGrupo(grupoId, { cantidadAlumnos: alumnosDelGrupo.length });
+    },
+    [grupoId, actualizarGrupo]
   );
 
-  useEffect(() => {
-    const notasGuardadas = typeof grupo?.notasPersonales === "string" ? grupo.notasPersonales : "";
-    const notasActualizadas =
-      typeof grupo?.notasActualizadoEn === "string" ? grupo.notasActualizadoEn : null;
-
-    setSavedGrupoNotas(notasGuardadas);
-    setGrupoNotasState(notasGuardadas);
-    setNotasActualizadoEn(notasActualizadas);
-    setNotasEstado("sin-cambios");
-    setNotasError("");
-  }, [grupo?.id, grupo?.notasPersonales, grupo?.notasActualizadoEn]);
+  // --- Student management sub-hooks ---
+  const addStudents = useAddStudentsModal(grupoId, allAlumnos, persistAlumnosAndCount);
+  const removeStudent = useRemoveStudentModal(allAlumnos, persistAlumnosAndCount);
 
   const readArray = useCallback(async <T>(key: string): Promise<T[]> => {
     const raw = await AsyncStorage.getItem(key);
@@ -243,179 +213,6 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
   useEffect(() => {
     void reloadDetalleData();
   }, [reloadDetalleData]);
-
-  const availableStudents = useMemo(() => {
-    const query = studentSearchQuery.trim().toLowerCase();
-    return allAlumnos
-      .filter((alumno) => alumno.grupoId !== grupoId)
-      .filter((alumno) => {
-        if (!query) return true;
-        return (
-          `${alumno.nombre} ${alumno.apellidos}`.toLowerCase().includes(query) ||
-          alumno.numeroControl.toLowerCase().includes(query)
-        );
-      });
-  }, [allAlumnos, grupoId, studentSearchQuery]);
-
-  const openAddStudentsModal = useCallback(() => {
-    setAddStudentsError("");
-    setStudentSearchQuery("");
-    setSelectedStudentIds([]);
-    setCreateStudentMode(false);
-    setAddStudentsModalVisible(true);
-  }, []);
-
-  const closeAddStudentsModal = useCallback(() => {
-    if (isLinkingStudents) return;
-    setAddStudentsModalVisible(false);
-    setCreateStudentMode(false);
-    setAddStudentsError("");
-  }, [isLinkingStudents]);
-
-  const openCreateStudentMode = useCallback(() => {
-    setCreateStudentMode(true);
-    setAddStudentsError("");
-  }, []);
-
-  const closeCreateStudentMode = useCallback(() => {
-    if (isLinkingStudents) return;
-    setCreateStudentMode(false);
-    setAddStudentsError("");
-  }, [isLinkingStudents]);
-
-  const toggleStudentSelection = useCallback((studentId: number) => {
-    setSelectedStudentIds((prev) =>
-      prev.includes(studentId) ? prev.filter((id) => id !== studentId) : [...prev, studentId]
-    );
-    setAddStudentsError("");
-  }, []);
-
-  const persistAlumnosAndCount = useCallback(
-    async (nextAlumnos: Alumno[]) => {
-      await AsyncStorage.setItem("@planearia:alumnos", JSON.stringify(nextAlumnos));
-      setAllAlumnos(nextAlumnos);
-      const alumnosDelGrupo = nextAlumnos.filter((alumno) => alumno.grupoId === grupoId);
-      setAlumnos(alumnosDelGrupo);
-      await actualizarGrupo(grupoId, { cantidadAlumnos: alumnosDelGrupo.length });
-      setCreatedAndAddedCount(alumnosDelGrupo.length);
-    },
-    [grupoId, actualizarGrupo]
-  );
-
-  const confirmAddSelectedStudents = useCallback(async () => {
-    if (selectedStudentIds.length === 0) {
-      setAddStudentsError("Selecciona al menos un alumno para agregar.");
-      return;
-    }
-
-    try {
-      setIsLinkingStudents(true);
-      setAddStudentsError("");
-      const nextAlumnos = allAlumnos.map((alumno) =>
-        selectedStudentIds.includes(alumno.id) ? { ...alumno, grupoId } : alumno
-      );
-
-      await persistAlumnosAndCount(nextAlumnos);
-      setAddStudentsModalVisible(false);
-      setAddStudentsSuccessVisible(true);
-      setSelectedStudentIds([]);
-    } catch {
-      setAddStudentsError("No se pudieron agregar los alumnos. Intenta nuevamente.");
-    } finally {
-      setIsLinkingStudents(false);
-    }
-  }, [allAlumnos, grupoId, persistAlumnosAndCount, selectedStudentIds]);
-
-  const createAndAddStudent = useCallback(async () => {
-    if (
-      !newStudentNombre.trim() ||
-      !newStudentApellidos.trim() ||
-      !newStudentNumeroControl.trim()
-    ) {
-      setAddStudentsError("Completa nombre, apellidos y número de control.");
-      return;
-    }
-
-    try {
-      setIsLinkingStudents(true);
-      setAddStudentsError("");
-      const maxId = allAlumnos.reduce((max, alumno) => Math.max(max, alumno.id), 0);
-      const nuevoAlumno: Alumno = {
-        id: maxId + 1,
-        nombre: newStudentNombre.trim(),
-        apellidos: newStudentApellidos.trim(),
-        numeroControl: newStudentNumeroControl.trim(),
-        grupoId,
-        carrera: (newStudentCarrera || "ISC") as Alumno["carrera"],
-        fechaIngreso: new Date(),
-        estado: "activo",
-      };
-
-      const nextAlumnos = [...allAlumnos, nuevoAlumno];
-      await persistAlumnosAndCount(nextAlumnos);
-
-      setNewStudentNombre("");
-      setNewStudentApellidos("");
-      setNewStudentNumeroControl("");
-      setNewStudentCarrera("");
-      setCreateStudentMode(false);
-      setAddStudentsModalVisible(false);
-      setAddStudentsSuccessVisible(true);
-    } catch {
-      setAddStudentsError("No se pudo crear y agregar el alumno.");
-    } finally {
-      setIsLinkingStudents(false);
-    }
-  }, [
-    allAlumnos,
-    grupoId,
-    newStudentApellidos,
-    newStudentCarrera,
-    newStudentNombre,
-    newStudentNumeroControl,
-    persistAlumnosAndCount,
-  ]);
-
-  const closeAddStudentsSuccess = useCallback(() => {
-    setAddStudentsSuccessVisible(false);
-  }, []);
-
-  const openRemoveStudentModal = useCallback((student: Alumno) => {
-    setStudentToRemove(student);
-    setRemoveStudentError("");
-    setRemoveStudentModalVisible(true);
-  }, []);
-
-  const closeRemoveStudentModal = useCallback(() => {
-    if (isUnlinkingStudent) return;
-    setRemoveStudentModalVisible(false);
-    setStudentToRemove(null);
-    setRemoveStudentError("");
-  }, [isUnlinkingStudent]);
-
-  const confirmRemoveStudentFromGroup = useCallback(async () => {
-    if (!studentToRemove) {
-      setRemoveStudentError("No se encontró el alumno para desvincular.");
-      return;
-    }
-
-    try {
-      setIsUnlinkingStudent(true);
-      setRemoveStudentError("");
-
-      const nextAlumnos = allAlumnos.map((alumno) =>
-        alumno.id === studentToRemove.id ? { ...alumno, grupoId: undefined } : alumno
-      );
-
-      await persistAlumnosAndCount(nextAlumnos);
-      setRemoveStudentModalVisible(false);
-      setStudentToRemove(null);
-    } catch {
-      setRemoveStudentError("No se pudo quitar al alumno del grupo. Intenta nuevamente.");
-    } finally {
-      setIsUnlinkingStudent(false);
-    }
-  }, [allAlumnos, persistAlumnosAndCount, studentToRemove]);
 
   const navigateCrearTarea = useCallback(() => {
     navigation.navigate("CrearTareaGrupo", { grupoId });
@@ -511,46 +308,6 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     }
   }, [deleteConfirmed, eliminarGrupo, grupoId, navigation]);
 
-  const setGrupoNotas = useCallback(
-    (value: string) => {
-      setGrupoNotasState(value);
-      setNotasEstado(value === savedGrupoNotas ? "sin-cambios" : "cambios-sin-guardar");
-      setNotasError("");
-    },
-    [savedGrupoNotas]
-  );
-
-  const descartarCambiosNotas = useCallback(() => {
-    setGrupoNotasState(savedGrupoNotas);
-    setNotasEstado("sin-cambios");
-    setNotasError("");
-  }, [savedGrupoNotas]);
-
-  const guardarNotasGrupo = useCallback(async () => {
-    if (grupoNotas === savedGrupoNotas) {
-      setNotasEstado("sin-cambios");
-      return;
-    }
-
-    try {
-      setNotasEstado("guardando");
-      setNotasError("");
-      const nowIso = new Date().toISOString();
-
-      await actualizarGrupo(grupoId, {
-        notasPersonales: grupoNotas,
-        notasActualizadoEn: nowIso,
-      });
-
-      setSavedGrupoNotas(grupoNotas);
-      setNotasActualizadoEn(nowIso);
-      setNotasEstado("guardado");
-    } catch {
-      setNotasEstado("error");
-      setNotasError("No se pudieron guardar las notas. Intenta nuevamente.");
-    }
-  }, [actualizarGrupo, grupoId, grupoNotas, savedGrupoNotas]);
-
   return {
     grupoId,
     grupoNombre,
@@ -564,44 +321,10 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     calificaciones,
     entregas,
     lastDataRefreshAt,
-    grupoNotas,
-    notasUltimaEdicion,
-    notasEstado,
-    notasError,
+    ...notasHook,
     reloadDetalleData,
-    addStudentsModalVisible,
-    createStudentMode,
-    studentSearchQuery,
-    selectedStudentIds,
-    availableStudents,
-    isLinkingStudents,
-    addStudentsError,
-    addStudentsSuccessVisible,
-    createdAndAddedCount,
-    newStudentNombre,
-    newStudentApellidos,
-    newStudentNumeroControl,
-    newStudentCarrera,
-    setStudentSearchQuery,
-    openAddStudentsModal,
-    closeAddStudentsModal,
-    openCreateStudentMode,
-    closeCreateStudentMode,
-    toggleStudentSelection,
-    confirmAddSelectedStudents,
-    setNewStudentNombre,
-    setNewStudentApellidos,
-    setNewStudentNumeroControl,
-    setNewStudentCarrera,
-    createAndAddStudent,
-    closeAddStudentsSuccess,
-    removeStudentModalVisible,
-    studentToRemove,
-    isUnlinkingStudent,
-    removeStudentError,
-    openRemoveStudentModal,
-    closeRemoveStudentModal,
-    confirmRemoveStudentFromGroup,
+    ...addStudents,
+    ...removeStudent,
     deleteModalVisible,
     deleteConfirmed,
     isDeleting,
@@ -619,8 +342,8 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     navigateDetalleTarea,
     navigateReportesGrupo,
     exportarGrupo,
-    setGrupoNotas,
-    guardarNotasGrupo,
-    descartarCambiosNotas,
+    setGrupoNotas: notasHook.setGrupoNotas,
+    guardarNotasGrupo: notasHook.guardarNotasGrupo,
+    descartarCambiosNotas: notasHook.descartarCambiosNotas,
   };
 };

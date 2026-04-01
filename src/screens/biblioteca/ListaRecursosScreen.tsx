@@ -51,7 +51,7 @@ const ListaRecursosScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
@@ -59,13 +59,13 @@ const ListaRecursosScreen: React.FC = () => {
           <Text style={styles.subtitle}>{recursosEjemplo.length} recursos disponibles</Text>
 
           <View style={styles.searchContainer}>
-            <MaterialIcons name="search" size={20} color="#6B7D96" />
+            <MaterialIcons name="search" size={20} color={COLORS.textTertiary} />
             <TextInput
               style={styles.searchInput}
               placeholder="Buscar recurso..."
               value={searchQuery}
               onChangeText={setSearchQuery}
-              placeholderTextColor="#6B7D96"
+              placeholderTextColor={COLORS.textTertiary}
             />
           </View>
         </View>
@@ -111,7 +111,7 @@ const ListaRecursosScreen: React.FC = () => {
                               : "edit"
                         }
                         size={12}
-                        color="#1676D2"
+                        color={COLORS.primary}
                       />
                       <Text style={styles.badgeText}>{recurso.origen}</Text>
                     </View>
@@ -131,7 +131,7 @@ const ListaRecursosScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -147,23 +147,23 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 34,
     fontWeight: "800",
-    color: "#1E2A3A",
+    color: COLORS.text,
     letterSpacing: -0.4,
   },
   subtitle: {
     marginTop: 2,
     fontSize: 15,
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     marginBottom: 10,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 12,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     minHeight: 48,
     boxShadow: "0px 8px 14px rgba(18, 44, 86, 0.06)",
   },
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 8,
     fontSize: 15,
-    color: "#1E2A3A",
+    color: COLORS.text,
     paddingVertical: 0,
   },
   scrollContent: {
@@ -189,10 +189,10 @@ const styles = StyleSheet.create({
   },
   recursoCard: {
     width: "100%",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
     boxShadow: "0px 10px 22px rgba(33, 60, 109, 0.08)",
   },
@@ -217,12 +217,12 @@ const styles = StyleSheet.create({
   recursoTitulo: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#1E2A3A",
+    color: COLORS.text,
     marginBottom: 3,
   },
   recursoDescripcion: {
     fontSize: 13,
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     marginBottom: 7,
   },
   recursoBadges: {
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   badge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#EAF4FF",
+    backgroundColor: COLORS.primaryTint,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 10,
-    color: "#1676D2",
+    color: COLORS.primary,
     fontWeight: "700",
     textTransform: "capitalize",
   },

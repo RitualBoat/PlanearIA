@@ -28,7 +28,7 @@ const metricCards = [
     value: "24",
     badge: "+12%",
     icon: "event-note" as const,
-    tone: "#147AD6",
+    tone: COLORS.metricBlue,
   },
   {
     id: "grupos",
@@ -36,7 +36,7 @@ const metricCards = [
     value: "6",
     badge: "Activo",
     icon: "groups" as const,
-    tone: "#0E8B9A",
+    tone: COLORS.metricTeal,
   },
   {
     id: "sugerencias",
@@ -44,7 +44,7 @@ const metricCards = [
     value: "158",
     badge: "Pro",
     icon: "auto-awesome" as const,
-    tone: "#A6651A",
+    tone: COLORS.metricAmber,
   },
   {
     id: "pendientes",
@@ -52,7 +52,7 @@ const metricCards = [
     value: "3",
     badge: "Pendientes",
     icon: "assignment-late" as const,
-    tone: "#D34553",
+    tone: COLORS.danger,
   },
 ];
 
@@ -148,7 +148,7 @@ const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar backgroundColor="#F4F7FB" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.surfaceHover} barStyle="dark-content" />
 
       <Modal animationType="fade" transparent visible={menuVisible} onRequestClose={closeMenu}>
         <View style={styles.menuOverlay}>
@@ -188,7 +188,7 @@ const HomeScreen: React.FC = () => {
                   <MaterialIcons
                     name={item.icon}
                     size={18}
-                    color={item.active ? "#1E64CC" : "#7D8BA3"}
+                    color={item.active ? COLORS.primaryMuted : "#7D8BA3"}
                   />
                   <Text style={[styles.sidebarText, item.active && styles.sidebarTextActive]}>
                     {item.label}
@@ -202,7 +202,7 @@ const HomeScreen: React.FC = () => {
               activeOpacity={0.85}
               onPress={() => onSidebarPress("planeaciones")}
             >
-              <MaterialIcons name="add" size={18} color="#FFFFFF" />
+              <MaterialIcons name="add" size={18} color={COLORS.surface} />
               <Text style={styles.sidebarCtaText}>Nueva Planeación</Text>
             </TouchableOpacity>
           </View>
@@ -228,13 +228,13 @@ const HomeScreen: React.FC = () => {
                     style={[styles.iconAction, styles.iconActionCompact]}
                     activeOpacity={0.85}
                   >
-                    <MaterialIcons name="notifications-none" size={20} color="#4A5568" />
+                    <MaterialIcons name="notifications-none" size={20} color={COLORS.textDark} />
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.iconAction, styles.iconActionCompact]}
                     activeOpacity={0.85}
                   >
-                    <MaterialIcons name="help-outline" size={20} color="#4A5568" />
+                    <MaterialIcons name="help-outline" size={20} color={COLORS.textDark} />
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.profileBlock, styles.profileBlockCompact]}
@@ -242,7 +242,7 @@ const HomeScreen: React.FC = () => {
                     onPress={openMenu}
                   >
                     <View style={styles.avatarCircle}>
-                      <MaterialIcons name="person" size={16} color="#FFFFFF" />
+                      <MaterialIcons name="person" size={16} color={COLORS.surface} />
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -316,7 +316,7 @@ const HomeScreen: React.FC = () => {
                 activeOpacity={0.85}
                 onPress={() => onSidebarPress("planeaciones")}
               >
-                <MaterialIcons name="edit-document" size={22} color="#FFFFFF" />
+                <MaterialIcons name="edit-document" size={22} color={COLORS.surface} />
                 <Text style={styles.quickActionPrimaryText} numberOfLines={1}>
                   Nueva Planeación
                 </Text>
@@ -327,7 +327,7 @@ const HomeScreen: React.FC = () => {
                 activeOpacity={0.85}
                 onPress={() => onSidebarPress("planeaciones")}
               >
-                <MaterialIcons name="upload-file" size={22} color="#1E64CC" />
+                <MaterialIcons name="upload-file" size={22} color={COLORS.primaryMuted} />
                 <Text style={styles.quickActionText} numberOfLines={1}>
                   Importar PDF
                 </Text>
@@ -337,7 +337,7 @@ const HomeScreen: React.FC = () => {
                 style={[styles.quickActionCard, !wideContent && { width: quickActionCardWidth }]}
                 activeOpacity={0.85}
               >
-                <MaterialIcons name="psychology" size={22} color="#1E64CC" />
+                <MaterialIcons name="psychology" size={22} color={COLORS.primaryMuted} />
                 <Text style={styles.quickActionText} numberOfLines={1}>
                   Asistente IA
                 </Text>
@@ -347,7 +347,7 @@ const HomeScreen: React.FC = () => {
                 style={[styles.quickActionCard, !wideContent && { width: quickActionCardWidth }]}
                 activeOpacity={0.85}
               >
-                <MaterialIcons name="share" size={22} color="#1E64CC" />
+                <MaterialIcons name="share" size={22} color={COLORS.primaryMuted} />
                 <Text style={styles.quickActionText} numberOfLines={1}>
                   Compartir Recurso
                 </Text>
@@ -371,7 +371,7 @@ const HomeScreen: React.FC = () => {
                 {continueCards.map((item) => (
                   <TouchableOpacity key={item.id} style={styles.continueCard} activeOpacity={0.9}>
                     <View style={styles.continueIcon}>
-                      <MaterialIcons name="functions" size={22} color="#1E64CC" />
+                      <MaterialIcons name="functions" size={22} color={COLORS.primaryMuted} />
                     </View>
                     <View style={styles.continueBody}>
                       <View style={styles.continueMetaRow}>
@@ -433,7 +433,7 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   rootLayout: {
     flex: 1,
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
   },
   sidebar: {
     width: 170,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRightWidth: 1,
     borderRightColor: "#E4EAF2",
     paddingHorizontal: 12,
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: 27,
     fontWeight: "900",
-    color: "#1E64CC",
+    color: COLORS.primaryMuted,
     letterSpacing: -0.4,
   },
   logoSub: {
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   sidebarTextActive: {
-    color: "#1E64CC",
+    color: COLORS.primaryMuted,
   },
   sidebarCta: {
     marginBottom: 8,
@@ -492,11 +492,11 @@ const styles = StyleSheet.create({
     gap: 6,
     borderRadius: 10,
     paddingVertical: 12,
-    backgroundColor: "#1E64CC",
+    backgroundColor: COLORS.primaryMuted,
     boxShadow: "0px 10px 18px rgba(30, 100, 204, 0.3)",
   },
   sidebarCtaText: {
-    color: "#FFFFFF",
+    color: COLORS.surface,
     fontSize: 13,
     fontWeight: "700",
   },
@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
   },
   topBar: {
     minHeight: 76,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderBottomWidth: 1,
     borderBottomColor: "#E4EAF2",
     flexDirection: "row",
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: "#F2F5FA",
+    backgroundColor: COLORS.surfaceTertiary,
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -555,7 +555,7 @@ const styles = StyleSheet.create({
   },
   mobileGreetingPill: {
     borderRadius: 22,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: "#E3EAF3",
     minHeight: 96,
@@ -567,7 +567,7 @@ const styles = StyleSheet.create({
   mobileHello: {
     fontSize: 33,
     fontWeight: "800",
-    color: "#1F2A3E",
+    color: COLORS.text,
     lineHeight: 37,
     letterSpacing: -0.5,
   },
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#F2F5FA",
+    backgroundColor: COLORS.surfaceTertiary,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -612,7 +612,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F4F7FC",
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "#E2EAF5",
+    borderColor: COLORS.border,
     paddingVertical: 4,
     paddingHorizontal: 6,
     maxWidth: 150,
@@ -626,14 +626,14 @@ const styles = StyleSheet.create({
   },
   profileText: {
     fontSize: 12,
-    color: "#4A5568",
+    color: COLORS.textDark,
     fontWeight: "600",
   },
   avatarCircle: {
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: "#1E64CC",
+    backgroundColor: COLORS.primaryMuted,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -657,7 +657,7 @@ const styles = StyleSheet.create({
   metricCard: {
     width: "100%",
     borderRadius: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: "#E6ECF4",
     padding: 14,
@@ -691,14 +691,14 @@ const styles = StyleSheet.create({
   metricTitle: {
     textTransform: "uppercase",
     fontSize: 11,
-    color: "#71829A",
+    color: COLORS.textTertiary,
     fontWeight: "700",
     letterSpacing: 0.5,
   },
   metricValue: {
     fontSize: 39,
     fontWeight: "800",
-    color: "#1F2A3E",
+    color: COLORS.text,
     letterSpacing: -0.6,
   },
   sectionLabel: {
@@ -719,7 +719,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#DEE8F5",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -728,12 +728,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   quickActionPrimary: {
-    backgroundColor: "#1E64CC",
-    borderColor: "#1E64CC",
+    backgroundColor: COLORS.primaryMuted,
+    borderColor: COLORS.primaryMuted,
     boxShadow: "0px 8px 16px rgba(30, 100, 204, 0.3)",
   },
   quickActionPrimaryText: {
-    color: "#FFFFFF",
+    color: COLORS.surface,
     fontSize: 15,
     fontWeight: "700",
   },
@@ -774,19 +774,19 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 25,
     fontWeight: "800",
-    color: "#1F2A3E",
+    color: COLORS.text,
     letterSpacing: -0.4,
   },
   sectionTitleCompact: {
     fontSize: 17,
   },
   sectionLink: {
-    color: "#1E64CC",
+    color: COLORS.primaryMuted,
     fontSize: 15,
     fontWeight: "700",
   },
   continueCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#E4EBF4",
@@ -816,7 +816,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "700",
     color: "#3D82D8",
-    backgroundColor: "#E8F3FF",
+    backgroundColor: COLORS.border,
     borderRadius: 6,
     paddingVertical: 3,
     paddingHorizontal: 6,
@@ -839,13 +839,13 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 6,
     borderRadius: 999,
-    backgroundColor: "#E8EDF5",
+    backgroundColor: COLORS.progressTrack,
     overflow: "hidden",
   },
   progressFill: {
     height: "100%",
     borderRadius: 999,
-    backgroundColor: "#1E64CC",
+    backgroundColor: COLORS.primaryMuted,
   },
   progressText: {
     fontSize: 11,
@@ -854,7 +854,7 @@ const styles = StyleSheet.create({
     minWidth: 30,
   },
   timelineCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#E4EBF4",
@@ -884,13 +884,13 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#1E64CC",
+    backgroundColor: COLORS.primaryMuted,
     marginTop: 5,
   },
   timelineLine: {
     width: 2,
     flex: 1,
-    backgroundColor: "#DFE8F4",
+    backgroundColor: COLORS.borderLight,
     marginTop: 4,
   },
   timelineTextWrap: {
@@ -900,7 +900,7 @@ const styles = StyleSheet.create({
   timelineTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#1F2A3E",
+    color: COLORS.text,
   },
   timelineDetail: {
     fontSize: 12,
@@ -930,7 +930,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   menuContainer: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     padding: 20,
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
@@ -938,7 +938,7 @@ const styles = StyleSheet.create({
   menuTitle: {
     fontSize: 19,
     fontWeight: "700",
-    color: "#1F2A3E",
+    color: COLORS.text,
     marginBottom: 14,
   },
   menuOption: {
@@ -959,7 +959,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     alignItems: "center",
     borderRadius: 10,
-    backgroundColor: "#F2F5FA",
+    backgroundColor: COLORS.surfaceTertiary,
     paddingVertical: 10,
   },
   closeMenuText: {

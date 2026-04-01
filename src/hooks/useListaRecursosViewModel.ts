@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { COLORS } from "../../types";
 
 export interface ListaRecursosViewModel {
   searchQuery: string;
@@ -25,10 +26,10 @@ export const useListaRecursosViewModel = (): ListaRecursosViewModel => {
 
   const getColorByTipo = useCallback((tipo: string): string => {
     const colors: Record<string, string> = {
-      examen: "#4CAF50",
-      presentacion: "#2196F3",
-      mapa_mental: "#FF9800",
-      linea_tiempo: "#9C27B0",
+      examen: COLORS.success,
+      presentacion: COLORS.primaryLight,
+      mapa_mental: COLORS.warning,
+      linea_tiempo: COLORS.purple,
     };
     return colors[tipo] || "#757575";
   }, []);

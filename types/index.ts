@@ -484,17 +484,85 @@ export type CRUDOperation = "create" | "read" | "update" | "delete";
 // CONSTANTES DE TIPO
 // ==========================================
 /**
- * Colores principales de la aplicación
+ * Sistema de diseño — paleta de colores
+ *
+ * Cada token tiene un propósito semántico. Usar siempre estas constantes
+ * en lugar de valores hexadecimales hardcodeados.
  */
 export const COLORS = {
-  primary: "#2196F3", // Azul cielo principal (Material Blue)
-  secondary: "#87CEEB", // Azul cielo más claro para acentos
-  background: "#f8fbff", // Fondo con tinte azul muy suave
-  surface: "#ffffff", // Blanco para superficies
-  error: "#f44336", // Rojo para los errores
-  text: "#1a1a1a", // Negro para el texto
-  textSecondary: "#6b7280", // Gris azulado para texto secundario
-};
+  // ─── Primarios ───
+  primary: "#1676D2",
+  primaryDark: "#0C63B8",
+  primaryLight: "#2196F3",
+  primaryMuted: "#1E64CC",
+
+  // ─── Fondos ───
+  background: "#EEF3FA",
+  backgroundSoft: "#F8FBFF",
+
+  // ─── Superficies ───
+  surface: "#FFFFFF",
+  surfaceSecondary: "#ECF1F8",
+  surfaceTertiary: "#F2F5FA",
+  surfaceHover: "#F5F8FC",
+
+  // ─── Bordes ───
+  border: "#E3EAF4",
+  borderLight: "#DDE7F5",
+  borderStrong: "#D8E2F0",
+  divider: "#E0E0E0",
+
+  // ─── Texto ───
+  text: "#1E2A3A",
+  textSecondary: "#5C6E86",
+  textTertiary: "#6B7D96",
+  textMuted: "#8A97AA",
+  textDark: "#2A3B56",
+  textOnPrimary: "#FFFFFF",
+
+  // ─── Estado ───
+  success: "#4CAF50",
+  successTint: "#E7F9F3",
+  error: "#C62828",
+  errorLight: "#F44336",
+  errorTint: "#FFF1F2",
+  warning: "#FF9800",
+  warningTint: "#FFF8F1",
+  danger: "#D34553",
+  dangerDark: "#B12635",
+
+  // ─── Niveles académicos ───
+  nivelPrimaria: "#4CAF50",
+  nivelSecundaria: "#2196F3",
+  nivelPreparatoria: "#FF9800",
+  nivelUniversidad: "#9C27B0",
+
+  // ─── Acentos ───
+  purple: "#9C27B0",
+  teal: "#0B6F86",
+  tealLight: "#0EA5A5",
+  indigo: "#5C6BC0",
+  amber: "#F58026",
+
+  // ─── Dashboard métricas (Home) ───
+  metricBlue: "#147AD6",
+  metricTeal: "#0E8B9A",
+  metricAmber: "#A6651A",
+  metricRed: "#D34553",
+
+  // ─── Componentes específicos ───
+  bannerBg: "#09589E",
+  bannerAccent: "#A8D6FF",
+  toggleActive: "#0C74C6",
+  progressTrack: "#E8EDF5",
+  skeleton: "#EDF1F7",
+  overlay: "rgba(19, 30, 49, 0.42)",
+
+  // ─── Tints suaves (fondos de badges / tarjetas de estado) ───
+  primaryTint: "#EAF4FF",
+  successLight: "#0D9E70",
+  purpleTint: "#F3E5F5",
+} as const;
 /**
  * Tamaños de fuente estándar
  */

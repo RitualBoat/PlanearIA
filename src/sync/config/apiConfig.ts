@@ -1,3 +1,4 @@
+import logger from "../../utils/logger";
 /**
  * Configuración del API de sincronización
  * Backend serverless en Vercel conectado a MongoDB Atlas
@@ -140,10 +141,10 @@ export const isAPIConfigured = (): boolean => {
  */
 export const logConfigStatus = (): void => {
   if (isAPIConfigured()) {
-    console.log("[config] Sync API configured");
-    console.log(`   URL: ${API_CONFIG.baseUrl}`);
+    logger.log("[config] Sync API configured");
+    logger.log(`   URL: ${API_CONFIG.baseUrl}`);
   } else {
-    console.log("[config] API not configured, local-only mode");
-    console.log("   Actualiza API_CONFIG.baseUrl después del deploy en Vercel");
+    logger.log("[config] API not configured, local-only mode");
+    logger.log("   Actualiza API_CONFIG.baseUrl después del deploy en Vercel");
   }
 };

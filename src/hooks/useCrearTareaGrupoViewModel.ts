@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
+import logger from "../utils/logger";
 
 type Nav = StackNavigationProp<RootStackParamList, "CrearTareaGrupo">;
 
@@ -49,7 +50,7 @@ export const useCrearTareaGrupoViewModel = (
 
   const handleGuardar = useCallback(() => {
     // TODO: Integrate with a tareas service
-    console.log("[tareas] Saving task:", {
+    logger.log("[tareas] Saving task:", {
       grupoId,
       titulo,
       descripcion,

@@ -3,6 +3,7 @@ import { render } from "@testing-library/react-native";
 import StatCard from "../../components/StatCard";
 import TrendMiniChart from "../../components/TrendMiniChart";
 import DeliveryDistributionMini from "../../components/DeliveryDistributionMini";
+import { COLORS } from "../../../types";
 
 jest.mock("react-native-chart-kit", () => ({
   ProgressChart: () => null,
@@ -14,7 +15,7 @@ describe("Componentes de estadisticas", () => {
       <StatCard
         label="PROMEDIO"
         value="8.5"
-        accentColor="#1676D2"
+        accentColor={COLORS.primary}
         trend="up"
         footerText="Meta: 8.0"
       />
@@ -30,7 +31,7 @@ describe("Componentes de estadisticas", () => {
       <TrendMiniChart
         title="Evolucion del promedio"
         subtitle="8.5 / 10 actual"
-        color="#1676D2"
+        color={COLORS.primary}
         bars={[55, 62, 70, 76, 85]}
       />
     );

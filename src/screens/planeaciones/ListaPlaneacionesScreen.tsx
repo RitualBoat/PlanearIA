@@ -85,8 +85,8 @@ const ListaPlaneacionesScreen: React.FC = () => {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={() => handleEliminar(item.id)}>
-              <MaterialIcons name="delete" size={20} color="#f44336" />
-              <Text style={[styles.menuItemText, { color: "#f44336" }]}>Eliminar</Text>
+              <MaterialIcons name="delete" size={20} color={COLORS.errorLight} />
+              <Text style={[styles.menuItemText, { color: COLORS.errorLight }]}>Eliminar</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={() => handleExportar(item.id)}>
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
   },
   badgeDetallado: {
     left: 100,
-    backgroundColor: "#5c6bc0",
+    backgroundColor: COLORS.indigo,
   },
   menuButton: {
     position: "absolute",
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   detalleCurso: {
-    backgroundColor: "#f5f5f5",
+    backgroundColor: COLORS.surfaceTertiary,
     padding: 10,
     borderRadius: 8,
     marginBottom: 12,

@@ -13,21 +13,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LineChart, ProgressChart } from "react-native-chart-kit";
 import WebScrollView from "../../components/WebScrollView";
+import { COLORS } from "../../../types";
 import {
   useReportesAlumnoViewModel,
   type PeriodoReporteAlumno,
 } from "../../hooks/useReportesAlumnoViewModel";
 
 const chartConfig = {
-  backgroundGradientFrom: "#FFFFFF",
-  backgroundGradientTo: "#FFFFFF",
+  backgroundGradientFrom: COLORS.surface,
+  backgroundGradientTo: COLORS.surface,
   color: (opacity = 1) => `rgba(12, 99, 184, ${opacity})`,
   labelColor: (opacity = 1) => `rgba(82, 96, 118, ${opacity})`,
   decimalPlaces: 0,
   propsForDots: {
     r: "4",
     strokeWidth: "2",
-    stroke: "#FFFFFF",
+    stroke: COLORS.surface,
   },
 };
 
@@ -141,7 +142,7 @@ const ReportesAlumnoScreen: React.FC = () => {
     <View style={styles.centerStateWrap}>
       <View style={styles.centerStateCard}>
         <View style={styles.errorIconCircleStrong}>
-          <MaterialIcons name="wifi-off" size={44} color="#C62828" />
+          <MaterialIcons name="wifi-off" size={44} color={COLORS.error} />
         </View>
         <Text style={styles.centerStateTitle}>No se pudieron cargar las estadísticas</Text>
         <Text style={styles.centerStateText}>
@@ -169,7 +170,7 @@ const ReportesAlumnoScreen: React.FC = () => {
         estadísticas.
       </Text>
       <TouchableOpacity style={styles.retryMainButton} onPress={goBack}>
-        <MaterialIcons name="post-add" size={18} color="#FFFFFF" />
+        <MaterialIcons name="post-add" size={18} color={COLORS.surface} />
         <Text style={styles.retryMainButtonText}>Registrar primera calificación</Text>
       </TouchableOpacity>
     </View>
@@ -244,7 +245,7 @@ const ReportesAlumnoScreen: React.FC = () => {
           {diferenciaVsGrupo.toFixed(1)} sobre el promedio ({promedioGrupo.toFixed(1)})
         </Text>
         <View style={styles.comparisonBadge}>
-          <MaterialIcons name="trending-up" size={18} color="#FFFFFF" />
+          <MaterialIcons name="trending-up" size={18} color={COLORS.surface} />
           <Text style={styles.comparisonBadgeText}>{comparativaDelta}%</Text>
         </View>
       </View>
@@ -302,13 +303,13 @@ const ReportesAlumnoScreen: React.FC = () => {
       <View style={styles.mainDesktop}>
         <View style={styles.headerDesktop}>
           <TouchableOpacity onPress={goBack} style={styles.iconButton}>
-            <MaterialIcons name="arrow-back" size={22} color="#2B3A54" />
+            <MaterialIcons name="arrow-back" size={22} color={COLORS.textDark} />
           </TouchableOpacity>
           <Text style={styles.titleDesktop}>Progreso del Alumno</Text>
           <View style={{ flex: 1 }} />
           <Text style={styles.cycleText}>Ciclo Escolar 2023 - 2024</Text>
           <TouchableOpacity onPress={handleExportar} style={styles.iconButton}>
-            <MaterialIcons name="calendar-today" size={20} color="#0C63B8" />
+            <MaterialIcons name="calendar-today" size={20} color={COLORS.primaryDark} />
           </TouchableOpacity>
         </View>
 
@@ -340,7 +341,7 @@ const ReportesAlumnoScreen: React.FC = () => {
             <View style={styles.desktopLeftCol}>
               <View style={styles.profileCard}>
                 <View style={styles.avatarWrap}>
-                  <MaterialIcons name="person" size={42} color="#1676D2" />
+                  <MaterialIcons name="person" size={42} color={COLORS.primary} />
                 </View>
                 <Text style={styles.profileName}>{alumnoNombre}</Text>
                 <Text style={styles.profileSub}>
@@ -439,7 +440,7 @@ const ReportesAlumnoScreen: React.FC = () => {
                   tareasResumen.map((item) => (
                     <View key={item.id} style={styles.taskRowDesktop}>
                       <View style={styles.taskIconWrap}>
-                        <MaterialIcons name="grid-view" size={16} color="#0C63B8" />
+                        <MaterialIcons name="grid-view" size={16} color={COLORS.primaryDark} />
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text style={styles.taskTitleDesktop}>{item.titulo}</Text>
@@ -465,7 +466,7 @@ const ReportesAlumnoScreen: React.FC = () => {
   if (isDesktop) {
     return (
       <View style={styles.container}>
-        <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+        <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
         <SafeAreaView style={styles.safeArea}>{renderDesktop()}</SafeAreaView>
       </View>
     );
@@ -473,11 +474,11 @@ const ReportesAlumnoScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
           <TouchableOpacity onPress={goBack} style={styles.iconButton}>
-            <MaterialIcons name="arrow-back" size={22} color="#2B3A54" />
+            <MaterialIcons name="arrow-back" size={22} color={COLORS.textDark} />
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>Estadísticas del alumno</Text>
@@ -486,7 +487,7 @@ const ReportesAlumnoScreen: React.FC = () => {
             </Text>
           </View>
           <TouchableOpacity onPress={handleExportar} style={styles.iconButton}>
-            <MaterialIcons name="calendar-today" size={20} color="#0C63B8" />
+            <MaterialIcons name="calendar-today" size={20} color={COLORS.primaryDark} />
           </TouchableOpacity>
         </View>
 
@@ -510,7 +511,7 @@ const TabItem: React.FC<{
 }> = ({ icon, label, active = false }) => (
   <View style={styles.tabItem}>
     <View style={[styles.tabIconWrap, active && styles.tabIconWrapActive]}>
-      <MaterialIcons name={icon} size={18} color={active ? "#0C63B8" : "#4E5664"} />
+      <MaterialIcons name={icon} size={18} color={active ? COLORS.primaryDark : "#4E5664"} />
     </View>
     <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{label}</Text>
   </View>
@@ -534,7 +535,7 @@ const SideMenuItem: React.FC<{
   active?: boolean;
 }> = ({ icon, label, active = false }) => (
   <View style={[styles.sideMenuItem, active && styles.sideMenuItemActive]}>
-    <MaterialIcons name={icon} size={17} color={active ? "#0C63B8" : "#404B5F"} />
+    <MaterialIcons name={icon} size={17} color={active ? COLORS.primaryDark : COLORS.textDark} />
     <Text style={[styles.sideMenuLabel, active && styles.sideMenuLabelActive]}>{label}</Text>
   </View>
 );
@@ -558,7 +559,7 @@ const DesktopKpi: React.FC<{
 }> = ({ icon, label, value }) => (
   <View style={styles.desktopKpiCard}>
     <View style={styles.desktopKpiIcon}>
-      <MaterialIcons name={icon} size={18} color="#0C63B8" />
+      <MaterialIcons name={icon} size={18} color={COLORS.primaryDark} />
     </View>
     <View>
       <Text style={styles.desktopKpiLabel}>{label}</Text>
@@ -595,7 +596,7 @@ const SkeletonList: React.FC = () => (
 );
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#EEF3FA" },
+  container: { flex: 1, backgroundColor: COLORS.background },
   safeArea: { flex: 1 },
   header: {
     flexDirection: "row",
@@ -604,8 +605,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#E3EAF4",
-    backgroundColor: "#FFFFFF",
+    borderBottomColor: COLORS.border,
+    backgroundColor: COLORS.surface,
   },
   iconButton: {
     width: 34,
@@ -613,10 +614,10 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#F2F6FB",
+    backgroundColor: COLORS.surfaceTertiary,
   },
-  title: { fontSize: 38, color: "#1E2A3A", fontWeight: "800", letterSpacing: -0.4 },
-  subtitle: { marginTop: 2, color: "#73839B", fontSize: 15, fontWeight: "500" },
+  title: { fontSize: 38, color: COLORS.text, fontWeight: "800", letterSpacing: -0.4 },
+  subtitle: { marginTop: 2, color: COLORS.textTertiary, fontSize: 15, fontWeight: "500" },
   content: { flex: 1 },
   mobileContentContainer: { paddingBottom: 22 },
   periodsRow: {
@@ -630,14 +631,14 @@ const styles = StyleSheet.create({
   periodChip: {
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: "#D7E1EF",
+    borderColor: COLORS.borderStrong,
     backgroundColor: "#F1F4F8",
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
-  periodChipActive: { backgroundColor: "#0C63B8", borderColor: "#0C63B8" },
-  periodChipText: { color: "#4C5C74", fontWeight: "700" },
-  periodChipTextActive: { color: "#FFFFFF" },
+  periodChipActive: { backgroundColor: COLORS.primaryDark, borderColor: COLORS.primaryDark },
+  periodChipText: { color: COLORS.textDark, fontWeight: "700" },
+  periodChipTextActive: { color: COLORS.surface },
   kpiGridMobile: {
     marginTop: 8,
     paddingHorizontal: 14,
@@ -648,61 +649,61 @@ const styles = StyleSheet.create({
   kpiCompactCard: {
     width: "47%",
     borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     paddingVertical: 14,
     paddingHorizontal: 14,
   },
   kpiCompactLabel: { color: "#7C8A9D", fontSize: 12, fontWeight: "800", letterSpacing: 0.7 },
-  kpiCompactValue: { marginTop: 6, fontSize: 52, color: "#1E2A3A", fontWeight: "800" },
-  kpiCompactValueBlue: { marginTop: 6, fontSize: 52, color: "#0C63B8", fontWeight: "800" },
-  kpiCompactValueDanger: { marginTop: 6, fontSize: 52, color: "#C62828", fontWeight: "800" },
+  kpiCompactValue: { marginTop: 6, fontSize: 52, color: COLORS.text, fontWeight: "800" },
+  kpiCompactValueBlue: { marginTop: 6, fontSize: 52, color: COLORS.primaryDark, fontWeight: "800" },
+  kpiCompactValueDanger: { marginTop: 6, fontSize: 52, color: COLORS.error, fontWeight: "800" },
   kpiCompactSub: { fontSize: 22, color: "#7B8799", fontWeight: "700" },
   blockCardMobile: {
     marginHorizontal: 14,
     marginTop: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     borderRadius: 18,
     padding: 14,
   },
   blockCard: {
     marginHorizontal: 16,
     marginTop: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     borderRadius: 14,
     padding: 14,
   },
   blockHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  blockTitle: { color: "#1E2A3A", fontWeight: "800", fontSize: 17 },
+  blockTitle: { color: COLORS.text, fontWeight: "800", fontSize: 17 },
   trendBadge: {
-    backgroundColor: "#E7F0FF",
+    backgroundColor: COLORS.border,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  trendBadgeText: { color: "#0C63B8", fontWeight: "700", fontSize: 12 },
+  trendBadgeText: { color: COLORS.primaryDark, fontWeight: "700", fontSize: 12 },
   chart: { marginTop: 8, borderRadius: 12 },
   badgeMini: {
     borderRadius: 999,
-    backgroundColor: "#DDEFFF",
+    backgroundColor: COLORS.primaryTint,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  badgeMiniText: { color: "#0C63B8", fontWeight: "700", fontSize: 12 },
+  badgeMiniText: { color: COLORS.primaryDark, fontWeight: "700", fontSize: 12 },
   comparisonBlueCard: {
     marginHorizontal: 14,
     marginTop: 16,
     borderRadius: 18,
-    backgroundColor: "#0C63B8",
+    backgroundColor: COLORS.primaryDark,
     padding: 16,
   },
   comparisonLabel: { color: "#83B6E6", fontSize: 12, fontWeight: "800", letterSpacing: 0.8 },
-  comparisonTitle: { color: "#FFFFFF", fontSize: 46, fontWeight: "800", marginTop: 8 },
+  comparisonTitle: { color: COLORS.surface, fontSize: 46, fontWeight: "800", marginTop: 8 },
   comparisonText: { color: "#BBD8F2", marginTop: 8, lineHeight: 20 },
   comparisonBadge: {
     position: "absolute",
@@ -714,20 +715,20 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
   },
-  comparisonBadgeText: { marginTop: 4, color: "#FFFFFF", fontWeight: "800", fontSize: 24 },
+  comparisonBadgeText: { marginTop: 4, color: COLORS.surface, fontWeight: "800", fontSize: 24 },
   progressWrap: { alignItems: "center", justifyContent: "center", marginTop: 8, minHeight: 190 },
   progressCenterText: {
     position: "absolute",
     top: 74,
     fontSize: 32,
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontWeight: "800",
   },
   progressCenterSubText: {
     position: "absolute",
     top: 112,
     fontSize: 12,
-    color: "#76879E",
+    color: COLORS.textTertiary,
     fontWeight: "700",
     letterSpacing: 0.4,
   },
@@ -737,10 +738,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  legendValue: { color: "#2E3E57", fontWeight: "700" },
-  legendDotBlue: { color: "#0C63B8", fontWeight: "700" },
-  legendDotOrange: { color: "#F58026", fontWeight: "700" },
-  legendDotRed: { color: "#C62828", fontWeight: "700" },
+  legendValue: { color: COLORS.textDark, fontWeight: "700" },
+  legendDotBlue: { color: COLORS.primaryDark, fontWeight: "700" },
+  legendDotOrange: { color: COLORS.amber, fontWeight: "700" },
+  legendDotRed: { color: COLORS.error, fontWeight: "700" },
   tasksWrapMobile: {
     marginHorizontal: 14,
     marginTop: 16,
@@ -757,7 +758,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 42,
     fontSize: 34,
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontWeight: "800",
   },
   progressCircleSub: {
@@ -767,7 +768,7 @@ const styles = StyleSheet.create({
     color: "#7C8A9C",
     fontWeight: "800",
   },
-  tasksTitle: { color: "#2A3B56", fontWeight: "800", fontSize: 38 },
+  tasksTitle: { color: COLORS.textDark, fontWeight: "800", fontSize: 38 },
   legendRowInline: { flexDirection: "row", alignItems: "center", marginTop: 6 },
   legendBullet: { fontSize: 16, marginRight: 8 },
   legendLabelInline: { flex: 1, color: "#4C607C", fontSize: 25, fontWeight: "600" },
@@ -788,23 +789,23 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 27,
-    backgroundColor: "#DDEFFF",
+    backgroundColor: COLORS.primaryTint,
     alignItems: "center",
     justifyContent: "center",
   },
-  suggestionTitle: { color: "#2A3B56", fontWeight: "800", fontSize: 31 },
+  suggestionTitle: { color: COLORS.textDark, fontWeight: "800", fontSize: 31 },
   suggestionText: { marginTop: 4, color: "#52667F", lineHeight: 22, fontSize: 23 },
   tableHeader: {
     borderBottomWidth: 1,
-    borderBottomColor: "#DDE7F5",
-    backgroundColor: "#F6FAFF",
+    borderBottomColor: COLORS.borderLight,
+    backgroundColor: COLORS.backgroundSoft,
   },
   tableRow: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#EEF3FA",
+    borderBottomColor: COLORS.background,
   },
   tableHeaderText: {
     color: "#5D6F89",
@@ -822,22 +823,22 @@ const styles = StyleSheet.create({
   colEstado: { flex: 1, textAlign: "right" },
   tableEmptyText: {
     marginTop: 10,
-    color: "#73839B",
+    color: COLORS.textTertiary,
     fontSize: 14,
   },
   centerStateWrap: { paddingHorizontal: 16, paddingTop: 46, alignItems: "center" },
   centerStateCard: {
     width: "100%",
     borderRadius: 22,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E2EAF5",
+    borderColor: COLORS.border,
     alignItems: "center",
     padding: 22,
   },
   centerStateTitle: {
     marginTop: 16,
-    color: "#1E2A3A",
+    color: COLORS.text,
     fontWeight: "800",
     fontSize: 18,
     textAlign: "center",
@@ -860,14 +861,14 @@ const styles = StyleSheet.create({
   retryMainButton: {
     marginTop: 22,
     borderRadius: 999,
-    backgroundColor: "#0C63B8",
+    backgroundColor: COLORS.primaryDark,
     paddingHorizontal: 26,
     paddingVertical: 14,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
   },
-  retryMainButtonText: { color: "#FFFFFF", fontWeight: "800", fontSize: 20 },
+  retryMainButtonText: { color: COLORS.surface, fontWeight: "800", fontSize: 20 },
   secondaryLink: { marginTop: 16, color: "#2D76B8", fontWeight: "700", fontSize: 16 },
   emptyIllustration: {
     width: 160,
@@ -895,8 +896,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     borderTopWidth: 1,
-    borderTopColor: "#E0E8F4",
-    backgroundColor: "#FFFFFF",
+    borderTopColor: COLORS.border,
+    backgroundColor: COLORS.surface,
     paddingTop: 8,
     paddingBottom: 8,
   },
@@ -910,31 +911,31 @@ const styles = StyleSheet.create({
   },
   tabIconWrapActive: { backgroundColor: "#E8F1FF" },
   tabLabel: { color: "#4F5968", fontSize: 10, fontWeight: "800", letterSpacing: 0.5 },
-  tabLabelActive: { color: "#0C63B8" },
+  tabLabelActive: { color: COLORS.primaryDark },
 
   loadingTopCards: { marginTop: 10, paddingHorizontal: 14, flexDirection: "row", gap: 10 },
   skeletonCard: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#E5ECF6",
+    borderColor: COLORS.border,
     padding: 12,
     minHeight: 108,
   },
-  skeletonCircle: { width: 26, height: 26, borderRadius: 13, backgroundColor: "#EDF1F7" },
+  skeletonCircle: { width: 26, height: 26, borderRadius: 13, backgroundColor: COLORS.skeleton },
   skeletonBar: {
     marginTop: 12,
     height: 10,
     borderRadius: 8,
-    backgroundColor: "#EDF1F7",
+    backgroundColor: COLORS.skeleton,
     width: "58%",
   },
   skeletonBarWide: {
     marginTop: 8,
     height: 14,
     borderRadius: 8,
-    backgroundColor: "#EDF1F7",
+    backgroundColor: COLORS.skeleton,
     width: "76%",
   },
   skeletonWide: {
@@ -942,8 +943,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#E5ECF6",
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
     padding: 12,
     minHeight: 95,
   },
@@ -954,12 +955,12 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: "#EDF1F7",
+    backgroundColor: COLORS.skeleton,
   },
   skeletonLine: {
     height: 14,
     borderRadius: 8,
-    backgroundColor: "#EDF1F7",
+    backgroundColor: COLORS.skeleton,
     marginHorizontal: 14,
     marginTop: 16,
     width: "55%",
@@ -970,20 +971,20 @@ const styles = StyleSheet.create({
     height: 190,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#E5ECF6",
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
   },
   skeletonListWrap: {
     marginTop: 16,
     marginHorizontal: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#E5ECF6",
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
     padding: 12,
     gap: 12,
   },
-  skeletonListRow: { height: 44, borderRadius: 10, backgroundColor: "#EDF1F7" },
+  skeletonListRow: { height: 44, borderRadius: 10, backgroundColor: COLORS.skeleton },
   skeletonSuggestion: {
     marginTop: 18,
     marginHorizontal: 14,
@@ -997,9 +998,9 @@ const styles = StyleSheet.create({
   desktopLayout: { flex: 1, flexDirection: "row" },
   sidebarDesktop: {
     width: 225,
-    backgroundColor: "#F4F7FB",
+    backgroundColor: COLORS.surfaceHover,
     borderRightWidth: 1,
-    borderRightColor: "#E0E8F3",
+    borderRightColor: COLORS.border,
     padding: 16,
     gap: 8,
   },
@@ -1012,9 +1013,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 12,
   },
-  sideMenuItemActive: { backgroundColor: "#EAF2FF" },
-  sideMenuLabel: { color: "#404B5F", fontWeight: "600" },
-  sideMenuLabelActive: { color: "#0C63B8", fontWeight: "700" },
+  sideMenuItemActive: { backgroundColor: COLORS.primaryTint },
+  sideMenuLabel: { color: COLORS.textDark, fontWeight: "600" },
+  sideMenuLabelActive: { color: COLORS.primaryDark, fontWeight: "700" },
   mainDesktop: { flex: 1 },
   headerDesktop: {
     flexDirection: "row",
@@ -1022,19 +1023,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#E3EAF4",
-    backgroundColor: "#FFFFFF",
+    borderBottomColor: COLORS.border,
+    backgroundColor: COLORS.surface,
   },
-  titleDesktop: { fontSize: 34, color: "#1E2A3A", fontWeight: "800", marginLeft: 8 },
+  titleDesktop: { fontSize: 34, color: COLORS.text, fontWeight: "800", marginLeft: 8 },
   cycleText: { color: "#687A93", marginRight: 8, fontWeight: "600" },
   desktopGrid: { flex: 1, padding: 14, flexDirection: "row", gap: 14 },
   desktopLeftCol: { width: 290, gap: 12 },
   desktopRightCol: { flex: 1, gap: 12 },
   profileCard: {
     borderRadius: 18,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 16,
     alignItems: "center",
   },
@@ -1048,7 +1049,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  profileName: { marginTop: 10, fontSize: 24, color: "#2A3B56", fontWeight: "800" },
+  profileName: { marginTop: 10, fontSize: 24, color: COLORS.textDark, fontWeight: "800" },
   profileSub: { marginTop: 4, color: "#7E8EA5", fontWeight: "600" },
   profileTagsRow: { marginTop: 10, flexDirection: "row", gap: 8 },
   badgeSmall: {
@@ -1058,13 +1059,13 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   badgeSmallPale: { backgroundColor: "#DCF4F7" },
-  badgeSmallText: { color: "#1A71BA", fontWeight: "800", fontSize: 11 },
+  badgeSmallText: { color: COLORS.primaryDark, fontWeight: "800", fontSize: 11 },
   badgeSmallTextPale: { color: "#2A8E97" },
   desktopKpiCard: {
     borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
     flexDirection: "row",
     alignItems: "center",
@@ -1074,28 +1075,28 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: "#EAF2FF",
+    backgroundColor: COLORS.primaryTint,
     alignItems: "center",
     justifyContent: "center",
   },
   desktopKpiLabel: { color: "#6F8098", fontSize: 11, fontWeight: "800" },
-  desktopKpiValue: { marginTop: 2, color: "#1E2A3A", fontSize: 20, fontWeight: "800" },
+  desktopKpiValue: { marginTop: 2, color: COLORS.text, fontSize: 20, fontWeight: "800" },
   groupCard: {
     borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
   },
-  groupCardTitle: { color: "#2A3B56", fontWeight: "800", fontSize: 20, marginBottom: 8 },
+  groupCardTitle: { color: COLORS.textDark, fontWeight: "800", fontSize: 20, marginBottom: 8 },
   groupMetricLabel: { color: "#6C7E98", fontSize: 11, fontWeight: "800", marginTop: 4 },
   progressBarTrack: {
     marginTop: 4,
     height: 8,
     borderRadius: 999,
-    backgroundColor: "#DDEFFF",
+    backgroundColor: COLORS.primaryTint,
   },
-  progressBarFill: { height: "100%", borderRadius: 999, backgroundColor: "#0C63B8" },
+  progressBarFill: { height: "100%", borderRadius: 999, backgroundColor: COLORS.primaryDark },
   progressBarTrackGray: {
     marginTop: 4,
     height: 8,
@@ -1106,38 +1107,38 @@ const styles = StyleSheet.create({
   groupCardNote: { marginTop: 10, color: "#6C7E98", fontSize: 12, lineHeight: 18 },
   trendCardDesktop: {
     borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
   },
   yearsRow: { flexDirection: "row", gap: 8 },
   yearChip: {
     borderRadius: 999,
-    backgroundColor: "#EEF2F7",
+    backgroundColor: COLORS.skeleton,
     paddingHorizontal: 10,
     paddingVertical: 5,
   },
-  yearChipActive: { backgroundColor: "#0C63B8" },
+  yearChipActive: { backgroundColor: COLORS.primaryDark },
   yearChipText: { color: "#617590", fontWeight: "700", fontSize: 12 },
-  yearChipTextActive: { color: "#FFFFFF" },
+  yearChipTextActive: { color: COLORS.surface },
   smallSub: { color: "#7C8CA2", marginTop: 2 },
   tasksCardDesktop: {
     borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
   },
   legendInline: { flexDirection: "row", gap: 10 },
-  legendInlineBlue: { color: "#0C63B8", fontWeight: "800", fontSize: 11 },
-  legendInlineRed: { color: "#C62828", fontWeight: "800", fontSize: 11 },
+  legendInlineBlue: { color: COLORS.primaryDark, fontWeight: "800", fontSize: 11 },
+  legendInlineRed: { color: COLORS.error, fontWeight: "800", fontSize: 11 },
   taskRowDesktop: {
     marginTop: 10,
     borderRadius: 12,
-    backgroundColor: "#F5F8FC",
+    backgroundColor: COLORS.surfaceHover,
     borderWidth: 1,
-    borderColor: "#E2EAF5",
+    borderColor: COLORS.border,
     padding: 10,
     flexDirection: "row",
     alignItems: "center",
@@ -1151,16 +1152,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  taskTitleDesktop: { color: "#2A3B56", fontWeight: "700" },
+  taskTitleDesktop: { color: COLORS.textDark, fontWeight: "700" },
   taskSubDesktop: { marginTop: 2, color: "#7C8CA2", fontSize: 12 },
-  taskScoreDesktop: { color: "#2A3B56", fontWeight: "800", textAlign: "right" },
-  taskStatusDesktop: { marginTop: 2, color: "#0C63B8", fontWeight: "800", fontSize: 11 },
+  taskScoreDesktop: { color: COLORS.textDark, fontWeight: "800", textAlign: "right" },
+  taskStatusDesktop: { marginTop: 2, color: COLORS.primaryDark, fontWeight: "800", fontSize: 11 },
   desktopStateCard: {
     margin: 20,
     borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 24,
     alignItems: "center",
   },

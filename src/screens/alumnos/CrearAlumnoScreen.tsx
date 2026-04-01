@@ -20,6 +20,7 @@ import WebScrollView from "../../components/WebScrollView";
 import { useCrearAlumnoViewModel, type CarreraOption } from "../../hooks/useCrearAlumnoViewModel";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
 import { useAlumnos } from "../../context/AlumnosContext";
+import { COLORS } from "../../../types";
 
 const CARRERAS: CarreraOption[] = ["ISC", "IGE", "ARQ", "ITICS"];
 
@@ -154,12 +155,12 @@ const CrearAlumnoScreen: React.FC = () => {
   if (saveView === "success") {
     return (
       <View style={styles.container}>
-        <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+        <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
         <SafeAreaView style={styles.safeArea}>
           <WebScrollView contentContainerStyle={styles.successContainer}>
             <View style={styles.successBannerCard}>
               <View style={styles.successBannerIcon}>
-                <MaterialIcons name="check-circle" size={28} color="#1676D2" />
+                <MaterialIcons name="check-circle" size={28} color={COLORS.primary} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.successBannerTitle}>
@@ -185,12 +186,12 @@ const CrearAlumnoScreen: React.FC = () => {
               <FieldReadonly label="Correo institucional" value={email || "No definido"} />
 
               <TouchableOpacity style={styles.primaryActionBtn} onPress={handlePrimaryAfterSuccess}>
-                <MaterialIcons name="person" size={18} color="#FFFFFF" />
+                <MaterialIcons name="person" size={18} color={COLORS.surface} />
                 <Text style={styles.primaryActionBtnText}>Volver al detalle</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.secondaryActionBtn} onPress={handleRegisterAnother}>
-                <MaterialIcons name="person-add" size={18} color="#1676D2" />
+                <MaterialIcons name="person-add" size={18} color={COLORS.primary} />
                 <Text style={styles.secondaryActionBtnText}>Registrar otro</Text>
               </TouchableOpacity>
             </View>
@@ -219,11 +220,11 @@ const CrearAlumnoScreen: React.FC = () => {
   if (saveView === "sync-error") {
     return (
       <View style={styles.container}>
-        <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+        <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
         <SafeAreaView style={styles.safeArea}>
           <WebScrollView contentContainerStyle={styles.errorContainer}>
             <View style={styles.errorBanner}>
-              <MaterialIcons name="wifi-off" size={20} color="#C62828" />
+              <MaterialIcons name="wifi-off" size={20} color={COLORS.error} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.errorTitle}>No se pudo guardar la informacion</Text>
                 <Text style={styles.errorTextLarge}>
@@ -251,7 +252,7 @@ const CrearAlumnoScreen: React.FC = () => {
                 style={styles.primaryActionBtn}
                 onPress={() => void handleGuardar()}
               >
-                <MaterialIcons name="refresh" size={18} color="#FFFFFF" />
+                <MaterialIcons name="refresh" size={18} color={COLORS.surface} />
                 <Text style={styles.primaryActionBtnText}>Reintentar</Text>
               </TouchableOpacity>
 
@@ -267,7 +268,7 @@ const CrearAlumnoScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.headerBar}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBackBtn}>
@@ -290,7 +291,7 @@ const CrearAlumnoScreen: React.FC = () => {
           <WebScrollView style={styles.formScroll} contentContainerStyle={styles.formScrollContent}>
             {showValidationBanner ? (
               <View style={styles.validationBanner}>
-                <MaterialIcons name="error" size={20} color="#C62828" />
+                <MaterialIcons name="error" size={20} color={COLORS.error} />
                 <View style={{ flex: 1 }}>
                   <Text style={styles.validationTitle}>Por favor revisa los errores</Text>
                   <Text style={styles.validationText}>
@@ -307,7 +308,7 @@ const CrearAlumnoScreen: React.FC = () => {
                   Asegurate de capturar los datos oficiales para reportes IA.
                 </Text>
                 <View style={styles.miniIntroIconWrap}>
-                  <MaterialIcons name="person-add" size={20} color="#1676D2" />
+                  <MaterialIcons name="person-add" size={20} color={COLORS.primary} />
                 </View>
               </View>
             ) : null}
@@ -366,12 +367,12 @@ const CrearAlumnoScreen: React.FC = () => {
               >
                 {isSaving ? (
                   <>
-                    <ActivityIndicator size="small" color="#FFFFFF" />
+                    <ActivityIndicator size="small" color={COLORS.surface} />
                     <Text style={styles.saveButtonText}>Guardando...</Text>
                   </>
                 ) : (
                   <>
-                    <MaterialIcons name="save" size={16} color="#FFFFFF" />
+                    <MaterialIcons name="save" size={16} color={COLORS.surface} />
                     <Text style={styles.saveButtonText}>
                       {isCreateMode ? "Guardar alumno" : "Guardar cambios"}
                     </Text>
@@ -467,13 +468,13 @@ const SuggestionRow: React.FC<{
 );
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#EEF3FA" },
+  container: { flex: 1, backgroundColor: COLORS.background },
   safeArea: { flex: 1 },
   headerBar: {
     flexDirection: "row",
     alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "#DFE8F4",
+    borderBottomColor: COLORS.borderLight,
     backgroundColor: "#F5F9FE",
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -531,8 +532,8 @@ const styles = StyleSheet.create({
   formCard: {
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#DFE8F4",
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.borderLight,
+    backgroundColor: COLORS.surface,
     padding: 14,
   },
   formCardWeb: { maxWidth: 760, width: "100%" },
@@ -559,13 +560,13 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "#DCE4F1",
+    borderColor: COLORS.borderLight,
     borderRadius: 10,
-    backgroundColor: "#F6F9FD",
+    backgroundColor: COLORS.surfaceHover,
     paddingHorizontal: 12,
     paddingVertical: 11,
     fontSize: 15,
-    color: "#2A3D56",
+    color: COLORS.textDark,
   },
   inputError: {
     borderColor: "#DB3B33",
@@ -573,9 +574,9 @@ const styles = StyleSheet.create({
   },
   selectorButton: {
     borderWidth: 1,
-    borderColor: "#DCE4F1",
+    borderColor: COLORS.borderLight,
     borderRadius: 10,
-    backgroundColor: "#F6F9FD",
+    backgroundColor: COLORS.surfaceHover,
     paddingHorizontal: 12,
     paddingVertical: 11,
     flexDirection: "row",
@@ -583,7 +584,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   selectorButtonError: { borderColor: "#DB3B33", backgroundColor: "#FFF6F6" },
-  selectorText: { color: "#2A3D56", fontSize: 15 },
+  selectorText: { color: COLORS.textDark, fontSize: 15 },
   errorText: { color: "#C12620", fontSize: 12, fontWeight: "700", marginTop: 4 },
   saveButton: {
     marginTop: 12,
@@ -596,14 +597,14 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
   },
   saveButtonDisabled: { backgroundColor: "#8EB8E3" },
-  saveButtonText: { color: "#FFFFFF", fontWeight: "800", fontSize: 16 },
+  saveButtonText: { color: COLORS.surface, fontWeight: "800", fontSize: 16 },
   cancelAction: { alignItems: "center", paddingVertical: 12 },
   cancelActionText: { color: "#246FB2", fontWeight: "700", fontSize: 16 },
   webRightPanel: { width: 300, gap: 12 },
   tipCard: {
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#DCE4F1",
+    borderColor: COLORS.borderLight,
     backgroundColor: "#E7EDF7",
     padding: 12,
   },
@@ -650,31 +651,31 @@ const styles = StyleSheet.create({
     marginTop: 14,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#DFE8F4",
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.borderLight,
+    backgroundColor: COLORS.surface,
     padding: 14,
   },
   successSectionTitle: { color: "#1F74BA", fontWeight: "800", marginBottom: 8 },
   successGridRow: { flexDirection: "row", gap: 10 },
   readonlyField: {
     borderWidth: 1,
-    borderColor: "#E0E8F3",
+    borderColor: COLORS.border,
     borderRadius: 12,
-    backgroundColor: "#F6F9FD",
+    backgroundColor: COLORS.surfaceHover,
     padding: 12,
     marginBottom: 10,
   },
   readonlyCompactField: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#E0E8F3",
+    borderColor: COLORS.border,
     borderRadius: 12,
-    backgroundColor: "#F6F9FD",
+    backgroundColor: COLORS.surfaceHover,
     padding: 12,
     marginBottom: 10,
   },
   readonlyLabel: { color: "#7A8EA9", fontSize: 12, fontWeight: "700" },
-  readonlyValue: { marginTop: 4, color: "#2A3D56", fontSize: 16, fontWeight: "800" },
+  readonlyValue: { marginTop: 4, color: COLORS.textDark, fontSize: 16, fontWeight: "800" },
   primaryActionBtn: {
     marginTop: 8,
     borderRadius: 12,
@@ -685,7 +686,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 13,
   },
-  primaryActionBtnText: { color: "#FFFFFF", fontWeight: "800", fontSize: 16 },
+  primaryActionBtnText: { color: COLORS.surface, fontWeight: "800", fontSize: 16 },
   secondaryActionBtn: {
     marginTop: 10,
     borderRadius: 12,
@@ -702,8 +703,8 @@ const styles = StyleSheet.create({
   suggestionRow: {
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#DFE8F4",
-    backgroundColor: "#F5F8FC",
+    borderColor: COLORS.borderLight,
+    backgroundColor: COLORS.surfaceHover,
     padding: 12,
     flexDirection: "row",
     alignItems: "center",
@@ -726,8 +727,8 @@ const styles = StyleSheet.create({
   errorDataCard: {
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#DFE7F3",
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.borderLight,
+    backgroundColor: COLORS.surface,
     padding: 12,
   },
   errorDataName: { color: "#4D5C71", fontSize: 20, fontWeight: "800" },
@@ -735,8 +736,8 @@ const styles = StyleSheet.create({
   errorActionsCard: {
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#DFE7F3",
-    backgroundColor: "#F7FAFF",
+    borderColor: COLORS.borderLight,
+    backgroundColor: COLORS.backgroundSoft,
     padding: 12,
   },
   errorActionsTitle: { color: "#2B3C54", fontSize: 20, fontWeight: "800" },

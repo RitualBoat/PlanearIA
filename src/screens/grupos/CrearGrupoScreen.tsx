@@ -56,7 +56,7 @@ const CrearGrupoScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -89,10 +89,10 @@ const CrearGrupoScreen: React.FC = () => {
                   !isOnline
                     ? "#B87424"
                     : syncStatus === "error"
-                      ? "#B12635"
+                      ? COLORS.dangerDark
                       : pendingSyncCount > 0
-                        ? "#0C5DA8"
-                        : "#0D9E70"
+                        ? COLORS.primaryDark
+                        : COLORS.successLight
                 }
               />
               <Text style={styles.syncText}>{syncLabel}</Text>
@@ -106,7 +106,7 @@ const CrearGrupoScreen: React.FC = () => {
               onPress={() => void sincronizarGrupos()}
               disabled={!isOnline || syncStatus === "syncing"}
             >
-              <MaterialIcons name="sync" size={16} color="#1676D2" />
+              <MaterialIcons name="sync" size={16} color={COLORS.primary} />
               <Text style={styles.syncButtonText}>Sincronizar ahora</Text>
             </TouchableOpacity>
           </View>
@@ -232,7 +232,7 @@ const CrearGrupoScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF3FA",
+    backgroundColor: COLORS.background,
   },
   safeArea: {
     flex: 1,
@@ -248,13 +248,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 34,
     fontWeight: "800",
-    color: "#1E2A3A",
+    color: COLORS.text,
     letterSpacing: -0.4,
     marginBottom: 2,
   },
   subtitle: {
     fontSize: 15,
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     marginBottom: 14,
   },
   syncRow: {
@@ -274,16 +274,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   syncOk: {
-    backgroundColor: "#E7F9F3",
+    backgroundColor: COLORS.successTint,
     borderColor: "#B8EAD8",
   },
   syncPending: {
-    backgroundColor: "#EAF4FF",
+    backgroundColor: COLORS.primaryTint,
     borderColor: "#CAE1FB",
   },
   syncError: {
-    backgroundColor: "#FFF1F2",
-    borderColor: "#F7CDD2",
+    backgroundColor: COLORS.errorTint,
+    borderColor: COLORS.errorTint,
   },
   syncOffline: {
     backgroundColor: "#FFF5E9",
@@ -292,15 +292,15 @@ const styles = StyleSheet.create({
   syncText: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#1E2A3A",
+    color: COLORS.text,
   },
   syncButton: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     borderWidth: 1,
-    borderColor: "#D0E2F6",
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.borderLight,
+    backgroundColor: COLORS.surface,
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -311,14 +311,14 @@ const styles = StyleSheet.create({
   syncButtonText: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#1676D2",
+    color: COLORS.primary,
   },
   form: {
     gap: 12,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E3EAF4",
+    borderColor: COLORS.border,
     padding: 14,
     boxShadow: "0px 10px 22px rgba(33, 60, 109, 0.08)",
   },
@@ -332,18 +332,18 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#1E2A3A",
+    color: COLORS.text,
     marginBottom: 6,
   },
   input: {
-    backgroundColor: "#F8FBFF",
+    backgroundColor: COLORS.backgroundSoft,
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 15,
-    color: "#1E2A3A",
+    color: COLORS.text,
     borderWidth: 1,
-    borderColor: "#DCE6F3",
+    borderColor: COLORS.borderLight,
   },
   carreraContainer: {
     flexDirection: "row",
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: COLORS.primary,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
   },
   carreraButtonActive: {
     backgroundColor: COLORS.primary,
@@ -390,12 +390,12 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   errorText: {
-    color: "#B12635",
+    color: COLORS.dangerDark,
     fontSize: 13,
     fontWeight: "600",
-    backgroundColor: "#FFF1F2",
+    backgroundColor: COLORS.errorTint,
     borderWidth: 1,
-    borderColor: "#F5C2C7",
+    borderColor: COLORS.errorTint,
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 8,
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     fontSize: 14,
-    color: "#5C6E86",
+    color: COLORS.textSecondary,
     fontWeight: "600",
   },
 });

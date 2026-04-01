@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { COLORS } from "../../types";
 
 interface TrendMiniChartProps {
   title: string;
@@ -38,8 +39,8 @@ const TrendMiniChart: React.FC<TrendMiniChartProps> = ({ title, subtitle, color,
 const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
-    borderColor: "#E3EAF4",
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 12,
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   title: {
-    color: "#2A3B56",
+    color: COLORS.textDark,
     fontSize: 15,
     fontWeight: "700",
   },

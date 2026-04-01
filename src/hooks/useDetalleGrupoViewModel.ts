@@ -5,7 +5,16 @@ import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RouteProp } from "@react-navigation/native";
 import type { RootStackParamList } from "../navigation/StackNavigator";
 import { useGruposContext } from "../context/GruposContext";
-import type { Alumno, Asistencia, Calificacion, EntregaTarea, Recurso, Tarea } from "../../types";
+import type {
+  Alumno,
+  Asistencia,
+  Calificacion,
+  EntregaTarea,
+  Grupo,
+  Recurso,
+  Tarea,
+} from "../../types";
+import { exportarGrupoArchivo, type GrupoExportFormat } from "../services/grupoExportService";
 
 type Nav = StackNavigationProp<RootStackParamList, "DetalleGrupo">;
 type Route = RouteProp<RootStackParamList, "DetalleGrupo">;
@@ -92,6 +101,7 @@ export interface DetalleGrupoViewModel {
   navigateAsignarRecurso: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
   navigateReportesGrupo: () => void;
+  exportarGrupo: (formato: GrupoExportFormat) => Promise<boolean>;
   setGrupoNotas: (value: string) => void;
   guardarNotasGrupo: () => Promise<void>;
   descartarCambiosNotas: () => void;
@@ -436,6 +446,32 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     });
   }, [navigation, grupoId, grupoNombre]);
 
+  const exportarGrupo = useCallback(
+    async (formato: GrupoExportFormat): Promise<boolean> => {
+      const grupoActual = obtenerGrupo(grupoId);
+      if (!grupoActual) {
+        return false;
+      }
+
+      return exportarGrupoArchivo({
+        formato,
+        grupo: {
+          id: grupoId,
+          nombre: String(grupoActual.nombre ?? grupoNombre),
+          materia: String(grupoActual.materia ?? "Sin materia"),
+          carrera: (grupoActual.carrera as Grupo["carrera"]) ?? "ISC",
+          semestre: Number(grupoActual.semestre ?? 1),
+          periodo: String(grupoActual.periodo ?? "Sin periodo"),
+          cantidadAlumnos: Number(grupoActual.cantidadAlumnos ?? alumnos.length),
+          horario: typeof grupoActual.horario === "string" ? grupoActual.horario : "",
+          estado: (grupoActual.estado as Grupo["estado"]) ?? "activo",
+        },
+        alumnos,
+      });
+    },
+    [alumnos, grupoId, grupoNombre, obtenerGrupo]
+  );
+
   const openDeleteModal = useCallback(() => {
     setDeleteError("");
     setDeleteConfirmed(false);
@@ -582,6 +618,7 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     navigateAsignarRecurso,
     navigateDetalleTarea,
     navigateReportesGrupo,
+    exportarGrupo,
     setGrupoNotas,
     guardarNotasGrupo,
     descartarCambiosNotas,

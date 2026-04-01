@@ -9,6 +9,8 @@ import {
   Modal,
   ActivityIndicator,
   TextInput,
+  Alert,
+  Platform,
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -592,10 +594,51 @@ const DetalleGrupoScreen: React.FC = () => {
     navigateAsignarRecurso,
     navigateDetalleTarea,
     navigateReportesGrupo,
+    exportarGrupo,
     setGrupoNotas,
     guardarNotasGrupo,
     descartarCambiosNotas,
   } = useDetalleGrupoViewModel();
+
+  const handleExport = React.useCallback(() => {
+    Alert.alert("Exportar grupo", "Selecciona el formato que deseas generar", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "PDF",
+        onPress: () => {
+          void exportarGrupo("pdf")
+            .then((ok) => {
+              if (!ok) {
+                throw new Error("No se pudo exportar el grupo a PDF");
+              }
+              if (Platform.OS !== "web") {
+                Alert.alert("Listo", "Grupo exportado en PDF.");
+              }
+            })
+            .catch(() => {
+              Alert.alert("Error", "No se pudo exportar el grupo en PDF.");
+            });
+        },
+      },
+      {
+        text: "Excel",
+        onPress: () => {
+          void exportarGrupo("excel")
+            .then((ok) => {
+              if (!ok) {
+                throw new Error("No se pudo exportar el grupo a Excel");
+              }
+              if (Platform.OS !== "web") {
+                Alert.alert("Listo", "Grupo exportado en Excel.");
+              }
+            })
+            .catch(() => {
+              Alert.alert("Error", "No se pudo exportar el grupo en Excel.");
+            });
+        },
+      },
+    ]);
+  }, [exportarGrupo]);
 
   return (
     <View style={styles.container}>
@@ -609,6 +652,10 @@ const DetalleGrupoScreen: React.FC = () => {
           <TouchableOpacity style={styles.editarButton} onPress={navigateEditarGrupo}>
             <MaterialIcons name="edit" size={16} color="#1676D2" />
             <Text style={styles.editarButtonText}>Editar grupo</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.exportarButton} onPress={handleExport}>
+            <MaterialIcons name="file-download" size={16} color="#0E7A56" />
+            <Text style={styles.exportarButtonText}>Exportar grupo</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.eliminarButton} onPress={openDeleteModal}>
             <MaterialIcons name="delete-outline" size={16} color="#C62828" />
@@ -1013,6 +1060,24 @@ const styles = StyleSheet.create({
   },
   editarButtonText: {
     color: "#1676D2",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  exportarButton: {
+    marginTop: 8,
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderWidth: 1,
+    borderColor: "#BFE8DA",
+    backgroundColor: "#F1FCF8",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  exportarButtonText: {
+    color: "#0E7A56",
     fontSize: 13,
     fontWeight: "700",
   },

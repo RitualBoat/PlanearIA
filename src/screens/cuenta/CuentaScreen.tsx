@@ -78,7 +78,7 @@ const CuentaScreen: React.FC = () => {
               <AnimatedTopPill
                 icon="settings"
                 title="Configuracion"
-                subtitle="Ajusta accesibilidad, preferencias y cuenta"
+                subtitle="Accesibilidad, preferencias y cuenta"
               />
             </Animated.View>
           </View>

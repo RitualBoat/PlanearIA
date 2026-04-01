@@ -24,27 +24,6 @@ export interface BaseEntity {
 }
 
 /**
- * Interfaz para Planeaciones Docentes
- */
-export interface Planeacion extends BaseEntity {
-  titulo: string;
-  materia: string;
-  carrera: Carrera;
-  semestre: number;
-  objetivo: string;
-  contenido: string;
-  metodologia: string;
-  evaluacion: string;
-  recursos: string[];
-  fechaInicio: Date;
-  fechaFin: Date;
-  horasTeoricas: number;
-  horasPracticas: number;
-  profesorId?: ID;
-  estado: "borrador" | "activa" | "completada" | "archivada";
-}
-
-/**
  * Interfaz para Grupos
  * Un grupo agrupa a los alumnos de una materia específica
  */
@@ -72,6 +51,8 @@ export interface Alumno extends BaseEntity {
   numeroControl: string;
   grupoId?: ID; // Relación con el grupo
   carrera: Carrera;
+  escuela?: string;
+  especialidad?: string;
   email?: string;
   telefono?: string;
   fechaNacimiento?: Date;

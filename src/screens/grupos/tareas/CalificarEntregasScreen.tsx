@@ -5,12 +5,15 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, FONT_SIZES } from "../../../../types";
 import WebScrollView from "../../../components/WebScrollView";
 import { useCalificarEntregasViewModel } from "../../../hooks/useCalificarEntregasViewModel";
+import { useRoute, RouteProp } from "@react-navigation/native";
+import { RootStackParamList } from "../../../navigation/StackNavigator";
 
 /**
  * Pantalla para calificar las entregas de una tarea (View)
  * Solo JSX y StyleSheet - la logica vive en useCalificarEntregasViewModel
  */
 const CalificarEntregasScreen: React.FC = () => {
+  const route = useRoute<RouteProp<RootStackParamList, "CalificarEntregas">>();
   const {
     tareaId,
     grupoId,
@@ -19,7 +22,7 @@ const CalificarEntregasScreen: React.FC = () => {
     updateCalificacion,
     handleGuardarCalificaciones,
     handleCancelar,
-  } = useCalificarEntregasViewModel();
+  } = useCalificarEntregasViewModel(route.params.tareaId, route.params.grupoId);
 
   return (
     <View style={styles.container}>

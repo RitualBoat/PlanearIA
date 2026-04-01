@@ -5,9 +5,17 @@ const mockNavigate = jest.fn();
 const mockEliminarGrupo = jest.fn();
 const mockActualizarGrupo = jest.fn();
 const mockSetItem = jest.fn();
+const mockExportarGrupoArchivo = jest.fn();
 const mockObtenerGrupo = jest.fn(() => ({
   id: 7,
   cantidadAlumnos: 24,
+  nombre: "3o A Secundaria",
+  materia: "Matemáticas",
+  carrera: "ISC",
+  semestre: 3,
+  periodo: "Enero-Junio 2026",
+  estado: "activo",
+  horario: "Lun-Mie 7:00-9:00",
   notasPersonales: "Nota inicial",
   notasActualizadoEn: "2026-03-31T10:42:00.000Z",
 }));
@@ -67,18 +75,53 @@ jest.mock("../../context/GruposContext", () => ({
   }),
 }));
 
+jest.mock("../../services/grupoExportService", () => ({
+  exportarGrupoArchivo: (...args: unknown[]) => mockExportarGrupoArchivo(...args),
+}));
+
 describe("useDetalleGrupoViewModel", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockEliminarGrupo.mockResolvedValue(undefined);
     mockActualizarGrupo.mockResolvedValue(undefined);
     mockSetItem.mockResolvedValue(undefined);
+    mockExportarGrupoArchivo.mockResolvedValue(true);
     mockObtenerGrupo.mockReturnValue({
       id: 7,
       cantidadAlumnos: 24,
+      nombre: "3o A Secundaria",
+      materia: "Matemáticas",
+      carrera: "ISC",
+      semestre: 3,
+      periodo: "Enero-Junio 2026",
+      estado: "activo",
+      horario: "Lun-Mie 7:00-9:00",
       notasPersonales: "Nota inicial",
       notasActualizadoEn: "2026-03-31T10:42:00.000Z",
     });
+  });
+
+  it("exporta grupo en el formato solicitado", async () => {
+    const { result } = renderHook(() => useDetalleGrupoViewModel());
+
+    await act(async () => {
+      await result.current.reloadDetalleData();
+    });
+
+    await act(async () => {
+      await result.current.exportarGrupo("excel");
+    });
+
+    expect(mockExportarGrupoArchivo).toHaveBeenCalledWith(
+      expect.objectContaining({
+        formato: "excel",
+        grupo: expect.objectContaining({
+          id: 7,
+          nombre: "3o A Secundaria",
+        }),
+        alumnos: expect.any(Array),
+      })
+    );
   });
 
   it("carga notas guardadas del grupo", () => {

@@ -65,6 +65,10 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({ navigation }) =
     navigation.navigate("ImportarPlaneacion");
   };
 
+  const handleExportarPlaneacion = (): void => {
+    navigation.navigate("ExportarPlaneacion", {});
+  };
+
   const quickStats = [
     {
       id: "totales",
@@ -182,6 +186,24 @@ const PlaneacionesScreen: React.FC<PlaneacionesScreenProps> = ({ navigation }) =
               </Text>
               <View style={styles.optionFooter}>
                 <Text style={styles.optionCta}>Importar ahora</Text>
+                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
+              onPress={handleExportarPlaneacion}
+              activeOpacity={0.85}
+            >
+              <View style={[styles.iconContainer, { backgroundColor: "#5B8BD5" }]}>
+                <MaterialIcons name="download" size={28} color="#ffffff" />
+              </View>
+              <Text style={styles.optionTitle}>Exportar Planeación</Text>
+              <Text style={styles.optionDescription}>
+                Genera PDF o DOCX de tus planeaciones para compartir, imprimir o respaldar.
+              </Text>
+              <View style={styles.optionFooter}>
+                <Text style={styles.optionCta}>Exportar ahora</Text>
                 <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
               </View>
             </TouchableOpacity>

@@ -6,11 +6,12 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
+import BottomNavBar from "../../components/BottomNavBar";
 
 /**
  * Tipo para las props de navegación
  */
-type AlumnosScreenNavigationProp = StackNavigationProp<RootStackParamList, "Alumnos">;
+type AlumnosScreenNavigationProp = StackNavigationProp<RootStackParamList, "ListaAlumnos">;
 
 /**
  * Props del componente
@@ -28,19 +29,20 @@ const AlumnosScreen: React.FC<AlumnosScreenProps> = ({ navigation }) => {
    * Navega a agregar nuevo alumno
    */
   const handleAgregarAlumno = (): void => {
-    console.log("Agregar nuevo alumno");
+    navigation.navigate("CrearAlumno");
   };
 
   /**
    * Navega a ver lista de alumnos
    */
   const handleVerAlumnos = (): void => {
-    console.log("Ver lista de alumnos");
+    navigation.navigate("ListaAlumnos");
   };
 
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
+      <BottomNavBar currentScreen="Alumnos" showBackButton={false} />
 
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>

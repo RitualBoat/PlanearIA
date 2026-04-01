@@ -24,4 +24,14 @@ describe("PlaneacionesScreen - Importar", () => {
 
     expect(navigate).toHaveBeenCalledWith("ImportarPlaneacion");
   });
+
+  it("navega a ExportarPlaneacion desde la nueva tarjeta", () => {
+    const navigate = jest.fn();
+
+    const { getByText } = render(<PlaneacionesScreen navigation={{ navigate } as any} />);
+
+    fireEvent.press(getByText("Exportar Planeación"));
+
+    expect(navigate).toHaveBeenCalledWith("ExportarPlaneacion", {});
+  });
 });

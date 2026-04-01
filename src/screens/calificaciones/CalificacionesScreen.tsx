@@ -9,7 +9,7 @@ import { COLORS, FONT_SIZES } from "../../../types";
 /**
  * Tipo para las props de navegación
  */
-type CalificacionesScreenNavigationProp = StackNavigationProp<RootStackParamList, "Calificaciones">;
+type CalificacionesScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 /**
  * Props del componente

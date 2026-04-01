@@ -13,6 +13,7 @@ import { useListaPlaneacionesViewModel } from "../../hooks/useListaPlaneacionesV
  */
 const ListaPlaneacionesScreen: React.FC = () => {
   const {
+    planeaciones,
     planeacionesFiltradas,
     showFiltros,
     setShowFiltros,

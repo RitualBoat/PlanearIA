@@ -333,7 +333,10 @@ const normalizeActividades = (value: unknown) => {
     return [defaults.inicio, defaults.desarrollo, defaults.cierre];
   }
 
-  const byTipo = { ...defaults };
+  const byTipo: Record<
+    "inicio" | "desarrollo" | "cierre",
+    { tipo: "inicio" | "desarrollo" | "cierre"; descripcion: string; duracion: number }
+  > = { ...defaults };
 
   for (const item of value) {
     const tipo = (item as { tipo?: string })?.tipo;

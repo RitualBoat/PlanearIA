@@ -20,7 +20,7 @@ const COLLECTION = "planeaciones";
 
 module.exports = async (req, res) => {
   // Establecer headers CORS
-  applyCors(res);
+  applyCors(req, res);
 
   // Manejar preflight
   if (handleCors(req, res)) return;
@@ -34,6 +34,10 @@ module.exports = async (req, res) => {
   try {
     const { db } = await connectToDatabase();
     const collection = db.collection(COLLECTION);
+
+    // Crear índices (idempotente)
+    await collection.createIndex({ id: 1 }, { unique: true });
+    await collection.createIndex({ fechaModificacion: -1 });
 
     switch (req.method) {
       case "GET":
@@ -79,7 +83,7 @@ async function handleGet(req, res, collection) {
   const planeaciones = await collection
     .find(query)
     .sort({ fechaModificacion: -1 })
-    .limit(parseInt(limit))
+    .limit(parseInt(limit, 10))
     .toArray();
 
   return successResponse(res, {

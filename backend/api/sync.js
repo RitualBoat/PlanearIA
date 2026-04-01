@@ -31,7 +31,7 @@ const {
 const COLLECTION = "planeaciones";
 
 module.exports = async (req, res) => {
-  applyCors(res);
+  applyCors(req, res);
 
   if (handleCors(req, res)) return;
 
@@ -102,17 +102,11 @@ module.exports = async (req, res) => {
       }
     }
 
-    const serverChanges = await collection
-      .find(query)
-      .sort({ syncedAt: -1 })
-      .limit(200)
-      .toArray();
+    const serverChanges = await collection.find(query).sort({ syncedAt: -1 }).limit(200).toArray();
 
     result.downloaded = serverChanges;
 
-    console.log(
-      `🔄 Sync: ${result.uploaded} subidos, ${result.downloaded.length} descargados`
-    );
+    console.log(`🔄 Sync: ${result.uploaded} subidos, ${result.downloaded.length} descargados`);
 
     return successResponse(res, result);
   } catch (error) {

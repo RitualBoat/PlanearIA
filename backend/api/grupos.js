@@ -19,7 +19,7 @@ const {
 const COLLECTION = "grupos";
 
 module.exports = async (req, res) => {
-  applyCors(res);
+  applyCors(req, res);
 
   if (handleCors(req, res)) return;
 

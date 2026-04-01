@@ -21,7 +21,7 @@ const OPENAI_TIMEOUT_MS = parseInt(process.env.OPENAI_TIMEOUT_MS || "20000", 10)
 const MAX_SUGERENCIAS_DEFAULT = 8;
 
 module.exports = async (req, res) => {
-  applyCors(res);
+  applyCors(req, res);
 
   if (handleCors(req, res)) return;
 

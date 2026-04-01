@@ -5,7 +5,7 @@
 const { applyCors, successResponse } = require("../lib/auth");
 
 module.exports = async (req, res) => {
-  applyCors(res);
+  applyCors(req, res);
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();

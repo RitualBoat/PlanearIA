@@ -5,12 +5,15 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, FONT_SIZES } from "../../../../types";
 import WebScrollView from "../../../components/WebScrollView";
 import { useCrearTareaGrupoViewModel } from "../../../hooks/useCrearTareaGrupoViewModel";
+import { useRoute, RouteProp } from "@react-navigation/native";
+import { RootStackParamList } from "../../../navigation/StackNavigator";
 
 /**
  * Pantalla para crear una nueva tarea en un grupo (View)
  * Solo JSX y StyleSheet - la logica vive en useCrearTareaGrupoViewModel
  */
 const CrearTareaGrupoScreen: React.FC = () => {
+  const route = useRoute<RouteProp<RootStackParamList, "CrearTareaGrupo">>();
   const {
     grupoId,
     titulo,
@@ -26,7 +29,7 @@ const CrearTareaGrupoScreen: React.FC = () => {
     tipoOptions,
     handleGuardar,
     handleCancelar,
-  } = useCrearTareaGrupoViewModel();
+  } = useCrearTareaGrupoViewModel(route.params.grupoId);
 
   return (
     <View style={styles.container}>

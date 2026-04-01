@@ -29,7 +29,7 @@ const OPENAI_TIMEOUT_MS = parseInt(process.env.OPENAI_TIMEOUT_MS || "20000", 10)
 const NIVELES_VALIDOS = ["primaria", "secundaria", "preparatoria", "universidad"];
 
 module.exports = async (req, res) => {
-  applyCors(res);
+  applyCors(req, res);
 
   if (handleCors(req, res)) return;
 

@@ -26,7 +26,7 @@ const SyncIndicator: React.FC = () => {
    */
   const getIcon = () => {
     if (!isOnline) return "cloud-off";
-    if (isLoading || syncStatus === "loading") return "sync";
+    if (isLoading || syncStatus === "syncing") return "sync";
     if (syncStatus === "error") return "error";
     if (syncStatus === "synced") return "cloud-done";
     return "cloud-queue";
@@ -48,7 +48,7 @@ const SyncIndicator: React.FC = () => {
   const getText = () => {
     if (!isOnline) return "Sin conexión";
     if (isLoading) return "Cargando...";
-    if (syncStatus === "loading") return "Guardando...";
+    if (syncStatus === "syncing") return "Sincronizando...";
     if (syncStatus === "error") return "Error";
     if (syncStatus === "synced") return "Guardado";
     return "Esperando...";

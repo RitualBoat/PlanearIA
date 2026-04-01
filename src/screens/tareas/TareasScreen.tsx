@@ -9,7 +9,7 @@ import { COLORS, FONT_SIZES } from "../../../types";
 /**
  * Tipo para las props de navegación
  */
-type TareasScreenNavigationProp = StackNavigationProp<RootStackParamList, "Tareas">;
+type TareasScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 /**
  * Props del componente

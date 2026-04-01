@@ -65,6 +65,26 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
     navigation.navigate("ImportarGrupos");
   };
 
+  const handleExportarGrupos = (): void => {
+    navigation.navigate("ListaGrupos");
+  };
+
+  const handleCrearAlumno = (): void => {
+    navigation.navigate("CrearAlumno");
+  };
+
+  const handleVerAlumnos = (): void => {
+    navigation.navigate("ListaAlumnos");
+  };
+
+  const handleImportarAlumnos = (): void => {
+    alert("Esta funcion se implementara proximamente.");
+  };
+
+  const handleExportarAlumnos = (): void => {
+    alert("Esta funcion se implementara proximamente.");
+  };
+
   const quickStats = [
     {
       id: "grupos",
@@ -184,6 +204,24 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
                 <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
               </View>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
+              onPress={handleExportarGrupos}
+              activeOpacity={0.85}
+            >
+              <View style={[styles.iconContainer, { backgroundColor: "#6A8FDD" }]}>
+                <MaterialIcons name="file-download" size={28} color="#FFFFFF" />
+              </View>
+              <Text style={styles.optionTitle}>Exportar Grupos</Text>
+              <Text style={styles.optionDescription}>
+                Abre la lista de grupos para exportar el grupo seleccionado en PDF o Excel.
+              </Text>
+              <View style={styles.optionFooter}>
+                <Text style={styles.optionCta}>Ir a exportación</Text>
+                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+              </View>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.tipCard}>
@@ -191,6 +229,98 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
             <Text style={styles.tipText}>
               Consejo: desde el detalle de cada grupo puedes crear tareas, asignar recursos y
               calificar entregas.
+            </Text>
+          </View>
+
+          <View style={styles.headerBlockSecondary}>
+            <AnimatedTopPill
+              icon="school"
+              title="Alumnos"
+              subtitle="Administra expediente, importacion y control academico"
+            />
+          </View>
+
+          <Text style={styles.sectionLabel}>ACCIONES DE ALUMNOS</Text>
+
+          <View style={[styles.optionsContainer, wideLayout && styles.optionsContainerWide]}>
+            <TouchableOpacity
+              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
+              onPress={handleCrearAlumno}
+              activeOpacity={0.85}
+            >
+              <View style={[styles.iconContainer, { backgroundColor: "#1676D2" }]}>
+                <MaterialIcons name="person-add" size={28} color="#FFFFFF" />
+              </View>
+              <Text style={styles.optionTitle}>Crear Nuevo Alumno</Text>
+              <Text style={styles.optionDescription}>
+                Registra un nuevo alumno con datos personales, academicos y de contacto.
+              </Text>
+              <View style={styles.optionFooter}>
+                <Text style={styles.optionCta}>Crear alumno</Text>
+                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
+              onPress={handleVerAlumnos}
+              activeOpacity={0.85}
+            >
+              <View style={[styles.iconContainer, { backgroundColor: "#0EA5A5" }]}>
+                <MaterialIcons name="groups" size={28} color="#FFFFFF" />
+              </View>
+              <Text style={styles.optionTitle}>Mis Alumnos</Text>
+              <Text style={styles.optionDescription}>
+                Consulta la lista, filtra por grupo o carrera y edita cada perfil rapidamente.
+              </Text>
+              <View style={styles.optionFooter}>
+                <Text style={styles.optionCta}>Ver alumnos</Text>
+                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
+              onPress={handleImportarAlumnos}
+              activeOpacity={0.85}
+            >
+              <View style={[styles.iconContainer, { backgroundColor: "#0F6CC8" }]}>
+                <MaterialIcons name="file-upload" size={28} color="#FFFFFF" />
+              </View>
+              <Text style={styles.optionTitle}>Importar Alumnos</Text>
+              <Text style={styles.optionDescription}>
+                Carga lotes desde CSV o Excel para acelerar altas masivas por ciclo escolar.
+              </Text>
+              <View style={styles.optionFooter}>
+                <Text style={styles.optionCta}>Importar archivo</Text>
+                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
+              onPress={handleExportarAlumnos}
+              activeOpacity={0.85}
+            >
+              <View style={[styles.iconContainer, { backgroundColor: "#7A57D1" }]}>
+                <MaterialIcons name="file-download" size={28} color="#FFFFFF" />
+              </View>
+              <Text style={styles.optionTitle}>Exportar Alumnos</Text>
+              <Text style={styles.optionDescription}>
+                Genera reportes de alumnos para compartirlos en PDF o formatos de oficina.
+              </Text>
+              <View style={styles.optionFooter}>
+                <Text style={styles.optionCta}>Exportar archivo</Text>
+                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.tipCard}>
+            <MaterialIcons name="auto-awesome" size={18} color="#0B6F86" />
+            <Text style={styles.tipText}>
+              Consejo: mantendremos este flujo continuo para que Grupos y Alumnos se gestionen en
+              una sola experiencia de scroll.
             </Text>
           </View>
         </Animated.ScrollView>
@@ -220,6 +350,10 @@ const styles = StyleSheet.create({
     maxWidth: 1220,
   },
   headerBlock: {
+    marginBottom: 2,
+  },
+  headerBlockSecondary: {
+    marginTop: 6,
     marginBottom: 2,
   },
   statsGrid: {

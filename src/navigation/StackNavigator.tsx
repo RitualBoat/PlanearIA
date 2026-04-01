@@ -32,6 +32,13 @@ import AsignarRecursoScreen from "../screens/grupos/tareas/AsignarRecursoScreen"
 import DetalleTareaScreen from "../screens/grupos/tareas/DetalleTareaScreen";
 import CalificarEntregasScreen from "../screens/grupos/tareas/CalificarEntregasScreen";
 
+// Pantallas de Alumnos
+import CrearAlumnoScreen from "../screens/alumnos/CrearAlumnoScreen";
+import ListaAlumnosScreen from "../screens/alumnos/ListaAlumnosScreen";
+import DetalleAlumnoScreen from "../screens/alumnos/DetalleAlumnoScreen";
+import ReportesAlumnoScreen from "../screens/alumnos/ReportesAlumnoScreen";
+import NotasAlumnoScreen from "../screens/alumnos/NotasAlumnoScreen";
+
 // Importación de pantallas de Biblioteca de Recursos
 import RecursosDidacticosScreen from "../screens/biblioteca/RecursosDidacticosScreen";
 import ExamenesScreen from "../screens/biblioteca/ExamenesScreen";
@@ -90,6 +97,24 @@ export type RootStackParamList = {
   AsignarRecurso: { grupoId: number };
   DetalleTarea: { tareaId: number; grupoId: number };
   CalificarEntregas: { tareaId: number; grupoId: number };
+
+  // Alumnos (reemplaza ruta deprecated Alumnos)
+  CrearAlumno:
+    | undefined
+    | {
+        modo?: "crear" | "editar";
+        alumnoId?: number;
+      };
+  ListaAlumnos: undefined;
+  DetalleAlumno: { alumnoId: number };
+  NotasAlumno: {
+    alumnoId: number;
+    alumnoNombre?: string;
+  };
+  ReportesAlumno: {
+    alumnoId: number;
+    alumnoNombre?: string;
+  };
 
   // NUEVA ARQUITECTURA: Recursos Didácticos (reemplaza Recursos)
   RecursosDidacticos: undefined;
@@ -306,6 +331,52 @@ const StackNavigator: React.FC = () => {
         component={CalificarEntregasScreen}
         options={{
           title: "Calificar Entregas",
+          headerShown: false,
+        }}
+      />
+
+      {/* ========== ALUMNOS ========== */}
+      <Stack.Screen
+        name="CrearAlumno"
+        component={CrearAlumnoScreen}
+        options={{
+          title: "Crear Alumno",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="ListaAlumnos"
+        component={ListaAlumnosScreen}
+        options={{
+          title: "Lista de Alumnos",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="DetalleAlumno"
+        component={DetalleAlumnoScreen}
+        options={{
+          title: "Detalle de Alumno",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="NotasAlumno"
+        component={NotasAlumnoScreen}
+        options={{
+          title: "Notas Personales",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="ReportesAlumno"
+        component={ReportesAlumnoScreen}
+        options={{
+          title: "Reporte de Alumno",
           headerShown: false,
         }}
       />

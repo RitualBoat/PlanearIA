@@ -3,7 +3,11 @@
  * Verifica el API secret en el header
  */
 
-const API_SECRET = process.env.API_SECRET || "planearia-dev-secret-2025";
+const API_SECRET = process.env.API_SECRET;
+
+if (!API_SECRET) {
+  console.error("FATAL: API_SECRET environment variable is not set");
+}
 
 /**
  * Valida que la request tenga el API secret correcto
@@ -25,11 +29,23 @@ function validateAuth(req) {
 }
 
 /**
+ * Orígenes permitidos para CORS
+ */
+const ALLOWED_ORIGINS = [
+  "https://planearia.app",
+  "https://planearia.vercel.app",
+  "http://localhost:8081",
+  "http://localhost:19006",
+];
+
+/**
  * Headers CORS para permitir requests desde la app
  */
-function getCorsHeaders() {
+function getCorsHeaders(req) {
+  const origin = req?.headers?.origin || "";
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
   return {
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-API-Key",
     "Content-Type": "application/json",
@@ -41,7 +57,7 @@ function getCorsHeaders() {
  */
 function handleCors(req, res) {
   if (req.method === "OPTIONS") {
-    const headers = getCorsHeaders();
+    const headers = getCorsHeaders(req);
     Object.entries(headers).forEach(([key, value]) => {
       res.setHeader(key, value);
     });
@@ -54,8 +70,8 @@ function handleCors(req, res) {
 /**
  * Aplica headers CORS a la respuesta
  */
-function applyCors(res) {
-  const headers = getCorsHeaders();
+function applyCors(req, res) {
+  const headers = getCorsHeaders(req);
   Object.entries(headers).forEach(([key, value]) => {
     res.setHeader(key, value);
   });

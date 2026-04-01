@@ -118,6 +118,22 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
     navigation.navigate(route as any);
   };
 
+  const handleCrearEntregable = (): void => {
+    alert("Esta funcion se implementara proximamente.");
+  };
+
+  const handleMisEntregables = (): void => {
+    alert("Esta funcion se implementara proximamente.");
+  };
+
+  const handleImportarEntregables = (): void => {
+    alert("Esta funcion se implementara proximamente.");
+  };
+
+  const handleExportarEntregables = (): void => {
+    alert("Esta funcion se implementara proximamente.");
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#EEF3FA" barStyle="dark-content" />
@@ -217,6 +233,90 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
               de próxima actualización.
             </Text>
           </View>
+
+          <View style={styles.headerBlockSecondary}>
+            <AnimatedTopPill
+              icon="assignment-turned-in"
+              title="Entregables"
+              subtitle="Configura, importa y exporta entregables en un flujo continuo"
+            />
+          </View>
+
+          <Text style={styles.sectionLabel}>ACCIONES DE ENTREGABLES</Text>
+
+          <View style={[styles.optionsContainer, wideLayout && styles.optionsContainerWide]}>
+            <TouchableOpacity
+              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
+              onPress={handleCrearEntregable}
+              activeOpacity={0.85}
+            >
+              <View style={[styles.iconContainer, { backgroundColor: "#1676D220" }]}>
+                <MaterialIcons name="add-task" size={28} color="#1676D2" />
+              </View>
+              <Text style={styles.optionTitle}>Crear Entregable</Text>
+              <Text style={styles.optionDescription}>
+                Configura entregables con fecha, criterios y evidencia esperada para tu grupo.
+              </Text>
+              <View style={styles.optionFooter}>
+                <Text style={styles.optionCta}>Nuevo entregable</Text>
+                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
+              onPress={handleMisEntregables}
+              activeOpacity={0.85}
+            >
+              <View style={[styles.iconContainer, { backgroundColor: "#0EA5A520" }]}>
+                <MaterialIcons name="fact-check" size={28} color="#0EA5A5" />
+              </View>
+              <Text style={styles.optionTitle}>Mis Entregables</Text>
+              <Text style={styles.optionDescription}>
+                Consulta entregables activos, estado de entrega y avance de evaluacion.
+              </Text>
+              <View style={styles.optionFooter}>
+                <Text style={styles.optionCta}>Ver entregables</Text>
+                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
+              onPress={handleImportarEntregables}
+              activeOpacity={0.85}
+            >
+              <View style={[styles.iconContainer, { backgroundColor: "#0F6CC820" }]}>
+                <MaterialIcons name="file-upload" size={28} color="#0F6CC8" />
+              </View>
+              <Text style={styles.optionTitle}>Importar Entregables</Text>
+              <Text style={styles.optionDescription}>
+                Importa entregables por lote desde plantillas para reducir carga manual.
+              </Text>
+              <View style={styles.optionFooter}>
+                <Text style={styles.optionCta}>Importar archivo</Text>
+                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
+              onPress={handleExportarEntregables}
+              activeOpacity={0.85}
+            >
+              <View style={[styles.iconContainer, { backgroundColor: "#7A57D120" }]}>
+                <MaterialIcons name="file-download" size={28} color="#7A57D1" />
+              </View>
+              <Text style={styles.optionTitle}>Exportar Entregables</Text>
+              <Text style={styles.optionDescription}>
+                Exporta resumenes y evidencias de entregables para reportes o respaldo.
+              </Text>
+              <View style={styles.optionFooter}>
+                <Text style={styles.optionCta}>Exportar archivo</Text>
+                <MaterialIcons name="arrow-forward" size={18} color="#1676D2" />
+              </View>
+            </TouchableOpacity>
+          </View>
         </Animated.ScrollView>
       </SafeAreaView>
     </View>
@@ -244,6 +344,10 @@ const styles = StyleSheet.create({
     maxWidth: 1220,
   },
   headerBlock: {
+    marginBottom: 2,
+  },
+  headerBlockSecondary: {
+    marginTop: 6,
     marginBottom: 2,
   },
   quickPanel: {

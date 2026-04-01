@@ -8,9 +8,13 @@ const mockAgregarPlaneacion = jest.fn().mockResolvedValue(undefined);
 const mockActualizarPlaneacion = jest.fn().mockResolvedValue(undefined);
 const mockObtenerPlaneacion = jest.fn();
 
-let mockRouteParams = {
+let mockRouteParams: {
+  nivel: NivelAcademico;
+  modo: "crear" | "editar";
+  planeacionId?: string;
+} = {
   nivel: NivelAcademico.PRIMARIA,
-  modo: "crear" as const,
+  modo: "crear",
 };
 
 jest.mock("@react-navigation/native", () => ({

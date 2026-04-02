@@ -88,7 +88,7 @@ export const useHomeViewModel = (): HomeViewModel => {
   const handleNavigation = useCallback(
     (option: MenuOption) => {
       if (option.route === "Planeaciones") {
-        navigation.navigate("MainTabs", { screen: "PlaneacionesTab" });
+        navigation.navigate("MainTabs", { screen: "ContenidoTab" });
         return;
       }
 
@@ -98,7 +98,7 @@ export const useHomeViewModel = (): HomeViewModel => {
       }
 
       if (option.route === "RecursosDidacticos") {
-        navigation.navigate("MainTabs", { screen: "RecursosTab" });
+        navigation.navigate("MainTabs", { screen: "ContenidoTab" });
         return;
       }
 

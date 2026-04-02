@@ -28,6 +28,7 @@ const LoginScreen: React.FC = () => {
     handleLogin,
     handleForgotPassword,
     handleRegister,
+    handleEntrarComoInvitado,
   } = useLoginViewModel();
 
   return (
@@ -89,6 +90,16 @@ const LoginScreen: React.FC = () => {
               <Text style={styles.link}>Registrate</Text>
             </TouchableOpacity>
           </View>
+
+          {/* Entrar como invitado */}
+          <TouchableOpacity
+            style={styles.guestButton}
+            onPress={handleEntrarComoInvitado}
+            disabled={isLoading}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.guestButtonText}>Entrar como invitado</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -127,22 +138,14 @@ const styles = StyleSheet.create({
     borderRadius: responsive(60, 70, 80),
   },
   title: {
-    fontSize: responsive(
-      FONT_SIZES.xxlarge,
-      FONT_SIZES.xxlarge + 4,
-      FONT_SIZES.xxlarge + 8,
-    ),
+    fontSize: responsive(FONT_SIZES.xxlarge, FONT_SIZES.xxlarge + 4, FONT_SIZES.xxlarge + 8),
     fontWeight: "bold",
     color: COLORS.primary,
     textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: responsive(
-      FONT_SIZES.large,
-      FONT_SIZES.large + 2,
-      FONT_SIZES.large + 4,
-    ),
+    fontSize: responsive(FONT_SIZES.large, FONT_SIZES.large + 2, FONT_SIZES.large + 4),
     color: COLORS.textSecondary,
     textAlign: "center",
     marginBottom: responsive(30, 35, 40),
@@ -189,6 +192,19 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontSize: FONT_SIZES.medium,
     textDecorationLine: "underline",
+  },
+  guestButton: {
+    marginTop: 20,
+    paddingVertical: 14,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.textSecondary,
+    alignItems: "center",
+  },
+  guestButtonText: {
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.medium,
+    fontWeight: "600",
   },
 });
 export default LoginScreen;

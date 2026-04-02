@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
 import type { LoginFormData } from "../../types";
+import { useAuth } from "../context/AuthContext";
 import logger from "../utils/logger";
 
 type Nav = StackNavigationProp<RootStackParamList, "Login">;
@@ -15,10 +16,12 @@ export interface LoginViewModel {
   handleLogin: () => void;
   handleForgotPassword: () => void;
   handleRegister: () => void;
+  handleEntrarComoInvitado: () => void;
 }
 
 export const useLoginViewModel = (): LoginViewModel => {
   const navigation = useNavigation<Nav>();
+  const { login, loginComoInvitado } = useAuth();
   const [formData, setFormData] = useState<LoginFormData>({
     username: "",
     password: "",
@@ -39,7 +42,7 @@ export const useLoginViewModel = (): LoginViewModel => {
 
   const validateForm = useCallback((): boolean => {
     if (!formData.username.trim()) {
-      showAlert("Error", "Por favor ingrese su nombre de usuario");
+      showAlert("Error", "Por favor ingrese su email");
       return false;
     }
     if (!formData.password.trim()) {
@@ -53,43 +56,44 @@ export const useLoginViewModel = (): LoginViewModel => {
     return true;
   }, [formData, showAlert]);
 
-  const authenticateUser = useCallback(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      logger.log("[auth] Authenticated:", formData.username);
-      navigation.replace("MainTabs");
-    }, 2000);
-  }, [formData.username, navigation]);
-
-  const handleLogin = useCallback(() => {
+  const handleLogin = useCallback(async () => {
     if (!validateForm()) return;
 
-    if (Platform.OS === "web") {
-      const confirmed = window.confirm(
-        `¿Desea iniciar sesión con el usuario: ${formData.username}?`
-      );
-      if (confirmed) authenticateUser();
-    } else {
-      Alert.alert(
-        "Confirmación de Inicio de Sesión",
-        `¿Desea iniciar sesión con el usuario: ${formData.username}?`,
-        [
-          { text: "Cancelar", style: "cancel" },
-          { text: "Aceptar", onPress: authenticateUser },
-        ],
-        { cancelable: false }
-      );
+    setIsLoading(true);
+    try {
+      const result = await login(formData.username.trim(), formData.password);
+      if (result.success) {
+        logger.log("[auth] Login exitoso:", formData.username);
+        navigation.replace("MainTabs");
+      } else {
+        showAlert("Error de inicio de sesión", result.error || "Credenciales incorrectas.");
+      }
+    } catch {
+      showAlert("Error", "No se pudo conectar al servidor.");
+    } finally {
+      setIsLoading(false);
     }
-  }, [formData.username, validateForm, authenticateUser]);
+  }, [formData, validateForm, login, navigation, showAlert]);
 
   const handleForgotPassword = useCallback(() => {
-    showAlert("Recuperar Contraseña", "Esta funcionalidad estará disponible próximamente.");
-  }, [showAlert]);
+    navigation.navigate("RecuperarContrasena");
+  }, [navigation]);
 
   const handleRegister = useCallback(() => {
-    showAlert("Registro", "Esta funcionalidad estará disponible próximamente.");
-  }, [showAlert]);
+    navigation.navigate("Registro");
+  }, [navigation]);
+
+  const handleEntrarComoInvitado = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      await loginComoInvitado();
+      navigation.replace("MainTabs");
+    } catch {
+      showAlert("Error", "No se pudo iniciar como invitado.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [loginComoInvitado, navigation, showAlert]);
 
   return {
     formData,
@@ -98,5 +102,6 @@ export const useLoginViewModel = (): LoginViewModel => {
     handleLogin,
     handleForgotPassword,
     handleRegister,
+    handleEntrarComoInvitado,
   };
 };

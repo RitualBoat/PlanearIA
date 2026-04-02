@@ -222,32 +222,6 @@ const HomeScreen: React.FC = () => {
             </View>
           ) : (
             <>
-              <View style={styles.floatingActionsWrap}>
-                <View style={[styles.topActions, styles.topActionsCompact]}>
-                  <TouchableOpacity
-                    style={[styles.iconAction, styles.iconActionCompact]}
-                    activeOpacity={0.85}
-                  >
-                    <MaterialIcons name="notifications-none" size={20} color={COLORS.textDark} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.iconAction, styles.iconActionCompact]}
-                    activeOpacity={0.85}
-                  >
-                    <MaterialIcons name="help-outline" size={20} color={COLORS.textDark} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.profileBlock, styles.profileBlockCompact]}
-                    activeOpacity={0.85}
-                    onPress={openMenu}
-                  >
-                    <View style={styles.avatarCircle}>
-                      <MaterialIcons name="person" size={16} color={COLORS.surface} />
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              </View>
-
               <Animated.View
                 style={[
                   styles.mobileGreetingOverlay,

@@ -1,28 +1,89 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   Animated,
-  ScrollView,
+  Modal,
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useNavigation } from "@react-navigation/native";
 import AnimatedTopPill from "../../components/AnimatedTopPill";
 import { isWeb } from "../../utils/responsive";
 import { useCuentaViewModel } from "../../hooks/useCuentaViewModel";
+import { useAuth, PREFERENCIAS_DEFAULT } from "../../context/AuthContext";
 import { COLORS } from "../../../types";
+
+const FEATURE_HIGHLIGHTS = [
+  {
+    icon: "auto-stories" as const,
+    color: "#0B6F86",
+    bg: "#E0F7FA",
+    title: "Modo Lectura",
+    description:
+      "Proyecta tus planeaciones en clase con texto grande y claro para leer desde cualquier distancia.",
+  },
+  {
+    icon: "psychology" as const,
+    color: "#7B1FA2",
+    bg: "#F3E5F5",
+    title: "IA Generadora",
+    description:
+      "Genera secuencias didácticas completas en segundos con inteligencia artificial adaptada a tu nivel educativo.",
+  },
+  {
+    icon: "offline-bolt" as const,
+    color: "#E65100",
+    bg: "#FFF3E0",
+    title: "Sin conexión",
+    description:
+      "Trabaja sin internet. Tus planeaciones se sincronizan automáticamente cuando vuelvas a conectarte.",
+  },
+];
+
+const REVIEWS = [
+  {
+    name: "María G.",
+    role: "Docente de Primaria",
+    stars: 5,
+    text: "PlanearIA me ahorra hasta 3 horas semanales en planeación. ¡Ya no puedo vivir sin ella!",
+  },
+  {
+    name: "Carlos R.",
+    role: "Profesor de Secundaria",
+    stars: 5,
+    text: "La mejor herramienta que he encontrado para organizar mis grupos y calificaciones en un solo lugar.",
+  },
+  {
+    name: "Laura P.",
+    role: "Maestra de Preescolar",
+    stars: 5,
+    text: "Muy intuitiva, me encanta poder crear planeaciones desde el celular mientras viajo al trabajo.",
+  },
+];
+
+const StarRow: React.FC<{ count: number }> = ({ count }) => (
+  <View style={{ flexDirection: "row", gap: 2 }}>
+    {Array.from({ length: count }).map((_, i) => (
+      <MaterialIcons key={i} name="star" size={14} color="#F5A623" />
+    ))}
+  </View>
+);
 
 const CuentaScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const wideLayout = width >= 1080;
+  const navigation = useNavigation();
   const [scrollY] = React.useState(() => new Animated.Value(0));
-  const [viewportHeight, setViewportHeight] = React.useState(0);
-  const [contentHeight, setContentHeight] = React.useState(0);
 
+  // Accesibilidad states
   const [fontSizeMode, setFontSizeMode] = React.useState<"Pequeno" | "Medio" | "Grande">("Medio");
   const [highContrast, setHighContrast] = React.useState(true);
   const [voiceReading, setVoiceReading] = React.useState(true);
@@ -30,26 +91,82 @@ const CuentaScreen: React.FC = () => {
   const [darkMode, setDarkMode] = React.useState(true);
   const [daltonismo, setDaltonismo] = React.useState<"Deuteranopia" | "Protanopia">("Deuteranopia");
 
+  // Accordion states
   const [openAccesibilidad, setOpenAccesibilidad] = React.useState(false);
   const [openPreferencias, setOpenPreferencias] = React.useState(false);
   const [openCuenta, setOpenCuenta] = React.useState(false);
 
-  const { handleEditarPerfil, handleCambiarContrasena, handleCerrarSesion } = useCuentaViewModel();
+  // Delete account modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
-  const isCollapsedView = !openAccesibilidad && !openPreferencias && !openCuenta;
-  const enablePillFade = contentHeight > viewportHeight + 6;
+  const {
+    usuario,
+    handleEditarPerfil,
+    handleCambiarContrasena,
+    handleCerrarSesion,
+    handleEliminarCuenta,
+  } = useCuentaViewModel();
+  const { actualizarPreferencias, isGuest } = useAuth();
+
+  const prefs = { ...PREFERENCIAS_DEFAULT, ...usuario?.preferencias };
 
   const mobilePillOpacity = scrollY.interpolate({
-    inputRange: [0, 16, 42],
+    inputRange: [0, 22, 56],
     outputRange: [1, 0.5, 0],
     extrapolate: "clamp",
   });
 
   const mobilePillTranslateY = scrollY.interpolate({
-    inputRange: [0, 42],
+    inputRange: [0, 56],
     outputRange: [0, -16],
     extrapolate: "clamp",
   });
+
+  const togglePref = (key: string, value: boolean) => {
+    actualizarPreferencias({ [key]: value });
+  };
+
+  const onPressEliminar = () => {
+    Alert.alert(
+      "Eliminar cuenta",
+      "Esta acción es irreversible. Se eliminarán todos tus datos permanentemente. ¿Deseas continuar?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Continuar",
+          style: "destructive",
+          onPress: () => {
+            setDeletePassword("");
+            setDeleteError("");
+            setShowDeleteModal(true);
+          },
+        },
+      ]
+    );
+  };
+
+  const confirmarEliminacion = async () => {
+    if (!deletePassword.trim()) {
+      setDeleteError("Ingresa tu contraseña para confirmar.");
+      return;
+    }
+    setDeleteLoading(true);
+    setDeleteError("");
+    const result = await handleEliminarCuenta(deletePassword);
+    setDeleteLoading(false);
+    if (!result.success) {
+      setDeleteError(result.error || "Error al eliminar cuenta.");
+    }
+  };
+
+  const userName = usuario
+    ? `${usuario.nombre}${usuario.apellidos ? ` ${usuario.apellidos}` : ""}`
+    : "Usuario";
+
+  const userRole = isGuest ? "Invitado" : usuario?.rol === "admin" ? "Administrador" : "Docente";
 
   return (
     <View style={styles.container}>
@@ -57,12 +174,7 @@ const CuentaScreen: React.FC = () => {
 
       <SafeAreaView style={styles.safeArea}>
         <Animated.ScrollView
-          contentContainerStyle={[
-            styles.scrollContent,
-            isCollapsedView && styles.scrollContentCentered,
-          ]}
-          onLayout={(event) => setViewportHeight(event.nativeEvent.layout.height)}
-          onContentSizeChange={(_, h) => setContentHeight(h)}
+          contentContainerStyle={styles.scrollContent}
           onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
             useNativeDriver: true,
           })}
@@ -72,8 +184,8 @@ const CuentaScreen: React.FC = () => {
           <View style={styles.headerBlock}>
             <Animated.View
               style={{
-                opacity: enablePillFade ? mobilePillOpacity : 1,
-                transform: [{ translateY: enablePillFade ? mobilePillTranslateY : 0 }],
+                opacity: mobilePillOpacity,
+                transform: [{ translateY: mobilePillTranslateY }],
               }}
             >
               <AnimatedTopPill
@@ -91,6 +203,7 @@ const CuentaScreen: React.FC = () => {
 
           <View style={[styles.layoutGrid, wideLayout && styles.layoutGridWide]}>
             <View style={[styles.leftColumn, wideLayout && styles.leftColumnWide]}>
+              {/* ── Accesibilidad ── */}
               <View style={styles.sectionBlock}>
                 <TouchableOpacity
                   style={styles.sectionHeader}
@@ -228,6 +341,7 @@ const CuentaScreen: React.FC = () => {
                 ) : null}
               </View>
 
+              {/* ── Preferencias de app ── */}
               <View style={styles.sectionBlock}>
                 <TouchableOpacity
                   style={styles.sectionHeader}
@@ -254,7 +368,9 @@ const CuentaScreen: React.FC = () => {
                         </View>
                         <View style={styles.prefTextWrap}>
                           <Text style={styles.prefTitle}>Modo oscuro</Text>
-                          <Text style={styles.prefSubtitle}>Actualmente activado</Text>
+                          <Text style={styles.prefSubtitle}>
+                            {darkMode ? "Actualmente activado" : "Actualmente desactivado"}
+                          </Text>
                         </View>
                         <TouchableOpacity
                           style={[styles.toggleTrack, darkMode && styles.toggleTrackOn]}
@@ -273,15 +389,138 @@ const CuentaScreen: React.FC = () => {
                         </View>
                         <View style={styles.prefTextWrap}>
                           <Text style={styles.prefTitle}>Idioma</Text>
-                          <Text style={styles.prefSubtitle}>Espanol (Espana)</Text>
+                          <Text style={styles.prefSubtitle}>Espanol (Mexico)</Text>
                         </View>
                         <MaterialIcons name="chevron-right" size={22} color="#6A7890" />
                       </TouchableOpacity>
+
+                      {!isGuest && (
+                        <>
+                          <View style={styles.rowDivider} />
+
+                          <View style={styles.preferenceRow}>
+                            <View style={styles.prefIconWrap}>
+                              <MaterialIcons name="lightbulb" size={19} color={COLORS.textDark} />
+                            </View>
+                            <View style={styles.prefTextWrap}>
+                              <Text style={styles.prefTitle}>Recibir recomendaciones</Text>
+                              <Text style={styles.prefSubtitle}>Sugerencias de la IA</Text>
+                            </View>
+                            <TouchableOpacity
+                              style={[
+                                styles.toggleTrack,
+                                prefs.recibirRecomendaciones && styles.toggleTrackOn,
+                              ]}
+                              onPress={() =>
+                                togglePref("recibirRecomendaciones", !prefs.recibirRecomendaciones)
+                              }
+                              activeOpacity={0.9}
+                            >
+                              <View
+                                style={[
+                                  styles.toggleThumb,
+                                  prefs.recibirRecomendaciones && styles.toggleThumbOn,
+                                ]}
+                              />
+                            </TouchableOpacity>
+                          </View>
+
+                          <View style={styles.rowDivider} />
+
+                          <View style={styles.preferenceRow}>
+                            <View style={styles.prefIconWrap}>
+                              <MaterialIcons name="bar-chart" size={19} color={COLORS.textDark} />
+                            </View>
+                            <View style={styles.prefTextWrap}>
+                              <Text style={styles.prefTitle}>Compartir datos de uso</Text>
+                              <Text style={styles.prefSubtitle}>Ayuda a mejorar la app</Text>
+                            </View>
+                            <TouchableOpacity
+                              style={[
+                                styles.toggleTrack,
+                                prefs.compartirDatos && styles.toggleTrackOn,
+                              ]}
+                              onPress={() => togglePref("compartirDatos", !prefs.compartirDatos)}
+                              activeOpacity={0.9}
+                            >
+                              <View
+                                style={[
+                                  styles.toggleThumb,
+                                  prefs.compartirDatos && styles.toggleThumbOn,
+                                ]}
+                              />
+                            </TouchableOpacity>
+                          </View>
+
+                          <View style={styles.rowDivider} />
+
+                          <View style={styles.preferenceRow}>
+                            <View style={styles.prefIconWrap}>
+                              <MaterialIcons name="shield" size={19} color={COLORS.textDark} />
+                            </View>
+                            <View style={styles.prefTextWrap}>
+                              <Text style={styles.prefTitle}>Contenido para adultos</Text>
+                              <Text style={styles.prefSubtitle}>
+                                {prefs.contenidoAdulto ? "Activado" : "Desactivado"}
+                              </Text>
+                            </View>
+                            <TouchableOpacity
+                              style={[
+                                styles.toggleTrack,
+                                prefs.contenidoAdulto && styles.toggleTrackOn,
+                              ]}
+                              onPress={() => togglePref("contenidoAdulto", !prefs.contenidoAdulto)}
+                              activeOpacity={0.9}
+                            >
+                              <View
+                                style={[
+                                  styles.toggleThumb,
+                                  prefs.contenidoAdulto && styles.toggleThumbOn,
+                                ]}
+                              />
+                            </TouchableOpacity>
+                          </View>
+
+                          <View style={styles.rowDivider} />
+
+                          <View style={styles.preferenceRow}>
+                            <View style={styles.prefIconWrap}>
+                              <MaterialIcons
+                                name="notifications"
+                                size={19}
+                                color={COLORS.textDark}
+                              />
+                            </View>
+                            <View style={styles.prefTextWrap}>
+                              <Text style={styles.prefTitle}>Notificaciones push</Text>
+                              <Text style={styles.prefSubtitle}>
+                                {prefs.notificaciones ? "Activadas" : "Desactivadas"}
+                              </Text>
+                            </View>
+                            <TouchableOpacity
+                              style={[
+                                styles.toggleTrack,
+                                prefs.notificaciones && styles.toggleTrackOn,
+                              ]}
+                              onPress={() => togglePref("notificaciones", !prefs.notificaciones)}
+                              activeOpacity={0.9}
+                            >
+                              <View
+                                style={[
+                                  styles.toggleThumb,
+                                  prefs.notificaciones && styles.toggleThumbOn,
+                                ]}
+                              />
+                            </TouchableOpacity>
+                          </View>
+                        </>
+                      )}
                     </View>
                   </View>
                 ) : null}
               </View>
 
+              {/* ── Cuenta y seguridad ── */}
               <View style={styles.sectionBlock}>
                 <TouchableOpacity
                   style={styles.sectionHeader}
@@ -307,46 +546,150 @@ const CuentaScreen: React.FC = () => {
                           <MaterialIcons name="person" size={26} color="#587096" />
                         </View>
                         <View style={styles.identityTextWrap}>
-                          <Text style={styles.identityName}>Elena Rodriguez</Text>
-                          <Text style={styles.identityRole}>Plan Premium Docente</Text>
+                          <Text style={styles.identityName}>{userName}</Text>
+                          <Text style={styles.identityRole}>{userRole}</Text>
                         </View>
                       </View>
 
-                      <TouchableOpacity style={styles.primaryAction} onPress={handleEditarPerfil}>
-                        <MaterialIcons name="person" size={18} color={COLORS.surface} />
-                        <Text style={styles.primaryActionText}>Cuenta y perfil</Text>
-                      </TouchableOpacity>
+                      {!isGuest && (
+                        <TouchableOpacity style={styles.primaryAction} onPress={handleEditarPerfil}>
+                          <MaterialIcons name="person" size={18} color={COLORS.surface} />
+                          <Text style={styles.primaryActionText}>Cuenta y perfil</Text>
+                        </TouchableOpacity>
+                      )}
+
+                      {!isGuest && (
+                        <TouchableOpacity
+                          style={styles.secondaryAction}
+                          onPress={handleCambiarContrasena}
+                        >
+                          <MaterialIcons name="lock" size={18} color={COLORS.textDark} />
+                          <Text style={styles.secondaryActionText}>Cambiar contrasena</Text>
+                        </TouchableOpacity>
+                      )}
+
+                      {usuario?.rol === "admin" && (
+                        <TouchableOpacity
+                          style={styles.secondaryAction}
+                          onPress={() => (navigation as any).navigate("AdminRoles")}
+                        >
+                          <MaterialIcons
+                            name="admin-panel-settings"
+                            size={18}
+                            color={COLORS.textDark}
+                          />
+                          <Text style={styles.secondaryActionText}>Administrar roles</Text>
+                        </TouchableOpacity>
+                      )}
+
+                      {!isGuest && (
+                        <TouchableOpacity
+                          style={styles.secondaryAction}
+                          onPress={() =>
+                            Alert.alert(
+                              "Próximamente",
+                              "Esta función se implementará en una próxima actualización."
+                            )
+                          }
+                          activeOpacity={0.82}
+                        >
+                          <MaterialIcons
+                            name="workspace-premium"
+                            size={18}
+                            color={COLORS.textDark}
+                          />
+                          <Text style={styles.secondaryActionText}>Suscripcion y plan</Text>
+                        </TouchableOpacity>
+                      )}
+
+                      {!isGuest && (
+                        <TouchableOpacity
+                          style={styles.secondaryAction}
+                          onPress={() =>
+                            Alert.alert(
+                              "Próximamente",
+                              "Esta función se implementará en una próxima actualización."
+                            )
+                          }
+                          activeOpacity={0.82}
+                        >
+                          <MaterialIcons name="devices" size={18} color={COLORS.textDark} />
+                          <Text style={styles.secondaryActionText}>Sesiones iniciadas</Text>
+                        </TouchableOpacity>
+                      )}
 
                       <TouchableOpacity
                         style={styles.secondaryAction}
-                        onPress={handleCambiarContrasena}
+                        onPress={() => (navigation as any).navigate("Terminos")}
                       >
-                        <MaterialIcons name="lock" size={18} color={COLORS.textDark} />
-                        <Text style={styles.secondaryActionText}>Cambiar contrasena</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity style={styles.secondaryAction} activeOpacity={0.82}>
-                        <MaterialIcons name="workspace-premium" size={18} color={COLORS.textDark} />
-                        <Text style={styles.secondaryActionText}>Suscripcion y plan</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity style={styles.secondaryAction} activeOpacity={0.82}>
-                        <MaterialIcons name="devices" size={18} color={COLORS.textDark} />
-                        <Text style={styles.secondaryActionText}>Sesiones iniciadas</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity style={styles.secondaryAction} activeOpacity={0.82}>
                         <MaterialIcons name="policy" size={18} color={COLORS.textDark} />
                         <Text style={styles.secondaryActionText}>Privacidad y terminos</Text>
                       </TouchableOpacity>
 
+                      {!isGuest && (
+                        <TouchableOpacity style={styles.secondaryAction} onPress={onPressEliminar}>
+                          <MaterialIcons name="delete" size={18} color={COLORS.danger} />
+                          <Text style={[styles.secondaryActionText, { color: COLORS.danger }]}>
+                            Eliminar cuenta
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+
                       <TouchableOpacity style={styles.logoutButton} onPress={handleCerrarSesion}>
-                        <MaterialIcons name="logout" size={18} color={COLORS.surface} />
-                        <Text style={styles.logoutButtonText}>Cerrar sesion</Text>
+                        <MaterialIcons
+                          name={isGuest ? "login" : "logout"}
+                          size={18}
+                          color={COLORS.surface}
+                        />
+                        <Text style={styles.logoutButtonText}>
+                          {isGuest ? "Iniciar sesion" : "Cerrar sesion"}
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   </View>
                 ) : null}
+              </View>
+
+              {/* ── Destacados y Reseñas ── */}
+              <View style={styles.promoSection}>
+                <View style={styles.promoBanner}>
+                  <Text style={styles.promoBannerText}>
+                    Descubre funciones impresionantes{"\n"}dentro de PlanearIA.
+                  </Text>
+                </View>
+
+                {FEATURE_HIGHLIGHTS.map((feat) => (
+                  <View key={feat.title} style={styles.featureCard}>
+                    <View style={[styles.featureIconWrap, { backgroundColor: feat.bg }]}>
+                      <MaterialIcons name={feat.icon} size={22} color={feat.color} />
+                    </View>
+                    <View style={styles.featureTextWrap}>
+                      <Text style={styles.featureTitle}>{feat.title}</Text>
+                      <Text style={styles.featureDesc}>{feat.description}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+
+              <View style={styles.promoSection}>
+                <Text style={styles.promoKicker}>LO QUE DICEN LOS DOCENTES</Text>
+                <Text style={styles.promoTitle}>Resenas de usuarios</Text>
+
+                {REVIEWS.map((review) => (
+                  <View key={review.name} style={styles.reviewCard}>
+                    <View style={styles.reviewHeader}>
+                      <View style={styles.reviewAvatar}>
+                        <Text style={styles.reviewAvatarText}>{review.name[0]}</Text>
+                      </View>
+                      <View style={styles.reviewMeta}>
+                        <Text style={styles.reviewName}>{review.name}</Text>
+                        <Text style={styles.reviewRole}>{review.role}</Text>
+                      </View>
+                      <StarRow count={review.stars} />
+                    </View>
+                    <Text style={styles.reviewText}>"{review.text}"</Text>
+                  </View>
+                ))}
               </View>
 
               <Text style={styles.footerText}>PlanearIA v2.4.0 · Actualizado hace 2 dias</Text>
@@ -365,6 +708,61 @@ const CuentaScreen: React.FC = () => {
             ) : null}
           </View>
         </Animated.ScrollView>
+
+        {/* Modal de confirmación de eliminación */}
+        <Modal visible={showDeleteModal} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalCard}>
+              <View style={styles.modalIconCircle}>
+                <MaterialIcons name="warning" size={32} color="#C62828" />
+              </View>
+              <Text style={styles.modalTitle}>Eliminar cuenta</Text>
+              <Text style={styles.modalSubtitle}>
+                Ingresa tu contraseña para confirmar la eliminación permanente de tu cuenta y todos
+                tus datos.
+              </Text>
+
+              {deleteError ? (
+                <View style={styles.modalError}>
+                  <MaterialIcons name="error-outline" size={16} color={COLORS.error} />
+                  <Text style={styles.modalErrorText}>{deleteError}</Text>
+                </View>
+              ) : null}
+
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Tu contraseña"
+                placeholderTextColor={COLORS.textTertiary}
+                secureTextEntry
+                value={deletePassword}
+                onChangeText={setDeletePassword}
+                editable={!deleteLoading}
+                autoCapitalize="none"
+              />
+
+              <TouchableOpacity
+                style={[styles.deleteBtn, deleteLoading && { opacity: 0.6 }]}
+                onPress={confirmarEliminacion}
+                disabled={deleteLoading}
+                activeOpacity={0.85}
+              >
+                {deleteLoading ? (
+                  <ActivityIndicator color={COLORS.surface} size="small" />
+                ) : (
+                  <Text style={styles.deleteBtnText}>Eliminar mi cuenta</Text>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalCancelBtn}
+                onPress={() => setShowDeleteModal(false)}
+                disabled={deleteLoading}
+              >
+                <Text style={styles.modalCancelText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </View>
   );
@@ -380,16 +778,12 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingTop: 14,
+    paddingTop: 54,
     paddingBottom: isWeb() ? 28 : 110,
     gap: 14,
     width: "100%",
     alignSelf: "center",
-    maxWidth: 1260,
-  },
-  scrollContentCentered: {
-    flexGrow: 1,
-    justifyContent: "center",
+    maxWidth: 1220,
   },
   headerBlock: {
     marginBottom: 2,
@@ -711,6 +1105,113 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "700",
   },
+  // Promo & Reviews
+  promoSection: {
+    gap: 10,
+    marginTop: 6,
+  },
+  promoBanner: {
+    borderRadius: 16,
+    padding: 24,
+    backgroundColor: "#D5C4A1",
+    marginBottom: 4,
+  },
+  promoBannerText: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#3E2C1A",
+    lineHeight: 24,
+  },
+  promoKicker: {
+    fontSize: 12,
+    fontWeight: "800",
+    letterSpacing: 1.2,
+    color: "#50627C",
+    paddingHorizontal: 4,
+  },
+  promoTitle: {
+    fontSize: 22,
+    fontWeight: "800",
+    color: COLORS.text,
+    paddingHorizontal: 4,
+    marginBottom: 2,
+  },
+  featureCard: {
+    borderRadius: 16,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  featureIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  featureTextWrap: {
+    flex: 1,
+    gap: 3,
+  },
+  featureTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: COLORS.text,
+  },
+  featureDesc: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    lineHeight: 18,
+  },
+  reviewCard: {
+    borderRadius: 16,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: 14,
+    gap: 10,
+  },
+  reviewHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  reviewAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#D9E4F3",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  reviewAvatarText: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#587096",
+  },
+  reviewMeta: {
+    flex: 1,
+    gap: 1,
+  },
+  reviewName: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: COLORS.text,
+  },
+  reviewRole: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+  },
+  reviewText: {
+    fontSize: 14,
+    color: "#4A5B73",
+    lineHeight: 20,
+    fontStyle: "italic",
+  },
   footerText: {
     marginTop: 10,
     textAlign: "center",
@@ -734,6 +1235,95 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#566A84",
     lineHeight: 20,
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+  },
+  modalCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 20,
+    padding: 28,
+    width: "100%",
+    maxWidth: 400,
+    alignItems: "center",
+  },
+  modalIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "#FFEBEE",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: COLORS.text,
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  modalError: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#FFEBEE",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 12,
+    width: "100%",
+  },
+  modalErrorText: {
+    fontSize: 13,
+    color: COLORS.error,
+    flex: 1,
+  },
+  modalInput: {
+    borderWidth: 1.5,
+    borderColor: COLORS.borderLight,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: COLORS.text,
+    backgroundColor: COLORS.backgroundSoft,
+    width: "100%",
+    marginBottom: 16,
+  },
+  deleteBtn: {
+    backgroundColor: "#C62828",
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 10,
+  },
+  deleteBtnText: {
+    color: COLORS.surface,
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  modalCancelBtn: {
+    paddingVertical: 12,
+    alignItems: "center",
+    width: "100%",
+  },
+  modalCancelText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: COLORS.textSecondary,
   },
 });
 

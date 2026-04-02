@@ -104,6 +104,10 @@ export interface DetalleGrupoViewModel {
   navigateAsignarRecurso: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
   navigateReportesGrupo: () => void;
+  navigateRegistrarAsistencia: () => void;
+  navigateHistorialAsistencia: () => void;
+  navigateCapturarCalificaciones: () => void;
+  navigatePromediosCalificaciones: () => void;
   exportarGrupo: (formato: GrupoExportFormat) => Promise<boolean>;
   setGrupoNotas: (value: string) => void;
   guardarNotasGrupo: () => Promise<void>;
@@ -243,6 +247,22 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     });
   }, [navigation, grupoId, grupoNombre]);
 
+  const navigateRegistrarAsistencia = useCallback(() => {
+    navigation.navigate("RegistrarAsistencia", { grupoId });
+  }, [navigation, grupoId]);
+
+  const navigateHistorialAsistencia = useCallback(() => {
+    navigation.navigate("HistorialAsistencia", { grupoId });
+  }, [navigation, grupoId]);
+
+  const navigateCapturarCalificaciones = useCallback(() => {
+    navigation.navigate("CapturarCalificaciones", { grupoId });
+  }, [navigation, grupoId]);
+
+  const navigatePromediosCalificaciones = useCallback(() => {
+    navigation.navigate("PromediosCalificaciones", { grupoId });
+  }, [navigation, grupoId]);
+
   const exportarGrupo = useCallback(
     async (formato: GrupoExportFormat): Promise<boolean> => {
       const grupoActual = obtenerGrupo(grupoId);
@@ -341,6 +361,10 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     navigateAsignarRecurso,
     navigateDetalleTarea,
     navigateReportesGrupo,
+    navigateRegistrarAsistencia,
+    navigateHistorialAsistencia,
+    navigateCapturarCalificaciones,
+    navigatePromediosCalificaciones,
     exportarGrupo,
     setGrupoNotas: notasHook.setGrupoNotas,
     guardarNotasGrupo: notasHook.guardarNotasGrupo,

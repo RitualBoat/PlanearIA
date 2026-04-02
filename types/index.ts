@@ -13,6 +13,55 @@ export type ID = number;
  * Carreras disponibles en el sistema
  */
 export type Carrera = "ISC" | "IGE" | "ARQ" | "ITICS";
+
+// ==========================================
+// ROLES Y PERMISOS
+// ==========================================
+
+export type RolUsuario = "admin" | "supervisor" | "docente" | "alumno" | "usuario";
+
+export const PERMISOS = {
+  GESTIONAR_USUARIOS: "gestionar_usuarios",
+  CAMBIAR_ROLES: "cambiar_roles",
+  VER_TODOS_GRUPOS: "ver_todos_grupos",
+  GESTIONAR_PLANEACIONES: "gestionar_planeaciones",
+  GESTIONAR_GRUPOS: "gestionar_grupos",
+  GESTIONAR_ALUMNOS: "gestionar_alumnos",
+  GESTIONAR_CALIFICACIONES: "gestionar_calificaciones",
+  GESTIONAR_ENTREGABLES: "gestionar_entregables",
+  GESTIONAR_RECURSOS: "gestionar_recursos",
+  GESTIONAR_ASISTENCIA: "gestionar_asistencia",
+  VER_PROPIOS_DATOS: "ver_propios_datos",
+} as const;
+
+export type Permiso = (typeof PERMISOS)[keyof typeof PERMISOS];
+
+export const PERMISOS_POR_ROL: Record<RolUsuario, Permiso[]> = {
+  admin: Object.values(PERMISOS),
+  supervisor: [
+    PERMISOS.VER_TODOS_GRUPOS,
+    PERMISOS.GESTIONAR_PLANEACIONES,
+    PERMISOS.GESTIONAR_GRUPOS,
+    PERMISOS.GESTIONAR_ALUMNOS,
+    PERMISOS.GESTIONAR_CALIFICACIONES,
+    PERMISOS.GESTIONAR_ENTREGABLES,
+    PERMISOS.GESTIONAR_RECURSOS,
+    PERMISOS.GESTIONAR_ASISTENCIA,
+    PERMISOS.VER_PROPIOS_DATOS,
+  ],
+  docente: [
+    PERMISOS.GESTIONAR_PLANEACIONES,
+    PERMISOS.GESTIONAR_GRUPOS,
+    PERMISOS.GESTIONAR_ALUMNOS,
+    PERMISOS.GESTIONAR_CALIFICACIONES,
+    PERMISOS.GESTIONAR_ENTREGABLES,
+    PERMISOS.GESTIONAR_RECURSOS,
+    PERMISOS.GESTIONAR_ASISTENCIA,
+    PERMISOS.VER_PROPIOS_DATOS,
+  ],
+  alumno: [PERMISOS.VER_PROPIOS_DATOS],
+  usuario: [PERMISOS.VER_PROPIOS_DATOS],
+};
 // ==========================================
 // INTERFACES DE ENTIDADES PRINCIPALES
 // ==========================================
@@ -175,6 +224,24 @@ export interface Recurso extends BaseEntity {
   origen: "manual" | "ia" | "plantilla"; // Cómo se creó
   profesorId: ID;
   versionActual: number; // Para control de versiones
+}
+
+/**
+ * Interfaz para Plantillas
+ */
+export interface Plantilla extends BaseEntity {
+  nombre: string;
+  tipo: "examen" | "presentacion" | "mapa_mental" | "linea_tiempo" | "postal" | "reporte" | "otro";
+  categoria: "diapositivas" | "mapas_mentales" | "examenes" | "postales" | "reportes" | "otros";
+  descripcion: string;
+  contenido: string; // JSON serializado del contenido de la plantilla
+  vistaPrevia?: string; // URI de preview/thumbnail
+  tags: string[];
+  esDelSistema: boolean; // true = plantilla precargada, false = del usuario
+  profesorId?: ID;
+  fechaCreacion: Date;
+  fechaModificacion: Date;
+  usosCount: number; // Cuántas veces se ha usado
 }
 
 /**

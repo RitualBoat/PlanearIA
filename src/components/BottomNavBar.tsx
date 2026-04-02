@@ -19,12 +19,12 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ currentScreen, showBackButt
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate("MainTabs", { screen: "HomeTab" });
+      navigation.navigate("MainTabs", { screen: "FeedTab" });
     }
   };
 
   const handleMenu = (): void => {
-    navigation.navigate("MainTabs", { screen: "HomeTab" });
+    navigation.navigate("MainTabs", { screen: "FeedTab" });
   };
 
   return (

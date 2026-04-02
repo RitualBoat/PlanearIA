@@ -78,11 +78,11 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
   };
 
   const handleImportarAlumnos = (): void => {
-    alert("Esta funcion se implementara proximamente.");
+    navigation.navigate("ImportarAlumnos");
   };
 
   const handleExportarAlumnos = (): void => {
-    alert("Esta funcion se implementara proximamente.");
+    navigation.navigate("ExportarAlumnos");
   };
 
   const quickStats = [
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingTop: 14,
+    paddingTop: 54,
     paddingBottom: isWeb() ? 28 : 110,
     gap: 14,
     width: "100%",

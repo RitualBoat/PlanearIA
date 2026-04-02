@@ -6,61 +6,65 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
+  ScrollView,
+  Image,
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS } from "../../../types";
 import { isWeb } from "../../utils/responsive";
 import AnimatedTopPill from "../../components/AnimatedTopPill";
+import { useRecursos } from "../../context/RecursosContext";
 
-/**
- * Tipo para las props de navegación
- */
 type RecursosDidacticosScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   "RecursosDidacticos"
 >;
 
-/**
- * Props del componente
- */
 interface RecursosDidacticosScreenProps {
   navigation: RecursosDidacticosScreenNavigationProp;
 }
 
-/**
- * Interfaz para las opciones de recursos
- */
-interface RecursoOption {
-  id: string;
-  title: string;
-  icon: string;
-  iconLibrary: "MaterialIcons" | "FontAwesome5";
-  color: string;
-  route: keyof RootStackParamList;
-}
+const TIPO_CARDS = [
+  { id: "examen", title: "Exámenes", icon: "quiz", color: COLORS.warning, bgColor: "#FFF3E0" },
+  {
+    id: "presentacion",
+    title: "Presentaciones",
+    icon: "slideshow",
+    color: COLORS.primaryLight,
+    bgColor: "#E3F2FD",
+  },
+  {
+    id: "mapa_mental",
+    title: "Mapas\nMentales",
+    icon: "hub",
+    color: COLORS.primary,
+    bgColor: "#E3F2FD",
+  },
+  {
+    id: "linea_tiempo",
+    title: "Líneas de\nTiempo",
+    icon: "show-chart",
+    color: COLORS.textSecondary,
+    bgColor: "#F0F4F9",
+  },
+] as const;
 
-/**
- * Componente para renderizar el icono de un recurso didáctico
- */
-const RecursoIcon: React.FC<{ option: RecursoOption }> = React.memo(({ option }) => {
-  if (option.iconLibrary === "FontAwesome5") {
-    return <FontAwesome5 name={option.icon} size={50} color={option.color} />;
-  }
-  return <MaterialIcons name={option.icon as any} size={60} color={option.color} />;
-});
+const FILTER_CHIPS = [
+  { id: "todos", label: "Todos" },
+  { id: "examen", label: "Exámenes" },
+  { id: "presentacion", label: "Presentac..." },
+  { id: "mapa_mental", label: "Mapas" },
+  { id: "linea_tiempo", label: "Líneas" },
+] as const;
 
-/**
- * Pantalla principal de Recursos Didácticos
- * Menú central para crear y gestionar recursos educativos
- */
 const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ navigation }) => {
   const { width } = useWindowDimensions();
   const wideLayout = width >= 920;
+  const { recursos } = useRecursos();
   const scrollY = React.useRef(new Animated.Value(0)).current;
   const mobilePillOpacity = scrollY.interpolate({
     inputRange: [0, 12, 34],
@@ -73,66 +77,8 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
     extrapolate: "clamp",
   });
 
-  /**
-   * Opciones de recursos didácticos
-   */
-  const recursosOptions: RecursoOption[] = [
-    {
-      id: "examenes",
-      title: "Exámenes",
-      icon: "assignment",
-      iconLibrary: "MaterialIcons",
-      color: COLORS.warning,
-      route: "Examenes",
-    },
-    {
-      id: "presentaciones",
-      title: "Presentaciones",
-      icon: "slideshow",
-      iconLibrary: "MaterialIcons",
-      color: COLORS.primaryLight,
-      route: "Presentaciones",
-    },
-    {
-      id: "mapas_mentales",
-      title: "Mapas Mentales",
-      icon: "brain",
-      iconLibrary: "FontAwesome5",
-      color: COLORS.purple,
-      route: "MapasMentales",
-    },
-    {
-      id: "lineas_tiempo",
-      title: "Líneas de Tiempo",
-      icon: "timeline",
-      iconLibrary: "MaterialIcons",
-      color: COLORS.success,
-      route: "LineasTiempo",
-    },
-  ];
-
-  /**
-   * Maneja la navegación a cada tipo de recurso
-   */
-  const handleRecursoPress = (route: keyof RootStackParamList): void => {
-    navigation.navigate(route as any);
-  };
-
-  const handleCrearEntregable = (): void => {
-    alert("Esta funcion se implementara proximamente.");
-  };
-
-  const handleMisEntregables = (): void => {
-    alert("Esta funcion se implementara proximamente.");
-  };
-
-  const handleImportarEntregables = (): void => {
-    alert("Esta funcion se implementara proximamente.");
-  };
-
-  const handleExportarEntregables = (): void => {
-    alert("Esta funcion se implementara proximamente.");
-  };
+  const getCountByTipo = (tipo: string) =>
+    tipo === "todos" ? recursos.length : recursos.filter((r) => r.tipo === tipo).length;
 
   return (
     <View style={styles.container}>
@@ -147,6 +93,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
           })}
           scrollEventThrottle={16}
         >
+          {/* Header pill */}
           <View style={styles.headerBlock}>
             <Animated.View
               style={{
@@ -162,160 +109,100 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
             </Animated.View>
           </View>
 
-          <View style={[styles.quickPanel, wideLayout && styles.quickPanelWide]}>
-            <View style={styles.quickCard}>
-              <Text style={styles.quickValue}>46</Text>
-              <Text style={styles.quickLabel}>Recursos activos</Text>
-            </View>
-            <View style={styles.quickCard}>
-              <Text style={styles.quickValue}>12</Text>
-              <Text style={styles.quickLabel}>Generados con IA</Text>
-            </View>
-            <View style={styles.quickCard}>
-              <Text style={styles.quickValue}>8</Text>
-              <Text style={styles.quickLabel}>Asignados esta semana</Text>
-            </View>
-          </View>
+          {/* Hero text */}
+          <Text style={styles.heroTitle}>Crea y organiza{"\n"}materiales didácticos</Text>
+          <Text style={styles.heroSubtitle}>
+            Gestiona tu biblioteca digital con herramientas inteligentes.
+          </Text>
 
-          <Text style={styles.sectionLabel}>TIPOS DE RECURSOS</Text>
-
-          <View style={[styles.optionsContainer, wideLayout && styles.optionsContainerWide]}>
-            {recursosOptions.map((option) => (
-              <TouchableOpacity
-                key={option.id}
-                style={[styles.optionCard, wideLayout && styles.optionCardWide]}
-                onPress={() => handleRecursoPress(option.route)}
-                activeOpacity={0.85}
-              >
-                <View style={[styles.iconContainer, { backgroundColor: `${option.color}20` }]}>
-                  <RecursoIcon option={option} />
-                </View>
-                <Text style={styles.optionTitle}>{option.title}</Text>
-                <Text style={styles.optionDescription}>
-                  Disponible en IA, plantillas y modo manual.
-                </Text>
-                <View style={styles.methodsContainer}>
-                  <View style={styles.methodBadge}>
-                    <MaterialIcons name="auto-awesome" size={14} color={COLORS.primary} />
-                    <Text style={styles.methodText}>IA</Text>
-                  </View>
-                  <View style={styles.methodBadge}>
-                    <MaterialIcons name="dashboard" size={14} color={COLORS.primary} />
-                    <Text style={styles.methodText}>Plantillas</Text>
-                  </View>
-                  <View style={styles.methodBadge}>
-                    <MaterialIcons name="edit" size={14} color={COLORS.primary} />
-                    <Text style={styles.methodText}>Manual</Text>
-                  </View>
-                </View>
-                <View style={styles.optionFooter}>
-                  <Text style={styles.optionCta}>Abrir módulo</Text>
-                  <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {/* Botón para ver todos los recursos */}
-          <TouchableOpacity
-            style={styles.verTodosButton}
-            onPress={() => navigation.navigate("ListaRecursos")}
-            activeOpacity={0.8}
+          {/* MIS RECURSOS — chip filters */}
+          <Text style={styles.sectionLabel}>MIS RECURSOS</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.chipsRow}
           >
-            <MaterialIcons name="folder-open" size={24} color="white" />
-            <Text style={styles.verTodosText}>Ver Todos Mis Recursos</Text>
+            {FILTER_CHIPS.map((chip) => {
+              const count = getCountByTipo(chip.id);
+              return (
+                <TouchableOpacity
+                  key={chip.id}
+                  style={[styles.chip, chip.id === "todos" && styles.chipActive]}
+                  onPress={() =>
+                    navigation.navigate("ListaRecursos", {
+                      filtroTipo: chip.id === "todos" ? undefined : chip.id,
+                    })
+                  }
+                  activeOpacity={0.8}
+                >
+                  <Text style={[styles.chipText, chip.id === "todos" && styles.chipTextActive]}>
+                    {chip.label} ({count})
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          {/* POR TIPO — 2x2 grid */}
+          <Text style={styles.sectionLabel}>POR TIPO</Text>
+          <View style={[styles.tipoGrid, wideLayout && styles.tipoGridWide]}>
+            {TIPO_CARDS.map((card) => {
+              const count = getCountByTipo(card.id);
+              return (
+                <TouchableOpacity
+                  key={card.id}
+                  style={[styles.tipoCard, wideLayout && styles.tipoCardWide]}
+                  onPress={() => navigation.navigate("ListaRecursos", { filtroTipo: card.id })}
+                  activeOpacity={0.85}
+                >
+                  <View style={[styles.tipoIconCircle, { backgroundColor: card.bgColor }]}>
+                    <MaterialIcons name={card.icon as any} size={28} color={card.color} />
+                  </View>
+                  <Text style={styles.tipoTitle}>{card.title}</Text>
+                  <Text style={styles.tipoCount}>{count} RECURSOS</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {/* ACCIONES RÁPIDAS */}
+          <Text style={styles.sectionLabel}>ACCIONES RÁPIDAS</Text>
+
+          <TouchableOpacity
+            style={styles.actionCard}
+            onPress={() => navigation.navigate("CrearRecurso")}
+            activeOpacity={0.85}
+          >
+            <View style={[styles.actionIcon, { backgroundColor: COLORS.primaryTint }]}>
+              <MaterialIcons name="add" size={24} color={COLORS.primary} />
+            </View>
+            <View style={styles.actionInfo}>
+              <Text style={styles.actionTitle}>Crear recurso</Text>
+              <Text style={styles.actionSubtitle}>Nuevo documento, examen o presentación</Text>
+            </View>
+            <MaterialIcons name="chevron-right" size={22} color={COLORS.textTertiary} />
           </TouchableOpacity>
 
-          <View style={styles.tipCard}>
-            <MaterialIcons name="tips-and-updates" size={18} color={COLORS.teal} />
-            <Text style={styles.tipText}>
-              Consejo: los módulos no implementados mantienen pantalla esqueleto y mostrarán aviso
-              de próxima actualización.
+          <TouchableOpacity
+            style={styles.actionCard}
+            onPress={() => navigation.navigate("ListaRecursos")}
+            activeOpacity={0.85}
+          >
+            <View style={[styles.actionIcon, { backgroundColor: "#F0F4F9" }]}>
+              <MaterialIcons name="format-list-bulleted" size={24} color={COLORS.textSecondary} />
+            </View>
+            <View style={styles.actionInfo}>
+              <Text style={styles.actionTitle}>Ver todos mis recursos</Text>
+              <Text style={styles.actionSubtitle}>Buscar y gestionar tu biblioteca</Text>
+            </View>
+            <MaterialIcons name="chevron-right" size={22} color={COLORS.textTertiary} />
+          </TouchableOpacity>
+
+          {/* Banner decorativo */}
+          <View style={styles.banner}>
+            <Text style={styles.bannerTitle}>
+              Organización inteligente{"\n"}para mentes brillantes.
             </Text>
-          </View>
-
-          <View style={styles.headerBlockSecondary}>
-            <AnimatedTopPill
-              icon="assignment-turned-in"
-              title="Entregables"
-              subtitle="Configura, importa y exporta entregables en un flujo continuo"
-            />
-          </View>
-
-          <Text style={styles.sectionLabel}>ACCIONES DE ENTREGABLES</Text>
-
-          <View style={[styles.optionsContainer, wideLayout && styles.optionsContainerWide]}>
-            <TouchableOpacity
-              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
-              onPress={handleCrearEntregable}
-              activeOpacity={0.85}
-            >
-              <View style={[styles.iconContainer, { backgroundColor: "#1676D220" }]}>
-                <MaterialIcons name="add-task" size={28} color={COLORS.primary} />
-              </View>
-              <Text style={styles.optionTitle}>Crear Entregable</Text>
-              <Text style={styles.optionDescription}>
-                Configura entregables con fecha, criterios y evidencia esperada para tu grupo.
-              </Text>
-              <View style={styles.optionFooter}>
-                <Text style={styles.optionCta}>Nuevo entregable</Text>
-                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
-              onPress={handleMisEntregables}
-              activeOpacity={0.85}
-            >
-              <View style={[styles.iconContainer, { backgroundColor: "#0EA5A520" }]}>
-                <MaterialIcons name="fact-check" size={28} color={COLORS.tealLight} />
-              </View>
-              <Text style={styles.optionTitle}>Mis Entregables</Text>
-              <Text style={styles.optionDescription}>
-                Consulta entregables activos, estado de entrega y avance de evaluacion.
-              </Text>
-              <View style={styles.optionFooter}>
-                <Text style={styles.optionCta}>Ver entregables</Text>
-                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
-              onPress={handleImportarEntregables}
-              activeOpacity={0.85}
-            >
-              <View style={[styles.iconContainer, { backgroundColor: "#0F6CC820" }]}>
-                <MaterialIcons name="file-upload" size={28} color={COLORS.primaryDark} />
-              </View>
-              <Text style={styles.optionTitle}>Importar Entregables</Text>
-              <Text style={styles.optionDescription}>
-                Importa entregables por lote desde plantillas para reducir carga manual.
-              </Text>
-              <View style={styles.optionFooter}>
-                <Text style={styles.optionCta}>Importar archivo</Text>
-                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.optionCard, wideLayout && styles.optionCardWide]}
-              onPress={handleExportarEntregables}
-              activeOpacity={0.85}
-            >
-              <View style={[styles.iconContainer, { backgroundColor: "#7A57D120" }]}>
-                <MaterialIcons name="file-download" size={28} color="#7A57D1" />
-              </View>
-              <Text style={styles.optionTitle}>Exportar Entregables</Text>
-              <Text style={styles.optionDescription}>
-                Exporta resumenes y evidencias de entregables para reportes o respaldo.
-              </Text>
-              <View style={styles.optionFooter}>
-                <Text style={styles.optionCta}>Exportar archivo</Text>
-                <MaterialIcons name="arrow-forward" size={18} color={COLORS.primary} />
-              </View>
-            </TouchableOpacity>
           </View>
         </Animated.ScrollView>
       </SafeAreaView>
@@ -323,169 +210,124 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
   );
 };
 
-/**
- * Estilos del componente
- */
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  safeArea: {
-    flex: 1,
-  },
+  container: { flex: 1, backgroundColor: COLORS.background },
+  safeArea: { flex: 1 },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingTop: 14,
+    paddingTop: 54,
     paddingBottom: isWeb() ? 28 : 110,
-    gap: 14,
+    gap: 12,
     width: "100%",
     alignSelf: "center",
     maxWidth: 1220,
   },
-  headerBlock: {
-    marginBottom: 2,
-  },
-  headerBlockSecondary: {
-    marginTop: 6,
-    marginBottom: 2,
-  },
-  quickPanel: {
-    gap: 10,
-  },
-  quickPanelWide: {
-    flexDirection: "row",
-  },
-  quickCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 14,
-    flex: 1,
-  },
-  quickValue: {
-    fontSize: 32,
+  headerBlock: { marginBottom: 2 },
+  heroTitle: {
+    fontSize: 26,
     fontWeight: "800",
     color: COLORS.text,
-    lineHeight: 36,
+    letterSpacing: -0.3,
+    lineHeight: 32,
   },
-  quickLabel: {
-    marginTop: 2,
-    fontSize: 13,
-    color: COLORS.textTertiary,
-    fontWeight: "600",
+  heroSubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    lineHeight: 20,
+    marginBottom: 4,
   },
   sectionLabel: {
-    marginTop: 4,
+    marginTop: 8,
+    fontSize: 12,
+    color: COLORS.textTertiary,
+    fontWeight: "700",
+    letterSpacing: 1,
+  },
+  chipsRow: { gap: 8, paddingVertical: 4 },
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
+  },
+  chipActive: {
+    backgroundColor: COLORS.text,
+    borderColor: COLORS.text,
+  },
+  chipText: {
     fontSize: 13,
+    fontWeight: "600",
     color: COLORS.textSecondary,
-    fontWeight: "800",
-    letterSpacing: 1.1,
   },
-  optionsContainer: {
-    gap: 12,
-  },
-  optionsContainerWide: {
+  chipTextActive: { color: "#FFFFFF" },
+  tipoGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    gap: 12,
   },
-  optionCard: {
-    width: "100%",
+  tipoGridWide: {},
+  tipoCard: {
+    width: "47.5%",
     backgroundColor: COLORS.surface,
-    borderRadius: 14,
+    borderRadius: 16,
     padding: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
     gap: 8,
-    boxShadow: "0px 10px 22px rgba(33, 60, 109, 0.08)",
+    boxShadow: "0px 4px 12px rgba(33, 60, 109, 0.06)",
   },
-  optionCardWide: {
-    width: "49%",
-  },
-  iconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
+  tipoCardWide: { width: "23%" },
+  tipoIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
   },
-  optionTitle: {
-    fontSize: 18,
+  tipoTitle: {
+    fontSize: 15,
     fontWeight: "700",
     color: COLORS.text,
   },
-  optionDescription: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    lineHeight: 20,
-  },
-  methodsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
-    gap: 8,
-  },
-  methodBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: COLORS.primaryTint,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 15,
-  },
-  methodText: {
-    fontSize: 12,
-    color: COLORS.primary,
-    marginLeft: 4,
-    fontWeight: "600",
-  },
-  optionFooter: {
-    marginTop: 4,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  optionCta: {
-    color: COLORS.primary,
-    fontSize: 14,
+  tipoCount: {
+    fontSize: 11,
     fontWeight: "700",
+    color: COLORS.primary,
+    letterSpacing: 0.5,
   },
-  verTodosButton: {
+  actionCard: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: COLORS.primary,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
-    boxShadow: "0px 8px 18px rgba(22, 118, 210, 0.32)",
-  },
-  verTodosText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-    marginLeft: 10,
-  },
-  tipCard: {
-    borderRadius: 12,
+    padding: 14,
     borderWidth: 1,
-    borderColor: COLORS.primaryTint,
-    backgroundColor: COLORS.primaryTint,
-    padding: 12,
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 8,
+    borderColor: COLORS.border,
+    gap: 12,
   },
-  tipText: {
-    flex: 1,
-    fontSize: 13,
-    color: COLORS.teal,
-    lineHeight: 18,
+  actionIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  actionInfo: { flex: 1 },
+  actionTitle: { fontSize: 15, fontWeight: "700", color: COLORS.text },
+  actionSubtitle: { fontSize: 13, color: COLORS.textSecondary, marginTop: 2 },
+  banner: {
+    borderRadius: 16,
+    padding: 24,
+    backgroundColor: "#D5C4A1",
+    marginTop: 4,
+  },
+  bannerTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#3E2C1A",
+    lineHeight: 24,
   },
 });
 

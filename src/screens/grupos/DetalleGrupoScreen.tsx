@@ -68,6 +68,10 @@ const TabContent: React.FC<{
   navigateAsignarRecurso: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
   navigateReportesGrupo: () => void;
+  navigateRegistrarAsistencia: () => void;
+  navigateHistorialAsistencia: () => void;
+  navigateCapturarCalificaciones: () => void;
+  navigatePromediosCalificaciones: () => void;
   setGrupoNotas: (value: string) => void;
   guardarNotasGrupo: () => Promise<void>;
   descartarCambiosNotas: () => void;
@@ -92,6 +96,10 @@ const TabContent: React.FC<{
     navigateAsignarRecurso,
     navigateDetalleTarea,
     navigateReportesGrupo,
+    navigateRegistrarAsistencia,
+    navigateHistorialAsistencia,
+    navigateCapturarCalificaciones,
+    navigatePromediosCalificaciones,
     setGrupoNotas,
     guardarNotasGrupo,
     descartarCambiosNotas,
@@ -141,9 +149,17 @@ const TabContent: React.FC<{
             <Text style={styles.tabDescription}>
               Registra y consulta las calificaciones de tus alumnos
             </Text>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton} onPress={navigateCapturarCalificaciones}>
               <MaterialIcons name="edit-note" size={24} color="white" />
               <Text style={styles.actionButtonText}>Registrar Calificaciones</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: COLORS.secondary, marginTop: 8 }]}
+              onPress={navigatePromediosCalificaciones}
+            >
+              <MaterialIcons name="bar-chart" size={24} color="white" />
+              <Text style={styles.actionButtonText}>Ver Promedios</Text>
             </TouchableOpacity>
 
             <View style={styles.statsContainer}>
@@ -181,9 +197,17 @@ const TabContent: React.FC<{
             <Text style={styles.tabDescription}>
               Lleva el registro de asistencia de tus alumnos
             </Text>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton} onPress={navigateRegistrarAsistencia}>
               <MaterialIcons name="checklist" size={24} color="white" />
               <Text style={styles.actionButtonText}>Pasar Lista</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: COLORS.secondary, marginTop: 8 }]}
+              onPress={navigateHistorialAsistencia}
+            >
+              <MaterialIcons name="history" size={24} color="white" />
+              <Text style={styles.actionButtonText}>Ver Historial</Text>
             </TouchableOpacity>
 
             <View style={styles.statsContainer}>
@@ -594,6 +618,10 @@ const DetalleGrupoScreen: React.FC = () => {
     navigateAsignarRecurso,
     navigateDetalleTarea,
     navigateReportesGrupo,
+    navigateRegistrarAsistencia,
+    navigateHistorialAsistencia,
+    navigateCapturarCalificaciones,
+    navigatePromediosCalificaciones,
     exportarGrupo,
     setGrupoNotas,
     guardarNotasGrupo,
@@ -724,6 +752,10 @@ const DetalleGrupoScreen: React.FC = () => {
             navigateAsignarRecurso={navigateAsignarRecurso}
             navigateDetalleTarea={navigateDetalleTarea}
             navigateReportesGrupo={navigateReportesGrupo}
+            navigateRegistrarAsistencia={navigateRegistrarAsistencia}
+            navigateHistorialAsistencia={navigateHistorialAsistencia}
+            navigateCapturarCalificaciones={navigateCapturarCalificaciones}
+            navigatePromediosCalificaciones={navigatePromediosCalificaciones}
             setGrupoNotas={setGrupoNotas}
             guardarNotasGrupo={guardarNotasGrupo}
             descartarCambiosNotas={descartarCambiosNotas}
@@ -973,7 +1005,9 @@ const DetalleGrupoScreen: React.FC = () => {
                 activeOpacity={0.8}
               >
                 <View style={[styles.checkbox, deleteConfirmed && styles.checkboxActive]}>
-                  {deleteConfirmed && <MaterialIcons name="check" size={14} color={COLORS.surface} />}
+                  {deleteConfirmed && (
+                    <MaterialIcons name="check" size={14} color={COLORS.surface} />
+                  )}
                 </View>
                 <Text style={styles.confirmText}>
                   Confirmo que entiendo que esta acción no se puede deshacer.

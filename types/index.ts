@@ -330,6 +330,42 @@ export interface Post extends BaseEntity {
 }
 
 // ==========================================
+// TIPOS PARA EL SISTEMA DE CONTACTOS (Sprint 5)
+// ==========================================
+
+export type EstadoConexion = "pendiente" | "aceptada" | "rechazada" | "bloqueada";
+
+export interface Contacto extends BaseEntity {
+  usuarioId: string;
+  nombre: string;
+  apellidos: string;
+  email: string;
+  materia?: string;
+  institucion?: string;
+  avatar?: string;
+  estado: EstadoConexion;
+  enLinea: boolean;
+  ultimaConexion?: string;
+  fechaConexion: string;
+  fechaModificacion: string;
+  syncStatus?: "synced" | "pending" | "error";
+}
+
+export interface SolicitudConexion extends BaseEntity {
+  deUsuarioId: string;
+  deUsuarioNombre: string;
+  deUsuarioAvatar?: string;
+  deUsuarioMateria?: string;
+  deUsuarioInstitucion?: string;
+  paraUsuarioId: string;
+  mensaje?: string;
+  estado: "pendiente" | "aceptada" | "rechazada";
+  fechaCreacion: string;
+  fechaModificacion: string;
+  syncStatus?: "synced" | "pending" | "error";
+}
+
+// ==========================================
 // TIPOS PARA COMPONENTES UI
 // ==========================================
 /**

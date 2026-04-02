@@ -10,6 +10,7 @@ import { CalificacionesProvider } from "./src/context/CalificacionesContext";
 import { EntregablesProvider } from "./src/context/EntregablesContext";
 import { RecursosProvider } from "./src/context/RecursosContext";
 import { PlantillasProvider } from "./src/context/PlantillasContext";
+import { PostsProvider } from "./src/context/PostsContext";
 import { ThemeProvider } from "./src/context/ThemeContext";
 import { FontSizeProvider } from "./src/context/FontSizeContext";
 import { DaltonismoProvider } from "./src/context/DaltonismoContext";
@@ -29,9 +30,11 @@ const App: React.FC = () => {
                       <EntregablesProvider>
                         <RecursosProvider>
                           <PlantillasProvider>
-                            <NavigationContainer>
-                              <StackNavigator />
-                            </NavigationContainer>
+                            <PostsProvider>
+                              <NavigationContainer>
+                                <StackNavigator />
+                              </NavigationContainer>
+                            </PostsProvider>
                           </PlantillasProvider>
                         </RecursosProvider>
                       </EntregablesProvider>

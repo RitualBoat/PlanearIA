@@ -52,6 +52,22 @@ export const lightTheme: ColorTokens = {
   primaryTint: "#EAF4FF",
   successLight: "#0D9E70",
   purpleTint: "#F3E5F5",
+
+  // Stitch Material 3 surface system
+  surfaceContainerLowest: "#FFFFFF",
+  surfaceContainerLow: "#f1f4f8",
+  surfaceContainer: "#ebeef2",
+  surfaceContainerHigh: "#e5e8ec",
+  surfaceContainerHighest: "#e0e3e7",
+  onSurface: "#181c1f",
+  onSurfaceVariant: "#414752",
+  outlineVariant: "#c0c7d4",
+  primaryContainer: "#0576d2",
+  secondaryContainer: "#60e2ff",
+  errorContainer: "#ffdad6",
+  inverseSurface: "#2d3134",
+  shadowBlue: "rgba(0,93,168,0.06)",
+  shadowBlueLift: "rgba(0,93,168,0.12)",
 };
 
 export const darkTheme: ColorTokens = {
@@ -106,4 +122,20 @@ export const darkTheme: ColorTokens = {
   primaryTint: "#1A2E44",
   successLight: "#2E7D56",
   purpleTint: "#2A1A30",
+
+  // Stitch Material 3 surface system
+  surfaceContainerLowest: "#1E252E",
+  surfaceContainerLow: "#252D38",
+  surfaceContainer: "#2A3340",
+  surfaceContainerHigh: "#303A48",
+  surfaceContainerHighest: "#364454",
+  onSurface: "#E8ECF1",
+  onSurfaceVariant: "#A0B0C4",
+  outlineVariant: "#3C4C5E",
+  primaryContainer: "#4A90D4",
+  secondaryContainer: "#1A4A5A",
+  errorContainer: "#3A1A1A",
+  inverseSurface: "#E8ECF1",
+  shadowBlue: "rgba(0,0,0,0.2)",
+  shadowBlueLift: "rgba(0,0,0,0.35)",
 };

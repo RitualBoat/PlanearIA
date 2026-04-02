@@ -279,6 +279,57 @@ export interface Usuario extends BaseEntity {
 }
 
 // ==========================================
+// TIPOS PARA EL FEED SOCIAL
+// ==========================================
+
+export type PostMood = "😊" | "📚" | "💡" | "🎯" | "☕" | "🎨" | "🚀";
+
+export interface PostAttachment {
+  type: "image" | "document" | "link";
+  url: string;
+  name?: string;
+  size?: string;
+  mimeType?: string;
+}
+
+export interface PostComment extends BaseEntity {
+  postId: ID;
+  autorId: string;
+  autorNombre: string;
+  autorAvatar?: string;
+  contenido: string;
+  parentCommentId?: ID;
+  likes: number;
+  fechaCreacion: string;
+  fechaModificacion: string;
+}
+
+export interface Post extends BaseEntity {
+  autorId: string;
+  autorNombre: string;
+  autorRol?: string;
+  autorAvatar?: string;
+  titulo?: string;
+  contenido: string;
+  mood?: PostMood;
+  attachments: PostAttachment[];
+  likes: number;
+  likedBy: string[];
+  commentsCount: number;
+  savedBy: string[];
+  isChallenge?: boolean;
+  challengeData?: {
+    titulo: string;
+    descripcion: string;
+    tiempoLimite?: number;
+    preguntas?: number;
+  };
+  fechaCreacion: string;
+  fechaModificacion: string;
+  syncStatus?: "synced" | "pending" | "error";
+}
+
+// ==========================================
 // TIPOS PARA COMPONENTES UI
 // ==========================================
 /**
@@ -629,6 +680,22 @@ export const COLORS = {
   primaryTint: "#EAF4FF",
   successLight: "#0D9E70",
   purpleTint: "#F3E5F5",
+
+  // ─── Stitch Material 3 surface system ───
+  surfaceContainerLowest: "#FFFFFF",
+  surfaceContainerLow: "#f1f4f8",
+  surfaceContainer: "#ebeef2",
+  surfaceContainerHigh: "#e5e8ec",
+  surfaceContainerHighest: "#e0e3e7",
+  onSurface: "#181c1f",
+  onSurfaceVariant: "#414752",
+  outlineVariant: "#c0c7d4",
+  primaryContainer: "#0576d2",
+  secondaryContainer: "#60e2ff",
+  errorContainer: "#ffdad6",
+  inverseSurface: "#2d3134",
+  shadowBlue: "rgba(0,93,168,0.06)",
+  shadowBlueLift: "rgba(0,93,168,0.12)",
 } as const;
 /**
  * Tamaños de fuente estándar

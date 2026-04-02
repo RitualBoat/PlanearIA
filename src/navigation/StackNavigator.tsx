@@ -77,6 +77,9 @@ import EditorPlantillaScreen from "../screens/plantillas/EditorPlantillaScreen";
 // Importación de pantalla de Perfil
 import PerfilScreen from "../screens/perfil/PerfilScreen";
 
+// Importación de pantalla de Reto
+import RetoResolucionScreen from "../screens/feed/RetoResolucionScreen";
+
 // Importación de pantalla de Onboarding
 import OnboardingScreen from "../screens/onboarding/OnboardingScreen";
 
@@ -185,6 +188,16 @@ export type RootStackParamList = {
 
   // Perfil
   Perfil: undefined;
+
+  // Reto / Examen
+  RetoResolucion:
+    | {
+        titulo?: string;
+        descripcion?: string;
+        tiempoLimite?: number;
+        preguntas?: number;
+      }
+    | undefined;
 };
 /**
  * Creamos el Stack Navigator con tipado
@@ -622,6 +635,15 @@ const StackNavigator: React.FC = () => {
         component={PerfilScreen}
         options={{
           title: "Mi Perfil",
+          headerShown: false,
+        }}
+      />
+      {/* ========== RETO ========== */}
+      <Stack.Screen
+        name="RetoResolucion"
+        component={RetoResolucionScreen}
+        options={{
+          title: "Resolver Reto",
           headerShown: false,
         }}
       />

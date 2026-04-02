@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-bright": "#f7fafe",
+                        "surface-container-high": "#e5e8ec",
+                        "surface-container-highest": "#e0e3e7",
+                        "background": "#f7fafe",
+                        "secondary-container": "#60e2ff",
+                        "on-tertiary-fixed": "#311300",
+                        "on-primary-fixed": "#001c39",
+                        "on-tertiary-fixed-variant": "#733500",
+                        "primary-container": "#0576d2",
+                        "tertiary-fixed": "#ffdbc7",
+                        "primary-fixed": "#d4e3ff",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb688",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#fffbff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#b95a00",
+                        "outline": "#717783",
+                        "secondary-fixed-dim": "#52d7f3",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#004e5c",
+                        "on-primary-container": "#fdfcff",
+                        "secondary-fixed": "#aaedff",
+                        "tertiary": "#934600",
+                        "surface": "#f7fafe",
+                        "inverse-primary": "#a4c9ff",
+                        "on-primary-fixed-variant": "#004884",
+                        "surface-variant": "#e0e3e7",
+                        "surface-dim": "#d7dade",
+                        "surface-container-low": "#f1f4f8",
+                        "on-secondary-fixed": "#001f26",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#005fac",
+                        "error": "#ba1a1a",
+                        "primary": "#005da8",
+                        "on-surface-variant": "#414752",
+                        "inverse-surface": "#2d3134",
+                        "outline-variant": "#c0c7d4",
+                        "primary-fixed-dim": "#a4c9ff",
+                        "on-surface": "#181c1f",
+                        "secondary": "#006879",
+                        "inverse-on-surface": "#eef1f5",
+                        "on-background": "#181c1f",
+                        "surface-container": "#ebeef2",
+                        "on-secondary-container": "#006373",
+                        "on-error-container": "#93000a"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Manrope', sans-serif; }
+        .headline-sm { font-size: 1.5rem; line-height: 2rem; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#f7fafe]/80 dark:bg-[#181c1f]/80 backdrop-blur-xl shadow-[0px_12px_32px_rgba(0,93,168,0.06)]">
+<div class="flex justify-between items-center px-6 h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<button class="p-2 text-[#414752] dark:text-[#f1f4f8] hover:bg-[#f1f4f8] dark:hover:bg-[#414752] transition-colors active:scale-95 duration-200 rounded-full">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-manrope text-xl font-extrabold text-[#147AD6] dark:text-[#60e2ff] tracking-tight">Comunidad</h1>
+</div>
+<button class="p-2 text-[#414752] dark:text-[#f1f4f8] hover:bg-[#f1f4f8] dark:hover:bg-[#414752] transition-colors active:scale-95 duration-200 rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content: Mobile Feed -->
+<main class="pt-20 px-4 max-w-md mx-auto space-y-8">
+<!-- Post 1: Bento Style -->
+<article class="bg-surface-container-lowest rounded-lg shadow-[0px_12px_32px_rgba(0,93,168,0.04)] overflow-hidden">
+<div class="p-4 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center overflow-hidden">
+<img alt="" data-alt="professional portrait of a smiling female educator in a brightly lit modern library environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgrV7lJ6tUugWrJJ0YOphaJ5ddfpkB5uxOdd5fFZ8uWPsvZg3XxkWghtOi55V6GaHtbSQXwWZXZGpakEsMEcUEJFI0cs715x3N8j5UvqBYMopEZPcqf7mMPawrYad_utWrZdpPVUCIqThT0rS60e_FUOuUIW-NFNdZj1j2seNOaIjv5dCIepfG-Niq_nQ4p9Aa8GWZAwOiTNIDqgSpWDBW2W1HNys3X_vSc_UkYD_j3ZuhlsQPN9Ll5j7EIcdhCN9-LNJjmaIEkXk"/>
+</div>
+<div>
+<h3 class="font-bold text-on-surface leading-tight">Clara Martínez</h3>
+<p class="text-[10px] font-bold uppercase tracking-[0.05rem] text-on-surface-variant">2h ago • Matemáticas</p>
+</div>
+</div>
+<div class="px-4 pb-4 space-y-3">
+<p class="text-on-surface leading-relaxed">¿Cómo están abordando el concepto de fracciones con sus alumnos de primaria? He diseñado este tablero bento para visualizar partes del todo.</p>
+<div class="grid grid-cols-2 gap-2 h-48">
+<div class="bg-surface-container rounded-lg overflow-hidden relative">
+<img alt="" class="w-full h-full object-cover" data-alt="colorful wooden educational toys depicting geometric fractions on a clean white desk surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKOjgYtz-7oYgxMsc-NW_Ql6uXUwtVrI4MGmdCPXuCVLbCEWa_nmslA_ftk2HBolYC0bv0P3xEMLHHz7yPO3wZ39827t8utEs3Vc4v1yT_8Oxw42CBCUg6BivmKqefhvbl8HxpGpLNBAjdq_7GujzUX4r_AzEwMDurJV1dtXPPj9qDp_FdyEa7pR9wem89uT9t4J9uwxWV8ncpgv47PZ0mZIZh-Y9KHg6_DYXoJRNZ1elcF4a-y43bAm8GREJBLCEem3Ku3o3nYy0"/>
+</div>
+<div class="grid grid-rows-2 gap-2">
+<div class="bg-surface-container rounded-lg overflow-hidden">
+<img alt="" class="w-full h-full object-cover" data-alt="brightly colored classroom posters showing fractions and decimals in a modern minimalist style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCl49K_vdg4bEk1Uqpgrm_AiP6GDSJG3IminE8OS21G7GtHYIJkmnN4Nn-z3psV4vDTjpSYqRSCV4BEBhxv5TXgCz4-m3ekCj_-q2PqLasjJNYug8mRpAM6USXES7hDTYezSJogNDsV_MKM1xmP6S-_Q3PkWJCDzQN3xT-2f2HvxwefVwvOKCFJ87KWNvkGnguPagDsCJSSyyMcxAYYEp4LdWWAAkQB2SuMGM0gZj8hU91ZEbZct_Wb8_qctX7HrSL7yNLgqtxgkoc"/>
+</div>
+<div class="bg-secondary-container/20 rounded-lg flex items-center justify-center border border-secondary-container/30">
+<span class="text-secondary font-bold">+3 recursos</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-outline-variant/15">
+<div class="flex gap-4">
+<button class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">favorite</span>
+<span class="text-xs font-bold">124</span>
+</button>
+<button class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">comment</span>
+<span class="text-xs font-bold">18</span>
+</button>
+</div>
+<button class="text-primary hover:bg-surface-container-high p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined text-sm">bookmark</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Post 2: AI Suggestion Style -->
+<article class="bg-surface-container-lowest rounded-lg shadow-[0px_12px_32px_rgba(0,93,168,0.04)] p-6 space-y-4 border-l-4 border-secondary-container">
+<div class="flex items-center gap-2">
+<div class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">AI Insight</div>
+<span class="text-on-surface-variant text-xs">• Popular en tu área</span>
+</div>
+<h2 class="font-headline font-bold text-lg text-on-surface">Estrategias de Gamificación para el Cierre del Trimestre</h2>
+<p class="text-on-surface-variant text-sm leading-relaxed">Basado en tus últimas planificaciones, otros educadores están usando el "Escape Room Digital" para evaluar conocimientos.</p>
+<div class="flex gap-2 pt-2">
+<button class="flex-1 bg-primary text-on-primary py-2.5 rounded-full font-bold text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity">Explorar Guía</button>
+<button class="px-4 py-2.5 rounded-full border border-outline-variant/30 text-on-surface font-bold text-sm hover:bg-surface-container-high">Guardar</button>
+</div>
+</article>
+<!-- Post 3: Simple Content -->
+<article class="bg-surface-container-lowest rounded-lg shadow-[0px_12px_32px_rgba(0,93,168,0.04)] overflow-hidden">
+<div class="p-4 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center overflow-hidden">
+<img alt="" data-alt="close up profile of a male teacher in casual attire against a soft blurred outdoor school background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGhD29qSy7Bw7VHG6tXlruMVkHZutAFBUrvq5jqythxwzWEb9nM6J-9xBqZJeN39Yu82Op6EDJU6eocsIvTd2EFMhYD2k2U1hbF6afzZAYgKIrhwt9yuCNCL41UH_USSQUVt7uTOx3AlOpQn3R2NQQFMbWp28MFN-2bbOm-RJyArWE5AHiXdsSCmYf_h8VN8cwWueDONLzSBn0X4B6c7GqLaszerw351Xi_GODAqYU23XntrmmwGsZ4fdM1HwQwwA5w55bLL1eWFA"/>
+</div>
+<div>
+<h3 class="font-bold text-on-surface leading-tight">Andrés Ruiz</h3>
+<p class="text-[10px] font-bold uppercase tracking-[0.05rem] text-on-surface-variant">5h ago • Innovación</p>
+</div>
+</div>
+<img alt="" class="w-full h-56 object-cover" data-alt="wide shot of a modern brightly lit collaborative classroom space with flexible seating and green plants" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdBGQoYl4qh-5rLJTNKtSLDBTQfJ-fOZss-HKzWh4dsHLV5jHC1LGeLPKjPfw1lXbfjKoL1oVkUPmH6Js_jrKiKmUUnpTEbc9NDko2Z-x8HBRVah5zqo5yQShZhwDfOWSViraQuHbQc6FNataTibsnf3ek3hGCmjjDPINlucWRvj55mpMZyVtrghK9yHkmlpHPMvu4FyqQSbnQXcZpaMd4lqM5pYEAdfXyJnfiJpfgYCloebcNs_fZ9b6hhkexMdwe7WE3XBq5lnA"/>
+<div class="p-4 space-y-2">
+<p class="text-on-surface text-sm">Organizando el taller de robótica para el próximo sábado. ¡Aún quedan 5 plazas!</p>
+</div>
+</article>
+</main>
+<!-- OVERLAYS: SNACKBAR EXAMPLES -->
+<!-- Positioned absolutely/fixed for demonstration on top of the feed -->
+<div class="fixed top-20 left-0 w-full z-[60] flex flex-col items-center gap-4 pointer-events-none px-4">
+<!-- 1. Success Snackbar -->
+<div class="pointer-events-auto w-full max-w-sm bg-[#2e3135] text-white rounded-lg p-3 flex items-center justify-between shadow-xl">
+<div class="flex items-center gap-3">
+<span class="text-green-400">✅</span>
+<span class="text-sm font-medium">¡Publicación compartida!</span>
+</div>
+<button class="text-secondary-fixed font-bold text-xs px-3 py-1 hover:bg-white/10 rounded transition-colors uppercase tracking-wider">Ver</button>
+</div>
+<!-- 2. Library Snackbar -->
+<div class="pointer-events-auto w-full max-w-sm bg-[#2e3135] text-white rounded-lg p-3 flex items-center justify-between shadow-xl">
+<div class="flex items-center gap-3">
+<span class="text-green-400">📥</span>
+<span class="text-sm font-medium">Guardado en tu biblioteca</span>
+</div>
+<button class="text-secondary-fixed font-bold text-xs px-3 py-1 hover:bg-white/10 rounded transition-colors uppercase tracking-wider">Ir a biblioteca</button>
+</div>
+<!-- 3. Error Snackbar -->
+<div class="pointer-events-auto w-full max-w-sm bg-error text-white rounded-lg p-3 flex items-center justify-between shadow-xl">
+<div class="flex items-center gap-3">
+<span>❌</span>
+<span class="text-sm font-medium">No se pudo publicar. Toca para reintentar.</span>
+</div>
+<button class="p-1 hover:bg-white/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</div>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full flex justify-around items-center px-4 pb-4 bg-[#f7fafe]/80 dark:bg-[#181c1f]/80 backdrop-blur-xl z-50 rounded-t-2xl shadow-[0px_-4px_24px_rgba(0,93,168,0.04)]">
+<a class="flex flex-col items-center justify-center bg-[#147AD6] text-white rounded-full p-3 shadow-lg shadow-blue-500/20 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-manrope text-[8px] font-bold uppercase tracking-[0.05rem]">Feed</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#414752] dark:text-[#f1f4f8] p-3 hover:text-[#147AD6] transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-manrope text-[8px] font-bold uppercase tracking-[0.05rem]">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#414752] dark:text-[#f1f4f8] p-3 hover:text-[#147AD6] transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-manrope text-[8px] font-bold uppercase tracking-[0.05rem]">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#414752] dark:text-[#f1f4f8] p-3 hover:text-[#147AD6] transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-manrope text-[8px] font-bold uppercase tracking-[0.05rem]">Profile</span>
+</a>
+</nav>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full shadow-lg shadow-primary/30 flex items-center justify-center z-40 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">add</span>
+</button>
+</body></html>

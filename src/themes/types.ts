@@ -50,6 +50,22 @@ export interface ColorTokens {
   primaryTint: string;
   successLight: string;
   purpleTint: string;
+
+  // Stitch Material 3 surface system
+  surfaceContainerLowest: string;
+  surfaceContainerLow: string;
+  surfaceContainer: string;
+  surfaceContainerHigh: string;
+  surfaceContainerHighest: string;
+  onSurface: string;
+  onSurfaceVariant: string;
+  outlineVariant: string;
+  primaryContainer: string;
+  secondaryContainer: string;
+  errorContainer: string;
+  inverseSurface: string;
+  shadowBlue: string;
+  shadowBlueLift: string;
 }
 
 export type ThemeMode = "light" | "dark";

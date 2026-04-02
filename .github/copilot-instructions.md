@@ -5,61 +5,29 @@
 PlanearIA es una app React Native + Expo SDK 54 + TypeScript para docentes mexicanos.
 Arquitectura MVVM con hooks como ViewModels.
 
-## Azure DevOps — Gestión de Tareas
+## Roadmap
 
-### Conexión
-
-- **Organización:** https://dev.azure.com/L22010068
-- **Proyecto:** App PlanearIA
-- **Credenciales:** Almacenadas en `roadmap-context/devops_config.json`
-
-### Roadmap y Estados
-
-- El archivo `roadmap-context/ROADMAP_COMPLETO.md` es la **fuente de verdad** de las tareas del proyecto.
-- Cada tarea tiene un prefijo numérico (ej: `1.1.1.2`) y un estado:
-  - `✅ COMPLETADA` → Azure DevOps: **Closed**
-  - `🔄 EN PROGRESO` → Azure DevOps: **Active**
-  - `❌ PENDIENTE` → Azure DevOps: **New**
-- Los estados de Stories, Features y Epics se **infieren** de sus hijos.
-
-### Flujo obligatorio al completar tareas
-
-**Cada vez que termines de implementar/completar una tarea del roadmap, DEBES:**
-
-1. **Actualizar `ROADMAP_COMPLETO.md`:**
-   - Cambiar el estado de la tarea de `❌ PENDIENTE` a `✅ COMPLETADA`
-   - O de `❌ PENDIENTE` a `🔄 EN PROGRESO` si queda trabajo parcial
-   - Formato exacto: `- **Estado:** ✅ COMPLETADA` (o `🔄 EN PROGRESO`)
-
-2. **Ejecutar el script de sincronización automática:**
-
-   ```powershell
-   cd "c:\Users\jarco\dev\PlanearIA\roadmap-context"
-   & "C:/Users/jarco/AppData/Local/Programs/Python/Python312/python.exe" actualizar_estados_api.py --auto
-   ```
-
-   Este script:
-   - Lee los estados actualizados de `ROADMAP_COMPLETO.md`
-   - Los compara con el CSV exportado (`planearIA.csv` en Desktop)
-   - Actualiza Azure DevOps via REST API (credenciales desde `devops_config.json`)
-   - No requiere confirmación manual en modo `--auto`
-
-3. **Si el CSV del Desktop está desactualizado**, recordar al usuario exportar uno nuevo desde Azure DevOps.
-
-### Estructura de numeración
-
-- **Epic:** `N` (ej: `1`)
-- **Feature:** `N.N` (ej: `1.1`)
-- **User Story:** `N.N.N` (ej: `1.1.1`)
-- **Task:** `N.N.N.N` (ej: `1.1.1.2`)
+- El archivo `roadmap-context/ROADMAP_COMPLETO_2.md` es la **fuente de verdad** de las tareas del proyecto.
+- Cada tarea tiene un prefijo numérico (ej: `1.1.1`) y un estado: `[PENDIENTE]`, `[EN PROGRESO]`, `[COMPLETADO]`.
+- Al completar una tarea, actualizar su estado en el roadmap.
 
 ### Cuando el usuario pida "trabajar en la próxima tarea"
 
-1. Leer `ROADMAP_COMPLETO.md` para encontrar la siguiente tarea `❌ PENDIENTE`
+1. Leer `ROADMAP_COMPLETO_2.md` para encontrar la siguiente tarea `[PENDIENTE]`
 2. Implementar la tarea en el código
-3. Cambiar su estado en el roadmap a `✅ COMPLETADA` (o `🔄 EN PROGRESO`)
-4. Ejecutar `actualizar_estados_api.py --auto`
+3. **Ejecutar tests** relacionados (`npm test -- --testPathPattern="<patrón>"`)
+4. Cambiar su estado en el roadmap a `[COMPLETADO]` (o `[EN PROGRESO]`)
 5. Informar al usuario del resultado
+
+### Testing CI/CD — Regla obligatoria
+
+**Cada vez que implementes o modifiques código funcional, DEBES:**
+
+1. **Buscar tests existentes** que cubran el módulo modificado en `src/__tests__/`
+2. **Ejecutar los tests afectados** y verificar que pasen
+3. **Crear tests nuevos** si el módulo no tiene cobertura o si se crean archivos nuevos (context, viewModel, componente, servicio)
+4. **Si un test falla**, arreglarlo antes de marcar la tarea como completada
+5. Los tests se ejecutan con: `npm test` o `npm test -- --testPathPattern="<archivo>"`
 
 ### Python
 

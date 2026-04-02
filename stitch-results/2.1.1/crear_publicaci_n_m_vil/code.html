@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Crear Publicación - Comunidad</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#f7fafe",
+              "surface-container-high": "#e5e8ec",
+              "surface-container-highest": "#e0e3e7",
+              "background": "#f7fafe",
+              "secondary-container": "#60e2ff",
+              "on-tertiary-fixed": "#311300",
+              "on-primary-fixed": "#001c39",
+              "on-tertiary-fixed-variant": "#733500",
+              "primary-container": "#0576d2",
+              "tertiary-fixed": "#ffdbc7",
+              "primary-fixed": "#d4e3ff",
+              "on-primary": "#ffffff",
+              "tertiary-fixed-dim": "#ffb688",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-container": "#fffbff",
+              "on-tertiary": "#ffffff",
+              "tertiary-container": "#b95a00",
+              "outline": "#717783",
+              "secondary-fixed-dim": "#52d7f3",
+              "on-secondary": "#ffffff",
+              "on-error": "#ffffff",
+              "on-secondary-fixed-variant": "#004e5c",
+              "on-primary-container": "#fdfcff",
+              "secondary-fixed": "#aaedff",
+              "tertiary": "#934600",
+              "surface": "#f7fafe",
+              "inverse-primary": "#a4c9ff",
+              "on-primary-fixed-variant": "#004884",
+              "surface-variant": "#e0e3e7",
+              "surface-dim": "#d7dade",
+              "surface-container-low": "#f1f4f8",
+              "on-secondary-fixed": "#001f26",
+              "error-container": "#ffdad6",
+              "surface-tint": "#005fac",
+              "error": "#ba1a1a",
+              "primary": "#005da8",
+              "on-surface-variant": "#414752",
+              "inverse-surface": "#2d3134",
+              "outline-variant": "#c0c7d4",
+              "primary-fixed-dim": "#a4c9ff",
+              "on-surface": "#181c1f",
+              "secondary": "#006879",
+              "inverse-on-surface": "#eef1f5",
+              "on-background": "#181c1f",
+              "surface-container": "#ebeef2",
+              "on-secondary-container": "#006373",
+              "on-error-container": "#93000a"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.25rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface">
+<!-- Full Screen Modal Container -->
+<div class="fixed inset-0 z-50 bg-surface-container-lowest flex flex-col">
+<!-- TopAppBar (Customized for Modal) -->
+<header class="flex justify-between items-center px-4 h-16 w-full z-50 bg-surface-container-lowest/80 backdrop-blur-xl">
+<button class="p-2 text-on-surface hover:bg-surface-container-high rounded-full transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+<h1 class="font-headline headline-sm font-bold tracking-tight text-on-surface">Crear Publicación</h1>
+<button class="bg-primary hover:bg-primary-container text-white px-6 py-2 rounded-full font-bold transition-all active:scale-95 shadow-lg shadow-primary/20">
+                Publicar
+            </button>
+</header>
+<!-- Modal Scrollable Content -->
+<main class="flex-1 overflow-y-auto px-6 py-4 space-y-8">
+<!-- User Info & Visibility -->
+<section class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden shadow-md ring-2 ring-surface-container-high">
+<img alt="Avatar del usuario" class="w-full h-full object-cover" data-alt="portrait of a smiling professional female educator with a warm and friendly expression in an office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0rbPaufHNYCCR80wyacqxNj5BpNhT21rXcrMVftatorQ2vXtxDnVMfR3ZDwnqq7cB8irbO-oGuHiwa7J_Yun-Dqf6eltr-2rzfEYNPvW1QUYN8PU4n0TohGIDJhmjnY_eI3rYVRIYFT7vvBeVuqGUm22jR9sdT6QB3MXRRbzgPwCkkayBcJwqKW5Bz-Fex8ak5jYVQ1l2fT4St3AigXk9LILxcUgtJXPbFG-FEl0gos-9gKew0Nzl09i69YFpLg0VDr2M5mvwMUk"/>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface headline-sm tracking-tight">Ana Valenzuela</span>
+<button class="flex items-center gap-1.5 px-3 py-1 mt-1 bg-surface-container-low text-on-surface-variant rounded-full text-xs font-semibold hover:bg-surface-container-high transition-colors w-fit">
+<span class="material-symbols-outlined text-[14px]" data-icon="public">public</span>
+                        Todos
+                        <span class="material-symbols-outlined text-[14px]" data-icon="arrow_drop_down">arrow_drop_down</span>
+</button>
+</div>
+</section>
+<!-- Inputs Area -->
+<div class="space-y-6">
+<!-- Title Field -->
+<div class="group">
+<input class="w-full text-2xl font-bold bg-transparent border-none focus:ring-0 placeholder-on-surface-variant/40 tracking-tight" placeholder="Título (opcional)" type="text"/>
+</div>
+<!-- Main Content Field -->
+<div class="min-h-[200px]">
+<textarea class="w-full min-h-[200px] text-lg bg-transparent border-none focus:ring-0 placeholder-on-surface-variant/50 resize-none leading-relaxed" placeholder="Escribe algo para compartir con la comunidad docente..."></textarea>
+</div>
+</div>
+<!-- Mood Selector (The Horizontal Scrollable Chips) -->
+<section class="space-y-3">
+<label class="label-md font-bold text-on-surface-variant uppercase tracking-[0.05rem]">¿Cómo te sientes hoy?</label>
+<div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-6 px-6">
+<button class="flex items-center gap-2 px-4 py-2.5 bg-surface-container-lowest border border-outline-variant/20 rounded-full whitespace-nowrap shadow-sm hover:bg-surface-container-high transition-all active:scale-95 shrink-0">
+<span>😊</span>
+<span class="text-sm font-medium">Inspirado</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2.5 bg-surface-container-lowest border border-outline-variant/20 rounded-full whitespace-nowrap shadow-sm hover:bg-surface-container-high transition-all active:scale-95 shrink-0">
+<span>📚</span>
+<span class="text-sm font-medium">Productivo</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2.5 bg-secondary-container text-on-secondary-container rounded-full whitespace-nowrap shadow-md shadow-secondary-container/20 transition-all active:scale-95 shrink-0">
+<span>💡</span>
+<span class="text-sm font-bold">Creativo</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2.5 bg-surface-container-lowest border border-outline-variant/20 rounded-full whitespace-nowrap shadow-sm hover:bg-surface-container-high transition-all active:scale-95 shrink-0">
+<span>🎯</span>
+<span class="text-sm font-medium">Enfocado</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2.5 bg-surface-container-lowest border border-outline-variant/20 rounded-full whitespace-nowrap shadow-sm hover:bg-surface-container-high transition-all active:scale-95 shrink-0">
+<span>☕</span>
+<span class="text-sm font-medium">Relajado</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Bottom Tool Bar -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant/10 p-4">
+<div class="flex items-center justify-between">
+<!-- Tool Icons -->
+<div class="flex items-center gap-1">
+<button class="p-3 text-primary hover:bg-surface-container-low rounded-full transition-all active:scale-90">
+<span class="material-symbols-outlined" data-icon="image">image</span>
+</button>
+<button class="p-3 text-primary hover:bg-surface-container-low rounded-full transition-all active:scale-90">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+</button>
+<button class="p-3 text-primary hover:bg-surface-container-low rounded-full transition-all active:scale-90">
+<span class="material-symbols-outlined" data-icon="link">link</span>
+</button>
+<button class="p-3 text-primary hover:bg-surface-container-low rounded-full transition-all active:scale-90">
+<span class="material-symbols-outlined" data-icon="military_tech">military_tech</span>
+</button>
+</div>
+<!-- Character Count -->
+<div class="text-on-surface-variant font-medium text-xs tracking-wider">
+<span class="text-primary font-bold">0</span>/2000
+                </div>
+</div>
+</footer>
+</div>
+<!-- Background Layer (To visualize focus on modal) -->
+<div class="fixed inset-0 -z-10 bg-surface flex flex-col p-4 opacity-50">
+<!-- Mock background content -->
+<div class="w-full h-32 bg-surface-container-lowest rounded-xl mb-4"></div>
+<div class="w-full h-32 bg-surface-container-lowest rounded-xl mb-4"></div>
+<div class="w-full h-32 bg-surface-container-lowest rounded-xl mb-4"></div>
+</div>
+</body></html>

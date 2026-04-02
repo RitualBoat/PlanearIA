@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#f7fafe",
+              "surface-container-high": "#e5e8ec",
+              "surface-container-highest": "#e0e3e7",
+              "background": "#f7fafe",
+              "secondary-container": "#60e2ff",
+              "on-tertiary-fixed": "#311300",
+              "on-primary-fixed": "#001c39",
+              "on-tertiary-fixed-variant": "#733500",
+              "primary-container": "#0576d2",
+              "tertiary-fixed": "#ffdbc7",
+              "primary-fixed": "#d4e3ff",
+              "on-primary": "#ffffff",
+              "tertiary-fixed-dim": "#ffb688",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-container": "#fffbff",
+              "on-tertiary": "#ffffff",
+              "tertiary-container": "#b95a00",
+              "outline": "#717783",
+              "secondary-fixed-dim": "#52d7f3",
+              "on-secondary": "#ffffff",
+              "on-error": "#ffffff",
+              "on-secondary-fixed-variant": "#004e5c",
+              "on-primary-container": "#fdfcff",
+              "secondary-fixed": "#aaedff",
+              "tertiary": "#934600",
+              "surface": "#f7fafe",
+              "inverse-primary": "#a4c9ff",
+              "on-primary-fixed-variant": "#004884",
+              "surface-variant": "#e0e3e7",
+              "surface-dim": "#d7dade",
+              "surface-container-low": "#f1f4f8",
+              "on-secondary-fixed": "#001f26",
+              "error-container": "#ffdad6",
+              "surface-tint": "#005fac",
+              "error": "#ba1a1a",
+              "primary": "#005da8",
+              "on-surface-variant": "#414752",
+              "inverse-surface": "#2d3134",
+              "outline-variant": "#c0c7d4",
+              "primary-fixed-dim": "#a4c9ff",
+              "on-surface": "#181c1f",
+              "secondary": "#006879",
+              "inverse-on-surface": "#eef1f5",
+              "on-background": "#181c1f",
+              "surface-container": "#ebeef2",
+              "on-secondary-container": "#006373",
+              "on-error-container": "#93000a"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.25rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-offline-amber {
+            background-color: #FFF3E0;
+        }
+        .text-offline-amber {
+            color: #E65100;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#f7fafe] font-body text-on-surface selection:bg-primary-fixed">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#f7fafe]/80 dark:bg-[#181c1f]/80 backdrop-blur-xl shadow-[0px_12px_32px_rgba(0,93,168,0.06)]">
+<div class="flex justify-between items-center px-6 h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<button class="text-[#414752] dark:text-[#f1f4f8] hover:bg-[#f1f4f8] dark:hover:bg-[#414752] transition-colors p-2 rounded-full active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-manrope headline-sm font-bold tracking-tight text-[#147AD6] dark:text-[#60e2ff] text-xl font-extrabold tracking-tight">Comunidad</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="text-[#414752] dark:text-[#f1f4f8] hover:bg-[#f1f4f8] dark:hover:bg-[#414752] transition-colors p-2 rounded-full active:scale-95 duration-200 relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-16 pb-24 min-h-screen">
+<!-- Offline Banner -->
+<div class="bg-offline-amber px-6 py-3 flex items-center gap-3 sticky top-16 z-40">
+<span class="material-symbols-outlined text-offline-amber text-lg" data-icon="warning">warning</span>
+<p class="text-offline-amber font-medium text-sm tracking-tight">
+                ⚠️ Sin conexión — Mostrando publicaciones guardadas
+            </p>
+</div>
+<div class="px-6 mt-8 space-y-8 max-w-2xl mx-auto">
+<!-- Cached Post 1 (Slightly Opaque) -->
+<article class="bg-surface-container-lowest rounded-lg p-5 shadow-[0px_4px_12px_rgba(0,93,168,0.04)] opacity-60 border border-outline-variant/10">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="Avatar" data-alt="profile portrait of a friendly teacher in a bright classroom setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGu5bB7MrflK8lLu9BewE6vR0SrZ_nCErx4qJM66b0zCLFtRFZzDxfyS30Yi0xUrIZQF2ICaNlbBvpgOKQtlRq8Wx4t-qrqCNgeZ16ntUaHfx5vK2fxeOj1pvyoNW9vS2sLxSBDsgYWUb15hLokg065olYJDL9QOAXmkGKyD2isKacehjsyunIHzS5d_Idea5vdj3V08j3Jsf4xSsnA6XY5RF5mNJfOAJLOiJ_2K-g8NXra1POucZ8BNOeJETjnu4A0cDqMoLIOKQ"/>
+</div>
+<div>
+<h3 class="font-bold text-on-surface text-sm">Carlos Mendoza</h3>
+<p class="text-[10px] text-on-surface-variant font-label uppercase tracking-[0.05rem]">Hace 2 horas • Guardado</p>
+</div>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-4">
+                    ¿Alguien tiene estrategias para manejar la transición entre el recreo y la clase de matemáticas? Mis alumnos de 3ro vienen muy activos.
+                </p>
+<div class="flex items-center gap-6 text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-lg" data-icon="favorite">favorite</span>
+<span class="text-xs font-bold">12</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-lg" data-icon="chat_bubble">chat_bubble</span>
+<span class="text-xs font-bold">4</span>
+</div>
+</div>
+</article>
+<!-- Network Error State (Asymmetric Section) -->
+<div class="py-12 px-4 flex flex-col items-center text-center">
+<div class="w-24 h-24 bg-surface-container-high rounded-full flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-5xl" data-icon="cloud_off">cloud_off</span>
+</div>
+<h2 class="font-headline font-bold text-xl text-on-surface mb-2">No pudimos cargar las publicaciones</h2>
+<p class="text-on-surface-variant text-sm max-w-[240px] mb-8">
+                    Revisa tu conexión e intenta de nuevo
+                </p>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-8 py-3.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-blue-500/20 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="refresh">refresh</span>
+                    Reintentar
+                </button>
+</div>
+<!-- More Cached Content -->
+<div class="space-y-6 opacity-40">
+<article class="bg-surface-container-lowest rounded-lg p-5 border border-outline-variant/10">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="Avatar" data-alt="professional woman portrait with soft studio lighting and clean background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtg--ee_RdxubRNFtDhdHjPFXUJd59-cau6qP9iZR7XTARJdA9fYfFtvZpnYDxkrT7imRYdh9eMN9nTjMVdCcYgoRlNUdDnDjYhBhEDaA1u0l653NPgQ8lnHZV95BeI78_5sIZx5BOUGIi_jqPSiQfNfS3XrY_r9ZUiubqFaZcqXWP1nfLzlILWTY3HLUI32LCvGRVGCxRS7QwrVjU9v9e6D6tqb6LUzJ01AWEC9nh3HV1kCcMCHCt6ni-yqFOz4kPl_E0DjCsepI"/>
+</div>
+<div>
+<h3 class="font-bold text-on-surface text-sm">Elena Rios</h3>
+<p class="text-[10px] text-on-surface-variant font-label uppercase tracking-[0.05rem]">Ayer • Guardado</p>
+</div>
+</div>
+<div class="w-full h-40 rounded-lg bg-surface-container-high mb-4 overflow-hidden">
+<img alt="Post Image" class="w-full h-full object-cover" data-alt="classroom interior with wooden desks and colorful posters on walls in soft daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrHhGk-YrJdgW9ecyroZI-F0fP1dxu7zTuYfaa-7bcvDK1mWXAbK9Bur9BcZSWXm7gdBHsT6Fwce8gKqH1fDG0dsYzSF8LaF1ahm0wvlyAG3asK_9C3jRnoJ8fGdw7PmjROI7PmaMOzSI4q8GmWPqQ5hlcygoG1DsnzbdJWX8Sji6S1TaRi9pYYobJjfHCLmKl_CizVmppnRGNgSlCqy2NC55hyVV77NgcNK9hfEdFZi8pEuDBf9ZQXFctyWMk9qNKkDugdACirV0"/>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed">
+                        ¡Nueva guía de planificación disponible en la biblioteca!
+                    </p>
+</article>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-2xl bg-[#f7fafe]/80 dark:bg-[#181c1f]/80 backdrop-blur-xl shadow-[0px_-4px_24px_rgba(0,93,168,0.04)]">
+<div class="fixed bottom-0 w-full flex justify-around items-center px-4 pb-4 h-20">
+<!-- Feed (Active) -->
+<a class="flex flex-col items-center justify-center bg-[#147AD6] text-white rounded-full p-3 shadow-lg shadow-blue-500/20 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-manrope text-[10px] font-bold uppercase tracking-[0.05rem] mt-1 hidden">Feed</span>
+</a>
+<!-- Explore -->
+<a class="flex flex-col items-center justify-center text-[#414752] dark:text-[#f1f4f8] p-3 hover:text-[#147AD6] transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-manrope text-[10px] font-bold uppercase tracking-[0.05rem] mt-1">Explore</span>
+</a>
+<!-- Library -->
+<a class="flex flex-col items-center justify-center text-[#414752] dark:text-[#f1f4f8] p-3 hover:text-[#147AD6] transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
+<span class="font-manrope text-[10px] font-bold uppercase tracking-[0.05rem] mt-1">Library</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-[#414752] dark:text-[#f1f4f8] p-3 hover:text-[#147AD6] transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-manrope text-[10px] font-bold uppercase tracking-[0.05rem] mt-1">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Comunidad - Feed Principal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#f7fafe",
+              "surface-container-high": "#e5e8ec",
+              "surface-container-highest": "#e0e3e7",
+              "background": "#f7fafe",
+              "secondary-container": "#60e2ff",
+              "on-tertiary-fixed": "#311300",
+              "on-primary-fixed": "#001c39",
+              "on-tertiary-fixed-variant": "#733500",
+              "primary-container": "#0576d2",
+              "tertiary-fixed": "#ffdbc7",
+              "primary-fixed": "#d4e3ff",
+              "on-primary": "#ffffff",
+              "tertiary-fixed-dim": "#ffb688",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-container": "#fffbff",
+              "on-tertiary": "#ffffff",
+              "tertiary-container": "#b95a00",
+              "outline": "#717783",
+              "secondary-fixed-dim": "#52d7f3",
+              "on-secondary": "#ffffff",
+              "on-error": "#ffffff",
+              "on-secondary-fixed-variant": "#004e5c",
+              "on-primary-container": "#fdfcff",
+              "secondary-fixed": "#aaedff",
+              "tertiary": "#934600",
+              "surface": "#f7fafe",
+              "inverse-primary": "#a4c9ff",
+              "on-primary-fixed-variant": "#004884",
+              "surface-variant": "#e0e3e7",
+              "surface-dim": "#d7dade",
+              "surface-container-low": "#f1f4f8",
+              "on-secondary-fixed": "#001f26",
+              "error-container": "#ffdad6",
+              "surface-tint": "#005fac",
+              "error": "#ba1a1a",
+              "primary": "#005da8",
+              "on-surface-variant": "#414752",
+              "inverse-surface": "#2d3134",
+              "outline-variant": "#c0c7d4",
+              "primary-fixed-dim": "#a4c9ff",
+              "on-surface": "#181c1f",
+              "secondary": "#006879",
+              "inverse-on-surface": "#eef1f5",
+              "on-background": "#181c1f",
+              "surface-container": "#ebeef2",
+              "on-secondary-container": "#006373",
+              "on-error-container": "#93000a"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.25rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; background-color: #EEF3FA; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .headline-sm { font-size: 1.5rem; line-height: 2rem; }
+    </style>
+</head>
+<body class="text-on-surface">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#f7fafe]/80 backdrop-blur-xl shadow-[0px_12px_32px_rgba(0,93,168,0.06)]">
+<div class="flex justify-between items-center px-6 h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-[#f1f4f8] transition-colors rounded-full active:scale-95 duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">menu</span>
+</button>
+<h1 class="text-xl font-extrabold text-[#147AD6] tracking-tight">Comunidad</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="hidden md:flex items-center bg-surface-container px-4 py-2 rounded-full mr-4">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-64 text-on-surface" placeholder="Buscar en Comunidad..." type="text"/>
+</div>
+<button class="p-2 hover:bg-[#f1f4f8] transition-colors rounded-full active:scale-95 duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-primary overflow-hidden border-2 border-white shadow-sm">
+<img class="w-full h-full object-cover" data-alt="professional portrait of a male teacher in a bright studio setting with a friendly expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZZclrdK4jGC4J4WxVCdWH79DWomAkf-6jMaKA3fCiNkagbdHxFeicDq64nsdAe1KtrNGh7yrlvQK8lFYRqdfB9Y6MgUCf1f2lmqeaOEskY8ZlSunLkA4L-rbha97t5lSRwCe1GhX5lADNuMedLoDT2MtVVUR2isgN2bHto_cDzMWQ3RPNjRlNp5tamGi9HDWpTk6iXe38iSot7ciHNl_xTcu4wQl_D2FolBj8cQ20gsQfXtT88UO4CeF1a2bHh75z6rPbfKwhfzA"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-20 px-6 max-w-7xl mx-auto flex gap-10 items-start">
+<!-- Left Sidebar Navigation (Desktop) -->
+<aside class="hidden lg:flex flex-col w-64 sticky top-24 gap-2">
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-4 px-4 py-3 bg-[#147AD6] text-white rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-bold text-sm tracking-wide">Feed</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-all rounded-xl active:scale-95 duration-200" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-bold text-sm tracking-wide">Explore</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-all rounded-xl active:scale-95 duration-200" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-bold text-sm tracking-wide">Library</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-all rounded-xl active:scale-95 duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-bold text-sm tracking-wide">Profile</span>
+</a>
+</nav>
+<div class="mt-8 p-6 rounded-xl bg-gradient-to-br from-primary to-primary-container text-white shadow-xl">
+<h3 class="font-bold text-lg leading-tight mb-2">Workspace Pro</h3>
+<p class="text-xs opacity-90 mb-4">Potencia tus clases con herramientas de IA ilimitadas.</p>
+<button class="w-full py-2 bg-white text-primary font-bold rounded-lg text-sm hover:bg-opacity-90 transition-all">Actualizar</button>
+</div>
+</aside>
+<!-- Main Feed -->
+<section class="flex-1 max-w-[640px] flex flex-col gap-8">
+<!-- Post Bar Card -->
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0px_12px_32px_rgba(0,93,168,0.06)] flex gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="professional male portrait avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8Cu5lxqh7-ApExQlAk-CO5DKVhlZbs0QZoJoCdCaMsI-RxUd71ohOspvc1-TW9WDeOXa-ZILtTnWMhu4_iAC3BYrwEHWMhRXKIu1trmOZ5zf08UJoev0NiDdvwFcG5kioPEQJ9rwB1MDiE7orVFYWRuDBJMd78yJKIh0Cb9jVA6OSLSZEkDj2_XXKTbwfSsvtmWc676fZEIpNPX-oNyBZLSqxNBcDeycartaHBMcDCJYm_b3fOWinOo1aLx54uMP4yljG7dPrBZ0"/>
+</div>
+<div class="flex-1">
+<button class="w-full text-left px-6 py-3 bg-surface-container-low text-on-surface-variant/60 rounded-full font-medium hover:bg-surface-container transition-colors">
+                        ¿Qué estás planeando hoy?
+                    </button>
+<div class="flex gap-6 mt-4 px-2">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">image</span>
+<span class="text-xs font-bold uppercase tracking-wider">Multimedia</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">description</span>
+<span class="text-xs font-bold uppercase tracking-wider">Recurso</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">analytics</span>
+<span class="text-xs font-bold uppercase tracking-wider">Encuesta</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Post 1: María García -->
+<article class="bg-surface-container-lowest rounded-lg shadow-[0px_12px_32px_rgba(0,93,168,0.06)] overflow-hidden">
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="portrait of a confident female teacher in a modern bright classroom setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAu8fOimSb6HlvkwPO6QOdvSPNwvUrOD6OGc5z_tRWKd_5a82rDZ5WeWJf_W7vzmDssT5tPmhi1ElWq3PyHP1du1cbk1KcmpwObDCpK0cfyfboxYj05v9sddqZyV0sjvAHmVYiANdNZzyHxxDew_-KL4L9cJTUZsMU46VL1_L_0p0GDpziT7y_Y2Bas2rkI8ll8NO6Q9znlySycwFDx9HPRQ-j9F4NGMsK4PAqDDiEMXMzGI7PubLLS2PKDseK6Qe7GvE0v7GnaFP4"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">María García</h4>
+<p class="text-xs text-on-surface-variant">Profesora de Matemáticas • Hace 2 horas</p>
+</div>
+</div>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_horiz</span>
+</button>
+</div>
+<p class="text-on-surface leading-relaxed mb-4">He diseñado una nueva secuencia para enseñar fracciones usando gamificación. ¡Mis alumnos de 1º de ESO están encantados! Dejo el enlace al recurso abajo. 👇</p>
+<div class="bg-secondary-container/10 p-4 rounded-xl border border-secondary-container/20 flex items-center gap-4 mb-4">
+<div class="w-12 h-12 bg-secondary-container flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-on-secondary-container">folder_zip</span>
+</div>
+<div class="flex-1">
+<p class="font-bold text-sm text-on-secondary-container">Gamificacion_Fracciones_v2.pdf</p>
+<p class="text-xs text-on-secondary-container/80">4.2 MB • PDF</p>
+</div>
+<span class="material-symbols-outlined text-on-secondary-container">download</span>
+</div>
+</div>
+<div class="border-t border-outline-variant/10 px-6 py-3 flex gap-6">
+<button class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="font-bold text-xs uppercase">124</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-bold text-xs uppercase">18</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant ml-auto">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</article>
+<!-- Post 2: Carlos Rodríguez -->
+<article class="bg-surface-container-lowest rounded-lg shadow-[0px_12px_32px_rgba(0,93,168,0.06)] overflow-hidden">
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="close-up portrait of a male educator with glasses and a smart casual style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIItXGTZsRqub2V53-VdlmgaXzjd2u3L2CA7my45A6QclM-Tj7TfUzk7dxPprY3QbgeccrnCr33U9b_qhqLMSEhzZHFVsVOoL-3ENUTpTqWILMBzZsORoCYaJRShC51A4U6p31O4ZintG94GZPH7qzxUrRF-gaQ6pjJY64WTbjXHVF2wWsj3YLD66gpeZtzAQKS0eknz6F8bA_we4RLXPagcOgzevDttpIQpwpp0moq4o5K1JwwOi9akFyxqPrbFRsL9b7ndI4oeI"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Carlos Rodríguez</h4>
+<p class="text-xs text-on-surface-variant">Innovación Educativa • Hace 5 horas</p>
+</div>
+</div>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_horiz</span>
+</button>
+</div>
+<p class="text-on-surface leading-relaxed mb-4">¿Alguien ha probado ChatGPT para generar rúbricas personalizadas? Los resultados son sorprendentes si el prompt está bien estructurado. He preparado un hilo sobre esto.</p>
+<div class="h-64 rounded-xl overflow-hidden mb-4 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="modern desk setup with a glowing laptop screen showing complex educational charts and ai interface icons" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9ReptnPDpSjspf-46ls7jJBZZb2_eyJzuQMKFLYouV1M0L-xC90JIryVxuF9ynqcTzX2JRiRSwqNokXmBWENOxerITAZKP4X5aawNsxBS6_hi6wp_9vcfkGp02VSBbuOUhsBJAElWB2_2xHUT3r_mdutDKyYOI-EkIxSA1AJwmHBYlOfVXRdbRe_5_U12TeKlA9-r2_NX8oQmvxG6qofFkBtHMsuZWEoVO7h5cHXtLitHb6YveHQm5837yCW1UnxKi6YTVBdqKv8"/>
+</div>
+</div>
+<div class="border-t border-outline-variant/10 px-6 py-3 flex gap-6">
+<button class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-bold text-xs uppercase">89</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-bold text-xs uppercase">42</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant ml-auto">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</article>
+<!-- Post 3: Laura Pérez -->
+<article class="bg-surface-container-lowest rounded-lg shadow-[0px_12px_32px_rgba(0,93,168,0.06)] overflow-hidden">
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="young female teacher smiling with her hair tied back in a professional profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXY8ibECEuLXKCg9M93nqhdyIckOeUpcC41Zt7ZsWWsacL6w0Sjxn2-InVxkm7D2uyleOQPchqAbZJFqpAra3Dm42V97vPH1oMgHYCT-ghX7KGlvdeU8U0Qnt1kgqBYpbBvt8SSQ8MhzNKBsHGsllpzj_fkrIqo1ShnpzaQ0j0b5yUMYNN9DWT4H8dYGF25Llu69yrtbBBpaEBXwhUXwljQCz9p9xvkRHHfA8wk1xVHnZYhnJk-gM2Lx5AjjuRpxQcUdavGTHkGPk"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Laura Pérez</h4>
+<p class="text-xs text-on-surface-variant">Artes Visuales • Ayer</p>
+</div>
+</div>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_horiz</span>
+</button>
+</div>
+<p class="text-on-surface leading-relaxed mb-4">Explorando el cubismo con mis alumnos de 3º. Me impresiona su capacidad de ver el mundo desde múltiples perspectivas cuando se les da libertad creativa. 🎨✨</p>
+</div>
+<div class="border-t border-outline-variant/10 px-6 py-3 flex gap-6">
+<button class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-bold text-xs uppercase">56</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-bold text-xs uppercase">5</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant ml-auto">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</article>
+<!-- Post 4: Roberto Sánchez -->
+<article class="bg-surface-container-lowest rounded-lg shadow-[0px_12px_32px_rgba(0,93,168,0.06)] overflow-hidden">
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="portrait of an older male professor with gray hair and a warm smile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASW2gVWWCJfLCCovjsX-g8jxQ7OqVV6zQL8R5fFZMe65DgMQIJ9S292qjNmMYMPKRAhKPPF5tJaHkzjgDcG5wLZUiKp7eLe-fqTP1v5QHgnkYhhwNepFGs1d2BmvDcwXe7B2EGe3b8vrIbN79nSP8Oxpb97S2GbtYItMiFYZJ0rC_g2V1WlPZwo6xGXjBaG3YuEHBe6rfm7vzTnyDRI69uAr5vcw-iwB3fw9eX8zY_EdNqo6E91seOdvsgtJQ2z9RE8Se2FPFVerE"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Roberto Sánchez</h4>
+<p class="text-xs text-on-surface-variant">Historia Contemporánea • Hace 2 días</p>
+</div>
+</div>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_horiz</span>
+</button>
+</div>
+<p class="text-on-surface leading-relaxed mb-4">He publicado mi última investigación sobre el impacto de las redes sociales en la comprensión histórica. Disponible para debate en el foro de la facultad. ¿Qué opinan de este enfoque?</p>
+</div>
+<div class="border-t border-outline-variant/10 px-6 py-3 flex gap-6">
+<button class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-bold text-xs uppercase">112</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-bold text-xs uppercase">31</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant ml-auto">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</article>
+</section>
+<!-- Right Sidebar -->
+<aside class="hidden xl:flex flex-col w-[280px] gap-8 sticky top-24">
+<!-- Tu actividad -->
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0px_12px_32px_rgba(0,93,168,0.06)]">
+<h3 class="font-bold text-on-surface mb-4">Tu actividad</h3>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-low p-3 rounded-xl text-center">
+<p class="text-lg font-extrabold text-primary">24</p>
+<p class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Posteos</p>
+</div>
+<div class="bg-surface-container-low p-3 rounded-xl text-center">
+<p class="text-lg font-extrabold text-primary">1.2k</p>
+<p class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Seguidores</p>
+</div>
+</div>
+</div>
+<!-- Temas populares -->
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0px_12px_32px_rgba(0,93,168,0.06)]">
+<h3 class="font-bold text-on-surface mb-4">Temas populares</h3>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-surface-container-low text-on-surface-variant text-xs font-bold rounded-full hover:bg-secondary-container/20 hover:text-secondary cursor-pointer transition-colors">#Gamificación</span>
+<span class="px-3 py-1 bg-surface-container-low text-on-surface-variant text-xs font-bold rounded-full hover:bg-secondary-container/20 hover:text-secondary cursor-pointer transition-colors">#IAenAula</span>
+<span class="px-3 py-1 bg-surface-container-low text-on-surface-variant text-xs font-bold rounded-full hover:bg-secondary-container/20 hover:text-secondary cursor-pointer transition-colors">#EdTech</span>
+<span class="px-3 py-1 bg-surface-container-low text-on-surface-variant text-xs font-bold rounded-full hover:bg-secondary-container/20 hover:text-secondary cursor-pointer transition-colors">#Primaria</span>
+<span class="px-3 py-1 bg-surface-container-low text-on-surface-variant text-xs font-bold rounded-full hover:bg-secondary-container/20 hover:text-secondary cursor-pointer transition-colors">#Matemáticas</span>
+</div>
+</div>
+<!-- Docentes sugeridos -->
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0px_12px_32px_rgba(0,93,168,0.06)]">
+<h3 class="font-bold text-on-surface mb-4">Docentes sugeridos</h3>
+<div class="flex flex-col gap-4">
+<!-- Perfil 1 -->
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="professional female teacher portrait with a warm expression and elegant clothing" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMHwvzyY5Gk8xNINZdXPeU0UwMx-QOik3WxRltWmb14lh3WoLt0Rcz1iTRio1oCxlnRCZwfq9SlrNbISWaYUKJwp_MU-tHXGI4MZKTfXwY7csmdhTZ22entcT2MH6Ey3kZ69UMlLmlISUOyT110ioaH-KHFdakGPIANmf-sTCxHVSThC_JvAtz2Xn5i4Zc61ejQkj2RVqKJNfpA0aVCLYgV-oaKCmYlIUmiRNkQmc1QsRv--3lIWHp8j7zDX2lWfsYALfmvQA2UvU"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">Elena Ruiz</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-tighter">Ciencias</p>
+</div>
+<button class="text-xs font-bold text-primary hover:bg-primary/5 px-2 py-1 rounded-lg">Seguir</button>
+</div>
+<!-- Perfil 2 -->
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="headshot of a middle-aged male teacher with a professional and welcoming look" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSujCySLompvanoZwpXrdKWdOy4d_A4BjLKk_AaZwteP99x0w_aF7_MU21yjCBH8mrWM_mhaw8eL2oSucKUPJhC4r_yUasqqxBT_1__HwfrSzwj5GOwQmHVvj1kJEMfDn0J1fSK2BqPYSB3xzPGQSdJkg-3VlgrT575uQyCEpGThR_SlHsXpC6a30rwjzkG2cndBN4l1n9Xb91yzuXYGC83Nx7IaXBVr75XEWhKbUYdvtoXCttx8tc_m5xqoHUSI_7AKBjyxRpUWA"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">Marcos Polo</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-tighter">Geografía</p>
+</div>
+<button class="text-xs font-bold text-primary hover:bg-primary/5 px-2 py-1 rounded-lg">Seguir</button>
+</div>
+<!-- Perfil 3 -->
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="smiling female educator with glasses in a professional headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDVraDfy4P8ElMAxac4fcIJ1VWxcxF1w_mKgvu8mF4hxIZaJQRLRONHW-fLQCw742HYaCEItJSu-4rdc2svEF8eAsWoJ4meGjTRUJ9KCldrU7VDeTfdoE5la9qUHBEG_SXonnRlnUXXsW0nZaIJ9DJvMfni2XUPMYpoqSCX7u7cX4cjG6HJYFx60LVZIH3vvk4WSnx6vrUJqB5TNacMJA5iqv_5AU7HmaQv48RbGv1WfdOQalmYiBvbWlzuQztUzZuKN6c7WEIm2M"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">Sofía Chen</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-tighter">Idiomas</p>
+</div>
+<button class="text-xs font-bold text-primary hover:bg-primary/5 px-2 py-1 rounded-lg">Seguir</button>
+</div>
+</div>
+</div>
+<p class="text-[10px] text-on-surface-variant/60 px-2 font-medium">© 2024 Comunidad Educativa. Todos los derechos reservados. Privacidad y Términos.</p>
+</aside>
+</main>
+<!-- BottomNavBar (Only Mobile) -->
+<nav class="md:hidden fixed bottom-0 w-full flex justify-around items-center px-4 pb-4 bg-[#f7fafe]/80 backdrop-blur-xl z-50 rounded-t-2xl shadow-[0px_-4px_24px_rgba(0,93,168,0.04)]">
+<a class="flex flex-col items-center justify-center bg-[#147AD6] text-white rounded-full p-3 shadow-lg shadow-blue-500/20 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#414752] p-3 hover:text-[#147AD6] transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#414752] p-3 hover:text-[#147AD6] transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#414752] p-3 hover:text-[#147AD6] transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+</a>
+</nav>
+<!-- Floating Action Button (Only Mobile context) -->
+<button class="md:hidden fixed bottom-24 right-6 w-14 h-14 bg-gradient-to-br from-primary to-primary-container text-white rounded-full shadow-2xl flex items-center justify-center active:scale-95 duration-200">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+</body></html>

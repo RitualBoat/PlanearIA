@@ -6,6 +6,9 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { useAuth } from "../../context/AuthContext";
+import { usePlaneaciones } from "../../sync/providers/SyncProvider";
+import { useGruposContext } from "../../context/GruposContext";
+import { useRecursos } from "../../context/RecursosContext";
 import { COLORS } from "../../../types";
 
 type Nav = StackNavigationProp<RootStackParamList>;
@@ -13,6 +16,9 @@ type Nav = StackNavigationProp<RootStackParamList>;
 const PerfilScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
   const { usuario, isGuest } = useAuth();
+  const { planeaciones } = usePlaneaciones();
+  const { grupos } = useGruposContext();
+  const { recursos } = useRecursos();
 
   const userName = usuario
     ? `${usuario.nombre}${usuario.apellidos ? ` ${usuario.apellidos}` : ""}`
@@ -50,20 +56,20 @@ const PerfilScreen: React.FC = () => {
           {usuario?.email ? <Text style={styles.userEmail}>{usuario.email}</Text> : null}
         </View>
 
-        {/* Estadísticas placeholder */}
+        {/* Estadísticas reales */}
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>—</Text>
+            <Text style={styles.statNumber}>{planeaciones.length}</Text>
             <Text style={styles.statLabel}>Planeaciones</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>—</Text>
+            <Text style={styles.statNumber}>{grupos.length}</Text>
             <Text style={styles.statLabel}>Grupos</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>—</Text>
+            <Text style={styles.statNumber}>{recursos.length}</Text>
             <Text style={styles.statLabel}>Recursos</Text>
           </View>
         </View>
@@ -78,12 +84,6 @@ const PerfilScreen: React.FC = () => {
             <Text style={styles.actionBtnText}>Editar perfil</Text>
           </TouchableOpacity>
         )}
-
-        <View style={styles.placeholderNote}>
-          <Text style={styles.placeholderNoteText}>
-            Las estadísticas reales se conectarán en el Sprint 1
-          </Text>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -208,17 +208,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "700",
     color: COLORS.primary,
-  },
-  placeholderNote: {
-    alignItems: "center",
-    marginTop: 30,
-    paddingHorizontal: 16,
-  },
-  placeholderNoteText: {
-    fontSize: 13,
-    color: COLORS.textMuted,
-    fontStyle: "italic",
-    textAlign: "center",
   },
 });
 

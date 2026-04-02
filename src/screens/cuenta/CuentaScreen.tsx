@@ -19,6 +19,11 @@ import AnimatedTopPill from "../../components/AnimatedTopPill";
 import { isWeb } from "../../utils/responsive";
 import { useCuentaViewModel } from "../../hooks/useCuentaViewModel";
 import { useAuth, PREFERENCIAS_DEFAULT } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
+import { useFontSize } from "../../context/FontSizeContext";
+import { useDaltonismo } from "../../context/DaltonismoContext";
+import { changeLanguage } from "../../locales/i18n";
+import { useTranslation } from "react-i18next";
 import { COLORS } from "../../../types";
 
 const FEATURE_HIGHLIGHTS = [
@@ -82,14 +87,44 @@ const CuentaScreen: React.FC = () => {
   const wideLayout = width >= 1080;
   const navigation = useNavigation();
   const [scrollY] = React.useState(() => new Animated.Value(0));
+  const { t, i18n } = useTranslation();
 
-  // Accesibilidad states
-  const [fontSizeMode, setFontSizeMode] = React.useState<"Pequeno" | "Medio" | "Grande">("Medio");
+  // Real accessibility contexts
+  const { isDark: darkMode, toggleTheme } = useTheme();
+  const { fontSizeMode: fsModeCtx, setFontSizeMode: setFsModeCtx } = useFontSize();
+  const { daltonismoMode, setDaltonismoMode } = useDaltonismo();
+
+  // Map context font size to UI labels
+  const fontSizeMode =
+    fsModeCtx === "small" ? "Pequeno" : fsModeCtx === "large" ? "Grande" : "Medio";
+  const setFontSizeMode = (label: "Pequeno" | "Medio" | "Grande") => {
+    const map = { Pequeno: "small", Medio: "medium", Grande: "large" } as const;
+    setFsModeCtx(map[label]);
+  };
+
+  // Map daltonismo context to UI labels
+  const daltonismo =
+    daltonismoMode === "deuteranopia"
+      ? "Deuteranopia"
+      : daltonismoMode === "protanopia"
+        ? "Protanopia"
+        : daltonismoMode === "tritanopia"
+          ? "Tritanopia"
+          : "Ninguno";
+  const setDaltonismo = (label: string) => {
+    const map: Record<string, "none" | "protanopia" | "deuteranopia" | "tritanopia"> = {
+      Ninguno: "none",
+      Deuteranopia: "deuteranopia",
+      Protanopia: "protanopia",
+      Tritanopia: "tritanopia",
+    };
+    setDaltonismoMode(map[label] ?? "none");
+  };
+
+  // Local UI states for non-persisted preferences
   const [highContrast, setHighContrast] = React.useState(true);
   const [voiceReading, setVoiceReading] = React.useState(true);
   const [reduceMotion, setReduceMotion] = React.useState(true);
-  const [darkMode, setDarkMode] = React.useState(true);
-  const [daltonismo, setDaltonismo] = React.useState<"Deuteranopia" | "Protanopia">("Deuteranopia");
 
   // Accordion states
   const [openAccesibilidad, setOpenAccesibilidad] = React.useState(false);
@@ -267,47 +302,32 @@ const CuentaScreen: React.FC = () => {
 
                     <View style={styles.surfaceCard}>
                       <Text style={styles.rowTitle}>Modo Daltonismo</Text>
-                      <TouchableOpacity
-                        style={[
-                          styles.radioRow,
-                          daltonismo === "Deuteranopia" && styles.radioRowActive,
-                        ]}
-                        onPress={() => setDaltonismo("Deuteranopia")}
-                        activeOpacity={0.85}
-                      >
-                        <Text
-                          style={[
-                            styles.radioText,
-                            daltonismo === "Deuteranopia" && styles.radioTextActive,
-                          ]}
-                        >
-                          Deuteranopia
-                        </Text>
-                        {daltonismo === "Deuteranopia" ? (
-                          <MaterialIcons name="check-circle" size={20} color={COLORS.primaryDark} />
-                        ) : null}
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={[
-                          styles.radioRow,
-                          daltonismo === "Protanopia" && styles.radioRowActive,
-                        ]}
-                        onPress={() => setDaltonismo("Protanopia")}
-                        activeOpacity={0.85}
-                      >
-                        <Text
-                          style={[
-                            styles.radioText,
-                            daltonismo === "Protanopia" && styles.radioTextActive,
-                          ]}
-                        >
-                          Protanopia
-                        </Text>
-                        {daltonismo === "Protanopia" ? (
-                          <MaterialIcons name="check-circle" size={20} color={COLORS.primaryDark} />
-                        ) : null}
-                      </TouchableOpacity>
+                      {(["Ninguno", "Deuteranopia", "Protanopia", "Tritanopia"] as const).map(
+                        (opt) => (
+                          <TouchableOpacity
+                            key={opt}
+                            style={[styles.radioRow, daltonismo === opt && styles.radioRowActive]}
+                            onPress={() => setDaltonismo(opt)}
+                            activeOpacity={0.85}
+                          >
+                            <Text
+                              style={[
+                                styles.radioText,
+                                daltonismo === opt && styles.radioTextActive,
+                              ]}
+                            >
+                              {opt}
+                            </Text>
+                            {daltonismo === opt ? (
+                              <MaterialIcons
+                                name="check-circle"
+                                size={20}
+                                color={COLORS.primaryDark}
+                              />
+                            ) : null}
+                          </TouchableOpacity>
+                        )
+                      )}
                     </View>
 
                     <View style={styles.surfaceRowCard}>
@@ -374,7 +394,7 @@ const CuentaScreen: React.FC = () => {
                         </View>
                         <TouchableOpacity
                           style={[styles.toggleTrack, darkMode && styles.toggleTrackOn]}
-                          onPress={() => setDarkMode((prev) => !prev)}
+                          onPress={toggleTheme}
                           activeOpacity={0.9}
                         >
                           <View style={[styles.toggleThumb, darkMode && styles.toggleThumbOn]} />
@@ -383,13 +403,22 @@ const CuentaScreen: React.FC = () => {
 
                       <View style={styles.rowDivider} />
 
-                      <TouchableOpacity style={styles.preferenceRow} activeOpacity={0.82}>
+                      <TouchableOpacity
+                        style={styles.preferenceRow}
+                        activeOpacity={0.82}
+                        onPress={() => {
+                          const nextLang = i18n.language === "es" ? "en" : "es";
+                          changeLanguage(nextLang);
+                        }}
+                      >
                         <View style={styles.prefIconWrap}>
                           <MaterialIcons name="translate" size={19} color={COLORS.textDark} />
                         </View>
                         <View style={styles.prefTextWrap}>
                           <Text style={styles.prefTitle}>Idioma</Text>
-                          <Text style={styles.prefSubtitle}>Espanol (Mexico)</Text>
+                          <Text style={styles.prefSubtitle}>
+                            {i18n.language === "es" ? "Español (México)" : "English"}
+                          </Text>
                         </View>
                         <MaterialIcons name="chevron-right" size={22} color="#6A7890" />
                       </TouchableOpacity>

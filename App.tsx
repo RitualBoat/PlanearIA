@@ -10,30 +10,40 @@ import { CalificacionesProvider } from "./src/context/CalificacionesContext";
 import { EntregablesProvider } from "./src/context/EntregablesContext";
 import { RecursosProvider } from "./src/context/RecursosContext";
 import { PlantillasProvider } from "./src/context/PlantillasContext";
+import { ThemeProvider } from "./src/context/ThemeContext";
+import { FontSizeProvider } from "./src/context/FontSizeContext";
+import { DaltonismoProvider } from "./src/context/DaltonismoContext";
+import "./src/locales/i18n";
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <SyncProvider>
-        <AlumnosProvider>
-          <GruposProvider>
-            <AsistenciaProvider>
-              <CalificacionesProvider>
-                <EntregablesProvider>
-                  <RecursosProvider>
-                    <PlantillasProvider>
-                      <NavigationContainer>
-                        <StackNavigator />
-                      </NavigationContainer>
-                    </PlantillasProvider>
-                  </RecursosProvider>
-                </EntregablesProvider>
-              </CalificacionesProvider>
-            </AsistenciaProvider>
-          </GruposProvider>
-        </AlumnosProvider>
-      </SyncProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <FontSizeProvider>
+        <DaltonismoProvider>
+          <AuthProvider>
+            <SyncProvider>
+              <AlumnosProvider>
+                <GruposProvider>
+                  <AsistenciaProvider>
+                    <CalificacionesProvider>
+                      <EntregablesProvider>
+                        <RecursosProvider>
+                          <PlantillasProvider>
+                            <NavigationContainer>
+                              <StackNavigator />
+                            </NavigationContainer>
+                          </PlantillasProvider>
+                        </RecursosProvider>
+                      </EntregablesProvider>
+                    </CalificacionesProvider>
+                  </AsistenciaProvider>
+                </GruposProvider>
+              </AlumnosProvider>
+            </SyncProvider>
+          </AuthProvider>
+        </DaltonismoProvider>
+      </FontSizeProvider>
+    </ThemeProvider>
   );
 };
 export default App;

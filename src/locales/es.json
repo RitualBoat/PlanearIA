@@ -1,0 +1,68 @@
+{
+  "tabs": {
+    "feed": "Feed",
+    "contenido": "Contenido",
+    "grupos": "Grupos",
+    "social": "Social",
+    "configuracion": "Configuración"
+  },
+  "onboarding": {
+    "skip": "Saltar",
+    "next": "Siguiente",
+    "start": "¡Comenzar!",
+    "slide1Title": "Planea con Inteligencia Artificial",
+    "slide1Desc": "Crea planeaciones didácticas en segundos con ayuda de IA. Manual o automática, tú decides.",
+    "slide2Title": "Gestiona tus Grupos",
+    "slide2Desc": "Control total de asistencia, calificaciones, tareas y reportes de todos tus grupos.",
+    "slide3Title": "Recursos y Plantillas",
+    "slide3Desc": "Exámenes, presentaciones, mapas mentales y más. Tu biblioteca personal de recursos.",
+    "slide4Title": "Colabora con otros Docentes",
+    "slide4Desc": "Comparte recursos, conecta con colegas y descubre contenido en el feed social."
+  },
+  "perfil": {
+    "title": "Mi Perfil",
+    "editProfile": "Editar perfil",
+    "planeaciones": "Planeaciones",
+    "grupos": "Grupos",
+    "recursos": "Recursos",
+    "guest": "Invitado",
+    "admin": "Administrador",
+    "teacher": "Docente"
+  },
+  "config": {
+    "title": "Configuración",
+    "subtitle": "Accesibilidad, preferencias y cuenta",
+    "accessibility": "Accesibilidad",
+    "preferences": "Preferencias de App",
+    "account": "Cuenta y Seguridad",
+    "darkMode": "Modo oscuro",
+    "fontSize": "Tamaño de fuente",
+    "colorblind": "Daltonismo",
+    "language": "Idioma",
+    "voiceReading": "Lectura por voz",
+    "reduceMotion": "Reducir movimiento",
+    "none": "Ninguno"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "guestMode": "Entrar como invitado",
+    "recoverPassword": "Recuperar contraseña",
+    "needAccount": "Necesitas una cuenta",
+    "needAccountDesc": "Para usar esta función necesitas iniciar sesión o crear una cuenta.",
+    "continueWithout": "Continuar sin cuenta",
+    "logout": "Cerrar sesión",
+    "deleteAccount": "Eliminar cuenta"
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "search": "Buscar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "comingSoon": "Próximamente"
+  }
+}

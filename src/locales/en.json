@@ -1,0 +1,68 @@
+{
+  "tabs": {
+    "feed": "Feed",
+    "contenido": "Content",
+    "grupos": "Groups",
+    "social": "Social",
+    "configuracion": "Settings"
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "start": "Get Started!",
+    "slide1Title": "Plan with Artificial Intelligence",
+    "slide1Desc": "Create lesson plans in seconds with AI assistance. Manual or automatic, you decide.",
+    "slide2Title": "Manage your Groups",
+    "slide2Desc": "Full control of attendance, grades, assignments, and reports for all your groups.",
+    "slide3Title": "Resources & Templates",
+    "slide3Desc": "Exams, presentations, mind maps, and more. Your personal resource library.",
+    "slide4Title": "Collaborate with Teachers",
+    "slide4Desc": "Share resources, connect with colleagues, and discover content in the social feed."
+  },
+  "perfil": {
+    "title": "My Profile",
+    "editProfile": "Edit profile",
+    "planeaciones": "Plans",
+    "grupos": "Groups",
+    "recursos": "Resources",
+    "guest": "Guest",
+    "admin": "Administrator",
+    "teacher": "Teacher"
+  },
+  "config": {
+    "title": "Settings",
+    "subtitle": "Accessibility, preferences, and account",
+    "accessibility": "Accessibility",
+    "preferences": "App Preferences",
+    "account": "Account & Security",
+    "darkMode": "Dark mode",
+    "fontSize": "Font size",
+    "colorblind": "Color blindness",
+    "language": "Language",
+    "voiceReading": "Voice reading",
+    "reduceMotion": "Reduce motion",
+    "none": "None"
+  },
+  "auth": {
+    "login": "Sign In",
+    "register": "Sign Up",
+    "guestMode": "Continue as guest",
+    "recoverPassword": "Recover password",
+    "needAccount": "Account required",
+    "needAccountDesc": "You need to sign in or create an account to use this feature.",
+    "continueWithout": "Continue without account",
+    "logout": "Sign out",
+    "deleteAccount": "Delete account"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "comingSoon": "Coming Soon"
+  }
+}

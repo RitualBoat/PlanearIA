@@ -46,6 +46,8 @@ skills/
 skills-lock.json
 .agents/
 roadmap-context
+stitch-results
+
 
 # AI coding tools (agent config directories)
 .adal/

@@ -677,18 +677,20 @@ const DetalleGrupoScreen: React.FC = () => {
         <View style={styles.header}>
           <Text style={styles.grupoNombre}>{grupoNombre}</Text>
           <Text style={styles.grupoId}>ID: {grupoId}</Text>
-          <TouchableOpacity style={styles.editarButton} onPress={navigateEditarGrupo}>
-            <MaterialIcons name="edit" size={16} color={COLORS.primary} />
-            <Text style={styles.editarButtonText}>Editar grupo</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.exportarButton} onPress={handleExport}>
-            <MaterialIcons name="file-download" size={16} color="#0E7A56" />
-            <Text style={styles.exportarButtonText}>Exportar grupo</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.eliminarButton} onPress={openDeleteModal}>
-            <MaterialIcons name="delete-outline" size={16} color={COLORS.error} />
-            <Text style={styles.eliminarButtonText}>Eliminar grupo</Text>
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <TouchableOpacity style={styles.editarButton} onPress={navigateEditarGrupo}>
+              <MaterialIcons name="edit" size={16} color={COLORS.primary} />
+              <Text style={styles.editarButtonText}>Editar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.exportarButton} onPress={handleExport}>
+              <MaterialIcons name="file-download" size={16} color="#0E7A56" />
+              <Text style={styles.exportarButtonText}>Exportar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.eliminarButton} onPress={openDeleteModal}>
+              <MaterialIcons name="delete-outline" size={16} color={COLORS.error} />
+              <Text style={styles.eliminarButtonText}>Eliminar</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Tabs horizontales */}
@@ -1064,10 +1066,15 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: COLORS.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
+    boxShadow: "0px 4px 12px rgba(0, 72, 132, 0.06)",
+  },
+  headerActions: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 10,
+    flexWrap: "wrap",
   },
   grupoNombre: {
     fontSize: FONT_SIZES.large,
@@ -1080,17 +1087,13 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   editarButton: {
-    marginTop: 10,
-    alignSelf: "flex-start",
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    borderWidth: 1,
-    borderColor: COLORS.primaryTint,
     backgroundColor: COLORS.backgroundSoft,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
   },
   editarButtonText: {
     color: COLORS.primary,
@@ -1098,17 +1101,13 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   exportarButton: {
-    marginTop: 8,
-    alignSelf: "flex-start",
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    borderWidth: 1,
-    borderColor: "#BFE8DA",
     backgroundColor: "#F1FCF8",
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
   },
   exportarButtonText: {
     color: "#0E7A56",
@@ -1116,17 +1115,13 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   eliminarButton: {
-    marginTop: 8,
-    alignSelf: "flex-start",
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    borderWidth: 1,
-    borderColor: COLORS.errorTint,
     backgroundColor: "#FFF5F6",
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
   },
   eliminarButtonText: {
     color: COLORS.error,
@@ -1134,9 +1129,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   tabsContainer: {
-    backgroundColor: COLORS.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    backgroundColor: COLORS.surfaceContainerLow,
   },
   tabsContent: {
     paddingHorizontal: 10,
@@ -1147,10 +1140,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginHorizontal: 4,
-    borderRadius: 10,
+    borderRadius: 14,
   },
   activeTab: {
-    backgroundColor: COLORS.primaryTint,
+    backgroundColor: COLORS.surface,
+    boxShadow: "0px 4px 12px rgba(0, 72, 132, 0.06)",
   },
   tabLabel: {
     fontSize: FONT_SIZES.small,
@@ -1168,10 +1162,8 @@ const styles = StyleSheet.create({
   inlineState: {
     marginHorizontal: 16,
     marginTop: 10,
-    borderWidth: 1,
-    borderColor: COLORS.primaryTint,
     backgroundColor: COLORS.backgroundSoft,
-    borderRadius: 10,
+    borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: 10,
     flexDirection: "row",
@@ -1186,10 +1178,8 @@ const styles = StyleSheet.create({
   inlineStateError: {
     marginHorizontal: 16,
     marginTop: 10,
-    borderWidth: 1,
-    borderColor: COLORS.errorTint,
     backgroundColor: COLORS.errorTint,
-    borderRadius: 10,
+    borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: 10,
     flexDirection: "row",
@@ -1220,10 +1210,8 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: FONT_SIZES.medium,
     color: COLORS.textSecondary,
-    backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 12,
+    backgroundColor: COLORS.surfaceContainerLow,
+    borderRadius: 16,
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
@@ -1234,9 +1222,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     paddingVertical: 14,
     paddingHorizontal: 20,
-    borderRadius: 10,
+    borderRadius: 14,
     marginBottom: 20,
-    boxShadow: "0px 8px 18px rgba(22, 118, 210, 0.32)",
+    boxShadow: "0px 12px 24px rgba(22, 118, 210, 0.25)",
   },
   actionButtonText: {
     color: "white",
@@ -1251,12 +1239,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.border,
     padding: 14,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 10,
-    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
+    boxShadow: "0px 12px 24px rgba(0, 72, 132, 0.06)",
   },
   alumnoNombre: {
     fontSize: FONT_SIZES.medium,
@@ -1276,10 +1262,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    borderWidth: 1,
-    borderColor: COLORS.errorTint,
     backgroundColor: "#FFF5F6",
-    borderRadius: 10,
+    borderRadius: 14,
     paddingHorizontal: 10,
     paddingVertical: 7,
   },
@@ -1295,14 +1279,12 @@ const styles = StyleSheet.create({
   },
   statCard: {
     backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.border,
     padding: 18,
-    borderRadius: 12,
+    borderRadius: 16,
     alignItems: "center",
     flex: 1,
     marginHorizontal: 5,
-    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
+    boxShadow: "0px 12px 24px rgba(0, 72, 132, 0.06)",
   },
   statNumber: {
     fontSize: 32,
@@ -1323,12 +1305,10 @@ const styles = StyleSheet.create({
   },
   comentarioItem: {
     backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.border,
     padding: 14,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 10,
-    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
+    boxShadow: "0px 12px 24px rgba(0, 72, 132, 0.06)",
   },
   comentarioAlumno: {
     fontSize: FONT_SIZES.medium,
@@ -1370,10 +1350,8 @@ const styles = StyleSheet.create({
   insightCard: {
     marginTop: 10,
     marginBottom: 6,
-    borderWidth: 1,
-    borderColor: "#F1E3BD",
     backgroundColor: "#FFF9E8",
-    borderRadius: 12,
+    borderRadius: 16,
     paddingHorizontal: 12,
     paddingVertical: 10,
     flexDirection: "row",
@@ -1408,14 +1386,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.primary,
-    borderWidth: 1,
-    borderColor: "#DCE8F6",
-    borderRadius: 14,
+    borderRadius: 16,
     paddingHorizontal: 14,
     paddingVertical: 12,
     flexDirection: "row",
     gap: 10,
     marginBottom: 14,
+    boxShadow: "0px 12px 24px rgba(0, 72, 132, 0.06)",
   },
   notesSuggestionTitle: {
     color: "#5D6E87",
@@ -1433,10 +1410,8 @@ const styles = StyleSheet.create({
   notesCard: {
     backgroundColor: COLORS.surface,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: COLORS.border,
     padding: 16,
-    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
+    boxShadow: "0px 12px 24px rgba(0, 72, 132, 0.06)",
   },
   notesHeaderRow: {
     flexDirection: "row",
@@ -1546,11 +1521,11 @@ const styles = StyleSheet.create({
   },
   notesSaveButton: {
     flex: 1,
-    borderRadius: 12,
+    borderRadius: 14,
     paddingVertical: 14,
     alignItems: "center",
     backgroundColor: COLORS.primary,
-    boxShadow: "0px 8px 18px rgba(22, 118, 210, 0.3)",
+    boxShadow: "0px 12px 24px rgba(22, 118, 210, 0.25)",
   },
   notesSaveButtonDisabled: {
     backgroundColor: "#8EBCE6",
@@ -1586,12 +1561,10 @@ const styles = StyleSheet.create({
   },
   tareaItem: {
     backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.border,
     padding: 14,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 12,
-    boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
+    boxShadow: "0px 12px 24px rgba(0, 72, 132, 0.06)",
   },
   tareaHeader: {
     flexDirection: "row",
@@ -1638,8 +1611,8 @@ const styles = StyleSheet.create({
   },
   modalCard: {
     backgroundColor: COLORS.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     paddingHorizontal: 18,
     paddingTop: 18,
     paddingBottom: 24,

@@ -11,6 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { LinearGradient } from "expo-linear-gradient";
 import { NivelAcademico } from "../../types/planeacion";
 
 // ─── Design tokens (Stitch 3.3.1) ───
@@ -56,40 +57,35 @@ const NIVELES: {
   label: string;
   icon: keyof typeof MaterialIcons.glyphMap;
   bg: string;
-  iconBg: string;
   textColor: string;
 }[] = [
   {
     key: NivelAcademico.PRIMARIA,
-    label: "PRIMARIA",
+    label: "Primaria",
     icon: "child-care",
     bg: DT.primaryFixed,
-    iconBg: DT.primary,
-    textColor: DT.onPrimaryFixed,
+    textColor: DT.primary,
   },
   {
     key: NivelAcademico.SECUNDARIA,
-    label: "SECUNDARIA",
+    label: "Secundaria",
     icon: "school",
     bg: DT.secondaryContainer,
-    iconBg: DT.secondary,
-    textColor: DT.onSecondaryFixedVariant,
+    textColor: DT.secondary,
   },
   {
     key: NivelAcademico.PREPARATORIA,
-    label: "PREPARATORIA",
+    label: "Preparatoria",
     icon: "menu-book",
     bg: DT.amberBg,
-    iconBg: DT.tertiaryContainer,
-    textColor: DT.onTertiaryFixedVariant,
+    textColor: DT.amber,
   },
   {
     key: NivelAcademico.UNIVERSIDAD,
-    label: "UNIVERSIDAD",
+    label: "Universidad",
     icon: "account-balance",
     bg: DT.purpleBg,
-    iconBg: DT.purple,
-    textColor: DT.darkPurple,
+    textColor: DT.purple,
   },
 ];
 
@@ -140,7 +136,7 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({
     <>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Crear Nuevo</Text>
+        <Text style={styles.headerTitle}>Crear nuevo</Text>
         <TouchableOpacity style={styles.closeBtn} onPress={handleClose} accessibilityLabel="Cerrar">
           <MaterialIcons name="close" size={20} color={DT.onSurfaceVariant} />
         </TouchableOpacity>
@@ -158,12 +154,17 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({
             accessibilityLabel="Planeación manual"
           >
             <View style={[styles.optionIconLg, { backgroundColor: DT.primaryContainer }]}>
-              <MaterialIcons name="edit-note" size={24} color={DT.onPrimary} />
+              <MaterialIcons name="event-note" size={24} color={DT.onPrimary} />
             </View>
             <View style={styles.optionText}>
               <Text style={styles.optionTitle}>Planeación manual</Text>
-              <Text style={styles.optionSubtitle}>Crea desde cero paso a paso</Text>
+              <Text style={styles.optionSubtitle}>
+                {isDesktop
+                  ? "Diseña tu clase paso a paso con nuestras herramientas avanzadas."
+                  : "Configura paso a paso tus objetivos."}
+              </Text>
             </View>
+            <MaterialIcons name="chevron-right" size={22} color={DT.outlineVariant} />
           </TouchableOpacity>
 
           {/* Planeación con IA */}
@@ -173,9 +174,14 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({
             activeOpacity={0.7}
             accessibilityLabel="Planeación con IA"
           >
-            <View style={[styles.optionIconLg, styles.gradientIcon]}>
+            <LinearGradient
+              colors={["#004580", "#005da8"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.optionIconLg}
+            >
               <MaterialIcons name="auto-awesome" size={24} color={DT.onPrimary} />
-            </View>
+            </LinearGradient>
             <View style={styles.optionText}>
               <View style={styles.optionTitleRow}>
                 <Text style={styles.optionTitle}>Planeación con IA</Text>
@@ -183,7 +189,11 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({
                   <Text style={styles.iaBadgeText}>IA</Text>
                 </View>
               </View>
-              <Text style={styles.optionSubtitle}>Genera automáticamente</Text>
+              <Text style={styles.optionSubtitle}>
+                {isDesktop
+                  ? "Genera estructuras curriculares completas en segundos usando inteligencia artificial."
+                  : "Genera propuestas inteligentes al instante."}
+              </Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -198,11 +208,16 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({
             activeOpacity={0.7}
             accessibilityLabel="Recurso"
           >
-            <View style={[styles.optionIconSm, { backgroundColor: DT.secondaryContainer }]}>
-              <MaterialIcons name="description" size={20} color={DT.onSecondaryFixedVariant} />
+            <View style={[styles.optionIconLg, { backgroundColor: "rgba(160,244,153,0.3)" }]}>
+              <MaterialIcons name="folder-special" size={24} color={DT.secondary} />
             </View>
             <View style={styles.optionText}>
               <Text style={styles.optionTitle}>Recurso</Text>
+              <Text style={styles.optionSubtitle}>
+                {isDesktop
+                  ? "Sube documentos, videos o enlaces para tus alumnos."
+                  : "Sube archivos, lecturas o multimedia."}
+              </Text>
             </View>
           </TouchableOpacity>
 
@@ -213,11 +228,16 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({
             activeOpacity={0.7}
             accessibilityLabel="Entregable"
           >
-            <View style={[styles.optionIconSm, { backgroundColor: DT.tertiaryFixed }]}>
-              <MaterialIcons name="assignment" size={20} color={DT.onTertiaryFixedVariant} />
+            <View style={[styles.optionIconLg, { backgroundColor: DT.tertiaryFixed }]}>
+              <MaterialIcons name="assignment" size={24} color={DT.onTertiaryFixedVariant} />
             </View>
             <View style={styles.optionText}>
               <Text style={styles.optionTitle}>Entregable</Text>
+              <Text style={styles.optionSubtitle}>
+                {isDesktop
+                  ? "Crea actividades de evaluación y tareas específicas."
+                  : "Define tareas y criterios de evaluación."}
+              </Text>
             </View>
           </TouchableOpacity>
 
@@ -228,15 +248,16 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({
             activeOpacity={0.7}
             accessibilityLabel="Plantilla"
           >
-            <View style={[styles.optionIconSm, { backgroundColor: DT.primaryFixed }]}>
-              <MaterialIcons
-                name="dashboard-customize"
-                size={20}
-                color={DT.onPrimaryFixedVariant}
-              />
+            <View style={[styles.optionIconLg, { backgroundColor: DT.purpleBg }]}>
+              <MaterialIcons name="dashboard-customize" size={24} color={DT.purple} />
             </View>
             <View style={styles.optionText}>
               <Text style={styles.optionTitle}>Plantilla</Text>
+              <Text style={styles.optionSubtitle}>
+                {isDesktop
+                  ? "Guarda estructuras para reutilizarlas en futuros periodos."
+                  : "Guarda este formato para uso futuro."}
+              </Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -246,10 +267,10 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({
           style={styles.importBtn}
           onPress={() => handleDirectNav("ImportarPlaneacion")}
           activeOpacity={0.7}
-          accessibilityLabel="Importar planeación"
+          accessibilityLabel="Importar desde archivo"
         >
-          <MaterialIcons name="cloud-upload" size={20} color={DT.outline} />
-          <Text style={styles.importText}>Importar planeación</Text>
+          <MaterialIcons name="file-upload" size={20} color={DT.primary} />
+          <Text style={styles.importText}>Importar desde archivo</Text>
         </TouchableOpacity>
       </ScrollView>
     </>
@@ -259,11 +280,16 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({
   const renderNivelSelector = () => (
     <>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.closeBtn} onPress={handleBack} accessibilityLabel="Volver">
-          <MaterialIcons name="close" size={20} color={DT.onSurfaceVariant} />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { marginLeft: 8 }]}>Selecciona el nivel</Text>
+      <View style={styles.nivelHeader}>
+        {isDesktop && (
+          <View style={styles.nivelSchoolIcon}>
+            <MaterialIcons name="school" size={28} color={DT.primary} />
+          </View>
+        )}
+        <Text style={styles.nivelTitle}>Selecciona el nivel</Text>
+        {isDesktop && (
+          <Text style={styles.nivelSubtitle}>Personaliza tu experiencia educativa</Text>
+        )}
       </View>
 
       <View style={styles.nivelList}>
@@ -275,18 +301,18 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({
             activeOpacity={0.8}
             accessibilityLabel={nivel.label}
           >
-            <View style={styles.nivelLeft}>
-              <View style={[styles.nivelIcon, { backgroundColor: nivel.iconBg }]}>
-                <MaterialIcons name={nivel.icon} size={24} color="#ffffff" />
+            {isDesktop && (
+              <View style={styles.nivelLeft}>
+                <MaterialIcons name={nivel.icon} size={22} color={nivel.textColor} />
+                <Text style={[styles.nivelLabel, { color: nivel.textColor }]}>{nivel.label}</Text>
               </View>
-              <Text style={[styles.nivelLabel, { color: nivel.textColor }]}>{nivel.label}</Text>
-            </View>
-            <MaterialIcons
-              name="chevron-right"
-              size={24}
-              color={nivel.textColor}
-              style={{ opacity: 0.4 }}
-            />
+            )}
+            {!isDesktop && (
+              <>
+                <Text style={[styles.nivelLabel, { color: nivel.textColor }]}>{nivel.label}</Text>
+                <MaterialIcons name={nivel.icon} size={22} color={nivel.textColor} />
+              </>
+            )}
           </TouchableOpacity>
         ))}
 
@@ -327,21 +353,21 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(23, 28, 33, 0.20)",
+    backgroundColor: "rgba(0,28,58,0.30)",
     justifyContent: "flex-end",
     ...Platform.select({
-      web: { backdropFilter: "blur(8px)" as never },
+      web: { backdropFilter: "blur(4px)" as never },
       default: {},
     }),
   },
   sheet: {
     backgroundColor: DT.surfaceLowest,
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
     paddingBottom: Platform.OS === "ios" ? 40 : 32,
     maxHeight: "85%",
     ...Platform.select({
-      web: { boxShadow: "0px 0px 48px rgba(0,0,0,0.12)" as never },
+      web: { boxShadow: "0px -24px 48px rgba(0,72,132,0.12)" as never },
       default: { elevation: 24 },
     }),
   },
@@ -352,6 +378,10 @@ const styles = StyleSheet.create({
     marginBottom: "auto",
     marginTop: "auto",
     maxHeight: "80%",
+    ...Platform.select({
+      web: { boxShadow: "0px 24px 48px rgba(0,72,132,0.08)" as never },
+      default: { elevation: 24 },
+    }),
   },
   handleContainer: {
     alignItems: "center",
@@ -359,11 +389,11 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   handle: {
-    width: 48,
+    width: 40,
     height: 6,
     borderRadius: 3,
-    backgroundColor: DT.surfaceHighest,
-    opacity: 0.6,
+    backgroundColor: DT.outlineVariant,
+    opacity: 0.4,
   },
   header: {
     flexDirection: "row",
@@ -373,10 +403,10 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    fontFamily: "Manrope",
-    fontWeight: "700",
-    fontSize: 18,
+    fontWeight: "800",
+    fontSize: 20,
     color: DT.primary,
+    letterSpacing: -0.3,
   },
   closeBtn: {
     width: 40,
@@ -387,20 +417,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   scrollContent: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
   },
   sectionLabel: {
-    fontFamily: "Manrope",
     fontSize: 10,
-    fontWeight: "700",
-    letterSpacing: 2,
+    fontWeight: "800",
+    letterSpacing: 1.5,
     textTransform: "uppercase",
     color: DT.outline,
-    marginBottom: 12,
-    paddingHorizontal: 4,
+    marginBottom: 8,
+    paddingHorizontal: 16,
   },
   sectionGap: {
-    gap: 12,
+    gap: 8,
   },
   optionRow: {
     flexDirection: "row",
@@ -412,19 +441,9 @@ const styles = StyleSheet.create({
   optionIconLg: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-  },
-  optionIconSm: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  gradientIcon: {
-    backgroundColor: DT.primaryContainer,
   },
   optionText: {
     marginLeft: 16,
@@ -436,95 +455,109 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   optionTitle: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 16,
     color: DT.onSurface,
   },
   optionSubtitle: {
-    fontFamily: "Manrope",
-    fontWeight: "500",
-    fontSize: 12,
+    fontWeight: "400",
+    fontSize: 14,
     color: DT.onSurfaceVariant,
     marginTop: 2,
+    lineHeight: 18,
   },
   iaBadge: {
     backgroundColor: DT.primaryFixed,
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 999,
+    borderRadius: 4,
   },
   iaBadgeText: {
-    fontFamily: "Manrope",
-    fontWeight: "900",
-    fontSize: 9,
-    color: DT.onPrimaryFixed,
+    fontWeight: "800",
+    fontSize: 10,
+    color: DT.primary,
     textTransform: "uppercase",
-    letterSpacing: -0.5,
   },
   importBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 20,
+    padding: 16,
     marginTop: 24,
-    borderRadius: 16,
+    marginBottom: 8,
+    borderRadius: 12,
     borderWidth: 2,
     borderStyle: "dashed",
-    borderColor: `${DT.outlineVariant}4D`,
-    backgroundColor: DT.surface,
+    borderColor: `rgba(0,69,128,0.10)`,
   },
   importText: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 14,
-    color: DT.onSurfaceVariant,
+    color: DT.primary,
     marginLeft: 12,
   },
 
   // ─── Nivel Selector ───
+  nivelHeader: {
+    alignItems: "center",
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 16,
+  },
+  nivelSchoolIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: DT.surfaceLow,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  nivelTitle: {
+    fontWeight: "800",
+    fontSize: 20,
+    color: DT.primary,
+    letterSpacing: -0.3,
+  },
+  nivelSubtitle: {
+    fontWeight: "500",
+    fontSize: 14,
+    color: DT.onSurfaceVariant,
+    marginTop: 4,
+  },
   nivelList: {
     paddingHorizontal: 24,
-    paddingTop: 16,
-    gap: 16,
+    paddingTop: 8,
+    gap: 10,
   },
   nivelBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 24,
-    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 999,
   },
   nivelLeft: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
-  },
-  nivelIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
+    gap: 12,
   },
   nivelLabel: {
-    fontFamily: "Manrope",
     fontWeight: "700",
-    fontSize: 14,
-    letterSpacing: 1.5,
-    textTransform: "uppercase",
+    fontSize: 16,
   },
   cancelBtn: {
-    marginTop: 8,
+    marginTop: 12,
     alignItems: "center",
-    paddingVertical: 16,
-    borderRadius: 999,
+    paddingVertical: 12,
   },
   cancelText: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 14,
-    color: DT.primaryContainer,
+    color: DT.onSurfaceVariant,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
 });
 

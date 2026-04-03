@@ -131,9 +131,9 @@ describe("CreatePostModal", () => {
     );
 
     // Moods should be visible
-    expect(getByText("Feliz")).toBeTruthy();
     expect(getByText("Inspirado")).toBeTruthy();
     expect(getByText("Productivo")).toBeTruthy();
+    expect(getByText("Creativo")).toBeTruthy();
   });
 
   it("llama onClose al presionar cerrar", () => {

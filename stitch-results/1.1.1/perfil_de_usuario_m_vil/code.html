@@ -2,71 +2,71 @@
 
 <html class="light" lang="es"><head>
 <meta charset="utf-8"/>
-<meta content="width=390, initial-scale=1.0" name="viewport"/>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
         theme: {
           extend: {
             colors: {
-              "on-background": "#181c1f",
-              "surface-container-lowest": "#ffffff",
-              "secondary": "#006879",
-              "on-surface": "#181c1f",
-              "on-error": "#ffffff",
-              "surface-dim": "#d7dade",
-              "primary": "#005da8",
-              "on-primary-fixed": "#001c39",
-              "secondary-fixed-dim": "#52d7f3",
-              "tertiary-container": "#b95a00",
-              "inverse-on-surface": "#eef1f5",
-              "surface-tint": "#005fac",
-              "surface-container-highest": "#e0e3e7",
-              "on-tertiary-fixed-variant": "#733500",
-              "surface-container-low": "#f1f4f8",
-              "surface-container": "#ebeef2",
-              "on-secondary-fixed-variant": "#004e5c",
-              "inverse-surface": "#2d3134",
-              "inverse-primary": "#a4c9ff",
-              "primary-container": "#0576d2",
-              "on-surface-variant": "#414752",
-              "on-primary-fixed-variant": "#004884",
-              "tertiary-fixed-dim": "#ffb688",
-              "on-tertiary": "#ffffff",
-              "on-tertiary-fixed": "#311300",
-              "on-error-container": "#93000a",
-              "surface-variant": "#e0e3e7",
-              "on-primary-container": "#fdfcff",
-              "tertiary-fixed": "#ffdbc7",
-              "surface-container-high": "#e5e8ec",
-              "surface": "#f7fafe",
-              "outline": "#717783",
-              "on-tertiary-container": "#fffbff",
-              "on-secondary-fixed": "#001f26",
-              "outline-variant": "#c0c7d4",
-              "secondary-container": "#60e2ff",
-              "on-secondary-container": "#006373",
-              "surface-bright": "#f7fafe",
+              "on-secondary-fixed-variant": "#005312",
               "error": "#ba1a1a",
-              "background": "#f7fafe",
-              "primary-fixed": "#d4e3ff",
-              "primary-fixed-dim": "#a4c9ff",
-              "tertiary": "#934600",
-              "error-container": "#ffdad6",
+              "tertiary-fixed": "#ffdbc9",
+              "on-primary-fixed": "#001c3a",
+              "on-tertiary-fixed": "#321200",
+              "surface-container-lowest": "#ffffff",
               "on-secondary": "#ffffff",
+              "surface": "#f7f9ff",
+              "surface-container": "#ebeef4",
+              "tertiary": "#4f2100",
+              "error-container": "#ffdad6",
+              "on-primary-fixed-variant": "#064883",
+              "inverse-surface": "#2d3135",
+              "on-tertiary-container": "#f69b63",
+              "surface-container-highest": "#dfe3e8",
+              "primary-container": "#004580",
+              "tertiary-fixed-dim": "#ffb68c",
+              "on-surface": "#181c20",
+              "on-tertiary": "#ffffff",
+              "on-background": "#181c20",
+              "on-tertiary-fixed-variant": "#743402",
+              "primary-fixed": "#d4e3ff",
+              "on-error-container": "#93000a",
+              "background": "#f7f9ff",
+              "on-secondary-container": "#207128",
+              "surface-tint": "#2c609c",
+              "tertiary-container": "#713200",
+              "on-primary-container": "#85b4f6",
+              "outline": "#727781",
+              "inverse-on-surface": "#eef1f7",
+              "secondary-container": "#a0f499",
+              "surface-container-low": "#f1f4fa",
+              "inverse-primary": "#a4c8ff",
               "on-primary": "#ffffff",
-              "secondary-fixed": "#aaedff"
+              "outline-variant": "#c2c6d1",
+              "primary": "#002f5a",
+              "secondary-fixed-dim": "#87d982",
+              "primary-fixed-dim": "#a4c8ff",
+              "on-secondary-fixed": "#002204",
+              "surface-dim": "#d7dae0",
+              "secondary": "#1b6d24",
+              "surface-bright": "#f7f9ff",
+              "on-surface-variant": "#424750",
+              "secondary-fixed": "#a3f69c",
+              "on-error": "#ffffff",
+              "surface-variant": "#dfe3e8",
+              "surface-container-high": "#e5e8ee"
             },
             fontFamily: {
-              "headline": ["Manrope", "sans-serif"],
-              "body": ["Manrope", "sans-serif"],
-              "label": ["Manrope", "sans-serif"]
+              "headline": ["Manrope"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
             },
-            borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
           },
         },
       }
@@ -74,21 +74,16 @@
 <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
         }
-        .glass-header {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(24px);
+        .atelier-gradient {
+            background: linear-gradient(135deg, #004580, #005da8);
         }
-        .hero-gradient {
-            background: linear-gradient(135deg, #005da8 0%, #0576d2 100%);
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
         }
-        body {
-            background-color: #f7fafe;
-            color: #181c1f;
-            font-family: 'Manrope', sans-serif;
-            width: 390px;
-            margin: 0 auto;
-            min-height: 100vh;
+        .ghost-border {
+            outline: 1px solid rgba(194, 198, 209, 0.2);
         }
     </style>
 <style>
@@ -97,125 +92,152 @@
     }
   </style>
   </head>
-<body class="bg-background text-on-background selection:bg-primary-fixed selection:text-on-primary-fixed">
-<!-- Top Navigation (Shell Implementation) -->
-<header class="fixed top-0 w-[390px] z-50 bg-white/80 backdrop-blur-xl shadow-[0px_12px_32px_rgba(0,93,168,0.06)]">
-<div class="flex items-center justify-between px-6 h-16 w-full">
-<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-100 active:scale-95 duration-200 transition-colors text-blue-700">
+<body class="bg-surface font-body text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopAppBar (From Shared Components) -->
+<header class="bg-[#f7f9ff] dark:bg-slate-950 docked full-width top-0 sticky z-50 transition-all duration-150 active:scale-95 duration-150">
+<div class="flex items-center justify-between px-4 h-16 w-full max-w-[1280px] mx-auto">
+<button class="text-[#004580] dark:text-blue-400 p-2 rounded-full hover:bg-[#f1f4fa] dark:hover:bg-slate-800 transition-colors">
 <span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
 </button>
-<h1 class="font-manrope text-lg font-bold tracking-tight text-slate-900">Teacher Profile</h1>
-<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-100 active:scale-95 duration-200 transition-colors text-slate-500">
+<h1 class="font-['Manrope'] font-bold text-lg tracking-tight text-[#004580] dark:text-blue-400">Mi Perfil</h1>
+<button class="text-[#004580] dark:text-blue-400 p-2 rounded-full hover:bg-[#f1f4fa] dark:hover:bg-slate-800 transition-colors">
 <span class="material-symbols-outlined" data-icon="settings">settings</span>
 </button>
 </div>
 </header>
-<main class="pt-16 pb-12">
-<!-- Banner and Avatar Section -->
-<div class="relative w-full h-44 hero-gradient rounded-b-[2.5rem] shadow-lg overflow-hidden">
-<div class="absolute inset-0 opacity-20 pointer-events-none">
-<img alt="" class="w-full h-full object-cover" data-alt="abstract architectural geometry with soft shadows and blue reflections on white surfaces minimal aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDE1UGVTQzuKL5Txi_7R2plRghz4-szVMTo567QAlxhx2qJYyMLTRMW0V1khzHHbwjCHMQbObssz0aMwhp-6gkb3PrVlJaOosB8ZiiKHlW1FuNZT63B2s1tCY1cjxxnXex5OKWY0blChQU3CyX8jWNGedriGIsppOfSZYzumUz1GIgjOyKOLp9iPsYI-klOkxtp0lX8Xhx78wlYqbS24eT6Op6Z2IGcTgzbgUhesHHSWrWERQmoxcMoivaxScmjYjlyiCy5VOkLQlU"/>
+<main class="max-w-[390px] mx-auto pb-12 overflow-x-hidden">
+<!-- Banner & Avatar Section -->
+<section class="relative">
+<div class="atelier-gradient h-[160px] w-full rounded-b-[20px] flex items-center justify-center relative overflow-hidden">
+<!-- Decorative pattern for banner -->
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB39YEv0x8A13MYyD0lutTVIZRE1YS2rmB5SUuhs_VAWvF2ZaveueFWWLDqD18HbZWTRIKkMKUm7Dy1N_wLvni1UEWCS8mwuILN8Tr3kUyaAM7kZ2S9vg3DCrKd5g4yQaI_e3G_aJ4jB369Ru9nZNsjE8c2CMhoqpifDSTARJn2Sb2DZvHudGGnwP1fMWoZlePbBi1DZ-bjnuUjZMY1nO7uiYs66GB3tMMxVkHlyedvTLYf_lxlZo8kSQWpS2ysUkZFBTI2JVaVQJA');"></div>
+<button class="bg-white/20 backdrop-blur-md p-3 rounded-full text-white transition-transform active:scale-90">
+<span class="material-symbols-outlined" data-icon="photo_camera">photo_camera</span>
+</button>
 </div>
-<div class="absolute -bottom-11 left-1/2 -translate-x-1/2">
-<div class="relative p-1.5 bg-surface-container-lowest rounded-full shadow-[0px_8px_24px_rgba(0,93,168,0.12)]">
-<img alt="Ana Sofía Martínez López" class="w-[88px] h-[88px] rounded-full object-cover" data-alt="professional portrait of a warm and confident latina woman in a modern educational setting with soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBo_RuPFuXgmdkNsC31RdFi23h9UcfkWXiIS7dVOZcIexLWFnH3nyUJOizhhDGQxzwTnOPTE04S9V9trebx_tGItjstC1UGdSrXR6OPhcwffU2HAsdwQk--rZ7ECIKfDOmWCfvg1FfLDhY6OcWTYCAi0_Dib9R4vRH6VB0_fY52Hr6jSji2DQWsjka5EKP767Xu0lktnIk-bV2HkQO1hNgQFBTFu7vzK4DYXRPFJtFrYh_j7EZ556UMil1oa-8x9vygJe_jQZ7Mmhg"/>
+<div class="flex justify-center -mt-11 relative z-10">
+<div class="relative">
+<div class="w-[88px] h-[88px] rounded-full border-4 border-surface-container-lowest overflow-hidden bg-surface-container-highest shadow-lg">
+<img alt="Ana Sofía Martínez" class="w-full h-full object-cover" data-alt="Professional headshot of a friendly Latina woman in her 30s with dark hair, soft natural lighting, educational setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNqOTrSaSJI3NJ8Mn-SDUC3VwPk1s4Kw1rjZqh7fTi1NL6-eERVxbJdVDA3wDfMHEVeRI5-vnrpKHBD3y_UkX-TbGS7Lsu-icD1arD8nXBQmU2gTt9Fbo3H_I48UEPz1bbp1URXji7iJv9KDPVcwQuHJa77qLl_i5OYOKuxCJpUHvwlcobyJoUI6ayVjSxRskrHWVvI1DQMSH1hILU37R8P7bAqCXi3cQzcbdkOCrUSwHO8qXd4SZHyiXQwm6vseKEzXUTxgoL5X0"/>
+</div>
+<button class="absolute bottom-0 right-0 bg-primary-container text-white p-1.5 rounded-full border-2 border-surface-container-lowest shadow-md active:scale-90">
+<span class="material-symbols-outlined text-[16px]" data-icon="add_a_photo">add_a_photo</span>
+</button>
 </div>
 </div>
+</section>
+<!-- Profile Info Section -->
+<section class="mt-4 px-6 text-center">
+<h2 class="text-[22px] font-extrabold tracking-tight text-on-surface">Ana Sofía Martínez López</h2>
+<div class="mt-2 inline-flex items-center px-3 py-1 bg-[#d2e4ff] text-[#004580] rounded-full text-xs font-bold uppercase tracking-wider">
+                Docente
+            </div>
+<p class="mt-2 text-[13px] text-outline font-medium">anasofia.mtz@gmail.com</p>
+<div class="mt-4 text-left">
+<p class="text-sm leading-relaxed text-on-surface-variant">
+                    Maestra de primaria con 8 años de experiencia. Apasionada por las matemáticas lúdicas... 
+                    <span class="text-primary-container font-bold cursor-pointer">Ver más</span>
+</p>
 </div>
-<!-- Personal Information -->
-<section class="mt-14 px-6 text-center">
-<div class="flex flex-col items-center gap-1.5">
-<h2 class="text-2xl font-extrabold text-on-surface tracking-tight leading-tight">Ana Sofía Martínez López</h2>
-<div class="flex items-center gap-2">
-<span class="bg-secondary-container/30 text-on-secondary-container px-3 py-0.5 rounded-full text-[0.7rem] font-bold uppercase tracking-wider">
-                        Docente
-                    </span>
-<span class="text-on-surface-variant flex items-center gap-1 text-sm">
-<span class="text-base">🇲🇽</span> México
-                    </span>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex items-center gap-1.5 text-on-surface-variant text-sm font-semibold">
+<span class="material-symbols-outlined text-primary-container text-lg" data-icon="location_on">location_on</span>
+<span>México</span>
 </div>
-<p class="text-sm text-on-surface-variant font-medium mt-1">anasofia.mtz@gmail.com</p>
-<p class="mt-4 text-sm text-on-surface-variant/90 leading-relaxed max-w-[300px]">
-                    Maestra de primaria con 8 años de experiencia apasionada por integrar el aprendizaje socioemocional y la gamificación en el aula.
-                </p>
-<div class="mt-2 flex items-center gap-1.5 text-[0.7rem] font-bold text-outline uppercase tracking-widest">
-<span class="material-symbols-outlined text-[1rem]">calendar_today</span>
+<div class="text-outline text-xs">
                     Miembro desde marzo 2024
                 </div>
 </div>
 </section>
-<!-- Stats Bento Card -->
-<section class="mt-8 px-6">
-<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0px_12px_32px_rgba(0,93,168,0.04)] grid grid-cols-2 gap-4">
-<div class="flex flex-col p-3 bg-surface-container-low rounded-lg transition-transform active:scale-95">
-<span class="text-primary font-extrabold text-xl">18</span>
-<span class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Planeaciones</span>
+<!-- Stats Card Section -->
+<section class="mt-8 px-4">
+<div class="bg-surface-container-lowest rounded-2xl shadow-[0px_2px_8px_rgba(0,69,128,0.06)] p-5 grid grid-cols-4 gap-2">
+<div class="flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-primary-container mb-1 text-[20px]" data-icon="description">description</span>
+<span class="text-lg font-extrabold text-on-surface leading-tight">18</span>
+<span class="text-[10px] font-bold text-outline uppercase tracking-tighter">Planeac.</span>
 </div>
-<div class="flex flex-col p-3 bg-surface-container-low rounded-lg transition-transform active:scale-95">
-<span class="text-primary font-extrabold text-xl">4</span>
-<span class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Grupos</span>
+<div class="flex flex-col items-center text-center border-l border-surface-container">
+<span class="material-symbols-outlined text-primary-container mb-1 text-[20px]" data-icon="groups">groups</span>
+<span class="text-lg font-extrabold text-on-surface leading-tight">4</span>
+<span class="text-[10px] font-bold text-outline uppercase tracking-tighter">Grupos</span>
 </div>
-<div class="flex flex-col p-3 bg-surface-container-low rounded-lg transition-transform active:scale-95">
-<span class="text-primary font-extrabold text-xl">23</span>
-<span class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Recursos</span>
+<div class="flex flex-col items-center text-center border-l border-surface-container">
+<span class="material-symbols-outlined text-primary-container mb-1 text-[20px]" data-icon="library_books">library_books</span>
+<span class="text-lg font-extrabold text-on-surface leading-tight">23</span>
+<span class="text-[10px] font-bold text-outline uppercase tracking-tighter">Recursos</span>
 </div>
-<div class="flex flex-col p-3 bg-surface-container-low rounded-lg transition-transform active:scale-95">
-<span class="text-primary font-extrabold text-xl">12</span>
-<span class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest">Entregables</span>
+<div class="flex flex-col items-center text-center border-l border-surface-container">
+<span class="material-symbols-outlined text-primary-container mb-1 text-[20px]" data-icon="assessment">assessment</span>
+<span class="text-lg font-extrabold text-on-surface leading-tight">12</span>
+<span class="text-[10px] font-bold text-outline uppercase tracking-tighter">Entreg.</span>
 </div>
 </div>
 </section>
-<!-- Action Buttons -->
-<section class="mt-8 px-6 flex flex-col gap-3">
-<button class="w-full py-3.5 bg-surface-container-lowest border border-primary text-primary rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all hover:bg-primary/5 active:scale-[0.98]">
-<span class="material-symbols-outlined text-lg">edit</span>
+<!-- Recent Activity Section -->
+<section class="mt-8 px-6">
+<h3 class="text-base font-extrabold text-primary tracking-tight mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg" data-icon="history">history</span>
+                Actividad reciente
+            </h3>
+<div class="space-y-6 relative">
+<!-- Timeline Vertical Line -->
+<div class="absolute left-3 top-2 bottom-2 w-0.5 bg-surface-container-high rounded-full"></div>
+<!-- Activity Item 1 -->
+<div class="relative pl-10">
+<div class="absolute left-1.5 top-1 w-3.5 h-3.5 rounded-full bg-primary ring-4 ring-surface"></div>
+<p class="text-sm text-on-surface leading-snug">
+<span class="font-bold">Creó planeación</span> de Matemáticas 3er grado
+                    </p>
+<p class="text-xs text-outline mt-1 font-medium">hace 2h</p>
+</div>
+<!-- Activity Item 2 -->
+<div class="relative pl-10">
+<div class="absolute left-1.5 top-1 w-3.5 h-3.5 rounded-full bg-secondary ring-4 ring-surface"></div>
+<p class="text-sm text-on-surface leading-snug">
+<span class="font-bold">Añadió 5 alumnos</span> al grupo 3°A
+                    </p>
+<p class="text-xs text-outline mt-1 font-medium">ayer</p>
+</div>
+<!-- Activity Item 3 -->
+<div class="relative pl-10">
+<div class="absolute left-1.5 top-1 w-3.5 h-3.5 rounded-full bg-on-primary-fixed-variant ring-4 ring-surface"></div>
+<p class="text-sm text-on-surface leading-snug">
+<span class="font-bold">Compartió recurso</span> 'Fracciones divertidas'
+                    </p>
+<p class="text-xs text-outline mt-1 font-medium">hace 3 días</p>
+</div>
+<!-- Activity Item 4 -->
+<div class="relative pl-10">
+<div class="absolute left-1.5 top-1 w-3.5 h-3.5 rounded-full bg-outline ring-4 ring-surface"></div>
+<p class="text-sm text-on-surface leading-snug">
+<span class="font-bold">Calificó entregables</span> del grupo 2°B
+                    </p>
+<p class="text-xs text-outline mt-1 font-medium">hace 1 semana</p>
+</div>
+</div>
+</section>
+<!-- Action Buttons Section -->
+<section class="mt-10 px-6 space-y-3">
+<button class="w-full h-12 rounded-xl border-2 border-primary-container text-primary-container font-bold flex items-center justify-center gap-2 transition-colors active:bg-primary-fixed">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
                 Editar perfil
             </button>
-<button class="w-full py-3.5 text-on-surface-variant rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-surface-container-highest transition-colors active:scale-[0.98]">
-<span class="material-symbols-outlined text-lg">share</span>
+<button class="w-full h-12 rounded-xl text-outline font-bold flex items-center justify-center gap-2 hover:bg-surface-container transition-colors active:scale-98">
+<span class="material-symbols-outlined text-[20px]" data-icon="share">share</span>
                 Compartir perfil
             </button>
 </section>
-<!-- Recent Activity Timeline -->
-<section class="mt-10 px-6">
-<h3 class="text-sm font-extrabold text-on-surface uppercase tracking-widest mb-6">Actividad Reciente</h3>
-<div class="relative space-y-6">
-<!-- Timeline Line -->
-<div class="absolute left-3 top-2 bottom-2 w-px bg-outline-variant/30"></div>
-<!-- Activity Item 1 -->
-<div class="relative flex gap-4 pl-8">
-<div class="absolute left-1.5 w-3 h-3 bg-primary rounded-full border-4 border-surface ring-2 ring-primary/10"></div>
-<div>
-<p class="text-sm font-semibold text-on-surface">Nueva planeación publicada</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Matemáticas: Fracciones Equivalentes • Hace 2 horas</p>
-</div>
-</div>
-<!-- Activity Item 2 -->
-<div class="relative flex gap-4 pl-8">
-<div class="absolute left-1.5 w-3 h-3 bg-secondary-fixed-dim rounded-full border-4 border-surface ring-2 ring-secondary/10"></div>
-<div>
-<p class="text-sm font-semibold text-on-surface">Subió recurso didáctico</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Guía de Comprensión Lectora • Ayer</p>
-</div>
-</div>
-<!-- Activity Item 3 -->
-<div class="relative flex gap-4 pl-8">
-<div class="absolute left-1.5 w-3 h-3 bg-primary-fixed-dim rounded-full border-4 border-surface ring-2 ring-primary/10"></div>
-<div>
-<p class="text-sm font-semibold text-on-surface">Evaluación completada</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Grupo 4º B - Ciencias Naturales • 2 días</p>
-</div>
-</div>
-<!-- Activity Item 4 -->
-<div class="relative flex gap-4 pl-8">
-<div class="absolute left-1.5 w-3 h-3 bg-outline rounded-full border-4 border-surface"></div>
-<div>
-<p class="text-sm font-semibold text-on-surface">Se unió a la comunidad</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Bienvenida a Teacher Atelier • Marzo 2024</p>
-</div>
-</div>
+<!-- Guest Banner (Optional / High end context) -->
+<section class="mt-8 px-4">
+<div class="rounded-2xl p-6 bg-gradient-to-br from-[#1676D2] to-[#7C3AED] text-white shadow-xl overflow-hidden relative group">
+<div class="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+<h4 class="text-sm font-bold opacity-90 mb-1">¿No eres Ana Sofía?</h4>
+<p class="text-lg font-extrabold mb-4 leading-tight">Estás navegando como invitado</p>
+<button class="bg-white text-[#1676D2] px-6 py-2 rounded-lg font-extrabold text-sm shadow-lg active:scale-95 transition-transform">
+                    Crear cuenta gratis
+                </button>
 </div>
 </section>
 </main>
-<!-- Navigation Shell Suppression (As requested: No bottom nav bar) -->
 </body></html>

@@ -18,6 +18,8 @@ import { useTheme } from "../../context/ThemeContext";
 import { useFeedViewModel } from "../../hooks/useFeedViewModel";
 import PostCard from "../../components/PostCard";
 import CreatePostModal from "../../components/CreatePostModal";
+import PostOptionsSheet from "../../components/PostOptionsSheet";
+import ReportPostModal from "../../components/ReportPostModal";
 import { Post } from "../../../types";
 
 /* ── Skeleton shimmer ── */
@@ -53,13 +55,13 @@ const ShimmerBlock: React.FC<{
 const SkeletonPostCard: React.FC = () => {
   const { colors } = useTheme();
   const cardShadow = Platform.select({
-    web: { boxShadow: `0px 12px 32px ${colors.shadowBlue}` } as any,
+    web: { boxShadow: `0px 2px 8px ${colors.shadowBlue}` } as any,
     default: {
       shadowColor: "#005da8",
-      shadowOffset: { width: 0, height: 12 },
+      shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.06,
-      shadowRadius: 32,
-      elevation: 3,
+      shadowRadius: 8,
+      elevation: 2,
     },
   });
 
@@ -99,6 +101,9 @@ const FeedScreen: React.FC = () => {
 
   const isDesktop = width >= 768;
 
+  const [optionsPost, setOptionsPost] = useState<Post | null>(null);
+  const [showReportModal, setShowReportModal] = useState(false);
+
   /* ── Post creation bar ── */
   const renderCreateBar = () => {
     const initials = vm.userName
@@ -109,13 +114,13 @@ const FeedScreen: React.FC = () => {
       .toUpperCase();
 
     const cardShadow = Platform.select({
-      web: { boxShadow: `0px 12px 32px ${colors.shadowBlue}` } as any,
+      web: { boxShadow: `0px 2px 8px ${colors.shadowBlue}` } as any,
       default: {
         shadowColor: "#005da8",
-        shadowOffset: { width: 0, height: 12 },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.06,
-        shadowRadius: 32,
-        elevation: 3,
+        shadowRadius: 8,
+        elevation: 2,
       },
     });
 
@@ -166,33 +171,70 @@ const FeedScreen: React.FC = () => {
   /* ── Empty state ── */
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <View style={[styles.emptyIconWrap, { backgroundColor: colors.surfaceContainerHigh }]}>
+      {/* Decorative glow */}
+      <View style={[styles.emptyGlow, { backgroundColor: `${colors.primaryContainer}08` }]} />
+      <View style={[styles.emptyImageBox, { backgroundColor: colors.surfaceContainerLow, borderColor: `${colors.outlineVariant}15` }]}>
         <MaterialIcons name="groups" size={56} color={colors.primary} />
+        {/* Floating icon */}
+        <View style={[styles.emptyFloatingIcon, {
+          backgroundColor: colors.surfaceContainerLowest,
+          ...Platform.select({
+            web: { boxShadow: '0px 4px 12px rgba(0,69,128,0.1)' } as any,
+            default: { shadowColor: '#004580', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 4 },
+          }),
+        }]}>
+          <MaterialIcons name="group-add" size={20} color={colors.primary} />
+        </View>
       </View>
-      <Text style={[styles.emptyTitle, { color: colors.onSurface }]}>
+      <Text style={[styles.emptyTitle, { color: colors.primary }]}>
         ¡Bienvenido a la comunidad docente!
       </Text>
       <Text style={[styles.emptyDesc, { color: colors.onSurfaceVariant }]}>
-        Comparte tus experiencias, recursos y planeaciones con otros docentes.
+        Sé el primero en compartir tus experiencias, recursos y planeaciones con otros docentes.
       </Text>
-      <TouchableOpacity onPress={vm.handleOpenCreateModal}>
+      <TouchableOpacity onPress={vm.handleOpenCreateModal} activeOpacity={0.85}>
         <LinearGradient
           colors={[colors.primary, colors.primaryContainer]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.emptyCTABtn}
         >
-          <Text style={styles.emptyCTAText}>Crear mi primera publicación</Text>
+          <Text style={styles.emptyCTAText}>✏️ Crear mi primera publicación</Text>
         </LinearGradient>
       </TouchableOpacity>
+      {/* Decorative separator */}
+      <View style={[styles.emptySeparator, { backgroundColor: `${colors.primary}15` }]} />
     </View>
   );
 
   /* ── Error state ── */
   const renderErrorState = () => (
     <View style={styles.emptyContainer}>
-      <View style={[styles.emptyIconWrap, { backgroundColor: colors.surfaceContainerHigh }]}>
-        <MaterialIcons name="cloud-off" size={56} color={colors.primary} />
+      <View style={styles.errorIconContainer}>
+        {/* Background glow */}
+        <View style={[styles.errorGlow, { backgroundColor: colors.surfaceContainerLow }]} />
+        <View style={[
+          styles.errorIconBox,
+          {
+            backgroundColor: colors.surfaceContainerLowest,
+            ...Platform.select({
+              web: { boxShadow: '0px 24px 48px rgba(0,72,132,0.08)' } as any,
+              default: { shadowColor: '#004884', shadowOffset: { width: 0, height: 24 }, shadowOpacity: 0.08, shadowRadius: 48, elevation: 4 },
+            }),
+          },
+        ]}>
+          <MaterialIcons name="cloud-off" size={48} color={colors.primaryContainer} />
+        </View>
+        {/* Error overlay badge */}
+        <View style={[
+          styles.errorBadge,
+          {
+            backgroundColor: colors.error,
+            borderColor: colors.background,
+          },
+        ]}>
+          <MaterialIcons name="wifi-off" size={14} color="#FFF" />
+        </View>
       </View>
       <Text style={[styles.emptyTitle, { color: colors.onSurface }]}>
         No pudimos cargar las publicaciones
@@ -200,17 +242,22 @@ const FeedScreen: React.FC = () => {
       <Text style={[styles.emptyDesc, { color: colors.onSurfaceVariant }]}>
         Revisa tu conexión e intenta de nuevo
       </Text>
-      <TouchableOpacity onPress={vm.handleRefresh}>
-        <LinearGradient
-          colors={[colors.primary, colors.primaryContainer]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.emptyCTABtn}
-        >
-          <MaterialIcons name="refresh" size={18} color="#FFF" />
-          <Text style={styles.emptyCTAText}>Reintentar</Text>
-        </LinearGradient>
+      <TouchableOpacity
+        onPress={vm.handleRefresh}
+        activeOpacity={0.85}
+        style={[
+          styles.retryBtn,
+          { borderColor: colors.primaryContainer },
+        ]}
+      >
+        <MaterialIcons name="refresh" size={20} color={colors.primaryContainer} />
+        <Text style={[styles.retryBtnText, { color: colors.primaryContainer }]}>Reintentar</Text>
       </TouchableOpacity>
+      <View style={[styles.errorTipContainer, { borderTopColor: `${colors.outlineVariant}30` }]}>
+        <Text style={[styles.errorTipText, { color: colors.onSurfaceVariant }]}>
+          Si el problema persiste, tus publicaciones guardadas siguen disponibles offline.
+        </Text>
+      </View>
     </View>
   );
 
@@ -241,7 +288,9 @@ const FeedScreen: React.FC = () => {
       post={item}
       currentUserId={vm.userId}
       onLike={vm.handleLike}
-      onComment={vm.handleComment}
+      onComment={(postId) => {
+        navigation.navigate("PostDetail", { postId, userId: vm.userId });
+      }}
       onSave={vm.handleSave}
       onShare={vm.handleShare}
       onAddToLibrary={vm.handleAddToLibrary}
@@ -259,6 +308,10 @@ const FeedScreen: React.FC = () => {
         });
       }}
       onSaveExam={vm.handleSaveExam}
+      onPress={(post) => {
+        navigation.navigate("PostDetail", { postId: post.id, userId: vm.userId });
+      }}
+      onOptions={(post) => setOptionsPost(post)}
     />
   );
 
@@ -323,6 +376,35 @@ const FeedScreen: React.FC = () => {
         onClose={vm.handleCloseCreateModal}
         onPublish={vm.handlePublishPost}
         authorName={vm.userName}
+      />
+
+      {/* Post options sheet */}
+      <PostOptionsSheet
+        visible={!!optionsPost}
+        onClose={() => setOptionsPost(null)}
+        isOwnPost={optionsPost?.autorId === vm.userId}
+        onEdit={() => {
+          // Stub
+        }}
+        onDelete={() => {
+          // Stub
+        }}
+        onSaveToLibrary={() => {
+          if (optionsPost) vm.handleSave(optionsPost.id as number);
+        }}
+        onReport={() => {
+          setOptionsPost(null);
+          setShowReportModal(true);
+        }}
+      />
+
+      {/* Report modal */}
+      <ReportPostModal
+        visible={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        onSubmit={() => {
+          setShowReportModal(false);
+        }}
       />
     </SafeAreaView>
   );
@@ -422,37 +504,141 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
     gap: 16,
   },
-  emptyIconWrap: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+  /* Empty state styles */
+  emptyGlow: {
+    position: "absolute",
+    top: -40,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    opacity: 0.6,
+  },
+  emptyImageBox: {
+    width: 128,
+    height: 128,
+    borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 8,
+    marginBottom: 24,
+    borderWidth: 1,
+    transform: [{ rotate: "-3deg" }],
+  },
+  emptyFloatingIcon: {
+    position: "absolute",
+    top: -12,
+    right: -8,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    transform: [{ rotate: "12deg" }],
   },
   emptyTitle: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: "800",
     textAlign: "center",
+    letterSpacing: -0.3,
+    lineHeight: 32,
   },
   emptyDesc: {
-    fontSize: 14,
+    fontSize: 16,
     textAlign: "center",
-    lineHeight: 20,
+    lineHeight: 24,
+    paddingHorizontal: 8,
   },
   emptyCTABtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 14,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
     marginTop: 8,
+    ...Platform.select({
+      web: { boxShadow: "0px 4px 12px rgba(0,69,128,0.15)" } as any,
+      default: {
+        shadowColor: "#004580",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 4,
+      },
+    }),
   },
   emptyCTAText: {
     color: "#FFF",
     fontWeight: "700",
-    fontSize: 15,
+    fontSize: 16,
+  },
+  emptySeparator: {
+    width: 96,
+    height: 4,
+    borderRadius: 2,
+    marginTop: 40,
+  },
+  /* Error state styles */
+  errorIconContainer: {
+    position: "relative",
+    marginBottom: 24,
+  },
+  errorGlow: {
+    position: "absolute",
+    top: -16,
+    left: -16,
+    right: -16,
+    bottom: -16,
+    borderRadius: 100,
+    opacity: 0.6,
+  },
+  errorIconBox: {
+    width: 128,
+    height: 128,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  errorBadge: {
+    position: "absolute",
+    bottom: -8,
+    right: -8,
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 3,
+    ...Platform.select({
+      web: { boxShadow: "0px 4px 8px rgba(0,0,0,0.15)" } as any,
+      default: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 4 },
+    }),
+  },
+  retryBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+    borderWidth: 2,
+    marginTop: 8,
+  },
+  retryBtnText: {
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  errorTipContainer: {
+    paddingTop: 24,
+    borderTopWidth: 1,
+    marginTop: 24,
+  },
+  errorTipText: {
+    fontSize: 14,
+    fontStyle: "italic",
+    textAlign: "center",
+    lineHeight: 20,
+    opacity: 0.8,
   },
   fabWrap: {
     position: "absolute",

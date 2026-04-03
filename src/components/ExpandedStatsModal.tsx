@@ -76,9 +76,7 @@ const ExpandedStatsModal: React.FC<ExpandedStatsModalProps> = ({ visible, data, 
           )}
           {data.pendingCount != null && (
             <View style={[styles.quickStatCard, { backgroundColor: "#fff3e0" }]}>
-              <Text style={[styles.quickStatValue, { color: "#e65100" }]}>
-                {data.pendingCount}
-              </Text>
+              <Text style={[styles.quickStatValue, { color: "#e65100" }]}>{data.pendingCount}</Text>
               <Text style={[styles.quickStatLabel, { color: "#e65100" }]}>Pendientes</Text>
             </View>
           )}
@@ -109,8 +107,7 @@ const ExpandedStatsModal: React.FC<ExpandedStatsModalProps> = ({ visible, data, 
                   style={[
                     styles.statusBadge,
                     {
-                      backgroundColor:
-                        item.status === "Completa" ? "#d4edda" : "#ebeef4",
+                      backgroundColor: item.status === "Completa" ? "#d4edda" : "#ebeef4",
                     },
                   ]}
                 >
@@ -118,8 +115,7 @@ const ExpandedStatsModal: React.FC<ExpandedStatsModalProps> = ({ visible, data, 
                     style={[
                       styles.statusBadgeText,
                       {
-                        color:
-                          item.status === "Completa" ? "#1b6d24" : "#424750",
+                        color: item.status === "Completa" ? "#1b6d24" : "#424750",
                       },
                     ]}
                   >

@@ -17,6 +17,7 @@ interface PostCardProps {
   onSaveExam?: (post: Post) => void;
   onPress?: (post: Post) => void;
   onAuthorPress?: (autorId: string) => void;
+  onOptions?: (post: Post) => void;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -32,6 +33,7 @@ const PostCard: React.FC<PostCardProps> = ({
   onSaveExam,
   onPress,
   onAuthorPress,
+  onOptions,
 }) => {
   const { colors } = useTheme();
   const isLiked = currentUserId ? post.likedBy.includes(currentUserId) : false;
@@ -50,13 +52,13 @@ const PostCard: React.FC<PostCardProps> = ({
   const docAttachment = post.attachments.find((a) => a.type === "document");
 
   const cardShadow = Platform.select({
-    web: { boxShadow: `0px 12px 32px ${colors.shadowBlue}` } as any,
+    web: { boxShadow: `0px 2px 8px ${colors.shadowBlue}` } as any,
     default: {
       shadowColor: "#005da8",
-      shadowOffset: { width: 0, height: 12 },
+      shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.06,
-      shadowRadius: 32,
-      elevation: 3,
+      shadowRadius: 8,
+      elevation: 2,
     },
   });
 
@@ -85,7 +87,7 @@ const PostCard: React.FC<PostCardProps> = ({
             </Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.moreBtn}>
+        <TouchableOpacity style={styles.moreBtn} onPress={() => onOptions?.(post)}>
           <MaterialIcons name="more-horiz" size={20} color={colors.onSurfaceVariant} />
         </TouchableOpacity>
       </View>
@@ -198,49 +200,55 @@ const PostCard: React.FC<PostCardProps> = ({
 
       {/* Action bar */}
       <View style={[styles.actionBar, { borderTopColor: `${colors.outlineVariant}15` }]}>
-        <TouchableOpacity style={styles.actionBtn} onPress={() => onLike(post.id as number)}>
-          <MaterialIcons
-            name={isLiked ? "favorite" : "favorite-border"}
-            size={20}
-            color={isLiked ? colors.primary : colors.onSurfaceVariant}
-          />
-          <Text
-            style={[
-              styles.actionLabel,
-              { color: isLiked ? colors.primary : colors.onSurfaceVariant },
-            ]}
-          >
-            {post.likes > 0 ? post.likes : "ME GUSTA"}
-          </Text>
-        </TouchableOpacity>
+        {/* Left group: like, comment, download */}
+        <View style={styles.actionGroupLeft}>
+          <TouchableOpacity style={styles.actionBtn} onPress={() => onLike(post.id as number)}>
+            <MaterialIcons
+              name={isLiked ? "favorite" : "favorite-border"}
+              size={22}
+              color={isLiked ? colors.primary : colors.onSurfaceVariant}
+            />
+            {post.likes > 0 && (
+              <Text
+                style={[
+                  styles.actionCount,
+                  { color: isLiked ? colors.primary : colors.onSurfaceVariant },
+                ]}
+              >
+                {post.likes}
+              </Text>
+            )}
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionBtn} onPress={() => onComment(post.id as number)}>
-          <MaterialIcons name="chat-bubble-outline" size={20} color={colors.onSurfaceVariant} />
-          <Text style={[styles.actionLabel, { color: colors.onSurfaceVariant }]}>
-            {post.commentsCount > 0 ? post.commentsCount : "COMENTAR"}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.actionBtn} onPress={() => onComment(post.id as number)}>
+            <MaterialIcons name="chat-bubble-outline" size={22} color={colors.onSurfaceVariant} />
+            {post.commentsCount > 0 && (
+              <Text style={[styles.actionCount, { color: colors.onSurfaceVariant }]}>
+                {post.commentsCount}
+              </Text>
+            )}
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionBtn} onPress={() => onSave(post.id as number)}>
-          <MaterialIcons
-            name={isSaved ? "bookmark" : "bookmark-border"}
-            size={20}
-            color={isSaved ? colors.primary : colors.onSurfaceVariant}
-          />
-          <Text
-            style={[
-              styles.actionLabel,
-              { color: isSaved ? colors.primary : colors.onSurfaceVariant },
-            ]}
-          >
-            GUARDAR
-          </Text>
-        </TouchableOpacity>
+          {docAttachment && onDownload && (
+            <TouchableOpacity style={styles.actionBtn} onPress={() => onDownload(docAttachment)}>
+              <MaterialIcons name="download" size={22} color={colors.onSurfaceVariant} />
+            </TouchableOpacity>
+          )}
+        </View>
 
-        <TouchableOpacity style={styles.actionBtn} onPress={() => onShare(post.id as number)}>
-          <MaterialIcons name="share" size={20} color={colors.onSurfaceVariant} />
-          <Text style={[styles.actionLabel, { color: colors.onSurfaceVariant }]}>COMPARTIR</Text>
-        </TouchableOpacity>
+        {/* Right group: bookmark, share */}
+        <View style={styles.actionGroupRight}>
+          <TouchableOpacity onPress={() => onSave(post.id as number)}>
+            <MaterialIcons
+              name={isSaved ? "bookmark" : "bookmark-border"}
+              size={22}
+              color={isSaved ? colors.primary : colors.onSurfaceVariant}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => onShare(post.id as number)}>
+            <MaterialIcons name="share" size={22} color={colors.onSurfaceVariant} />
+          </TouchableOpacity>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -404,22 +412,32 @@ const styles = StyleSheet.create({
   },
   actionBar: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     borderTopWidth: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  actionGroupLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20,
+  },
+  actionGroupRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
   },
   actionBtn: {
-    flex: 1,
-    flexDirection: "column",
+    flexDirection: "row",
     alignItems: "center",
-    gap: 2,
+    gap: 4,
     paddingVertical: 4,
   },
-  actionLabel: {
-    fontSize: 9,
+  actionCount: {
+    fontSize: 12,
     fontWeight: "700",
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
   },
 });
 

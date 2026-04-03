@@ -16,14 +16,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useTheme } from "../context/ThemeContext";
 import { PostMood } from "../../types";
 
-const MOODS: { emoji: PostMood; label: string }[] = [
-  { emoji: "😊", label: "Feliz" },
-  { emoji: "📚", label: "Estudiando" },
-  { emoji: "💡", label: "Inspirado" },
-  { emoji: "🎯", label: "Enfocado" },
-  { emoji: "☕", label: "Relajado" },
-  { emoji: "🎨", label: "Creativo" },
-  { emoji: "🚀", label: "Productivo" },
+const MOODS: { emoji: PostMood; label: string; bg: string; text: string; icon: string }[] = [
+  { emoji: "💡", label: "Inspirado", bg: "#d4e3ff", text: "#001c3a", icon: "lightbulb" },
+  { emoji: "🚀", label: "Productivo", bg: "#a3f69c", text: "#002204", icon: "rocket-launch" },
+  { emoji: "🎨", label: "Creativo", bg: "#ffdbc9", text: "#321200", icon: "palette" },
+  { emoji: "🎯", label: "Enfocado", bg: "#ffdad6", text: "#93000a", icon: "center-focus-strong" },
+  { emoji: "☕", label: "Relajado", bg: "#e5e8ee", text: "#424750", icon: "spa" },
 ];
 
 const MAX_CHARS = 2000;
@@ -203,18 +201,22 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   styles.moodChip,
                   {
                     backgroundColor:
-                      selectedMood === m.emoji ? `${colors.primary}15` : colors.surfaceContainerLow,
-                    borderColor: selectedMood === m.emoji ? colors.primary : "transparent",
+                      selectedMood === m.emoji ? m.bg : colors.surfaceContainerLow,
+                    borderColor: selectedMood === m.emoji ? `${m.text}30` : "transparent",
                   },
                 ]}
                 onPress={() => setSelectedMood((prev) => (prev === m.emoji ? undefined : m.emoji))}
               >
-                <Text style={{ fontSize: 18 }}>{m.emoji}</Text>
+                <MaterialIcons
+                  name={m.icon as any}
+                  size={16}
+                  color={selectedMood === m.emoji ? m.text : colors.onSurfaceVariant}
+                />
                 <Text
                   style={{
                     fontSize: 12,
-                    fontWeight: "600",
-                    color: selectedMood === m.emoji ? colors.primary : colors.onSurfaceVariant,
+                    fontWeight: "700",
+                    color: selectedMood === m.emoji ? m.text : colors.onSurfaceVariant,
                   }}
                 >
                   {m.label}
@@ -404,13 +406,14 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   titleInput: {
-    fontSize: 22,
-    fontWeight: "700",
+    fontSize: 28,
+    fontWeight: "800",
     marginBottom: 12,
+    letterSpacing: -0.3,
   },
   contentInput: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 18,
+    lineHeight: 28,
     minHeight: 200,
     marginBottom: 16,
   },
@@ -422,9 +425,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 12,
     borderWidth: 1.5,
   },
   toolbar: {

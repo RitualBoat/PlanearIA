@@ -80,6 +80,9 @@ import PerfilScreen from "../screens/perfil/PerfilScreen";
 // Importación de pantalla de Reto
 import RetoResolucionScreen from "../screens/feed/RetoResolucionScreen";
 
+// Importación de pantalla de Detalle de Post
+import PostDetailScreen from "../screens/feed/PostDetailScreen";
+
 // Importación de pantalla de Onboarding
 import OnboardingScreen from "../screens/onboarding/OnboardingScreen";
 
@@ -198,6 +201,12 @@ export type RootStackParamList = {
         preguntas?: number;
       }
     | undefined;
+
+  // Detalle de Post
+  PostDetail: {
+    postId: number;
+    userId?: string;
+  };
 };
 /**
  * Creamos el Stack Navigator con tipado
@@ -644,6 +653,15 @@ const StackNavigator: React.FC = () => {
         component={RetoResolucionScreen}
         options={{
           title: "Resolver Reto",
+          headerShown: false,
+        }}
+      />
+      {/* ========== DETALLE DE POST ========== */}
+      <Stack.Screen
+        name="PostDetail"
+        component={PostDetailScreen}
+        options={{
+          title: "Detalle del Post",
           headerShown: false,
         }}
       />

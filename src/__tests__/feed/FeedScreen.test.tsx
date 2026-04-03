@@ -101,7 +101,7 @@ describe("FeedScreen", () => {
     const { getByText } = render(<FeedScreen />);
 
     expect(getByText(/Bienvenido a la comunidad/i)).toBeTruthy();
-    expect(getByText(/Comparte tus experiencias/i)).toBeTruthy();
+    expect(getByText(/primero en compartir/i)).toBeTruthy();
     expect(getByText(/Crear mi primera publicación/i)).toBeTruthy();
   });
 

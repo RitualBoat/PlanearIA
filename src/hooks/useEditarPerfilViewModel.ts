@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { Platform, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
@@ -6,6 +6,8 @@ import type { RootStackParamList } from "../navigation/StackNavigator";
 import { useAuth } from "../context/AuthContext";
 
 type Nav = StackNavigationProp<RootStackParamList>;
+
+export const BIO_MAX_LENGTH = 300;
 
 export interface EditarPerfilViewModel {
   nombre: string;
@@ -15,33 +17,65 @@ export interface EditarPerfilViewModel {
   email: string;
   isLoading: boolean;
   error: string;
+  nombreError: string;
+  isDirty: boolean;
+  bioCharCount: number;
+  bioMaxLength: number;
+  saveSuccess: boolean;
+  saveError: boolean;
   setNombre: (v: string) => void;
   setApellidos: (v: string) => void;
   setBiografia: (v: string) => void;
   setPais: (v: string) => void;
   handleGuardar: () => void;
   handleCancelar: () => void;
+  dismissSuccess: () => void;
+  dismissError: () => void;
 }
 
 export const useEditarPerfilViewModel = (): EditarPerfilViewModel => {
   const navigation = useNavigation<Nav>();
   const { usuario, actualizarPerfil } = useAuth();
 
-  const [nombre, setNombre] = useState(usuario?.nombre || "");
+  const [nombre, setNombreRaw] = useState(usuario?.nombre || "");
   const [apellidos, setApellidos] = useState(usuario?.apellidos || "");
-  const [biografia, setBiografia] = useState(usuario?.biografia || "");
+  const [biografia, setBiografiaRaw] = useState(usuario?.biografia || "");
   const [pais, setPais] = useState(usuario?.pais || "México");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [nombreError, setNombreError] = useState("");
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   useEffect(() => {
     if (usuario) {
-      setNombre(usuario.nombre);
+      setNombreRaw(usuario.nombre);
       setApellidos(usuario.apellidos);
-      setBiografia(usuario.biografia);
+      setBiografiaRaw(usuario.biografia);
       setPais(usuario.pais);
     }
   }, [usuario]);
+
+  const isDirty = useMemo(() => {
+    if (!usuario) return false;
+    return (
+      nombre !== usuario.nombre ||
+      apellidos !== usuario.apellidos ||
+      biografia !== usuario.biografia ||
+      pais !== usuario.pais
+    );
+  }, [nombre, apellidos, biografia, pais, usuario]);
+
+  const setNombre = useCallback((v: string) => {
+    setNombreRaw(v);
+    if (v.trim()) setNombreError("");
+  }, []);
+
+  const setBiografia = useCallback((v: string) => {
+    if (v.length <= BIO_MAX_LENGTH) {
+      setBiografiaRaw(v);
+    }
+  }, []);
 
   const showAlert = useCallback((title: string, message: string) => {
     if (Platform.OS === "web") {
@@ -53,8 +87,9 @@ export const useEditarPerfilViewModel = (): EditarPerfilViewModel => {
 
   const handleGuardar = useCallback(async () => {
     setError("");
+    setNombreError("");
     if (!nombre.trim()) {
-      setError("El nombre es obligatorio.");
+      setNombreError("Este campo es obligatorio");
       return;
     }
 
@@ -67,17 +102,19 @@ export const useEditarPerfilViewModel = (): EditarPerfilViewModel => {
         pais: pais.trim(),
       });
       if (result.success) {
-        showAlert("Perfil actualizado", "Tus datos se han guardado correctamente.");
-        navigation.goBack();
+        setSaveSuccess(true);
+        setTimeout(() => navigation.goBack(), 1200);
       } else {
         setError(result.error || "Error al guardar.");
+        setSaveError(true);
       }
     } catch {
       setError("No se pudo conectar al servidor.");
+      setSaveError(true);
     } finally {
       setIsLoading(false);
     }
-  }, [nombre, apellidos, biografia, pais, actualizarPerfil, navigation, showAlert]);
+  }, [nombre, apellidos, biografia, pais, actualizarPerfil, navigation]);
 
   const handleCancelar = useCallback(() => {
     navigation.goBack();
@@ -91,11 +128,19 @@ export const useEditarPerfilViewModel = (): EditarPerfilViewModel => {
     email: usuario?.email || "",
     isLoading,
     error,
+    nombreError,
+    isDirty,
+    bioCharCount: biografia.length,
+    bioMaxLength: BIO_MAX_LENGTH,
+    saveSuccess,
+    saveError,
     setNombre,
     setApellidos,
     setBiografia,
     setPais,
     handleGuardar,
     handleCancelar,
+    dismissSuccess: () => setSaveSuccess(false),
+    dismissError: () => setSaveError(false),
   };
 };

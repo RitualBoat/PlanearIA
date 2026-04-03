@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
   Platform,
   Animated,
+  Share,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -20,6 +21,8 @@ import { usePlaneaciones } from "../../sync/providers/SyncProvider";
 import { useGruposContext } from "../../context/GruposContext";
 import { useRecursos } from "../../context/RecursosContext";
 import { useTheme } from "../../context/ThemeContext";
+import Toast, { type ToastConfig } from "../../components/Toast";
+import ExpandedStatsModal, { type ExpandedStatsData } from "../../components/ExpandedStatsModal";
 
 type Nav = StackNavigationProp<RootStackParamList>;
 
@@ -64,6 +67,11 @@ const PerfilScreen: React.FC = () => {
   const { width } = useWindowDimensions();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [toast, setToast] = useState<ToastConfig | null>(null);
+  const [showToast, setShowToast] = useState(false);
+  const [expandedStat, setExpandedStat] = useState<ExpandedStatsData | null>(null);
+
   useEffect(() => {
     const t = setTimeout(() => setIsLoading(false), 600);
     return () => clearTimeout(t);
@@ -87,11 +95,69 @@ const PerfilScreen: React.FC = () => {
     : null;
 
   const stats = [
-    { value: planeaciones.length, label: "PLANEACIONES" },
-    { value: grupos.length, label: "GRUPOS" },
-    { value: recursos.length, label: "RECURSOS" },
-    { value: 0, label: "ENTREGABLES" },
+    { icon: "description", value: planeaciones.length, label: "PLANEACIONES" },
+    { icon: "groups", value: grupos.length, label: "GRUPOS" },
+    { icon: "library-books", value: recursos.length, label: "RECURSOS" },
+    { icon: "assignment", value: 0, label: "ENTREGABLES" },
   ];
+
+  const showToastMessage = useCallback((config: ToastConfig) => {
+    setToast(config);
+    setShowToast(true);
+  }, []);
+
+  const handleShare = useCallback(async () => {
+    const profileUrl = `https://planearia.app/perfil/${usuario?.id || ""}`;
+    if (Platform.OS === "web") {
+      try {
+        await navigator.clipboard.writeText(profileUrl);
+        showToastMessage({ message: "Enlace copiado al portapapeles", type: "share" });
+      } catch {
+        showToastMessage({ message: "No se pudo copiar el enlace", type: "error" });
+      }
+    } else {
+      try {
+        await Share.share({ message: `Mira mi perfil en PlanearIA: ${profileUrl}` });
+      } catch {
+        /* User cancelled share */
+      }
+    }
+  }, [usuario?.id, showToastMessage]);
+
+  const handleStatPress = useCallback(
+    (statIndex: number) => {
+      const s = stats[statIndex];
+      let items: { label: string; subtitle?: string }[] = [];
+      if (statIndex === 0) {
+        items = planeaciones.slice(0, 10).map((p) => ({
+          label: p.temaSesion || "Sin título",
+          subtitle: p.nivel || undefined,
+        }));
+      } else if (statIndex === 1) {
+        items = grupos.slice(0, 10).map((g) => ({
+          label: g.nombre || "Sin nombre",
+          subtitle: `${g.alumnos?.length ?? 0} alumnos`,
+        }));
+      } else if (statIndex === 2) {
+        items = recursos.slice(0, 10).map((r) => ({
+          label: r.titulo || r.nombre || "Sin título",
+        }));
+      }
+      setExpandedStat({
+        icon: s.icon,
+        title: s.label.charAt(0) + s.label.slice(1).toLowerCase(),
+        count: s.value,
+        items,
+      });
+    },
+    [stats, planeaciones, grupos, recursos]
+  );
+
+  const handleRetry = useCallback(() => {
+    setHasError(false);
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 600);
+  }, []);
 
   /* ── Skeleton State ── */
   if (isLoading) {
@@ -152,6 +218,49 @@ const PerfilScreen: React.FC = () => {
     );
   }
 
+  /* ── Error State ── */
+  if (hasError) {
+    return (
+      <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top"]}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={[styles.headerBtn, { backgroundColor: colors.surfaceContainerLow }]}
+          >
+            <MaterialIcons name="arrow-back" size={24} color={colors.onSurface} />
+          </TouchableOpacity>
+          <Text style={[styles.headerTitle, { color: colors.primary }]}>Mi Perfil</Text>
+          <View style={{ width: 40 }} />
+        </View>
+        <View style={styles.errorContainer}>
+          <View style={styles.errorDecorCircle1} />
+          <View style={styles.errorDecorCircle2} />
+          <View style={styles.errorIconWrap}>
+            <MaterialIcons name="person-outline" size={48} color={colors.onSurfaceVariant} />
+            <View style={styles.errorBadge}>
+              <MaterialIcons name="error-outline" size={20} color="#ba1a1a" />
+            </View>
+          </View>
+          <Text style={[styles.errorTitle, { color: colors.onSurface }]}>
+            No pudimos cargar tu perfil
+          </Text>
+          <Text style={[styles.errorMessage, { color: colors.onSurfaceVariant }]}>
+            Revisa tu conexión e intenta de nuevo.
+          </Text>
+          <TouchableOpacity
+            style={[styles.retryBtn, { borderColor: colors.primary }]}
+            onPress={handleRetry}
+            accessibilityRole="button"
+            accessibilityLabel="Reintentar"
+          >
+            <Text style={[styles.retryBtnText, { color: colors.primary }]}>Reintentar</Text>
+          </TouchableOpacity>
+          <Text style={[styles.errorCode, { color: colors.onSurfaceVariant }]}>(503)</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   /* ── Guest State ── */
   if (isGuest) {
     return (
@@ -165,7 +274,7 @@ const PerfilScreen: React.FC = () => {
             >
               <MaterialIcons name="arrow-back" size={24} color={colors.onSurface} />
             </TouchableOpacity>
-            <Text style={[styles.headerTitle, { color: colors.primary }]}>Teacher Profile</Text>
+            <Text style={[styles.headerTitle, { color: colors.primary }]}>Mi Perfil</Text>
             <View style={{ width: 40 }} />
           </View>
 
@@ -232,14 +341,16 @@ const PerfilScreen: React.FC = () => {
 
           {/* CTA Banner */}
           <LinearGradient
-            colors={[colors.primary, "#7c4dff"]}
+            colors={["#004580", "#6b21a8"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.guestCTA}
           >
-            <Text style={styles.guestCTATitle}>Únete a la comunidad docente</Text>
+            <MaterialIcons name="shield" size={32} color="#FFFFFF" />
+            <Text style={styles.guestCTATitle}>Estás navegando como invitado</Text>
             <Text style={styles.guestCTADesc}>
-              Crea tu cuenta para guardar planeaciones, recursos y conectar con otros docentes.
+              Crea una cuenta para guardar tu progreso, sincronizar tus datos y acceder a todas las
+              funciones.
             </Text>
             <TouchableOpacity
               style={styles.guestCTABtn}
@@ -250,9 +361,30 @@ const PerfilScreen: React.FC = () => {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-              <Text style={styles.guestLoginLink}>Iniciar sesión</Text>
+              <Text style={styles.guestLoginLink}>Ya tengo cuenta → Iniciar sesión</Text>
             </TouchableOpacity>
           </LinearGradient>
+
+          {/* Empty activity */}
+          <View style={[styles.activitySection, { marginTop: 8 }]}>
+            <Text style={[styles.activityTitle, { color: colors.onSurface }]}>
+              ACTIVIDAD RECIENTE
+            </Text>
+            <View
+              style={[
+                styles.emptyActivity,
+                { borderColor: colors.outlineVariant, backgroundColor: colors.surfaceContainerLow },
+              ]}
+            >
+              <MaterialIcons name="history" size={36} color={colors.onSurfaceVariant} />
+              <Text style={{ color: colors.onSurface, fontWeight: "600", fontSize: 15 }}>
+                Aún no tienes actividad
+              </Text>
+              <Text style={{ color: colors.onSurfaceVariant, fontSize: 13, textAlign: "center" }}>
+                Tus interacciones recientes aparecerán aquí una vez que comiences.
+              </Text>
+            </View>
+          </View>
         </ScrollView>
       </SafeAreaView>
     );
@@ -270,7 +402,7 @@ const PerfilScreen: React.FC = () => {
           >
             <MaterialIcons name="arrow-back" size={24} color={colors.onSurface} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.primary }]}>Teacher Profile</Text>
+          <Text style={[styles.headerTitle, { color: colors.primary }]}>Mi Perfil</Text>
           <TouchableOpacity
             onPress={() => navigation.navigate("Cuenta")}
             style={[styles.headerBtn, { backgroundColor: colors.surfaceContainerLow }]}
@@ -332,8 +464,12 @@ const PerfilScreen: React.FC = () => {
         {/* Bento Stats Grid */}
         <View style={[styles.statsGrid, isDesktop && styles.statsGridDesktop]}>
           {stats.map((s, i) => (
-            <View
+            <TouchableOpacity
               key={i}
+              activeOpacity={0.7}
+              onPress={() => handleStatPress(i)}
+              accessibilityRole="button"
+              accessibilityLabel={`${s.label}: ${s.value}`}
               style={[
                 styles.statCard,
                 { backgroundColor: colors.surfaceContainerLowest },
@@ -349,9 +485,10 @@ const PerfilScreen: React.FC = () => {
                 }),
               ]}
             >
+              <MaterialIcons name={s.icon as any} size={20} color={colors.onSurfaceVariant} />
               <Text style={[styles.statNumber, { color: colors.primary }]}>{s.value}</Text>
               <Text style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>{s.label}</Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
 
@@ -370,7 +507,12 @@ const PerfilScreen: React.FC = () => {
             <MaterialIcons name="edit" size={18} color={colors.primary} />
             <Text style={[styles.editBtnText, { color: colors.primary }]}>Editar perfil</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.shareRow}>
+          <TouchableOpacity
+            style={styles.shareRow}
+            onPress={handleShare}
+            accessibilityRole="button"
+            accessibilityLabel="Compartir perfil"
+          >
             <MaterialIcons name="share" size={18} color={colors.onSurfaceVariant} />
             <Text style={{ color: colors.onSurfaceVariant, fontWeight: "600", fontSize: 14 }}>
               Compartir perfil
@@ -448,6 +590,22 @@ const PerfilScreen: React.FC = () => {
           )}
         </View>
       </ScrollView>
+
+      {/* Toast notification */}
+      <Toast
+        visible={showToast}
+        message={toast?.message || ""}
+        type={toast?.type || "info"}
+        duration={toast?.duration}
+        onDismiss={() => setShowToast(false)}
+      />
+
+      {/* Expanded stats modal */}
+      <ExpandedStatsModal
+        visible={!!expandedStat}
+        data={expandedStat}
+        onClose={() => setExpandedStat(null)}
+      />
     </SafeAreaView>
   );
 };
@@ -669,6 +827,70 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontSize: 14,
     marginBottom: 2,
+  },
+  /* ── Error state styles ── */
+  errorContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+  },
+  errorDecorCircle1: {
+    position: "absolute",
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: "rgba(0, 93, 168, 0.05)",
+    top: "15%",
+    left: -40,
+  },
+  errorDecorCircle2: {
+    position: "absolute",
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: "rgba(186, 26, 26, 0.04)",
+    bottom: "20%",
+    right: -30,
+  },
+  errorIconWrap: {
+    marginBottom: 20,
+  },
+  errorBadge: {
+    position: "absolute",
+    bottom: -2,
+    right: -4,
+    backgroundColor: "#ffdad6",
+    borderRadius: 12,
+    padding: 2,
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  errorMessage: {
+    fontSize: 14,
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 24,
+  },
+  retryBtn: {
+    borderWidth: 2,
+    borderRadius: 12,
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    marginBottom: 16,
+  },
+  retryBtnText: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  errorCode: {
+    fontSize: 11,
+    fontVariant: ["small-caps" as any],
+    opacity: 0.6,
   },
 });
 

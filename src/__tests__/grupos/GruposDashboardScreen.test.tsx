@@ -189,9 +189,7 @@ describe("GruposDashboardScreen", () => {
 
       const { getByText } = renderScreen();
       expect(getByText("No se pudieron cargar los datos")).toBeTruthy();
-      expect(
-        getByText("Ocurrió un error al obtener la información de tus grupos")
-      ).toBeTruthy();
+      expect(getByText("Ocurrió un error al obtener la información de tus grupos")).toBeTruthy();
       expect(getByText("Reintentar")).toBeTruthy();
     });
 

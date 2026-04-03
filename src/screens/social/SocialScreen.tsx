@@ -9,15 +9,56 @@ import {
   RefreshControl,
   Modal,
   Platform,
-  ActivityIndicator,
+  StatusBar,
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import AnimatedTopPill from "../../components/AnimatedTopPill";
-import { COLORS, Contacto, SolicitudConexion } from "../../../types";
+import { Contacto, SolicitudConexion } from "../../../types";
 import { useSocialViewModel, SocialTab } from "../../hooks/useSocialViewModel";
+
+// ─── Design Tokens (Scholarly Atelier) ───
+
+const DT = {
+  primary: "#002f5a",
+  primaryContainer: "#004580",
+  primaryFixed: "#d4e3ff",
+  primaryFixedDim: "#a4c8ff",
+  onPrimary: "#ffffff",
+  onPrimaryContainer: "#85b4f6",
+  secondary: "#1b6d24",
+  secondaryContainer: "#a0f499",
+  onSecondaryContainer: "#207128",
+  tertiary: "#4f2100",
+  tertiaryContainer: "#713200",
+  tertiaryFixed: "#ffdbc9",
+  onTertiaryContainer: "#f69b63",
+  surface: "#f7f9ff",
+  surfaceLowest: "#ffffff",
+  surfaceLow: "#f1f4fa",
+  surfaceContainer: "#ebeef4",
+  surfaceHigh: "#e5e8ee",
+  surfaceHighest: "#dfe3e8",
+  onSurface: "#181c20",
+  onSurfaceVariant: "#424750",
+  outline: "#727781",
+  outlineVariant: "#c2c6d1",
+  error: "#ba1a1a",
+  errorContainer: "#ffdad6",
+  errorIcon: "#ba1a1a",
+  skeleton: "#EDF1F7",
+  overlay: "rgba(19,30,49,0.42)",
+  // Convenience aliases
+  text: "#181c20",
+  textSecondary: "#424750",
+  textMuted: "#727781",
+  success: "#1b6d24",
+  successTint: "#E7F9F3",
+  warning: "#F58026",
+  warningTint: "#FFF8F1",
+};
 
 // ─── Helpers ───
 
@@ -28,24 +69,24 @@ const getInitials = (nombre: string, apellidos?: string): string => {
 };
 
 const cardShadow = Platform.select({
-  web: { boxShadow: "0px 12px 24px rgba(0,72,132,0.06)" } as any,
+  web: { boxShadow: "0px 2px 8px rgba(0,69,128,0.06)" } as any,
   default: {
-    shadowColor: "#004884",
-    shadowOffset: { width: 0, height: 12 },
+    shadowColor: "#004580",
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
-    shadowRadius: 24,
-    elevation: 3,
+    shadowRadius: 8,
+    elevation: 2,
   },
 });
 
 const liftShadow = Platform.select({
-  web: { boxShadow: "0px 24px 48px rgba(0,72,132,0.08)" } as any,
+  web: { boxShadow: "0px 12px 48px rgba(0,69,128,0.08)" } as any,
   default: {
-    shadowColor: "#004884",
-    shadowOffset: { width: 0, height: 24 },
+    shadowColor: "#004580",
+    shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.08,
     shadowRadius: 48,
-    elevation: 5,
+    elevation: 4,
   },
 });
 
@@ -56,9 +97,20 @@ const ContactAvatar: React.FC<{
   apellidos?: string;
   size?: number;
   enLinea?: boolean;
-}> = ({ nombre, apellidos, size = 56, enLinea }) => (
+  bgColor?: string;
+}> = ({ nombre, apellidos, size = 44, enLinea, bgColor }) => (
   <View style={{ position: "relative" }}>
-    <View style={[styles.avatar, { width: size, height: size, borderRadius: size / 2 }]}>
+    <View
+      style={[
+        styles.avatar,
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          backgroundColor: bgColor || DT.primaryContainer,
+        },
+      ]}
+    >
       <Text style={[styles.avatarText, { fontSize: size * 0.36 }]}>
         {getInitials(nombre, apellidos)}
       </Text>
@@ -68,7 +120,7 @@ const ContactAvatar: React.FC<{
         style={[
           styles.onlineDot,
           {
-            backgroundColor: enLinea ? COLORS.success : COLORS.outlineVariant,
+            backgroundColor: enLinea ? DT.success : DT.outlineVariant,
             bottom: 0,
             right: 0,
           },
@@ -86,17 +138,19 @@ const StatsRow: React.FC<{
   pendientes: number;
 }> = ({ totalContactos, totalGrupos, pendientes }) => (
   <View style={styles.statsRow}>
-    <View style={[styles.statCard, styles.statCardDefault, liftShadow]}>
-      <Text style={[styles.statValue, { color: COLORS.primary }]}>{totalContactos}</Text>
-      <Text style={styles.statLabel}>CONTACTOS</Text>
+    <View style={[styles.statBadge, { backgroundColor: DT.primaryFixed }]}>
+      <MaterialIcons name="people-outline" size={14} color={DT.primaryContainer} />
+      <Text style={[styles.statBadgeText, { color: DT.primaryContainer }]}>
+        {totalContactos} Contactos
+      </Text>
     </View>
-    <View style={[styles.statCard, styles.statCardPrimary]}>
-      <Text style={[styles.statValue, { color: "#FFF" }]}>{totalGrupos}</Text>
-      <Text style={[styles.statLabel, { color: "rgba(255,255,255,0.8)" }]}>GRUPOS</Text>
+    <View style={[styles.statBadge, { backgroundColor: DT.warningTint }]}>
+      <MaterialIcons name="schedule" size={14} color={DT.warning} />
+      <Text style={[styles.statBadgeText, { color: DT.warning }]}>{pendientes} Pendientes</Text>
     </View>
-    <View style={[styles.statCard, styles.statCardMuted]}>
-      <Text style={[styles.statValue, { color: COLORS.success }]}>{pendientes}</Text>
-      <Text style={styles.statLabel}>PENDIENTES</Text>
+    <View style={[styles.statBadge, { backgroundColor: DT.successTint }]}>
+      <MaterialIcons name="chat" size={14} color={DT.success} />
+      <Text style={[styles.statBadgeText, { color: DT.success }]}>{totalGrupos} Mensajes</Text>
     </View>
   </View>
 );
@@ -108,10 +162,10 @@ const TabBar: React.FC<{
   onTabChange: (tab: SocialTab) => void;
   pendientes: number;
 }> = ({ activeTab, onTabChange, pendientes }) => {
-  const tabs: { key: SocialTab; label: string }[] = [
-    { key: "contactos", label: "Contactos" },
-    { key: "solicitudes", label: "Solicitudes" },
-    { key: "buscar", label: "Buscar" },
+  const tabs: { key: SocialTab; label: string; icon: keyof typeof MaterialIcons.glyphMap }[] = [
+    { key: "contactos", label: "Contactos", icon: "people" },
+    { key: "solicitudes", label: "Solicitudes", icon: "person-add" },
+    { key: "buscar", label: "Buscar", icon: "search" },
   ];
 
   return (
@@ -123,14 +177,15 @@ const TabBar: React.FC<{
           onPress={() => onTabChange(tab.key)}
           activeOpacity={0.7}
         >
+          <MaterialIcons
+            name={tab.icon}
+            size={16}
+            color={activeTab === tab.key ? DT.onSurface : DT.textMuted}
+          />
           <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>
             {tab.label}
           </Text>
-          {tab.key === "solicitudes" && pendientes > 0 && (
-            <View style={styles.tabBadge}>
-              <Text style={styles.tabBadgeText}>{pendientes}</Text>
-            </View>
-          )}
+          {tab.key === "solicitudes" && pendientes > 0 && <View style={styles.tabBadge} />}
         </TouchableOpacity>
       ))}
     </View>
@@ -154,27 +209,26 @@ const ContactCard: React.FC<{
       <ContactAvatar
         nombre={contacto.nombre}
         apellidos={contacto.apellidos}
+        size={44}
         enLinea={contacto.enLinea}
       />
       <View style={styles.contactInfo}>
         <Text style={styles.contactName}>
           {contacto.nombre} {contacto.apellidos}
         </Text>
-        <Text style={styles.contactMateria}>{contacto.materia || "Docente"}</Text>
+        {contacto.institucion ? (
+          <Text style={styles.contactSchool} numberOfLines={1}>
+            {contacto.institucion}
+          </Text>
+        ) : null}
+        <Text style={styles.contactMateria} numberOfLines={1}>
+          {contacto.materia || "Docente"}
+        </Text>
       </View>
     </View>
-    <View style={styles.contactActions}>
-      <TouchableOpacity style={styles.contactActionBtn} onPress={onChat} activeOpacity={0.7}>
-        <MaterialIcons name="chat-bubble" size={20} color={COLORS.primary} />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.contactActionBtn}
-        onPress={() => onMore(contacto)}
-        activeOpacity={0.7}
-      >
-        <MaterialIcons name="more-vert" size={20} color={COLORS.textMuted} />
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity style={styles.contactChatBtn} onPress={onChat} activeOpacity={0.7}>
+      <MaterialIcons name="chat" size={18} color={DT.primaryContainer} />
+    </TouchableOpacity>
   </TouchableOpacity>
 );
 
@@ -190,7 +244,7 @@ const SolicitudCard: React.FC<{
       <ContactAvatar
         nombre={solicitud.deUsuarioNombre.split(" ")[0] || ""}
         apellidos={solicitud.deUsuarioNombre.split(" ").slice(1).join(" ")}
-        size={56}
+        size={44}
       />
       <View style={styles.solicitudInfo}>
         <Text style={styles.contactName}>{solicitud.deUsuarioNombre}</Text>
@@ -201,7 +255,7 @@ const SolicitudCard: React.FC<{
     </View>
     {solicitud.mensaje ? (
       <View style={styles.solicitudMsgBubble}>
-        <MaterialIcons name="format-quote" size={16} color={COLORS.outlineVariant} />
+        <MaterialIcons name="format-quote" size={16} color={DT.outlineVariant} />
         <Text style={styles.solicitudMsgText}>{solicitud.mensaje}</Text>
       </View>
     ) : null}
@@ -212,12 +266,12 @@ const SolicitudCard: React.FC<{
         activeOpacity={0.85}
       >
         <LinearGradient
-          colors={[COLORS.primary, COLORS.primaryContainer]}
+          colors={[DT.primaryContainer, "#005da8"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.btnGradient}
         >
-          <MaterialIcons name="check-circle" size={16} color="#FFF" />
+          <MaterialIcons name="check" size={16} color="#FFF" />
           <Text style={styles.btnAceptarText}>Aceptar</Text>
         </LinearGradient>
       </TouchableOpacity>
@@ -226,6 +280,7 @@ const SolicitudCard: React.FC<{
         onPress={() => onRechazar(solicitud.id)}
         activeOpacity={0.7}
       >
+        <MaterialIcons name="close" size={16} color={DT.textMuted} />
         <Text style={styles.btnRechazarText}>Rechazar</Text>
       </TouchableOpacity>
     </View>
@@ -249,38 +304,44 @@ const ProfileBottomSheet: React.FC<{
           <TouchableOpacity activeOpacity={1}>
             <View style={styles.sheetHandle} />
             <View style={styles.sheetProfile}>
-              <ContactAvatar nombre={contacto.nombre} apellidos={contacto.apellidos} size={96} />
+              <ContactAvatar nombre={contacto.nombre} apellidos={contacto.apellidos} size={72} />
               <Text style={styles.sheetName}>
                 {contacto.nombre} {contacto.apellidos}
               </Text>
               <Text style={styles.sheetInstitution}>{contacto.institucion || ""}</Text>
+              {contacto.materia ? (
+                <View style={styles.sheetLevelBadge}>
+                  <Text style={styles.sheetLevelBadgeText}>{contacto.materia}</Text>
+                </View>
+              ) : null}
             </View>
 
             <View style={styles.sheetStats}>
               <View style={styles.sheetStatItem}>
                 <Text style={styles.sheetStatValue}>—</Text>
-                <Text style={styles.sheetStatLabel}>CONTACTOS</Text>
+                <Text style={styles.sheetStatLabel}>Contactos</Text>
               </View>
               <View style={styles.sheetStatDivider} />
               <View style={styles.sheetStatItem}>
                 <Text style={styles.sheetStatValue}>—</Text>
-                <Text style={styles.sheetStatLabel}>RECURSOS</Text>
+                <Text style={styles.sheetStatLabel}>Recursos</Text>
               </View>
               <View style={styles.sheetStatDivider} />
               <View style={styles.sheetStatItem}>
                 <Text style={styles.sheetStatValue}>—</Text>
-                <Text style={styles.sheetStatLabel}>GRUPOS</Text>
+                <Text style={styles.sheetStatLabel}>Grupos</Text>
               </View>
             </View>
 
             {contacto.email ? (
               <View style={styles.sheetInfoCard}>
                 <View style={styles.sheetInfoIcon}>
-                  <MaterialIcons name="alternate-email" size={20} color={COLORS.primary} />
+                  <MaterialIcons name="alternate-email" size={18} color={DT.textSecondary} />
                 </View>
-                <View>
-                  <Text style={styles.sheetInfoLabel}>CORREO ELECTRÓNICO</Text>
-                  <Text style={styles.sheetInfoValue}>{contacto.email}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.sheetInfoValue} numberOfLines={1}>
+                    {contacto.email}
+                  </Text>
                 </View>
               </View>
             ) : null}
@@ -288,11 +349,23 @@ const ProfileBottomSheet: React.FC<{
             {contacto.materia ? (
               <View style={styles.sheetInfoCard}>
                 <View style={styles.sheetInfoIcon}>
-                  <MaterialIcons name="menu-book" size={20} color={COLORS.primary} />
+                  <MaterialIcons name="school" size={18} color={DT.textSecondary} />
                 </View>
                 <View>
-                  <Text style={styles.sheetInfoLabel}>MATERIA PRINCIPAL</Text>
                   <Text style={styles.sheetInfoValue}>{contacto.materia}</Text>
+                </View>
+              </View>
+            ) : null}
+
+            {contacto.institucion ? (
+              <View style={styles.sheetInfoCard}>
+                <View style={styles.sheetInfoIcon}>
+                  <MaterialIcons name="location-on" size={18} color={DT.textSecondary} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.sheetInfoValue} numberOfLines={1}>
+                    {contacto.institucion}
+                  </Text>
                 </View>
               </View>
             ) : null}
@@ -300,7 +373,7 @@ const ProfileBottomSheet: React.FC<{
             <View style={styles.sheetActions}>
               <TouchableOpacity onPress={onMessage} activeOpacity={0.85}>
                 <LinearGradient
-                  colors={[COLORS.primary, COLORS.primaryContainer]}
+                  colors={[DT.primaryContainer, "#005da8"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={styles.sheetPrimaryBtn}
@@ -310,12 +383,14 @@ const ProfileBottomSheet: React.FC<{
                 </LinearGradient>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.sheetSecondaryBtn}
+                style={styles.sheetDeleteBtn}
                 onPress={() => onDelete(contacto.id)}
                 activeOpacity={0.7}
               >
-                <MaterialIcons name="person-remove" size={18} color={COLORS.error} />
-                <Text style={styles.sheetSecondaryBtnText}>Eliminar contacto</Text>
+                <Text style={styles.sheetDeleteBtnText}>Bloquear</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.sheetCloseBtn} onPress={onClose} activeOpacity={0.7}>
+                <Text style={styles.sheetCloseBtnText}>Cerrar</Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
@@ -327,22 +402,34 @@ const ProfileBottomSheet: React.FC<{
 
 // ─── Empty State ───
 
-const EmptyState: React.FC<{ tab: SocialTab }> = ({ tab }) => {
+const EmptyState: React.FC<{ tab: SocialTab; onBuscar?: () => void }> = ({ tab, onBuscar }) => {
   const configs = {
     contactos: {
-      icon: "people" as const,
+      icon: "people-outline" as const,
       title: "Aún no tienes contactos",
-      subtitle: "Busca docentes para conectar y colaborar en proyectos académicos.",
+      subtitle: "Busca y conecta con otros docentes para compartir materiales y colaborar.",
+      primaryBtn: "Buscar docentes",
+      primaryIcon: "search" as const,
+      secondaryBtn: "Invitar por enlace",
+      secondaryIcon: "link" as const,
     },
     solicitudes: {
-      icon: "mail" as const,
+      icon: "mail-outline" as const,
       title: "Sin solicitudes pendientes",
       subtitle: "Cuando otros docentes quieran conectar contigo, sus solicitudes aparecerán aquí.",
+      primaryBtn: null,
+      primaryIcon: null,
+      secondaryBtn: null,
+      secondaryIcon: null,
     },
     buscar: {
       icon: "person-search" as const,
       title: "Busca compañeros docentes",
       subtitle: "Usa el buscador para encontrar docentes por nombre, materia o institución.",
+      primaryBtn: null,
+      primaryIcon: null,
+      secondaryBtn: null,
+      secondaryIcon: null,
     },
   };
   const cfg = configs[tab];
@@ -350,10 +437,22 @@ const EmptyState: React.FC<{ tab: SocialTab }> = ({ tab }) => {
   return (
     <View style={styles.emptyState}>
       <View style={styles.emptyIconWrap}>
-        <MaterialIcons name={cfg.icon} size={56} color={COLORS.outlineVariant} />
+        <MaterialIcons name={cfg.icon} size={64} color={DT.outlineVariant} />
       </View>
       <Text style={styles.emptyTitle}>{cfg.title}</Text>
       <Text style={styles.emptySubtitle}>{cfg.subtitle}</Text>
+      {cfg.primaryBtn && (
+        <TouchableOpacity style={styles.emptyPrimaryBtn} onPress={onBuscar} activeOpacity={0.85}>
+          <MaterialIcons name={cfg.primaryIcon!} size={18} color="#FFF" />
+          <Text style={styles.emptyPrimaryBtnText}>{cfg.primaryBtn}</Text>
+        </TouchableOpacity>
+      )}
+      {cfg.secondaryBtn && (
+        <TouchableOpacity style={styles.emptySecondaryBtn} activeOpacity={0.7}>
+          <MaterialIcons name={cfg.secondaryIcon!} size={18} color={DT.onSurface} />
+          <Text style={styles.emptySecondaryBtnText}>{cfg.secondaryBtn}</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -390,7 +489,10 @@ const SocialScreen: React.FC = () => {
       ) : (
         <View style={styles.sectionBlock}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Mis Contactos</Text>
+            <Text style={styles.sectionTitle}>MIS CONTACTOS</Text>
+            <TouchableOpacity activeOpacity={0.7}>
+              <Text style={styles.sectionLink}>Ver todos →</Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.contactList}>
             {vm.contactos.map((contacto) => (
@@ -449,7 +551,7 @@ const SocialScreen: React.FC = () => {
               Enviadas
             </Text>
             {vm.solicitudesEnviadas.length > 0 && (
-              <View style={[styles.subTabBadge, { backgroundColor: COLORS.textMuted }]}>
+              <View style={[styles.subTabBadge, { backgroundColor: DT.textMuted }]}>
                 <Text style={styles.subTabBadgeText}>{vm.solicitudesEnviadas.length}</Text>
               </View>
             )}
@@ -477,68 +579,77 @@ const SocialScreen: React.FC = () => {
   // ─── Buscar Tab ───
   const renderBuscarTab = () => (
     <>
-      <Text style={styles.searchHero}>
-        Encuentra a tu próximo{"\n"}
-        <Text style={styles.searchHeroAccent}>compañero docente</Text>
-      </Text>
-
       <View style={styles.searchBarWrap}>
-        <MaterialIcons name="search" size={22} color={COLORS.textMuted} />
+        <MaterialIcons name="search" size={20} color={DT.textMuted} />
         <TextInput
           style={styles.searchInput}
-          placeholder="¿A quién buscas?"
-          placeholderTextColor={COLORS.textMuted}
+          placeholder="Buscar por nombre, email o escuela..."
+          placeholderTextColor={DT.textMuted}
           value={vm.searchQuery}
           onChangeText={vm.setSearchQuery}
         />
         {vm.searchQuery.length > 0 && (
           <TouchableOpacity onPress={() => vm.setSearchQuery("")}>
-            <MaterialIcons name="close" size={20} color={COLORS.textMuted} />
+            <MaterialIcons name="close" size={20} color={DT.textMuted} />
           </TouchableOpacity>
         )}
       </View>
 
-      <View style={styles.filterChips}>
-        {["Todas las áreas", "Primaria", "Secundaria", "Universidad"].map((label, i) => (
-          <View key={label} style={[styles.chip, i === 0 && styles.chipActive]}>
-            <Text style={[styles.chipText, i === 0 && styles.chipTextActive]}>{label}</Text>
-          </View>
-        ))}
-      </View>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filterChipsScroll}
+      >
+        <View style={styles.filterChips}>
+          {["Todos", "Primaria", "Secundaria", "Preparatoria", "Universidad"].map((label, i) => (
+            <View key={label} style={[styles.chip, i === 0 && styles.chipActive]}>
+              <Text style={[styles.chipText, i === 0 && styles.chipTextActive]}>{label}</Text>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
 
       {vm.searchQuery.trim() ? (
         vm.contactos.length === 0 ? (
           <View style={styles.emptyState}>
-            <MaterialIcons name="search-off" size={48} color={COLORS.outlineVariant} />
-            <Text style={styles.emptyTitle}>Sin resultados</Text>
+            <MaterialIcons name="search-off" size={48} color={DT.outlineVariant} />
+            <Text style={styles.emptyTitle}>No se encontraron docentes</Text>
             <Text style={styles.emptySubtitle}>
-              No se encontraron contactos con "{vm.searchQuery}"
+              Intenta buscar con otro nombre, email o escuela
             </Text>
+            <TouchableOpacity style={styles.emptyInviteBtn} activeOpacity={0.7}>
+              <MaterialIcons name="link" size={16} color={DT.primaryContainer} />
+              <Text style={styles.emptyInviteBtnText}>Invitar por enlace</Text>
+            </TouchableOpacity>
           </View>
         ) : (
           <View style={[styles.searchResults, isDesktop && styles.searchResultsDesktop]}>
             {vm.contactos.map((c) => (
-              <View key={c.id} style={[styles.searchResultCard, liftShadow]}>
+              <View key={c.id} style={[styles.searchResultCard, cardShadow]}>
                 <View style={styles.searchResultHeader}>
-                  <ContactAvatar nombre={c.nombre} apellidos={c.apellidos} size={56} />
+                  <ContactAvatar nombre={c.nombre} apellidos={c.apellidos} size={48} />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.contactName}>
                       {c.nombre} {c.apellidos}
                     </Text>
+                    {c.institucion ? (
+                      <Text style={styles.contactSchool} numberOfLines={1}>
+                        {c.institucion}
+                      </Text>
+                    ) : null}
                     <Text style={styles.contactMateria}>{c.materia || "Docente"}</Text>
                   </View>
+                  <TouchableOpacity onPress={() => vm.handleSelectContacto(c)} activeOpacity={0.85}>
+                    <LinearGradient
+                      colors={[DT.primaryContainer, "#005da8"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.connectBtn}
+                    >
+                      <Text style={styles.connectBtnText}>Conectar</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={() => vm.handleSelectContacto(c)} activeOpacity={0.85}>
-                  <LinearGradient
-                    colors={[COLORS.primary, COLORS.primaryContainer]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.connectBtn}
-                  >
-                    <Text style={styles.connectBtnText}>Ver perfil</Text>
-                    <MaterialIcons name="arrow-forward" size={14} color="#FFF" />
-                  </LinearGradient>
-                </TouchableOpacity>
               </View>
             ))}
           </View>
@@ -549,13 +660,25 @@ const SocialScreen: React.FC = () => {
     </>
   );
 
-  // ─── Loading State ───
+  // ─── Loading State (Skeleton) ───
   if (vm.isLoading) {
     return (
       <SafeAreaView style={styles.safe} edges={["top"]}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>Cargando...</Text>
+        <StatusBar backgroundColor={DT.surface} barStyle="dark-content" />
+        <View style={styles.skeletonContent}>
+          <View style={styles.skeletonPill} />
+          <View style={styles.skeletonTabBar} />
+          <View style={styles.skeletonStatsRow}>
+            {[0, 1, 2].map((i) => (
+              <View key={i} style={styles.skeletonStatBadge} />
+            ))}
+          </View>
+          {[0, 1, 2, 3, 4].map((i) => (
+            <View key={i} style={styles.skeletonContactCard} />
+          ))}
+          {[0, 1].map((i) => (
+            <View key={i} style={styles.skeletonMessageCard} />
+          ))}
         </View>
       </SafeAreaView>
     );
@@ -563,14 +686,7 @@ const SocialScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <View style={styles.headerIconWrap}>
-            <MaterialIcons name="group" size={22} color={COLORS.primary} />
-          </View>
-          <Text style={styles.headerTitle}>Social</Text>
-        </View>
-      </View>
+      <StatusBar backgroundColor={DT.surface} barStyle="dark-content" />
 
       <ScrollView
         style={styles.scrollView}
@@ -582,12 +698,18 @@ const SocialScreen: React.FC = () => {
           <RefreshControl
             refreshing={vm.isRefreshing}
             onRefresh={vm.handleRefresh}
-            tintColor={COLORS.primary}
-            colors={[COLORS.primary]}
+            tintColor={DT.primaryContainer}
+            colors={[DT.primaryContainer]}
           />
         }
         showsVerticalScrollIndicator={false}
       >
+        <AnimatedTopPill
+          icon="people"
+          title="Social"
+          subtitle="Conecta y colabora con otros docentes"
+        />
+
         <TabBar
           activeTab={vm.activeTab}
           onTabChange={vm.handleTabChange}
@@ -597,6 +719,16 @@ const SocialScreen: React.FC = () => {
         {vm.activeTab === "contactos" && renderContactosTab()}
         {vm.activeTab === "solicitudes" && renderSolicitudesTab()}
         {vm.activeTab === "buscar" && renderBuscarTab()}
+
+        {/* Tip Card */}
+        {vm.activeTab === "contactos" && vm.contactos.length > 0 && (
+          <View style={styles.tipCard}>
+            <MaterialIcons name="lightbulb" size={18} color={DT.primaryContainer} />
+            <Text style={styles.tipCardText}>
+              Conecta con docentes de tu misma materia para compartir planeaciones y recursos.
+            </Text>
+          </View>
+        )}
       </ScrollView>
 
       <ProfileBottomSheet
@@ -616,153 +748,141 @@ const SocialScreen: React.FC = () => {
 // ─── Styles ───
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.background },
-
-  // Header
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: COLORS.surfaceContainerLow,
-  },
-  headerLeft: { flexDirection: "row", alignItems: "center", gap: 10 },
-  headerIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: COLORS.primaryTint,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: COLORS.primary,
-    letterSpacing: -0.3,
-  },
+  safe: { flex: 1, backgroundColor: DT.surface },
 
   // ScrollView
   scrollView: { flex: 1 },
-  scrollContent: { padding: 16, paddingBottom: 100, gap: 24 },
+  scrollContent: { padding: 16, paddingTop: 54, paddingBottom: 110, gap: 14 },
 
   // Tab Bar
   tabBar: {
     flexDirection: "row",
-    gap: 6,
     padding: 4,
-    backgroundColor: COLORS.surfaceContainer,
-    borderRadius: 28,
+    backgroundColor: DT.surfaceLow,
+    borderRadius: 14,
+    height: 44,
   },
   tab: {
     flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 24,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
     gap: 6,
   },
-  tabActive: { backgroundColor: COLORS.primary },
-  tabText: { fontSize: 13, fontWeight: "600", color: COLORS.textSecondary },
-  tabTextActive: { color: "#FFF", fontWeight: "700" },
+  tabActive: {
+    backgroundColor: DT.surfaceLowest,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 8px rgba(0,72,132,0.08)" } as any,
+      default: {
+        shadowColor: "#004884",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 2,
+      },
+    }),
+  },
+  tabText: { fontSize: 14, fontWeight: "500", color: DT.textMuted },
+  tabTextActive: { color: DT.onSurface, fontWeight: "700" },
   tabBadge: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.error,
+    backgroundColor: DT.error,
   },
-  tabBadgeText: { display: "none" } as any,
 
-  // Stats Row
-  statsRow: { flexDirection: "row", gap: 10 },
-  statCard: {
-    flex: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 8,
-    borderRadius: 16,
+  // Stats Row (mini-badges)
+  statsRow: { flexDirection: "row", gap: 8 },
+  statBadge: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    gap: 4,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
   },
-  statCardDefault: { backgroundColor: COLORS.surface },
-  statCardPrimary: { backgroundColor: COLORS.primaryContainer },
-  statCardMuted: { backgroundColor: COLORS.surfaceContainerLow },
-  statValue: { fontSize: 24, fontWeight: "800" },
-  statLabel: {
-    fontSize: 10,
+  statBadgeText: {
+    fontSize: 12,
     fontWeight: "700",
-    color: COLORS.textMuted,
-    letterSpacing: 1.2,
-    marginTop: 2,
   },
 
   // Sections
-  sectionBlock: { gap: 12 },
+  sectionBlock: { gap: 10 },
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
-  sectionTitle: { fontSize: 17, fontWeight: "700", color: COLORS.text },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: "800",
+    color: DT.textMuted,
+    letterSpacing: 1.1,
+  },
+  sectionLink: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: DT.primaryContainer,
+  },
 
   // Contact Card
   contactList: { gap: 10 },
   contactCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: DT.surfaceLowest,
     padding: 14,
-    borderRadius: 16,
+    borderRadius: 14,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
   contactCardInner: { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
   contactInfo: { flex: 1 },
-  contactName: { fontSize: 15, fontWeight: "700", color: COLORS.text },
-  contactMateria: { fontSize: 12, fontWeight: "500", color: COLORS.textMuted, marginTop: 2 },
-  contactActions: { flexDirection: "row", gap: 6 },
-  contactActionBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: COLORS.surfaceContainerHigh,
+  contactName: { fontSize: 15, fontWeight: "700", color: DT.onSurface },
+  contactSchool: { fontSize: 13, color: DT.textSecondary, marginTop: 1 },
+  contactMateria: { fontSize: 12, fontWeight: "500", color: DT.textMuted, marginTop: 1 },
+  contactChatBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: DT.primaryFixed,
     alignItems: "center",
     justifyContent: "center",
   },
 
   // Avatar
   avatar: {
-    backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
   },
   avatarText: { color: "#FFF", fontWeight: "700" },
   onlineDot: {
     position: "absolute",
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     borderWidth: 2,
     borderColor: "#FFF",
   },
 
   // Solicitud Card
-  solicitudList: { gap: 12 },
+  solicitudList: { gap: 10 },
   solicitudCard: {
-    backgroundColor: COLORS.surface,
-    padding: 16,
-    borderRadius: 16,
+    backgroundColor: DT.surfaceLowest,
+    padding: 14,
+    borderRadius: 14,
   },
-  solicitudHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 12 },
+  solicitudHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 10 },
   solicitudInfo: { flex: 1 },
   solicitudMsgBubble: {
-    backgroundColor: COLORS.surfaceContainerLow,
-    borderTopRightRadius: 16,
-    borderBottomRightRadius: 16,
-    borderBottomLeftRadius: 16,
-    padding: 12,
-    marginBottom: 14,
+    backgroundColor: DT.surfaceLow,
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    borderBottomLeftRadius: 10,
+    padding: 10,
+    marginBottom: 10,
     flexDirection: "row",
     gap: 8,
     alignItems: "flex-start",
@@ -770,114 +890,114 @@ const styles = StyleSheet.create({
   solicitudMsgText: {
     flex: 1,
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: DT.textSecondary,
     fontStyle: "italic",
     lineHeight: 18,
   },
-  solicitudBtns: { flexDirection: "row", gap: 10 },
+  solicitudBtns: { flexDirection: "row", gap: 8 },
   btnAceptar: { flex: 1 },
   btnGradient: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
-    paddingVertical: 12,
-    borderRadius: 24,
+    height: 38,
+    borderRadius: 10,
   },
-  btnAceptarText: { color: "#FFF", fontWeight: "700", fontSize: 14 },
+  btnAceptarText: { color: "#FFF", fontWeight: "700", fontSize: 13 },
   btnRechazar: {
     flex: 1,
-    backgroundColor: COLORS.surfaceContainerHigh,
-    paddingVertical: 12,
-    borderRadius: 24,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 4,
+    backgroundColor: DT.surfaceContainer,
+    height: 38,
+    borderRadius: 10,
   },
-  btnRechazarText: { color: COLORS.textSecondary, fontWeight: "700", fontSize: 14 },
+  btnRechazarText: { color: DT.textMuted, fontWeight: "700", fontSize: 13 },
 
   // Sub Tabs
-  subTabRow: { flexDirection: "row", gap: 10 },
+  subTabRow: { flexDirection: "row", gap: 0 },
   subTab: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 24,
-    backgroundColor: COLORS.surfaceContainerLow,
-  },
-  subTabActive: { backgroundColor: COLORS.surfaceContainerHighest },
-  subTabText: { fontWeight: "600", fontSize: 14, color: COLORS.textSecondary },
-  subTabTextActive: { fontWeight: "700", color: COLORS.primary },
-  subTabBadge: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: COLORS.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  subTabBadgeText: { color: "#FFF", fontSize: 10, fontWeight: "700" },
-
-  // Search Tab
-  searchHero: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: COLORS.text,
-    letterSpacing: -0.5,
-    lineHeight: 34,
-  },
-  searchHeroAccent: { color: COLORS.primary },
-  searchBarWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: COLORS.surface,
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    gap: 10,
-    ...Platform.select({
-      web: { boxShadow: "0px 24px 48px rgba(0,72,132,0.04)" } as any,
-      default: {
-        shadowColor: "#004884",
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.04,
-        shadowRadius: 24,
-        elevation: 2,
-      },
-    }),
-  },
-  searchInput: { flex: 1, fontSize: 16, fontWeight: "500", color: COLORS.text },
-  filterChips: { flexDirection: "row", gap: 8, flexWrap: "wrap" },
-  chip: {
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 24,
-    backgroundColor: COLORS.surfaceContainerHigh,
-  },
-  chipActive: { backgroundColor: COLORS.primary },
-  chipText: { fontSize: 13, fontWeight: "600", color: COLORS.textSecondary },
-  chipTextActive: { color: "#FFF", fontWeight: "700" },
-
-  // Search Results
-  searchResults: { gap: 12 },
-  searchResultsDesktop: { flexDirection: "row", flexWrap: "wrap" },
-  searchResultCard: {
-    backgroundColor: COLORS.surface,
-    padding: 16,
-    borderRadius: 16,
-    gap: 14,
-  },
-  searchResultHeader: { flexDirection: "row", alignItems: "center", gap: 12 },
-  connectBtn: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
-    paddingVertical: 12,
-    borderRadius: 24,
+    paddingVertical: 9,
+    borderRadius: 10,
+    backgroundColor: DT.surfaceContainer,
   },
-  connectBtnText: { color: "#FFF", fontWeight: "700", fontSize: 14 },
+  subTabActive: {
+    backgroundColor: DT.surfaceLowest,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 8px rgba(0,72,132,0.08)" } as any,
+      default: {
+        shadowColor: "#004884",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 2,
+      },
+    }),
+  },
+  subTabText: { fontWeight: "500", fontSize: 13, color: DT.textMuted },
+  subTabTextActive: { fontWeight: "700", color: DT.onSurface },
+  subTabBadge: {
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: DT.primaryContainer,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
+  subTabBadgeText: { color: "#FFF", fontSize: 10, fontWeight: "700" },
+
+  // Search Tab
+  searchBarWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: DT.surfaceContainer,
+    borderRadius: 14,
+    height: 48,
+    paddingHorizontal: 14,
+    gap: 8,
+  },
+  searchInput: { flex: 1, fontSize: 15, fontWeight: "500", color: DT.onSurface },
+  filterChipsScroll: { maxHeight: 36 },
+  filterChips: { flexDirection: "row", gap: 8 },
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 999,
+    height: 32,
+    backgroundColor: DT.surfaceContainer,
+    justifyContent: "center",
+  },
+  chipActive: { backgroundColor: DT.primaryContainer },
+  chipText: { fontSize: 13, fontWeight: "600", color: DT.textMuted },
+  chipTextActive: { color: "#FFF", fontWeight: "700" },
+
+  // Search Results
+  searchResults: { gap: 10 },
+  searchResultsDesktop: { flexDirection: "row", flexWrap: "wrap" },
+  searchResultCard: {
+    backgroundColor: DT.surfaceLowest,
+    padding: 14,
+    borderRadius: 14,
+  },
+  searchResultHeader: { flexDirection: "row", alignItems: "center", gap: 12 },
+  connectBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 10,
+    height: 34,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  connectBtnText: { color: "#FFF", fontWeight: "700", fontSize: 13 },
 
   // Empty State
   emptyState: {
@@ -887,147 +1007,236 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   emptyIconWrap: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    backgroundColor: COLORS.surfaceContainerHigh,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: DT.surfaceContainer,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 8,
   },
-  emptyTitle: { fontSize: 18, fontWeight: "700", color: COLORS.text },
+  emptyTitle: { fontSize: 22, fontWeight: "700", color: DT.onSurface, textAlign: "center" },
   emptySubtitle: {
-    fontSize: 14,
-    color: COLORS.textMuted,
+    fontSize: 15,
+    color: DT.textMuted,
     textAlign: "center",
-    lineHeight: 20,
+    lineHeight: 22,
     maxWidth: 280,
   },
-
-  // Loading
-  loadingContainer: {
-    flex: 1,
+  emptyPrimaryBtn: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 12,
+    gap: 8,
+    backgroundColor: DT.primaryContainer,
+    height: 50,
+    borderRadius: 12,
+    width: "100%",
+    maxWidth: 320,
+    marginTop: 8,
   },
-  loadingText: { fontSize: 14, color: COLORS.textMuted },
+  emptyPrimaryBtnText: { color: "#FFF", fontSize: 15, fontWeight: "800" },
+  emptySecondaryBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: DT.surfaceContainer,
+    height: 48,
+    borderRadius: 12,
+    width: "100%",
+    maxWidth: 320,
+  },
+  emptySecondaryBtnText: { color: DT.onSurface, fontSize: 15, fontWeight: "700" },
+  emptyInviteBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    backgroundColor: DT.primaryFixed,
+    height: 44,
+    borderRadius: 10,
+    paddingHorizontal: 20,
+    marginTop: 8,
+  },
+  emptyInviteBtnText: { color: DT.primaryContainer, fontSize: 14, fontWeight: "700" },
+
+  // Skeleton Loading
+  skeletonContent: {
+    paddingHorizontal: 16,
+    paddingTop: 60,
+    gap: 14,
+  },
+  skeletonPill: {
+    width: 160,
+    height: 32,
+    borderRadius: 999,
+    backgroundColor: DT.skeleton,
+    opacity: 0.5,
+  },
+  skeletonTabBar: {
+    width: "100%",
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: DT.skeleton,
+    opacity: 0.5,
+  },
+  skeletonStatsRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  skeletonStatBadge: {
+    width: 100,
+    height: 28,
+    borderRadius: 999,
+    backgroundColor: DT.skeleton,
+    opacity: 0.4,
+  },
+  skeletonContactCard: {
+    width: "100%",
+    height: 72,
+    borderRadius: 14,
+    backgroundColor: DT.skeleton,
+    opacity: 0.5,
+  },
+  skeletonMessageCard: {
+    width: "100%",
+    height: 60,
+    borderRadius: 14,
+    backgroundColor: DT.skeleton,
+    opacity: 0.4,
+  },
+
+  // Tip Card
+  tipCard: {
+    flexDirection: "row",
+    gap: 8,
+    backgroundColor: DT.primaryFixed,
+    borderRadius: 12,
+    padding: 12,
+    alignItems: "flex-start",
+  },
+  tipCardText: {
+    flex: 1,
+    fontSize: 13,
+    color: DT.primaryContainer,
+    lineHeight: 18,
+  },
 
   // Profile Bottom Sheet
   sheetBackdrop: {
     flex: 1,
-    backgroundColor: "rgba(23,28,33,0.2)",
+    backgroundColor: DT.overlay,
     justifyContent: "flex-end",
   },
   sheetContainer: {
-    backgroundColor: COLORS.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: DT.surfaceLowest,
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
     ...Platform.select({
-      web: { boxShadow: "0px -4px 24px rgba(0,72,132,0.1)" } as any,
+      web: { boxShadow: "0px -12px 48px rgba(0,69,128,0.12)" } as any,
       default: {
-        shadowColor: "#004884",
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 24,
+        shadowColor: "#004580",
+        shadowOffset: { width: 0, height: -12 },
+        shadowOpacity: 0.12,
+        shadowRadius: 48,
         elevation: 10,
       },
     }),
   },
   sheetHandle: {
-    width: 48,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: COLORS.outlineVariant,
+    width: 36,
+    height: 4,
+    borderRadius: 999,
+    backgroundColor: DT.outlineVariant,
     alignSelf: "center",
-    marginTop: 12,
+    marginTop: 14,
     marginBottom: 16,
     opacity: 0.3,
   },
-  sheetProfile: { alignItems: "center", paddingHorizontal: 24, paddingBottom: 20, gap: 6 },
-  sheetName: { fontSize: 22, fontWeight: "700", color: COLORS.text, marginTop: 12 },
-  sheetInstitution: { fontSize: 14, fontWeight: "500", color: COLORS.textSecondary },
+  sheetProfile: { alignItems: "center", paddingHorizontal: 24, paddingBottom: 16, gap: 4 },
+  sheetName: { fontSize: 20, fontWeight: "700", color: DT.onSurface, marginTop: 12 },
+  sheetInstitution: { fontSize: 15, fontWeight: "500", color: DT.textSecondary },
+  sheetLevelBadge: {
+    backgroundColor: DT.primaryFixed,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginTop: 4,
+  },
+  sheetLevelBadgeText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: DT.primaryContainer,
+  },
   sheetStats: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-    backgroundColor: COLORS.surfaceContainerLow,
-    borderRadius: 16,
+    backgroundColor: DT.surfaceLow,
+    borderRadius: 14,
     padding: 16,
     marginHorizontal: 24,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   sheetStatItem: { alignItems: "center" },
-  sheetStatValue: { fontSize: 18, fontWeight: "800", color: COLORS.primary },
+  sheetStatValue: { fontSize: 18, fontWeight: "700", color: DT.onSurface },
   sheetStatLabel: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: "600",
-    color: COLORS.textMuted,
-    letterSpacing: 0.5,
+    color: DT.textMuted,
     marginTop: 2,
   },
   sheetStatDivider: {
     width: 1,
-    height: 24,
-    backgroundColor: COLORS.outlineVariant,
-    opacity: 0.2,
+    height: 28,
+    backgroundColor: DT.outlineVariant,
+    opacity: 0.3,
   },
   sheetInfoCard: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 10,
     padding: 14,
-    backgroundColor: COLORS.surfaceContainerHigh,
-    borderRadius: 12,
+    backgroundColor: DT.surfaceLow,
+    borderRadius: 14,
     marginHorizontal: 24,
-    marginBottom: 10,
-    opacity: 0.9,
+    marginBottom: 8,
   },
   sheetInfoIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.surface,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: DT.surfaceLowest,
     alignItems: "center",
     justifyContent: "center",
   },
-  sheetInfoLabel: {
-    fontSize: 10,
-    fontWeight: "600",
-    color: COLORS.textMuted,
-    letterSpacing: 0.5,
-  },
-  sheetInfoValue: { fontSize: 14, fontWeight: "500", color: COLORS.text, marginTop: 2 },
-  sheetActions: { padding: 24, gap: 10 },
+  sheetInfoValue: { fontSize: 14, fontWeight: "500", color: DT.onSurface },
+  sheetActions: { padding: 24, gap: 8 },
   sheetPrimaryBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    paddingVertical: 16,
-    borderRadius: 28,
-    ...Platform.select({
-      web: { boxShadow: "0px 8px 16px rgba(0,69,128,0.2)" } as any,
-      default: {
-        shadowColor: COLORS.primary,
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.2,
-        shadowRadius: 16,
-        elevation: 4,
-      },
-    }),
+    height: 48,
+    borderRadius: 12,
   },
   sheetPrimaryBtnText: { color: "#FFF", fontWeight: "700", fontSize: 15 },
-  sheetSecondaryBtn: {
-    flexDirection: "row",
+  sheetDeleteBtn: {
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    paddingVertical: 16,
-    borderRadius: 28,
-    backgroundColor: COLORS.errorTint,
+    paddingVertical: 8,
+    marginTop: 4,
   },
-  sheetSecondaryBtnText: { color: COLORS.error, fontWeight: "700", fontSize: 15 },
+  sheetDeleteBtnText: { color: DT.error, fontWeight: "600", fontSize: 13 },
+  sheetCloseBtn: {
+    backgroundColor: DT.surfaceContainer,
+    height: 48,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sheetCloseBtnText: { color: DT.onSurface, fontWeight: "700", fontSize: 15 },
 });
 
 export default SocialScreen;

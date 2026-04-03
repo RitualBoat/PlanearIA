@@ -19,7 +19,14 @@ jest.mock("expo-linear-gradient", () => {
   };
 });
 
-jest.mock("../../components/AnimatedTopPill", () => "AnimatedTopPill");
+jest.mock("../../components/AnimatedTopPill", () => {
+  const React = require("react");
+  return ({ title, subtitle }: any) =>
+    React.createElement("View", { testID: "animated-top-pill" },
+      React.createElement("Text", null, title),
+      subtitle ? React.createElement("Text", null, subtitle) : null
+    );
+});
 
 // ─── ViewModel mock ───
 
@@ -122,17 +129,14 @@ describe("SocialScreen", () => {
 
   it("renderiza stats row con valores correctos", () => {
     const { getByText } = render(<SocialScreen />);
-    expect(getByText("2")).toBeTruthy(); // totalContactos
-    expect(getByText("0")).toBeTruthy(); // totalGrupos
-    expect(getByText("1")).toBeTruthy(); // pendientes
-    expect(getByText("CONTACTOS")).toBeTruthy();
-    expect(getByText("GRUPOS")).toBeTruthy();
-    expect(getByText("PENDIENTES")).toBeTruthy();
+    expect(getByText("2 Contactos")).toBeTruthy();
+    expect(getByText("1 Pendientes")).toBeTruthy();
+    expect(getByText("0 Mensajes")).toBeTruthy();
   });
 
   it("renderiza contactos en la tab Contactos", () => {
     const { getByText } = render(<SocialScreen />);
-    expect(getByText("Mis Contactos")).toBeTruthy();
+    expect(getByText("MIS CONTACTOS")).toBeTruthy();
     expect(getByText("María Hernández")).toBeTruthy();
     expect(getByText("José Ramírez")).toBeTruthy();
     expect(getByText("Investigación Académica")).toBeTruthy();
@@ -184,19 +188,19 @@ describe("SocialScreen", () => {
     expect(mockHandleRechazarSolicitud).toHaveBeenCalledWith(100);
   });
 
-  it("renderiza búsqueda con hero text en tab Buscar", () => {
+  it("renderiza búsqueda con search bar en tab Buscar", () => {
     mockCurrentVm = { ...defaultVm, activeTab: "buscar" };
-    const { getByText, getByPlaceholderText } = render(<SocialScreen />);
-    expect(getByText("compañero docente")).toBeTruthy();
-    expect(getByPlaceholderText("¿A quién buscas?")).toBeTruthy();
+    const { getByPlaceholderText } = render(<SocialScreen />);
+    expect(getByPlaceholderText("Buscar por nombre, email o escuela...")).toBeTruthy();
   });
 
   it("renderiza filter chips en tab Buscar", () => {
     mockCurrentVm = { ...defaultVm, activeTab: "buscar" };
     const { getByText } = render(<SocialScreen />);
-    expect(getByText("Todas las áreas")).toBeTruthy();
+    expect(getByText("Todos")).toBeTruthy();
     expect(getByText("Primaria")).toBeTruthy();
     expect(getByText("Secundaria")).toBeTruthy();
+    expect(getByText("Preparatoria")).toBeTruthy();
     expect(getByText("Universidad")).toBeTruthy();
   });
 
@@ -220,10 +224,12 @@ describe("SocialScreen", () => {
     expect(getByText("Sin solicitudes pendientes")).toBeTruthy();
   });
 
-  it("muestra estado de carga", () => {
+  it("muestra skeleton de carga", () => {
     mockCurrentVm = { ...defaultVm, isLoading: true };
-    const { getByText } = render(<SocialScreen />);
-    expect(getByText("Cargando...")).toBeTruthy();
+    const { queryByText, toJSON } = render(<SocialScreen />);
+    // Skeleton loading has no text - just placeholder shapes
+    expect(queryByText("Cargando...")).toBeNull();
+    expect(toJSON()).toBeTruthy();
   });
 
   it("renderiza sub-tabs Recibidas/Enviadas con badge", () => {

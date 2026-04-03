@@ -17,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { LinearGradient } from "expo-linear-gradient";
 import * as Sharing from "expo-sharing";
 import { COLORS } from "../../../types";
 import { RootStackParamList } from "../../navigation/StackNavigator";
@@ -161,34 +162,52 @@ const CategoryPill: React.FC<{
   active: boolean;
   count?: number;
   onPress: () => void;
-}> = ({ label, active, count, onPress }) => (
-  <TouchableOpacity
-    style={[styles.pill, active ? styles.pillActive : styles.pillInactive]}
-    onPress={onPress}
-    activeOpacity={0.7}
-    accessibilityRole="button"
-    accessibilityState={{ selected: active }}
-    accessibilityLabel={`Filtrar por ${label}`}
-  >
-    <Text style={[styles.pillText, active ? styles.pillTextActive : styles.pillTextInactive]}>
-      {label}
-    </Text>
-    {count !== undefined && (
-      <View
-        style={[
-          styles.pillBadge,
-          { backgroundColor: active ? "rgba(255,255,255,0.25)" : DT.surfaceHighest },
-        ]}
-      >
-        <Text
-          style={[styles.pillBadgeText, { color: active ? DT.onPrimary : DT.onSurfaceVariant }]}
+}> = ({ label, active, count, onPress }) => {
+  const inner = (
+    <>
+      <Text style={[styles.pillText, active ? styles.pillTextActive : styles.pillTextInactive]}>
+        {label}
+      </Text>
+      {count !== undefined && (
+        <View
+          style={[
+            styles.pillBadge,
+            { backgroundColor: active ? "rgba(255,255,255,0.25)" : DT.surfaceHighest },
+          ]}
         >
-          {count}
-        </Text>
-      </View>
-    )}
-  </TouchableOpacity>
-);
+          <Text
+            style={[styles.pillBadgeText, { color: active ? DT.onPrimary : DT.onSurfaceVariant }]}
+          >
+            {count}
+          </Text>
+        </View>
+      )}
+    </>
+  );
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
+      accessibilityLabel={`Filtrar por ${label}`}
+    >
+      {active ? (
+        <LinearGradient
+          colors={["#004580", "#005da8"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.pill, styles.pillActive]}
+        >
+          {inner}
+        </LinearGradient>
+      ) : (
+        <View style={[styles.pill, styles.pillInactive]}>{inner}</View>
+      )}
+    </TouchableOpacity>
+  );
+};
 
 const DraftCard: React.FC<{ item: ContenidoItem; onPress: () => void }> = ({ item, onPress }) => {
   const icon = CAT_ICONS[item.tipo] || "description";
@@ -223,7 +242,7 @@ const DraftCard: React.FC<{ item: ContenidoItem; onPress: () => void }> = ({ ite
           <View
             style={[
               styles.draftProgressFill,
-              { width: `${item.progreso}%`, backgroundColor: DT.primary },
+              { width: `${item.progreso}%`, backgroundColor: DT.secondary },
             ]}
           />
         </View>
@@ -236,7 +255,8 @@ const ContentItemCard: React.FC<{
   item: ContenidoItem;
   onPress: () => void;
   onMenuPress: () => void;
-}> = ({ item, onPress, onMenuPress }) => {
+  isDesktop?: boolean;
+}> = ({ item, onPress, onMenuPress, isDesktop }) => {
   const catColors = CAT_COLORS[item.tipo] || { text: DT.primary, bg: DT.primaryFixed };
   const catLabel = CATEGORIAS.find((c) => c.key === item.tipo)?.label?.toUpperCase() || "";
   const icon = item.tipoRecurso
@@ -245,7 +265,10 @@ const ContentItemCard: React.FC<{
 
   return (
     <TouchableOpacity
-      style={styles.contentCard}
+      style={[
+        styles.contentCard,
+        isDesktop && { borderLeftWidth: 4, borderLeftColor: catColors.text },
+      ]}
       onPress={onPress}
       activeOpacity={0.85}
       accessibilityLabel={item.titulo}
@@ -345,6 +368,12 @@ const ContenidoScreen: React.FC = () => {
           break;
         case "exportar":
           handleExportar(currentItem);
+          break;
+        case "asignar":
+          Alert.alert(
+            "Próximamente",
+            "Asignar a grupo estará disponible en una próxima actualización."
+          );
           break;
       }
     },
@@ -567,6 +596,31 @@ const ContenidoScreen: React.FC = () => {
     );
   };
 
+  // ─── Error state ───
+
+  const renderError = () => (
+    <View style={styles.errorContainer}>
+      <View style={styles.errorIconWrap}>
+        <MaterialIcons name="cloud-off" size={64} color={DT.outlineVariant} />
+      </View>
+      <Text style={styles.errorTitle}>No se pudo cargar tu contenido</Text>
+      <Text style={styles.errorSubtitle}>Revisa tu conexión a internet e intenta de nuevo</Text>
+      <TouchableOpacity style={styles.errorRetry} onPress={vm.retryLoad}>
+        <LinearGradient
+          colors={["#004580", "#005da8"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.errorRetryGradient}
+        >
+          <Text style={styles.errorRetryText}>Reintentar</Text>
+        </LinearGradient>
+      </TouchableOpacity>
+      <Text style={styles.errorFooter}>
+        SI EL PROBLEMA PERSISTE, TUS DATOS LOCALES ESTÁN SEGUROS
+      </Text>
+    </View>
+  );
+
   // ─── Empty state ───
 
   const renderEmpty = () => (
@@ -582,12 +636,21 @@ const ContenidoScreen: React.FC = () => {
         style={styles.emptyPrimary}
         onPress={() => navigation.navigate("Planeaciones")}
       >
-        <Text style={styles.emptyPrimaryText}>Crear planeación</Text>
+        <LinearGradient
+          colors={["#004580", "#005da8"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.emptyPrimaryGradient}
+        >
+          <MaterialIcons name="add-circle" size={20} color={DT.onPrimary} />
+          <Text style={styles.emptyPrimaryText}>Crear planeación</Text>
+        </LinearGradient>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.emptySecondary}
         onPress={() => navigation.navigate("CrearRecurso")}
       >
+        <MaterialIcons name="upload-file" size={20} color={DT.onSurface} />
         <Text style={styles.emptySecondaryText}>Subir recurso</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("BibliotecaPlantillas")}>
@@ -655,13 +718,19 @@ const ContenidoScreen: React.FC = () => {
                   </Text>
                   <Text style={styles.sheetSubtitle}>{menuItem.subtitulo}</Text>
                 </View>
+                <TouchableOpacity
+                  onPress={() => setMenuItem(null)}
+                  hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                  accessibilityLabel="Cerrar menú"
+                >
+                  <MaterialIcons name="close" size={22} color={DT.onSurfaceVariant} />
+                </TouchableOpacity>
               </View>
               <View style={styles.sheetDivider} />
               {[
                 { key: "editar", icon: "edit" as const, label: "Editar" },
                 { key: "duplicar", icon: "content-copy" as const, label: "Duplicar" },
-                { key: "compartir", icon: "share" as const, label: "Compartir" },
-                { key: "exportar", icon: "file-download" as const, label: "Exportar" },
+                { key: "asignar", icon: "group-add" as const, label: "Asignar a grupo" },
               ].map((opt) => (
                 <TouchableOpacity
                   key={opt.key}
@@ -672,6 +741,24 @@ const ContenidoScreen: React.FC = () => {
                   <Text style={styles.sheetOptionText}>{opt.label}</Text>
                 </TouchableOpacity>
               ))}
+              <View style={styles.sheetDivider} />
+              <TouchableOpacity
+                style={styles.sheetOption}
+                onPress={() => handleMenuAction("exportar")}
+              >
+                <MaterialIcons name="file-download" size={22} color={DT.onSurface} />
+                <View>
+                  <Text style={styles.sheetOptionText}>Exportar</Text>
+                  <Text style={styles.sheetOptionSubtext}>PDF, DOCX, PPTX</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.sheetOption}
+                onPress={() => handleMenuAction("compartir")}
+              >
+                <MaterialIcons name="share" size={22} color={DT.onSurface} />
+                <Text style={styles.sheetOptionText}>Compartir</Text>
+              </TouchableOpacity>
               <View style={styles.sheetDivider} />
               <TouchableOpacity
                 style={styles.sheetOption}
@@ -698,7 +785,9 @@ const ContenidoScreen: React.FC = () => {
     >
       <View style={styles.modalOverlay}>
         <View style={styles.deleteModal}>
-          <MaterialIcons name="warning" size={40} color={DT.error} />
+          <View style={styles.deleteIconBox}>
+            <MaterialIcons name="warning" size={32} color={DT.error} />
+          </View>
           <Text style={styles.deleteTitle}>¿Eliminar este elemento?</Text>
           <Text style={styles.deleteSubtitle}>
             Se eliminará &quot;{deleteConfirm?.titulo}&quot;. Esta acción no se puede deshacer.
@@ -753,9 +842,10 @@ const ContenidoScreen: React.FC = () => {
         item={item}
         onPress={() => handleItemPress(item)}
         onMenuPress={() => setMenuItem(item)}
+        isDesktop={isDesktop}
       />
     ),
-    [handleItemPress]
+    [handleItemPress, isDesktop]
   );
 
   const keyExtractor = useCallback((item: ContenidoItem) => item.id, []);
@@ -788,7 +878,6 @@ const ContenidoScreen: React.FC = () => {
           </TouchableOpacity>
         )}
       </View>
-
       {/* Category pills (mobile/tablet) */}
       {!isDesktop && (
         <ScrollView
@@ -807,24 +896,25 @@ const ContenidoScreen: React.FC = () => {
           ))}
         </ScrollView>
       )}
-
-      {/* Filter toggle button */}
-      <TouchableOpacity style={styles.filterToggle} onPress={() => setShowFilters(!showFilters)}>
-        <MaterialIcons name="tune" size={18} color={DT.onSurfaceVariant} />
-        <Text style={styles.filterToggleText}>Filtros</Text>
+      // ─── Filter toggle button ───
+      <View style={styles.filterToggleRow}>
+        <TouchableOpacity style={styles.filterToggle} onPress={() => setShowFilters(!showFilters)}>
+          <MaterialIcons name="tune" size={18} color={DT.onSurfaceVariant} />
+          <Text style={styles.filterToggleText}>Filtros</Text>
+          {vm.filtrosActivos > 0 && (
+            <View style={styles.filterBadge}>
+              <Text style={styles.filterBadgeText}>{vm.filtrosActivos}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
         {vm.filtrosActivos > 0 && (
-          <View style={styles.filterBadge}>
-            <Text style={styles.filterBadgeText}>{vm.filtrosActivos}</Text>
-          </View>
+          <Text style={styles.filterResultCount}>Mostrando {vm.items.length} resultados</Text>
         )}
-      </TouchableOpacity>
-
+      </View>
       {/* Filter chips */}
       {(showFilters || vm.filtrosActivos > 0) && renderFilterChips()}
-
       {/* Drafts */}
       {!vm.searchQuery && vm.filtrosActivos === 0 && renderDrafts()}
-
       {/* Section title */}
       <View style={styles.sectionHeaderRow}>
         <Text style={styles.sectionTitle}>Reciente</Text>
@@ -846,10 +936,29 @@ const ContenidoScreen: React.FC = () => {
     );
   }
 
+  if (vm.isError) {
+    return (
+      <SafeAreaView style={styles.safe} edges={["top"]}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Mi Contenido</Text>
+        </View>
+        {renderError()}
+      </SafeAreaView>
+    );
+  }
+
   const showEmpty = vm.totalItems === 0;
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
+      {/* Offline banner */}
+      {vm.isOffline && (
+        <View style={styles.offlineBanner}>
+          <MaterialIcons name="wifi-off" size={16} color={DT.primary} />
+          <Text style={styles.offlineBannerText}>Sin conexión — Mostrando datos guardados</Text>
+        </View>
+      )}
+
       {/* Header */}
       <View style={styles.header}>
         <View>
@@ -894,12 +1003,19 @@ const ContenidoScreen: React.FC = () => {
       {/* FAB */}
       {!showEmpty && (
         <TouchableOpacity
-          style={[styles.fab, isDesktop && styles.fabDesktop]}
+          style={[styles.fabWrap, isDesktop && styles.fabWrapDesktop]}
           onPress={handleCreatePress}
           activeOpacity={0.85}
           accessibilityLabel="Crear nuevo contenido"
         >
-          <MaterialIcons name="add" size={28} color={DT.onPrimary} />
+          <LinearGradient
+            colors={["#004580", "#005da8"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.fab, isDesktop && styles.fabDesktop]}
+          >
+            <MaterialIcons name="add" size={28} color={DT.onPrimary} />
+          </LinearGradient>
         </TouchableOpacity>
       )}
 
@@ -932,7 +1048,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: "700",
-    color: DT.onSurface,
+    color: DT.primary,
   },
   headerSubtitle: {
     fontSize: 13,
@@ -1002,12 +1118,17 @@ const styles = StyleSheet.create({
   },
 
   // Filter toggle
+  filterToggleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    marginTop: 12,
+  },
   filterToggle: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    paddingHorizontal: 16,
-    marginTop: 12,
   },
   filterToggleText: {
     fontSize: 13,
@@ -1015,7 +1136,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   filterBadge: {
-    backgroundColor: DT.primary,
+    backgroundColor: DT.secondary,
     borderRadius: 10,
     width: 20,
     height: 20,
@@ -1184,6 +1305,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 10,
     gap: 12,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 8px rgba(0,69,128,0.06)" },
+      default: { elevation: 2 },
+    }),
   },
   contentIcon: {
     width: 48,
@@ -1241,11 +1366,13 @@ const styles = StyleSheet.create({
 
   // Sidebar (desktop)
   sidebar: {
-    width: 240,
-    backgroundColor: DT.surfaceLow,
+    width: 288,
+    backgroundColor: "#f1f4fa",
     paddingTop: 20,
     paddingHorizontal: 12,
     gap: 4,
+    borderTopRightRadius: 16,
+    borderBottomRightRadius: 16,
   },
   sidebarItem: {
     flexDirection: "row",
@@ -1301,14 +1428,18 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptyPrimary: {
-    backgroundColor: DT.primary,
-    paddingHorizontal: 32,
-    height: 48,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
     width: "100%",
     maxWidth: 300,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  emptyPrimaryGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 48,
+    borderRadius: 12,
+    gap: 8,
   },
   emptyPrimaryText: {
     color: DT.onPrimary,
@@ -1316,14 +1447,16 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   emptySecondary: {
+    flexDirection: "row",
     backgroundColor: DT.surfaceHigh,
     paddingHorizontal: 32,
     height: 48,
-    borderRadius: 24,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
     maxWidth: 300,
+    gap: 8,
   },
   emptySecondaryText: {
     color: DT.onSurface,
@@ -1365,24 +1498,27 @@ const styles = StyleSheet.create({
   },
 
   // FAB
-  fab: {
+  fabWrap: {
     position: "absolute",
     right: 20,
     bottom: 24,
+  },
+  fabWrapDesktop: {
+    right: 32,
+    bottom: 32,
+  },
+  fab: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: DT.primary,
     alignItems: "center",
     justifyContent: "center",
     ...Platform.select({
-      web: { boxShadow: "0px 8px 24px rgba(0,69,128,0.15)" },
+      web: { boxShadow: "0px 24px 48px rgba(0,72,132,0.08)" },
       default: { elevation: 6 },
     }),
   },
   fabDesktop: {
-    right: 32,
-    bottom: 32,
     width: 64,
     height: 64,
     borderRadius: 32,
@@ -1396,11 +1532,15 @@ const styles = StyleSheet.create({
   },
   bottomSheet: {
     backgroundColor: DT.surfaceLowest,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
     paddingBottom: 32,
     paddingTop: 12,
     maxHeight: "60%",
+    ...Platform.select({
+      web: { boxShadow: "0px -24px 48px rgba(0,72,132,0.08)" },
+      default: { elevation: 8 },
+    }),
   },
   bottomSheetTablet: {
     alignSelf: "center",
@@ -1461,6 +1601,14 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: DT.onSurface,
   },
+  sheetOptionSubtext: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: DT.onSurfaceVariant,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    marginTop: 1,
+  },
 
   // Delete modal
   deleteModal: {
@@ -1470,9 +1618,21 @@ const styles = StyleSheet.create({
     marginHorizontal: 32,
     alignItems: "center",
     alignSelf: "center",
-    maxWidth: 400,
+    maxWidth: 480,
     width: "100%",
     gap: 8,
+    ...Platform.select({
+      web: { boxShadow: "0px 24px 48px rgba(0,72,132,0.15)" },
+      default: { elevation: 10 },
+    }),
+  },
+  deleteIconBox: {
+    width: 64,
+    height: 64,
+    borderRadius: 16,
+    backgroundColor: DT.errorContainer,
+    alignItems: "center",
+    justifyContent: "center",
   },
   deleteTitle: {
     fontSize: 20,
@@ -1494,8 +1654,8 @@ const styles = StyleSheet.create({
   },
   deleteCancel: {
     flex: 1,
-    height: 44,
-    borderRadius: 22,
+    height: 48,
+    borderRadius: 12,
     backgroundColor: DT.surfaceHigh,
     alignItems: "center",
     justifyContent: "center",
@@ -1507,16 +1667,107 @@ const styles = StyleSheet.create({
   },
   deleteConfirmBtn: {
     flex: 1,
-    height: 44,
-    borderRadius: 22,
+    height: 48,
+    borderRadius: 12,
     backgroundColor: DT.error,
     alignItems: "center",
     justifyContent: "center",
+    ...Platform.select({
+      web: { boxShadow: "0px 4px 12px rgba(186,26,26,0.2)" },
+      default: { elevation: 3 },
+    }),
   },
   deleteConfirmText: {
     fontSize: 15,
     fontWeight: "600",
     color: DT.onPrimary,
+  },
+
+  // Offline banner
+  offlineBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#facc15",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    gap: 8,
+  },
+  offlineBannerText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: DT.primary,
+  },
+
+  // Error state
+  errorContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 40,
+    gap: 12,
+  },
+  errorIconWrap: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: DT.surfaceLowest,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+    ...Platform.select({
+      web: { boxShadow: "0px 24px 48px rgba(0,72,132,0.08)" },
+      default: { elevation: 4 },
+    }),
+  },
+  errorTitle: {
+    fontSize: 22,
+    fontWeight: "800",
+    color: DT.primary,
+    textAlign: "center",
+  },
+  errorSubtitle: {
+    fontSize: 16,
+    color: DT.onSurfaceVariant,
+    textAlign: "center",
+    lineHeight: 24,
+  },
+  errorRetry: {
+    borderRadius: 12,
+    overflow: "hidden",
+    marginTop: 8,
+  },
+  errorRetryGradient: {
+    paddingHorizontal: 40,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    ...Platform.select({
+      web: { boxShadow: "0px 8px 16px rgba(0,69,128,0.15)" },
+      default: { elevation: 4 },
+    }),
+  },
+  errorRetryText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: DT.onPrimary,
+  },
+  errorFooter: {
+    fontSize: 10,
+    fontWeight: "600",
+    letterSpacing: 1,
+    color: DT.outlineVariant,
+    textAlign: "center",
+    marginTop: 20,
+  },
+
+  // Filter result count
+  filterResultCount: {
+    fontSize: 11,
+    fontWeight: "600",
+    letterSpacing: 0.8,
+    color: DT.onSurfaceVariant,
+    textTransform: "uppercase",
   },
 });
 

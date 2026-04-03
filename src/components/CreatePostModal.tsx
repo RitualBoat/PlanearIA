@@ -299,18 +299,46 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
               {/* Preview card */}
               {challengeTitulo.trim() ? (
-                <View style={[styles.challengePreview, { backgroundColor: colors.surfaceContainerLowest }]}>
-                  <Text style={{ fontSize: 10, fontWeight: "700", color: colors.onSurfaceVariant, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>
+                <View
+                  style={[
+                    styles.challengePreview,
+                    { backgroundColor: colors.surfaceContainerLowest },
+                  ]}
+                >
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      fontWeight: "700",
+                      color: colors.onSurfaceVariant,
+                      textTransform: "uppercase",
+                      letterSpacing: 0.8,
+                      marginBottom: 6,
+                    }}
+                  >
                     Vista previa
                   </Text>
                   <View style={[styles.challengePreviewBadge, { backgroundColor: colors.primary }]}>
-                    <Text style={{ color: "#FFF", fontSize: 9, fontWeight: "800", letterSpacing: 1 }}>RETO</Text>
+                    <Text
+                      style={{ color: "#FFF", fontSize: 9, fontWeight: "800", letterSpacing: 1 }}
+                    >
+                      RETO
+                    </Text>
                   </View>
-                  <Text style={{ fontWeight: "700", fontSize: 14, color: colors.onSurface, marginTop: 4 }}>
+                  <Text
+                    style={{
+                      fontWeight: "700",
+                      fontSize: 14,
+                      color: colors.onSurface,
+                      marginTop: 4,
+                    }}
+                  >
                     {challengeTitulo}
                   </Text>
                   {challengeDescripcion.trim() ? (
-                    <Text style={{ fontSize: 12, color: colors.onSurfaceVariant, marginTop: 2 }} numberOfLines={2}>
+                    <Text
+                      style={{ fontSize: 12, color: colors.onSurfaceVariant, marginTop: 2 }}
+                      numberOfLines={2}
+                    >
                       {challengeDescripcion}
                     </Text>
                   ) : null}
@@ -320,7 +348,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
               {/* Tip card */}
               <View style={[styles.challengeTip, { backgroundColor: `${colors.primary}06` }]}>
                 <MaterialIcons name="lightbulb" size={16} color={colors.primary} />
-                <Text style={{ flex: 1, fontSize: 12, color: colors.onSurfaceVariant, lineHeight: 18 }}>
+                <Text
+                  style={{ flex: 1, fontSize: 12, color: colors.onSurfaceVariant, lineHeight: 18 }}
+                >
                   Los retos aparecen destacados en el feed y otros docentes pueden contestarlos
                 </Text>
               </View>

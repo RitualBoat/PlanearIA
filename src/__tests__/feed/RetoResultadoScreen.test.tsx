@@ -48,16 +48,12 @@ describe("RetoResultadoScreen", () => {
   });
 
   it("renderiza el header con título 'Resultado'", () => {
-    const { getByText } = render(
-      <RetoResultadoScreen navigation={mockNavigation} />
-    );
+    const { getByText } = render(<RetoResultadoScreen navigation={mockNavigation} />);
     expect(getByText("Resultado")).toBeTruthy();
   });
 
   it("muestra el puntaje demo por defecto (2/3)", () => {
-    const { getByText } = render(
-      <RetoResultadoScreen navigation={mockNavigation} />
-    );
+    const { getByText } = render(<RetoResultadoScreen navigation={mockNavigation} />);
     // Default sample: 2 correct out of 3
     expect(getByText("2/3")).toBeTruthy();
     expect(getByText("67% correcto")).toBeTruthy();
@@ -67,9 +63,7 @@ describe("RetoResultadoScreen", () => {
     const route = {
       params: { correctas: 8, total: 10, tiempo: 503 },
     };
-    const { getByText } = render(
-      <RetoResultadoScreen route={route} navigation={mockNavigation} />
-    );
+    const { getByText } = render(<RetoResultadoScreen route={route} navigation={mockNavigation} />);
     expect(getByText("8/10")).toBeTruthy();
     expect(getByText("80% correcto")).toBeTruthy();
     expect(getByText("8:23")).toBeTruthy();
@@ -77,16 +71,12 @@ describe("RetoResultadoScreen", () => {
 
   it("muestra el mensaje correcto según porcentaje", () => {
     const route = { params: { correctas: 9, total: 10 } };
-    const { getByText } = render(
-      <RetoResultadoScreen route={route} navigation={mockNavigation} />
-    );
+    const { getByText } = render(<RetoResultadoScreen route={route} navigation={mockNavigation} />);
     expect(getByText("¡Excelente trabajo!")).toBeTruthy();
   });
 
   it("muestra análisis de preguntas (correctas e incorrectas)", () => {
-    const { getByText } = render(
-      <RetoResultadoScreen navigation={mockNavigation} />
-    );
+    const { getByText } = render(<RetoResultadoScreen navigation={mockNavigation} />);
     expect(getByText("Análisis de Desempeño")).toBeTruthy();
     expect(getByText("Pregunta 01")).toBeTruthy();
     expect(getByText("Pregunta 02")).toBeTruthy();
@@ -94,26 +84,20 @@ describe("RetoResultadoScreen", () => {
   });
 
   it("muestra respuesta correcta para pregunta incorrecta", () => {
-    const { getByText } = render(
-      <RetoResultadoScreen navigation={mockNavigation} />
-    );
+    const { getByText } = render(<RetoResultadoScreen navigation={mockNavigation} />);
     expect(getByText("Uso de colores primarios")).toBeTruthy();
     expect(getByText("Punto de fuga único")).toBeTruthy();
   });
 
   it("muestra 3 botones de acción en el footer", () => {
-    const { getByText } = render(
-      <RetoResultadoScreen navigation={mockNavigation} />
-    );
+    const { getByText } = render(<RetoResultadoScreen navigation={mockNavigation} />);
     expect(getByText("Volver al feed")).toBeTruthy();
     expect(getByText("Guardar en biblioteca")).toBeTruthy();
     expect(getByText("Compartir")).toBeTruthy();
   });
 
   it("navega hacia atrás al presionar 'Volver al feed'", () => {
-    const { getByText } = render(
-      <RetoResultadoScreen navigation={mockNavigation} />
-    );
+    const { getByText } = render(<RetoResultadoScreen navigation={mockNavigation} />);
     fireEvent.press(getByText("Volver al feed"));
     expect(mockNavigation.goBack).toHaveBeenCalled();
   });

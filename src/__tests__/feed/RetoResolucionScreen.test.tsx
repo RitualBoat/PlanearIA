@@ -112,9 +112,7 @@ describe("RetoResolucionScreen", () => {
   });
 
   it("muestra título por defecto cuando no hay params", () => {
-    const { getByText } = render(
-      <RetoResolucionScreen navigation={mockNavigation} />
-    );
+    const { getByText } = render(<RetoResolucionScreen navigation={mockNavigation} />);
     expect(getByText("Resolver Reto")).toBeTruthy();
   });
 });

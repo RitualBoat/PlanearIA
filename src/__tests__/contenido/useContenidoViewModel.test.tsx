@@ -5,6 +5,11 @@ import { Recurso, Plantilla, Tarea } from "../../../types";
 
 // ─── Mocks ───
 
+jest.mock("@react-native-community/netinfo", () => ({
+  addEventListener: jest.fn(() => jest.fn()),
+  fetch: jest.fn().mockResolvedValue({ isConnected: true, isInternetReachable: true }),
+}));
+
 const mockEliminarPlaneacion = jest.fn().mockResolvedValue(undefined);
 const mockClonarPlaneacion = jest.fn().mockResolvedValue(undefined);
 const mockAgregarPlaneacion = jest.fn().mockResolvedValue(undefined);

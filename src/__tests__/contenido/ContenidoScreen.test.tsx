@@ -10,6 +10,14 @@ import {
 
 jest.mock("@expo/vector-icons/MaterialIcons", () => "MaterialIcons");
 
+jest.mock("expo-linear-gradient", () => {
+  const React = require("react");
+  return {
+    LinearGradient: ({ children, ...props }: any) =>
+      React.createElement("View", { ...props, testID: "linear-gradient" }, children),
+  };
+});
+
 jest.mock("react-native-safe-area-context", () => {
   const React = require("react");
   return {
@@ -50,6 +58,7 @@ const mockSetFiltroEstado = jest.fn();
 const mockLimpiarFiltros = jest.fn();
 const mockEliminarItem = jest.fn();
 const mockDuplicarItem = jest.fn();
+const mockRetryLoad = jest.fn();
 
 const mockItems: ContenidoItem[] = [
   {
@@ -92,6 +101,9 @@ const defaultVm: ContenidoViewModel = {
   borradores: mockBorradores,
   totalItems: 3,
   isLoading: false,
+  isError: false,
+  isOffline: false,
+  retryLoad: mockRetryLoad,
   categoriaActiva: "todo",
   setCategoriaActiva: mockSetCategoriaActiva,
   searchQuery: "",
@@ -198,6 +210,77 @@ describe("ContenidoScreen", () => {
     expect(queryByText("Fracciones equivalentes")).toBeNull();
   });
 
+  it("muestra estado de error con botón Reintentar", () => {
+    mockCurrentVm = { ...defaultVm, isError: true };
+
+    const { getByText } = render(<ContenidoScreen />);
+
+    expect(getByText("No se pudo cargar tu contenido")).toBeTruthy();
+    expect(getByText("Revisa tu conexión a internet e intenta de nuevo")).toBeTruthy();
+    expect(getByText("Reintentar")).toBeTruthy();
+  });
+
+  it("llama retryLoad al presionar Reintentar en estado de error", () => {
+    mockCurrentVm = { ...defaultVm, isError: true };
+
+    const { getByText } = render(<ContenidoScreen />);
+    fireEvent.press(getByText("Reintentar"));
+
+    expect(mockRetryLoad).toHaveBeenCalled();
+  });
+
+  it("muestra banner offline cuando isOffline es true", () => {
+    mockCurrentVm = { ...defaultVm, isOffline: true };
+
+    const { getByText } = render(<ContenidoScreen />);
+
+    expect(getByText("Sin conexión — Mostrando datos guardados")).toBeTruthy();
+  });
+
+  it("no muestra banner offline cuando isOffline es false", () => {
+    mockCurrentVm = { ...defaultVm, isOffline: false };
+
+    const { queryByText } = render(<ContenidoScreen />);
+
+    expect(queryByText("Sin conexión — Mostrando datos guardados")).toBeNull();
+  });
+
+  it("muestra opciones Asignar a grupo, Exportar y Compartir en context menu", () => {
+    const { getAllByLabelText, getByText } = render(<ContenidoScreen />);
+
+    const moreButtons = getAllByLabelText("Más opciones");
+    fireEvent.press(moreButtons[0]);
+
+    expect(getByText("Asignar a grupo")).toBeTruthy();
+    expect(getByText("Exportar")).toBeTruthy();
+    expect(getByText("Compartir")).toBeTruthy();
+  });
+
+  it("muestra botón cerrar en context menu", () => {
+    const { getAllByLabelText } = render(<ContenidoScreen />);
+
+    const moreButtons = getAllByLabelText("Más opciones");
+    fireEvent.press(moreButtons[0]);
+
+    expect(getAllByLabelText("Cerrar menú").length).toBeGreaterThan(0);
+  });
+
+  it("acción Asignar a grupo muestra alerta Próximamente", () => {
+    const alertSpy = jest.spyOn(Alert, "alert");
+
+    const { getAllByLabelText, getByText } = render(<ContenidoScreen />);
+
+    const moreButtons = getAllByLabelText("Más opciones");
+    fireEvent.press(moreButtons[0]);
+    fireEvent.press(getByText("Asignar a grupo"));
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      "Próximamente",
+      expect.stringContaining("próxima actualización")
+    );
+    alertSpy.mockRestore();
+  });
+
   it("ejecuta búsqueda al escribir en el campo", () => {
     const { getByPlaceholderText } = render(<ContenidoScreen />);
 
@@ -247,6 +330,9 @@ describe("ContenidoScreen", () => {
 
     expect(getByText("Compartir")).toBeTruthy();
     expect(getByText("Exportar")).toBeTruthy();
+    expect(getByText("Editar")).toBeTruthy();
+    expect(getByText("Duplicar")).toBeTruthy();
+    expect(getByText("Eliminar")).toBeTruthy();
   });
 
   it("compartir planeación genera PDF y abre sharing", async () => {

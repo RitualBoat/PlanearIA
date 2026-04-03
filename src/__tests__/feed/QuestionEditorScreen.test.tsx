@@ -43,24 +43,18 @@ describe("QuestionEditorScreen", () => {
   });
 
   it("renderiza el estado vacío por defecto", () => {
-    const { getByText } = render(
-      <QuestionEditorScreen navigation={mockNavigation} />
-    );
+    const { getByText } = render(<QuestionEditorScreen navigation={mockNavigation} />);
     expect(getByText("Aún no has añadido preguntas")).toBeTruthy();
     expect(getByText(/Toca el botón de abajo/)).toBeTruthy();
   });
 
   it("muestra el botón CTA en estado vacío", () => {
-    const { getByText } = render(
-      <QuestionEditorScreen navigation={mockNavigation} />
-    );
+    const { getByText } = render(<QuestionEditorScreen navigation={mockNavigation} />);
     expect(getByText("Crear primera pregunta")).toBeTruthy();
   });
 
   it("cambia al editor al crear la primera pregunta", () => {
-    const { getByText, queryByText } = render(
-      <QuestionEditorScreen navigation={mockNavigation} />
-    );
+    const { getByText, queryByText } = render(<QuestionEditorScreen navigation={mockNavigation} />);
     fireEvent.press(getByText("Crear primera pregunta"));
     // Should now show editor header
     expect(queryByText("Aún no has añadido preguntas")).toBeNull();
@@ -68,18 +62,14 @@ describe("QuestionEditorScreen", () => {
   });
 
   it("muestra el header del editor con conteo de preguntas", () => {
-    const { getByText } = render(
-      <QuestionEditorScreen navigation={mockNavigation} />
-    );
+    const { getByText } = render(<QuestionEditorScreen navigation={mockNavigation} />);
     fireEvent.press(getByText("Crear primera pregunta"));
     // The header shows e.g. "Preguntas (1/10)" but may be split
     expect(getByText(/Preguntas \(1\//)).toBeTruthy();
   });
 
   it("permite agregar más preguntas con el FAB", () => {
-    const { getByText } = render(
-      <QuestionEditorScreen navigation={mockNavigation} />
-    );
+    const { getByText } = render(<QuestionEditorScreen navigation={mockNavigation} />);
     fireEvent.press(getByText("Crear primera pregunta"));
     // Add another question via FAB
     fireEvent.press(getByText("Añadir pregunta"));
@@ -87,9 +77,7 @@ describe("QuestionEditorScreen", () => {
   });
 
   it("navega hacia atrás al presionar el botón de cerrar", () => {
-    const { getByText } = render(
-      <QuestionEditorScreen navigation={mockNavigation} />
-    );
+    const { getByText } = render(<QuestionEditorScreen navigation={mockNavigation} />);
     fireEvent.press(getByText("Crear primera pregunta"));
     expect(getByText(/Preguntas/)).toBeTruthy();
   });

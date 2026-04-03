@@ -1,5 +1,6 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Alert } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
 import { usePlaneaciones } from "../sync/providers/SyncProvider";
 import { useRecursos } from "../context/RecursosContext";
 import { useEntregables } from "../context/EntregablesContext";
@@ -38,6 +39,9 @@ export interface ContenidoViewModel {
   borradores: ContenidoItem[];
   totalItems: number;
   isLoading: boolean;
+  isError: boolean;
+  isOffline: boolean;
+  retryLoad: () => void;
 
   // Filters
   categoriaActiva: CategoriaContenido;
@@ -130,6 +134,22 @@ export const useContenidoViewModel = (): ContenidoViewModel => {
   const [filtroEstado, setFiltroEstado] = useState<FiltroEstado>("");
 
   const isLoading = loadingPlan || loadingRec || loadingEnt || loadingPla;
+
+  const [isOffline, setIsOffline] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsOffline(state.isConnected === false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const retryLoad = useCallback(() => {
+    setIsError(false);
+    setRetryKey((k) => k + 1);
+  }, []);
 
   // Normalize all content into ContenidoItem[]
   const allItems = useMemo<ContenidoItem[]>(() => {
@@ -349,6 +369,9 @@ export const useContenidoViewModel = (): ContenidoViewModel => {
     borradores,
     totalItems: allItems.length,
     isLoading,
+    isError,
+    isOffline,
+    retryLoad,
     categoriaActiva,
     setCategoriaActiva,
     searchQuery,

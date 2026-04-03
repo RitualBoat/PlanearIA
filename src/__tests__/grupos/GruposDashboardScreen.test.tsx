@@ -54,6 +54,14 @@ jest.mock("../../utils/responsive", () => ({
   responsive: (mobile: any) => mobile,
 }));
 
+jest.mock("expo-linear-gradient", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+  return {
+    LinearGradient: (props: any) => <View {...props} />,
+  };
+});
+
 // ─── Helpers ───
 
 const defaultQuickActions = [
@@ -164,11 +172,12 @@ describe("GruposDashboardScreen", () => {
   // ─── Loading State ───
 
   describe("loading state", () => {
-    it("muestra indicador de carga", () => {
+    it("muestra esqueleto de carga", () => {
       mockViewModelReturn = buildViewModel({ isLoading: true, isEmpty: false });
 
-      const { getByText } = renderScreen();
-      expect(getByText("Cargando dashboard...")).toBeTruthy();
+      const { toJSON } = renderScreen();
+      // Skeleton renders without text, just verify no crash
+      expect(toJSON()).toBeTruthy();
     });
   });
 
@@ -179,8 +188,10 @@ describe("GruposDashboardScreen", () => {
       mockViewModelReturn = buildViewModel({ error: "Sin conexión" });
 
       const { getByText } = renderScreen();
-      expect(getByText("No se pudo cargar el dashboard")).toBeTruthy();
-      expect(getByText("Sin conexión")).toBeTruthy();
+      expect(getByText("No se pudieron cargar los datos")).toBeTruthy();
+      expect(
+        getByText("Ocurrió un error al obtener la información de tus grupos")
+      ).toBeTruthy();
       expect(getByText("Reintentar")).toBeTruthy();
     });
 
@@ -214,17 +225,18 @@ describe("GruposDashboardScreen", () => {
     });
 
     it("muestra las acciones rápidas", () => {
-      const { getByText } = renderScreen();
+      const { getByText, getAllByText } = renderScreen();
 
       expect(getByText("Calificar")).toBeTruthy();
       expect(getByText("Tarea")).toBeTruthy();
       expect(getByText("Reportes")).toBeTruthy();
-      expect(getByText("Asistencia")).toBeTruthy();
+      // "Asistencia" appears in quick actions + grupo card stats
+      expect(getAllByText("Asistencia").length).toBeGreaterThanOrEqual(1);
     });
 
     it("muestra la sección de tip", () => {
       const { getByText } = renderScreen();
-      expect(getByText("Tip de Eficiencia")).toBeTruthy();
+      expect(getByText("CONSEJO DEL DÍA")).toBeTruthy();
     });
   });
 
@@ -418,7 +430,8 @@ describe("GruposDashboardScreen", () => {
       expect(getAllByText("Comparar Grupos")).toHaveLength(2);
       expect(getByText("MÉTRICA")).toBeTruthy();
       expect(getByText("Alumnos")).toBeTruthy();
-      expect(getByText("Promedio")).toBeTruthy();
+      // "Promedio" appears in grupo card stats + modal table
+      expect(getAllByText("Promedio").length).toBeGreaterThanOrEqual(2);
       // "Asistencia" appears in quick actions + modal table
       expect(getAllByText("Asistencia").length).toBeGreaterThanOrEqual(2);
       // "Pendientes" may appear multiple times

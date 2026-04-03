@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import {
   Animated,
   View,
@@ -10,13 +10,12 @@ import {
   Modal,
   TextInput,
   useWindowDimensions,
-  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
-import { COLORS } from "../../../types";
 import { isWeb } from "../../utils/responsive";
 import AnimatedTopPill from "../../components/AnimatedTopPill";
 import {
@@ -27,6 +26,51 @@ import {
 } from "../../hooks/useGruposDashboardViewModel";
 import { useGruposContext } from "../../context/GruposContext";
 import type { Grupo } from "../../../types";
+
+// ─── Stitch Design Tokens (4.1.1) ───
+const DT = {
+  primary: "#002f5a",
+  primaryContainer: "#004580",
+  primaryFixed: "#d4e3ff",
+  primaryFixedDim: "#a4c8ff",
+  onPrimaryContainer: "#85b4f6",
+  surface: "#f7f9ff",
+  surfaceLowest: "#ffffff",
+  surfaceLow: "#f1f4fa",
+  surfaceContainer: "#ebeef4",
+  surfaceHigh: "#e5e8ee",
+  surfaceHighest: "#dfe3e8",
+  onSurface: "#181c20",
+  onSurfaceVariant: "#424750",
+  outline: "#727781",
+  outlineVariant: "#c2c6d1",
+  secondary: "#1b6d24",
+  secondaryContainer: "#a0f499",
+  onSecondaryContainer: "#207128",
+  tertiary: "#4f2100",
+  tertiaryContainer: "#713200",
+  onTertiaryContainer: "#f69b63",
+  error: "#ba1a1a",
+  errorContainer: "#ffdad6",
+  errorIcon: "#C62828",
+  errorTint: "#FFF1F2",
+  warningBanner: "#FFF5E9",
+  warningBorder: "#F5D7B0",
+  warningText: "#B87424",
+  toastSuccessBg: "#E7F9F3",
+  toastSuccessBorder: "#B8EAD8",
+  toastSuccessIcon: "#0D9E70",
+  toastErrorBg: "#FFF1F2",
+  toastErrorBorder: "#F2C6C6",
+  toastErrorIcon: "#C62828",
+  skeleton: "#EDF1F7",
+  text: "#1E2A3A",
+  textSecondary: "#5C6E86",
+  textMuted: "#6B7D96",
+  shadow: "rgba(0,69,128,0.06)",
+  shadowLift: "rgba(33,60,109,0.12)",
+  overlay: "rgba(19,30,49,0.42)",
+};
 
 type GruposDashboardNavigationProp = StackNavigationProp<RootStackParamList, "Grupos">;
 
@@ -67,15 +111,15 @@ const GrupoSelectorModal: React.FC<GrupoSelectorModalProps> = ({
           <View style={modalStyles.header}>
             <Text style={modalStyles.title}>{title}</Text>
             <TouchableOpacity style={modalStyles.closeBtn} onPress={onClose}>
-              <MaterialIcons name="close" size={22} color={COLORS.textSecondary} />
+              <MaterialIcons name="close" size={20} color={DT.onSurfaceVariant} />
             </TouchableOpacity>
           </View>
           <View style={modalStyles.searchWrap}>
-            <MaterialIcons name="search" size={20} color={COLORS.textMuted} />
+            <MaterialIcons name="search" size={20} color={DT.outline} />
             <TextInput
               style={modalStyles.searchInput}
               placeholder="Buscar grupo..."
-              placeholderTextColor={COLORS.textMuted}
+              placeholderTextColor={DT.outline}
               value={search}
               onChangeText={setSearch}
             />
@@ -99,14 +143,11 @@ const GrupoSelectorModal: React.FC<GrupoSelectorModalProps> = ({
                 <View style={modalStyles.grupoInfo}>
                   <Text style={modalStyles.grupoName}>{grupo.nombre}</Text>
                   <Text style={modalStyles.grupoMeta}>{grupo.materia}</Text>
-                  <View style={modalStyles.grupoAlumnosRow}>
-                    <MaterialIcons name="groups" size={14} color={COLORS.textMuted} />
-                    <Text style={modalStyles.grupoAlumnosText}>
-                      {grupo.cantidadAlumnos} Alumnos
-                    </Text>
-                  </View>
                 </View>
-                <MaterialIcons name="chevron-right" size={22} color={COLORS.textMuted} />
+                <View style={modalStyles.grupoBadge}>
+                  <Text style={modalStyles.grupoBadgeText}>{grupo.cantidadAlumnos}</Text>
+                </View>
+                <MaterialIcons name="chevron-right" size={22} color={DT.outline} />
               </TouchableOpacity>
             ))}
             {filtered.length === 0 && (
@@ -165,7 +206,12 @@ const CompararGruposModal: React.FC<CompararGruposModalProps> = ({ visible, grup
       <View style={compareStyles.overlay}>
         <View style={compareStyles.sheet}>
           <View style={compareStyles.handle} />
-          <Text style={compareStyles.title}>Comparar Grupos</Text>
+          <View style={compareStyles.headerRow}>
+            <View>
+              <Text style={compareStyles.title}>Comparar Grupos</Text>
+              <Text style={compareStyles.subtitle}>Análisis comparativo de rendimiento</Text>
+            </View>
+          </View>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={compareStyles.chips}>
             {grupos.map((g) => (
@@ -182,13 +228,18 @@ const CompararGruposModal: React.FC<CompararGruposModalProps> = ({ visible, grup
                 >
                   {g.nombre}
                 </Text>
+                <MaterialIcons
+                  name={selectedIds.has(g.id) ? "close" : "add"}
+                  size={16}
+                  color={selectedIds.has(g.id) ? "#FFF" : DT.onSurfaceVariant}
+                />
               </TouchableOpacity>
             ))}
           </ScrollView>
 
           <ScrollView style={compareStyles.tableWrap}>
             {/* Table Header */}
-            <View style={compareStyles.row}>
+            <View style={[compareStyles.row, compareStyles.headerRowBg]}>
               <View style={compareStyles.metricCell}>
                 <Text style={compareStyles.metricLabel}>MÉTRICA</Text>
               </View>
@@ -284,7 +335,7 @@ const CompararGruposModal: React.FC<CompararGruposModalProps> = ({ visible, grup
                         compareStyles.barFill,
                         {
                           width: `${Math.min(g.promedio * 10, 100)}%`,
-                          backgroundColor: COLORS.primary,
+                          backgroundColor: DT.primaryContainer,
                         },
                       ]}
                     />
@@ -295,9 +346,22 @@ const CompararGruposModal: React.FC<CompararGruposModalProps> = ({ visible, grup
             </View>
           </ScrollView>
 
-          <TouchableOpacity style={compareStyles.closeBtn} onPress={onClose}>
-            <Text style={compareStyles.closeBtnText}>Cerrar</Text>
-          </TouchableOpacity>
+          <View style={compareStyles.footerRow}>
+            <LinearGradient
+              colors={[DT.primaryContainer, "#005da8"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={compareStyles.exportBtn}
+            >
+              <TouchableOpacity style={compareStyles.exportBtnInner} activeOpacity={0.8}>
+                <MaterialIcons name="ios-share" size={18} color="#FFF" />
+                <Text style={compareStyles.exportBtnText}>Exportar</Text>
+              </TouchableOpacity>
+            </LinearGradient>
+            <TouchableOpacity style={compareStyles.closeBtn} onPress={onClose}>
+              <Text style={compareStyles.closeBtnText}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Modal>
@@ -418,15 +482,15 @@ const GruposDashboardScreen: React.FC<GruposDashboardScreenProps> = ({ navigatio
   if (isEmpty) {
     return (
       <View style={styles.container}>
-        <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
+        <StatusBar backgroundColor={DT.surface} barStyle="dark-content" />
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.emptyContainer}>
             <View style={styles.emptyIconWrap}>
-              <MaterialIcons name="groups" size={64} color={COLORS.outlineVariant} />
+              <MaterialIcons name="groups" size={64} color={DT.outlineVariant} />
             </View>
             <Text style={styles.emptyTitle}>Aún no tienes grupos</Text>
             <Text style={styles.emptySubtitle}>
-              Crea tu primer grupo para comenzar a gestionar tus clases de manera inteligente.
+              Crea tu primer grupo para comenzar a gestionar tus clases
             </Text>
             <TouchableOpacity
               style={styles.emptyPrimaryBtn}
@@ -436,25 +500,43 @@ const GruposDashboardScreen: React.FC<GruposDashboardScreenProps> = ({ navigatio
               <MaterialIcons name="add" size={18} color="#FFF" />
               <Text style={styles.emptyPrimaryBtnText}>Crear mi primer grupo</Text>
             </TouchableOpacity>
-            <View style={styles.tipCard}>
-              <MaterialIcons name="auto-awesome" size={18} color={COLORS.primary} />
-              <Text style={styles.tipText}>
-                Tip Académico: Los grupos te permiten organizar tus estudiantes y generar planes de
-                clase personalizados con IA en segundos.
-              </Text>
-            </View>
+            <TouchableOpacity style={styles.emptySecondaryBtn} activeOpacity={0.7}>
+              <Text style={styles.emptySecondaryBtnText}>Importar desde archivo</Text>
+            </TouchableOpacity>
           </View>
         </SafeAreaView>
       </View>
     );
   }
 
-  // ─── Loading State ───
+  // ─── Loading State (Skeleton) ───
   if (isLoading) {
     return (
-      <View style={[styles.container, styles.centerContent]}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-        <Text style={styles.loadingText}>Cargando dashboard...</Text>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={DT.surface} barStyle="dark-content" />
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.skeletonContent}>
+            <View style={styles.skeletonPill} />
+            <View style={styles.skeletonKpiGrid}>
+              {[0, 1, 2, 3].map((i) => (
+                <View key={i} style={styles.skeletonKpi} />
+              ))}
+            </View>
+            <View style={styles.skeletonChart} />
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.skeletonActionsRow}
+            >
+              {[0, 1, 2, 3].map((i) => (
+                <View key={i} style={styles.skeletonAction} />
+              ))}
+            </ScrollView>
+            {[0, 1, 2].map((i) => (
+              <View key={i} style={styles.skeletonGrupo} />
+            ))}
+          </View>
+        </SafeAreaView>
       </View>
     );
   }
@@ -462,13 +544,23 @@ const GruposDashboardScreen: React.FC<GruposDashboardScreenProps> = ({ navigatio
   // ─── Error State ───
   if (error) {
     return (
-      <View style={[styles.container, styles.centerContent]}>
-        <MaterialIcons name="error-outline" size={48} color={COLORS.error} />
-        <Text style={styles.errorTitle}>No se pudo cargar el dashboard</Text>
-        <Text style={styles.errorMessage}>{error}</Text>
-        <TouchableOpacity style={styles.retryBtn} onPress={recargar}>
-          <Text style={styles.retryBtnText}>Reintentar</Text>
-        </TouchableOpacity>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={DT.surface} barStyle="dark-content" />
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.errorContainer}>
+            <View style={styles.errorIconWrap}>
+              <MaterialIcons name="error-outline" size={64} color={DT.errorIcon} />
+            </View>
+            <Text style={styles.errorTitle}>No se pudieron cargar los datos</Text>
+            <Text style={styles.errorMessage}>
+              Ocurrió un error al obtener la información de tus grupos
+            </Text>
+            <TouchableOpacity style={styles.retryBtn} onPress={recargar} activeOpacity={0.85}>
+              <MaterialIcons name="refresh" size={20} color="#FFF" />
+              <Text style={styles.retryBtnText}>Reintentar</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
       </View>
     );
   }
@@ -476,7 +568,7 @@ const GruposDashboardScreen: React.FC<GruposDashboardScreenProps> = ({ navigatio
   // ─── Dashboard ───
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
+      <StatusBar backgroundColor={DT.surface} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <Animated.ScrollView
@@ -505,11 +597,15 @@ const GruposDashboardScreen: React.FC<GruposDashboardScreenProps> = ({ navigatio
           {/* Section 2: Sync Badges */}
           <View style={styles.badgesRow}>
             <View style={[styles.badge, styles.badgeSync]}>
-              <MaterialIcons name="cloud-done" size={14} color="#002204" />
-              <Text style={styles.badgeText}>SINCRONIZADO</Text>
+              <MaterialIcons name="cloud-done" size={14} color={DT.onSecondaryContainer} />
+              <Text style={[styles.badgeText, { color: DT.onSecondaryContainer }]}>
+                Sincronizado
+              </Text>
             </View>
             <View style={[styles.badge, styles.badgeInfo]}>
-              <Text style={styles.badgeText}>{kpis.gruposActivos} GRUPOS ACTIVOS</Text>
+              <Text style={[styles.badgeText, { color: DT.primaryContainer }]}>
+                {kpis.gruposActivos} grupos activos
+              </Text>
             </View>
           </View>
 
@@ -526,7 +622,7 @@ const GruposDashboardScreen: React.FC<GruposDashboardScreenProps> = ({ navigatio
                     onPress={() => setCompareVisible(true)}
                     activeOpacity={0.8}
                   >
-                    <MaterialIcons name="compare-arrows" size={18} color={COLORS.primary} />
+                    <MaterialIcons name="compare-arrows" size={18} color={DT.primaryContainer} />
                     <Text style={styles.compareBtnText}>Comparar Grupos</Text>
                   </TouchableOpacity>
                 )}
@@ -550,7 +646,7 @@ const GruposDashboardScreen: React.FC<GruposDashboardScreenProps> = ({ navigatio
                   onPress={() => setCompareVisible(true)}
                   activeOpacity={0.8}
                 >
-                  <MaterialIcons name="compare-arrows" size={18} color={COLORS.primary} />
+                  <MaterialIcons name="compare-arrows" size={18} color={DT.primaryContainer} />
                   <Text style={styles.compareBtnText}>Comparar Grupos</Text>
                 </TouchableOpacity>
               )}
@@ -595,25 +691,25 @@ const renderKPIs = (
     {
       label: "Total Alumnos",
       value: String(kpis.totalAlumnos),
-      color: "#1565C0",
-      icon: "people" as const,
+      color: DT.primaryContainer,
+      icon: "school" as const,
     },
     {
       label: "Promedio Gral",
       value: kpis.promedioGeneral.toFixed(1),
-      color: "#2E7D32",
+      color: DT.secondary,
       icon: "trending-up" as const,
     },
     {
       label: "Asistencia",
       value: `${kpis.indiceAsistencia}%`,
-      color: "#00796B",
-      icon: "event-available" as const,
+      color: DT.onTertiaryContainer,
+      icon: "check-circle" as const,
     },
     {
       label: "Pendientes",
       value: String(kpis.entregasPendientes),
-      color: "#E65100",
+      color: DT.error,
       icon: "assignment-late" as const,
     },
   ];
@@ -622,11 +718,11 @@ const renderKPIs = (
     <View style={[styles.kpiGrid, wideLayout && styles.kpiGridWide]}>
       {items.map((item) => (
         <View key={item.label} style={[styles.kpiCard, { borderLeftColor: item.color }]}>
-          <Text style={styles.kpiLabel}>{item.label.toUpperCase()}</Text>
-          <View style={styles.kpiValueRow}>
-            <Text style={styles.kpiValue}>{item.value}</Text>
-            <MaterialIcons name={item.icon} size={16} color={item.color} />
+          <View style={styles.kpiLabelRow}>
+            <Text style={styles.kpiLabel}>{item.label.toUpperCase()}</Text>
+            <MaterialIcons name={item.icon} size={18} color={item.color} />
           </View>
+          <Text style={[styles.kpiValue, { color: DT.primaryContainer }]}>{item.value}</Text>
         </View>
       ))}
     </View>
@@ -650,23 +746,26 @@ const renderChart = (wideLayout: boolean) => {
         </View>
         <View style={styles.chartLegend}>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: COLORS.primary }]} />
+            <View style={[styles.legendDot, { backgroundColor: DT.primaryContainer }]} />
             <Text style={styles.legendText}>Aprob.</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: COLORS.tealLight }]} />
+            <View style={[styles.legendDot, { backgroundColor: DT.surfaceHigh }]} />
             <Text style={styles.legendText}>Asist.</Text>
           </View>
         </View>
       </View>
-      <View style={styles.chartBars}>
+      <View style={[styles.chartBars, wideLayout && { height: 180 }]}>
         {bars.map((bar, i) => (
           <View key={i} style={styles.chartBarGroup}>
             <View
-              style={[styles.chartBar, { height: `${bar.h1}%`, backgroundColor: COLORS.primary }]}
+              style={[
+                styles.chartBar,
+                { height: `${bar.h1}%`, backgroundColor: DT.primaryContainer },
+              ]}
             />
             <View
-              style={[styles.chartBar, { height: `${bar.h2}%`, backgroundColor: COLORS.tealLight }]}
+              style={[styles.chartBar, { height: `${bar.h2}%`, backgroundColor: DT.surfaceHigh }]}
             />
           </View>
         ))}
@@ -683,21 +782,45 @@ const renderQuickActions = (
   if (isDesktop) {
     return (
       <View style={styles.quickActionsDesktop}>
-        <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
-        {actions.map((action) => (
-          <TouchableOpacity
-            key={action.id}
-            style={styles.quickActionDesktopItem}
-            onPress={() => onPress(action.id as QuickActionType)}
-            activeOpacity={0.7}
-          >
-            <View style={[styles.quickActionDesktopIcon, { backgroundColor: action.bgColor }]}>
-              <MaterialIcons name={action.icon as any} size={22} color={action.color} />
-            </View>
-            <Text style={styles.quickActionDesktopLabel}>{action.label}</Text>
-            <MaterialIcons name="chevron-right" size={20} color={COLORS.textMuted} />
-          </TouchableOpacity>
-        ))}
+        <Text style={styles.quickActionsDesktopTitle}>ACCIONES RÁPIDAS</Text>
+        {actions.map((action, index) => {
+          const isFirst = index === 0;
+          if (isFirst) {
+            return (
+              <LinearGradient
+                key={action.id}
+                colors={[DT.primaryContainer, "#005da8"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.quickActionDesktopGradient}
+              >
+                <TouchableOpacity
+                  style={styles.quickActionDesktopGradientInner}
+                  onPress={() => onPress(action.id as QuickActionType)}
+                  activeOpacity={0.7}
+                >
+                  <MaterialIcons name={action.icon as any} size={22} color="#FFF" />
+                  <Text style={styles.quickActionDesktopGradientLabel}>{action.label}</Text>
+                  <MaterialIcons name="chevron-right" size={20} color="rgba(255,255,255,0.7)" />
+                </TouchableOpacity>
+              </LinearGradient>
+            );
+          }
+          return (
+            <TouchableOpacity
+              key={action.id}
+              style={styles.quickActionDesktopItem}
+              onPress={() => onPress(action.id as QuickActionType)}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.quickActionDesktopIcon, { backgroundColor: DT.surfaceLowest }]}>
+                <MaterialIcons name={action.icon as any} size={22} color={DT.primaryContainer} />
+              </View>
+              <Text style={styles.quickActionDesktopLabel}>{action.label}</Text>
+              <MaterialIcons name="chevron-right" size={20} color={DT.outline} />
+            </TouchableOpacity>
+          );
+        })}
       </View>
     );
   }
@@ -710,16 +833,27 @@ const renderQuickActions = (
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.quickActionsScroll}
       >
-        {actions.map((action) => (
+        {actions.map((action, index) => (
           <TouchableOpacity
             key={action.id}
             style={styles.quickActionBtn}
             onPress={() => onPress(action.id as QuickActionType)}
             activeOpacity={0.7}
           >
-            <View style={[styles.quickActionIcon, { backgroundColor: action.bgColor }]}>
-              <MaterialIcons name={action.icon as any} size={24} color={action.color} />
-            </View>
+            {index === 0 ? (
+              <LinearGradient
+                colors={[DT.primaryContainer, "#005da8"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.quickActionIconGradient}
+              >
+                <MaterialIcons name={action.icon as any} size={24} color="#FFF" />
+              </LinearGradient>
+            ) : (
+              <View style={styles.quickActionIcon}>
+                <MaterialIcons name={action.icon as any} size={24} color={DT.primaryContainer} />
+              </View>
+            )}
             <Text style={styles.quickActionLabel}>{action.label}</Text>
           </TouchableOpacity>
         ))}
@@ -735,7 +869,12 @@ const renderGruposList = (
 ) => {
   return (
     <View style={styles.gruposSection}>
-      <Text style={styles.sectionLabel}>TUS GRUPOS ACTIVOS</Text>
+      <View style={styles.gruposSectionHeader}>
+        <Text style={styles.sectionLabel}>MIS GRUPOS</Text>
+        <View style={styles.grupoCountBadge}>
+          <Text style={styles.grupoCountText}>{gruposConStats.length}</Text>
+        </View>
+      </View>
       <View style={styles.gruposList}>
         {gruposConStats.map((grupo) => (
           <TouchableOpacity
@@ -751,27 +890,38 @@ const renderGruposList = (
                     {grupo.nombre.substring(0, 2).toUpperCase()}
                   </Text>
                 </View>
-                <View>
+                <View style={{ flex: 1 }}>
                   <Text style={styles.grupoCardName}>{grupo.nombre}</Text>
-                  <Text style={styles.grupoCardMeta}>{grupo.cantidadAlumnos} Alumnos</Text>
+                  <Text style={styles.grupoCardMeta}>
+                    {grupo.materia} · {grupo.cantidadAlumnos} alumnos
+                  </Text>
                 </View>
               </View>
               <View style={styles.grupoCardBadge}>
-                <Text style={styles.grupoCardBadgeText}>ACTIVO</Text>
+                <Text style={styles.grupoCardBadgeText}>
+                  {grupo.estado === "activo" ? "AL DÍA" : "REPASO"}
+                </Text>
               </View>
             </View>
             <View style={styles.grupoCardStats}>
               <View style={styles.grupoCardStat}>
-                <Text style={styles.grupoCardStatLabel}>Prom.</Text>
+                <Text style={styles.grupoCardStatLabel}>Promedio</Text>
                 <Text style={styles.grupoCardStatValue}>{grupo.promedio.toFixed(1)}</Text>
               </View>
               <View style={styles.grupoCardStat}>
-                <Text style={styles.grupoCardStatLabel}>Asist.</Text>
+                <Text style={styles.grupoCardStatLabel}>Asistencia</Text>
                 <Text style={styles.grupoCardStatValue}>{grupo.asistencia}%</Text>
               </View>
               <View style={styles.grupoCardStat}>
-                <Text style={styles.grupoCardStatLabel}>Pend.</Text>
-                <Text style={styles.grupoCardStatValue}>{grupo.pendientes}</Text>
+                <Text style={styles.grupoCardStatLabel}>Pendientes</Text>
+                <Text
+                  style={[
+                    styles.grupoCardStatValue,
+                    grupo.pendientes > 0 && { color: DT.onTertiaryContainer },
+                  ]}
+                >
+                  {grupo.pendientes}
+                </Text>
               </View>
             </View>
             <View style={styles.progressBar}>
@@ -780,7 +930,7 @@ const renderGruposList = (
                   styles.progressFill,
                   {
                     width: `${Math.min(grupo.asistencia, 100)}%`,
-                    backgroundColor: grupo.asistencia >= 80 ? COLORS.primary : COLORS.warning,
+                    backgroundColor: DT.secondary,
                   },
                 ]}
               />
@@ -796,25 +946,16 @@ const renderAlertas = (
   alertas: AlertaAlumno[],
   onAlertaPress: (alumnoId: number, nombre: string, apellidos: string) => void
 ) => {
+  if (alertas.length === 0) return null;
+
   const getBorderColor = (tipo: string) => {
     switch (tipo) {
       case "critico":
-        return COLORS.error;
+        return DT.error;
       case "alerta":
-        return COLORS.warning;
+        return DT.onTertiaryContainer;
       default:
-        return COLORS.primary;
-    }
-  };
-
-  const getBgColor = (tipo: string) => {
-    switch (tipo) {
-      case "critico":
-        return COLORS.errorTint;
-      case "alerta":
-        return COLORS.warningTint;
-      default:
-        return COLORS.primaryTint;
+        return DT.primaryContainer;
     }
   };
 
@@ -822,30 +963,59 @@ const renderAlertas = (
     <View style={styles.alertasSection}>
       <View style={styles.alertasHeader}>
         <Text style={styles.sectionLabel}>ATENCIÓN REQUERIDA</Text>
-        <MaterialIcons name="warning" size={18} color={COLORS.error} />
+        <View style={styles.alertaCountBadge}>
+          <Text style={styles.alertaCountText}>{alertas.length}</Text>
+        </View>
       </View>
       {alertas.map((alerta, index) => (
         <TouchableOpacity
           key={`${alerta.alumnoId}-${index}`}
-          style={[
-            styles.alertaCard,
-            {
-              backgroundColor: getBgColor(alerta.tipo),
-              borderLeftColor: getBorderColor(alerta.tipo),
-            },
-          ]}
+          style={[styles.alertaCard, { borderLeftColor: getBorderColor(alerta.tipo) }]}
           onPress={() => onAlertaPress(alerta.alumnoId, alerta.nombre, alerta.apellidos)}
           activeOpacity={0.7}
         >
+          <View
+            style={[
+              styles.alertaAvatar,
+              {
+                backgroundColor:
+                  alerta.tipo === "critico" ? "rgba(186,26,26,0.1)" : "rgba(246,155,99,0.2)",
+              },
+            ]}
+          >
+            <MaterialIcons
+              name={alerta.tipo === "critico" ? "warning" : "info"}
+              size={20}
+              color={getBorderColor(alerta.tipo)}
+            />
+          </View>
           <View style={styles.alertaInfo}>
             <Text style={styles.alertaName}>
               {alerta.nombre} {alerta.apellidos}
             </Text>
-            <Text style={[styles.alertaMsg, { color: getBorderColor(alerta.tipo) }]}>
-              {alerta.mensaje}
-            </Text>
+            <Text style={styles.alertaGrupo}>{alerta.grupoNombre}</Text>
+            <View
+              style={[
+                styles.alertaBadge,
+                {
+                  backgroundColor:
+                    alerta.tipo === "critico" ? DT.errorTint : "rgba(246,155,99,0.15)",
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.alertaBadgeText,
+                  {
+                    color: getBorderColor(alerta.tipo),
+                  },
+                ]}
+              >
+                {alerta.mensaje}
+              </Text>
+            </View>
           </View>
-          <MaterialIcons name="chevron-right" size={22} color={COLORS.textMuted} />
+          <MaterialIcons name="chevron-right" size={20} color={DT.outline} />
         </TouchableOpacity>
       ))}
     </View>
@@ -853,16 +1023,20 @@ const renderAlertas = (
 };
 
 const renderTipCard = () => (
-  <View style={styles.tipCardDashboard}>
+  <LinearGradient
+    colors={[DT.primary, DT.primaryContainer]}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 1 }}
+    style={styles.tipCardDashboard}
+  >
     <View style={styles.tipCardInner}>
-      <MaterialIcons name="lightbulb" size={20} color="#d4e3ff" />
-      <Text style={styles.tipCardTitle}>Tip de Eficiencia</Text>
+      <MaterialIcons name="lightbulb" size={20} color="rgba(255,255,255,0.8)" />
+      <Text style={styles.tipCardOverline}>CONSEJO DEL DÍA</Text>
     </View>
     <Text style={styles.tipCardDesc}>
-      Puedes usar las acciones rápidas para pasar lista en menos de 2 minutos. PlanearIA
-      sincronizará los datos automáticamente con el reporte semanal.
+      Usa las acciones rápidas para gestionar tus grupos sin entrar al detalle de cada uno.
     </Text>
-  </View>
+  </LinearGradient>
 );
 
 // ─── Styles ───
@@ -870,7 +1044,7 @@ const renderTipCard = () => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: DT.surface,
   },
   safeArea: {
     flex: 1,
@@ -890,7 +1064,7 @@ const styles = StyleSheet.create({
     maxWidth: 1220,
   },
   scrollContentWide: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 32,
   },
   headerBlock: {
     marginBottom: 2,
@@ -907,19 +1081,20 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 20,
+    borderRadius: 999,
   },
   badgeSync: {
-    backgroundColor: "rgba(163, 246, 156, 0.3)",
+    backgroundColor: "rgba(160,244,153,0.2)",
+    borderWidth: 1,
+    borderColor: "rgba(160,244,153,0.4)",
   },
   badgeInfo: {
-    backgroundColor: "rgba(212, 227, 255, 0.3)",
+    backgroundColor: "rgba(212,227,255,0.3)",
   },
   badgeText: {
     fontSize: 11,
-    fontWeight: "800",
+    fontWeight: "700",
     letterSpacing: 0.8,
-    color: COLORS.text,
   },
 
   // KPIs
@@ -934,39 +1109,40 @@ const styles = StyleSheet.create({
   kpiCard: {
     flex: 1,
     minWidth: "46%",
-    backgroundColor: COLORS.surface,
+    backgroundColor: DT.surfaceLowest,
     borderRadius: 16,
-    padding: 14,
+    padding: 16,
     borderLeftWidth: 4,
-    boxShadow: "0px 12px 24px rgba(0,72,132,0.06)",
+    boxShadow: `0px 2px 8px ${DT.shadow}`,
+  },
+  kpiLabelRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
   },
   kpiLabel: {
     fontSize: 10,
     fontWeight: "800",
-    color: COLORS.textMuted,
+    color: DT.onSurfaceVariant,
     letterSpacing: 1.2,
   },
-  kpiValueRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 4,
-  },
   kpiValue: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: "800",
-    color: COLORS.text,
+    lineHeight: 32,
   },
 
   // Chart
   chartCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: DT.surfaceLowest,
     borderRadius: 16,
     padding: 20,
-    boxShadow: "0px 12px 24px rgba(0,72,132,0.06)",
+    boxShadow: `0px 2px 8px ${DT.shadow}`,
   },
   chartCardWide: {
     padding: 28,
+    borderRadius: 24,
   },
   chartHeader: {
     flexDirection: "row",
@@ -975,13 +1151,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   chartTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "700",
-    color: COLORS.text,
+    color: DT.primaryContainer,
   },
   chartSubtitle: {
     fontSize: 12,
-    color: COLORS.textMuted,
+    color: DT.onSurfaceVariant,
     marginTop: 2,
   },
   chartLegend: {
@@ -994,14 +1170,14 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   legendDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
   legendText: {
     fontSize: 10,
     fontWeight: "700",
-    color: COLORS.textSecondary,
+    color: DT.onSurfaceVariant,
   },
   chartBars: {
     height: 120,
@@ -1016,18 +1192,19 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   chartBar: {
-    width: 10,
+    width: 12,
     borderTopLeftRadius: 6,
     borderTopRightRadius: 6,
   },
 
   // Quick Actions (Mobile)
   sectionLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "800",
-    letterSpacing: 1.2,
-    color: COLORS.textMuted,
+    letterSpacing: 1.5,
+    color: DT.onSurfaceVariant,
     marginBottom: 10,
+    textTransform: "uppercase",
   },
   quickActionsScroll: {
     gap: 16,
@@ -1035,38 +1212,70 @@ const styles = StyleSheet.create({
   },
   quickActionBtn: {
     alignItems: "center",
-    gap: 6,
+    gap: 8,
     minWidth: 72,
   },
   quickActionIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: DT.surfaceLowest,
+    boxShadow: `0px 2px 8px ${DT.shadow}`,
+  },
+  quickActionIconGradient: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
   },
   quickActionLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "700",
-    color: COLORS.text,
+    color: DT.onSurfaceVariant,
   },
 
   // Quick Actions (Desktop)
   quickActionsDesktop: {
-    gap: 8,
+    backgroundColor: DT.surfaceContainer,
+    borderRadius: 24,
+    padding: 20,
+    gap: 10,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: COLORS.text,
+  quickActionsDesktopTitle: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: DT.onSurfaceVariant,
+    letterSpacing: 1.5,
     marginBottom: 8,
+    textTransform: "uppercase",
+  },
+  quickActionDesktopGradient: {
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  quickActionDesktopGradientInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  quickActionDesktopGradientLabel: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#FFF",
   },
   quickActionDesktopItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.surface,
-    borderRadius: 14,
-    padding: 14,
+    backgroundColor: DT.surfaceLowest,
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     gap: 12,
   },
   quickActionDesktopIcon: {
@@ -1080,13 +1289,13 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: "700",
-    color: COLORS.text,
+    color: DT.primaryContainer,
   },
 
   // Desktop grid
   desktopGrid: {
     flexDirection: "row",
-    gap: 24,
+    gap: 40,
   },
   desktopMain: {
     flex: 2,
@@ -1101,18 +1310,34 @@ const styles = StyleSheet.create({
   gruposSection: {
     gap: 10,
   },
+  gruposSectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  grupoCountBadge: {
+    backgroundColor: DT.primaryFixed,
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  grupoCountText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: DT.primaryContainer,
+  },
   gruposList: {
     gap: 12,
   },
   grupoCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: DT.surfaceLow,
     borderRadius: 16,
     padding: 16,
-    gap: 12,
-    boxShadow: "0px 4px 12px rgba(0,72,132,0.04)",
+    gap: 14,
   },
   grupoCardWide: {
     padding: 20,
+    borderRadius: 24,
   },
   grupoCardHeader: {
     flexDirection: "row",
@@ -1123,66 +1348,77 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
+    flex: 1,
   },
   grupoCardAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: COLORS.primaryContainer,
+    width: 44,
+    height: 44,
+    borderRadius: 16,
+    backgroundColor: DT.surfaceLowest,
     alignItems: "center",
     justifyContent: "center",
+    boxShadow: `0px 2px 4px ${DT.shadow}`,
   },
   grupoCardAvatarText: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#bdd6ff",
+    color: DT.primaryContainer,
   },
   grupoCardName: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "700",
-    color: COLORS.text,
+    color: DT.primaryContainer,
   },
   grupoCardMeta: {
-    fontSize: 11,
-    color: COLORS.textMuted,
+    fontSize: 12,
+    color: DT.onSurfaceVariant,
+    marginTop: 1,
   },
   grupoCardBadge: {
-    backgroundColor: "rgba(163, 246, 156, 0.4)",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
+    backgroundColor: "rgba(160,244,153,0.3)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
   },
   grupoCardBadgeText: {
-    fontSize: 9,
-    fontWeight: "900",
-    color: "#002204",
+    fontSize: 10,
+    fontWeight: "800",
+    color: DT.onSecondaryContainer,
     letterSpacing: 0.5,
+    textTransform: "uppercase",
   },
   grupoCardStats: {
     flexDirection: "row",
     justifyContent: "space-around",
+    borderTopWidth: 1,
+    borderTopColor: "rgba(194,198,209,0.15)",
+    paddingTop: 14,
   },
   grupoCardStat: {
     alignItems: "center",
   },
   grupoCardStatLabel: {
     fontSize: 10,
-    color: COLORS.textMuted,
+    fontWeight: "700",
+    color: DT.onSurfaceVariant,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   grupoCardStatValue: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "700",
-    color: COLORS.text,
+    color: DT.onSurface,
+    marginTop: 2,
   },
   progressBar: {
-    height: 5,
-    backgroundColor: COLORS.surfaceContainerLow,
-    borderRadius: 3,
+    height: 4,
+    backgroundColor: "rgba(255,255,255,0.5)",
+    borderRadius: 999,
     overflow: "hidden",
   },
   progressFill: {
     height: "100%",
-    borderRadius: 3,
+    borderRadius: 999,
   },
 
   // Alertas
@@ -1191,52 +1427,87 @@ const styles = StyleSheet.create({
   },
   alertasHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    gap: 8,
+  },
+  alertaCountBadge: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: DT.errorContainer,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  alertaCountText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: DT.error,
   },
   alertaCard: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    backgroundColor: DT.surfaceLowest,
     borderRadius: 16,
     padding: 14,
     borderLeftWidth: 4,
+    gap: 12,
+  },
+  alertaAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
   alertaInfo: {
     flex: 1,
+    gap: 4,
   },
   alertaName: {
     fontSize: 14,
     fontWeight: "700",
-    color: COLORS.text,
+    color: DT.onSurface,
   },
-  alertaMsg: {
+  alertaGrupo: {
     fontSize: 11,
-    fontWeight: "600",
+    color: DT.onSurfaceVariant,
+  },
+  alertaBadge: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
     marginTop: 2,
+  },
+  alertaBadgeText: {
+    fontSize: 11,
+    fontWeight: "700",
   },
 
   // Tip Card (Dashboard)
   tipCardDashboard: {
-    backgroundColor: COLORS.primaryDark,
-    borderRadius: 16,
+    borderRadius: 24,
     padding: 20,
     gap: 8,
+    overflow: "hidden",
   },
   tipCardInner: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
   },
-  tipCardTitle: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#d4e3ff",
+  tipCardOverline: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: "rgba(255,255,255,0.7)",
+    letterSpacing: 1.5,
+    textTransform: "uppercase",
   },
   tipCardDesc: {
-    fontSize: 12,
-    color: "#a4c9ff",
-    lineHeight: 18,
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#FFF",
+    lineHeight: 20,
   },
 
   // Empty State
@@ -1247,92 +1518,177 @@ const styles = StyleSheet.create({
     padding: 32,
   },
   emptyIconWrap: {
-    width: 128,
-    height: 128,
-    borderRadius: 64,
-    backgroundColor: COLORS.surfaceContainer,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: DT.surfaceContainer,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 24,
   },
   emptyTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "700",
-    color: COLORS.text,
+    color: DT.onSurface,
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 15,
-    color: COLORS.textSecondary,
+    color: DT.textSecondary,
     textAlign: "center",
     lineHeight: 22,
-    maxWidth: 300,
+    maxWidth: 280,
     marginBottom: 24,
   },
   emptyPrimaryBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: COLORS.primary,
+    backgroundColor: "#1676D2",
     paddingVertical: 14,
     paddingHorizontal: 28,
-    borderRadius: 24,
+    borderRadius: 12,
     marginBottom: 12,
+    width: "100%",
+    maxWidth: 320,
+    justifyContent: "center",
+    height: 50,
   },
   emptyPrimaryBtnText: {
     color: "#FFF",
     fontSize: 15,
-    fontWeight: "700",
+    fontWeight: "800",
   },
-  tipCard: {
-    marginTop: 32,
+  emptySecondaryBtn: {
+    backgroundColor: DT.surfaceContainer,
+    paddingVertical: 14,
+    paddingHorizontal: 28,
     borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.primary,
-    backgroundColor: COLORS.surfaceContainerLow,
-    padding: 14,
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 10,
-    maxWidth: 340,
+    width: "100%",
+    maxWidth: 320,
+    alignItems: "center",
+    height: 48,
+    justifyContent: "center",
   },
-  tipText: {
-    flex: 1,
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    fontStyle: "italic",
-    lineHeight: 17,
+  emptySecondaryBtnText: {
+    color: DT.onSurface,
+    fontSize: 15,
+    fontWeight: "700",
   },
 
-  // Loading / Error
-  loadingText: {
-    marginTop: 12,
-    fontSize: 14,
-    color: COLORS.textSecondary,
+  // Skeleton
+  skeletonContent: {
+    paddingHorizontal: 16,
+    paddingTop: 80,
+    gap: 28,
+  },
+  skeletonPill: {
+    width: 180,
+    height: 32,
+    borderRadius: 999,
+    backgroundColor: DT.skeleton,
+    opacity: 0.5,
+  },
+  skeletonKpiGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  skeletonKpi: {
+    width: "47%",
+    height: 100,
+    borderRadius: 14,
+    backgroundColor: DT.skeleton,
+    opacity: 0.5,
+  },
+  skeletonChart: {
+    width: "100%",
+    height: 200,
+    borderRadius: 14,
+    backgroundColor: DT.skeleton,
+    opacity: 0.5,
+  },
+  skeletonActionsRow: {
+    flexDirection: "row",
+  },
+  skeletonAction: {
+    width: 130,
+    height: 120,
+    borderRadius: 14,
+    backgroundColor: DT.skeleton,
+    opacity: 0.5,
+    marginRight: 12,
+  },
+  skeletonGrupo: {
+    width: "100%",
+    height: 90,
+    borderRadius: 14,
+    backgroundColor: DT.skeleton,
+    opacity: 0.5,
+  },
+
+  // Error State
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 32,
+  },
+  errorIconWrap: {
+    padding: 20,
+    borderRadius: 999,
+    backgroundColor: DT.surfaceLow,
+    marginBottom: 20,
   },
   errorTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "700",
-    color: COLORS.text,
-    marginTop: 12,
+    color: DT.text,
+    textAlign: "center",
+    marginBottom: 8,
   },
   errorMessage: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    marginTop: 4,
+    fontSize: 15,
+    color: DT.textSecondary,
     textAlign: "center",
+    lineHeight: 22,
+    maxWidth: 300,
+    marginBottom: 20,
   },
   retryBtn: {
-    marginTop: 16,
-    backgroundColor: COLORS.primary,
-    paddingVertical: 10,
-    paddingHorizontal: 24,
-    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "#1676D2",
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 12,
+    height: 50,
+    justifyContent: "center",
+    width: "100%",
+    maxWidth: 280,
   },
   retryBtnText: {
     color: "#FFF",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+
+  // Compare button
+  compareBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: DT.surfaceLow,
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  compareBtnText: {
     fontSize: 14,
     fontWeight: "700",
+    color: DT.primaryContainer,
   },
 });
 
@@ -1341,72 +1697,72 @@ const styles = StyleSheet.create({
 const modalStyles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(23, 28, 33, 0.4)",
+    backgroundColor: DT.overlay,
     justifyContent: "flex-end",
   },
   sheet: {
-    backgroundColor: COLORS.surface,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    backgroundColor: DT.surfaceLowest,
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
     maxHeight: "90%",
-    boxShadow: "0px -12px 24px rgba(0,72,132,0.08)",
+    boxShadow: `0px -24px 48px rgba(0,72,132,0.12)`,
   },
   handle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: COLORS.outlineVariant,
+    width: 48,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: "rgba(194,198,209,0.3)",
     alignSelf: "center",
-    marginTop: 12,
+    marginTop: 14,
     marginBottom: 8,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingBottom: 12,
   },
   title: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: "800",
-    color: COLORS.text,
+    color: DT.primaryContainer,
+    letterSpacing: -0.3,
   },
   closeBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: COLORS.surfaceContainerHigh,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: DT.surfaceLow,
     alignItems: "center",
     justifyContent: "center",
   },
   searchWrap: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.surfaceContainerLow,
-    borderRadius: 24,
-    marginHorizontal: 20,
+    backgroundColor: DT.surfaceLow,
+    borderRadius: 16,
+    marginHorizontal: 24,
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 12,
     marginBottom: 8,
     gap: 8,
   },
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: COLORS.text,
+    color: DT.onSurface,
     padding: 0,
   },
   list: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     maxHeight: 400,
   },
   grupoItem: {
     flexDirection: "row",
     alignItems: "center",
     padding: 14,
-    backgroundColor: COLORS.surface,
-    borderRadius: 14,
+    borderRadius: 16,
     marginBottom: 8,
     gap: 12,
   },
@@ -1414,14 +1770,14 @@ const modalStyles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.primaryTint,
+    backgroundColor: "rgba(0,69,128,0.05)",
     alignItems: "center",
     justifyContent: "center",
   },
   grupoAvatarText: {
     fontSize: 16,
     fontWeight: "700",
-    color: COLORS.primary,
+    color: DT.primaryContainer,
   },
   grupoInfo: {
     flex: 1,
@@ -1429,51 +1785,50 @@ const modalStyles = StyleSheet.create({
   grupoName: {
     fontSize: 15,
     fontWeight: "700",
-    color: COLORS.text,
+    color: DT.onSurface,
   },
   grupoMeta: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: DT.onSurfaceVariant,
   },
-  grupoAlumnosRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    marginTop: 2,
+  grupoBadge: {
+    backgroundColor: "rgba(27,109,36,0.1)",
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
   },
-  grupoAlumnosText: {
+  grupoBadgeText: {
     fontSize: 11,
-    color: COLORS.textMuted,
-    letterSpacing: 0.5,
+    fontWeight: "800",
+    color: DT.secondary,
   },
   noResults: {
     textAlign: "center",
     fontSize: 14,
-    color: COLORS.textMuted,
+    color: DT.outline,
     paddingVertical: 24,
   },
   footer: {
     padding: 20,
-    backgroundColor: COLORS.surfaceContainerLow,
   },
   cancelBtn: {
-    backgroundColor: COLORS.surfaceContainerHigh,
-    borderRadius: 24,
+    backgroundColor: DT.surfaceLow,
+    borderRadius: 16,
     paddingVertical: 14,
     alignItems: "center",
   },
   cancelBtnText: {
     fontSize: 15,
     fontWeight: "700",
-    color: COLORS.text,
+    color: DT.primaryContainer,
   },
   compareBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: COLORS.surfaceContainerLow,
-    borderRadius: 14,
+    backgroundColor: DT.surfaceLow,
+    borderRadius: 16,
     paddingVertical: 12,
     paddingHorizontal: 16,
     marginTop: 4,
@@ -1481,39 +1836,46 @@ const modalStyles = StyleSheet.create({
   },
   compareBtnText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: COLORS.primary,
+    fontWeight: "700",
+    color: DT.primaryContainer,
   },
 });
 
 const compareStyles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: DT.overlay,
     justifyContent: "flex-end",
   },
   sheet: {
-    backgroundColor: COLORS.surface,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    backgroundColor: DT.surfaceLowest,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
     maxHeight: "90%",
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingTop: 14,
     paddingBottom: 28,
+    boxShadow: `0px -24px 48px rgba(0,72,132,0.12)`,
   },
   handle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: COLORS.outlineVariant,
+    width: 48,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: "rgba(194,198,209,0.3)",
     alignSelf: "center",
     marginBottom: 12,
   },
   title: {
     fontSize: 20,
-    fontWeight: "700",
-    color: COLORS.text,
-    marginBottom: 12,
+    fontWeight: "800",
+    color: DT.primaryContainer,
+    letterSpacing: -0.3,
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 13,
+    color: DT.onSurfaceVariant,
+    marginBottom: 16,
   },
   chips: {
     flexDirection: "row",
@@ -1521,19 +1883,22 @@ const compareStyles = StyleSheet.create({
     maxHeight: 40,
   },
   chip: {
-    backgroundColor: COLORS.surfaceContainerLow,
-    borderRadius: 20,
+    backgroundColor: DT.surfaceHigh,
+    borderRadius: 999,
     paddingVertical: 6,
     paddingHorizontal: 14,
     marginRight: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   chipSelected: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: DT.primaryContainer,
   },
   chipText: {
     fontSize: 13,
-    fontWeight: "600",
-    color: COLORS.textSecondary,
+    fontWeight: "700",
+    color: DT.onSurfaceVariant,
   },
   chipTextSelected: {
     color: "#FFF",
@@ -1542,12 +1907,16 @@ const compareStyles = StyleSheet.create({
     flex: 1,
     marginBottom: 16,
   },
+  headerRowBg: {
+    backgroundColor: DT.surfaceLow,
+    borderRadius: 12,
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: DT.outlineVariant,
   },
   metricCell: {
     width: 100,
@@ -1559,36 +1928,38 @@ const compareStyles = StyleSheet.create({
   metricLabel: {
     fontSize: 11,
     fontWeight: "700",
-    color: COLORS.textMuted,
+    color: DT.outline,
     letterSpacing: 0.5,
+    textTransform: "uppercase",
   },
   colHeader: {
     fontSize: 12,
     fontWeight: "700",
-    color: COLORS.text,
+    color: DT.onSurface,
   },
   metricText: {
     fontSize: 13,
     fontWeight: "600",
-    color: COLORS.textSecondary,
+    color: DT.onSurfaceVariant,
   },
   valueText: {
     fontSize: 15,
     fontWeight: "700",
-    color: COLORS.text,
+    color: DT.onSurface,
   },
   bestValue: {
-    color: "#2E7D32",
+    color: DT.secondary,
   },
   barsSection: {
     marginTop: 20,
   },
   barsSectionTitle: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: COLORS.textMuted,
+    fontSize: 11,
+    fontWeight: "800",
+    color: DT.outline,
     marginBottom: 12,
-    letterSpacing: 0.3,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
   },
   barRow: {
     flexDirection: "row",
@@ -1600,13 +1971,13 @@ const compareStyles = StyleSheet.create({
     width: 80,
     fontSize: 12,
     fontWeight: "600",
-    color: COLORS.text,
+    color: DT.onSurface,
   },
   barTrack: {
     flex: 1,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.surfaceContainerLow,
+    backgroundColor: DT.surfaceLow,
     overflow: "hidden",
   },
   barFill: {
@@ -1617,19 +1988,42 @@ const compareStyles = StyleSheet.create({
     width: 36,
     fontSize: 12,
     fontWeight: "700",
-    color: COLORS.textSecondary,
+    color: DT.onSurfaceVariant,
     textAlign: "right",
   },
+  footerRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 8,
+  },
+  exportBtn: {
+    flex: 1,
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  exportBtnInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 14,
+  },
+  exportBtnText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#FFF",
+  },
   closeBtn: {
-    backgroundColor: COLORS.surfaceContainerHigh,
-    borderRadius: 24,
+    flex: 1,
+    backgroundColor: DT.surfaceLow,
+    borderRadius: 16,
     paddingVertical: 14,
     alignItems: "center",
   },
   closeBtnText: {
     fontSize: 15,
     fontWeight: "700",
-    color: COLORS.text,
+    color: DT.primaryContainer,
   },
 });
 

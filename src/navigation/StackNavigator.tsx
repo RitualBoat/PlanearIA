@@ -85,6 +85,9 @@ import QuestionEditorScreen from "../screens/feed/QuestionEditorScreen";
 // Importación de pantalla de Detalle de Post
 import PostDetailScreen from "../screens/feed/PostDetailScreen";
 
+// Importación de pantalla de Buscador de Perfiles
+import BuscadorPerfilesScreen from "../screens/social/BuscadorPerfilesScreen";
+
 // Importación de pantalla de Onboarding
 import OnboardingScreen from "../screens/onboarding/OnboardingScreen";
 
@@ -218,6 +221,9 @@ export type RootStackParamList = {
     postId: number;
     userId?: string;
   };
+
+  // Social / Buscador de Perfiles
+  BuscadorPerfiles: undefined;
 };
 /**
  * Creamos el Stack Navigator con tipado
@@ -689,6 +695,15 @@ const StackNavigator: React.FC = () => {
         component={PostDetailScreen}
         options={{
           title: "Detalle del Post",
+          headerShown: false,
+        }}
+      />
+      {/* ========== BUSCADOR DE PERFILES ========== */}
+      <Stack.Screen
+        name="BuscadorPerfiles"
+        component={BuscadorPerfilesScreen}
+        options={{
+          title: "Buscar Docentes",
           headerShown: false,
         }}
       />

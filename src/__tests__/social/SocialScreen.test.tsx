@@ -5,6 +5,10 @@ import SocialScreen from "../../screens/social/SocialScreen";
 
 jest.mock("@expo/vector-icons/MaterialIcons", () => "MaterialIcons");
 
+jest.mock("@react-navigation/native", () => ({
+  useNavigation: () => ({ navigate: jest.fn(), goBack: jest.fn() }),
+}));
+
 jest.mock("react-native-safe-area-context", () => {
   const React = require("react");
   return {
@@ -22,7 +26,9 @@ jest.mock("expo-linear-gradient", () => {
 jest.mock("../../components/AnimatedTopPill", () => {
   const React = require("react");
   return ({ title, subtitle }: any) =>
-    React.createElement("View", { testID: "animated-top-pill" },
+    React.createElement(
+      "View",
+      { testID: "animated-top-pill" },
       React.createElement("Text", null, title),
       subtitle ? React.createElement("Text", null, subtitle) : null
     );

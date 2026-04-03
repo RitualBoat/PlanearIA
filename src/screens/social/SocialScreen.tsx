@@ -15,6 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
 import AnimatedTopPill from "../../components/AnimatedTopPill";
 import { Contacto, SolicitudConexion } from "../../../types";
 import { useSocialViewModel, SocialTab } from "../../hooks/useSocialViewModel";
@@ -462,6 +463,7 @@ const EmptyState: React.FC<{ tab: SocialTab; onBuscar?: () => void }> = ({ tab, 
 const SocialScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
+  const navigation = useNavigation<any>();
   const vm = useSocialViewModel();
 
   const handleChatPress = () => {
@@ -485,7 +487,7 @@ const SocialScreen: React.FC = () => {
       />
 
       {vm.contactos.length === 0 ? (
-        <EmptyState tab="contactos" />
+        <EmptyState tab="contactos" onBuscar={() => navigation.navigate("BuscadorPerfiles")} />
       ) : (
         <View style={styles.sectionBlock}>
           <View style={styles.sectionHeader}>

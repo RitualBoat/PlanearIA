@@ -1,9 +1,34 @@
 import { renderHook, act } from "@testing-library/react-native";
 import { useBuscadorPerfilesViewModel } from "../../hooks/useBuscadorPerfilesViewModel";
 
+// Mock ContactosContext
+const mockEnviarSolicitud = jest.fn().mockResolvedValue(undefined);
+let mockContactos: any[] = [];
+let mockSolicitudes: any[] = [];
+
+jest.mock("../../context/ContactosContext", () => ({
+  useContactos: () => ({
+    contactos: mockContactos,
+    solicitudes: mockSolicitudes,
+    enviarSolicitud: mockEnviarSolicitud,
+  }),
+}));
+
+// Mock AuthContext
+const mockUsuario = { id: 1, nombre: "Test", apellidos: "User", fotoPerfil: null };
+
+jest.mock("../../context/AuthContext", () => ({
+  useAuth: () => ({
+    usuario: mockUsuario,
+  }),
+}));
+
 describe("useBuscadorPerfilesViewModel", () => {
   beforeEach(() => {
     jest.useFakeTimers();
+    jest.clearAllMocks();
+    mockContactos = [];
+    mockSolicitudes = [];
   });
 
   afterEach(() => {
@@ -76,14 +101,22 @@ describe("useBuscadorPerfilesViewModel", () => {
     expect(result.current.solicitudModal.docente).toEqual(docente);
   });
 
-  it("handleEnviarSolicitud cierra modal y muestra toast", () => {
+  it("handleEnviarSolicitud cierra modal, persiste solicitud y muestra toast", async () => {
     const { result } = renderHook(() => useBuscadorPerfilesViewModel());
     const docente = result.current.sugeridos[0];
     act(() => result.current.handleConectar(docente));
-    act(() => result.current.handleEnviarSolicitud("Hola!"));
+    await act(async () => result.current.handleEnviarSolicitud("Hola!"));
     expect(result.current.solicitudModal.visible).toBe(false);
     expect(result.current.toast.visible).toBe(true);
     expect(result.current.toast.type).toBe("solicitud");
+    expect(mockEnviarSolicitud).toHaveBeenCalledWith(
+      expect.objectContaining({
+        deUsuarioId: "1",
+        deUsuarioNombre: "Test User",
+        paraUsuarioId: docente.id,
+        mensaje: "Hola!",
+      })
+    );
   });
 
   it("handleCerrarSolicitudModal cierra modal", () => {
@@ -123,5 +156,39 @@ describe("useBuscadorPerfilesViewModel", () => {
     expect(result.current.toast.visible).toBe(true);
     act(() => jest.advanceTimersByTime(3100));
     expect(result.current.toast.visible).toBe(false);
+  });
+
+  it("sugeridos reflect real status from contactos context", () => {
+    mockContactos = [{ usuarioId: "s1", estado: "aceptada" }];
+    const { result } = renderHook(() => useBuscadorPerfilesViewModel());
+    const s1 = result.current.sugeridos.find((s: any) => s.id === "s1");
+    expect(s1?.estado).toBe("conectado");
+  });
+
+  it("sugeridos reflect pending solicitud from solicitudes context", () => {
+    mockSolicitudes = [{ paraUsuarioId: "s2", estado: "pendiente" }];
+    const { result } = renderHook(() => useBuscadorPerfilesViewModel());
+    const s2 = result.current.sugeridos.find((s: any) => s.id === "s2");
+    expect(s2?.estado).toBe("solicitud_enviada");
+  });
+
+  it("enriches search results with real connection status", () => {
+    mockContactos = [{ usuarioId: "r5", estado: "aceptada" }];
+    const { result } = renderHook(() => useBuscadorPerfilesViewModel());
+    act(() => result.current.setSearchQuery("Sec"));
+    act(() => result.current.handleSearch());
+    act(() => jest.advanceTimersByTime(1000));
+    const r5 = result.current.resultados.find((r: any) => r.id === "r5");
+    if (r5) expect(r5.estado).toBe("conectado");
+  });
+
+  it("enviarSolicitud sends empty mensaje as undefined", async () => {
+    const { result } = renderHook(() => useBuscadorPerfilesViewModel());
+    const docente = result.current.sugeridos[0];
+    act(() => result.current.handleConectar(docente));
+    await act(async () => result.current.handleEnviarSolicitud(""));
+    expect(mockEnviarSolicitud).toHaveBeenCalledWith(
+      expect.objectContaining({ mensaje: undefined })
+    );
   });
 });

@@ -14,8 +14,7 @@ jest.mock("react-native-safe-area-context", () => {
 jest.mock("expo-linear-gradient", () => {
   const React = require("react");
   return {
-    LinearGradient: ({ children, style }: any) =>
-      React.createElement("View", { style }, children),
+    LinearGradient: ({ children, style }: any) => React.createElement("View", { style }, children),
   };
 });
 
@@ -100,9 +99,7 @@ describe("BuscadorPerfilesScreen", () => {
 
   it("renderiza barra de búsqueda con placeholder correcto", () => {
     const { getByPlaceholderText } = render(<BuscadorPerfilesScreen />);
-    expect(
-      getByPlaceholderText("Nombre, email o escuela...")
-    ).toBeTruthy();
+    expect(getByPlaceholderText("Nombre, email o escuela...")).toBeTruthy();
   });
 
   it("renderiza chips de filtro por nivel", () => {
@@ -227,9 +224,7 @@ describe("BuscadorPerfilesScreen", () => {
   it("muestra banner offline", () => {
     mockCurrentVm = { ...defaultVm, isOffline: true };
     const { getByText } = render(<BuscadorPerfilesScreen />);
-    expect(
-      getByText(/Modo sin conexión/)
-    ).toBeTruthy();
+    expect(getByText(/Modo sin conexión/)).toBeTruthy();
   });
 
   it("muestra toast de solicitud enviada", () => {

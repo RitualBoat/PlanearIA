@@ -1,4 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
+import { useContactos } from "../context/ContactosContext";
+import { useAuth } from "../context/AuthContext";
 
 // ─── Types ───
 
@@ -156,6 +158,9 @@ const MOCK_RESULTADOS: DocentePerfil[] = [
 // ─── Hook ───
 
 export function useBuscadorPerfilesViewModel(): BuscadorPerfilesVM {
+  const { contactos, solicitudes, enviarSolicitud: ctxEnviarSolicitud } = useContactos();
+  const { usuario } = useAuth();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [filtroNivel, setFiltroNivel] = useState("Todos");
   const [filtrosExpandidos, setFiltrosExpandidos] = useState(false);
@@ -177,7 +182,34 @@ export function useBuscadorPerfilesViewModel(): BuscadorPerfilesVM {
     nombre: string;
   }>({ visible: false, type: null, nombre: "" });
 
-  const sugeridos = useMemo(() => SUGERIDOS, []);
+  // Determine real connection status from context
+  const getEstadoReal = useCallback(
+    (perfilId: string): DocentePerfil["estado"] => {
+      // Check if already a connected contact
+      const esContacto = contactos.find(
+        (c) => c.usuarioId === perfilId && c.estado === "aceptada"
+      );
+      if (esContacto) return "conectado";
+
+      // Check if there's a pending solicitud sent to this user
+      const solicitudEnviada = solicitudes.find(
+        (s) => s.paraUsuarioId === perfilId && s.estado === "pendiente"
+      );
+      if (solicitudEnviada) return "solicitud_enviada";
+
+      return "no_conectado";
+    },
+    [contactos, solicitudes]
+  );
+
+  // Enrich mock profiles with real connection status
+  const enrichWithRealStatus = useCallback(
+    (perfiles: DocentePerfil[]): DocentePerfil[] =>
+      perfiles.map((p) => ({ ...p, estado: getEstadoReal(p.id) })),
+    [getEstadoReal]
+  );
+
+  const sugeridos = useMemo(() => enrichWithRealStatus(SUGERIDOS), [enrichWithRealStatus]);
   const totalResultados = resultados.length;
 
   const showToast = useCallback((type: "solicitud" | "enlace", nombre: string) => {
@@ -189,7 +221,7 @@ export function useBuscadorPerfilesViewModel(): BuscadorPerfilesVM {
     if (!searchQuery.trim()) return;
     setIsSearching(true);
     setHasSearched(true);
-    // Simulate search delay
+    // Simulate search delay (mock user discovery — no users API yet)
     setTimeout(() => {
       const query = searchQuery.toLowerCase();
       const filtered = MOCK_RESULTADOS.filter(
@@ -199,10 +231,11 @@ export function useBuscadorPerfilesViewModel(): BuscadorPerfilesVM {
           d.materia.toLowerCase().includes(query) ||
           d.escuela.toLowerCase().includes(query)
       );
-      setResultados(filtered);
+      // Enrich with real connection status from context
+      setResultados(enrichWithRealStatus(filtered));
       setIsSearching(false);
     }, 800);
-  }, [searchQuery]);
+  }, [searchQuery, enrichWithRealStatus]);
 
   const handleClearSearch = useCallback(() => {
     setSearchQuery("");
@@ -215,20 +248,35 @@ export function useBuscadorPerfilesViewModel(): BuscadorPerfilesVM {
   }, []);
 
   const handleEnviarSolicitud = useCallback(
-    (mensaje: string) => {
-      const nombre = solicitudModal.docente
-        ? `${solicitudModal.docente.nombre} ${solicitudModal.docente.apellidos}`
-        : "";
+    async (mensaje: string) => {
+      const docente = solicitudModal.docente;
+      if (!docente) return;
+
+      const nombre = `${docente.nombre} ${docente.apellidos}`;
       setSolicitudModal({ visible: false, docente: null });
-      // Update the docente status to solicitud_enviada
+
+      // Persist solicitud via ContactosContext
+      await ctxEnviarSolicitud({
+        deUsuarioId: usuario?.id?.toString() ?? "guest",
+        deUsuarioNombre: usuario
+          ? `${usuario.nombre} ${usuario.apellidos}`
+          : "Usuario Invitado",
+        deUsuarioAvatar: usuario?.fotoPerfil ?? undefined,
+        deUsuarioMateria: undefined,
+        deUsuarioInstitucion: undefined,
+        paraUsuarioId: docente.id,
+        mensaje: mensaje || undefined,
+      });
+
+      // Update the docente status locally
       setResultados((prev) =>
         prev.map((d) =>
-          d.id === solicitudModal.docente?.id ? { ...d, estado: "solicitud_enviada" as const } : d
+          d.id === docente.id ? { ...d, estado: "solicitud_enviada" as const } : d
         )
       );
       showToast("solicitud", nombre);
     },
-    [solicitudModal.docente, showToast]
+    [solicitudModal.docente, showToast, ctxEnviarSolicitud, usuario]
   );
 
   const handleCerrarSolicitudModal = useCallback(() => {

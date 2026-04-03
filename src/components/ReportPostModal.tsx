@@ -1,13 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
-  Platform,
-  Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Platform, Pressable } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTheme } from "../context/ThemeContext";
@@ -18,18 +10,9 @@ interface ReportPostModalProps {
   onSubmit: (reason: string) => void;
 }
 
-const REPORT_REASONS = [
-  "Spam",
-  "Contenido inapropiado",
-  "Información falsa",
-  "Otro",
-];
+const REPORT_REASONS = ["Spam", "Contenido inapropiado", "Información falsa", "Otro"];
 
-const ReportPostModal: React.FC<ReportPostModalProps> = ({
-  visible,
-  onClose,
-  onSubmit,
-}) => {
+const ReportPostModal: React.FC<ReportPostModalProps> = ({ visible, onClose, onSubmit }) => {
   const { colors } = useTheme();
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
 
@@ -59,18 +42,12 @@ const ReportPostModal: React.FC<ReportPostModalProps> = ({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
       <Pressable style={styles.backdrop} onPress={handleClose}>
         <Pressable
-          style={[
-            styles.modal,
-            { backgroundColor: colors.surfaceContainerLowest },
-            modalShadow,
-          ]}
+          style={[styles.modal, { backgroundColor: colors.surfaceContainerLowest }, modalShadow]}
           onPress={(e) => e?.stopPropagation?.()}
         >
           {/* Header */}
           <View style={styles.headerRow}>
-            <View
-              style={[styles.headerIcon, { backgroundColor: colors.surfaceContainerLow }]}
-            >
+            <View style={[styles.headerIcon, { backgroundColor: colors.surfaceContainerLow }]}>
               <MaterialIcons name="flag" size={22} color={colors.primary} />
             </View>
             <TouchableOpacity onPress={handleClose} style={styles.closeBtn}>
@@ -80,9 +57,7 @@ const ReportPostModal: React.FC<ReportPostModalProps> = ({
 
           {/* Title */}
           <View style={styles.titleSection}>
-            <Text style={[styles.title, { color: colors.primary }]}>
-              Reportar publicación
-            </Text>
+            <Text style={[styles.title, { color: colors.primary }]}>Reportar publicación</Text>
             <Text style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
               ¿Por qué quieres reportar esta publicación? Tu reporte es anónimo.
             </Text>
@@ -101,9 +76,7 @@ const ReportPostModal: React.FC<ReportPostModalProps> = ({
                       backgroundColor: isSelected
                         ? colors.surfaceContainerHigh
                         : colors.surfaceContainerLow,
-                      borderColor: isSelected
-                        ? `${colors.outlineVariant}50`
-                        : "transparent",
+                      borderColor: isSelected ? `${colors.outlineVariant}50` : "transparent",
                     },
                   ]}
                   onPress={() => setSelectedReason(reason)}
@@ -113,23 +86,14 @@ const ReportPostModal: React.FC<ReportPostModalProps> = ({
                     style={[
                       styles.radioCircle,
                       {
-                        borderColor: isSelected
-                          ? colors.primary
-                          : colors.outlineVariant,
+                        borderColor: isSelected ? colors.primary : colors.outlineVariant,
                         backgroundColor: isSelected ? colors.primary : "transparent",
                       },
                     ]}
                   >
                     {isSelected && <View style={styles.radioInner} />}
                   </View>
-                  <Text
-                    style={[
-                      styles.optionLabel,
-                      { color: colors.onSurface },
-                    ]}
-                  >
-                    {reason}
-                  </Text>
+                  <Text style={[styles.optionLabel, { color: colors.onSurface }]}>{reason}</Text>
                 </TouchableOpacity>
               );
             })}

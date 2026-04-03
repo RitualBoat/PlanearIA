@@ -173,16 +173,35 @@ const FeedScreen: React.FC = () => {
     <View style={styles.emptyContainer}>
       {/* Decorative glow */}
       <View style={[styles.emptyGlow, { backgroundColor: `${colors.primaryContainer}08` }]} />
-      <View style={[styles.emptyImageBox, { backgroundColor: colors.surfaceContainerLow, borderColor: `${colors.outlineVariant}15` }]}>
+      <View
+        style={[
+          styles.emptyImageBox,
+          {
+            backgroundColor: colors.surfaceContainerLow,
+            borderColor: `${colors.outlineVariant}15`,
+          },
+        ]}
+      >
         <MaterialIcons name="groups" size={56} color={colors.primary} />
         {/* Floating icon */}
-        <View style={[styles.emptyFloatingIcon, {
-          backgroundColor: colors.surfaceContainerLowest,
-          ...Platform.select({
-            web: { boxShadow: '0px 4px 12px rgba(0,69,128,0.1)' } as any,
-            default: { shadowColor: '#004580', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 4 },
-          }),
-        }]}>
+        <View
+          style={[
+            styles.emptyFloatingIcon,
+            {
+              backgroundColor: colors.surfaceContainerLowest,
+              ...Platform.select({
+                web: { boxShadow: "0px 4px 12px rgba(0,69,128,0.1)" } as any,
+                default: {
+                  shadowColor: "#004580",
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 12,
+                  elevation: 4,
+                },
+              }),
+            },
+          ]}
+        >
           <MaterialIcons name="group-add" size={20} color={colors.primary} />
         </View>
       </View>
@@ -213,26 +232,36 @@ const FeedScreen: React.FC = () => {
       <View style={styles.errorIconContainer}>
         {/* Background glow */}
         <View style={[styles.errorGlow, { backgroundColor: colors.surfaceContainerLow }]} />
-        <View style={[
-          styles.errorIconBox,
-          {
-            backgroundColor: colors.surfaceContainerLowest,
-            ...Platform.select({
-              web: { boxShadow: '0px 24px 48px rgba(0,72,132,0.08)' } as any,
-              default: { shadowColor: '#004884', shadowOffset: { width: 0, height: 24 }, shadowOpacity: 0.08, shadowRadius: 48, elevation: 4 },
-            }),
-          },
-        ]}>
+        <View
+          style={[
+            styles.errorIconBox,
+            {
+              backgroundColor: colors.surfaceContainerLowest,
+              ...Platform.select({
+                web: { boxShadow: "0px 24px 48px rgba(0,72,132,0.08)" } as any,
+                default: {
+                  shadowColor: "#004884",
+                  shadowOffset: { width: 0, height: 24 },
+                  shadowOpacity: 0.08,
+                  shadowRadius: 48,
+                  elevation: 4,
+                },
+              }),
+            },
+          ]}
+        >
           <MaterialIcons name="cloud-off" size={48} color={colors.primaryContainer} />
         </View>
         {/* Error overlay badge */}
-        <View style={[
-          styles.errorBadge,
-          {
-            backgroundColor: colors.error,
-            borderColor: colors.background,
-          },
-        ]}>
+        <View
+          style={[
+            styles.errorBadge,
+            {
+              backgroundColor: colors.error,
+              borderColor: colors.background,
+            },
+          ]}
+        >
           <MaterialIcons name="wifi-off" size={14} color="#FFF" />
         </View>
       </View>
@@ -245,10 +274,7 @@ const FeedScreen: React.FC = () => {
       <TouchableOpacity
         onPress={vm.handleRefresh}
         activeOpacity={0.85}
-        style={[
-          styles.retryBtn,
-          { borderColor: colors.primaryContainer },
-        ]}
+        style={[styles.retryBtn, { borderColor: colors.primaryContainer }]}
       >
         <MaterialIcons name="refresh" size={20} color={colors.primaryContainer} />
         <Text style={[styles.retryBtnText, { color: colors.primaryContainer }]}>Reintentar</Text>
@@ -610,7 +636,13 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     ...Platform.select({
       web: { boxShadow: "0px 4px 8px rgba(0,0,0,0.15)" } as any,
-      default: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 4 },
+      default: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 4,
+      },
     }),
   },
   retryBtn: {

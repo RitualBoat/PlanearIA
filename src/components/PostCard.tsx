@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useTheme } from "../context/ThemeContext";
 import { Post } from "../../types";
 
@@ -158,45 +159,271 @@ const PostCard: React.FC<PostCardProps> = ({
         </View>
       )}
 
-      {/* Challenge card */}
-      {post.isChallenge && post.challengeData && (
-        <View style={[styles.challengeCard, { backgroundColor: colors.surfaceContainerLow }]}>
-          <View style={[styles.challengeBadge, { backgroundColor: colors.primary }]}>
-            <Text style={styles.challengeBadgeText}>RETO</Text>
-          </View>
-          <Text style={[styles.challengeTitle, { color: colors.onSurface }]}>
-            {post.challengeData.titulo}
-          </Text>
-          <Text style={{ color: colors.onSurfaceVariant, fontSize: 13, marginBottom: 12 }}>
-            {post.challengeData.descripcion}
-          </Text>
-          <View style={{ flexDirection: "row", gap: 8 }}>
-            <TouchableOpacity
-              style={[styles.challengeBtn, { backgroundColor: colors.primary }]}
-              onPress={() => onTakeChallenge?.(post)}
-            >
-              <MaterialIcons name="emoji-events" size={16} color="#FFF" />
-              <Text style={styles.challengeBtnText}>Contestar ahora</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.challengeBtn,
-                {
-                  backgroundColor: "transparent",
-                  borderWidth: 1,
-                  borderColor: colors.outlineVariant,
-                },
-              ]}
-              onPress={() => onSaveExam?.(post)}
-            >
-            >
-              <Text style={{ color: colors.primary, fontWeight: "700", fontSize: 13 }}>
-                Guardar examen
+      {/* Challenge card — 4 variants */}
+      {post.isChallenge &&
+        post.challengeData &&
+        (() => {
+          const state =
+            post.challengeState || (post.autorId === currentUserId ? "propio" : "sin_contestar");
+          const cd = post.challengeData;
+
+          if (state === "contestado") {
+            /* ── Variant: Contestado (answered) ── */
+            return (
+              <View style={[styles.challengeCard, { backgroundColor: colors.surfaceContainerLow }]}>
+                <View style={[styles.challengeBadge, { backgroundColor: `${colors.primary}15` }]}>
+                  <MaterialIcons name="emoji-events" size={12} color={colors.primary} />
+                  <Text style={[styles.challengeBadgeText, { color: colors.primary }]}>RETO</Text>
+                </View>
+                <Text style={[styles.challengeTitle, { color: colors.onSurface }]}>
+                  {cd.titulo}
+                </Text>
+                {/* Score grid */}
+                <View style={styles.challengeStatsGrid}>
+                  <View
+                    style={[
+                      styles.challengeStatBox,
+                      { backgroundColor: colors.surfaceContainerLowest },
+                    ]}
+                  >
+                    <Text style={[styles.challengeStatValue, { color: "#1b6d24" }]}>
+                      {cd.score ?? 8}/{cd.totalPreguntas ?? 10}
+                    </Text>
+                    <Text style={[styles.challengeStatLabel, { color: colors.onSurfaceVariant }]}>
+                      Tu puntaje
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.challengeStatBox,
+                      { backgroundColor: colors.surfaceContainerLowest },
+                    ]}
+                  >
+                    <Text style={[styles.challengeStatValue, { color: colors.primary }]}>
+                      #{cd.ranking ?? 5} de {cd.totalParticipantes ?? 32}
+                    </Text>
+                    <Text style={[styles.challengeStatLabel, { color: colors.onSurfaceVariant }]}>
+                      Tu ranking
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.challengeBtnRow}>
+                  <TouchableOpacity
+                    style={[styles.challengeOutlineBtn, { borderColor: `${colors.primary}20` }]}
+                    onPress={() => onTakeChallenge?.(post)}
+                  >
+                    <Text style={[styles.challengeOutlineBtnText, { color: colors.primary }]}>
+                      Ver mis respuestas
+                    </Text>
+                  </TouchableOpacity>
+                  <LinearGradient
+                    colors={["#004580", "#005da8"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.challengeGradientBtn}
+                  >
+                    <TouchableOpacity
+                      style={styles.challengeGradientInner}
+                      onPress={() => onTakeChallenge?.(post)}
+                      activeOpacity={0.9}
+                    >
+                      <MaterialIcons name="refresh" size={16} color="#FFF" />
+                      <Text style={styles.challengeBtnText}>Reintentar</Text>
+                    </TouchableOpacity>
+                  </LinearGradient>
+                </View>
+              </View>
+            );
+          }
+
+          if (state === "cerrado") {
+            /* ── Variant: Cerrado (closed) ── */
+            return (
+              <View style={[styles.challengeCard, { backgroundColor: colors.surfaceContainerLow }]}>
+                <View
+                  style={[
+                    styles.challengeBadge,
+                    { backgroundColor: `${colors.onSurfaceVariant}15` },
+                  ]}
+                >
+                  <Text style={[styles.challengeBadgeText, { color: colors.onSurfaceVariant }]}>
+                    RETO CERRADO
+                  </Text>
+                </View>
+                <Text style={[styles.challengeTitle, { color: colors.onSurface }]}>
+                  {cd.titulo}
+                </Text>
+                <View
+                  style={[
+                    styles.challengeAlertBox,
+                    { backgroundColor: `${colors.onSurfaceVariant}08` },
+                  ]}
+                >
+                  <MaterialIcons name="event-busy" size={16} color={colors.onSurfaceVariant} />
+                  <Text style={[styles.challengeAlertText, { color: colors.onSurfaceVariant }]}>
+                    Este reto ya no acepta respuestas
+                  </Text>
+                </View>
+                <View style={styles.challengeBtnRow}>
+                  <TouchableOpacity
+                    style={[
+                      styles.challengeDisabledBtn,
+                      { backgroundColor: `${colors.onSurfaceVariant}08` },
+                    ]}
+                    disabled
+                  >
+                    <MaterialIcons name="lock" size={14} color={`${colors.onSurfaceVariant}50`} />
+                    <Text
+                      style={{
+                        color: `${colors.onSurfaceVariant}50`,
+                        fontWeight: "700",
+                        fontSize: 13,
+                      }}
+                    >
+                      Cerrado
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.challengeOutlineBtn, { borderColor: `${colors.primary}20` }]}
+                    onPress={() => onTakeChallenge?.(post)}
+                  >
+                    <Text style={[styles.challengeOutlineBtnText, { color: colors.primary }]}>
+                      Ver resultados
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            );
+          }
+
+          if (state === "propio") {
+            /* ── Variant: Propio (own challenge) ── */
+            return (
+              <View style={[styles.challengeCard, { backgroundColor: colors.surfaceContainerLow }]}>
+                <View style={[styles.challengeBadge, { backgroundColor: "#004580" }]}>
+                  <MaterialIcons name="auto-awesome" size={12} color="#FFF" />
+                  <Text style={styles.challengeOwnerBadgeText}>TU RETO</Text>
+                </View>
+                <Text style={[styles.challengeTitle, { color: colors.onSurface }]}>
+                  {cd.titulo}
+                </Text>
+                {/* Stats 3-col grid */}
+                <View style={styles.challengeStatsGrid3}>
+                  <View
+                    style={[
+                      styles.challengeStat3Col,
+                      { backgroundColor: colors.surfaceContainerLowest },
+                    ]}
+                  >
+                    <Text style={[styles.challengeStatValue, { color: "#1b6d24" }]}>
+                      {cd.participantesActivos ?? 12}
+                    </Text>
+                    <Text style={[styles.challengeStatLabel, { color: colors.onSurfaceVariant }]}>
+                      P. Activos
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.challengeStat3Col,
+                      { backgroundColor: colors.surfaceContainerLowest },
+                    ]}
+                  >
+                    <Text style={[styles.challengeStatValue, { color: colors.primary }]}>
+                      {cd.promedio ?? 7.2}
+                    </Text>
+                    <Text style={[styles.challengeStatLabel, { color: colors.onSurfaceVariant }]}>
+                      Promedio
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.challengeStat3Col,
+                      { backgroundColor: colors.surfaceContainerLowest },
+                    ]}
+                  >
+                    <Text style={[styles.challengeStatValue, { color: "#1b6d24" }]}>
+                      {cd.mejorPuntaje ?? 10}
+                    </Text>
+                    <Text style={[styles.challengeStatLabel, { color: colors.onSurfaceVariant }]}>
+                      Mejor
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.challengeBtnRow}>
+                  <LinearGradient
+                    colors={["#004580", "#005da8"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={[styles.challengeGradientBtn, { flex: 1 }]}
+                  >
+                    <TouchableOpacity
+                      style={styles.challengeGradientInner}
+                      onPress={() => onTakeChallenge?.(post)}
+                      activeOpacity={0.9}
+                    >
+                      <MaterialIcons name="bar-chart" size={16} color="#FFF" />
+                      <Text style={styles.challengeBtnText}>Ver estadísticas</Text>
+                    </TouchableOpacity>
+                  </LinearGradient>
+                  <TouchableOpacity
+                    style={[
+                      styles.challengeSecondaryBtn,
+                      { backgroundColor: `${colors.onSurfaceVariant}08` },
+                    ]}
+                    onPress={() => onSaveExam?.(post)}
+                  >
+                    <Text
+                      style={{ color: colors.onSurfaceVariant, fontWeight: "700", fontSize: 13 }}
+                    >
+                      Editar reto
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            );
+          }
+
+          /* ── Default: Sin contestar ── */
+          return (
+            <View style={[styles.challengeCard, { backgroundColor: colors.surfaceContainerLow }]}>
+              <View style={[styles.challengeBadge, { backgroundColor: colors.primary }]}>
+                <Text style={styles.challengeOwnerBadgeText}>RETO</Text>
+              </View>
+              <Text style={[styles.challengeTitle, { color: colors.onSurface }]}>{cd.titulo}</Text>
+              <Text style={{ color: colors.onSurfaceVariant, fontSize: 13, marginBottom: 12 }}>
+                {cd.descripcion}
               </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
+              <View style={styles.challengeBtnRow}>
+                <LinearGradient
+                  colors={["#004580", "#005da8"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={[styles.challengeGradientBtn, { flex: 1 }]}
+                >
+                  <TouchableOpacity
+                    style={styles.challengeGradientInner}
+                    onPress={() => onTakeChallenge?.(post)}
+                    activeOpacity={0.9}
+                  >
+                    <MaterialIcons name="emoji-events" size={16} color="#FFF" />
+                    <Text style={styles.challengeBtnText}>Contestar ahora</Text>
+                  </TouchableOpacity>
+                </LinearGradient>
+                <TouchableOpacity
+                  style={[
+                    styles.challengeSecondaryBtn,
+                    { backgroundColor: `${colors.onSurfaceVariant}08` },
+                  ]}
+                  onPress={() => onSaveExam?.(post)}
+                >
+                  <Text style={{ color: colors.onSurfaceVariant, fontWeight: "700", fontSize: 13 }}>
+                    Guardar examen
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          );
+        })()}
 
       {/* Action bar */}
       <View style={[styles.actionBar, { borderTopColor: `${colors.outlineVariant}15` }]}>
@@ -377,16 +604,25 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 12,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
+    gap: 8,
   },
   challengeBadge: {
     alignSelf: "flex-start",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    marginBottom: 4,
   },
   challengeBadgeText: {
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 1,
+  },
+  challengeOwnerBadgeText: {
     color: "#FFF",
     fontSize: 10,
     fontWeight: "800",
@@ -397,18 +633,101 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 4,
   },
-  challengeBtn: {
+  challengeBtnRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 4,
+  },
+  challengeGradientBtn: {
+    borderRadius: 10,
+    flex: 1,
+  },
+  challengeGradientInner: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: 6,
-    paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 10,
   },
   challengeBtnText: {
     color: "#FFF",
     fontWeight: "700",
     fontSize: 13,
+  },
+  challengeOutlineBtn: {
+    flex: 1,
+    borderWidth: 2,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+  },
+  challengeOutlineBtnText: {
+    fontWeight: "700",
+    fontSize: 13,
+  },
+  challengeSecondaryBtn: {
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  challengeDisabledBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+  challengeStatsGrid: {
+    flexDirection: "row",
+    gap: 8,
+    marginVertical: 8,
+  },
+  challengeStatBox: {
+    flex: 1,
+    borderRadius: 12,
+    padding: 12,
+    alignItems: "center",
+    gap: 4,
+  },
+  challengeStatsGrid3: {
+    flexDirection: "row",
+    gap: 6,
+    marginVertical: 8,
+  },
+  challengeStat3Col: {
+    flex: 1,
+    borderRadius: 10,
+    padding: 10,
+    alignItems: "center",
+    gap: 2,
+  },
+  challengeStatValue: {
+    fontWeight: "800",
+    fontSize: 16,
+  },
+  challengeStatLabel: {
+    fontSize: 10,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  challengeAlertBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 4,
+  },
+  challengeAlertText: {
+    fontSize: 12,
+    fontWeight: "600",
+    flex: 1,
   },
   actionBar: {
     flexDirection: "row",

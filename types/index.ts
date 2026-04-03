@@ -318,11 +318,19 @@ export interface Post extends BaseEntity {
   commentsCount: number;
   savedBy: string[];
   isChallenge?: boolean;
+  challengeState?: "sin_contestar" | "cerrado" | "contestado" | "propio";
   challengeData?: {
     titulo: string;
     descripcion: string;
     tiempoLimite?: number;
     preguntas?: number;
+    score?: number;
+    totalPreguntas?: number;
+    ranking?: number;
+    totalParticipantes?: number;
+    participantesActivos?: number;
+    promedio?: number;
+    mejorPuntaje?: number;
   };
   fechaCreacion: string;
   fechaModificacion: string;

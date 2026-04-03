@@ -200,8 +200,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 style={[
                   styles.moodChip,
                   {
-                    backgroundColor:
-                      selectedMood === m.emoji ? m.bg : colors.surfaceContainerLow,
+                    backgroundColor: selectedMood === m.emoji ? m.bg : colors.surfaceContainerLow,
                     borderColor: selectedMood === m.emoji ? `${m.text}30` : "transparent",
                   },
                 ]}
@@ -233,6 +232,8 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 {
                   backgroundColor: `${colors.primary}08`,
                   borderColor: `${colors.primary}20`,
+                  borderLeftColor: colors.primary,
+                  borderLeftWidth: 4,
                 },
               ]}
             >
@@ -294,6 +295,34 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                     maxLength={3}
                   />
                 </View>
+              </View>
+
+              {/* Preview card */}
+              {challengeTitulo.trim() ? (
+                <View style={[styles.challengePreview, { backgroundColor: colors.surfaceContainerLowest }]}>
+                  <Text style={{ fontSize: 10, fontWeight: "700", color: colors.onSurfaceVariant, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>
+                    Vista previa
+                  </Text>
+                  <View style={[styles.challengePreviewBadge, { backgroundColor: colors.primary }]}>
+                    <Text style={{ color: "#FFF", fontSize: 9, fontWeight: "800", letterSpacing: 1 }}>RETO</Text>
+                  </View>
+                  <Text style={{ fontWeight: "700", fontSize: 14, color: colors.onSurface, marginTop: 4 }}>
+                    {challengeTitulo}
+                  </Text>
+                  {challengeDescripcion.trim() ? (
+                    <Text style={{ fontSize: 12, color: colors.onSurfaceVariant, marginTop: 2 }} numberOfLines={2}>
+                      {challengeDescripcion}
+                    </Text>
+                  ) : null}
+                </View>
+              ) : null}
+
+              {/* Tip card */}
+              <View style={[styles.challengeTip, { backgroundColor: `${colors.primary}06` }]}>
+                <MaterialIcons name="lightbulb" size={16} color={colors.primary} />
+                <Text style={{ flex: 1, fontSize: 12, color: colors.onSurfaceVariant, lineHeight: 18 }}>
+                  Los retos aparecen destacados en el feed y otros docentes pueden contestarlos
+                </Text>
               </View>
             </View>
           )}
@@ -477,6 +506,25 @@ const styles = StyleSheet.create({
   challengeRow: {
     flexDirection: "row",
     gap: 10,
+  },
+  challengePreview: {
+    padding: 12,
+    borderRadius: 10,
+    marginTop: 4,
+  },
+  challengePreviewBadge: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  challengeTip: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    padding: 12,
+    borderRadius: 10,
+    marginTop: 4,
   },
 });
 

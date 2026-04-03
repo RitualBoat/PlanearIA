@@ -77,8 +77,10 @@ import EditorPlantillaScreen from "../screens/plantillas/EditorPlantillaScreen";
 // Importación de pantalla de Perfil
 import PerfilScreen from "../screens/perfil/PerfilScreen";
 
-// Importación de pantalla de Reto
+// Importación de pantallas de Reto
 import RetoResolucionScreen from "../screens/feed/RetoResolucionScreen";
+import RetoResultadoScreen from "../screens/feed/RetoResultadoScreen";
+import QuestionEditorScreen from "../screens/feed/QuestionEditorScreen";
 
 // Importación de pantalla de Detalle de Post
 import PostDetailScreen from "../screens/feed/PostDetailScreen";
@@ -201,6 +203,15 @@ export type RootStackParamList = {
         preguntas?: number;
       }
     | undefined;
+  RetoResultado:
+    | {
+        titulo?: string;
+        correctas?: number;
+        total?: number;
+        tiempo?: number;
+      }
+    | undefined;
+  QuestionEditor: undefined;
 
   // Detalle de Post
   PostDetail: {
@@ -653,6 +664,22 @@ const StackNavigator: React.FC = () => {
         component={RetoResolucionScreen}
         options={{
           title: "Resolver Reto",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="RetoResultado"
+        component={RetoResultadoScreen}
+        options={{
+          title: "Resultado del Reto",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="QuestionEditor"
+        component={QuestionEditorScreen}
+        options={{
+          title: "Editor de Preguntas",
           headerShown: false,
         }}
       />

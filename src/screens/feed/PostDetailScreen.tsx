@@ -141,11 +141,7 @@ const PostDetailScreen: React.FC = () => {
     <View>
       {/* Post image */}
       {imageAttachment && (
-        <Image
-          source={{ uri: imageAttachment.url }}
-          style={styles.postImage}
-          resizeMode="cover"
-        />
+        <Image source={{ uri: imageAttachment.url }} style={styles.postImage} resizeMode="cover" />
       )}
 
       {/* Author info */}
@@ -175,7 +171,15 @@ const PostDetailScreen: React.FC = () => {
       <Text style={[styles.postBody, { color: colors.onSurfaceVariant }]}>{post.contenido}</Text>
 
       {/* Action bar */}
-      <View style={[styles.actionBar, { borderTopColor: colors.surfaceContainerLow, borderBottomColor: colors.surfaceContainerLow }]}>
+      <View
+        style={[
+          styles.actionBar,
+          {
+            borderTopColor: colors.surfaceContainerLow,
+            borderBottomColor: colors.surfaceContainerLow,
+          },
+        ]}
+      >
         <View style={styles.actionGroupLeft}>
           <TouchableOpacity
             style={styles.actionBtn}
@@ -253,7 +257,12 @@ const PostDetailScreen: React.FC = () => {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
       >
-        <View style={[styles.contentContainer, isDesktop && { maxWidth: 640, alignSelf: "center", width: "100%" }]}>
+        <View
+          style={[
+            styles.contentContainer,
+            isDesktop && { maxWidth: 640, alignSelf: "center", width: "100%" },
+          ]}
+        >
           <FlatList
             data={mockComments}
             keyExtractor={(item) => item.id.toString()}
@@ -301,9 +310,7 @@ const PostDetailScreen: React.FC = () => {
             ]}
           >
             <View style={[styles.commentInputAvatar, { backgroundColor: colors.primary }]}>
-              <Text style={styles.commentInputAvatarText}>
-                {(userId || "U")[0].toUpperCase()}
-              </Text>
+              <Text style={styles.commentInputAvatarText}>{(userId || "U")[0].toUpperCase()}</Text>
             </View>
             <TextInput
               style={[styles.commentInput, { color: colors.onSurface }]}

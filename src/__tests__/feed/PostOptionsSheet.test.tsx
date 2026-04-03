@@ -118,11 +118,7 @@ describe("PostOptionsSheet", () => {
 
   it("muestra botón Cancelar", () => {
     const { getByText } = render(
-      <PostOptionsSheet
-        visible={true}
-        onClose={mockOnClose}
-        isOwnPost={true}
-      />
+      <PostOptionsSheet visible={true} onClose={mockOnClose} isOwnPost={true} />
     );
 
     expect(getByText("Cancelar")).toBeTruthy();
@@ -132,11 +128,7 @@ describe("PostOptionsSheet", () => {
 
   it("no renderiza contenido cuando visible=false", () => {
     const { queryByText } = render(
-      <PostOptionsSheet
-        visible={false}
-        onClose={mockOnClose}
-        isOwnPost={true}
-      />
+      <PostOptionsSheet visible={false} onClose={mockOnClose} isOwnPost={true} />
     );
 
     // Modal is not visible, content may or may not render depending on RN
@@ -146,11 +138,7 @@ describe("PostOptionsSheet", () => {
 
   it("muestra header correcto para post propio", () => {
     const { getByText } = render(
-      <PostOptionsSheet
-        visible={true}
-        onClose={mockOnClose}
-        isOwnPost={true}
-      />
+      <PostOptionsSheet visible={true} onClose={mockOnClose} isOwnPost={true} />
     );
 
     expect(getByText("GESTIONAR PUBLICACIÓN")).toBeTruthy();
@@ -158,11 +146,7 @@ describe("PostOptionsSheet", () => {
 
   it("muestra header correcto para post ajeno", () => {
     const { getByText } = render(
-      <PostOptionsSheet
-        visible={true}
-        onClose={mockOnClose}
-        isOwnPost={false}
-      />
+      <PostOptionsSheet visible={true} onClose={mockOnClose} isOwnPost={false} />
     );
 
     expect(getByText("OPCIONES")).toBeTruthy();

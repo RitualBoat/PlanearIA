@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
-  Platform,
-  Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Platform, Pressable } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTheme } from "../context/ThemeContext";
 
@@ -116,19 +108,13 @@ const PostOptionsSheet: React.FC<PostOptionsSheetProps> = ({
                   activeOpacity={0.7}
                 >
                   <View style={styles.optionLeft}>
-                    <View
-                      style={[styles.optionIconBox, { backgroundColor: iconBgColor }]}
-                    >
+                    <View style={[styles.optionIconBox, { backgroundColor: iconBgColor }]}>
                       <MaterialIcons name={opt.icon as any} size={22} color={iconColor} />
                     </View>
                     <Text style={[styles.optionLabel, { color: textColor }]}>{opt.label}</Text>
                   </View>
                   {!opt.destructive && (
-                    <MaterialIcons
-                      name="chevron-right"
-                      size={18}
-                      color={colors.outlineVariant}
-                    />
+                    <MaterialIcons name="chevron-right" size={18} color={colors.outlineVariant} />
                   )}
                 </TouchableOpacity>
               );
@@ -138,10 +124,7 @@ const PostOptionsSheet: React.FC<PostOptionsSheetProps> = ({
           {/* Dismiss */}
           <View style={styles.dismissContainer}>
             <TouchableOpacity
-              style={[
-                styles.dismissBtn,
-                { backgroundColor: colors.surfaceContainerHigh },
-              ]}
+              style={[styles.dismissBtn, { backgroundColor: colors.surfaceContainerHigh }]}
               onPress={onClose}
             >
               <Text style={[styles.dismissText, { color: colors.onSurface }]}>Cancelar</Text>

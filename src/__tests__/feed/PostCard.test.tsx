@@ -13,6 +13,10 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
 
 jest.mock("@expo/vector-icons/MaterialIcons", () => "MaterialIcons");
 
+jest.mock("expo-linear-gradient", () => ({
+  LinearGradient: "LinearGradient",
+}));
+
 jest.mock("../../context/ThemeContext", () => ({
   useTheme: () => ({
     theme: "light",
@@ -189,15 +193,13 @@ describe("PostCard", () => {
     expect(getByText(/2\.5 MB/)).toBeTruthy();
   });
 
-  it("muestra card de reto/examen cuando isChallenge", () => {
+  it("muestra card de reto/examen cuando isChallenge (sin_contestar)", () => {
     const challengePost: Post = {
       ...basePost,
       isChallenge: true,
       challengeData: {
         titulo: "Reto de Matemáticas",
         descripcion: "15 min · 10 preguntas",
-        duracionMinutos: 15,
-        totalPreguntas: 10,
       },
     };
 
@@ -216,5 +218,100 @@ describe("PostCard", () => {
     expect(getByText("RETO")).toBeTruthy();
     expect(getByText("Contestar ahora")).toBeTruthy();
     expect(getByText("Guardar examen")).toBeTruthy();
+  });
+
+  it("muestra variante 'contestado' con puntaje y ranking", () => {
+    const answeredPost: Post = {
+      ...basePost,
+      isChallenge: true,
+      challengeState: "contestado",
+      challengeData: {
+        titulo: "Reto Contestado",
+        descripcion: "Ya respondido",
+        score: 8,
+        totalPreguntas: 10,
+        ranking: 3,
+        totalParticipantes: 20,
+      },
+    };
+
+    const { getByText } = render(
+      <PostCard
+        post={answeredPost}
+        currentUserId="user5"
+        onLike={mockOnLike}
+        onComment={mockOnComment}
+        onSave={mockOnSave}
+        onShare={mockOnShare}
+      />
+    );
+
+    expect(getByText("Reto Contestado")).toBeTruthy();
+    expect(getByText("8/10")).toBeTruthy();
+    expect(getByText("#3 de 20")).toBeTruthy();
+    expect(getByText("Ver mis respuestas")).toBeTruthy();
+    expect(getByText("Reintentar")).toBeTruthy();
+  });
+
+  it("muestra variante 'cerrado' con mensaje de cierre", () => {
+    const closedPost: Post = {
+      ...basePost,
+      isChallenge: true,
+      challengeState: "cerrado",
+      challengeData: {
+        titulo: "Reto Cerrado",
+        descripcion: "Expirado",
+      },
+    };
+
+    const { getByText } = render(
+      <PostCard
+        post={closedPost}
+        currentUserId="user5"
+        onLike={mockOnLike}
+        onComment={mockOnComment}
+        onSave={mockOnSave}
+        onShare={mockOnShare}
+      />
+    );
+
+    expect(getByText("Reto Cerrado")).toBeTruthy();
+    expect(getByText("RETO CERRADO")).toBeTruthy();
+    expect(getByText("Este reto ya no acepta respuestas")).toBeTruthy();
+    expect(getByText("Cerrado")).toBeTruthy();
+    expect(getByText("Ver resultados")).toBeTruthy();
+  });
+
+  it("muestra variante 'propio' con estadísticas del creador", () => {
+    const ownPost: Post = {
+      ...basePost,
+      autorId: "user5",
+      isChallenge: true,
+      challengeData: {
+        titulo: "Mi Reto",
+        descripcion: "Creado por mí",
+        participantesActivos: 12,
+        promedio: 7.2,
+        mejorPuntaje: 10,
+      },
+    };
+
+    const { getByText } = render(
+      <PostCard
+        post={ownPost}
+        currentUserId="user5"
+        onLike={mockOnLike}
+        onComment={mockOnComment}
+        onSave={mockOnSave}
+        onShare={mockOnShare}
+      />
+    );
+
+    expect(getByText("Mi Reto")).toBeTruthy();
+    expect(getByText("TU RETO")).toBeTruthy();
+    expect(getByText("12")).toBeTruthy();
+    expect(getByText("7.2")).toBeTruthy();
+    expect(getByText("Ver estadísticas")).toBeTruthy();
+    expect(getByText("Editar reto")).toBeTruthy();
   });
 });

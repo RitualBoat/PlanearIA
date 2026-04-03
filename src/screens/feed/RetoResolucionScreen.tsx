@@ -1,8 +1,54 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState, useCallback, useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Platform,
+  Alert,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useTheme } from "../../context/ThemeContext";
+
+const OPTION_LETTERS = ["A", "B", "C", "D", "E", "F"];
+
+// Sample questions for demo (in real app, these come from the challenge data)
+const SAMPLE_QUESTIONS = [
+  {
+    id: "1",
+    text: "¿En qué año inició la Revolución Mexicana?",
+    category: "Historia de México",
+    options: [
+      { id: "a", text: "1910", isCorrect: true },
+      { id: "b", text: "1917", isCorrect: false },
+      { id: "c", text: "1810", isCorrect: false },
+      { id: "d", text: "1920", isCorrect: false },
+    ],
+  },
+  {
+    id: "2",
+    text: "Venustiano Carranza promulgó la Constitución de 1917.",
+    category: "Constitución",
+    options: [
+      { id: "a", text: "Verdadero", isCorrect: true },
+      { id: "b", text: "Falso", isCorrect: false },
+    ],
+  },
+  {
+    id: "3",
+    text: "¿Cuál de los siguientes personajes fue líder del Ejército Libertador del Sur?",
+    category: "Personajes Históricos",
+    options: [
+      { id: "a", text: "Francisco Villa", isCorrect: false },
+      { id: "b", text: "Emiliano Zapata", isCorrect: true },
+      { id: "c", text: "Álvaro Obregón", isCorrect: false },
+      { id: "d", text: "Porfirio Díaz", isCorrect: false },
+    ],
+  },
+];
 
 interface RetoResolucionScreenProps {
   route?: {
@@ -13,142 +59,367 @@ interface RetoResolucionScreenProps {
       preguntas?: number;
     };
   };
-  navigation?: { goBack: () => void };
+  navigation?: {
+    goBack: () => void;
+    navigate: (screen: string, params?: any) => void;
+  };
 }
 
 const RetoResolucionScreen: React.FC<RetoResolucionScreenProps> = ({ route, navigation }) => {
   const { colors } = useTheme();
   const params = route?.params;
+  const titulo = params?.titulo || "Resolver Reto";
+  const totalQuestions = SAMPLE_QUESTIONS.length;
+  const tiempoLimite = params?.tiempoLimite;
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [timeLeft, setTimeLeft] = useState(tiempoLimite ? tiempoLimite * 60 : 0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Timer
+  useEffect(() => {
+    if (!tiempoLimite) return;
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [tiempoLimite]);
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  };
+
+  const question = SAMPLE_QUESTIONS[currentIndex];
+  const progress = ((currentIndex + 1) / totalQuestions) * 100;
+  const answeredCount = Object.keys(answers).length;
+  const selectedOption = question ? answers[question.id] : undefined;
+
+  const handleSelectOption = useCallback(
+    (optId: string) => {
+      if (!question) return;
+      setAnswers((prev) => ({ ...prev, [question.id]: optId }));
+    },
+    [question]
+  );
+
+  const handlePrev = useCallback(() => {
+    setCurrentIndex((prev) => Math.max(0, prev - 1));
+  }, []);
+
+  const handleNext = useCallback(() => {
+    if (currentIndex < totalQuestions - 1) {
+      setCurrentIndex((prev) => prev + 1);
+    } else {
+      // Submit
+      Alert.alert(
+        "Enviar respuestas",
+        `Has contestado ${answeredCount} de ${totalQuestions} preguntas. ¿Deseas enviar tus respuestas?`,
+        [
+          { text: "Cancelar", style: "cancel" },
+          {
+            text: "Enviar",
+            onPress: () => {
+              navigation?.navigate("RetoResultado", {
+                titulo,
+                correctas: answeredCount,
+                total: totalQuestions,
+                tiempo: tiempoLimite ? tiempoLimite * 60 - timeLeft : undefined,
+              });
+            },
+          },
+        ]
+      );
+    }
+  }, [currentIndex, totalQuestions, answeredCount, navigation, titulo, tiempoLimite, timeLeft]);
+
+  const cardShadow = Platform.select({
+    web: { boxShadow: "0px 2px 8px rgba(0,69,128,0.06)" } as any,
+    default: {
+      shadowColor: "#004580",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 2,
+    },
+  });
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation?.goBack()} style={styles.backBtn}>
-          <MaterialIcons name="arrow-back" size={24} color={colors.onSurface} />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.onSurface }]}>
-          {params?.titulo || "Resolver Reto"}
-        </Text>
+      {/* Header */}
+      <View style={[styles.header, { backgroundColor: `${colors.surfaceContainerLow}F2` }]}>
+        <View style={styles.headerTop}>
+          <View style={styles.headerLeft}>
+            <MaterialIcons name="auto-stories" size={20} color={colors.primary} />
+            <Text style={[styles.headerTitle, { color: colors.primary }]} numberOfLines={1}>
+              {titulo}
+            </Text>
+          </View>
+          {tiempoLimite ? (
+            <View style={[styles.timerBadge, { borderColor: "rgba(246,155,99,0.2)" }]}>
+              <Text style={[styles.timerText, { color: "#f69b63" }]}>
+                ⏱️ {formatTime(timeLeft)}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+        {/* Progress */}
+        <View style={styles.progressSection}>
+          <View style={styles.progressLabels}>
+            <Text style={[styles.progressLabel, { color: colors.onSurfaceVariant }]}>
+              Pregunta {currentIndex + 1} de {totalQuestions}
+            </Text>
+            <Text style={[styles.progressPercent, { color: "#1b6d24" }]}>
+              {Math.round(progress)}% completado
+            </Text>
+          </View>
+          <View style={[styles.progressBarBg, { backgroundColor: colors.surfaceContainerHighest }]}>
+            <View
+              style={[
+                styles.progressBarFill,
+                { width: `${progress}%`, backgroundColor: "#1b6d24" },
+              ]}
+            />
+          </View>
+        </View>
       </View>
 
-      <View style={styles.content}>
-        <View style={[styles.iconWrap, { backgroundColor: colors.surfaceContainerHigh }]}>
-          <MaterialIcons name="military-tech" size={64} color={colors.primary} />
-        </View>
-        <Text style={[styles.title, { color: colors.onSurface }]}>Resolución de Retos</Text>
-        <Text style={[styles.description, { color: colors.onSurfaceVariant }]}>
-          El flujo completo de resolución con timer, preguntas interactivas y resultado inmediato se
-          implementará próximamente.
-        </Text>
-        {params?.descripcion && (
-          <Text style={[styles.retoDesc, { color: colors.onSurface }]}>{params.descripcion}</Text>
-        )}
-        {(params?.tiempoLimite || params?.preguntas) && (
-          <View style={styles.infoRow}>
-            {params?.tiempoLimite && (
-              <View style={[styles.infoBadge, { backgroundColor: colors.surfaceContainerLow }]}>
-                <MaterialIcons name="timer" size={16} color={colors.primary} />
-                <Text style={{ color: colors.onSurface, fontSize: 13, fontWeight: "600" }}>
-                  {params.tiempoLimite} min
-                </Text>
-              </View>
-            )}
-            {params?.preguntas && (
-              <View style={[styles.infoBadge, { backgroundColor: colors.surfaceContainerLow }]}>
-                <MaterialIcons name="quiz" size={16} color={colors.primary} />
-                <Text style={{ color: colors.onSurface, fontSize: 13, fontWeight: "600" }}>
-                  {params.preguntas} preguntas
-                </Text>
-              </View>
-            )}
+      {/* Question content */}
+      <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
+        {question && (
+          <View
+            style={[
+              styles.questionCard,
+              { backgroundColor: colors.surfaceContainerLowest },
+              cardShadow,
+            ]}
+          >
+            <View style={[styles.categoryBadge, { backgroundColor: "#d4e3ff" }]}>
+              <Text style={[styles.categoryText, { color: "#064883" }]}>{question.category}</Text>
+            </View>
+            <Text style={[styles.questionText, { color: colors.onSurface }]}>{question.text}</Text>
+            <View style={styles.optionsList}>
+              {question.options.map((opt, oi) => {
+                const isSelected = selectedOption === opt.id;
+                return (
+                  <TouchableOpacity
+                    key={opt.id}
+                    style={[
+                      styles.optionBtn,
+                      {
+                        backgroundColor: isSelected
+                          ? `${colors.primary}08`
+                          : colors.surfaceContainerLowest,
+                        borderWidth: isSelected ? 2 : 1,
+                        borderColor: isSelected ? colors.primary : colors.outlineVariant,
+                      },
+                    ]}
+                    onPress={() => handleSelectOption(opt.id)}
+                    activeOpacity={0.8}
+                  >
+                    <View
+                      style={[
+                        styles.optionCircle,
+                        {
+                          backgroundColor: isSelected ? colors.primary : "transparent",
+                          borderWidth: 2,
+                          borderColor: isSelected ? colors.primary : colors.outlineVariant,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.optionLetter,
+                          { color: isSelected ? "#FFF" : colors.outlineVariant },
+                        ]}
+                      >
+                        {OPTION_LETTERS[oi]}
+                      </Text>
+                    </View>
+                    <Text
+                      style={[
+                        styles.optionText,
+                        {
+                          color: isSelected ? colors.primary : colors.onSurfaceVariant,
+                          fontWeight: isSelected ? "700" : "500",
+                        },
+                      ]}
+                    >
+                      {opt.text}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
         )}
+      </ScrollView>
+
+      {/* Footer */}
+      <View
+        style={[
+          styles.footer,
+          {
+            backgroundColor: `${colors.surfaceContainerLowest}CC`,
+            borderTopColor: `${colors.outlineVariant}10`,
+          },
+        ]}
+      >
         <TouchableOpacity
-          style={[styles.backButton, { backgroundColor: colors.primary }]}
-          onPress={() => navigation?.goBack()}
+          style={[styles.prevBtn, { backgroundColor: colors.surfaceContainerHigh }]}
+          onPress={handlePrev}
+          disabled={currentIndex === 0}
         >
-          <Text style={styles.backButtonText}>Volver al Feed</Text>
+          <MaterialIcons
+            name="arrow-back"
+            size={16}
+            color={currentIndex === 0 ? colors.outline : colors.onSurface}
+          />
+          <Text
+            style={[
+              styles.prevBtnText,
+              { color: currentIndex === 0 ? colors.outline : colors.onSurface },
+            ]}
+          >
+            Anterior
+          </Text>
         </TouchableOpacity>
+
+        <LinearGradient
+          colors={["#004580", "#005da8"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.nextBtnGradient}
+        >
+          <TouchableOpacity style={styles.nextBtn} onPress={handleNext} activeOpacity={0.9}>
+            <Text style={styles.nextBtnText}>
+              {currentIndex === totalQuestions - 1 ? "Enviar" : "Siguiente"}
+            </Text>
+            <MaterialIcons name="arrow-forward" size={16} color="#FFF" />
+          </TouchableOpacity>
+        </LinearGradient>
       </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
+  container: { flex: 1 },
+  header: { paddingTop: 4 },
+  headerTop: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 12,
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 12,
   },
-  backBtn: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 32,
-    gap: 16,
-  },
-  iconWrap: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 8,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  description: {
-    fontSize: 15,
-    lineHeight: 22,
-    textAlign: "center",
-  },
-  retoDesc: {
-    fontSize: 14,
-    lineHeight: 20,
-    textAlign: "center",
-    fontStyle: "italic",
-    marginTop: 8,
-  },
-  infoRow: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 8,
-  },
-  infoBadge: {
+  headerLeft: { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
+  headerTitle: { fontSize: 20, fontWeight: "800", letterSpacing: -0.5 },
+  timerBadge: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingVertical: 6,
+    borderRadius: 9999,
+    borderWidth: 1,
+    backgroundColor: "rgba(246,155,99,0.1)",
   },
-  backButton: {
-    marginTop: 24,
-    paddingHorizontal: 32,
-    paddingVertical: 14,
-    borderRadius: 24,
+  timerText: { fontSize: 14, fontWeight: "700", letterSpacing: -0.3 },
+  progressSection: { paddingHorizontal: 20, paddingBottom: 16 },
+  progressLabels: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
   },
-  backButtonText: {
-    color: "#FFF",
+  progressLabel: {
+    fontSize: 10,
     fontWeight: "700",
-    fontSize: 15,
+    textTransform: "uppercase",
+    letterSpacing: 1.5,
   },
+  progressPercent: { fontSize: 10, fontWeight: "700" },
+  progressBarBg: { height: 4, borderRadius: 9999, overflow: "hidden" },
+  progressBarFill: { height: "100%", borderRadius: 9999 },
+  scrollArea: { flex: 1 },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 100, gap: 24 },
+  questionCard: { borderRadius: 16, padding: 24 },
+  categoryBadge: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    marginBottom: 16,
+  },
+  categoryText: {
+    fontSize: 10,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+  },
+  questionText: {
+    fontSize: 18,
+    fontWeight: "700",
+    lineHeight: 26,
+    marginBottom: 24,
+  },
+  optionsList: { gap: 12 },
+  optionBtn: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 16,
+    padding: 16,
+    borderRadius: 12,
+  },
+  optionCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 2,
+  },
+  optionLetter: { fontSize: 10, fontWeight: "700" },
+  optionText: { fontSize: 14, lineHeight: 20, flex: 1 },
+  footer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderTopWidth: 1,
+  },
+  prevBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 16,
+    borderRadius: 12,
+  },
+  prevBtnText: { fontWeight: "700", fontSize: 14 },
+  nextBtnGradient: { flex: 2, borderRadius: 12 },
+  nextBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 16,
+  },
+  nextBtnText: { color: "#FFF", fontWeight: "700", fontSize: 14 },
 });
 
 export default RetoResolucionScreen;

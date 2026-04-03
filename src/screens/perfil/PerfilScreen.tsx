@@ -320,12 +320,12 @@ const PerfilScreen: React.FC = () => {
                   styles.statCard,
                   { backgroundColor: colors.surfaceContainerLowest },
                   Platform.select({
-                    web: { boxShadow: `0px 8px 24px ${colors.shadowBlue}` } as any,
+                    web: { boxShadow: "0px 2px 8px rgba(0,69,128,0.06)" } as any,
                     default: {
-                      shadowColor: "#005da8",
-                      shadowOffset: { width: 0, height: 8 },
+                      shadowColor: "#004580",
+                      shadowOffset: { width: 0, height: 2 },
                       shadowOpacity: 0.06,
-                      shadowRadius: 24,
+                      shadowRadius: 8,
                       elevation: 2,
                     },
                   }),
@@ -430,8 +430,8 @@ const PerfilScreen: React.FC = () => {
         <View style={styles.infoSection}>
           <Text style={[styles.userName, { color: colors.onSurface }]}>{userName}</Text>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <View style={[styles.roleChip, { backgroundColor: `${colors.primary}15` }]}>
-              <Text style={[styles.roleChipText, { color: colors.primary }]}>{userRole}</Text>
+            <View style={[styles.roleChip, { backgroundColor: "#d2e4ff" }]}>
+              <Text style={[styles.roleChipText, { color: "#004580" }]}>{userRole}</Text>
             </View>
             <Text style={{ color: colors.onSurfaceVariant, fontSize: 14 }}>🇲🇽 México</Text>
           </View>
@@ -474,19 +474,19 @@ const PerfilScreen: React.FC = () => {
                 styles.statCard,
                 { backgroundColor: colors.surfaceContainerLowest },
                 Platform.select({
-                  web: { boxShadow: `0px 8px 24px ${colors.shadowBlue}` } as any,
+                  web: { boxShadow: "0px 2px 8px rgba(0,69,128,0.06)" } as any,
                   default: {
-                    shadowColor: "#005da8",
-                    shadowOffset: { width: 0, height: 8 },
+                    shadowColor: "#004580",
+                    shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.06,
-                    shadowRadius: 24,
+                    shadowRadius: 8,
                     elevation: 2,
                   },
                 }),
               ]}
             >
-              <MaterialIcons name={s.icon as any} size={20} color={colors.onSurfaceVariant} />
-              <Text style={[styles.statNumber, { color: colors.primary }]}>{s.value}</Text>
+              <MaterialIcons name={s.icon as any} size={20} color="#004580" />
+              <Text style={[styles.statNumber, { color: colors.onSurface }]}>{s.value}</Text>
               <Text style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>{s.label}</Text>
             </TouchableOpacity>
           ))}
@@ -633,6 +633,8 @@ const styles = StyleSheet.create({
   },
   heroBanner: {
     height: 200,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
   avatarWrap: {
     alignItems: "center",
@@ -708,7 +710,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   statNumber: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: "800",
   },
   statLabel: {
@@ -729,7 +731,7 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 16,
-    borderWidth: 1.5,
+    borderWidth: 2,
   },
   editBtnText: {
     fontSize: 15,

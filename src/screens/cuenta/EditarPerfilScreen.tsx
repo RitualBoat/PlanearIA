@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginTop: 16,
     marginBottom: 6,
-    letterSpacing: 0.5,
+    letterSpacing: 1.1,
     textTransform: "uppercase",
   },
   labelRow: {
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1.5,
-    borderRadius: 10,
+    borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
@@ -578,7 +578,7 @@ const styles = StyleSheet.create({
   },
   countryList: {
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 12,
     marginTop: 4,
     overflow: "hidden",
   },

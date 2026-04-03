@@ -4,6 +4,9 @@ import BibliotecaPlantillasScreen from "../../screens/plantillas/BibliotecaPlant
 import type { Plantilla } from "../../../types";
 
 jest.mock("@expo/vector-icons/MaterialIcons", () => "MaterialIcons");
+jest.mock("expo-linear-gradient", () => ({
+  LinearGradient: "LinearGradient",
+}));
 
 jest.mock("react-native-safe-area-context", () => {
   const React = require("react");
@@ -95,10 +98,10 @@ describe("BibliotecaPlantillasScreen", () => {
   });
 
   it("renderiza las pills de categoría", () => {
-    const { getByText } = render(<BibliotecaPlantillasScreen />);
-    expect(getByText("TODAS")).toBeTruthy();
-    expect(getByText("EXÁMENES")).toBeTruthy();
-    expect(getByText("PRESENTACIONES")).toBeTruthy();
+    const { getAllByText } = render(<BibliotecaPlantillasScreen />);
+    expect(getAllByText("Todas").length).toBeGreaterThanOrEqual(1);
+    expect(getAllByText("Exámenes").length).toBeGreaterThanOrEqual(1);
+    expect(getAllByText("Presentaciones").length).toBeGreaterThanOrEqual(1);
   });
 
   it("renderiza la sección Destacadas cuando hay plantillas con usos", () => {
@@ -158,7 +161,7 @@ describe("BibliotecaPlantillasScreen", () => {
     const { getByText, getAllByText } = render(<BibliotecaPlantillasScreen />);
 
     // Press Exámenes pill
-    fireEvent.press(getByText("EXÁMENES"));
+    fireEvent.press(getByText("Exámenes"));
 
     // Should show exam plantilla, but filter grid
     // The grid section shows filtered content
@@ -172,14 +175,20 @@ describe("BibliotecaPlantillasScreen", () => {
     // Detail modal should appear
     expect(getByText("Usar plantilla")).toBeTruthy();
     expect(getByText("Duplicar y editar")).toBeTruthy();
-    expect(getByText("Eliminar")).toBeTruthy();
+  });
+
+  it("muestra Eliminar solo para plantillas no del sistema", () => {
+    const { getAllByText, getByText, queryByText } = render(<BibliotecaPlantillasScreen />);
+    // Open system template — should NOT show Eliminar
+    fireEvent.press(getAllByText("Examen Álgebra")[0]);
+    expect(queryByText("Eliminar")).toBeNull();
   });
 
   it("muestra badges de tipo y sistema en modal de detalle", () => {
-    const { getAllByText, getByText } = render(<BibliotecaPlantillasScreen />);
+    const { getAllByText } = render(<BibliotecaPlantillasScreen />);
     fireEvent.press(getAllByText("Examen Álgebra")[0]);
-    expect(getByText("EXAMEN")).toBeTruthy();
-    expect(getByText("DEL SISTEMA")).toBeTruthy();
+    expect(getAllByText("EXAMEN").length).toBeGreaterThanOrEqual(1);
+    expect(getAllByText("DEL SISTEMA").length).toBeGreaterThanOrEqual(1);
   });
 
   it("muestra info del autor y usos en modal de detalle", () => {
@@ -206,7 +215,12 @@ describe("BibliotecaPlantillasScreen", () => {
 
   it("muestra conteo de usos en grid card", () => {
     const { getByText } = render(<BibliotecaPlantillasScreen />);
-    expect(getByText("12 usos")).toBeTruthy();
+    expect(getByText("12")).toBeTruthy();
+  });
+
+  it("muestra sección Destacadas con overline editorial", () => {
+    const { getByText } = render(<BibliotecaPlantillasScreen />);
+    expect(getByText("SELECCIÓN EDITORIAL")).toBeTruthy();
   });
 
   it("navega a ListaPlantillas desde estado vacío CTA", () => {

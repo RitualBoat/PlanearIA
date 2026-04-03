@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../navigation/StackNavigator";
@@ -24,26 +25,41 @@ type Nav = StackNavigationProp<RootStackParamList>;
 
 // ─── Design tokens (Stitch 3.5.1) ───
 const DT = {
-  primary: "#004580",
-  primaryContainer: "#005da8",
+  primary: "#002f5a",
+  primaryContainer: "#004580",
   primaryFixed: "#d4e3ff",
-  onPrimaryFixed: "#001c39",
+  onPrimaryFixed: "#001c3a",
+  onPrimaryFixedVariant: "#064883",
   onPrimary: "#ffffff",
-  surface: "#f6f9ff",
-  surfaceLow: "#eff4fb",
-  surfaceHigh: "#e3e9f0",
-  surfaceHighest: "#dee3ea",
+  surface: "#f7f9ff",
+  surfaceLow: "#f1f4fa",
+  surfaceContainer: "#ebeef4",
+  surfaceHigh: "#e5e8ee",
+  surfaceHighest: "#dfe3e8",
   surfaceLowest: "#ffffff",
-  onSurface: "#171c21",
-  onSurfaceVariant: "#414751",
-  outline: "#727782",
-  outlineVariant: "#c1c7d3",
+  onSurface: "#181c20",
+  onSurfaceVariant: "#424750",
+  outline: "#727781",
+  outlineVariant: "#c2c6d1",
   secondary: "#1b6d24",
   secondaryContainer: "#a0f399",
-  secondaryFixedDim: "#88d982",
-  onSecondaryFixed: "#002204",
+  secondaryFixed: "#a3f69c",
+  onSecondaryFixedVariant: "#005312",
+  tertiaryContainer: "#713200",
+  onTertiaryContainer: "#f69b63",
   error: "#ba1a1a",
-  starColor: "#ffb700",
+  errorContainer: "#ffdad6",
+  starColor: "#f59e0b",
+};
+
+const CATEGORY_COLORS: Record<string, { text: string; bg: string }> = {
+  examen: { text: "#7B3F00", bg: "#FFE0B2" },
+  presentacion: { text: "#004580", bg: "#d4e3ff" },
+  mapa_mental: { text: "#6A1B9A", bg: "#E1BEE7" },
+  postal: { text: "#00695C", bg: "#B2DFDB" },
+  reporte: { text: "#BF360C", bg: "#FFCCBC" },
+  linea_tiempo: { text: "#1565C0", bg: "#BBDEFB" },
+  otro: { text: DT.onSurfaceVariant, bg: DT.surfaceLow },
 };
 
 type CategoriaFilter = "todas" | Plantilla["tipo"];
@@ -63,13 +79,13 @@ const SIDEBAR_CATS: {
   label: string;
   icon: keyof typeof MaterialIcons.glyphMap;
 }[] = [
-  { key: "todas", label: "Explorar todo", icon: "grid-view" },
+  { key: "todas", label: "Explorar todo", icon: "dashboard" },
   { key: "examen", label: "Exámenes", icon: "quiz" },
-  { key: "presentacion", label: "Presentaciones", icon: "slideshow" },
-  { key: "mapa_mental", label: "Mapas Mentales", icon: "hub" },
+  { key: "presentacion", label: "Presentaciones", icon: "school" },
+  { key: "mapa_mental", label: "Mapas Mentales", icon: "account-tree" },
   { key: "postal", label: "Postales", icon: "mail" },
   { key: "reporte", label: "Reportes", icon: "summarize" },
-  { key: "linea_tiempo", label: "Líneas de Tiempo", icon: "timeline" },
+  { key: "linea_tiempo", label: "Líneas de Tiempo", icon: "show-chart" },
 ];
 
 const TIPO_ICONS: Record<string, keyof typeof MaterialIcons.glyphMap> = {
@@ -186,17 +202,24 @@ const BibliotecaPlantillasScreen: React.FC = () => {
   const renderSkeleton = () => (
     <View style={s.skeletonContainer}>
       <View style={s.skeletonPills}>
-        {[80, 90, 120].map((w, i) => (
-          <View key={i} style={[s.skeletonPill, { width: w }]} />
+        {[80, 90, 120, 80].map((w, i) => (
+          <View key={i} style={[s.skeletonPill, { width: w, opacity: 1 - i * 0.2 }]} />
         ))}
       </View>
       <View style={s.skeletonFeatured}>
         <View style={s.skeletonFeaturedCard} />
         <View style={s.skeletonFeaturedCard} />
+        <View style={[s.skeletonFeaturedCard, { opacity: 0.5 }]} />
       </View>
-      {[1, 2, 3, 4].map((i) => (
-        <View key={i} style={s.skeletonGridCard} />
-      ))}
+      <View style={s.skeletonGrid}>
+        {[1, 2, 3, 4].map((i) => (
+          <View key={i} style={s.skeletonGridCard}>
+            <View style={s.skeletonGridThumb} />
+            <View style={s.skeletonGridLine1} />
+            <View style={s.skeletonGridLine2} />
+          </View>
+        ))}
+      </View>
     </View>
   );
 
@@ -204,18 +227,11 @@ const BibliotecaPlantillasScreen: React.FC = () => {
   const renderEmptyState = () => (
     <View style={s.emptyContainer}>
       <View style={s.emptyIconWrap}>
-        <MaterialIcons name="grid-view" size={48} color={DT.primary} />
-        <View style={s.emptyPlusIcon}>
-          <MaterialIcons name="add" size={20} color={DT.primary} />
-        </View>
-      </View>
-      <View style={s.emptyBadge}>
-        <Text style={s.emptyBadgeText}>ATELIER</Text>
+        <MaterialIcons name="dashboard-customize" size={64} color={DT.outlineVariant} />
       </View>
       <Text style={s.emptyTitle}>Aún no tienes plantillas</Text>
       <Text style={s.emptySubtitle}>
-        Explora la biblioteca del sistema o crea tu primera plantilla personalizada para empezar a
-        diseñar tu próximo desafío educativo.
+        Explora la biblioteca del sistema o crea tu primera plantilla personalizada
       </Text>
       <TouchableOpacity
         style={s.emptyPrimaryBtn}
@@ -233,72 +249,94 @@ const BibliotecaPlantillasScreen: React.FC = () => {
       </TouchableOpacity>
       <TouchableOpacity style={s.emptyLink} onPress={() => {}} activeOpacity={0.7}>
         <Text style={s.emptyLinkText}>¿Qué son las plantillas?</Text>
-        <MaterialIcons name="arrow-forward" size={16} color={DT.primary} />
+        <MaterialIcons name="arrow-forward" size={18} color={DT.primaryContainer} />
       </TouchableOpacity>
     </View>
   );
 
   // ─── Featured card (horizontal scroll) ───
-  const renderDestacadaCard = ({ item }: { item: Plantilla }) => (
-    <TouchableOpacity
-      style={s.featuredCard}
-      onPress={() => handlePlantillaPress(item)}
-      activeOpacity={0.85}
-    >
-      <View style={s.featuredGradient}>
-        <MaterialIcons
-          name={TIPO_ICONS[item.tipo] || "description"}
-          size={48}
-          color={DT.onPrimary}
-          style={{ opacity: 0.4 }}
-        />
-        <View style={s.featuredBadge}>
-          <Text style={s.featuredBadgeText}>
-            {item.esDelSistema ? "SISTEMA" : TIPO_LABELS[item.tipo] || ""}
-          </Text>
+  const renderDestacadaCard = ({ item }: { item: Plantilla }) => {
+    const catColor = CATEGORY_COLORS[item.tipo] || CATEGORY_COLORS.otro;
+    return (
+      <TouchableOpacity
+        style={s.featuredCard}
+        onPress={() => handlePlantillaPress(item)}
+        activeOpacity={0.85}
+      >
+        <View style={s.featuredPreview}>
+          <MaterialIcons
+            name={TIPO_ICONS[item.tipo] || "description"}
+            size={48}
+            color={`${DT.primaryContainer}4D`}
+          />
+          {item.esDelSistema && (
+            <View style={s.featuredSystemBadge}>
+              <Text style={s.featuredSystemBadgeText}>DEL SISTEMA</Text>
+            </View>
+          )}
+          <View style={[s.featuredTypeBadge, { backgroundColor: `${DT.surfaceLowest}CC` }]}>
+            <Text style={[s.featuredTypeBadgeText, { color: catColor.text }]}>
+              {TIPO_LABELS[item.tipo] || ""}
+            </Text>
+          </View>
         </View>
-      </View>
-      <View style={s.featuredInfo}>
-        <Text style={s.featuredTitle} numberOfLines={1}>
-          {item.nombre}
-        </Text>
-        <View style={s.featuredRating}>
-          <MaterialIcons name="star" size={12} color={DT.starColor} />
-          <Text style={s.featuredRatingText}>
-            {Math.min(5, 4 + item.usosCount * 0.1).toFixed(1)}
+        <View style={s.featuredInfo}>
+          <Text style={s.featuredTitle} numberOfLines={2}>
+            {item.nombre}
           </Text>
+          <View style={s.featuredRating}>
+            <MaterialIcons name="star" size={12} color={DT.starColor} />
+            <Text style={s.featuredRatingText}>
+              {item.usosCount >= 1000
+                ? `${(item.usosCount / 1000).toFixed(1)}k usos`
+                : `${item.usosCount} usos`}
+            </Text>
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   // ─── Grid card ───
-  const renderGridCard = (item: Plantilla) => (
-    <TouchableOpacity
-      key={item.id}
-      style={s.gridCard}
-      onPress={() => handlePlantillaPress(item)}
-      activeOpacity={0.85}
-    >
-      <View style={[s.gridIcon, { backgroundColor: DT.primaryFixed }]}>
-        <MaterialIcons name={TIPO_ICONS[item.tipo] || "description"} size={22} color={DT.primary} />
-      </View>
-      <Text style={s.gridTitle} numberOfLines={1}>
-        {item.nombre}
-      </Text>
-      <Text style={s.gridAuthor} numberOfLines={1}>
-        {item.esDelSistema ? "Por PlanearIA" : "Personal"}
-      </Text>
-      <View style={s.gridUsoBadge}>
-        <MaterialIcons name="group" size={12} color={DT.primary} />
-        <Text style={s.gridUsoText}>{item.usosCount} usos</Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const renderGridCard = (item: Plantilla) => {
+    const catColor = CATEGORY_COLORS[item.tipo] || CATEGORY_COLORS.otro;
+    return (
+      <TouchableOpacity
+        key={item.id}
+        style={s.gridCard}
+        onPress={() => handlePlantillaPress(item)}
+        activeOpacity={0.85}
+      >
+        <View style={[s.gridPreview, { backgroundColor: `${catColor.bg}40` }]}>
+          <MaterialIcons
+            name={TIPO_ICONS[item.tipo] || "description"}
+            size={36}
+            color={catColor.text}
+          />
+        </View>
+        <Text style={s.gridTitle} numberOfLines={2}>
+          {item.nombre}
+        </Text>
+        <Text style={s.gridAuthor} numberOfLines={1}>
+          {item.esDelSistema ? "Por PlanearIA" : "Personal"}
+        </Text>
+        <View style={s.gridFooter}>
+          <View style={s.gridUsoBadge}>
+            <MaterialIcons name="group" size={10} color={DT.onSurfaceVariant} />
+            <Text style={s.gridUsoText}>
+              {item.usosCount >= 1000 ? `${(item.usosCount / 1000).toFixed(1)}k` : item.usosCount}
+            </Text>
+          </View>
+          <MaterialIcons name="add-circle" size={18} color={DT.primaryContainer} />
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   // ─── Detail preview modal ───
   const renderDetalleModal = () => {
     if (!detallePlantilla) return null;
+    const catColor = CATEGORY_COLORS[detallePlantilla.tipo] || CATEGORY_COLORS.otro;
     return (
       <Modal
         visible={!!detallePlantilla}
@@ -312,35 +350,46 @@ const BibliotecaPlantillasScreen: React.FC = () => {
             style={[s.detSheet, isDesktop && s.detSheetDesktop]}
             onPress={(e) => e.stopPropagation()}
           >
+            {/* Handle (mobile) / Close (desktop) */}
             {!isDesktop && (
               <View style={s.detHandle}>
                 <View style={s.detHandleBar} />
               </View>
             )}
+            {isDesktop && (
+              <TouchableOpacity
+                style={s.detCloseBtn}
+                onPress={() => setDetallePlantilla(null)}
+                accessibilityLabel="Cerrar detalle"
+              >
+                <MaterialIcons name="close" size={20} color={DT.onSurfaceVariant} />
+              </TouchableOpacity>
+            )}
             <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
               {/* Badges */}
               <View style={s.detBadgeRow}>
-                <View style={s.detTypeBadge}>
-                  <Text style={s.detTypeBadgeText}>
+                <View style={[s.detTypeBadge, { backgroundColor: catColor.bg }]}>
+                  <Text style={[s.detTypeBadgeText, { color: catColor.text }]}>
                     {TIPO_LABELS[detallePlantilla.tipo] || "PLANTILLA"}
                   </Text>
                 </View>
                 {detallePlantilla.esDelSistema && (
                   <View style={s.detSystemBadge}>
-                    <MaterialIcons name="verified" size={12} color={DT.onPrimary} />
                     <Text style={s.detSystemBadgeText}>DEL SISTEMA</Text>
                   </View>
                 )}
               </View>
 
               {/* Title */}
-              <Text style={s.detTitle}>{detallePlantilla.nombre}</Text>
+              <Text style={[s.detTitle, isDesktop && s.detTitleDesktop]}>
+                {detallePlantilla.nombre}
+              </Text>
 
               {/* Author + usage */}
               <View style={s.detMetaRow}>
                 <Text style={s.detAuthor}>
                   Por{" "}
-                  <Text style={{ color: DT.primary, fontWeight: "700" }}>
+                  <Text style={{ color: DT.primaryContainer, fontWeight: "700" }}>
                     {detallePlantilla.esDelSistema ? "PlanearIA" : "Ti"}
                   </Text>
                 </Text>
@@ -378,26 +427,35 @@ const BibliotecaPlantillasScreen: React.FC = () => {
             </ScrollView>
 
             {/* Actions */}
-            <View style={s.detActions}>
-              <TouchableOpacity
-                style={s.detPrimaryBtn}
-                onPress={handleUsarPlantilla}
-                activeOpacity={0.85}
+            <View style={[s.detActions, isDesktop && s.detActionsDesktop]}>
+              <LinearGradient
+                colors={["#004580", "#005da8"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[s.detPrimaryBtn, isDesktop && { flex: 1 }]}
               >
-                <Text style={s.detPrimaryBtnText}>Usar plantilla</Text>
-              </TouchableOpacity>
-              <View style={s.detSecondaryRow}>
                 <TouchableOpacity
-                  style={s.detSecondaryBtn}
-                  onPress={handleDuplicar}
-                  activeOpacity={0.7}
+                  style={s.detPrimaryBtnInner}
+                  onPress={handleUsarPlantilla}
+                  activeOpacity={0.85}
                 >
-                  <Text style={s.detSecondaryBtnText}>Duplicar y editar</Text>
+                  <MaterialIcons name="bolt" size={20} color={DT.onPrimary} />
+                  <Text style={s.detPrimaryBtnText}>Usar plantilla</Text>
                 </TouchableOpacity>
+              </LinearGradient>
+              <TouchableOpacity
+                style={[s.detSecondaryBtn, isDesktop && { flex: 1 }]}
+                onPress={handleDuplicar}
+                activeOpacity={0.7}
+              >
+                <MaterialIcons name="content-copy" size={18} color={DT.onSurface} />
+                <Text style={s.detSecondaryBtnText}>Duplicar y editar</Text>
+              </TouchableOpacity>
+              {!detallePlantilla.esDelSistema && (
                 <TouchableOpacity onPress={handleEliminar} activeOpacity={0.7}>
                   <Text style={s.detDeleteText}>Eliminar</Text>
                 </TouchableOpacity>
-              </View>
+              )}
             </View>
           </Pressable>
         </Pressable>
@@ -419,27 +477,44 @@ const BibliotecaPlantillasScreen: React.FC = () => {
         style={s.pillsScroll}
         contentContainerStyle={s.pillsContent}
       >
-        {CATEGORY_PILLS.map((cat) => (
-          <TouchableOpacity
-            key={cat.key}
-            style={[s.pill, categoriaActiva === cat.key && s.pillActive]}
-            onPress={() => setCategoriaActiva(cat.key)}
-            activeOpacity={0.8}
-          >
-            <Text style={[s.pillText, categoriaActiva === cat.key && s.pillTextActive]}>
-              {cat.label.toUpperCase()}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        {CATEGORY_PILLS.map((cat) =>
+          categoriaActiva === cat.key ? (
+            <LinearGradient
+              key={cat.key}
+              colors={["#004580", "#005da8"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={s.pillGradient}
+            >
+              <TouchableOpacity
+                onPress={() => setCategoriaActiva(cat.key)}
+                activeOpacity={0.8}
+                style={s.pillInner}
+              >
+                <Text style={s.pillTextActive}>{cat.label}</Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          ) : (
+            <TouchableOpacity
+              key={cat.key}
+              style={s.pill}
+              onPress={() => setCategoriaActiva(cat.key)}
+              activeOpacity={0.8}
+            >
+              <Text style={s.pillText}>{cat.label}</Text>
+            </TouchableOpacity>
+          )
+        )}
       </ScrollView>
 
       {/* Destacadas */}
       {destacadas.length > 0 && (
         <View style={s.sectionBlock}>
+          <Text style={s.sectionOverline}>SELECCIÓN EDITORIAL</Text>
           <View style={s.sectionHeader}>
             <Text style={s.sectionTitle}>Destacadas</Text>
             <TouchableOpacity onPress={() => navigation.navigate("ListaPlantillas")}>
-              <Text style={s.sectionLink}>VER TODO</Text>
+              <Text style={s.sectionLink}>Ver todas</Text>
             </TouchableOpacity>
           </View>
           <FlatList
@@ -456,12 +531,14 @@ const BibliotecaPlantillasScreen: React.FC = () => {
       {/* Grid */}
       <View style={s.sectionBlock}>
         <View style={s.sectionHeader}>
-          <Text style={s.sectionTitle}>
-            {categoriaActiva === "todas"
-              ? "Todas"
-              : CATEGORY_PILLS.find((c) => c.key === categoriaActiva)?.label || ""}
-          </Text>
-          <Text style={s.sectionLink}>RECIENTES</Text>
+          <View style={s.sectionTitleRow}>
+            <Text style={s.sectionTitle}>
+              {categoriaActiva === "todas"
+                ? "Todas"
+                : CATEGORY_PILLS.find((c) => c.key === categoriaActiva)?.label || ""}
+            </Text>
+            <MaterialIcons name="filter-list" size={20} color={DT.outline} />
+          </View>
         </View>
         {filteredPlantillas.length === 0 ? (
           <View style={s.noResults}>
@@ -491,14 +568,19 @@ const BibliotecaPlantillasScreen: React.FC = () => {
             <MaterialIcons
               name={cat.icon}
               size={20}
-              color={categoriaActiva === cat.key ? DT.onPrimary : DT.onSurfaceVariant}
+              color={categoriaActiva === cat.key ? DT.primaryContainer : DT.onSurfaceVariant}
             />
             <Text
               style={[s.sidebarItemText, categoriaActiva === cat.key && s.sidebarItemTextActive]}
             >
               {cat.label}
             </Text>
-            <Text style={[s.sidebarCount, categoriaActiva === cat.key && { color: DT.onPrimary }]}>
+            <Text
+              style={[
+                s.sidebarCount,
+                categoriaActiva === cat.key && { color: DT.primaryContainer },
+              ]}
+            >
               {getCatCount(cat.key)}
             </Text>
           </TouchableOpacity>
@@ -617,7 +699,7 @@ const BibliotecaPlantillasScreen: React.FC = () => {
             onPress={() => navigation.goBack()}
             accessibilityLabel="Volver"
           >
-            <MaterialIcons name="arrow-back" size={24} color={DT.primary} />
+            <MaterialIcons name="arrow-back" size={24} color={DT.onSurface} />
           </TouchableOpacity>
           <Text style={s.topBarTitle}>Plantillas</Text>
         </View>
@@ -626,7 +708,7 @@ const BibliotecaPlantillasScreen: React.FC = () => {
           onPress={handleSearchToggle}
           accessibilityLabel="Buscar"
         >
-          <MaterialIcons name="search" size={24} color={DT.primary} />
+          <MaterialIcons name="search" size={24} color={DT.onSurfaceVariant} />
         </TouchableOpacity>
       </View>
 
@@ -661,14 +743,21 @@ const BibliotecaPlantillasScreen: React.FC = () => {
 
       {/* FAB */}
       {!showEmpty && (
-        <TouchableOpacity
+        <LinearGradient
+          colors={["#004580", "#005da8"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
           style={[s.fab, isDesktop && s.fabDesktop]}
-          onPress={() => navigation.navigate("EditorPlantilla")}
-          activeOpacity={0.85}
-          accessibilityLabel="Crear plantilla"
         >
-          <MaterialIcons name="add" size={28} color={DT.onPrimary} />
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("EditorPlantilla")}
+            activeOpacity={0.85}
+            accessibilityLabel="Crear plantilla"
+            style={s.fabInner}
+          >
+            <MaterialIcons name="add" size={28} color={DT.onPrimary} />
+          </TouchableOpacity>
+        </LinearGradient>
       )}
 
       {/* Detail modal */}
@@ -687,6 +776,7 @@ const s = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
+    backgroundColor: DT.surface,
   },
   topBarLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
   backBtn: {
@@ -694,27 +784,31 @@ const s = StyleSheet.create({
     borderRadius: 20,
   },
   topBarTitle: {
-    fontFamily: "Manrope",
     fontWeight: "800",
     fontSize: 20,
-    color: DT.primary,
+    color: DT.onSurface,
     letterSpacing: -0.5,
   },
   // Search
   searchBarMobile: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: DT.surfaceLow,
+    backgroundColor: DT.surfaceLowest,
     borderRadius: 12,
     marginHorizontal: 16,
     marginBottom: 8,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 10,
     gap: 8,
+    borderWidth: 1,
+    borderColor: `${DT.outlineVariant}4D`,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 8px rgba(0,69,128,0.06)" as never },
+      default: { elevation: 1 },
+    }),
   },
   searchInput: {
     flex: 1,
-    fontFamily: "Manrope",
     fontSize: 14,
     color: DT.onSurface,
     padding: 0,
@@ -723,25 +817,47 @@ const s = StyleSheet.create({
   scrollMain: { flex: 1 },
   scrollPad: { paddingBottom: 100 },
   // Pills
-  pillsScroll: { maxHeight: 48 },
-  pillsContent: { paddingHorizontal: 16, gap: 10 },
+  pillsScroll: { maxHeight: 52 },
+  pillsContent: { paddingHorizontal: 16, gap: 12 },
   pill: {
-    backgroundColor: DT.surfaceHigh,
+    backgroundColor: DT.surfaceLow,
     paddingHorizontal: 20,
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderRadius: 999,
   },
-  pillActive: { backgroundColor: DT.primaryContainer },
+  pillGradient: {
+    borderRadius: 999,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 8px rgba(0,69,128,0.15)" as never },
+      default: { elevation: 3 },
+    }),
+  },
+  pillInner: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
   pillText: {
-    fontFamily: "Manrope",
-    fontWeight: "700",
-    fontSize: 11,
-    letterSpacing: 1.5,
+    fontWeight: "600",
+    fontSize: 14,
     color: DT.onSurfaceVariant,
   },
-  pillTextActive: { color: DT.onPrimary },
+  pillTextActive: {
+    fontWeight: "600",
+    fontSize: 14,
+    color: DT.onPrimary,
+  },
   // Section
   sectionBlock: { marginTop: 24, paddingHorizontal: 16 },
+  sectionOverline: {
+    fontWeight: "700",
+    fontSize: 10,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+    color: DT.onSurfaceVariant,
+    opacity: 0.6,
+    marginBottom: 4,
+    paddingHorizontal: 4,
+  },
   sectionHeader: {
     flexDirection: "row",
     alignItems: "flex-end",
@@ -749,54 +865,68 @@ const s = StyleSheet.create({
     marginBottom: 16,
     paddingHorizontal: 4,
   },
+  sectionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   sectionTitle: {
-    fontFamily: "Manrope",
     fontWeight: "800",
     fontSize: 20,
-    color: DT.primary,
+    color: DT.onSurface,
     letterSpacing: -0.3,
   },
   sectionLink: {
-    fontFamily: "Manrope",
     fontWeight: "700",
-    fontSize: 11,
-    color: DT.outline,
-    letterSpacing: 1.5,
-    textTransform: "uppercase",
+    fontSize: 14,
+    color: DT.primaryContainer,
   },
   // Featured
-  featuredList: { paddingHorizontal: 16, gap: 12, paddingVertical: 8 },
+  featuredList: { paddingHorizontal: 16, gap: 20, paddingVertical: 8 },
   featuredCard: {
     width: 160,
     height: 200,
     backgroundColor: DT.surfaceLowest,
-    borderRadius: 12,
+    borderRadius: 16,
     overflow: "hidden",
     ...Platform.select({
-      web: { boxShadow: "0px 24px 48px rgba(0,72,132,0.08)" as never },
-      default: { elevation: 3 },
+      web: { boxShadow: "0px 2px 8px rgba(0,69,128,0.06)" as never },
+      default: { elevation: 2 },
     }),
   },
-  featuredGradient: {
-    height: 120,
-    backgroundColor: DT.primaryContainer,
+  featuredPreview: {
+    height: 128,
+    backgroundColor: DT.surfaceLow,
     alignItems: "center",
     justifyContent: "center",
+    borderRadius: 16,
   },
-  featuredBadge: {
+  featuredSystemBadge: {
     position: "absolute",
     top: 8,
-    left: 8,
+    right: 8,
     backgroundColor: DT.primaryFixed,
     paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: 999,
+    borderRadius: 8,
   },
-  featuredBadgeText: {
-    fontFamily: "Manrope",
+  featuredSystemBadgeText: {
     fontWeight: "700",
     fontSize: 10,
-    color: DT.onPrimaryFixed,
+    color: DT.primaryContainer,
+    letterSpacing: 0.5,
+  },
+  featuredTypeBadge: {
+    position: "absolute",
+    bottom: 8,
+    left: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  featuredTypeBadgeText: {
+    fontWeight: "700",
+    fontSize: 10,
     letterSpacing: 0.5,
     textTransform: "uppercase",
   },
@@ -807,14 +937,12 @@ const s = StyleSheet.create({
     backgroundColor: DT.surfaceLowest,
   },
   featuredTitle: {
-    fontFamily: "Manrope",
-    fontWeight: "700",
-    fontSize: 13,
+    fontWeight: "600",
+    fontSize: 14,
     color: DT.onSurface,
   },
   featuredRating: { flexDirection: "row", alignItems: "center", gap: 4 },
   featuredRatingText: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 10,
     color: DT.outline,
@@ -823,54 +951,56 @@ const s = StyleSheet.create({
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
+    gap: 16,
   },
   gridCard: {
     width: "47%",
-    backgroundColor: DT.surfaceLow,
-    borderRadius: 12,
-    padding: 16,
-    gap: 8,
+    backgroundColor: DT.surfaceLowest,
+    borderRadius: 16,
+    padding: 12,
+    gap: 6,
+    borderWidth: 1,
+    borderColor: `${DT.outlineVariant}1A`,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 8px rgba(0,69,128,0.06)" as never },
+      default: { elevation: 1 },
+    }),
   },
-  gridIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  gridPreview: {
+    height: 96,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 4,
   },
   gridTitle: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 14,
     color: DT.onSurface,
   },
   gridAuthor: {
-    fontFamily: "Manrope",
-    fontWeight: "600",
-    fontSize: 10,
-    color: DT.outlineVariant,
+    fontWeight: "500",
+    fontSize: 11,
+    color: DT.onSurfaceVariant,
+  },
+  gridFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 4,
   },
   gridUsoBadge: {
     flexDirection: "row",
     alignItems: "center",
-    alignSelf: "flex-start",
-    backgroundColor: DT.surfaceHighest,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 999,
     gap: 4,
-    marginTop: 4,
   },
   gridUsoText: {
-    fontFamily: "Manrope",
-    fontWeight: "700",
+    fontWeight: "500",
     fontSize: 10,
-    color: DT.primary,
+    color: DT.onSurfaceVariant,
   },
   noResults: { alignItems: "center", paddingVertical: 40, gap: 8 },
   noResultsText: {
-    fontFamily: "Manrope",
     fontWeight: "600",
     fontSize: 14,
     color: DT.outlineVariant,
@@ -878,13 +1008,12 @@ const s = StyleSheet.create({
   // Desktop
   desktopRow: { flex: 1, flexDirection: "row" },
   sidebar: {
-    width: 220,
+    width: 240,
     paddingHorizontal: 16,
     paddingTop: 16,
-    backgroundColor: DT.surface,
+    backgroundColor: DT.surfaceLow,
   },
   sidebarLabel: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 10,
     letterSpacing: 1.5,
@@ -900,17 +1029,15 @@ const s = StyleSheet.create({
     marginBottom: 4,
     gap: 10,
   },
-  sidebarItemActive: { backgroundColor: DT.primary },
+  sidebarItemActive: { backgroundColor: DT.primaryFixed },
   sidebarItemText: {
     flex: 1,
-    fontFamily: "Manrope",
     fontWeight: "600",
     fontSize: 14,
     color: DT.onSurface,
   },
-  sidebarItemTextActive: { color: DT.onPrimary, fontWeight: "700" },
+  sidebarItemTextActive: { color: DT.primaryContainer, fontWeight: "700" },
   sidebarCount: {
-    fontFamily: "Manrope",
     fontWeight: "600",
     fontSize: 12,
     color: DT.outline,
@@ -920,16 +1047,19 @@ const s = StyleSheet.create({
   desktopSearchBar: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: DT.surfaceLow,
-    borderRadius: 16,
+    backgroundColor: DT.surfaceLowest,
+    borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginBottom: 24,
     gap: 10,
+    ...Platform.select({
+      web: { boxShadow: "0px 2px 8px rgba(0,69,128,0.06)" as never },
+      default: { elevation: 1 },
+    }),
   },
   desktopSearchInput: {
     flex: 1,
-    fontFamily: "Manrope",
     fontSize: 14,
     color: DT.onSurface,
     padding: 0,
@@ -949,14 +1079,12 @@ const s = StyleSheet.create({
     marginBottom: 16,
   },
   heroBadgeText: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 11,
     color: DT.onPrimary,
     letterSpacing: 0.5,
   },
   heroTitle: {
-    fontFamily: "Manrope",
     fontWeight: "800",
     fontSize: 28,
     color: DT.onPrimary,
@@ -970,7 +1098,6 @@ const s = StyleSheet.create({
     borderRadius: 12,
   },
   heroBtnText: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 14,
     color: DT.onSurface,
@@ -982,7 +1109,6 @@ const s = StyleSheet.create({
     borderRadius: 12,
   },
   heroBtnOutlineText: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 14,
     color: DT.onPrimary,
@@ -994,7 +1120,7 @@ const s = StyleSheet.create({
     borderRadius: 16,
     overflow: "hidden",
     ...Platform.select({
-      web: { boxShadow: "0px 8px 24px rgba(0,69,128,0.06)" as never },
+      web: { boxShadow: "0px 2px 8px rgba(0,69,128,0.06)" as never },
       default: { elevation: 2 },
     }),
   },
@@ -1005,17 +1131,15 @@ const s = StyleSheet.create({
     justifyContent: "center",
   },
   desktopCardCat: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 10,
     letterSpacing: 1,
-    color: DT.primary,
+    color: DT.primaryContainer,
     paddingHorizontal: 14,
     paddingTop: 10,
     textTransform: "uppercase",
   },
   desktopCardTitle: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 14,
     color: DT.onSurface,
@@ -1023,7 +1147,6 @@ const s = StyleSheet.create({
     paddingTop: 4,
   },
   desktopCardDesc: {
-    fontFamily: "Manrope",
     fontWeight: "500",
     fontSize: 12,
     color: DT.onSurfaceVariant,
@@ -1040,66 +1163,52 @@ const s = StyleSheet.create({
   // Empty state
   emptyContainer: { flex: 1, alignItems: "center", justifyContent: "center", padding: 32 },
   emptyIconWrap: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     backgroundColor: DT.surfaceLow,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 16,
-  },
-  emptyPlusIcon: { position: "absolute", right: -4, bottom: -4 },
-  emptyBadge: {
-    backgroundColor: DT.secondaryContainer,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  emptyBadgeText: {
-    fontFamily: "Manrope",
-    fontWeight: "700",
-    fontSize: 11,
-    color: DT.secondary,
-    letterSpacing: 0.5,
+    marginBottom: 24,
   },
   emptyTitle: {
-    fontFamily: "Manrope",
-    fontWeight: "800",
-    fontSize: 26,
+    fontWeight: "700",
+    fontSize: 22,
     color: DT.onSurface,
     textAlign: "center",
     marginBottom: 12,
   },
   emptySubtitle: {
-    fontFamily: "Manrope",
-    fontWeight: "500",
-    fontSize: 14,
+    fontWeight: "400",
+    fontSize: 15,
     color: DT.onSurfaceVariant,
     textAlign: "center",
-    lineHeight: 20,
+    lineHeight: 22,
     marginBottom: 28,
-    maxWidth: 340,
+    maxWidth: 280,
   },
   emptyPrimaryBtn: {
-    backgroundColor: DT.primary,
-    borderRadius: 16,
+    backgroundColor: DT.primaryContainer,
+    borderRadius: 12,
     paddingHorizontal: 24,
     paddingVertical: 14,
     width: "100%",
     maxWidth: 320,
     alignItems: "center",
     marginBottom: 12,
+    ...Platform.select({
+      web: { boxShadow: "0px 4px 12px rgba(0,69,128,0.15)" as never },
+      default: { elevation: 3 },
+    }),
   },
   emptyPrimaryBtnText: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 14,
     color: DT.onPrimary,
   },
   emptySecondaryBtn: {
-    backgroundColor: DT.surfaceLow,
-    borderRadius: 16,
+    backgroundColor: DT.surfaceHigh,
+    borderRadius: 12,
     paddingHorizontal: 24,
     paddingVertical: 14,
     width: "100%",
@@ -1108,141 +1217,192 @@ const s = StyleSheet.create({
     marginBottom: 16,
   },
   emptySecondaryBtnText: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 14,
     color: DT.onSurface,
   },
-  emptyLink: { flexDirection: "row", alignItems: "center", gap: 4 },
+  emptyLink: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 16 },
   emptyLinkText: {
-    fontFamily: "Manrope",
     fontWeight: "600",
     fontSize: 14,
-    color: DT.primary,
+    color: DT.primaryContainer,
   },
   // Skeleton
-  skeletonContainer: { padding: 16, gap: 16 },
-  skeletonPills: { flexDirection: "row", gap: 10 },
+  skeletonContainer: { padding: 16, gap: 20 },
+  skeletonPills: { flexDirection: "row", gap: 12 },
   skeletonPill: {
     height: 36,
-    borderRadius: 18,
+    borderRadius: 20,
     backgroundColor: DT.surfaceHigh,
-    opacity: 0.5,
   },
-  skeletonFeatured: { flexDirection: "row", gap: 12 },
+  skeletonFeatured: { flexDirection: "row", gap: 16 },
   skeletonFeaturedCard: {
     width: 160,
     height: 200,
-    borderRadius: 12,
+    borderRadius: 16,
     backgroundColor: DT.surfaceHigh,
-    opacity: 0.4,
+    opacity: 0.6,
+  },
+  skeletonGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 16,
   },
   skeletonGridCard: {
-    height: 120,
-    borderRadius: 12,
+    width: "47%",
+    borderRadius: 16,
     backgroundColor: DT.surfaceHigh,
+    padding: 20,
+    gap: 8,
+  },
+  skeletonGridThumb: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    backgroundColor: DT.surfaceLowest,
     opacity: 0.3,
+  },
+  skeletonGridLine1: {
+    height: 16,
+    width: "75%",
+    borderRadius: 8,
+    backgroundColor: DT.surfaceLowest,
+    opacity: 0.3,
+  },
+  skeletonGridLine2: {
+    height: 12,
+    width: "100%",
+    borderRadius: 6,
+    backgroundColor: DT.surfaceLowest,
+    opacity: 0.2,
   },
   // Detail modal
   detOverlay: {
     flex: 1,
-    backgroundColor: "rgba(23, 28, 33, 0.40)",
+    backgroundColor: `${DT.primaryContainer}33`,
     justifyContent: "flex-end",
+    ...Platform.select({
+      web: { backdropFilter: "blur(4px)" as never },
+      default: {},
+    }),
   },
   detSheet: {
     backgroundColor: DT.surfaceLowest,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    maxHeight: "80%",
+    maxHeight: "85%",
     paddingHorizontal: 24,
     paddingBottom: Platform.OS === "ios" ? 40 : 28,
+    ...Platform.select({
+      web: { boxShadow: "0px -8px 48px rgba(0,47,90,0.12)" as never },
+      default: { elevation: 24 },
+    }),
   },
   detSheetDesktop: {
     alignSelf: "center",
-    width: 520,
+    width: 600,
     borderRadius: 24,
     marginBottom: "auto",
     marginTop: "auto",
+    maxHeight: "80%",
+    paddingTop: 32,
+    ...Platform.select({
+      web: { boxShadow: "0px 24px 48px rgba(0,72,132,0.08)" as never },
+      default: { elevation: 24 },
+    }),
+  },
+  detCloseBtn: {
+    position: "absolute",
+    top: 24,
+    right: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: DT.surfaceLow,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
   },
   detHandle: { alignItems: "center", paddingTop: 12, paddingBottom: 8 },
   detHandleBar: {
-    width: 40,
-    height: 5,
+    width: 48,
+    height: 6,
     borderRadius: 3,
-    backgroundColor: DT.surfaceHighest,
-    opacity: 0.5,
+    backgroundColor: DT.outlineVariant,
+    opacity: 0.4,
   },
   detBadgeRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 12 },
   detTypeBadge: {
-    backgroundColor: DT.surfaceHigh,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 999,
   },
   detTypeBadgeText: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 10,
-    color: DT.onSurfaceVariant,
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
   },
   detSystemBadge: {
-    backgroundColor: DT.secondary,
+    backgroundColor: DT.primaryFixed,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 999,
     gap: 4,
   },
   detSystemBadgeText: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 10,
-    color: DT.onPrimary,
+    color: DT.primaryContainer,
     letterSpacing: 0.5,
   },
   detTitle: {
-    fontFamily: "Manrope",
     fontWeight: "800",
-    fontSize: 22,
+    fontSize: 24,
     color: DT.onSurface,
     marginTop: 16,
     marginBottom: 8,
+    lineHeight: 28,
+  },
+  detTitleDesktop: {
+    fontSize: 44,
+    lineHeight: 48,
+    letterSpacing: -0.5,
   },
   detMetaRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 12 },
   detAuthor: {
-    fontFamily: "Manrope",
     fontWeight: "500",
     fontSize: 14,
     color: DT.onSurfaceVariant,
   },
   detDot: { color: DT.onSurfaceVariant, fontSize: 14 },
   detUsos: {
-    fontFamily: "Manrope",
     fontWeight: "500",
     fontSize: 14,
     color: DT.onSurfaceVariant,
   },
   detTagsRow: { flexDirection: "row", gap: 8, marginBottom: 16, flexWrap: "wrap" },
   detTag: {
-    backgroundColor: DT.surfaceLow,
-    paddingHorizontal: 12,
+    backgroundColor: DT.surfaceHigh,
+    paddingHorizontal: 16,
     paddingVertical: 6,
-    borderRadius: 999,
+    borderRadius: 12,
   },
   detTagText: {
-    fontFamily: "Manrope",
-    fontWeight: "600",
-    fontSize: 12,
+    fontWeight: "700",
+    fontSize: 14,
     color: DT.onSurfaceVariant,
   },
   detPreview: {
     backgroundColor: DT.surfaceLow,
     borderRadius: 16,
-    padding: 20,
+    padding: 24,
     marginBottom: 16,
-    minHeight: 180,
+    minHeight: 200,
+    borderWidth: 1,
+    borderColor: `${DT.outlineVariant}1A`,
   },
   detPreviewContent: { gap: 12 },
   detPreviewLine1: {
@@ -1264,77 +1424,81 @@ const s = StyleSheet.create({
     backgroundColor: DT.surfaceHigh,
   },
   detDescripcion: {
-    fontFamily: "Manrope",
     fontWeight: "500",
     fontSize: 14,
     color: DT.onSurfaceVariant,
     lineHeight: 20,
     marginBottom: 12,
   },
-  detActions: { marginTop: 8 },
+  detActions: { marginTop: 8, gap: 12 },
+  detActionsDesktop: { flexDirection: "row", alignItems: "center" },
   detPrimaryBtn: {
-    backgroundColor: DT.primary,
     borderRadius: 16,
-    paddingVertical: 16,
+    overflow: "hidden",
+    ...Platform.select({
+      web: { boxShadow: "0px 4px 16px rgba(0,69,128,0.2)" as never },
+      default: { elevation: 4 },
+    }),
+  },
+  detPrimaryBtnInner: {
+    flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    justifyContent: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    gap: 8,
   },
   detPrimaryBtnText: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 16,
     color: DT.onPrimary,
   },
-  detSecondaryRow: {
+  detSecondaryBtn: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-  },
-  detSecondaryBtn: {
-    backgroundColor: DT.surfaceLow,
+    justifyContent: "center",
+    backgroundColor: DT.surfaceHigh,
     borderRadius: 16,
     paddingHorizontal: 24,
-    paddingVertical: 14,
-    flex: 1,
-    alignItems: "center",
-    marginRight: 16,
+    paddingVertical: 16,
+    gap: 8,
   },
   detSecondaryBtnText: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 14,
     color: DT.onSurface,
   },
   detDeleteText: {
-    fontFamily: "Manrope",
     fontWeight: "700",
     fontSize: 14,
     color: DT.error,
-    paddingHorizontal: 16,
+    textAlign: "center",
     paddingVertical: 14,
   },
   // FAB
   fab: {
     position: "absolute",
-    right: 20,
+    right: 24,
     bottom: 24,
     width: 56,
     height: 56,
-    borderRadius: 28,
-    backgroundColor: DT.primary,
-    alignItems: "center",
-    justifyContent: "center",
+    borderRadius: 16,
     ...Platform.select({
-      web: { boxShadow: "0px 8px 24px rgba(0,69,128,0.15)" as never },
+      web: { boxShadow: "0px 8px 24px rgba(0,69,128,0.2)" as never },
       default: { elevation: 6 },
     }),
+  },
+  fabInner: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   fabDesktop: {
     right: 32,
     bottom: 32,
     width: 64,
     height: 64,
-    borderRadius: 32,
+    borderRadius: 20,
   },
 });
 

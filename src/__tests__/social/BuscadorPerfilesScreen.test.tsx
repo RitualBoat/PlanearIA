@@ -68,6 +68,7 @@ const defaultVm = {
   hasError: false,
   solicitudModal: { visible: false, docente: null },
   inviteModal: false,
+  inviteUrl: "https://planearia.app/invite/test-token",
   toast: { visible: false, type: null, nombre: "" },
   handleSearch: jest.fn(),
   handleClearSearch: jest.fn(),
@@ -77,6 +78,7 @@ const defaultVm = {
   handleAbrirInviteModal: jest.fn(),
   handleCerrarInviteModal: jest.fn(),
   handleCopiarEnlace: jest.fn(),
+  handleCompartirEnlace: jest.fn(),
   handleReintentar: jest.fn(),
 };
 
@@ -273,5 +275,17 @@ describe("BuscadorPerfilesScreen", () => {
     const { getByText } = render(<BuscadorPerfilesScreen />);
     fireEvent.press(getByText("Copiar enlace de invitación"));
     expect(mockCurrentVm.handleAbrirInviteModal).toHaveBeenCalled();
+  });
+
+  it("invite modal muestra la URL generada", () => {
+    mockCurrentVm = {
+      ...defaultVm,
+      inviteModal: true,
+      inviteUrl: "https://planearia.app/invite/abc-1234",
+    };
+    const { getByText } = render(<BuscadorPerfilesScreen />);
+    expect(getByText("Invita a un colega")).toBeTruthy();
+    expect(getByText("https://planearia.app/invite/abc-1234")).toBeTruthy();
+    expect(getByText("El enlace expira en 7 días")).toBeTruthy();
   });
 });

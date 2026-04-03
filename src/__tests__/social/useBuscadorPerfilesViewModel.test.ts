@@ -23,6 +23,22 @@ jest.mock("../../context/AuthContext", () => ({
   }),
 }));
 
+// Mock inviteLinkService
+const mockCopyToClipboard = jest.fn().mockResolvedValue(true);
+const mockShareInviteLink = jest.fn().mockResolvedValue(true);
+
+jest.mock("../../services/inviteLinkService", () => ({
+  createInviteLink: (fromUserId?: string) => ({
+    token: "mock-token-123",
+    url: `https://planearia.app/invite/mock-token-123${fromUserId ? `?from=${fromUserId}` : ""}`,
+    webUrl: `https://planearia.app/invite/mock-token-123${fromUserId ? `?from=${fromUserId}` : ""}`,
+    deepUrl: `planearia://invite/mock-token-123${fromUserId ? `?from=${fromUserId}` : ""}`,
+    expiresAt: "2026-04-09T00:00:00.000Z",
+  }),
+  copyToClipboard: (...args: any[]) => mockCopyToClipboard(...args),
+  shareInviteLink: (...args: any[]) => mockShareInviteLink(...args),
+}));
+
 describe("useBuscadorPerfilesViewModel", () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -126,21 +142,36 @@ describe("useBuscadorPerfilesViewModel", () => {
     expect(result.current.solicitudModal.visible).toBe(false);
   });
 
-  it("handleAbrirInviteModal / handleCerrarInviteModal", () => {
+  it("handleAbrirInviteModal genera URL y abre modal", () => {
     const { result } = renderHook(() => useBuscadorPerfilesViewModel());
     act(() => result.current.handleAbrirInviteModal());
     expect(result.current.inviteModal).toBe(true);
+    expect(result.current.inviteUrl).toContain("https://planearia.app/invite/mock-token-123");
+    expect(result.current.inviteUrl).toContain("from=1");
     act(() => result.current.handleCerrarInviteModal());
     expect(result.current.inviteModal).toBe(false);
   });
 
-  it("handleCopiarEnlace cierra modal y muestra toast", () => {
+  it("handleCopiarEnlace copies URL, cierra modal y muestra toast", async () => {
     const { result } = renderHook(() => useBuscadorPerfilesViewModel());
     act(() => result.current.handleAbrirInviteModal());
-    act(() => result.current.handleCopiarEnlace());
+    await act(async () => result.current.handleCopiarEnlace());
+    expect(mockCopyToClipboard).toHaveBeenCalledWith(
+      expect.stringContaining("https://planearia.app/invite/mock-token-123")
+    );
     expect(result.current.inviteModal).toBe(false);
     expect(result.current.toast.visible).toBe(true);
     expect(result.current.toast.type).toBe("enlace");
+  });
+
+  it("handleCompartirEnlace shares invite link via native share", async () => {
+    const { result } = renderHook(() => useBuscadorPerfilesViewModel());
+    act(() => result.current.handleAbrirInviteModal());
+    await act(async () => result.current.handleCompartirEnlace());
+    expect(mockShareInviteLink).toHaveBeenCalledWith(
+      expect.stringContaining("https://planearia.app/invite/mock-token-123"),
+      "Test User"
+    );
   });
 
   it("setFiltroNivel actualiza filtro de nivel", () => {
@@ -149,10 +180,10 @@ describe("useBuscadorPerfilesViewModel", () => {
     expect(result.current.filtroNivel).toBe("Secundaria");
   });
 
-  it("toast auto-dismiss después de 3 segundos", () => {
+  it("toast auto-dismiss después de 3 segundos", async () => {
     const { result } = renderHook(() => useBuscadorPerfilesViewModel());
     act(() => result.current.handleAbrirInviteModal());
-    act(() => result.current.handleCopiarEnlace());
+    await act(async () => result.current.handleCopiarEnlace());
     expect(result.current.toast.visible).toBe(true);
     act(() => jest.advanceTimersByTime(3100));
     expect(result.current.toast.visible).toBe(false);

@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { useContactos } from "../context/ContactosContext";
 import { useAuth } from "../context/AuthContext";
+import { createInviteLink, copyToClipboard, shareInviteLink } from "../services/inviteLinkService";
 
 // ─── Types ───
 
@@ -36,6 +37,7 @@ export interface BuscadorPerfilesVM {
   hasError: boolean;
   solicitudModal: { visible: boolean; docente: DocentePerfil | null };
   inviteModal: boolean;
+  inviteUrl: string;
   toast: { visible: boolean; type: "solicitud" | "enlace" | null; nombre: string };
   handleSearch: () => void;
   handleClearSearch: () => void;
@@ -45,6 +47,7 @@ export interface BuscadorPerfilesVM {
   handleAbrirInviteModal: () => void;
   handleCerrarInviteModal: () => void;
   handleCopiarEnlace: () => void;
+  handleCompartirEnlace: () => void;
   handleReintentar: () => void;
 }
 
@@ -176,6 +179,7 @@ export function useBuscadorPerfilesViewModel(): BuscadorPerfilesVM {
     docente: DocentePerfil | null;
   }>({ visible: false, docente: null });
   const [inviteModal, setInviteModal] = useState(false);
+  const [inviteUrl, setInviteUrl] = useState("");
   const [toast, setToast] = useState<{
     visible: boolean;
     type: "solicitud" | "enlace" | null;
@@ -186,9 +190,7 @@ export function useBuscadorPerfilesViewModel(): BuscadorPerfilesVM {
   const getEstadoReal = useCallback(
     (perfilId: string): DocentePerfil["estado"] => {
       // Check if already a connected contact
-      const esContacto = contactos.find(
-        (c) => c.usuarioId === perfilId && c.estado === "aceptada"
-      );
+      const esContacto = contactos.find((c) => c.usuarioId === perfilId && c.estado === "aceptada");
       if (esContacto) return "conectado";
 
       // Check if there's a pending solicitud sent to this user
@@ -258,9 +260,7 @@ export function useBuscadorPerfilesViewModel(): BuscadorPerfilesVM {
       // Persist solicitud via ContactosContext
       await ctxEnviarSolicitud({
         deUsuarioId: usuario?.id?.toString() ?? "guest",
-        deUsuarioNombre: usuario
-          ? `${usuario.nombre} ${usuario.apellidos}`
-          : "Usuario Invitado",
+        deUsuarioNombre: usuario ? `${usuario.nombre} ${usuario.apellidos}` : "Usuario Invitado",
         deUsuarioAvatar: usuario?.fotoPerfil ?? undefined,
         deUsuarioMateria: undefined,
         deUsuarioInstitucion: undefined,
@@ -270,9 +270,7 @@ export function useBuscadorPerfilesViewModel(): BuscadorPerfilesVM {
 
       // Update the docente status locally
       setResultados((prev) =>
-        prev.map((d) =>
-          d.id === docente.id ? { ...d, estado: "solicitud_enviada" as const } : d
-        )
+        prev.map((d) => (d.id === docente.id ? { ...d, estado: "solicitud_enviada" as const } : d))
       );
       showToast("solicitud", nombre);
     },
@@ -284,17 +282,25 @@ export function useBuscadorPerfilesViewModel(): BuscadorPerfilesVM {
   }, []);
 
   const handleAbrirInviteModal = useCallback(() => {
+    const link = createInviteLink(usuario?.id?.toString());
+    setInviteUrl(link.url);
     setInviteModal(true);
-  }, []);
+  }, [usuario?.id]);
 
   const handleCerrarInviteModal = useCallback(() => {
     setInviteModal(false);
   }, []);
 
-  const handleCopiarEnlace = useCallback(() => {
+  const handleCopiarEnlace = useCallback(async () => {
+    await copyToClipboard(inviteUrl);
     setInviteModal(false);
     showToast("enlace", "");
-  }, [showToast]);
+  }, [inviteUrl, showToast]);
+
+  const handleCompartirEnlace = useCallback(async () => {
+    const nombre = usuario ? `${usuario.nombre} ${usuario.apellidos}` : undefined;
+    await shareInviteLink(inviteUrl, nombre);
+  }, [inviteUrl, usuario]);
 
   const handleReintentar = useCallback(() => {
     if (searchQuery.trim()) {
@@ -326,6 +332,7 @@ export function useBuscadorPerfilesViewModel(): BuscadorPerfilesVM {
     hasError,
     solicitudModal,
     inviteModal,
+    inviteUrl,
     toast,
     handleSearch,
     handleClearSearch,
@@ -335,6 +342,7 @@ export function useBuscadorPerfilesViewModel(): BuscadorPerfilesVM {
     handleAbrirInviteModal,
     handleCerrarInviteModal,
     handleCopiarEnlace,
+    handleCompartirEnlace,
     handleReintentar,
   };
 }

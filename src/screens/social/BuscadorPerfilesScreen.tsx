@@ -290,9 +290,11 @@ const SolicitudModal: React.FC<{
 
 const InviteModal: React.FC<{
   visible: boolean;
+  inviteUrl: string;
   onCopiar: () => void;
+  onCompartir: () => void;
   onCerrar: () => void;
-}> = ({ visible, onCopiar, onCerrar }) => (
+}> = ({ visible, inviteUrl, onCopiar, onCompartir, onCerrar }) => (
   <Modal visible={visible} transparent animationType="slide" onRequestClose={onCerrar}>
     <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={onCerrar}>
       <TouchableOpacity style={styles.modalSheet} activeOpacity={1} onPress={() => {}}>
@@ -308,7 +310,7 @@ const InviteModal: React.FC<{
         <View style={styles.inviteLinkRow}>
           <View style={styles.inviteLinkInput}>
             <Text style={styles.inviteLinkText} numberOfLines={1}>
-              planear.ia/invite/abc123...
+              {inviteUrl || "planear.ia/invite/..."}
             </Text>
           </View>
           <TouchableOpacity style={styles.inviteCopyBtn} onPress={onCopiar} activeOpacity={0.85}>
@@ -317,13 +319,13 @@ const InviteModal: React.FC<{
           </TouchableOpacity>
         </View>
         <View style={styles.shareRow}>
-          <TouchableOpacity style={styles.shareCircle} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.shareCircle} activeOpacity={0.7} onPress={onCompartir}>
             <MaterialIcons name="chat" size={22} color="#25D366" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.shareCircle} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.shareCircle} activeOpacity={0.7} onPress={onCompartir}>
             <MaterialIcons name="email" size={22} color={DT.primaryContainer} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.shareCircle} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.shareCircle} activeOpacity={0.7} onPress={onCompartir}>
             <MaterialIcons name="share" size={22} color={DT.textSecondary} />
           </TouchableOpacity>
         </View>
@@ -625,7 +627,9 @@ const BuscadorPerfilesScreen: React.FC = () => {
       />
       <InviteModal
         visible={vm.inviteModal}
+        inviteUrl={vm.inviteUrl}
         onCopiar={vm.handleCopiarEnlace}
+        onCompartir={vm.handleCompartirEnlace}
         onCerrar={vm.handleCerrarInviteModal}
       />
     </SafeAreaView>

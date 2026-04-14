@@ -896,7 +896,7 @@ const ContenidoScreen: React.FC = () => {
           ))}
         </ScrollView>
       )}
-      // ─── Filter toggle button ───
+      {/* ─── Filter toggle button ─── */}
       <View style={styles.filterToggleRow}>
         <TouchableOpacity style={styles.filterToggle} onPress={() => setShowFilters(!showFilters)}>
           <MaterialIcons name="tune" size={18} color={DT.onSurfaceVariant} />

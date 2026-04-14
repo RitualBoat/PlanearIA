@@ -47,6 +47,7 @@ interface AuthContextData {
   isGuest: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   loginComoInvitado: () => Promise<void>;
+  loginComoDesarrollador: () => Promise<void>;
   registro: (data: RegistroData) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   verificarToken: () => Promise<boolean>;
@@ -111,12 +112,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           AsyncStorage.getItem(AUTH_USER_KEY),
           AsyncStorage.getItem(AUTH_GUEST_KEY),
         ]);
-        if (storedGuest === "true" && storedUser) {
-          setUsuario(JSON.parse(storedUser) as Usuario);
-          setIsGuest(true);
-        } else if (storedToken && storedUser) {
+        if (storedToken && storedUser) {
+          // Token-based session takes full priority (dev or real user)
           setToken(storedToken);
           setUsuario(JSON.parse(storedUser) as Usuario);
+          setIsGuest(false);
+        } else if (storedGuest === "true" && storedUser) {
+          setUsuario(JSON.parse(storedUser) as Usuario);
+          setIsGuest(true);
         }
       } catch {
         // no-op
@@ -192,6 +195,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       AsyncStorage.removeItem(AUTH_TOKEN_KEY),
     ]);
   }, []);
+
+  const loginComoDesarrollador = useCallback(async () => {
+    const devUser: Usuario = {
+      id: 9999,
+      nombre: "Dev",
+      apellidos: "Admin",
+      email: "dev@planearia.local",
+      fotoPerfil: null,
+      biografia: "Cuenta de desarrollador para pruebas",
+      pais: "México",
+      rol: "admin" as RolUsuario,
+      fechaCreacion: new Date().toISOString(),
+      fechaModificacion: new Date().toISOString(),
+    };
+    const devToken = "dev-token-local-testing-only";
+    setIsGuest(false);
+    await AsyncStorage.removeItem(AUTH_GUEST_KEY);
+    await persistSession(devToken, devUser);
+  }, [persistSession]);
 
   const verificarToken = useCallback(async (): Promise<boolean> => {
     if (!token) return false;
@@ -301,6 +323,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isGuest,
     login,
     loginComoInvitado,
+    loginComoDesarrollador,
     registro,
     logout,
     verificarToken,

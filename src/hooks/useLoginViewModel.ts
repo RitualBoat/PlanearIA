@@ -17,11 +17,13 @@ export interface LoginViewModel {
   handleForgotPassword: () => void;
   handleRegister: () => void;
   handleEntrarComoInvitado: () => void;
+  handleLoginDesarrollador: () => void;
+  isDevMode: boolean;
 }
 
 export const useLoginViewModel = (): LoginViewModel => {
   const navigation = useNavigation<Nav>();
-  const { login, loginComoInvitado } = useAuth();
+  const { login, loginComoInvitado, loginComoDesarrollador } = useAuth();
   const [formData, setFormData] = useState<LoginFormData>({
     username: "",
     password: "",
@@ -95,6 +97,19 @@ export const useLoginViewModel = (): LoginViewModel => {
     }
   }, [loginComoInvitado, navigation, showAlert]);
 
+  const handleLoginDesarrollador = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      await loginComoDesarrollador();
+      logger.log("[auth] Login como desarrollador");
+      navigation.replace("MainTabs");
+    } catch {
+      showAlert("Error", "No se pudo iniciar como desarrollador.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [loginComoDesarrollador, navigation, showAlert]);
+
   return {
     formData,
     isLoading,
@@ -103,5 +118,7 @@ export const useLoginViewModel = (): LoginViewModel => {
     handleForgotPassword,
     handleRegister,
     handleEntrarComoInvitado,
+    handleLoginDesarrollador,
+    isDevMode: __DEV__,
   };
 };

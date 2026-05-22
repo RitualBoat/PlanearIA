@@ -4,7 +4,7 @@
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
-import { Grupo } from "../../types";
+import { Grupo, GrupoMiembro, RolGrupo } from "../../types";
 import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
 import logger from "../utils/logger";
 
@@ -351,7 +351,7 @@ export const agregarGrupo = async (grupo: Partial<Grupo>): Promise<void> => {
     const nuevoGrupo = {
       ...grupo,
       id: nuevoId,
-      fechaCreacion: grupo.fechaCreacion || new Date(),
+      fechaCreacion: grupo.fechaCreacion || new Date().toISOString(),
     };
 
     await guardarGrupos([...grupos, nuevoGrupo]);
@@ -402,6 +402,98 @@ export const eliminarGrupo = async (id: number): Promise<void> => {
     logger.error(" Error eliminando grupo:", error);
     throw new Error("No se pudo eliminar el grupo");
   }
+};
+
+/**
+ * Invita a un docente al grupo
+ */
+export const invitarDocenteAGrupo = async (
+  grupoId: number,
+  colaborador: { usuarioId: string; nombre: string; email: string; avatar?: string; rol: RolGrupo }
+): Promise<void> => {
+  const grupos = await obtenerGrupos();
+  const grupoActual = grupos.find((g) => g.id === grupoId);
+  if (!grupoActual) throw new Error("Grupo no encontrado");
+
+  const miembros = grupoActual.miembros || [];
+  if (miembros.some((m) => m.usuarioId === colaborador.usuarioId)) {
+    throw new Error("El docente ya es miembro o tiene invitación pendiente");
+  }
+
+  const nuevoMiembro: GrupoMiembro = {
+    ...colaborador,
+    estado: "pendiente",
+    fechaInvitacion: new Date().toISOString(),
+  };
+
+  await actualizarGrupo(grupoId, { miembros: [...miembros, nuevoMiembro] });
+};
+
+/**
+ * Responde a una invitación de grupo
+ */
+export const responderInvitacionGrupo = async (
+  grupoId: number,
+  usuarioId: string,
+  aceptar: boolean
+): Promise<void> => {
+  const grupos = await obtenerGrupos();
+  const grupoActual = grupos.find((g) => g.id === grupoId);
+  if (!grupoActual) throw new Error("Grupo no encontrado");
+
+  const miembros = grupoActual.miembros || [];
+  const miembroIndex = miembros.findIndex((m) => m.usuarioId === usuarioId);
+  
+  if (miembroIndex === -1) throw new Error("Invitación no encontrada");
+
+  let nuevosMiembros = [...miembros];
+  if (aceptar) {
+    nuevosMiembros[miembroIndex] = { ...nuevosMiembros[miembroIndex], estado: "activo" };
+  } else {
+    nuevosMiembros = nuevosMiembros.filter((m) => m.usuarioId !== usuarioId);
+  }
+
+  await actualizarGrupo(grupoId, { miembros: nuevosMiembros });
+};
+
+/**
+ * Cambia el rol de un miembro
+ */
+export const cambiarRolDocenteGrupo = async (
+  grupoId: number,
+  usuarioId: string,
+  nuevoRol: RolGrupo
+): Promise<void> => {
+  const grupos = await obtenerGrupos();
+  const grupoActual = grupos.find((g) => g.id === grupoId);
+  if (!grupoActual) throw new Error("Grupo no encontrado");
+
+  const miembros = grupoActual.miembros || [];
+  const miembroIndex = miembros.findIndex((m) => m.usuarioId === usuarioId);
+  
+  if (miembroIndex === -1) throw new Error("Colaborador no encontrado");
+
+  const nuevosMiembros = [...miembros];
+  nuevosMiembros[miembroIndex] = { ...nuevosMiembros[miembroIndex], rol: nuevoRol };
+
+  await actualizarGrupo(grupoId, { miembros: nuevosMiembros });
+};
+
+/**
+ * Elimina a un miembro del grupo
+ */
+export const eliminarDocenteGrupo = async (
+  grupoId: number,
+  usuarioId: string
+): Promise<void> => {
+  const grupos = await obtenerGrupos();
+  const grupoActual = grupos.find((g) => g.id === grupoId);
+  if (!grupoActual) throw new Error("Grupo no encontrado");
+
+  const miembros = grupoActual.miembros || [];
+  const nuevosMiembros = miembros.filter((m) => m.usuarioId !== usuarioId);
+
+  await actualizarGrupo(grupoId, { miembros: nuevosMiembros });
 };
 
 /**

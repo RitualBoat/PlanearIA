@@ -23,6 +23,8 @@ import type {
   EntregaTarea,
   Recurso,
   Tarea,
+  GrupoMiembro,
+  RolGrupo,
 } from "../../../types";
 import WebScrollView from "../../components/WebScrollView";
 import { useDetalleGrupoViewModel, TabType } from "../../hooks/useDetalleGrupoViewModel";
@@ -30,6 +32,9 @@ import { calcularEstadisticasGrupo } from "../../services/grupoReportesService";
 import StatCard from "../../components/StatCard";
 import TrendMiniChart from "../../components/TrendMiniChart";
 import DeliveryDistributionMini from "../../components/DeliveryDistributionMini";
+import { ColaboradorListItem } from "../../components/grupos/ColaboradorListItem";
+import { ModalInvitacionColaborador } from "../../components/grupos/ModalInvitacionColaborador";
+import { MenuContextualColaborador } from "../../components/grupos/MenuContextualColaborador";
 
 const getLastRefreshText = (lastRefreshAt: Date | null): string => {
   if (!lastRefreshAt) return "Actualizado recientemente";
@@ -56,6 +61,7 @@ const TabContent: React.FC<{
   notasUltimaEdicion: string;
   notasEstado: "sin-cambios" | "cambios-sin-guardar" | "guardando" | "guardado" | "error";
   notasError: string;
+  miembros: GrupoMiembro[];
   chartWidth: number;
   openAddStudentsModal: () => void;
   openRemoveStudentModal: (student: {
@@ -64,6 +70,8 @@ const TabContent: React.FC<{
     apellidos: string;
     numeroControl: string;
   }) => void;
+  openInvitacionModal: () => void;
+  openContextualMenu: (miembro: GrupoMiembro) => void;
   navigateCrearTarea: () => void;
   navigateAsignarRecurso: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
@@ -89,9 +97,12 @@ const TabContent: React.FC<{
     notasUltimaEdicion,
     notasEstado,
     notasError,
+    miembros,
     chartWidth,
     openAddStudentsModal,
     openRemoveStudentModal,
+    openInvitacionModal,
+    openContextualMenu,
     navigateCrearTarea,
     navigateAsignarRecurso,
     navigateDetalleTarea,
@@ -538,6 +549,34 @@ const TabContent: React.FC<{
           </View>
         );
 
+      case "colaboradores":
+        return (
+          <View style={styles.tabContent}>
+            <Text style={styles.tabTitle}>Colaboradores</Text>
+            <Text style={styles.tabDescription}>
+              Gestiona los docentes y asistentes con acceso a la planificación de este grupo.
+            </Text>
+            <TouchableOpacity style={styles.actionButton} onPress={openInvitacionModal}>
+              <MaterialIcons name="person-add" size={24} color="white" />
+              <Text style={styles.actionButtonText}>Invitar Docente</Text>
+            </TouchableOpacity>
+
+            <View style={styles.listaContainer}>
+              {miembros.length === 0 ? (
+                <Text style={styles.emptyText}>No hay colaboradores asignados a este grupo.</Text>
+              ) : (
+                miembros.map((miembro) => (
+                  <ColaboradorListItem
+                    key={miembro.usuarioId}
+                    miembro={miembro}
+                    onMenuPress={() => openContextualMenu(miembro)}
+                  />
+                ))
+              )}
+            </View>
+          </View>
+        );
+
       default:
         return null;
     }
@@ -569,6 +608,17 @@ const DetalleGrupoScreen: React.FC = () => {
     notasUltimaEdicion,
     notasEstado,
     notasError,
+    miembros,
+    invitacionModalVisible,
+    contextualMenuVisible,
+    colaboradorSeleccionado,
+    openInvitacionModal,
+    closeInvitacionModal,
+    openContextualMenu,
+    closeContextualMenu,
+    invitarDocente,
+    cambiarRolColaborador,
+    eliminarColaborador,
     addStudentsModalVisible,
     createStudentMode,
     studentSearchQuery,
@@ -747,9 +797,12 @@ const DetalleGrupoScreen: React.FC = () => {
             notasUltimaEdicion={notasUltimaEdicion}
             notasEstado={notasEstado}
             notasError={notasError}
+            miembros={miembros}
             chartWidth={chartWidth}
             openAddStudentsModal={openAddStudentsModal}
             openRemoveStudentModal={openRemoveStudentModal}
+            openInvitacionModal={openInvitacionModal}
+            openContextualMenu={openContextualMenu}
             navigateCrearTarea={navigateCrearTarea}
             navigateAsignarRecurso={navigateAsignarRecurso}
             navigateDetalleTarea={navigateDetalleTarea}
@@ -799,28 +852,40 @@ const DetalleGrupoScreen: React.FC = () => {
                 >
                   <Text style={styles.cancelModalButtonText}>Cancelar</Text>
                 </TouchableOpacity>
-
                 <TouchableOpacity
-                  style={[
-                    styles.deleteModalButton,
-                    isUnlinkingStudent && styles.deleteModalButtonDisabled,
-                  ]}
+                  style={styles.deleteModalButton}
                   onPress={() => void confirmRemoveStudentFromGroup()}
                   disabled={isUnlinkingStudent}
                 >
                   {isUnlinkingStudent ? (
-                    <ActivityIndicator size="small" color={COLORS.surface} />
+                    <ActivityIndicator size="small" color="#FFF" />
                   ) : (
-                    <MaterialIcons name="person-remove" size={16} color={COLORS.surface} />
+                    <Text style={styles.deleteModalButtonText}>Quitar</Text>
                   )}
-                  <Text style={styles.deleteModalButtonText}>
-                    {isUnlinkingStudent ? "Quitando..." : "Quitar del grupo"}
-                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         </Modal>
+
+        <ModalInvitacionColaborador 
+          visible={invitacionModalVisible}
+          onClose={closeInvitacionModal}
+          onInvite={invitarDocente}
+          grupoNombre={grupoNombre}
+        />
+        
+        <MenuContextualColaborador
+          visible={contextualMenuVisible}
+          colaborador={colaboradorSeleccionado}
+          onClose={closeContextualMenu}
+          onChangeRole={cambiarRolColaborador}
+          onRemove={eliminarColaborador}
+        />
+
+        {/* Modal de confirmación de eliminación (Grupo) */}
+        <Modal
+          visible={deleteModalVisible}
 
         <Modal
           visible={addStudentsModalVisible}

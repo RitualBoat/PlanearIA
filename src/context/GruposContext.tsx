@@ -9,7 +9,12 @@ import {
   getGruposConnectivity,
   sincronizarGruposConBackend,
   GrupoSyncStatus,
+  invitarDocenteAGrupo as invitarDocenteAGrupoServicio,
+  responderInvitacionGrupo as responderInvitacionGrupoServicio,
+  cambiarRolDocenteGrupo as cambiarRolDocenteGrupoServicio,
+  eliminarDocenteGrupo as eliminarDocenteGrupoServicio,
 } from "../services/gruposService";
+import { RolGrupo } from "../../types";
 
 interface GruposContextData {
   grupos: Partial<Grupo>[];
@@ -24,6 +29,10 @@ interface GruposContextData {
   actualizarGrupo: (id: number, actualizacion: Partial<Grupo>) => Promise<void>;
   eliminarGrupo: (id: number) => Promise<void>;
   obtenerGrupo: (id: number) => Partial<Grupo> | undefined;
+  invitarDocenteAGrupo: (grupoId: number, colaborador: { usuarioId: string; nombre: string; email: string; avatar?: string; rol: RolGrupo }) => Promise<void>;
+  responderInvitacionGrupo: (grupoId: number, usuarioId: string, aceptar: boolean) => Promise<void>;
+  cambiarRolDocenteGrupo: (grupoId: number, usuarioId: string, nuevoRol: RolGrupo) => Promise<void>;
+  eliminarDocenteGrupo: (grupoId: number, usuarioId: string) => Promise<void>;
 }
 
 const GruposContext = createContext<GruposContextData | undefined>(undefined);
@@ -121,6 +130,42 @@ export const GruposProvider: React.FC<GruposProviderProps> = ({ children }) => {
     [grupos]
   );
 
+  const invitarDocenteAGrupo = useCallback(
+    async (grupoId: number, colaborador: { usuarioId: string; nombre: string; email: string; avatar?: string; rol: RolGrupo }) => {
+      await invitarDocenteAGrupoServicio(grupoId, colaborador);
+      await loadGrupos();
+      await refreshSyncMeta();
+    },
+    [loadGrupos, refreshSyncMeta]
+  );
+
+  const responderInvitacionGrupo = useCallback(
+    async (grupoId: number, usuarioId: string, aceptar: boolean) => {
+      await responderInvitacionGrupoServicio(grupoId, usuarioId, aceptar);
+      await loadGrupos();
+      await refreshSyncMeta();
+    },
+    [loadGrupos, refreshSyncMeta]
+  );
+
+  const cambiarRolDocenteGrupo = useCallback(
+    async (grupoId: number, usuarioId: string, nuevoRol: RolGrupo) => {
+      await cambiarRolDocenteGrupoServicio(grupoId, usuarioId, nuevoRol);
+      await loadGrupos();
+      await refreshSyncMeta();
+    },
+    [loadGrupos, refreshSyncMeta]
+  );
+
+  const eliminarDocenteGrupo = useCallback(
+    async (grupoId: number, usuarioId: string) => {
+      await eliminarDocenteGrupoServicio(grupoId, usuarioId);
+      await loadGrupos();
+      await refreshSyncMeta();
+    },
+    [loadGrupos, refreshSyncMeta]
+  );
+
   const value: GruposContextData = {
     grupos,
     isLoading,
@@ -134,6 +179,10 @@ export const GruposProvider: React.FC<GruposProviderProps> = ({ children }) => {
     actualizarGrupo,
     eliminarGrupo,
     obtenerGrupo,
+    invitarDocenteAGrupo,
+    responderInvitacionGrupo,
+    cambiarRolDocenteGrupo,
+    eliminarDocenteGrupo,
   };
 
   return <GruposContext.Provider value={value}>{children}</GruposContext.Provider>;

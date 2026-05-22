@@ -210,17 +210,9 @@ const FeedScreen: React.FC = () => {
       </Text>
       <Text style={[styles.emptyDesc, { color: colors.onSurfaceVariant }]}>
         Sé el primero en compartir tus experiencias, recursos y planeaciones con otros docentes.
+        {"\n"}Usa el botón <Text style={{ fontWeight: "800", color: colors.primary }}>+</Text> para
+        crear tu primera publicación.
       </Text>
-      <TouchableOpacity onPress={vm.handleOpenCreateModal} activeOpacity={0.85}>
-        <LinearGradient
-          colors={[colors.primary, colors.primaryContainer]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.emptyCTABtn}
-        >
-          <Text style={styles.emptyCTAText}>✏️ Crear mi primera publicación</Text>
-        </LinearGradient>
-      </TouchableOpacity>
       {/* Decorative separator */}
       <View style={[styles.emptySeparator, { backgroundColor: `${colors.primary}15` }]} />
     </View>
@@ -293,9 +285,7 @@ const FeedScreen: React.FC = () => {
       <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top"]}>
         <View style={styles.headerBar}>
           <Text style={[styles.headerTitle, { color: colors.primary }]}>Comunidad</Text>
-          <TouchableOpacity style={styles.notifBtn}>
-            <MaterialIcons name="notifications-none" size={24} color={colors.onSurfaceVariant} />
-          </TouchableOpacity>
+          <View style={{ width: 40 }} />
         </View>
         <View style={[styles.feedContainer, isDesktop && styles.feedContainerDesktop]}>
           <View style={{ gap: 16, padding: 16, maxWidth: 640, width: "100%", alignSelf: "center" }}>
@@ -346,10 +336,7 @@ const FeedScreen: React.FC = () => {
       {/* Header */}
       <View style={styles.headerBar}>
         <Text style={[styles.headerTitle, { color: colors.primary }]}>Comunidad</Text>
-        <TouchableOpacity style={styles.notifBtn}>
-          <MaterialIcons name="notifications-none" size={24} color={colors.onSurfaceVariant} />
-          <View style={[styles.notifDot, { backgroundColor: colors.error }]} />
-        </TouchableOpacity>
+        <View style={{ width: 40 }} />
       </View>
 
       <View style={[styles.feedContainer, isDesktop && styles.feedContainerDesktop]}>

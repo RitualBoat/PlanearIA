@@ -467,10 +467,7 @@ const SocialScreen: React.FC = () => {
   const vm = useSocialViewModel();
 
   const handleChatPress = () => {
-    // Chat será implementado en Sprint 5.4
-    import("react-native").then(({ Alert }) => {
-      Alert.alert("Próximamente", "La mensajería se implementará en una próxima actualización.");
-    });
+    navigation.navigate("Chat");
   };
 
   const handleMorePress = (contacto: Contacto) => {

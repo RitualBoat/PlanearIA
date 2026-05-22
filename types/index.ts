@@ -89,6 +89,25 @@ export interface Grupo extends BaseEntity {
   horario?: string; // Ej: "Lun-Mie-Vie 7:00-9:00"
   notasPersonales?: string;
   notasActualizadoEn?: string;
+  miembros?: GrupoMiembro[];
+}
+
+/**
+ * Roles dentro de un grupo para los colaboradores
+ */
+export type RolGrupo = "titular" | "co-docente" | "ponente_invitado";
+
+/**
+ * Miembro colaborador de un grupo
+ */
+export interface GrupoMiembro {
+  usuarioId: string;
+  nombre: string;
+  email: string;
+  avatar?: string;
+  rol: RolGrupo;
+  estado: "pendiente" | "activo";
+  fechaInvitacion: string;
 }
 
 /**
@@ -368,6 +387,64 @@ export interface SolicitudConexion extends BaseEntity {
   paraUsuarioId: string;
   mensaje?: string;
   estado: "pendiente" | "aceptada" | "rechazada";
+  fechaCreacion: string;
+  fechaModificacion: string;
+  syncStatus?: "synced" | "pending" | "error";
+}
+
+// ==========================================
+// TIPOS PARA MENSAJERÍA / CHAT (Sprint 5.4)
+// ==========================================
+
+export type EstadoMensaje = "enviando" | "enviado" | "entregado" | "leido" | "error";
+export type TipoMensaje = "texto" | "archivo" | "planeacion" | "recurso";
+
+export interface MensajeArchivo {
+  nombre: string;
+  tamaño: number;
+  formato: string;
+  url?: string;
+}
+
+export interface MensajePlaneacion {
+  planeacionId: string;
+  titulo: string;
+  materia: string;
+  grado: string;
+}
+
+export interface MensajeRecurso {
+  recursoId: number;
+  titulo: string;
+  tipo: string;
+  formato?: string;
+}
+
+export interface Mensaje extends BaseEntity {
+  conversacionId: number;
+  remitenteId: string;
+  contenido: string;
+  tipo: TipoMensaje;
+  archivo?: MensajeArchivo;
+  planeacion?: MensajePlaneacion;
+  recurso?: MensajeRecurso;
+  estado: EstadoMensaje;
+  fechaCreacion: string;
+  fechaModificacion: string;
+  syncStatus?: "synced" | "pending" | "error";
+}
+
+export interface Conversacion extends BaseEntity {
+  participantes: string[];
+  contactoId: number;
+  contactoNombre: string;
+  contactoAvatar?: string;
+  contactoColor: string;
+  contactoEnLinea: boolean;
+  ultimoMensaje?: string;
+  ultimoMensajeTipo?: TipoMensaje;
+  fechaUltimoMensaje?: string;
+  mensajesNoLeidos: number;
   fechaCreacion: string;
   fechaModificacion: string;
   syncStatus?: "synced" | "pending" | "error";

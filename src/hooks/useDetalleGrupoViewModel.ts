@@ -9,8 +9,9 @@ import type {
   Alumno,
   Asistencia,
   Calificacion,
-  EntregaTarea,
   Grupo,
+  GrupoMiembro,
+  RolGrupo,
   Recurso,
   Tarea,
 } from "../../types";
@@ -29,7 +30,8 @@ export type TabType =
   | "recursos"
   | "tareas"
   | "graficas"
-  | "notas";
+  | "notas"
+  | "colaboradores";
 
 export interface Tab {
   id: TabType;
@@ -54,6 +56,17 @@ export interface DetalleGrupoViewModel {
   notasUltimaEdicion: string;
   notasEstado: "sin-cambios" | "cambios-sin-guardar" | "guardando" | "guardado" | "error";
   notasError: string;
+  miembros: GrupoMiembro[];
+  invitacionModalVisible: boolean;
+  contextualMenuVisible: boolean;
+  colaboradorSeleccionado: GrupoMiembro | null;
+  openInvitacionModal: () => void;
+  closeInvitacionModal: () => void;
+  openContextualMenu: (miembro: GrupoMiembro) => void;
+  closeContextualMenu: () => void;
+  invitarDocente: (email: string, rol: RolGrupo) => Promise<void>;
+  cambiarRolColaborador: (nuevoRol: RolGrupo) => Promise<void>;
+  eliminarColaborador: () => Promise<void>;
   reloadDetalleData: () => Promise<void>;
   addStudentsModalVisible: boolean;
   createStudentMode: boolean;
@@ -117,13 +130,26 @@ export interface DetalleGrupoViewModel {
 export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
-  const { obtenerGrupo, eliminarGrupo, actualizarGrupo } = useGruposContext();
+  const { 
+    obtenerGrupo, 
+    eliminarGrupo, 
+    actualizarGrupo,
+    invitarDocenteAGrupo,
+    cambiarRolDocenteGrupo,
+    eliminarDocenteGrupo
+  } = useGruposContext();
   const { grupoId, grupoNombre } = route.params;
   const [activeTab, setActiveTab] = useState<TabType>("alumnos");
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deleteConfirmed, setDeleteConfirmed] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  
+  // Estados para colaboradores
+  const [invitacionModalVisible, setInvitacionModalVisible] = useState(false);
+  const [contextualMenuVisible, setContextualMenuVisible] = useState(false);
+  const [colaboradorSeleccionado, setColaboradorSeleccionado] = useState<GrupoMiembro | null>(null);
+
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [alumnos, setAlumnos] = useState<Alumno[]>([]);
@@ -137,6 +163,7 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
 
   const grupo = obtenerGrupo(grupoId);
   const cantidadAlumnos = grupo?.cantidadAlumnos ?? 0;
+  const miembros = grupo?.miembros || [];
 
   const tabs: Tab[] = [
     { id: "alumnos", label: "Alumnos", icon: "people" },
@@ -146,6 +173,7 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     { id: "tareas", label: "Tareas", icon: "assignment" },
     { id: "graficas", label: "Gráficas", icon: "analytics" },
     { id: "notas", label: "Notas", icon: "note-alt" },
+    { id: "colaboradores", label: "Colaboradores", icon: "group-add" },
   ];
 
   // --- Notes sub-hook ---
@@ -328,6 +356,40 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     }
   }, [deleteConfirmed, eliminarGrupo, grupoId, navigation]);
 
+  const openInvitacionModal = useCallback(() => setInvitacionModalVisible(true), []);
+  const closeInvitacionModal = useCallback(() => setInvitacionModalVisible(false), []);
+  
+  const openContextualMenu = useCallback((miembro: GrupoMiembro) => {
+    setColaboradorSeleccionado(miembro);
+    setContextualMenuVisible(true);
+  }, []);
+  
+  const closeContextualMenu = useCallback(() => {
+    setColaboradorSeleccionado(null);
+    setContextualMenuVisible(false);
+  }, []);
+
+  const invitarDocente = useCallback(async (email: string, rol: RolGrupo) => {
+    await invitarDocenteAGrupo(grupoId, {
+      usuarioId: `usr_${Date.now()}`,
+      nombre: email.split("@")[0],
+      email,
+      rol,
+    });
+  }, [grupoId, invitarDocenteAGrupo]);
+
+  const cambiarRolColaborador = useCallback(async (nuevoRol: RolGrupo) => {
+    if (!colaboradorSeleccionado) return;
+    await cambiarRolDocenteGrupo(grupoId, colaboradorSeleccionado.usuarioId, nuevoRol);
+    closeContextualMenu();
+  }, [grupoId, colaboradorSeleccionado, cambiarRolDocenteGrupo, closeContextualMenu]);
+
+  const eliminarColaborador = useCallback(async () => {
+    if (!colaboradorSeleccionado) return;
+    await eliminarDocenteGrupo(grupoId, colaboradorSeleccionado.usuarioId);
+    closeContextualMenu();
+  }, [grupoId, colaboradorSeleccionado, eliminarDocenteGrupo, closeContextualMenu]);
+
   return {
     grupoId,
     grupoNombre,
@@ -341,6 +403,17 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     calificaciones,
     entregas,
     lastDataRefreshAt,
+    miembros,
+    invitacionModalVisible,
+    contextualMenuVisible,
+    colaboradorSeleccionado,
+    openInvitacionModal,
+    closeInvitacionModal,
+    openContextualMenu,
+    closeContextualMenu,
+    invitarDocente,
+    cambiarRolColaborador,
+    eliminarColaborador,
     ...notasHook,
     reloadDetalleData,
     ...addStudents,

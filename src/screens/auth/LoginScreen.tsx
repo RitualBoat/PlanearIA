@@ -29,6 +29,8 @@ const LoginScreen: React.FC = () => {
     handleForgotPassword,
     handleRegister,
     handleEntrarComoInvitado,
+    handleLoginDesarrollador,
+    isDevMode,
   } = useLoginViewModel();
 
   return (
@@ -100,6 +102,18 @@ const LoginScreen: React.FC = () => {
           >
             <Text style={styles.guestButtonText}>Entrar como invitado</Text>
           </TouchableOpacity>
+
+          {/* Modo desarrollador — solo visible en __DEV__ */}
+          {isDevMode && (
+            <TouchableOpacity
+              style={styles.devButton}
+              onPress={handleLoginDesarrollador}
+              disabled={isLoading}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.devButtonText}>🛠 Dev Login (Admin)</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -205,6 +219,21 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontSize: FONT_SIZES.medium,
     fontWeight: "600",
+  },
+  devButton: {
+    marginTop: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#F58026",
+    borderStyle: "dashed",
+    alignItems: "center",
+    backgroundColor: "#FFF8F1",
+  },
+  devButtonText: {
+    color: "#F58026",
+    fontSize: FONT_SIZES.small,
+    fontWeight: "700",
   },
 });
 export default LoginScreen;

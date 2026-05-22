@@ -88,6 +88,10 @@ import PostDetailScreen from "../screens/feed/PostDetailScreen";
 // Importación de pantalla de Buscador de Perfiles
 import BuscadorPerfilesScreen from "../screens/social/BuscadorPerfilesScreen";
 
+// Importación de pantallas de Chat/Mensajería
+import ChatScreen from "../screens/chat/ChatScreen";
+import ConversacionScreen from "../screens/chat/ConversacionScreen";
+
 // Importación de pantalla de Onboarding
 import OnboardingScreen from "../screens/onboarding/OnboardingScreen";
 
@@ -224,6 +228,10 @@ export type RootStackParamList = {
 
   // Social / Buscador de Perfiles
   BuscadorPerfiles: undefined;
+
+  // Chat / Mensajería
+  Chat: undefined;
+  Conversacion: { conversacionId: number };
 };
 /**
  * Creamos el Stack Navigator con tipado
@@ -704,6 +712,23 @@ const StackNavigator: React.FC = () => {
         component={BuscadorPerfilesScreen}
         options={{
           title: "Buscar Docentes",
+          headerShown: false,
+        }}
+      />
+      {/* ========== CHAT / MENSAJERÍA ========== */}
+      <Stack.Screen
+        name="Chat"
+        component={ChatScreen}
+        options={{
+          title: "Mensajes",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="Conversacion"
+        component={ConversacionScreen}
+        options={{
+          title: "Conversación",
           headerShown: false,
         }}
       />

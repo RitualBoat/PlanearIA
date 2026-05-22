@@ -102,7 +102,7 @@ describe("FeedScreen", () => {
 
     expect(getByText(/Bienvenido a la comunidad/i)).toBeTruthy();
     expect(getByText(/primero en compartir/i)).toBeTruthy();
-    expect(getByText(/Crear mi primera publicación/i)).toBeTruthy();
+    expect(getByText(/Usa el botón/i)).toBeTruthy();
   });
 
   it("muestra estado de error", () => {

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { GrupoMiembro, RolGrupo } from "../../../types";
 import { colors } from "../../themes/colors";
-import { typography } from "../../themes/typography";
+
 
 interface Props {
   miembro: GrupoMiembro;
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   name: {
-    ...typography.titleLg,
+    fontWeight: "500",
     fontSize: 16,
     lineHeight: 24,
     color: colors.onSurface,
@@ -141,13 +141,15 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   badgeText: {
-    ...typography.labelMd,
+    fontSize: 12,
+    fontWeight: "500",
   },
   pendingBadge: {
     backgroundColor: colors.errorContainer,
   },
   pendingBadgeText: {
-    ...typography.labelMd,
+    fontSize: 12,
+    fontWeight: "500",
     color: colors.onErrorContainer,
   },
   menuButton: {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../themes/colors";
-import { typography } from "../../themes/typography";
+
 import { RolGrupo } from "../../../types";
 
 interface Props {
@@ -180,7 +180,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   title: {
-    ...typography.titleLg,
+    fontSize: 18,
+    fontWeight: "500",
     color: colors.onSurface,
   },
   closeButton: {
@@ -194,7 +195,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    ...typography.labelMd,
+    fontSize: 12,
+    fontWeight: "500",
     color: colors.onSurfaceVariant,
     marginBottom: 8,
   },
@@ -212,7 +214,8 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    ...typography.bodyLg,
+    fontSize: 16,
+    fontWeight: "400",
     color: colors.onSurface,
     paddingVertical: 12,
   },
@@ -234,7 +237,8 @@ const styles = StyleSheet.create({
     borderColor: colors.primaryFixed,
   },
   roleText: {
-    ...typography.bodyMd,
+    fontSize: 14,
+    fontWeight: "400",
     color: colors.onSurfaceVariant,
   },
   roleTextActive: {
@@ -242,7 +246,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   roleDescription: {
-    ...typography.bodyMd,
+    fontSize: 14,
+    fontWeight: "400",
     color: colors.onSurfaceVariant,
     fontSize: 13,
   },
@@ -266,12 +271,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   emptyStateText: {
-    ...typography.bodyMd,
+    fontSize: 14,
+    fontWeight: "400",
     color: colors.onSurfaceVariant,
     marginBottom: 4,
   },
   emptyStateSubtext: {
-    ...typography.labelMd,
+    fontSize: 12,
+    fontWeight: "500",
     color: colors.outline,
   },
   inviteButton: {
@@ -287,7 +294,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   inviteButtonText: {
-    ...typography.titleLg,
+    fontWeight: "500",
     fontSize: 15,
     color: colors.onPrimaryContainer,
   },
@@ -297,13 +304,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   successTitle: {
-    ...typography.headlineMd,
+    fontSize: 24,
+    fontWeight: "400",
     color: colors.onSurface,
     marginTop: 16,
     marginBottom: 8,
   },
   successText: {
-    ...typography.bodyLg,
+    fontSize: 16,
+    fontWeight: "400",
     color: colors.onSurfaceVariant,
     textAlign: "center",
   },

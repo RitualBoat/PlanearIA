@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Platform } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../themes/colors";
-import { typography } from "../../themes/typography";
+
 import { GrupoMiembro, RolGrupo } from "../../../types";
 
 interface Props {
@@ -112,12 +112,14 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.outlineVariant + "40",
   },
   title: {
-    ...typography.titleLg,
+    fontSize: 18,
+    fontWeight: "500",
     color: colors.onSurface,
     marginBottom: 4,
   },
   subtitle: {
-    ...typography.bodyMd,
+    fontSize: 14,
+    fontWeight: "400",
     color: colors.onSurfaceVariant,
   },
   closeButton: {
@@ -129,7 +131,8 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   sectionTitle: {
-    ...typography.labelMd,
+    fontSize: 12,
+    fontWeight: "500",
     color: colors.onSurfaceVariant,
     marginBottom: 16,
   },
@@ -145,13 +148,15 @@ const styles = StyleSheet.create({
     borderColor: colors.primaryFixed,
   },
   roleTitle: {
-    ...typography.bodyLg,
+    fontSize: 16,
+    fontWeight: "400",
     fontWeight: "600",
     color: colors.onSurface,
     marginBottom: 4,
   },
   roleDesc: {
-    ...typography.bodyMd,
+    fontSize: 14,
+    fontWeight: "400",
     color: colors.onSurfaceVariant,
     fontSize: 13,
   },
@@ -169,7 +174,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.errorContainer,
   },
   removeText: {
-    ...typography.titleLg,
+    fontWeight: "500",
     fontSize: 15,
     color: colors.onErrorContainer,
     marginLeft: 8,

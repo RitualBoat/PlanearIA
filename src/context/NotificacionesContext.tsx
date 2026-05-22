@@ -1,8 +1,13 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Notificacion, TipoNotificacion } from "../../types";
+import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
+import logger from "../utils/logger";
 
 const NOTIFICACIONES_STORAGE_KEY = "APP_NOTIFICACIONES_DATA";
+
+// Usuario actual por defecto (se reemplazará con AuthContext en Sprint 8)
+const CURRENT_USER_ID = "1";
 
 interface NotificacionesContextData {
   notificaciones: Notificacion[];
@@ -66,16 +71,59 @@ export const NotificacionesProvider: React.FC<{ children: React.ReactNode }> = (
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchRemoteNotificaciones = async (): Promise<Notificacion[]> => {
+    if (!isAPIConfigured()) return [];
+    try {
+      const response = await fetch(
+        `${API_CONFIG.baseUrl}/api/notificaciones?usuarioId=${CURRENT_USER_ID}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-Key": API_CONFIG.apiSecret,
+          },
+        }
+      );
+      if (!response.ok) return [];
+      const json = await response.json();
+      return (json.data?.notificaciones ?? []) as Notificacion[];
+    } catch (err) {
+      if (__DEV__) logger.error("[NotificacionesContext] Error al obtener del backend:", err);
+      return [];
+    }
+  };
+
   const loadData = async () => {
     try {
       setIsLoading(true);
       setError(null);
+
+      // 1) Cargar datos locales primero para respuesta inmediata
       const stored = await AsyncStorage.getItem(NOTIFICACIONES_STORAGE_KEY);
-      if (stored) {
-        setNotificaciones(JSON.parse(stored));
-      } else {
-        // Inicializar con mock data y guardarla
-        setNotificaciones(MOCK_NOTIFICACIONES);
+      const local: Notificacion[] = stored ? JSON.parse(stored) : MOCK_NOTIFICACIONES;
+      setNotificaciones(local);
+
+      // 2) Intentar obtener desde backend y fusionar (Last-Write-Wins)
+      const remote = await fetchRemoteNotificaciones();
+      if (remote.length > 0) {
+        const localMap = new Map(local.map((n) => [n.id, n]));
+        for (const remoteItem of remote) {
+          const localItem = localMap.get(remoteItem.id);
+          if (!localItem) {
+            localMap.set(remoteItem.id, remoteItem);
+          } else {
+            // Preferir versión más reciente
+            const remoteDate = new Date(remoteItem.fechaCreacion).getTime();
+            const localDate = new Date(localItem.fechaCreacion).getTime();
+            if (remoteDate >= localDate) localMap.set(remoteItem.id, remoteItem);
+          }
+        }
+        const merged = Array.from(localMap.values()).sort(
+          (a, b) => new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime()
+        );
+        setNotificaciones(merged);
+        await AsyncStorage.setItem(NOTIFICACIONES_STORAGE_KEY, JSON.stringify(merged));
+      } else if (!stored) {
+        // Sin backend ni datos locales — usar mock
         await AsyncStorage.setItem(NOTIFICACIONES_STORAGE_KEY, JSON.stringify(MOCK_NOTIFICACIONES));
       }
     } catch {
@@ -110,6 +158,17 @@ export const NotificacionesProvider: React.FC<{ children: React.ReactNode }> = (
     const updated = notificaciones.map((n) => ({ ...n, leida: true }));
     setNotificaciones(updated);
     await saveNotificaciones(updated);
+    // Sincronizar con backend si está disponible
+    if (isAPIConfigured()) {
+      fetch(`${API_CONFIG.baseUrl}/api/notificaciones`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": API_CONFIG.apiSecret,
+        },
+        body: JSON.stringify({ usuarioId: CURRENT_USER_ID, marcarTodas: true }),
+      }).catch(() => { /* silent — offline-first */ });
+    }
   }, [notificaciones]);
 
   const eliminarNotificacion = useCallback(

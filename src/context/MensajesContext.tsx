@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
+import { AppState, AppStateStatus } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Conversacion,
@@ -8,6 +9,9 @@ import {
   MensajePlaneacion,
   MensajeRecurso,
 } from "../../types";
+import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
+import { mergeWithLocal } from "../sync/services/syncEngine";
+import logger from "../utils/logger";
 
 const CONVERSACIONES_STORAGE_KEY = "APP_CONVERSACIONES_DATA";
 const MENSAJES_STORAGE_KEY = "APP_MENSAJES_DATA";
@@ -50,15 +54,85 @@ interface MensajesContextData {
 
 const MensajesContext = createContext<MensajesContextData | undefined>(undefined);
 
+const POLLING_INTERVAL_MS = 5000;
+
 export const MensajesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [conversaciones, setConversaciones] = useState<Conversacion[]>([]);
   const [mensajes, setMensajes] = useState<Mensaje[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const appStateRef = useRef<AppStateStatus>("active");
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // ─── Arrancar y suspender polling según estado de la app ───────────────────
   useEffect(() => {
     loadData();
+
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      appStateRef.current = nextState;
+      if (nextState === "active") {
+        startPolling();
+      } else {
+        stopPolling();
+      }
+    });
+
+    startPolling();
+
+    return () => {
+      subscription.remove();
+      stopPolling();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const startPolling = () => {
+    if (pollingRef.current) return; // ya activo
+    pollingRef.current = setInterval(() => {
+      if (appStateRef.current === "active") {
+        fetchRemoteConversaciones().catch(() => { /* silent */ });
+      }
+    }, POLLING_INTERVAL_MS);
+  };
+
+  const stopPolling = () => {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+  };
+
+  /**
+   * Descarga conversaciones desde el backend y las fusiona con datos locales.
+   * Last-Write-Wins por fechaModificacion.
+   */
+  const fetchRemoteConversaciones = async () => {
+    if (!isAPIConfigured()) return;
+    try {
+      const response = await fetch(
+        `${API_CONFIG.baseUrl}/api/mensajes?tipo=conversaciones`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-Key": API_CONFIG.apiSecret,
+          },
+        }
+      );
+      if (!response.ok) return;
+      const json = await response.json();
+      const remoteConvs: Conversacion[] = json.data?.conversaciones ?? [];
+      if (remoteConvs.length === 0) return;
+
+      setConversaciones((local) => {
+        const merged = mergeWithLocal(local, remoteConvs);
+        // Guardar en storage sin bloquear el render
+        AsyncStorage.setItem(CONVERSACIONES_STORAGE_KEY, JSON.stringify(merged)).catch(() => {});
+        return merged;
+      });
+    } catch (err) {
+      if (__DEV__) logger.error("[MensajesContext] Polling error:", err);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -248,6 +322,8 @@ export const MensajesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const refreshMensajes = useCallback(async () => {
     await loadData();
+    await fetchRemoteConversaciones();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

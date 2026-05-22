@@ -30,6 +30,21 @@ export {
   type SyncResult,
 } from "./services/syncService";
 
+// Motor de sincronización unificado (genérico)
+export {
+  enqueueOperation,
+  getPendingOps,
+  getFailedOps,
+  clearFailedOps,
+  flushQueue,
+  resolveConflict,
+  mergeWithLocal,
+  type GenericPendingOp,
+  type EngineOperation,
+  type EngineStatus,
+  type EngineResult,
+} from "./services/syncEngine";
+
 // Hooks
 export { useSync, type UseSyncResult } from "./hooks/useSync";
 

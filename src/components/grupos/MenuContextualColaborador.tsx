@@ -1,9 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Platform } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import { colors } from "../../themes/colors";
-
-import { GrupoMiembro, RolGrupo } from "../../../types";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { COLORS } from "../../../types";
+import type { GrupoMiembro, RolGrupo } from "../../../types";
 
 interface Props {
   visible: boolean;
@@ -39,7 +38,7 @@ export const MenuContextualColaborador: React.FC<Props> = ({
               <Text style={styles.subtitle}>{colaborador.email}</Text>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <MaterialIcons name="close" size={20} color={colors.onSurfaceVariant} />
+              <MaterialIcons name="close" size={20} color={COLORS.textSecondary} />
             </TouchableOpacity>
           </View>
 
@@ -69,7 +68,7 @@ export const MenuContextualColaborador: React.FC<Props> = ({
             <View style={styles.divider} />
 
             <TouchableOpacity style={styles.removeButton} onPress={onRemove}>
-              <MaterialIcons name="person-remove" size={20} color={colors.error} />
+              <MaterialIcons name="person-remove" size={20} color={COLORS.error} />
               <Text style={styles.removeText}>Eliminar Colaborador</Text>
             </TouchableOpacity>
           </View>
@@ -88,12 +87,12 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(26, 26, 26, 0.4)",
+    backgroundColor: COLORS.overlay,
   },
   sheet: {
     width: "100%",
     maxWidth: 400,
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: COLORS.surface,
     borderRadius: 24,
     overflow: "hidden",
     elevation: 5,
@@ -109,23 +108,23 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: colors.outlineVariant + "40",
+    borderBottomColor: COLORS.borderLight,
   },
   title: {
     fontSize: 18,
     fontWeight: "500",
-    color: colors.onSurface,
+    color: COLORS.text,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
     fontWeight: "400",
-    color: colors.onSurfaceVariant,
+    color: COLORS.textSecondary,
   },
   closeButton: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: colors.surfaceContainerLow,
+    backgroundColor: COLORS.surfaceSecondary,
   },
   content: {
     padding: 24,
@@ -133,36 +132,34 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: "500",
-    color: colors.onSurfaceVariant,
+    color: COLORS.textSecondary,
     marginBottom: 16,
   },
   roleOption: {
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: colors.outlineVariant + "40",
+    borderColor: COLORS.borderLight,
     marginBottom: 12,
   },
   roleOptionActive: {
-    backgroundColor: colors.primaryFixed,
-    borderColor: colors.primaryFixed,
+    backgroundColor: COLORS.primaryTint,
+    borderColor: COLORS.primaryLight,
   },
   roleTitle: {
     fontSize: 16,
-    fontWeight: "400",
     fontWeight: "600",
-    color: colors.onSurface,
+    color: COLORS.text,
     marginBottom: 4,
   },
   roleDesc: {
-    fontSize: 14,
-    fontWeight: "400",
-    color: colors.onSurfaceVariant,
     fontSize: 13,
+    fontWeight: "400",
+    color: COLORS.textSecondary,
   },
   divider: {
     height: 1,
-    backgroundColor: colors.outlineVariant + "40",
+    backgroundColor: COLORS.borderLight,
     marginVertical: 16,
   },
   removeButton: {
@@ -171,12 +168,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 16,
     borderRadius: 12,
-    backgroundColor: colors.errorContainer,
+    backgroundColor: COLORS.errorTint,
   },
   removeText: {
     fontWeight: "500",
     fontSize: 15,
-    color: colors.onErrorContainer,
+    color: COLORS.error,
     marginLeft: 8,
   },
 });

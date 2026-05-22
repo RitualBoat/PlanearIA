@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import { colors } from "../../themes/colors";
-
-import { RolGrupo } from "../../../types";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { COLORS } from "../../../types";
+import type { RolGrupo } from "../../../types";
 
 interface Props {
   visible: boolean;
@@ -41,7 +40,7 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
 
   const renderSuccess = () => (
     <View style={styles.successContainer}>
-      <MaterialIcons name="check-circle" size={64} color={colors.primary} />
+      <MaterialIcons name="check-circle" size={64} color={COLORS.success} />
       <Text style={styles.successTitle}>¡Invitación Enviada!</Text>
       <Text style={styles.successText}>Se ha enviado un correo a {email} para unirse a {grupoNombre}.</Text>
     </View>
@@ -68,7 +67,7 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
           <View style={styles.header}>
             <Text style={styles.title}>Invitar Colaborador</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <MaterialIcons name="close" size={20} color={colors.onSurfaceVariant} />
+              <MaterialIcons name="close" size={20} color={COLORS.textSecondary} />
             </TouchableOpacity>
           </View>
 
@@ -78,11 +77,11 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>CORREO ELECTRÓNICO</Text>
                 <View style={styles.searchContainer}>
-                  <MaterialIcons name="search" size={20} color={colors.onSurfaceVariant} style={styles.searchIcon} />
+                  <MaterialIcons name="search" size={20} color={COLORS.textSecondary} style={styles.searchIcon} />
                   <TextInput
                     style={styles.input}
                     placeholder="ejemplo@escuela.edu"
-                    placeholderTextColor={colors.outlineVariant}
+                    placeholderTextColor={COLORS.textMuted}
                     value={email}
                     onChangeText={setEmail}
                     keyboardType="email-address"
@@ -116,7 +115,7 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
 
               <View style={styles.emptyState}>
                 <View style={styles.emptyStateIcon}>
-                  <MaterialIcons name="person-add" size={24} color={colors.secondary} />
+                  <MaterialIcons name="person-add" size={24} color={COLORS.primary} />
                 </View>
                 <Text style={styles.emptyStateText}>Ingresa el correo del docente</Text>
                 <Text style={styles.emptyStateSubtext}>Se le notificará para que acepte la invitación</Text>
@@ -128,10 +127,10 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
                 disabled={!email.includes("@") || loading}
               >
                 {loading ? (
-                  <ActivityIndicator color={colors.onPrimaryContainer} />
+                  <ActivityIndicator color={COLORS.textOnPrimary} />
                 ) : (
                   <>
-                    <MaterialIcons name="person-add" size={20} color={colors.onPrimaryContainer} style={{ marginRight: 8 }} />
+                    <MaterialIcons name="person-add" size={20} color={COLORS.textOnPrimary} style={{ marginRight: 8 }} />
                     <Text style={styles.inviteButtonText}>Enviar Invitación</Text>
                   </>
                 )}
@@ -151,10 +150,10 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(26, 26, 26, 0.4)",
+    backgroundColor: COLORS.overlay,
   },
   sheet: {
-    backgroundColor: colors.surface,
+    backgroundColor: COLORS.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: "90%",
@@ -169,7 +168,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 6,
     borderRadius: 3,
-    backgroundColor: colors.outlineVariant,
+    backgroundColor: COLORS.border,
   },
   header: {
     flexDirection: "row",
@@ -182,7 +181,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "500",
-    color: colors.onSurface,
+    color: COLORS.text,
   },
   closeButton: {
     padding: 8,
@@ -197,15 +196,15 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: "500",
-    color: colors.onSurfaceVariant,
+    color: COLORS.textSecondary,
     marginBottom: 8,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#D1E9FF",
+    borderColor: COLORS.borderLight,
     borderRadius: 8,
     paddingHorizontal: 12,
   },
@@ -216,7 +215,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: "400",
-    color: colors.onSurface,
+    color: COLORS.text,
     paddingVertical: 12,
   },
   rolesContainer: {
@@ -229,34 +228,33 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: colors.outlineVariant,
+    borderColor: COLORS.border,
     alignItems: "center",
   },
   roleButtonActive: {
-    backgroundColor: colors.primaryFixed,
-    borderColor: colors.primaryFixed,
+    backgroundColor: COLORS.primaryTint,
+    borderColor: COLORS.primaryLight,
   },
   roleText: {
     fontSize: 14,
     fontWeight: "400",
-    color: colors.onSurfaceVariant,
+    color: COLORS.textSecondary,
   },
   roleTextActive: {
-    color: colors.onPrimaryFixed,
+    color: COLORS.primaryDark,
     fontWeight: "600",
   },
   roleDescription: {
-    fontSize: 14,
-    fontWeight: "400",
-    color: colors.onSurfaceVariant,
     fontSize: 13,
+    fontWeight: "400",
+    color: COLORS.textSecondary,
   },
   emptyState: {
     alignItems: "center",
     padding: 24,
-    backgroundColor: colors.surfaceBright,
+    backgroundColor: COLORS.backgroundSoft,
     borderWidth: 2,
-    borderColor: colors.surfaceVariant,
+    borderColor: COLORS.borderLight,
     borderStyle: "dashed",
     borderRadius: 12,
     marginBottom: 24,
@@ -265,7 +263,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: "rgba(186, 234, 255, 0.2)",
+    backgroundColor: COLORS.primaryTint,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 12,
@@ -273,16 +271,16 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 14,
     fontWeight: "400",
-    color: colors.onSurfaceVariant,
+    color: COLORS.textSecondary,
     marginBottom: 4,
   },
   emptyStateSubtext: {
     fontSize: 12,
     fontWeight: "500",
-    color: colors.outline,
+    color: COLORS.textMuted,
   },
   inviteButton: {
-    backgroundColor: colors.primaryContainer,
+    backgroundColor: COLORS.primary,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -296,7 +294,7 @@ const styles = StyleSheet.create({
   inviteButtonText: {
     fontWeight: "500",
     fontSize: 15,
-    color: colors.onPrimaryContainer,
+    color: COLORS.textOnPrimary,
   },
   successContainer: {
     padding: 40,
@@ -306,14 +304,14 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: 24,
     fontWeight: "400",
-    color: colors.onSurface,
+    color: COLORS.text,
     marginTop: 16,
     marginBottom: 8,
   },
   successText: {
     fontSize: 16,
     fontWeight: "400",
-    color: colors.onSurfaceVariant,
+    color: COLORS.textSecondary,
     textAlign: "center",
   },
 });

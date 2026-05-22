@@ -1,9 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import { GrupoMiembro, RolGrupo } from "../../../types";
-import { colors } from "../../themes/colors";
-
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { COLORS } from "../../../types";
+import type { GrupoMiembro, RolGrupo } from "../../../types";
 
 interface Props {
   miembro: GrupoMiembro;
@@ -14,13 +13,13 @@ export const ColaboradorListItem: React.FC<Props> = ({ miembro, onMenuPress }) =
   const getBadgeStyle = (rol: RolGrupo) => {
     switch (rol) {
       case "titular":
-        return { backgroundColor: colors.primaryFixed, color: colors.onPrimaryFixed };
+        return { backgroundColor: COLORS.primaryTint, color: COLORS.primaryDark };
       case "co-docente":
-        return { backgroundColor: colors.secondaryFixed, color: colors.onSecondaryFixed };
+        return { backgroundColor: "#E0F7FA", color: "#00695C" };
       case "ponente_invitado":
-        return { backgroundColor: colors.surfaceVariant, color: colors.onSurfaceVariant };
+        return { backgroundColor: COLORS.surfaceSecondary, color: COLORS.textSecondary };
       default:
-        return { backgroundColor: colors.surfaceVariant, color: colors.onSurfaceVariant };
+        return { backgroundColor: COLORS.surfaceSecondary, color: COLORS.textSecondary };
     }
   };
 
@@ -43,7 +42,7 @@ export const ColaboradorListItem: React.FC<Props> = ({ miembro, onMenuPress }) =
         <Image source={{ uri: miembro.avatar }} style={styles.avatar} />
       ) : (
         <View style={styles.avatarPlaceholder}>
-          <MaterialIcons name="person" size={24} color={colors.onSurfaceVariant} />
+          <MaterialIcons name="person" size={24} color={COLORS.textSecondary} />
         </View>
       )}
 
@@ -68,7 +67,7 @@ export const ColaboradorListItem: React.FC<Props> = ({ miembro, onMenuPress }) =
         onPress={onMenuPress}
         accessibilityLabel="Opciones"
       >
-        <MaterialIcons name="more-vert" size={24} color={colors.onSurfaceVariant} />
+        <MaterialIcons name="more-vert" size={24} color={COLORS.textSecondary} />
       </TouchableOpacity>
     </View>
   );
@@ -76,14 +75,14 @@ export const ColaboradorListItem: React.FC<Props> = ({ miembro, onMenuPress }) =
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: COLORS.surface,
     borderRadius: 12,
     padding: 16,
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "rgba(191, 199, 212, 0.2)",
+    borderColor: COLORS.borderLight,
     elevation: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -98,14 +97,14 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: 4,
-    backgroundColor: colors.primary,
+    backgroundColor: COLORS.primary,
   },
   avatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: colors.surfaceContainerLow,
+    borderColor: COLORS.border,
     marginRight: 16,
     marginLeft: 4,
   },
@@ -114,8 +113,8 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: colors.surfaceContainerLow,
-    backgroundColor: colors.surfaceVariant,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surfaceSecondary,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
@@ -128,7 +127,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     fontSize: 16,
     lineHeight: 24,
-    color: colors.onSurface,
+    color: COLORS.text,
     marginBottom: 4,
   },
   badgesContainer: {
@@ -145,12 +144,12 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   pendingBadge: {
-    backgroundColor: colors.errorContainer,
+    backgroundColor: COLORS.errorTint,
   },
   pendingBadgeText: {
     fontSize: 12,
     fontWeight: "500",
-    color: colors.onErrorContainer,
+    color: COLORS.error,
   },
   menuButton: {
     padding: 8,

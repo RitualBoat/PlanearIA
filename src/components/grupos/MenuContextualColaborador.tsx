@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Platform } from "react-native";
-import { UserMinus, ShieldAlert, X } from "lucide-react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../themes/colors";
 import { typography } from "../../themes/typography";
 import { GrupoMiembro, RolGrupo } from "../../../types";
@@ -39,7 +39,7 @@ export const MenuContextualColaborador: React.FC<Props> = ({
               <Text style={styles.subtitle}>{colaborador.email}</Text>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <X size={20} color={colors.onSurfaceVariant} />
+              <MaterialIcons name="close" size={20} color={colors.onSurfaceVariant} />
             </TouchableOpacity>
           </View>
 
@@ -69,7 +69,7 @@ export const MenuContextualColaborador: React.FC<Props> = ({
             <View style={styles.divider} />
 
             <TouchableOpacity style={styles.removeButton} onPress={onRemove}>
-              <UserMinus size={20} color={colors.error} />
+              <MaterialIcons name="person-remove" size={20} color={colors.error} />
               <Text style={styles.removeText}>Eliminar Colaborador</Text>
             </TouchableOpacity>
           </View>

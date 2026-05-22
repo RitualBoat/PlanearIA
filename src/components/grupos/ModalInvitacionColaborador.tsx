@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
-import { X, Search, UserPlus, CheckCircle } from "lucide-react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../themes/colors";
 import { typography } from "../../themes/typography";
 import { RolGrupo } from "../../../types";
@@ -41,7 +41,7 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
 
   const renderSuccess = () => (
     <View style={styles.successContainer}>
-      <CheckCircle size={64} color={colors.primary} />
+      <MaterialIcons name="check-circle" size={64} color={colors.primary} />
       <Text style={styles.successTitle}>¡Invitación Enviada!</Text>
       <Text style={styles.successText}>Se ha enviado un correo a {email} para unirse a {grupoNombre}.</Text>
     </View>
@@ -68,7 +68,7 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
           <View style={styles.header}>
             <Text style={styles.title}>Invitar Colaborador</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <X size={20} color={colors.onSurfaceVariant} />
+              <MaterialIcons name="close" size={20} color={colors.onSurfaceVariant} />
             </TouchableOpacity>
           </View>
 
@@ -78,7 +78,7 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>CORREO ELECTRÓNICO</Text>
                 <View style={styles.searchContainer}>
-                  <Search size={20} color={colors.onSurfaceVariant} style={styles.searchIcon} />
+                  <MaterialIcons name="search" size={20} color={colors.onSurfaceVariant} style={styles.searchIcon} />
                   <TextInput
                     style={styles.input}
                     placeholder="ejemplo@escuela.edu"
@@ -116,7 +116,7 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
 
               <View style={styles.emptyState}>
                 <View style={styles.emptyStateIcon}>
-                  <UserPlus size={24} color={colors.secondary} />
+                  <MaterialIcons name="person-add" size={24} color={colors.secondary} />
                 </View>
                 <Text style={styles.emptyStateText}>Ingresa el correo del docente</Text>
                 <Text style={styles.emptyStateSubtext}>Se le notificará para que acepte la invitación</Text>
@@ -131,7 +131,7 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
                   <ActivityIndicator color={colors.onPrimaryContainer} />
                 ) : (
                   <>
-                    <UserPlus size={20} color={colors.onPrimaryContainer} style={{ marginRight: 8 }} />
+                    <MaterialIcons name="person-add" size={20} color={colors.onPrimaryContainer} style={{ marginRight: 8 }} />
                     <Text style={styles.inviteButtonText}>Enviar Invitación</Text>
                   </>
                 )}

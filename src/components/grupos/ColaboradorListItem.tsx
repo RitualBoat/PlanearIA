@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { User, MoreVertical } from "lucide-react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 import { GrupoMiembro, RolGrupo } from "../../../types";
 import { colors } from "../../themes/colors";
 import { typography } from "../../themes/typography";
@@ -43,7 +43,7 @@ export const ColaboradorListItem: React.FC<Props> = ({ miembro, onMenuPress }) =
         <Image source={{ uri: miembro.avatar }} style={styles.avatar} />
       ) : (
         <View style={styles.avatarPlaceholder}>
-          <User size={24} color={colors.onSurfaceVariant} />
+          <MaterialIcons name="person" size={24} color={colors.onSurfaceVariant} />
         </View>
       )}
 
@@ -68,7 +68,7 @@ export const ColaboradorListItem: React.FC<Props> = ({ miembro, onMenuPress }) =
         onPress={onMenuPress}
         accessibilityLabel="Opciones"
       >
-        <MoreVertical size={24} color={colors.onSurfaceVariant} />
+        <MaterialIcons name="more-vert" size={24} color={colors.onSurfaceVariant} />
       </TouchableOpacity>
     </View>
   );

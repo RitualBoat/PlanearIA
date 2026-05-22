@@ -304,7 +304,7 @@ export interface Usuario extends BaseEntity {
 export type PostMood = "😊" | "📚" | "💡" | "🎯" | "☕" | "🎨" | "🚀";
 
 export interface PostAttachment {
-  type: "image" | "document" | "link";
+  type: "image" | "document" | "link" | "planeacion" | "recurso";
   url: string;
   name?: string;
   size?: string;
@@ -447,6 +447,22 @@ export interface Conversacion extends BaseEntity {
   mensajesNoLeidos: number;
   fechaCreacion: string;
   fechaModificacion: string;
+  syncStatus?: "synced" | "pending" | "error";
+}
+
+// ==========================================
+// TIPOS PARA NOTIFICACIONES (Sprint 6.2)
+// ==========================================
+
+export type TipoNotificacion = "solicitud" | "mensaje" | "tarea" | "sistema";
+
+export interface Notificacion extends BaseEntity {
+  usuarioId: string;
+  titulo: string;
+  mensaje: string;
+  tipo: TipoNotificacion;
+  leida: boolean;
+  fechaCreacion: string;
   syncStatus?: "synced" | "pending" | "error";
 }
 

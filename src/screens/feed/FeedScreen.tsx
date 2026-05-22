@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useTheme } from "../../context/ThemeContext";
 import { useFeedViewModel } from "../../hooks/useFeedViewModel";
 import PostCard from "../../components/PostCard";
@@ -98,11 +98,26 @@ const FeedScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const vm = useFeedViewModel();
   const navigation = useNavigation<any>();
+  const route = useRoute<any>();
 
   const isDesktop = width >= 768;
 
   const [optionsPost, setOptionsPost] = useState<Post | null>(null);
   const [showReportModal, setShowReportModal] = useState(false);
+
+  useEffect(() => {
+    if (route.params?.openCreatePost) {
+      if (route.params.attachmentToShare) {
+        // En una implementación completa el ViewModel recibiría el attachment inicial
+        // Por ahora, solo abrimos el modal
+        vm.handleOpenCreateModal();
+      } else {
+        vm.handleOpenCreateModal();
+      }
+      // Limpiamos los parámetros para que no se vuelva a abrir
+      navigation.setParams({ openCreatePost: undefined, attachmentToShare: undefined });
+    }
+  }, [route.params, vm.handleOpenCreateModal, navigation]);
 
   /* ── Post creation bar ── */
   const renderCreateBar = () => {

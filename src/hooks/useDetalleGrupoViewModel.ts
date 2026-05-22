@@ -115,6 +115,7 @@ export interface DetalleGrupoViewModel {
   navigateEditarGrupo: () => void;
   navigateCrearTarea: () => void;
   navigateAsignarRecurso: () => void;
+  navigateAsignarDeBiblioteca: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
   navigateReportesGrupo: () => void;
   navigateRegistrarAsistencia: () => void;
@@ -259,6 +260,13 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
 
   const navigateAsignarRecurso = useCallback(() => {
     navigation.navigate("AsignarRecurso", { grupoId });
+  }, [navigation, grupoId]);
+
+  const navigateAsignarDeBiblioteca = useCallback(() => {
+    navigation.navigate("MainTabs", {
+      screen: "ContenidoTab",
+      params: { selectionMode: true, targetGroupId: grupoId },
+    });
   }, [navigation, grupoId]);
 
   const navigateDetalleTarea = useCallback(
@@ -432,6 +440,7 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
     navigateEditarGrupo,
     navigateCrearTarea,
     navigateAsignarRecurso,
+    navigateAsignarDeBiblioteca,
     navigateDetalleTarea,
     navigateReportesGrupo,
     navigateRegistrarAsistencia,

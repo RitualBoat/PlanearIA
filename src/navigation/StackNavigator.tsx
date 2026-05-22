@@ -95,6 +95,10 @@ import ConversacionScreen from "../screens/chat/ConversacionScreen";
 // Importación de pantalla de Onboarding
 import OnboardingScreen from "../screens/onboarding/OnboardingScreen";
 
+// Importación de pantallas de Notificaciones y Ayuda
+import { NotificacionesScreen } from "../screens/notificaciones/NotificacionesScreen";
+import { AyudaScreen } from "../screens/ayuda/AyudaScreen";
+
 /**
  * Definición de los tipos para los parámetros de navegación
  * Esto ayuda a TypeScript a entender qué parámetros espera cada pantalla
@@ -232,6 +236,10 @@ export type RootStackParamList = {
   // Chat / Mensajería
   Chat: undefined;
   Conversacion: { conversacionId: number };
+
+  // Notificaciones y Ayuda
+  Notificaciones: undefined;
+  Ayuda: undefined;
 };
 /**
  * Creamos el Stack Navigator con tipado
@@ -729,6 +737,24 @@ const StackNavigator: React.FC = () => {
         component={ConversacionScreen}
         options={{
           title: "Conversación",
+          headerShown: false,
+        }}
+      />
+      {/* ========== NOTIFICACIONES ========== */}
+      <Stack.Screen
+        name="Notificaciones"
+        component={NotificacionesScreen}
+        options={{
+          title: "Notificaciones",
+          headerShown: false,
+        }}
+      />
+      {/* ========== AYUDA ========== */}
+      <Stack.Screen
+        name="Ayuda"
+        component={AyudaScreen}
+        options={{
+          title: "Centro de Ayuda",
           headerShown: false,
         }}
       />

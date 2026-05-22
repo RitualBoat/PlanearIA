@@ -3,7 +3,7 @@ import { View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Platform, useWindowDimensions } from "react-native";
-import { COLORS } from "../../types";
+import { COLORS, PostAttachment } from "../../types";
 
 import FeedScreen from "../screens/feed/FeedScreen";
 import ContenidoScreen from "../screens/contenido/ContenidoScreen";
@@ -13,8 +13,14 @@ import CuentaScreen from "../screens/cuenta/CuentaScreen";
 import FloatingActionIcons from "../components/FloatingActionIcons";
 
 export type MainTabParamList = {
-  FeedTab: undefined;
-  ContenidoTab: undefined;
+  FeedTab: {
+    openCreatePost?: boolean;
+    attachmentToShare?: PostAttachment;
+  } | undefined;
+  ContenidoTab: {
+    selectionMode?: boolean;
+    targetGroupId?: string;
+  } | undefined;
   GruposTab: undefined;
   SocialTab: undefined;
   ConfiguracionTab: undefined;

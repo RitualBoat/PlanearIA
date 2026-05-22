@@ -13,6 +13,7 @@ import { PlantillasProvider } from "./src/context/PlantillasContext";
 import { PostsProvider } from "./src/context/PostsContext";
 import { ContactosProvider } from "./src/context/ContactosContext";
 import { MensajesProvider } from "./src/context/MensajesContext";
+import { NotificacionesProvider } from "./src/context/NotificacionesContext";
 import { ThemeProvider } from "./src/context/ThemeContext";
 import { FontSizeProvider } from "./src/context/FontSizeContext";
 import { DaltonismoProvider } from "./src/context/DaltonismoContext";
@@ -35,9 +36,11 @@ const App: React.FC = () => {
                             <PostsProvider>
                               <ContactosProvider>
                                 <MensajesProvider>
-                                  <NavigationContainer>
-                                    <StackNavigator />
-                                  </NavigationContainer>
+                                  <NotificacionesProvider>
+                                    <NavigationContainer>
+                                      <StackNavigator />
+                                    </NavigationContainer>
+                                  </NotificacionesProvider>
                                 </MensajesProvider>
                               </ContactosProvider>
                             </PostsProvider>

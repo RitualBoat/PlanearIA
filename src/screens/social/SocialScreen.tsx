@@ -1,3 +1,4 @@
+import { useTheme } from "../../context/ThemeContext";
 import React, { useState } from "react";
 import {
   View,
@@ -22,44 +23,37 @@ import { useSocialViewModel, SocialTab } from "../../hooks/useSocialViewModel";
 
 // ─── Design Tokens (Scholarly Atelier) ───
 
-const DT = {
-  primary: "#002f5a",
-  primaryContainer: "#004580",
-  primaryFixed: "#d4e3ff",
-  primaryFixedDim: "#a4c8ff",
-  onPrimary: "#ffffff",
-  onPrimaryContainer: "#85b4f6",
-  secondary: "#1b6d24",
-  secondaryContainer: "#a0f499",
-  onSecondaryContainer: "#207128",
-  tertiary: "#4f2100",
-  tertiaryContainer: "#713200",
-  tertiaryFixed: "#ffdbc9",
-  onTertiaryContainer: "#f69b63",
-  surface: "#f7f9ff",
-  surfaceLowest: "#ffffff",
-  surfaceLow: "#f1f4fa",
-  surfaceContainer: "#ebeef4",
-  surfaceHigh: "#e5e8ee",
-  surfaceHighest: "#dfe3e8",
-  onSurface: "#181c20",
-  onSurfaceVariant: "#424750",
-  outline: "#727781",
-  outlineVariant: "#c2c6d1",
-  error: "#ba1a1a",
-  errorContainer: "#ffdad6",
-  errorIcon: "#ba1a1a",
-  skeleton: "#EDF1F7",
-  overlay: "rgba(19,30,49,0.42)",
-  // Convenience aliases
-  text: "#181c20",
-  textSecondary: "#424750",
-  textMuted: "#727781",
-  success: "#1b6d24",
-  successTint: "#E7F9F3",
-  warning: "#F58026",
-  warningTint: "#FFF8F1",
-};
+
+// Helper to map dynamic theme colors to the legacy DT token schema
+const getThemeTokens = (colors: any) => ({
+  ...colors,
+  primaryFixed: colors.primaryTint,
+  primaryFixedDim: colors.primaryLight || colors.primaryTint,
+  onPrimary: colors.textOnPrimary,
+  onPrimaryContainer: colors.primary,
+  secondary: colors.success,
+  secondaryContainer: colors.successTint,
+  onSecondaryContainer: colors.success,
+  tertiary: colors.warning,
+  tertiaryContainer: colors.warningTint,
+  tertiaryFixed: colors.warningTint,
+  onTertiaryContainer: colors.warning,
+  surface: colors.background,
+  surfaceLowest: colors.surfaceContainerLowest,
+  surfaceLow: colors.surfaceContainerLow,
+  surfaceContainer: colors.surfaceContainer,
+  surfaceHigh: colors.surfaceContainerHigh,
+  surfaceHighest: colors.surfaceContainerHighest,
+  onSurface: colors.onSurface,
+  onSurfaceVariant: colors.onSurfaceVariant,
+  outline: colors.textMuted,
+  outlineVariant: colors.outlineVariant,
+  errorIcon: colors.error,
+  text: colors.text,
+  textSecondary: colors.textSecondary,
+  textMuted: colors.textMuted,
+});
+
 
 // ─── Helpers ───
 
@@ -69,27 +63,9 @@ const getInitials = (nombre: string, apellidos?: string): string => {
   return (first + last).toUpperCase() || "?";
 };
 
-const cardShadow = Platform.select({
-  web: { boxShadow: "0px 2px 8px rgba(0,69,128,0.06)" } as any,
-  default: {
-    shadowColor: "#004580",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-});
 
-const liftShadow = Platform.select({
-  web: { boxShadow: "0px 12px 48px rgba(0,69,128,0.08)" } as any,
-  default: {
-    shadowColor: "#004580",
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.08,
-    shadowRadius: 48,
-    elevation: 4,
-  },
-});
+
+
 
 // ─── Avatar Component ───
 
@@ -99,7 +75,11 @@ const ContactAvatar: React.FC<{
   size?: number;
   enLinea?: boolean;
   bgColor?: string;
-}> = ({ nombre, apellidos, size = 44, enLinea, bgColor }) => (
+}> = ({ nombre, apellidos, size = 44, enLinea, bgColor }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
   <View style={{ position: "relative" }}>
     <View
       style={[
@@ -129,7 +109,8 @@ const ContactAvatar: React.FC<{
       />
     )}
   </View>
-);
+  );
+};
 
 // ─── Stats Row ───
 
@@ -137,7 +118,11 @@ const StatsRow: React.FC<{
   totalContactos: number;
   totalGrupos: number;
   pendientes: number;
-}> = ({ totalContactos, totalGrupos, pendientes }) => (
+}> = ({ totalContactos, totalGrupos, pendientes }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
   <View style={styles.statsRow}>
     <View style={[styles.statBadge, { backgroundColor: DT.primaryFixed }]}>
       <MaterialIcons name="people-outline" size={14} color={DT.primaryContainer} />
@@ -154,7 +139,8 @@ const StatsRow: React.FC<{
       <Text style={[styles.statBadgeText, { color: DT.success }]}>{totalGrupos} Mensajes</Text>
     </View>
   </View>
-);
+  );
+};
 
 // ─── Tab Bar ───
 
@@ -163,6 +149,9 @@ const TabBar: React.FC<{
   onTabChange: (tab: SocialTab) => void;
   pendientes: number;
 }> = ({ activeTab, onTabChange, pendientes }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
   const tabs: { key: SocialTab; label: string; icon: keyof typeof MaterialIcons.glyphMap }[] = [
     { key: "contactos", label: "Contactos", icon: "people" },
     { key: "solicitudes", label: "Solicitudes", icon: "person-add" },
@@ -200,9 +189,13 @@ const ContactCard: React.FC<{
   onPress: (c: Contacto) => void;
   onChat: () => void;
   onMore: (c: Contacto) => void;
-}> = ({ contacto, onPress, onChat, onMore }) => (
+}> = ({ contacto, onPress, onChat, onMore }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
   <TouchableOpacity
-    style={[styles.contactCard, cardShadow]}
+    style={[styles.contactCard, styles.cardShadow]}
     onPress={() => onPress(contacto)}
     activeOpacity={0.85}
   >
@@ -231,7 +224,8 @@ const ContactCard: React.FC<{
       <MaterialIcons name="chat" size={18} color={DT.primaryContainer} />
     </TouchableOpacity>
   </TouchableOpacity>
-);
+  );
+};
 
 // ─── Solicitud Card ───
 
@@ -239,8 +233,12 @@ const SolicitudCard: React.FC<{
   solicitud: SolicitudConexion;
   onAceptar: (id: number) => void;
   onRechazar: (id: number) => void;
-}> = ({ solicitud, onAceptar, onRechazar }) => (
-  <View style={[styles.solicitudCard, cardShadow]}>
+}> = ({ solicitud, onAceptar, onRechazar }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
+  <View style={[styles.solicitudCard, styles.cardShadow]}>
     <View style={styles.solicitudHeader}>
       <ContactAvatar
         nombre={solicitud.deUsuarioNombre.split(" ")[0] || ""}
@@ -286,7 +284,8 @@ const SolicitudCard: React.FC<{
       </TouchableOpacity>
     </View>
   </View>
-);
+  );
+};
 
 // ─── Profile Bottom Sheet ───
 
@@ -297,6 +296,9 @@ const ProfileBottomSheet: React.FC<{
   onMessage: () => void;
   onDelete: (id: number) => void;
 }> = ({ contacto, visible, onClose, onMessage, onDelete }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
   if (!contacto) return null;
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -404,6 +406,9 @@ const ProfileBottomSheet: React.FC<{
 // ─── Empty State ───
 
 const EmptyState: React.FC<{ tab: SocialTab; onBuscar?: () => void }> = ({ tab, onBuscar }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
   const configs = {
     contactos: {
       icon: "people-outline" as const,
@@ -461,6 +466,9 @@ const EmptyState: React.FC<{ tab: SocialTab; onBuscar?: () => void }> = ({ tab, 
 // ─── Main Screen ───
 
 const SocialScreen: React.FC = () => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
   const navigation = useNavigation<any>();
@@ -624,7 +632,7 @@ const SocialScreen: React.FC = () => {
         ) : (
           <View style={[styles.searchResults, isDesktop && styles.searchResultsDesktop]}>
             {vm.contactos.map((c) => (
-              <View key={c.id} style={[styles.searchResultCard, cardShadow]}>
+              <View key={c.id} style={[styles.searchResultCard, styles.cardShadow]}>
                 <View style={styles.searchResultHeader}>
                   <ContactAvatar nombre={c.nombre} apellidos={c.apellidos} size={48} />
                   <View style={{ flex: 1 }}>
@@ -746,7 +754,27 @@ const SocialScreen: React.FC = () => {
 
 // ─── Styles ───
 
-const styles = StyleSheet.create({
+const getStyles = (DT: any, isDark: boolean) => StyleSheet.create({
+  cardShadow: Platform.select({
+    web: { boxShadow: isDark ? "0px 2px 8px rgba(0,0,0,0.2)" : "0px 2px 8px rgba(0,69,128,0.06)" } as any,
+    default: {
+      shadowColor: isDark ? "#000000" : "#004580",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: isDark ? 0.2 : 0.06,
+      shadowRadius: 8,
+      elevation: 2,
+    },
+  }),
+  liftShadow: Platform.select({
+    web: { boxShadow: isDark ? "0px 12px 48px rgba(0,0,0,0.35)" : "0px 12px 48px rgba(0,69,128,0.08)" } as any,
+    default: {
+      shadowColor: isDark ? "#000000" : "#004580",
+      shadowOffset: { width: 0, height: 12 },
+      shadowOpacity: isDark ? 0.35 : 0.08,
+      shadowRadius: 48,
+      elevation: 4,
+    },
+  }),
   safe: { flex: 1, backgroundColor: DT.surface },
 
   // ScrollView

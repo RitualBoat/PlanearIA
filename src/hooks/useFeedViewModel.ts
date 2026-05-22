@@ -108,12 +108,22 @@ export function useFeedViewModel() {
         return;
       }
       try {
+        if (attachment.type === "planeacion") {
+          // Si tuvieramos los datos crudos, usaríamos agregarPlaneacion.
+          // Por simplicidad, agregamos una planeacion basica o recurso de enlace
+          Alert.alert("Próximamente", "La clonación de planeaciones desde el feed se habilitará en breve.");
+          return;
+        }
+
         const tipo =
           attachment.type === "image"
             ? "imagen"
             : attachment.type === "document"
               ? "documento"
+              : attachment.type === "recurso"
+              ? "documento"
               : "enlace";
+              
         await crearRecurso({
           titulo: attachment.name || post.titulo || "Recurso del feed",
           tipo: tipo as any,

@@ -14,7 +14,7 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -32,6 +32,10 @@ import {
   exportPlaneacionToDocx,
 } from "../../services/planeacionExportService";
 import type { Planeacion } from "../../../types/planeacion";
+import { ModalSelectorContactos } from "../../components/social/ModalSelectorContactos";
+import type { Contacto } from "../../../types";
+import { useMensajes } from "../../context/MensajesContext";
+import { asignarRecursosAGrupo, asignarEntregablesAGrupo } from "../../services/grupoAsignacionesService";
 
 type Nav = StackNavigationProp<RootStackParamList>;
 
@@ -256,7 +260,10 @@ const ContentItemCard: React.FC<{
   onPress: () => void;
   onMenuPress: () => void;
   isDesktop?: boolean;
-}> = ({ item, onPress, onMenuPress, isDesktop }) => {
+  selectionMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: () => void;
+}> = ({ item, onPress, onMenuPress, isDesktop, selectionMode, selected, onToggleSelect }) => {
   const catColors = CAT_COLORS[item.tipo] || { text: DT.primary, bg: DT.primaryFixed };
   const catLabel = CATEGORIAS.find((c) => c.key === item.tipo)?.label?.toUpperCase() || "";
   const icon = item.tipoRecurso
@@ -268,11 +275,21 @@ const ContentItemCard: React.FC<{
       style={[
         styles.contentCard,
         isDesktop && { borderLeftWidth: 4, borderLeftColor: catColors.text },
+        selectionMode && selected && { backgroundColor: `${catColors.bg}80`, borderColor: catColors.text, borderWidth: 1 }
       ]}
-      onPress={onPress}
+      onPress={selectionMode ? onToggleSelect : onPress}
       activeOpacity={0.85}
       accessibilityLabel={item.titulo}
     >
+      {selectionMode && (
+        <View style={styles.selectionCheckbox}>
+          <MaterialIcons 
+            name={selected ? "check-circle" : "radio-button-unchecked"} 
+            size={24} 
+            color={selected ? catColors.text : DT.outlineVariant} 
+          />
+        </View>
+      )}
       <View style={[styles.contentIcon, { backgroundColor: catColors.bg }]}>
         <MaterialIcons name={icon} size={24} color={catColors.text} />
       </View>
@@ -288,14 +305,16 @@ const ContentItemCard: React.FC<{
           {item.subtitulo}
         </Text>
       </View>
-      <TouchableOpacity
-        style={styles.contentMenu}
-        onPress={onMenuPress}
-        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-        accessibilityLabel="Más opciones"
-      >
-        <MaterialIcons name="more-vert" size={20} color={DT.onSurfaceVariant} />
-      </TouchableOpacity>
+      {!selectionMode && (
+        <TouchableOpacity
+          style={styles.contentMenu}
+          onPress={onMenuPress}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          accessibilityLabel="Más opciones"
+        >
+          <MaterialIcons name="more-vert" size={20} color={DT.onSurfaceVariant} />
+        </TouchableOpacity>
+      )}
     </TouchableOpacity>
   );
 };
@@ -307,18 +326,77 @@ const ContenidoScreen: React.FC = () => {
   const isDesktop = width >= 1280;
   const isTablet = width >= 768;
   const navigation = useNavigation<Nav>();
+  const route = useRoute<any>();
   const vm = useContenidoViewModel();
   const searchRef = useRef<TextInput>(null);
+  const { enviarMensaje, crearConversacionDesdeContacto } = useMensajes();
+
+  // Selection mode params
+  const isSelectionMode = route.params?.selectionMode === true;
+  const targetGroupId = route.params?.targetGroupId;
 
   const [menuItem, setMenuItem] = useState<ContenidoItem | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<ContenidoItem | null>(null);
   const [showCrearNuevo, setShowCrearNuevo] = useState(false);
+  const [showContactSelector, setShowContactSelector] = useState(false);
+  const [itemToSend, setItemToSend] = useState<ContenidoItem | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isAssigning, setIsAssigning] = useState(false);
 
   // ─── Handlers ───
 
+  const handleToggleSelect = useCallback((item: ContenidoItem) => {
+    setSelectedIds((prev) => 
+      prev.includes(item.id) 
+        ? prev.filter(id => id !== item.id)
+        : [...prev, item.id]
+    );
+  }, []);
+
+  const handleConfirmSelection = useCallback(async () => {
+    if (selectedIds.length === 0 || !targetGroupId) return;
+    
+    setIsAssigning(true);
+    try {
+      // Separar IDs por tipo (recursos vs entregables vs planeaciones)
+      // La API asume recursos y entregables.
+      // IDs vienen como "rec-123", "ent-456", "plan-789"
+      const numIdsRecursos: number[] = [];
+      const numIdsEntregables: number[] = [];
+      
+      selectedIds.forEach(idStr => {
+        if (idStr.startsWith("rec-")) {
+          numIdsRecursos.push(parseInt(idStr.replace("rec-", ""), 10));
+        } else if (idStr.startsWith("ent-")) {
+          numIdsEntregables.push(parseInt(idStr.replace("ent-", ""), 10));
+        }
+      });
+      
+      const promises = [];
+      if (numIdsRecursos.length > 0) {
+        promises.push(asignarRecursosAGrupo(targetGroupId, numIdsRecursos));
+      }
+      if (numIdsEntregables.length > 0) {
+        promises.push(asignarEntregablesAGrupo(targetGroupId, numIdsEntregables));
+      }
+      
+      await Promise.all(promises);
+      Alert.alert("Éxito", "Elementos asignados correctamente.");
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert("Error", "No se pudo realizar la asignación.");
+    } finally {
+      setIsAssigning(false);
+    }
+  }, [selectedIds, targetGroupId, navigation]);
+
   const handleItemPress = useCallback(
     (item: ContenidoItem) => {
+      if (isSelectionMode) {
+        handleToggleSelect(item);
+        return;
+      }
       if (item.tipo === "planeaciones") {
         const raw = item.raw as { id: string; nivelAcademico: string };
         navigation.navigate("EditorPlaneacion", {
@@ -375,9 +453,75 @@ const ContenidoScreen: React.FC = () => {
             "Asignar a grupo estará disponible en una próxima actualización."
           );
           break;
+        case "compartir_feed":
+          navigation.navigate("MainTabs", {
+            screen: "FeedTab",
+            params: {
+              openCreatePost: true,
+              attachmentToShare: {
+                type: currentItem.tipo === "planeaciones" ? "planeacion" : "recurso",
+                url: `planearia://${currentItem.tipo}/${(currentItem.raw as any).id}`,
+                name: currentItem.titulo,
+              }
+            }
+          });
+          break;
+        case "enviar_chat":
+          if (currentItem.tipo === "planeaciones" || currentItem.tipo === "recursos") {
+            setItemToSend(currentItem);
+            setShowContactSelector(true);
+          } else {
+            Alert.alert("Próximamente", "Solo se pueden enviar planeaciones y recursos por chat.");
+          }
+          break;
       }
     },
-    [menuItem, vm, handleItemPress]
+    [menuItem, vm, handleItemPress, navigation]
+  );
+
+  const handleSendToContact = useCallback(
+    async (contacto: Contacto) => {
+      if (!itemToSend) return;
+      try {
+        const conversacionId = await crearConversacionDesdeContacto(contacto.id);
+        const tipoMensaje = itemToSend.tipo === "planeaciones" ? "planeacion" : "recurso";
+        
+        let extraData = {};
+        if (tipoMensaje === "planeacion") {
+          const raw = itemToSend.raw as any;
+          extraData = {
+            planeacion: {
+              planeacionId: raw.id,
+              titulo: raw.temaSesion || raw.titulo || itemToSend.titulo,
+              materia: raw.asignatura || "General",
+              grado: raw.grado || "N/A"
+            }
+          };
+        } else {
+          const raw = itemToSend.raw as any;
+          extraData = {
+            recurso: {
+              recursoId: raw.id,
+              titulo: raw.titulo || itemToSend.titulo,
+              tipo: raw.tipo || "otro",
+              formato: raw.formato || ""
+            }
+          };
+        }
+
+        const mensajeData = {
+          conversacionId,
+          tipo: tipoMensaje,
+          contenido: `Te compartí un${tipoMensaje === "planeacion" ? "a planeación" : " recurso"}: ${itemToSend.titulo}`,
+          ...extraData,
+        };
+        await enviarMensaje(mensajeData as any);
+        Alert.alert("Enviado", `Se envió a ${contacto.nombre}`);
+      } catch (error) {
+        Alert.alert("Error", "No se pudo enviar el mensaje.");
+      }
+    },
+    [itemToSend, crearConversacionDesdeContacto, enviarMensaje]
   );
 
   const handleCompartir = useCallback(async (item: ContenidoItem) => {
@@ -731,6 +875,8 @@ const ContenidoScreen: React.FC = () => {
                 { key: "editar", icon: "edit" as const, label: "Editar" },
                 { key: "duplicar", icon: "content-copy" as const, label: "Duplicar" },
                 { key: "asignar", icon: "group-add" as const, label: "Asignar a grupo" },
+                { key: "compartir_feed", icon: "dynamic-feed" as const, label: "Compartir en Feed" },
+                { key: "enviar_chat", icon: "send" as const, label: "Enviar por chat" },
               ].map((opt) => (
                 <TouchableOpacity
                   key={opt.key}
@@ -843,9 +989,12 @@ const ContenidoScreen: React.FC = () => {
         onPress={() => handleItemPress(item)}
         onMenuPress={() => setMenuItem(item)}
         isDesktop={isDesktop}
+        selectionMode={isSelectionMode}
+        selected={selectedIds.includes(item.id)}
+        onToggleSelect={() => handleToggleSelect(item)}
       />
     ),
-    [handleItemPress, isDesktop]
+    [handleItemPress, isDesktop, isSelectionMode, selectedIds, handleToggleSelect]
   );
 
   const keyExtractor = useCallback((item: ContenidoItem) => item.id, []);
@@ -961,10 +1110,22 @@ const ContenidoScreen: React.FC = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>Mi Contenido</Text>
-          <Text style={styles.headerSubtitle}>{vm.totalItems} elementos</Text>
-        </View>
+        {isSelectionMode ? (
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+            <TouchableOpacity onPress={() => navigation.goBack()} accessibilityLabel="Cancelar asignación">
+              <MaterialIcons name="close" size={24} color={DT.onSurfaceVariant} />
+            </TouchableOpacity>
+            <View>
+              <Text style={styles.headerTitle}>Seleccionar para Grupo</Text>
+              <Text style={styles.headerSubtitle}>{vm.totalItems} elementos disponibles</Text>
+            </View>
+          </View>
+        ) : (
+          <View>
+            <Text style={styles.headerTitle}>Mi Contenido</Text>
+            <Text style={styles.headerSubtitle}>{vm.totalItems} elementos</Text>
+          </View>
+        )}
       </View>
 
       {showEmpty ? (
@@ -1000,28 +1161,50 @@ const ContenidoScreen: React.FC = () => {
         </View>
       )}
 
-      {/* FAB */}
-      {!showEmpty && (
-        <TouchableOpacity
-          style={[styles.fabWrap, isDesktop && styles.fabWrapDesktop]}
-          onPress={handleCreatePress}
-          activeOpacity={0.85}
-          accessibilityLabel="Crear nuevo contenido"
-        >
-          <LinearGradient
-            colors={["#004580", "#005da8"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[styles.fab, isDesktop && styles.fabDesktop]}
+      {/* Floating Action Buttons / Selection Bar */}
+      {isSelectionMode ? (
+        <View style={styles.selectionBar}>
+          <Text style={styles.selectionBarText}>
+            {selectedIds.length} {selectedIds.length === 1 ? "elemento seleccionado" : "elementos seleccionados"}
+          </Text>
+          <TouchableOpacity 
+            style={[styles.selectionBarBtn, selectedIds.length === 0 && { opacity: 0.5 }]}
+            disabled={selectedIds.length === 0 || isAssigning}
+            onPress={handleConfirmSelection}
           >
-            <MaterialIcons name="add" size={28} color={DT.onPrimary} />
-          </LinearGradient>
-        </TouchableOpacity>
+            <Text style={styles.selectionBarBtnText}>{isAssigning ? "Asignando..." : "Asignar a Grupo"}</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        !showEmpty && (
+          <TouchableOpacity
+            style={[styles.fabWrap, isDesktop && styles.fabWrapDesktop]}
+            onPress={handleCreatePress}
+            activeOpacity={0.85}
+            accessibilityLabel="Crear nuevo contenido"
+          >
+            <LinearGradient
+              colors={["#004580", "#005da8"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.fab, isDesktop && styles.fabDesktop]}
+            >
+              <MaterialIcons name="add" size={28} color={DT.onPrimary} />
+            </LinearGradient>
+          </TouchableOpacity>
+        )
       )}
 
       {/* Modals */}
       {renderContextMenu()}
       {renderDeleteModal()}
+      {showContactSelector && (
+        <ModalSelectorContactos
+          visible={showContactSelector}
+          onClose={() => setShowContactSelector(false)}
+          onSelect={handleSendToContact}
+        />
+      )}
       <CrearNuevoModal
         visible={showCrearNuevo}
         onClose={() => setShowCrearNuevo(false)}
@@ -1768,6 +1951,46 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
     color: DT.onSurfaceVariant,
     textTransform: "uppercase",
+  },
+
+  // Selection mode
+  selectionCheckbox: {
+    marginRight: 12,
+    justifyContent: "center",
+  },
+  selectionBar: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: DT.surfaceLowest,
+    borderTopWidth: 1,
+    borderTopColor: DT.outlineVariant,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    ...Platform.select({
+      web: { boxShadow: "0px -4px 12px rgba(0,0,0,0.05)" },
+      default: { elevation: 8 },
+    }),
+  },
+  selectionBarText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: DT.onSurface,
+  },
+  selectionBarBtn: {
+    backgroundColor: DT.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  selectionBarBtnText: {
+    color: DT.onPrimary,
+    fontWeight: "700",
+    fontSize: 15,
   },
 });
 

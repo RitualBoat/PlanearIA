@@ -13,11 +13,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, CommonActions } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS } from "../../types";
+import { useNotificaciones } from "../context/NotificacionesContext";
 
 const FloatingActionIcons: React.FC = () => {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
+  const { unreadCount } = useNotificaciones();
   const [menuVisible, setMenuVisible] = useState(false);
 
   const isWebDesktop = Platform.OS === "web" && width >= 1080;
@@ -45,10 +47,25 @@ const FloatingActionIcons: React.FC = () => {
     <>
       <View style={[styles.wrap, { top: insets.top + 10 }]}>
         <View style={styles.row}>
-          <TouchableOpacity style={styles.iconBtn} activeOpacity={0.85}>
-            <MaterialIcons name="notifications-none" size={20} color={COLORS.textDark} />
+          <TouchableOpacity
+            style={styles.iconBtn}
+            activeOpacity={0.85}
+            onPress={() => navigation.navigate("Notificaciones")}
+          >
+            <View style={{ position: "relative", alignItems: "center", justifyContent: "center" }}>
+              <MaterialIcons name="notifications-none" size={20} color={COLORS.textDark} />
+              {unreadCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{unreadCount}</Text>
+                </View>
+              )}
+            </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn} activeOpacity={0.85}>
+          <TouchableOpacity
+            style={styles.iconBtn}
+            activeOpacity={0.85}
+            onPress={() => navigation.navigate("Ayuda")}
+          >
             <MaterialIcons name="help-outline" size={20} color={COLORS.textDark} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.avatarBtn} activeOpacity={0.85} onPress={handleProfile}>
@@ -99,6 +116,24 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surfaceTertiary,
     alignItems: "center",
     justifyContent: "center",
+  },
+  badge: {
+    position: "absolute",
+    top: -5,
+    right: -5,
+    backgroundColor: COLORS.error,
+    borderRadius: 7,
+    minWidth: 14,
+    height: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 2,
+  },
+  badgeText: {
+    color: "#FFF",
+    fontSize: 8,
+    fontWeight: "800",
+    textAlign: "center",
   },
   avatarBtn: {
     marginLeft: 0,

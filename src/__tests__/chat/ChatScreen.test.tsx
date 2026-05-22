@@ -79,6 +79,27 @@ jest.mock("../../context/MensajesContext", () => ({
   useMensajes: () => mockMensajesContext,
 }));
 
+jest.mock("../../context/ThemeContext", () => ({
+  useTheme: () => ({
+    theme: "light",
+    isDark: false,
+    colors: {
+      primary: "#1676D2",
+      background: "#EEF3FA",
+      surfaceContainerLowest: "#FFFFFF",
+      surfaceContainerLow: "#f1f4f8",
+      surfaceContainer: "#ebeef2",
+      surfaceContainerHigh: "#e3e8ef",
+      onSurface: "#181c1f",
+      onSurfaceVariant: "#43474e",
+      outlineVariant: "#c0c7d4",
+      primaryContainer: "#0576d2",
+      error: "#BA1A1A",
+      shadowBlue: "rgba(0,93,168,0.06)",
+    },
+  }),
+}));
+
 jest.mock("@react-native-async-storage/async-storage", () => ({
   getItem: jest.fn(() => Promise.resolve(null)),
   setItem: jest.fn(() => Promise.resolve()),

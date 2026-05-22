@@ -63,6 +63,8 @@ export interface ContenidoViewModel {
   // Actions
   eliminarItem: (item: ContenidoItem) => void;
   duplicarItem: (item: ContenidoItem) => void;
+  handleShareFeed?: (item: ContenidoItem) => void;
+  handleSendChat?: (item: ContenidoItem) => void;
 }
 
 // ─── Helpers ───

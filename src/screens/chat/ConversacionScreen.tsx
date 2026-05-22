@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from "react";
+import { useTheme } from "../../context/ThemeContext";
+import React, { useRef, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -16,31 +17,44 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useConversacionViewModel } from "../../hooks/useConversacionViewModel";
 import { usePlaneaciones } from "../../sync/providers/SyncProvider";
 import { useRecursos } from "../../context/RecursosContext";
+import { useGruposContext } from "../../context/GruposContext";
+import { asignarRecursosAGrupo } from "../../services/grupoAsignacionesService";
 import { Mensaje } from "../../../types";
 import type { Planeacion } from "../../../types/planeacion";
 import type { Recurso } from "../../../types";
 
 // ─── Design Tokens ───
-const DT = {
-  primary: "#1676D2",
-  primaryDark: "#0C63B8",
-  primaryContainer: "#0576d2",
-  primaryTint: "#EAF4FF",
-  surface: "#FFFFFF",
-  surfaceContainerLow: "#f1f4f8",
-  surfaceContainer: "#ebeef2",
-  background: "#EEF3FA",
-  text: "#1E2A3A",
-  textSecondary: "#5C6E86",
-  textMuted: "#8A97AA",
-  border: "#E3EAF4",
-  outlineVariant: "#c0c7d4",
-  success: "#0D9E70",
-  error: "#C62828",
-  errorTint: "#FFF1F2",
-  warning: "#F58026",
-  warningTint: "#FFF8F1",
-};
+
+// Helper to map dynamic theme colors to the legacy DT token schema
+const getThemeTokens = (colors: any) => ({
+  ...colors,
+  primaryFixed: colors.primaryTint,
+  primaryFixedDim: colors.primaryLight || colors.primaryTint,
+  onPrimary: colors.textOnPrimary,
+  onPrimaryContainer: colors.primary,
+  secondary: colors.success,
+  secondaryContainer: colors.successTint,
+  onSecondaryContainer: colors.success,
+  tertiary: colors.warning,
+  tertiaryContainer: colors.warningTint,
+  tertiaryFixed: colors.warningTint,
+  onTertiaryContainer: colors.warning,
+  surface: colors.background,
+  surfaceLowest: colors.surfaceContainerLowest,
+  surfaceLow: colors.surfaceContainerLow,
+  surfaceContainer: colors.surfaceContainer,
+  surfaceHigh: colors.surfaceContainerHigh,
+  surfaceHighest: colors.surfaceContainerHighest,
+  onSurface: colors.onSurface,
+  onSurfaceVariant: colors.onSurfaceVariant,
+  outline: colors.textMuted,
+  outlineVariant: colors.outlineVariant,
+  errorIcon: colors.error,
+  text: colors.text,
+  textSecondary: colors.textSecondary,
+  textMuted: colors.textMuted,
+});
+
 
 // ─── Message Bubble ───
 const MessageBubble: React.FC<{
@@ -49,7 +63,11 @@ const MessageBubble: React.FC<{
   formatHora: (fecha: string) => string;
   onRetry?: (id: number) => void;
   onAddToLibrary?: (mensaje: Mensaje) => void;
-}> = ({ mensaje, isOwn, formatHora, onRetry, onAddToLibrary }) => {
+  onAssignToGroup?: (mensaje: Mensaje) => void;
+}> = ({ mensaje, isOwn, formatHora, onRetry, onAddToLibrary, onAssignToGroup }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
   const isError = mensaje.estado === "error";
 
   // File message
@@ -106,15 +124,29 @@ const MessageBubble: React.FC<{
             <Text style={styles.planeacionMeta}>
               {mensaje.planeacion.materia} · {mensaje.planeacion.grado}
             </Text>
-            {!isOwn && onAddToLibrary && (
-              <TouchableOpacity
-                style={styles.addToLibraryBtn}
-                onPress={() => onAddToLibrary(mensaje)}
-                activeOpacity={0.7}
-              >
-                <MaterialIcons name="library-add" size={16} color="#FFFFFF" />
-                <Text style={styles.addToLibraryText}>Añadir a mi biblioteca</Text>
-              </TouchableOpacity>
+            {!isOwn && (
+              <View style={{ gap: 8 }}>
+                {onAddToLibrary && (
+                  <TouchableOpacity
+                    style={styles.addToLibraryBtn}
+                    onPress={() => onAddToLibrary(mensaje)}
+                    activeOpacity={0.7}
+                  >
+                    <MaterialIcons name="library-add" size={16} color="#FFFFFF" />
+                    <Text style={styles.addToLibraryText}>Añadir a mi biblioteca</Text>
+                  </TouchableOpacity>
+                )}
+                {onAssignToGroup && (
+                  <TouchableOpacity
+                    style={[styles.addToLibraryBtn, { backgroundColor: DT.surfaceContainer }]}
+                    onPress={() => onAssignToGroup(mensaje)}
+                    activeOpacity={0.7}
+                  >
+                    <MaterialIcons name="groups" size={16} color={DT.primary} />
+                    <Text style={[styles.addToLibraryText, { color: DT.primary }]}>Asignar a Grupo</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
             )}
           </View>
           <Text style={[styles.bubbleTime, { paddingHorizontal: 14, paddingBottom: 8 }]}>
@@ -152,15 +184,29 @@ const MessageBubble: React.FC<{
               {tipoLabel[mensaje.recurso.tipo] || mensaje.recurso.tipo}
               {mensaje.recurso.formato ? ` · ${mensaje.recurso.formato.toUpperCase()}` : ""}
             </Text>
-            {!isOwn && onAddToLibrary && (
-              <TouchableOpacity
-                style={styles.addToLibraryBtnRecurso}
-                onPress={() => onAddToLibrary(mensaje)}
-                activeOpacity={0.7}
-              >
-                <MaterialIcons name="library-add" size={16} color="#FFFFFF" />
-                <Text style={styles.addToLibraryText}>Añadir a mi biblioteca</Text>
-              </TouchableOpacity>
+            {!isOwn && (
+              <View style={{ gap: 8 }}>
+                {onAddToLibrary && (
+                  <TouchableOpacity
+                    style={styles.addToLibraryBtnRecurso}
+                    onPress={() => onAddToLibrary(mensaje)}
+                    activeOpacity={0.7}
+                  >
+                    <MaterialIcons name="library-add" size={16} color="#FFFFFF" />
+                    <Text style={styles.addToLibraryText}>Añadir a mi biblioteca</Text>
+                  </TouchableOpacity>
+                )}
+                {onAssignToGroup && (
+                  <TouchableOpacity
+                    style={[styles.addToLibraryBtnRecurso, { backgroundColor: DT.surfaceContainer }]}
+                    onPress={() => onAssignToGroup(mensaje)}
+                    activeOpacity={0.7}
+                  >
+                    <MaterialIcons name="groups" size={16} color="#7C3AED" />
+                    <Text style={[styles.addToLibraryText, { color: "#7C3AED" }]}>Asignar a Grupo</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
             )}
           </View>
           <Text style={[styles.bubbleTime, { paddingHorizontal: 14, paddingBottom: 8 }]}>
@@ -227,7 +273,11 @@ const AttachModal: React.FC<{
   onArchivo: () => void;
   onFoto: () => void;
   onRecurso: () => void;
-}> = ({ visible, onClose, onPlaneacion, onArchivo, onFoto, onRecurso }) => (
+}> = ({ visible, onClose, onPlaneacion, onArchivo, onFoto, onRecurso }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
   <Modal visible={visible} transparent animationType="slide">
     <TouchableOpacity style={styles.attachOverlay} activeOpacity={1} onPress={onClose}>
       <View style={styles.attachSheet}>
@@ -265,7 +315,8 @@ const AttachModal: React.FC<{
       </View>
     </TouchableOpacity>
   </Modal>
-);
+  );
+};
 
 // ─── Picker Modal (shared for planeaciones and recursos) ───
 const PickerModal: React.FC<{
@@ -276,7 +327,11 @@ const PickerModal: React.FC<{
   items: Array<{ id: string | number; title: string; subtitle: string }>;
   onSelect: (id: string | number) => void;
   onClose: () => void;
-}> = ({ visible, title, icon, iconColor, items, onSelect, onClose }) => (
+}> = ({ visible, title, icon, iconColor, items, onSelect, onClose }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
   <Modal visible={visible} transparent animationType="slide">
     <TouchableOpacity style={styles.attachOverlay} activeOpacity={1} onPress={onClose}>
       <View style={styles.pickerSheet}>
@@ -319,14 +374,22 @@ const PickerModal: React.FC<{
       </View>
     </TouchableOpacity>
   </Modal>
-);
+  );
+};
 
 // ─── Main Screen ───
 const ConversacionScreen: React.FC = () => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
   const vm = useConversacionViewModel();
   const { agregarPlaneacion } = usePlaneaciones();
   const { crearRecurso } = useRecursos();
+  const { grupos } = useGruposContext();
   const flatListRef = useRef<FlatList>(null);
+
+  const [showPickerGrupo, setShowPickerGrupo] = useState(false);
+  const [mensajeParaAsignar, setMensajeParaAsignar] = useState<Mensaje | null>(null);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -378,7 +441,7 @@ const ConversacionScreen: React.FC = () => {
           asignadoComoTarea: false,
           acceso: "privado",
           origen: "manual",
-          profesorId: vm.currentUserId,
+          profesorId: Number(vm.currentUserId),
           versionActual: 1,
           formato: mensaje.recurso.formato,
           fechaCreacion: new Date(),
@@ -388,6 +451,46 @@ const ConversacionScreen: React.FC = () => {
       }
     } catch {
       Alert.alert("Error", "No se pudo agregar a tu biblioteca. Intenta de nuevo.");
+    }
+  };
+
+  const handleAssignToGroupClick = (mensaje: Mensaje) => {
+    setMensajeParaAsignar(mensaje);
+    setShowPickerGrupo(true);
+  };
+
+  const onSeleccionarGrupo = async (grupoId: number) => {
+    setShowPickerGrupo(false);
+    if (!mensajeParaAsignar) return;
+
+    try {
+      if (mensajeParaAsignar.tipo === "recurso" && mensajeParaAsignar.recurso) {
+        const { recurso } = await crearRecurso({
+          titulo: mensajeParaAsignar.recurso.titulo,
+          tipo: (mensajeParaAsignar.recurso.tipo as any) || "otro",
+          descripcion: `Compartido por chat el ${new Date().toLocaleDateString("es-MX")}`,
+          tags: ["compartido"],
+          asignadoComoTarea: false,
+          acceso: "privado",
+          origen: "manual",
+          profesorId: Number(vm.currentUserId),
+          versionActual: 1,
+          formato: mensajeParaAsignar.recurso.formato,
+          fechaCreacion: new Date(),
+          fechaModificacion: new Date(),
+        });
+
+        if (recurso.id) {
+          await asignarRecursosAGrupo(grupoId, [recurso.id]);
+          Alert.alert("Éxito", "El recurso fue añadido a la biblioteca y asignado al grupo.");
+        }
+      } else if (mensajeParaAsignar.tipo === "planeacion") {
+        Alert.alert("No soportado", "Aún no se pueden asignar planeaciones a grupos directamente desde el chat.");
+      }
+    } catch {
+      Alert.alert("Error", "No se pudo asignar al grupo.");
+    } finally {
+      setMensajeParaAsignar(null);
     }
   };
 
@@ -403,6 +506,12 @@ const ConversacionScreen: React.FC = () => {
     subtitle: `${r.tipo}${r.formato ? ` · ${r.formato.toUpperCase()}` : ""}`,
   }));
 
+  const grupoItems = grupos.map((g) => ({
+    id: g.id || 0,
+    title: g.nombre || "Grupo sin nombre",
+    subtitle: `${g.carrera || ""} · Semestre ${g.semestre || ""}`,
+  }));
+
   const renderMessage = ({ item }: { item: Mensaje }) => (
     <MessageBubble
       mensaje={item}
@@ -410,6 +519,7 @@ const ConversacionScreen: React.FC = () => {
       formatHora={vm.formatHora}
       onRetry={vm.onReintentarMensaje}
       onAddToLibrary={handleAddToLibrary}
+      onAssignToGroup={handleAssignToGroupClick}
     />
   );
 
@@ -567,6 +677,17 @@ const ConversacionScreen: React.FC = () => {
           }}
           onClose={vm.onCerrarPickerRecurso}
         />
+
+        {/* Grupo Picker (Asignar a Grupo) */}
+        <PickerModal
+          visible={showPickerGrupo}
+          title="Asignar a Grupo"
+          icon="groups"
+          iconColor={DT.primary}
+          items={grupoItems}
+          onSelect={(id) => onSeleccionarGrupo(Number(id))}
+          onClose={() => setShowPickerGrupo(false)}
+        />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -575,7 +696,7 @@ const ConversacionScreen: React.FC = () => {
 export default ConversacionScreen;
 
 // ─── Styles ───
-const styles = StyleSheet.create({
+const getStyles = (DT: any, isDark: boolean) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: DT.surface,

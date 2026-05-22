@@ -1,3 +1,4 @@
+import { useTheme } from "../../context/ThemeContext";
 import React from "react";
 import {
   View,
@@ -17,23 +18,37 @@ import { useChatViewModel, FiltroChat } from "../../hooks/useChatViewModel";
 import { Conversacion } from "../../../types";
 
 // ─── Design Tokens ───
-const DT = {
-  primary: "#1676D2",
-  primaryDark: "#0C63B8",
-  primaryTint: "#EAF4FF",
-  surface: "#FFFFFF",
-  surfaceContainerLow: "#f1f4f8",
-  surfaceContainer: "#ebeef2",
-  background: "#EEF3FA",
-  text: "#1E2A3A",
-  textSecondary: "#5C6E86",
-  textMuted: "#8A97AA",
-  border: "#E3EAF4",
-  success: "#0D9E70",
-  error: "#C62828",
-  errorTint: "#FFF1F2",
-  skeleton: "#EDF1F7",
-};
+
+// Helper to map dynamic theme colors to the legacy DT token schema
+const getThemeTokens = (colors: any) => ({
+  ...colors,
+  primaryFixed: colors.primaryTint,
+  primaryFixedDim: colors.primaryLight || colors.primaryTint,
+  onPrimary: colors.textOnPrimary,
+  onPrimaryContainer: colors.primary,
+  secondary: colors.success,
+  secondaryContainer: colors.successTint,
+  onSecondaryContainer: colors.success,
+  tertiary: colors.warning,
+  tertiaryContainer: colors.warningTint,
+  tertiaryFixed: colors.warningTint,
+  onTertiaryContainer: colors.warning,
+  surface: colors.background,
+  surfaceLowest: colors.surfaceContainerLowest,
+  surfaceLow: colors.surfaceContainerLow,
+  surfaceContainer: colors.surfaceContainer,
+  surfaceHigh: colors.surfaceContainerHigh,
+  surfaceHighest: colors.surfaceContainerHighest,
+  onSurface: colors.onSurface,
+  onSurfaceVariant: colors.onSurfaceVariant,
+  outline: colors.textMuted,
+  outlineVariant: colors.outlineVariant,
+  errorIcon: colors.error,
+  text: colors.text,
+  textSecondary: colors.textSecondary,
+  textMuted: colors.textMuted,
+});
+
 
 const AVATAR_COLORS: Record<string, string> = {
   MH: "#4A90D9",
@@ -64,16 +79,7 @@ const FILTROS: { key: FiltroChat; label: string }[] = [
   { key: "con_archivos", label: "Con archivos" },
 ];
 
-const cardShadow = Platform.select({
-  web: { boxShadow: "0px 2px 8px rgba(0,72,132,0.04)" } as any,
-  default: {
-    shadowColor: "#004884",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 1,
-  },
-});
+
 
 // ─── Conversation Item ───
 const ConversacionItem: React.FC<{
@@ -82,6 +88,9 @@ const ConversacionItem: React.FC<{
   onLongPress: (c: Conversacion) => void;
   formatTimestamp: (fecha: string | undefined) => string;
 }> = ({ item, onPress, onLongPress, formatTimestamp }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
   const initials = getInitials(item.contactoNombre);
   const color = getAvatarColor(item.contactoNombre, item.contactoColor);
   const hasUnread = item.mensajesNoLeidos > 0;
@@ -134,7 +143,11 @@ const ConversacionItem: React.FC<{
 };
 
 // ─── Empty State ───
-const EmptyState: React.FC<{ searchActive: boolean }> = ({ searchActive }) => (
+const EmptyState: React.FC<{ searchActive: boolean }> = ({ searchActive }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
   <View style={styles.emptyContainer}>
     <View style={styles.emptyIconCircle}>
       <MaterialIcons
@@ -152,7 +165,8 @@ const EmptyState: React.FC<{ searchActive: boolean }> = ({ searchActive }) => (
         : "Envía un mensaje a uno de tus contactos para comenzar a colaborar"}
     </Text>
   </View>
-);
+  );
+};
 
 // ─── Delete Confirmation Modal ───
 const DeleteModal: React.FC<{
@@ -160,7 +174,11 @@ const DeleteModal: React.FC<{
   nombre: string;
   onConfirm: () => void;
   onCancel: () => void;
-}> = ({ visible, nombre, onConfirm, onCancel }) => (
+}> = ({ visible, nombre, onConfirm, onCancel }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
   <Modal visible={visible} transparent animationType="fade">
     <View style={styles.overlay}>
       <View style={styles.deleteModal}>
@@ -181,10 +199,14 @@ const DeleteModal: React.FC<{
       </View>
     </View>
   </Modal>
-);
+  );
+};
 
 // ─── Main Screen ───
 const ChatScreen: React.FC = () => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
   const vm = useChatViewModel();
 
   const renderConversacion = ({ item }: { item: Conversacion }) => (
@@ -272,7 +294,17 @@ const ChatScreen: React.FC = () => {
 export default ChatScreen;
 
 // ─── Styles ───
-const styles = StyleSheet.create({
+const getStyles = (DT: any, isDark: boolean) => StyleSheet.create({
+  cardShadow: Platform.select({
+    web: { boxShadow: isDark ? "0px 2px 8px rgba(0,0,0,0.2)" : "0px 2px 8px rgba(0,72,132,0.04)" } as any,
+    default: {
+      shadowColor: isDark ? "#000000" : "#004884",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: isDark ? 0.2 : 0.04,
+      shadowRadius: 8,
+      elevation: 1,
+    },
+  }),
   safeArea: {
     flex: 1,
     backgroundColor: DT.surface,

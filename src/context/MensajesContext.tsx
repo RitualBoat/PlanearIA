@@ -39,6 +39,7 @@ interface MensajesContextData {
     tipo: TipoMensaje;
     archivo?: MensajeArchivo;
     planeacion?: MensajePlaneacion;
+    recurso?: MensajeRecurso;
   }) => Promise<void>;
   getMensajesDeConversacion: (conversacionId: number) => Mensaje[];
   marcarComoLeido: (conversacionId: number) => void;

@@ -74,6 +74,7 @@ const TabContent: React.FC<{
   openContextualMenu: (miembro: GrupoMiembro) => void;
   navigateCrearTarea: () => void;
   navigateAsignarRecurso: () => void;
+  navigateAsignarDeBiblioteca: () => void;
   navigateDetalleTarea: (tareaId: number) => void;
   navigateReportesGrupo: () => void;
   navigateRegistrarAsistencia: () => void;
@@ -105,6 +106,7 @@ const TabContent: React.FC<{
     openContextualMenu,
     navigateCrearTarea,
     navigateAsignarRecurso,
+    navigateAsignarDeBiblioteca,
     navigateDetalleTarea,
     navigateReportesGrupo,
     navigateRegistrarAsistencia,
@@ -249,10 +251,16 @@ const TabContent: React.FC<{
           <View style={styles.tabContent}>
             <Text style={styles.tabTitle}>Recursos Asignados</Text>
             <Text style={styles.tabDescription}>Recursos asociados al grupo seleccionado.</Text>
-            <TouchableOpacity style={styles.actionButton} onPress={navigateAsignarRecurso}>
-              <MaterialIcons name="file-copy" size={24} color="white" />
-              <Text style={styles.actionButtonText}>Asignar Recurso</Text>
-            </TouchableOpacity>
+            <View style={styles.actionButtonsRow}>
+              <TouchableOpacity style={[styles.actionButton, styles.actionButtonHalf]} onPress={navigateAsignarRecurso}>
+                <MaterialIcons name="file-copy" size={24} color="white" />
+                <Text style={styles.actionButtonText}>Pantalla Asignar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.actionButton, styles.actionButtonHalf, styles.actionButtonSecondary]} onPress={navigateAsignarDeBiblioteca}>
+                <MaterialIcons name="library-books" size={24} color="white" />
+                <Text style={styles.actionButtonText}>De Biblioteca</Text>
+              </TouchableOpacity>
+            </View>
 
             <View style={styles.listaContainer}>
               <Text style={styles.sectionTitle}>Recursos del grupo</Text>
@@ -666,6 +674,7 @@ const DetalleGrupoScreen: React.FC = () => {
     navigateEditarGrupo,
     navigateCrearTarea,
     navigateAsignarRecurso,
+    navigateAsignarDeBiblioteca,
     navigateDetalleTarea,
     navigateReportesGrupo,
     navigateRegistrarAsistencia,
@@ -805,6 +814,7 @@ const DetalleGrupoScreen: React.FC = () => {
             openContextualMenu={openContextualMenu}
             navigateCrearTarea={navigateCrearTarea}
             navigateAsignarRecurso={navigateAsignarRecurso}
+            navigateAsignarDeBiblioteca={navigateAsignarDeBiblioteca}
             navigateDetalleTarea={navigateDetalleTarea}
             navigateReportesGrupo={navigateReportesGrupo}
             navigateRegistrarAsistencia={navigateRegistrarAsistencia}

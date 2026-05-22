@@ -1,3 +1,4 @@
+import { useTheme } from "../../context/ThemeContext";
 import React, { useState } from "react";
 import {
   View,
@@ -23,48 +24,43 @@ import {
 
 // ─── Design Tokens (Scholarly Atelier) ───
 
-const DT = {
-  primary: "#002f5a",
-  primaryContainer: "#004580",
-  primaryFixed: "#d4e3ff",
-  onPrimary: "#ffffff",
-  secondary: "#1b6d24",
-  secondaryContainer: "#a0f499",
-  error: "#ba1a1a",
-  errorTint: "#FFF1F2",
-  surface: "#f7f9ff",
-  surfaceLowest: "#ffffff",
-  surfaceLow: "#f1f4fa",
-  surfaceContainer: "#ebeef4",
-  surfaceContainerHigh: "#e5e8ee",
-  onSurface: "#181c20",
-  onSurfaceVariant: "#424750",
-  textSecondary: "#424750",
-  textMuted: "#727781",
-  outline: "#727781",
-  outlineVariant: "#c2c6d1",
-  skeleton: "#EDF1F7",
-  overlay: "rgba(19,30,49,0.42)",
-  success: "#0D9E70",
-  successTint: "#E7F9F3",
-  warning: "#F58026",
-  warningTint: "#FFF8F1",
-};
+
+// Helper to map dynamic theme colors to the legacy DT token schema
+const getThemeTokens = (colors: any) => ({
+  ...colors,
+  primaryFixed: colors.primaryTint,
+  primaryFixedDim: colors.primaryLight || colors.primaryTint,
+  onPrimary: colors.textOnPrimary,
+  onPrimaryContainer: colors.primary,
+  secondary: colors.success,
+  secondaryContainer: colors.successTint,
+  onSecondaryContainer: colors.success,
+  tertiary: colors.warning,
+  tertiaryContainer: colors.warningTint,
+  tertiaryFixed: colors.warningTint,
+  onTertiaryContainer: colors.warning,
+  surface: colors.background,
+  surfaceLowest: colors.surfaceContainerLowest,
+  surfaceLow: colors.surfaceContainerLow,
+  surfaceContainer: colors.surfaceContainer,
+  surfaceHigh: colors.surfaceContainerHigh,
+  surfaceHighest: colors.surfaceContainerHighest,
+  onSurface: colors.onSurface,
+  onSurfaceVariant: colors.onSurfaceVariant,
+  outline: colors.textMuted,
+  outlineVariant: colors.outlineVariant,
+  errorIcon: colors.error,
+  text: colors.text,
+  textSecondary: colors.textSecondary,
+  textMuted: colors.textMuted,
+});
+
 
 // ─── Helpers ───
 
 const getInitials = (n: string, a: string) => `${n.charAt(0)}${a.charAt(0)}`.toUpperCase();
 
-const cardShadow = Platform.select({
-  web: { boxShadow: "0px 2px 8px rgba(0,69,128,0.06)" } as any,
-  default: {
-    shadowColor: "#004584",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-});
+
 
 // ─── Avatar ───
 
@@ -73,7 +69,11 @@ const Avatar: React.FC<{
   apellidos: string;
   color: string;
   size?: number;
-}> = ({ nombre, apellidos, color, size = 48 }) => (
+}> = ({ nombre, apellidos, color, size = 48 }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
   <View
     style={[
       styles.avatar,
@@ -89,15 +89,20 @@ const Avatar: React.FC<{
       {getInitials(nombre, apellidos)}
     </Text>
   </View>
-);
+  );
+};
 
 // ─── Suggested Card ───
 
 const SuggestedCard: React.FC<{
   docente: DocentePerfil;
   onConectar: (d: DocentePerfil) => void;
-}> = ({ docente, onConectar }) => (
-  <View style={[styles.card, cardShadow]}>
+}> = ({ docente, onConectar }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
+  <View style={[styles.card, styles.cardShadow]}>
     <View style={styles.cardRow}>
       <Avatar
         nombre={docente.nombre}
@@ -126,7 +131,8 @@ const SuggestedCard: React.FC<{
       </TouchableOpacity>
     </View>
   </View>
-);
+  );
+};
 
 // ─── Result Card ───
 
@@ -134,6 +140,9 @@ const ResultCard: React.FC<{
   docente: DocentePerfil;
   onConectar: (d: DocentePerfil) => void;
 }> = ({ docente, onConectar }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
   const renderButton = () => {
     switch (docente.estado) {
       case "solicitud_enviada":
@@ -177,7 +186,7 @@ const ResultCard: React.FC<{
   };
 
   return (
-    <View style={[styles.resultCard, cardShadow]}>
+    <View style={[styles.resultCard, styles.cardShadow]}>
       <View style={styles.resultHeader}>
         <Avatar
           nombre={docente.nombre}
@@ -214,6 +223,9 @@ const SolicitudModal: React.FC<{
   onEnviar: (msg: string) => void;
   onCerrar: () => void;
 }> = ({ visible, docente, onEnviar, onCerrar }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
   const [mensaje, setMensaje] = useState("");
 
   if (!docente) return null;
@@ -294,7 +306,11 @@ const InviteModal: React.FC<{
   onCopiar: () => void;
   onCompartir: () => void;
   onCerrar: () => void;
-}> = ({ visible, inviteUrl, onCopiar, onCompartir, onCerrar }) => (
+}> = ({ visible, inviteUrl, onCopiar, onCompartir, onCerrar }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
   <Modal visible={visible} transparent animationType="slide" onRequestClose={onCerrar}>
     <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={onCerrar}>
       <TouchableOpacity style={styles.modalSheet} activeOpacity={1} onPress={() => {}}>
@@ -333,7 +349,8 @@ const InviteModal: React.FC<{
       </TouchableOpacity>
     </TouchableOpacity>
   </Modal>
-);
+  );
+};
 
 // ─── Toast ───
 
@@ -342,6 +359,9 @@ const Toast: React.FC<{
   type: "solicitud" | "enlace" | null;
   nombre: string;
 }> = ({ visible, type, nombre }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
   if (!visible || !type) return null;
 
   const isSolicitud = type === "solicitud";
@@ -360,7 +380,11 @@ const Toast: React.FC<{
 
 // ─── Skeleton Loading ───
 
-const SkeletonLoading: React.FC = () => (
+const SkeletonLoading: React.FC = () => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
   <View style={styles.skeletonWrap}>
     <View style={styles.skeletonSearchBar} />
     <View style={styles.skeletonChipsRow}>
@@ -382,11 +406,16 @@ const SkeletonLoading: React.FC = () => (
       </View>
     ))}
   </View>
-);
+  );
+};
 
 // ─── Error State ───
 
-const ErrorState: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
+const ErrorState: React.FC<{ onRetry: () => void }> = ({ onRetry }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
   <View style={styles.emptyCenter}>
     <View style={[styles.emptyIconCircle, { backgroundColor: DT.errorTint }]}>
       <MaterialIcons name="wifi-off" size={40} color="#C62828" />
@@ -398,14 +427,19 @@ const ErrorState: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
       <Text style={styles.retryBtnText}>Reintentar</Text>
     </TouchableOpacity>
   </View>
-);
+  );
+};
 
 // ─── No Results State ───
 
 const NoResults: React.FC<{
   query: string;
   onInvite: () => void;
-}> = ({ query, onInvite }) => (
+}> = ({ query, onInvite }) => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
   <View style={styles.emptyCenter}>
     <View style={[styles.emptyIconCircle, { backgroundColor: DT.surfaceContainer }]}>
       <MaterialIcons name="search-off" size={48} color={DT.outlineVariant} />
@@ -417,22 +451,31 @@ const NoResults: React.FC<{
       <Text style={styles.inviteLinkBtnText}>Invitar por enlace</Text>
     </TouchableOpacity>
   </View>
-);
+  );
+};
 
 // ─── Offline Banner ───
 
-const OfflineBanner: React.FC = () => (
+const OfflineBanner: React.FC = () => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
+  return (
   <View style={styles.offlineBanner}>
     <MaterialIcons name="cloud-off" size={14} color={DT.warning} />
     <Text style={styles.offlineBannerText}>
       Modo sin conexión — búsqueda limitada a contactos guardados
     </Text>
   </View>
-);
+  );
+};
 
 // ─── Main Screen ───
 
 const BuscadorPerfilesScreen: React.FC = () => {
+  const { colors, isDark } = useTheme();
+  const DT = getThemeTokens(colors);
+  const styles = getStyles(DT, isDark);
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
   const navigation = useNavigation();
@@ -638,7 +681,27 @@ const BuscadorPerfilesScreen: React.FC = () => {
 
 // ─── Styles ───
 
-const styles = StyleSheet.create({
+const getStyles = (DT: any, isDark: boolean) => StyleSheet.create({
+  cardShadow: Platform.select({
+    web: { boxShadow: isDark ? "0px 2px 8px rgba(0,0,0,0.2)" : "0px 2px 8px rgba(0,69,128,0.06)" } as any,
+    default: {
+      shadowColor: isDark ? "#000000" : "#004580",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: isDark ? 0.2 : 0.06,
+      shadowRadius: 8,
+      elevation: 2,
+    },
+  }),
+  liftShadow: Platform.select({
+    web: { boxShadow: isDark ? "0px 12px 48px rgba(0,0,0,0.35)" : "0px 12px 48px rgba(0,69,128,0.08)" } as any,
+    default: {
+      shadowColor: isDark ? "#000000" : "#004580",
+      shadowOffset: { width: 0, height: 12 },
+      shadowOpacity: isDark ? 0.35 : 0.08,
+      shadowRadius: 48,
+      elevation: 4,
+    },
+  }),
   safe: { flex: 1, backgroundColor: DT.surface },
 
   // Header

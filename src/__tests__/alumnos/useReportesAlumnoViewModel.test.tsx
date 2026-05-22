@@ -29,6 +29,11 @@ describe("useReportesAlumnoViewModel", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
+    const date15DaysAgo = new Date(Date.now() - 15 * 86400000).toISOString();
+    const date5DaysAgo = new Date(Date.now() - 5 * 86400000).toISOString();
+    const date2DaysAgo = new Date(Date.now() - 2 * 86400000).toISOString();
+    const date6DaysAgo = new Date(Date.now() - 6 * 86400000).toISOString();
+
     mockGetItem.mockImplementation((key: string) => {
       if (key === "@planearia:alumnos") {
         return Promise.resolve(
@@ -55,8 +60,8 @@ describe("useReportesAlumnoViewModel", () => {
               descripcion: "",
               tipo: "tarea",
               grupoId: 7,
-              fechaAsignacion: "2026-03-01T00:00:00.000Z",
-              fechaEntrega: "2026-03-20T00:00:00.000Z",
+              fechaAsignacion: date15DaysAgo,
+              fechaEntrega: date5DaysAgo,
               valor: 20,
               instrucciones: "",
               estado: "asignada",
@@ -74,7 +79,7 @@ describe("useReportesAlumnoViewModel", () => {
               id: 1,
               alumnoId: 10,
               grupoId: 7,
-              fecha: "2026-03-15T00:00:00.000Z",
+              fecha: date5DaysAgo,
               estado: "presente",
             },
           ])
@@ -90,7 +95,7 @@ describe("useReportesAlumnoViewModel", () => {
               periodo: "P1",
               promedio: 9.4,
               estado: "aprobado",
-              fechaRegistro: "2026-03-16T00:00:00.000Z",
+              fechaRegistro: date2DaysAgo,
             },
           ])
         );
@@ -102,7 +107,7 @@ describe("useReportesAlumnoViewModel", () => {
               id: 1,
               tareaId: 200,
               alumnoId: 10,
-              fechaEntrega: "2026-03-19T00:00:00.000Z",
+              fechaEntrega: date6DaysAgo,
               calificada: false,
               estado: "entregada",
               intentos: 1,

@@ -883,10 +883,6 @@ const DetalleGrupoScreen: React.FC = () => {
           onRemove={eliminarColaborador}
         />
 
-        {/* Modal de confirmación de eliminación (Grupo) */}
-        <Modal
-          visible={deleteModalVisible}
-
         <Modal
           visible={addStudentsModalVisible}
           animationType="slide"

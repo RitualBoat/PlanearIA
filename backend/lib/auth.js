@@ -1,7 +1,8 @@
 /**
  * Middleware de autenticación simple
- * Verifica el API secret en el header
+ * Verifica el API secret en el header y valida JWT tokens.
  */
+const crypto = require("crypto");
 
 const API_SECRET = process.env.API_SECRET;
 
@@ -26,6 +27,38 @@ function validateAuth(req) {
   }
 
   return { valid: true };
+}
+
+function getJWTSecret() {
+  return process.env.JWT_SECRET || process.env.API_SECRET;
+}
+
+function verifyToken(token) {
+  try {
+    const secret = getJWTSecret();
+    if (!secret) return null;
+    const [header, body, signature] = token.split(".");
+    const expectedSig = crypto
+      .createHmac("sha256", secret)
+      .update(`${header}.${body}`)
+      .digest("base64url");
+    if (signature !== expectedSig) return null;
+    const payload = JSON.parse(Buffer.from(body, "base64url").toString());
+    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Obtiene la información del usuario desde el JWT token en la cabecera de la petición
+ */
+function getUserFromToken(req) {
+  const authHeader = req.headers["authorization"] || "";
+  const token = authHeader.replace("Bearer ", "");
+  if (!token) return null;
+  return verifyToken(token);
 }
 
 /**
@@ -101,6 +134,7 @@ function successResponse(res, data, status = 200) {
 
 module.exports = {
   validateAuth,
+  getUserFromToken,
   getCorsHeaders,
   handleCors,
   applyCors,

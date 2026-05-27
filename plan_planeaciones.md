@@ -11,24 +11,25 @@
 
 > [!IMPORTANT]
 > Todas las decisiones de este plan se fundamentan en el análisis de planeaciones reales creadas por docentes mexicanos. Archivos analizados:
+>
 > - [primero.md](file:///c:/Users/jarco/dev/PlanearIA/context/planeaciones-reales/semana%2033%20y%2034%20primero/primero.md) — 1er grado, Español, 10 sesiones
 > - [segundo.md](file:///c:/Users/jarco/dev/PlanearIA/context/planeaciones-reales/semana%2033%20y%2034%20segundo/segundo.md) — 2do grado, Español, 10 sesiones
-> - `MATEDISCRETA/` — PDF sin transcribir (Matemáticas Discretas, nivel universidad)
+> - [Matediscretas.md](file:///c:/Users/jarco/dev/PlanearIA/context/planeaciones-reales/MATEDISCRETA/Matediscretas.md) — Matemáticas Discretas I, nivel universidad (transcrito)
 
 ### Hallazgos Estructurales Clave
 
 Las planeaciones reales tienen una estructura **radicalmente distinta** al modelo de datos actual del MVP:
 
-| Aspecto | Modelo Actual (MVP) | Realidad Docente |
-|---|---|---|
-| Sesiones | 1 sesión con 3 actividades (inicio/desarrollo/cierre) | **10 sesiones** multi-semana, cada una con inicio/desarrollo/cierre/tarea |
-| Evaluación | Campo string simple | Instrumentos dinámicos (escalas de 3 o 4 puntos, rúbricas con criterios) |
-| Metadata institucional | No existe | Institución, subsistema, ciclo escolar, lugar |
-| Curriculum NEM | Parcial | Propósito, PDA, campo formativo, eje articulador, rasgos perfil egreso |
-| Firmas | No existe | Coordinadora académica + docente |
-| Observaciones | String simple | Array de notas estructuradas (flexibilidad, USAER, proyectos) |
-| Actividades embebidas | No existen | Verdadero/falso (☐), preguntas guía numeradas, matching, escritura guiada |
-| Cobertura temporal | 1 fecha | Rango de fechas multi-semana |
+| Aspecto                | Modelo Actual (MVP)                                   | Realidad Docente                                                          |
+| ---------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------- |
+| Sesiones               | 1 sesión con 3 actividades (inicio/desarrollo/cierre) | **10 sesiones** multi-semana, cada una con inicio/desarrollo/cierre/tarea |
+| Evaluación             | Campo string simple                                   | Instrumentos dinámicos (escalas de 3 o 4 puntos, rúbricas con criterios)  |
+| Metadata institucional | No existe                                             | Institución, subsistema, ciclo escolar, lugar                             |
+| Curriculum NEM         | Parcial                                               | Propósito, PDA, campo formativo, eje articulador, rasgos perfil egreso    |
+| Firmas                 | No existe                                             | Coordinadora académica + docente                                          |
+| Observaciones          | String simple                                         | Array de notas estructuradas (flexibilidad, USAER, proyectos)             |
+| Actividades embebidas  | No existen                                            | Verdadero/falso (☐), preguntas guía numeradas, matching, escritura guiada |
+| Cobertura temporal     | 1 fecha                                               | Rango de fechas multi-semana                                              |
 
 ---
 
@@ -87,12 +88,12 @@ end
 
 ### Archivos Indirectamente Afectados
 
-| Archivo | Razón |
-|---|---|
+| Archivo                                                                                                      | Razón                                                         |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
 | [ContenidoScreen.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/screens/contenido/ContenidoScreen.tsx) (59KB) | Tab principal que muestra planeaciones, recursos y plantillas |
-| [useContenidoViewModel.ts](file:///c:/Users/jarco/dev/PlanearIA/src/hooks/useContenidoViewModel.ts) (13KB) | ViewModel del contenido, importa planeaciones |
-| [App.tsx](file:///c:/Users/jarco/dev/PlanearIA/App.tsx) | Provider tree (SyncProvider envuelve la app) |
-| [CrearNuevoModal.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/components/CrearNuevoModal.tsx) | Modal "crear nuevo" que incluye planeaciones |
+| [useContenidoViewModel.ts](file:///c:/Users/jarco/dev/PlanearIA/src/hooks/useContenidoViewModel.ts) (13KB)   | ViewModel del contenido, importa planeaciones                 |
+| [App.tsx](file:///c:/Users/jarco/dev/PlanearIA/App.tsx)                                                      | Provider tree (SyncProvider envuelve la app)                  |
+| [CrearNuevoModal.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/components/CrearNuevoModal.tsx)               | Modal "crear nuevo" que incluye planeaciones                  |
 
 ---
 
@@ -105,14 +106,15 @@ end
 
 No existe un componente nativo de React Native que proporcione una experiencia tipo Word/Docs con formato real. Las opciones evaluadas:
 
-| Opción | Veredicto | Razón |
-|---|---|---|
-| `TextInput` multiline | ❌ Descartado | Sin formato, sin tablas, sin listas |
-| `react-native-pell-rich-editor` | ❌ Descartado | Abandonado, bugs críticos en Expo |
+| Opción                                   | Veredicto      | Razón                                                                                                   |
+| ---------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------- |
+| `TextInput` multiline                    | ❌ Descartado  | Sin formato, sin tablas, sin listas                                                                     |
+| `react-native-pell-rich-editor`          | ❌ Descartado  | Abandonado, bugs críticos en Expo                                                                       |
 | `@10play/tentap-editor` (Tiptap para RN) | ✅ **ELEGIDO** | Tiptap/ProseMirror en WebView. Modular, extensible, soporte offline. Toolbar nativa RN + canvas WebView |
-| Custom WebView + Quill/Tiptap | ⚠️ Fallback | Si tentap tiene limitaciones, WebView con Tiptap puro como plan B |
+| Custom WebView + Quill/Tiptap            | ⚠️ Fallback    | Si tentap tiene limitaciones, WebView con Tiptap puro como plan B                                       |
 
 **Justificación de `@10play/tentap-editor`:**
+
 - Usa Tiptap (ProseMirror) dentro de una WebView controlada — rendimiento nativo
 - Toolbar completamente personalizable en React Native nativo (no HTML)
 - Soporte para extensiones Tiptap: listas, tablas, checkboxes, headings, placeholder
@@ -121,6 +123,7 @@ No existe un componente nativo de React Native que proporcione una experiencia t
 - Licencia MIT
 
 **Arquitectura del editor:**
+
 ```
 ┌─────────────────────────────────┐
 │ DocEditorScreen (RN nativo)     │
@@ -149,16 +152,17 @@ No existe un componente nativo de React Native que proporcione una experiencia t
 
 ### 2. Dualidad Estándar vs Móvil
 
-| Modo | Dispositivo | Comportamiento |
-|---|---|---|
-| **Estándar** | Tablets, teclado externo | Editor completo tipo Docs con todas las secciones visibles. Toolbar horizontal. Navegación por teclado |
-| **Móvil** | Teléfonos celulares | Navegación por secciones (wizard/stepper). Una sección a la vez. Inputs optimizados para touch. Acciones IA prominentes |
+| Modo         | Dispositivo              | Comportamiento                                                                                                          |
+| ------------ | ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| **Estándar** | Tablets, teclado externo | Editor completo tipo Docs con todas las secciones visibles. Toolbar horizontal. Navegación por teclado                  |
+| **Móvil**    | Teléfonos celulares      | Navegación por secciones (wizard/stepper). Una sección a la vez. Inputs optimizados para touch. Acciones IA prominentes |
 
 **Detección:** `useWindowDimensions()` + `Platform.isPad` + ancho > 768px → modo estándar.
 
 ### 3. Escáner y Generación de Plantillas
 
 **Flujo:**
+
 1. Docente sube PDF/DOCX (via `expo-document-picker`)
 2. El servicio de importación existente extrae texto raw
 3. El texto se envía a nuevo endpoint `POST /api/planeaciones/escanear-plantilla`
@@ -168,14 +172,14 @@ No existe un componente nativo de React Native que proporcione una experiencia t
 
 ### 4. Integración de IA como Copiloto
 
-| Función IA | Trigger | Endpoint |
-|---|---|---|
-| **Generar planeación completa** | Botón "Generar con IA" en creación | `POST /api/planeaciones/generar` (existente, se amplía) |
-| **Autocompletar sección** | Cursor en sección vacía + botón ✨ | `POST /api/planeaciones/copiloto` (NUEVO) |
-| **Sugerir actividades** | Dentro de una sesión, botón "Sugerir" | `POST /api/planeaciones/copiloto` con `accion: "sugerir_actividades"` |
-| **Mejorar texto** | Seleccionar texto + botón "Mejorar" | `POST /api/planeaciones/mejorar` (existente, se amplía) |
-| **Generar evaluación** | Sección evaluación + botón "Generar rúbrica" | `POST /api/planeaciones/copiloto` con `accion: "generar_evaluacion"` |
-| **Revisar alineamiento** | Botón "Revisar" en toolbar IA | `POST /api/planeaciones/copiloto` con `accion: "revisar_alineamiento"` |
+| Función IA                      | Trigger                                      | Endpoint                                                               |
+| ------------------------------- | -------------------------------------------- | ---------------------------------------------------------------------- |
+| **Generar planeación completa** | Botón "Generar con IA" en creación           | `POST /api/planeaciones/generar` (existente, se amplía)                |
+| **Autocompletar sección**       | Cursor en sección vacía + botón ✨           | `POST /api/planeaciones/copiloto` (NUEVO)                              |
+| **Sugerir actividades**         | Dentro de una sesión, botón "Sugerir"        | `POST /api/planeaciones/copiloto` con `accion: "sugerir_actividades"`  |
+| **Mejorar texto**               | Seleccionar texto + botón "Mejorar"          | `POST /api/planeaciones/mejorar` (existente, se amplía)                |
+| **Generar evaluación**          | Sección evaluación + botón "Generar rúbrica" | `POST /api/planeaciones/copiloto` con `accion: "generar_evaluacion"`   |
+| **Revisar alineamiento**        | Botón "Revisar" en toolbar IA                | `POST /api/planeaciones/copiloto` con `accion: "revisar_alineamiento"` |
 
 ---
 
@@ -208,12 +212,12 @@ export interface InfoInstitucional {
 export interface DatosGenerales {
   maestro: string;
   asignatura: string;
-  fechaInicio: string;       // ISO date
-  fechaFin: string;          // ISO date
-  semanas: number[];         // [33, 34]
+  fechaInicio: string; // ISO date
+  fechaFin: string; // ISO date
+  semanas: number[]; // [33, 34]
   trimestre?: number;
   grado: string;
-  grupos: string[];          // ["I", "J", "K", "L"]
+  grupos: string[]; // ["I", "J", "K", "L"]
 }
 
 // --- Elementos Curriculares (NEM) ---
@@ -221,7 +225,7 @@ export interface ElementosCurriculares {
   proposito: string;
   producto?: string;
   contenido: string;
-  pda: string;               // Procesos de Desarrollo Aprendizaje
+  pda: string; // Procesos de Desarrollo Aprendizaje
   campoFormativo: string;
   ejeArticulador: string;
   rasgosPerfilEgreso: string[];
@@ -235,30 +239,30 @@ export interface Sesion {
   id: string;
   numero: number;
   tipo: TipoSesion;
-  motivo?: string;           // para suspensiones: "CTE", etc.
-  inicio?: string;           // Rich text (JSON Tiptap)
-  desarrollo?: string;       // Rich text (JSON Tiptap)
-  cierre?: string;           // Rich text (JSON Tiptap)
-  tarea?: string;            // Opcional
+  motivo?: string; // para suspensiones: "CTE", etc.
+  inicio?: string; // Rich text (JSON Tiptap)
+  desarrollo?: string; // Rich text (JSON Tiptap)
+  cierre?: string; // Rich text (JSON Tiptap)
+  tarea?: string; // Opcional
 }
 
 // --- Evaluación Estructurada ---
 export type TipoInstrumento =
-  | "escala_valoracion"       // Sí / A veces / No
-  | "escala_estimativa"       // Excelente / Bueno / Regular / Deficiente
-  | "rubrica"                 // Criterios con niveles de desempeño
-  | "lista_cotejo"            // Cumple / No cumple
+  | "escala_valoracion" // Sí / A veces / No
+  | "escala_estimativa" // Excelente / Bueno / Regular / Deficiente
+  | "rubrica" // Criterios con niveles de desempeño
+  | "lista_cotejo" // Cumple / No cumple
   | "otro";
 
 export interface NivelEscala {
-  etiqueta: string;           // "Excelente", "Sí", etc.
-  valor?: number;             // 10, 8, etc.
+  etiqueta: string; // "Excelente", "Sí", etc.
+  valor?: number; // 10, 8, etc.
 }
 
 export interface CriterioEvaluacion {
   id: string;
   descripcion: string;
-  mejora?: string;            // "¿Qué necesito hacer para mejorar?"
+  mejora?: string; // "¿Qué necesito hacer para mejorar?"
 }
 
 export interface InstrumentoEvaluacion {
@@ -269,7 +273,7 @@ export interface InstrumentoEvaluacion {
 
 // --- Firmas ---
 export interface Firma {
-  rol: string;                // "Coordinadora académica", "Docente"
+  rol: string; // "Coordinadora académica", "Docente"
   nombre: string;
 }
 
@@ -284,7 +288,7 @@ export interface PlaneacionDocumento {
   // Identidad
   id: string;
   version: 2;
-  userId: string;             // ← NUEVO: aislamiento por usuario
+  userId: string; // ← NUEVO: aislamiento por usuario
   nivelAcademico: NivelAcademico;
 
   // Contenido estructurado
@@ -298,8 +302,8 @@ export interface PlaneacionDocumento {
   firmas: Firma[];
 
   // Metadata del documento
-  plantillaId?: string;       // Si fue creado desde plantilla
-  contenidoRaw?: string;      // JSON serializado del editor Tiptap (documento completo)
+  plantillaId?: string; // Si fue creado desde plantilla
+  contenidoRaw?: string; // JSON serializado del editor Tiptap (documento completo)
 
   // Campos específicos por nivel (extensibles)
   camposNivel?: Record<string, unknown>;
@@ -334,7 +338,15 @@ export interface PlantillaDocumento {
 
 export interface SeccionPlantilla {
   id: string;
-  tipo: "info_institucional" | "datos_generales" | "curricular" | "sesiones" | "evaluacion" | "observaciones" | "firmas" | "custom";
+  tipo:
+    | "info_institucional"
+    | "datos_generales"
+    | "curricular"
+    | "sesiones"
+    | "evaluacion"
+    | "observaciones"
+    | "firmas"
+    | "custom";
   titulo: string;
   visible: boolean;
   campos: CampoPlantilla[];
@@ -343,9 +355,17 @@ export interface SeccionPlantilla {
 export interface CampoPlantilla {
   id: string;
   etiqueta: string;
-  tipo: "text" | "richtext" | "number" | "date" | "select" | "multiselect" | "table" | "checkbox_list";
+  tipo:
+    | "text"
+    | "richtext"
+    | "number"
+    | "date"
+    | "select"
+    | "multiselect"
+    | "table"
+    | "checkbox_list";
   requerido: boolean;
-  opciones?: string[];        // Para select/multiselect
+  opciones?: string[]; // Para select/multiselect
   valorDefecto?: string;
 }
 
@@ -362,7 +382,7 @@ export interface FiltrosPlaneacionV2 {
   fechaInicio?: string;
   fechaFin?: string;
   maestro?: string;
-  busqueda?: string;          // Full-text search en contenido
+  busqueda?: string; // Full-text search en contenido
 }
 ```
 
@@ -376,15 +396,15 @@ export interface FiltrosPlaneacionV2 {
 
 > Eliminar tipos muertos, pantallas obsoletas, dependencias duplicadas y código que contamina el flujo actual.
 
-- [ ] **0.1** Eliminar `PlaneacionFormData` de [types/index.ts](file:///c:/Users/jarco/dev/PlanearIA/types/index.ts) (líneas ~514-528) — tipo incompatible nunca usado por la app real
-- [ ] **0.2** Eliminar constante `COLORS` de [types/index.ts](file:///c:/Users/jarco/dev/PlanearIA/types/index.ts) — duplica `lightTheme/darkTheme`. Migrar todos los imports `import { COLORS } from "../../types"` a `useTheme()`
-- [ ] **0.3** Auditar y eliminar la interfaz `Usuario` duplicada en [types/index.ts](file:///c:/Users/jarco/dev/PlanearIA/types/index.ts) que difiere de `AuthContext`
-- [ ] **0.4** Eliminar la ruta `Home` y la pantalla [HomeScreen.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/screens/home/HomeScreen.tsx) — no se usa, `MainTabs` es el landing post-auth
-- [ ] **0.5** Evaluar la pantalla [PlaneacionesScreen.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/screens/planeaciones/PlaneacionesScreen.tsx) — si `ContenidoScreen` ya maneja la lista, marcar como candidata a eliminación
-- [ ] **0.6** Desinstalar `react-native-vector-icons` redundante (ya existe `@expo/vector-icons` que es suficiente). Actualizar imports afectados
-- [ ] **0.7** Eliminar las funciones `apiRequest` duplicadas en `syncService.ts`, `syncEngine.ts` y `notasUtils.ts` — consolidar en un `src/utils/apiClient.ts` único
-- [ ] **0.8** Limpiar las referencias `[cite_start]...[cite: N]` de los archivos `.md` en `context/planeaciones-reales/` — son artefactos de transcripción, no contenido pedagógico
-- [ ] **0.9** Evaluar `react-native-worklets` 0.5.1 — verificar si es usado; si no, desinstalar
+- [x] **0.1** Eliminar `PlaneacionFormData` de [types/index.ts](file:///c:/Users/jarco/dev/PlanearIA/types/index.ts) (líneas ~514-528) — tipo incompatible nunca usado por la app real
+- [x] **0.2** Eliminar constante `COLORS` de [types/index.ts](file:///c:/Users/jarco/dev/PlanearIA/types/index.ts) — duplica `lightTheme/darkTheme`. Migrar todos los imports `import { COLORS } from "../../types"` a `useTheme()`
+- [x] **0.3** Auditar y eliminar la interfaz `Usuario` duplicada en [types/index.ts](file:///c:/Users/jarco/dev/PlanearIA/types/index.ts) que difiere de `AuthContext`
+- [x] **0.4** Eliminar la ruta `Home` y la pantalla [HomeScreen.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/screens/home/HomeScreen.tsx) — no se usa, `MainTabs` es el landing post-auth
+- [x] **0.5** Evaluar la pantalla [PlaneacionesScreen.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/screens/planeaciones/PlaneacionesScreen.tsx) — CONFIRMADO: ContenidoScreen maneja la lista; PlaneacionesScreen se eliminará en la Fase 7 y 8
+- [x] **0.6** Desinstalar `react-native-vector-icons` redundante (ya existe `@expo/vector-icons` que es suficiente). Actualizar imports afectados
+- [x] **0.7** Eliminar las funciones `apiRequest` duplicadas en `syncService.ts`, `syncEngine.ts` y `notasUtils.ts` — consolidar en un `src/utils/apiClient.ts` único
+- [x] **0.8** Limpiar las referencias `[cite_start]...[cite: N]` de los archivos `.md` en `context/planeaciones-reales/` — son artefactos de transcripción, no contenido pedagógico
+- [x] **0.9** Evaluar `react-native-worklets` 0.5.1 — verificar si es usado; si no, desinstalar
 
 ---
 
@@ -392,18 +412,18 @@ export interface FiltrosPlaneacionV2 {
 
 > Reemplazar el modelo plano actual por uno estructurado que refleje la realidad docente.
 
-- [ ] **1.1** Crear archivo [types/planeacionV2.ts](file:///c:/Users/jarco/dev/PlanearIA/types/planeacionV2.ts) con todas las interfaces del nuevo modelo (ver sección "Nuevo Modelo de Datos" arriba)
-- [ ] **1.2** Crear `types/plantillaDocumento.ts` con tipos `PlantillaDocumento`, `SeccionPlantilla`, `CampoPlantilla`
-- [ ] **1.3** Crear función de migración `src/utils/migrateV1toV2.ts` que transforme `Planeacion` (V1) → `PlaneacionDocumento` (V2):
+- [x] **1.1** Crear archivo [types/planeacionV2.ts](file:///c:/Users/jarco/dev/PlanearIA/types/planeacionV2.ts) con todas las interfaces del nuevo modelo (ver sección "Nuevo Modelo de Datos" arriba)
+- [x] **1.2** Crear `types/plantillaDocumento.ts` con tipos `PlantillaDocumento`, `SeccionPlantilla`, `CampoPlantilla`
+- [x] **1.3** Crear función de migración `src/utils/migrateV1toV2.ts` que transforme `Planeacion` (V1) → `PlaneacionDocumento` (V2):
   - Mapear `actividades[]` → una sola `Sesion` con inicio/desarrollo/cierre
   - Mapear `asignatura`, `grado`, `grupo` → `DatosGenerales`
   - Mapear `evaluacion` (string) → `InstrumentoEvaluacion` con tipo "otro"
   - Mapear `observaciones` (string) → `Observacion[]`
   - Agregar `version: 2`, `userId` desde AuthContext
   - Preservar `fechaCreacion` y `fechaModificacion`
-- [ ] **1.4** Crear tests unitarios para `migrateV1toV2.ts` — cubrir los 4 niveles académicos
-- [ ] **1.5** Actualizar colección MongoDB: agregar campo `version` e índice `{ userId: 1, fechaModificacion: -1 }`
-- [ ] **1.6** Agregar campo `userId` al backend: modificar [backend/api/planeaciones.js](file:///c:/Users/jarco/dev/PlanearIA/backend/api/planeaciones.js) para filtrar por `userId` del JWT
+- [x] **1.4** Crear tests unitarios para `migrateV1toV2.ts` — cubrir los 4 niveles académicos
+- [x] **1.5** Actualizar colección MongoDB: agregar campo `version` e índice `{ userId: 1, fechaModificacion: -1 }`
+- [x] **1.6** Agregar campo `userId` al backend: modificar [backend/api/planeaciones.js](file:///c:/Users/jarco/dev/PlanearIA/backend/api/planeaciones.js) para filtrar por `userId` del JWT
 
 ---
 
@@ -674,83 +694,83 @@ export interface FiltrosPlaneacionV2 {
 
 ### Archivos a CREAR (nuevos)
 
-| Archivo | Fase |
-|---|---|
-| `types/planeacionV2.ts` | 1.1 |
-| `types/plantillaDocumento.ts` | 1.2 |
-| `src/utils/migrateV1toV2.ts` | 1.3 |
-| `src/utils/apiClient.ts` | 0.7 |
-| `src/context/PlaneacionesContext.tsx` | 2.1 |
-| `src/components/editor/RichTextEditor.tsx` | 3.3 |
-| `src/components/editor/EditorToolbar.tsx` | 3.4 |
-| `src/components/editor/AIToolbar.tsx` | 3.5 |
-| `src/components/editor/SectionNavigator.tsx` | 3.7 |
+| Archivo                                                       | Fase |
+| ------------------------------------------------------------- | ---- |
+| `types/planeacionV2.ts`                                       | 1.1  |
+| `types/plantillaDocumento.ts`                                 | 1.2  |
+| `src/utils/migrateV1toV2.ts`                                  | 1.3  |
+| `src/utils/apiClient.ts`                                      | 0.7  |
+| `src/context/PlaneacionesContext.tsx`                         | 2.1  |
+| `src/components/editor/RichTextEditor.tsx`                    | 3.3  |
+| `src/components/editor/EditorToolbar.tsx`                     | 3.4  |
+| `src/components/editor/AIToolbar.tsx`                         | 3.5  |
+| `src/components/editor/SectionNavigator.tsx`                  | 3.7  |
 | `src/components/editor/sections/SeccionInfoInstitucional.tsx` | 4A.1 |
-| `src/components/editor/sections/SeccionDatosGenerales.tsx` | 4A.2 |
-| `src/components/editor/sections/SeccionCurricular.tsx` | 4A.3 |
-| `src/components/editor/sections/SeccionSesiones.tsx` | 4A.4 |
-| `src/components/editor/sections/SesionCard.tsx` | 4A.5 |
-| `src/components/editor/sections/SeccionEvaluacion.tsx` | 4A.6 |
-| `src/components/editor/sections/SeccionObservaciones.tsx` | 4A.7 |
-| `src/components/editor/sections/SeccionFirmas.tsx` | 4A.8 |
-| `src/screens/planeaciones/DocEditorScreen.tsx` | 4B.1 |
-| `src/hooks/useDocEditorViewModel.ts` | 4B.2 |
-| `src/hooks/useEditorMode.ts` | 3.6 |
-| `src/screens/planeaciones/EscanerPlantillaScreen.tsx` | 5.3 |
-| `src/hooks/useEscanerPlantillaViewModel.ts` | 5.4 |
-| `backend/api/planeaciones/escanear-plantilla.js` | 5.1 |
-| `backend/api/planeaciones/copiloto.js` | 6.1 |
-| `src/services/copilotoService.ts` | 6.2 |
-| `src/hooks/useCopiloto.ts` | 6.3 |
+| `src/components/editor/sections/SeccionDatosGenerales.tsx`    | 4A.2 |
+| `src/components/editor/sections/SeccionCurricular.tsx`        | 4A.3 |
+| `src/components/editor/sections/SeccionSesiones.tsx`          | 4A.4 |
+| `src/components/editor/sections/SesionCard.tsx`               | 4A.5 |
+| `src/components/editor/sections/SeccionEvaluacion.tsx`        | 4A.6 |
+| `src/components/editor/sections/SeccionObservaciones.tsx`     | 4A.7 |
+| `src/components/editor/sections/SeccionFirmas.tsx`            | 4A.8 |
+| `src/screens/planeaciones/DocEditorScreen.tsx`                | 4B.1 |
+| `src/hooks/useDocEditorViewModel.ts`                          | 4B.2 |
+| `src/hooks/useEditorMode.ts`                                  | 3.6  |
+| `src/screens/planeaciones/EscanerPlantillaScreen.tsx`         | 5.3  |
+| `src/hooks/useEscanerPlantillaViewModel.ts`                   | 5.4  |
+| `backend/api/planeaciones/escanear-plantilla.js`              | 5.1  |
+| `backend/api/planeaciones/copiloto.js`                        | 6.1  |
+| `src/services/copilotoService.ts`                             | 6.2  |
+| `src/hooks/useCopiloto.ts`                                    | 6.3  |
 
 ### Archivos a ELIMINAR
 
-| Archivo | Fase | Razón |
-|---|---|---|
-| `src/screens/planeaciones/EditorPlaneacionScreen.tsx` | 8.1 | Reemplazado por DocEditorScreen |
-| `src/hooks/useEditorPlaneacionViewModel.ts` | 8.2 | Reemplazado por useDocEditorViewModel |
-| `src/hooks/useUniversityDetailMode.ts` | 8.3 | Ya no aplica |
-| `src/components/SemanaEditor.tsx` | 8.4 | Reemplazado por SeccionSesiones |
-| `src/components/EvaluacionEditor.tsx` | 8.5 | Reemplazado por SeccionEvaluacion |
-| `src/screens/home/HomeScreen.tsx` | 0.4 | No se usa |
-| `types/planeacion.ts` (original) | 8.7 | Reemplazado por planeacionV2.ts |
+| Archivo                                               | Fase | Razón                                 |
+| ----------------------------------------------------- | ---- | ------------------------------------- |
+| `src/screens/planeaciones/EditorPlaneacionScreen.tsx` | 8.1  | Reemplazado por DocEditorScreen       |
+| `src/hooks/useEditorPlaneacionViewModel.ts`           | 8.2  | Reemplazado por useDocEditorViewModel |
+| `src/hooks/useUniversityDetailMode.ts`                | 8.3  | Ya no aplica                          |
+| `src/components/SemanaEditor.tsx`                     | 8.4  | Reemplazado por SeccionSesiones       |
+| `src/components/EvaluacionEditor.tsx`                 | 8.5  | Reemplazado por SeccionEvaluacion     |
+| `src/screens/home/HomeScreen.tsx`                     | 0.4  | No se usa                             |
+| `types/planeacion.ts` (original)                      | 8.7  | Reemplazado por planeacionV2.ts       |
 
 ### Archivos a MODIFICAR
 
-| Archivo | Fase | Cambio |
-|---|---|---|
-| `types/index.ts` | 0.1-0.3 | Eliminar PlaneacionFormData, COLORS, Usuario duplicado |
-| `App.tsx` | 2.5 | Reemplazar SyncProvider por PlaneacionesContext |
-| `navigation/StackNavigator.tsx` | 7.3 | Actualizar rutas de planeaciones |
-| `services/planeacionImportService.ts` | 5.2 | Soporte V2 + modo plantilla |
-| `services/planeacionExportService.ts` | 7.1 | Renderizar PlaneacionDocumento V2 |
-| `screens/planeaciones/CrearPlaneacionScreen.tsx` | 4B.3 | Wizard rediseñado |
-| `screens/planeaciones/ListaPlaneacionesScreen.tsx` | 4B.4 | Adaptar a V2 |
-| `screens/planeaciones/ExportarPlaneacionScreen.tsx` | 7.2 | Adaptar a V2 |
-| `screens/contenido/ContenidoScreen.tsx` | 7.4 | Usar PlaneacionesContext V2 |
-| `hooks/useListaPlaneacionesViewModel.ts` | 4B.5 | Adaptar a V2 |
-| `hooks/useCrearPlaneacionViewModel.ts` | 4B.3 | Wizard rediseñado |
-| `components/CrearNuevoModal.tsx` | 7.5 | Agregar opción escanear |
-| `backend/api/planeaciones.js` | 1.6 | Filtrar por userId |
-| `backend/api/planeaciones/generar.js` | 6.5 | Schema V2 |
-| `backend/api/sync.js` | 2.6 | Soporte V2 |
-| `package.json` | 3.1 | Agregar @10play/tentap-editor |
+| Archivo                                             | Fase    | Cambio                                                 |
+| --------------------------------------------------- | ------- | ------------------------------------------------------ |
+| `types/index.ts`                                    | 0.1-0.3 | Eliminar PlaneacionFormData, COLORS, Usuario duplicado |
+| `App.tsx`                                           | 2.5     | Reemplazar SyncProvider por PlaneacionesContext        |
+| `navigation/StackNavigator.tsx`                     | 7.3     | Actualizar rutas de planeaciones                       |
+| `services/planeacionImportService.ts`               | 5.2     | Soporte V2 + modo plantilla                            |
+| `services/planeacionExportService.ts`               | 7.1     | Renderizar PlaneacionDocumento V2                      |
+| `screens/planeaciones/CrearPlaneacionScreen.tsx`    | 4B.3    | Wizard rediseñado                                      |
+| `screens/planeaciones/ListaPlaneacionesScreen.tsx`  | 4B.4    | Adaptar a V2                                           |
+| `screens/planeaciones/ExportarPlaneacionScreen.tsx` | 7.2     | Adaptar a V2                                           |
+| `screens/contenido/ContenidoScreen.tsx`             | 7.4     | Usar PlaneacionesContext V2                            |
+| `hooks/useListaPlaneacionesViewModel.ts`            | 4B.5    | Adaptar a V2                                           |
+| `hooks/useCrearPlaneacionViewModel.ts`              | 4B.3    | Wizard rediseñado                                      |
+| `components/CrearNuevoModal.tsx`                    | 7.5     | Agregar opción escanear                                |
+| `backend/api/planeaciones.js`                       | 1.6     | Filtrar por userId                                     |
+| `backend/api/planeaciones/generar.js`               | 6.5     | Schema V2                                              |
+| `backend/api/sync.js`                               | 2.6     | Soporte V2                                             |
+| `package.json`                                      | 3.1     | Agregar @10play/tentap-editor                          |
 
 ---
 
 ## Open Questions
 
 > [!IMPORTANT]
-> **Q1 — Expo Go vs Dev Client:** `@10play/tentap-editor` usa código nativo. Esto **probablemente requiere migrar de Expo Go a Dev Client** (`expo-dev-client`). El paquete ya está en `package.json` pero confirma: ¿estás usando Expo Go actualmente o ya tienes un dev client configurado?
+> **Q1 — Expo Go vs Dev Client:** `@10play/tentap-editor` usa código nativo. Esto **probablemente requiere migrar de Expo Go a Dev Client** (`expo-dev-client`). El paquete ya está en `package.json` pero confirma: ¿estás usando Expo Go actualmente o ya tienes un dev client configurado? Estoy usando Expo Go, no tengo configurado el expo dev client, si es estrictamente necesario, tendras que instruirme para poder configurarlo.
 
 > [!IMPORTANT]
-> **Q2 — Plantillas existentes:** El módulo de Plantillas (`PlantillasContext`, `BibliotecaPlantillasScreen`, etc.) ya existe. ¿Las plantillas actuales deben integrarse con el nuevo sistema de `PlantillaDocumento` del escáner, o se mantienen como un sistema separado?
+> **Q2 — Plantillas existentes:** El módulo de Plantillas (`PlantillasContext`, `BibliotecaPlantillasScreen`, etc.) ya existe. ¿Las plantillas actuales deben integrarse con el nuevo sistema de `PlantillaDocumento` del escáner, o se mantienen como un sistema separado? como un sistema separado, las plantillas actuales que mencionas son legacy y tambien en su momento seran reemplazados con otro plan de refactorizacion.
 
 > [!WARNING]
-> **Q3 — Migración de datos en producción:** Si hay docentes con planeaciones V1 guardadas en producción, la migración V1→V2 se ejecutará automáticamente en el cliente. ¿Existe data de producción que debamos considerar, o el MVP solo tiene datos de testing?
+> **Q3 — Migración de datos en producción:** Si hay docentes con planeaciones V1 guardadas en producción, la migración V1→V2 se ejecutará automáticamente en el cliente. ¿Existe data de producción que debamos considerar, o el MVP solo tiene datos de testing? No consideres nada, todos los datos son de testing y la app aun no es desplegada totalmente o aun no se lanza ni estan produccion.
 
 > [!NOTE]
-> **Q4 — Modelo "Universidad":** El modelo actual tiene un modo detallado para universidad con `SemanaUniversitaria`, `ConfiguracionCurso`, etc. El PDF de Mate Discretas no fue transcrito. ¿Mantenemos la estructura universitaria existente adaptada al nuevo modelo, o la simplificamos?
+> **Q4 — Modelo "Universidad":** El modelo actual tiene un modo detallado para universidad con `SemanaUniversitaria`, `ConfiguracionCurso`, etc. El archivo de Mate Discretas sí está transcrito en [Matediscretas.md](file:///c:/Users/jarco/dev/PlanearIA/context/planeaciones-reales/MATEDISCRETA/Matediscretas.md). Adaptaremos la estructura universitaria para que encaje de manera limpia y armoniosa dentro de este nuevo modelo modular (Fase 1).
 
 ---
 
@@ -783,6 +803,7 @@ gantt
 ```
 
 **Dependencias críticas:**
+
 - Fase 1 → Fase 2 (tipos necesarios para contexto)
 - Fase 3 → Fase 4 (editor base necesario para pantallas)
 - Fases 4, 5, 6 pueden avanzar en paralelo una vez completadas las bases

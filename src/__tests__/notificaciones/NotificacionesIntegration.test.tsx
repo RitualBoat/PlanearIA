@@ -21,6 +21,23 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
 }));
 
+jest.mock("../../context/AuthContext", () => ({
+  useAuth: () => ({
+    isAuthenticated: true,
+    isGuest: false,
+    usuario: { id: 1, nombre: "Test User" },
+    actualizarPerfil: jest.fn().mockResolvedValue({ success: true }),
+  }),
+}));
+
+// Mock global.fetch to prevent real network requests during tests
+const mockFetch = jest.fn().mockResolvedValue({
+  ok: true,
+  json: async () => ({ success: true, data: { notificaciones: [] } }),
+});
+global.fetch = mockFetch as unknown as typeof fetch;
+
+
 // Mock AsyncStorage correctly with a dynamic store
 const mockStore: { [key: string]: string } = {};
 jest.mock("@react-native-async-storage/async-storage", () => ({

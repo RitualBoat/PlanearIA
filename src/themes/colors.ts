@@ -70,6 +70,8 @@ export const lightTheme: ColorTokens = {
   shadowBlueLift: "rgba(0,93,168,0.12)",
 };
 
+export const COLORS = lightTheme;
+
 export const darkTheme: ColorTokens = {
   primary: "#5BA3E6",
   primaryDark: "#4A90D4",

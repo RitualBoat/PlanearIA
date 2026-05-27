@@ -5,11 +5,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import {
-  API_CONFIG,
   SYNC_CONFIG,
   STORAGE_KEYS,
   isAPIConfigured,
 } from "../config/apiConfig";
+import { apiRequest } from "../../utils/apiClient";
 import { Planeacion } from "../../../types/planeacion";
 import logger from "../../utils/logger";
 
@@ -58,44 +58,6 @@ export const checkConnectivity = async (): Promise<boolean> => {
     return false;
   }
 };
-
-// =====================================
-// API CLIENT
-// =====================================
-
-const apiRequest = async (
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<Response> => {
-  const url = `${API_CONFIG.baseUrl}${endpoint}`;
-
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    "X-API-Key": API_CONFIG.apiSecret,
-    ...options.headers,
-  };
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-
-  try {
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
-};
-
-// =====================================
-// OPERACIONES LOCALES
-// =====================================
 
 export const saveLocalPlaneaciones = async (
   planeaciones: Planeacion[]

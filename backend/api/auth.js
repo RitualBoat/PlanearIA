@@ -393,13 +393,14 @@ async function handleActualizarPerfil(req, res, usuarios) {
     return errorResponse(res, 401, "Token inválido o expirado.");
   }
 
-  const { nombre, apellidos, biografia, pais } = req.body;
+  const { nombre, apellidos, biografia, pais, expoPushToken } = req.body;
 
   const updateFields = { fechaModificacion: new Date() };
   if (nombre !== undefined) updateFields.nombre = nombre.trim();
   if (apellidos !== undefined) updateFields.apellidos = apellidos.trim();
   if (biografia !== undefined) updateFields.biografia = biografia.trim();
   if (pais !== undefined) updateFields.pais = pais.trim();
+  if (expoPushToken !== undefined) updateFields.expoPushToken = expoPushToken;
 
   await usuarios.updateOne({ id: payload.userId }, { $set: updateFields });
 

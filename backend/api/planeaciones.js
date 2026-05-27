@@ -10,6 +10,7 @@
 const { connectToDatabase } = require("../lib/mongodb");
 const {
   validateAuth,
+  getUserFromToken,
   handleCors,
   applyCors,
   errorResponse,
@@ -31,23 +32,31 @@ module.exports = async (req, res) => {
     return errorResponse(res, 401, auth.error);
   }
 
+  // Obtener el userId del JWT
+  const userPayload = getUserFromToken(req);
+  if (!userPayload || !userPayload.userId) {
+    return errorResponse(res, 401, "Token de usuario inválido o ausente");
+  }
+  const userId = String(userPayload.userId);
+
   try {
     const { db } = await connectToDatabase();
     const collection = db.collection(COLLECTION);
 
     // Crear índices (idempotente)
     await collection.createIndex({ id: 1 }, { unique: true });
+    await collection.createIndex({ userId: 1, fechaModificacion: -1 });
     await collection.createIndex({ fechaModificacion: -1 });
 
     switch (req.method) {
       case "GET":
-        return await handleGet(req, res, collection);
+        return await handleGet(req, res, collection, userId);
       case "POST":
-        return await handlePost(req, res, collection);
+        return await handlePost(req, res, collection, userId);
       case "PUT":
-        return await handlePut(req, res, collection);
+        return await handlePut(req, res, collection, userId);
       case "DELETE":
-        return await handleDelete(req, res, collection);
+        return await handleDelete(req, res, collection, userId);
       default:
         return errorResponse(res, 405, `Method ${req.method} not allowed`);
     }
@@ -60,12 +69,12 @@ module.exports = async (req, res) => {
 /**
  * GET - Listar o obtener planeación
  */
-async function handleGet(req, res, collection) {
+async function handleGet(req, res, collection, userId) {
   const { id, desde, limit = 100 } = req.query;
 
   // Obtener una planeación específica
   if (id) {
-    const planeacion = await collection.findOne({ id: id });
+    const planeacion = await collection.findOne({ id: id, userId: userId });
     if (!planeacion) {
       return errorResponse(res, 404, "Planeación no encontrada");
     }
@@ -73,7 +82,7 @@ async function handleGet(req, res, collection) {
   }
 
   // Listar planeaciones (con paginación opcional)
-  const query = {};
+  const query = { userId: userId };
 
   // Filtrar por fecha de modificación (para sync incremental)
   if (desde) {
@@ -95,16 +104,23 @@ async function handleGet(req, res, collection) {
 /**
  * POST - Crear nueva planeación
  */
-async function handlePost(req, res, collection) {
+async function handlePost(req, res, collection, userId) {
   const planeacion = req.body;
 
   if (!planeacion || !planeacion.id) {
     return errorResponse(res, 400, "Datos de planeación inválidos");
   }
 
+  // Asegurar el aislamiento asignando el userId validado en el token
+  planeacion.userId = userId;
+
   // Verificar si ya existe
   const existing = await collection.findOne({ id: planeacion.id });
   if (existing) {
+    // Si existe, verificar que pertenezca al usuario antes de actualizar
+    if (existing.userId !== userId) {
+      return errorResponse(res, 403, "No tienes permiso para modificar esta planeación");
+    }
     // Si existe, actualizar
     await collection.updateOne(
       { id: planeacion.id },
@@ -132,11 +148,20 @@ async function handlePost(req, res, collection) {
 /**
  * PUT - Actualizar planeación existente
  */
-async function handlePut(req, res, collection) {
+async function handlePut(req, res, collection, userId) {
   const planeacion = req.body;
 
   if (!planeacion || !planeacion.id) {
     return errorResponse(res, 400, "ID de planeación requerido");
+  }
+
+  // Asegurar el aislamiento asignando el userId validado en el token
+  planeacion.userId = userId;
+
+  // Verificar si ya existe y pertenece al usuario
+  const existing = await collection.findOne({ id: planeacion.id });
+  if (existing && existing.userId !== userId) {
+    return errorResponse(res, 403, "No tienes permiso para modificar esta planeación");
   }
 
   const result = await collection.updateOne(
@@ -160,11 +185,20 @@ async function handlePut(req, res, collection) {
 /**
  * DELETE - Eliminar planeación
  */
-async function handleDelete(req, res, collection) {
+async function handleDelete(req, res, collection, userId) {
   const { id } = req.query;
 
   if (!id) {
     return errorResponse(res, 400, "ID de planeación requerido");
+  }
+
+  // Verificar que pertenezca al usuario antes de eliminar
+  const existing = await collection.findOne({ id: id });
+  if (!existing) {
+    return errorResponse(res, 404, "Planeación no encontrada");
+  }
+  if (existing.userId !== userId) {
+    return errorResponse(res, 403, "No tienes permiso para eliminar esta planeación");
   }
 
   const result = await collection.deleteOne({ id: id });

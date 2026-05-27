@@ -1,8 +1,12 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
+import * as Notifications from "expo-notifications";
+import { registerForPushNotificationsAsync } from "../services/pushNotificationService";
 import { Notificacion, TipoNotificacion } from "../../types";
 import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
 import logger from "../utils/logger";
+import { useAuth } from "./AuthContext";
 
 const NOTIFICACIONES_STORAGE_KEY = "APP_NOTIFICACIONES_DATA";
 
@@ -67,6 +71,7 @@ const MOCK_NOTIFICACIONES: Notificacion[] = [
 ];
 
 export const NotificacionesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, isGuest, actualizarPerfil } = useAuth();
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -198,6 +203,36 @@ export const NotificacionesProvider: React.FC<{ children: React.ReactNode }> = (
     },
     [notificaciones]
   );
+
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+
+    registerForPushNotificationsAsync().then((token) => {
+      if (token) {
+        if (__DEV__) {
+          logger.log("Push token registered successfully:", token);
+        }
+        if (isAuthenticated && !isGuest) {
+          actualizarPerfil({ expoPushToken: token }).catch((err) => {
+            logger.error("Failed to sync push token with backend:", err);
+          });
+        }
+      }
+    });
+
+    const subscription = Notifications.addNotificationReceivedListener((notification) => {
+      const { title, body, data } = notification.request.content;
+      agregarNotificacion({
+        titulo: title || "Notificacion",
+        mensaje: body || "",
+        tipo: (data?.tipo as TipoNotificacion) || "sistema",
+      });
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [agregarNotificacion, isAuthenticated, isGuest, actualizarPerfil]);
 
   const refreshNotificaciones = useCallback(async () => {
     await loadData();

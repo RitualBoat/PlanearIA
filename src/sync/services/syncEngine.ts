@@ -10,7 +10,8 @@
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
-import { API_CONFIG, SYNC_CONFIG } from "../config/apiConfig";
+import { SYNC_CONFIG } from "../config/apiConfig";
+import { apiRequest } from "../../utils/apiClient";
 import logger from "../../utils/logger";
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
@@ -54,36 +55,8 @@ const FAILED_OPS_KEY = "@planearia:failed_ops_v2";
 
 const generateOpId = (): string =>
   `op_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
 const getStorageKey = (entity: string): string =>
   `${STORAGE_PREFIX}${entity}`;
-
-const apiRequest = async (
-  endpoint: string,
-  method: string,
-  body?: unknown
-): Promise<Response> => {
-  const url = `${API_CONFIG.baseUrl}${endpoint}`;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-
-  try {
-    const response = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-Key": API_CONFIG.apiSecret,
-      },
-      body: body !== undefined ? JSON.stringify(body) : undefined,
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (err) {
-    clearTimeout(timeoutId);
-    throw err;
-  }
-};
 
 // ─── API pública del motor ────────────────────────────────────────────────────
 
@@ -223,8 +196,10 @@ export const flushQueue = async (
     try {
       const response = await apiRequest(
         endpointWithId,
-        httpMethod,
-        op.type !== "delete" ? op.payload : undefined
+        {
+          method: httpMethod,
+          body: op.type !== "delete" && op.payload !== null ? JSON.stringify(op.payload) : undefined
+        }
       );
 
       if (response.ok) {

@@ -23,7 +23,7 @@ interface FAQItemProps {
   styles: any;
 }
 
-const FAQAccordionItem: React.FC<FAQItemProps> = ({ pregunta, respuesta, colors, styles }) => {
+function FAQAccordionItem({ pregunta, respuesta, colors, styles }: FAQItemProps) {
   const [expanded, setExpanded] = useState(false);
 
   const toggle = () => {
@@ -48,7 +48,7 @@ const FAQAccordionItem: React.FC<FAQItemProps> = ({ pregunta, respuesta, colors,
       )}
     </View>
   );
-};
+}
 
 export const AyudaScreen: React.FC = () => {
   const { width } = useWindowDimensions();
@@ -142,7 +142,7 @@ export const AyudaScreen: React.FC = () => {
               style={styles.supportCard}
               activeOpacity={0.8}
               onPress={() => {
-                navigation.navigate("Social");
+                navigation.navigate("MainTabs", { screen: "SocialTab" });
               }}
             >
               <View style={[styles.supportIconWrap, { backgroundColor: colors.purpleTint }]}>

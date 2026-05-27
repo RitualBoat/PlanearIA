@@ -7,12 +7,13 @@ import { COLORS } from "../../types";
 import { NivelAcademico } from "../../types/planeacion";
 import AppTabsNavigator, { MainTabParamList } from "./AppTabsNavigator";
 import { useAuth } from "../context/AuthContext";
+import { useDeepLinkHandler } from "../hooks/useDeepLinkHandler";
 
 // Importación de pantallas de autenticación
 import LoginScreen from "../screens/auth/LoginScreen";
 import RegistroScreen from "../screens/auth/RegistroScreen";
 import RecuperarContrasenaScreen from "../screens/auth/RecuperarContrasenaScreen";
-import HomeScreen from "../screens/home/HomeScreen";
+
 
 // Importación de pantallas de Planeaciones
 import PlaneacionesScreen from "../screens/planeaciones/PlaneacionesScreen";
@@ -114,7 +115,7 @@ export type RootStackParamList = {
   Registro: undefined;
   RecuperarContrasena: undefined;
   MainTabs: NavigatorScreenParams<MainTabParamList>;
-  Home: undefined;
+
 
   // Planeaciones (se mantiene igual)
   Planeaciones: undefined;
@@ -253,6 +254,8 @@ const StackNavigator: React.FC = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(null);
 
+  useDeepLinkHandler();
+
   useEffect(() => {
     AsyncStorage.getItem(ONBOARDING_KEY).then((v) => setHasSeenOnboarding(v === "true"));
   }, []);
@@ -333,15 +336,7 @@ const StackNavigator: React.FC = () => {
           headerShown: false,
         }}
       />
-      <Stack.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          title: "Sistema de planeación",
-          headerLeft: () => null,
-          headerShown: false,
-        }}
-      />
+
       {/* ========== PLANEACIONES ========== */}
       <Stack.Screen
         name="Planeaciones"

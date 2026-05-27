@@ -35,6 +35,7 @@ export interface Usuario {
   pais: string;
   rol: RolUsuario;
   preferencias?: PreferenciasUsuario;
+  expoPushToken?: string | null;
   fechaCreacion: string;
   fechaModificacion: string;
 }
@@ -52,7 +53,7 @@ interface AuthContextData {
   logout: () => Promise<void>;
   verificarToken: () => Promise<boolean>;
   actualizarPerfil: (
-    data: Partial<Pick<Usuario, "nombre" | "apellidos" | "biografia" | "pais">>
+    data: Partial<Pick<Usuario, "nombre" | "apellidos" | "biografia" | "pais" | "expoPushToken">>
   ) => Promise<{ success: boolean; error?: string }>;
   actualizarPreferencias: (
     preferencias: Partial<PreferenciasUsuario>
@@ -226,7 +227,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [token, logout]);
 
   const actualizarPerfil = useCallback(
-    async (data: Partial<Pick<Usuario, "nombre" | "apellidos" | "biografia" | "pais">>) => {
+    async (data: Partial<Pick<Usuario, "nombre" | "apellidos" | "biografia" | "pais" | "expoPushToken">>) => {
       try {
         const res = await fetch(`${API_CONFIG.baseUrl}/api/auth`, {
           method: "POST",

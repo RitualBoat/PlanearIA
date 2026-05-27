@@ -1,5 +1,6 @@
 import type { ComentarioAlumno } from "../../types";
-import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
+import { apiRequest } from "./apiClient";
+import { isAPIConfigured } from "../sync/config/apiConfig";
 
 interface SyncResult {
   ok: boolean;
@@ -9,33 +10,6 @@ export const parseArray = <T>(raw: string | null): T[] => {
   if (!raw) return [];
   const parsed = JSON.parse(raw) as unknown;
   return Array.isArray(parsed) ? (parsed as T[]) : [];
-};
-
-export const apiRequest = async (
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<Response> => {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    "X-API-Key": API_CONFIG.apiSecret,
-    ...options.headers,
-  };
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-
-  try {
-    const response = await fetch(`${API_CONFIG.baseUrl}${endpoint}`, {
-      ...options,
-      headers,
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
 };
 
 export const syncComentarioRemoto = async (

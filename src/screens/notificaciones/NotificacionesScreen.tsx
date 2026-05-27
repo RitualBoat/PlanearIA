@@ -75,9 +75,9 @@ export const NotificacionesScreen: React.FC = () => {
     
     // Redirigir según el tipo de notificación
     if (n.tipo === "solicitud") {
-      navigation.navigate("Social");
+      navigation.navigate("MainTabs", { screen: "SocialTab" });
     } else if (n.tipo === "mensaje") {
-      navigation.navigate("Social");
+      navigation.navigate("MainTabs", { screen: "SocialTab" });
     } else if (n.tipo === "tarea") {
       navigation.navigate("Grupos");
     }
@@ -146,7 +146,7 @@ export const NotificacionesScreen: React.FC = () => {
           <MaterialIcons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Notificaciones</Text>
-        <View style={{ width: 40 }} /> {/* Espaciador balanceador */}
+        <View style={{ width: 40 }} />
       </View>
 
       <View style={[styles.container, isDesktop && styles.desktopContainer]}>

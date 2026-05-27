@@ -79,6 +79,7 @@ stitch-results
 .vibe/
 .windsurf/
 .zencoder/
+.stitch-results/
 
 # =============================================================================
 # IDE / Editor

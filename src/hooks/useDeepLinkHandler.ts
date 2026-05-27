@@ -51,7 +51,7 @@ export function useDeepLinkHandler() {
           "Se ha enviado la solicitud de conexión automáticamente.",
           [{ text: "OK" }]
         );
-        navigation.navigate("Social");
+        navigation.navigate("MainTabs", { screen: "SocialTab" });
       });
     });
 

@@ -1,592 +1,734 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, StatusBar } from "react-native";
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { COLORS, FONT_SIZES } from "../../../types";
-import SyncIndicator from "../../components/SyncIndicator";
-import { NivelAcademico, Planeacion, PlaneacionUniversidad } from "../../../types/planeacion";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useTheme } from "../../context/ThemeContext";
 import { useListaPlaneacionesViewModel } from "../../hooks/useListaPlaneacionesViewModel";
+import type { PlaneacionDocumento } from "../../../types/planeacionV2";
+import { NivelAcademico } from "../../../types/planeacionV2";
 
-/**
- * Pantalla de lista de planeaciones (View)
- * Solo JSX y StyleSheet - la logica vive en useListaPlaneacionesViewModel
- */
+const buildSyncState = (
+  syncStatus: "idle" | "syncing" | "synced" | "error" | "offline",
+  pendingCount: number,
+  isOnline: boolean
+): { icon: keyof typeof MaterialIcons.glyphMap; label: string; color: string } => {
+  if (!isOnline || syncStatus === "offline") {
+    return { icon: "cloud-off", label: "Sin conexion", color: "#f59e0b" };
+  }
+  if (syncStatus === "error") {
+    return { icon: "error-outline", label: "Error sync", color: "#dc2626" };
+  }
+  if (syncStatus === "syncing") {
+    return { icon: "sync", label: "Sincronizando", color: "#2563eb" };
+  }
+  if (pendingCount > 0) {
+    return { icon: "cloud-upload", label: `${pendingCount} pendientes`, color: "#2563eb" };
+  }
+  return { icon: "cloud-done", label: "Sincronizado", color: "#16a34a" };
+};
+
+const buildWeeksLabel = (doc: PlaneacionDocumento): string => {
+  const semanas = doc.datosGenerales.semanas;
+  if (!Array.isArray(semanas) || semanas.length === 0) return "Sin semanas";
+  return `Semanas ${semanas.join(", ")}`;
+};
+
 const ListaPlaneacionesScreen: React.FC = () => {
-  const {
-    planeaciones,
-    planeacionesFiltradas,
-    showFiltros,
-    setShowFiltros,
-    menuVisible,
-    setMenuVisible,
-    filtroNivel,
-    setFiltroNivel,
-    filtroAsignatura,
-    setFiltroAsignatura,
-    filtroGrado,
-    setFiltroGrado,
-    aplicarFiltros,
-    limpiarFiltros,
-    formatearFecha,
-    getColorNivel,
-    getTextoNivel,
-    handleEditar,
-    handleClonar,
-    handleEliminar,
-    handleExportar,
-    handleCrearNueva,
-  } = useListaPlaneacionesViewModel();
+  const { colors } = useTheme();
+  const vm = useListaPlaneacionesViewModel();
 
-  /**
-   * Renderiza una card de planeación
-   */
-  const renderPlaneacion = ({ item }: { item: Planeacion }) => {
-    const isMenuOpen = menuVisible === item.id;
-    const isUniversidadDetallada =
-      item.nivelAcademico === NivelAcademico.UNIVERSIDAD &&
-      (item as PlaneacionUniversidad).semanas &&
-      (item as PlaneacionUniversidad).semanas!.length > 0;
+  const syncMeta = buildSyncState(vm.syncStatus, vm.pendingCount, vm.isOnline);
+
+  const removeChip = (type: "nivel" | "asignatura" | "grado" | "inicio" | "fin") => {
+    if (type === "nivel") vm.setFiltroNivel(undefined);
+    if (type === "asignatura") vm.setFiltroAsignatura("");
+    if (type === "grado") vm.setFiltroGrado("");
+    if (type === "inicio") vm.setFiltroFechaInicio("");
+    if (type === "fin") vm.setFiltroFechaFin("");
+    vm.aplicarFiltros();
+  };
+
+  const renderMenu = (doc: PlaneacionDocumento) => {
+    if (vm.menuVisible !== doc.id) return null;
 
     return (
-      <View style={styles.card}>
-        {/* Badge de nivel */}
-        <View style={[styles.badge, { backgroundColor: getColorNivel(item.nivelAcademico) }]}>
-          <Text style={styles.badgeText}>{getTextoNivel(item.nivelAcademico)}</Text>
-        </View>
+      <View
+        style={[
+          styles.contextMenu,
+          {
+            backgroundColor: colors.surfaceContainerLowest,
+            borderColor: colors.borderLight,
+            shadowColor: colors.shadowBlue,
+          },
+        ]}
+      >
+        <Pressable style={styles.menuItem} onPress={() => vm.handleEditar(doc)}>
+          <MaterialIcons name="edit" size={16} color={colors.primary} />
+          <Text style={[styles.menuItemText, { color: colors.onSurface }]}>Editar</Text>
+        </Pressable>
 
-        {/* Badge de modo detallado para Universidad */}
-        {isUniversidadDetallada && (
-          <View style={[styles.badge, styles.badgeDetallado]}>
-            <Text style={styles.badgeText}>
-              {(item as PlaneacionUniversidad).configuracionCurso!.duracionSemanas} sem
-            </Text>
-          </View>
-        )}
+        <Pressable style={styles.menuItem} onPress={() => void vm.handleClonar(doc.id)}>
+          <MaterialIcons name="content-copy" size={16} color={colors.primary} />
+          <Text style={[styles.menuItemText, { color: colors.onSurface }]}>Clonar</Text>
+        </Pressable>
 
-        {/* Botón de menú */}
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => setMenuVisible(isMenuOpen ? null : item.id)}
-        >
-          <MaterialIcons name="more-vert" size={24} color={COLORS.text} />
-        </TouchableOpacity>
+        <Pressable style={styles.menuItem} onPress={() => vm.handleExportar(doc.id)}>
+          <MaterialIcons name="share" size={16} color={colors.primary} />
+          <Text style={[styles.menuItemText, { color: colors.onSurface }]}>Exportar</Text>
+        </Pressable>
 
-        {/* Menu contextual */}
-        {isMenuOpen && (
-          <View style={styles.contextMenu}>
-            <TouchableOpacity style={styles.menuItem} onPress={() => handleEditar(item)}>
-              <MaterialIcons name="edit" size={20} color={COLORS.primary} />
-              <Text style={styles.menuItemText}>Editar</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem} onPress={() => handleClonar(item.id)}>
-              <MaterialIcons name="content-copy" size={20} color={COLORS.primary} />
-              <Text style={styles.menuItemText}>Clonar</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem} onPress={() => handleEliminar(item.id)}>
-              <MaterialIcons name="delete" size={20} color={COLORS.errorLight} />
-              <Text style={[styles.menuItemText, { color: COLORS.errorLight }]}>Eliminar</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem} onPress={() => handleExportar(item.id)}>
-              <MaterialIcons name="share" size={20} color={COLORS.primary} />
-              <Text style={styles.menuItemText}>Exportar</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Contenido de la card */}
-        <TouchableOpacity style={styles.cardContent} onPress={() => handleEditar(item)}>
-          <Text style={styles.cardAsignatura}>{item.asignatura}</Text>
-          <Text style={styles.cardGrado}>
-            {item.grado} {item.grupo && `"${item.grupo}"`}
-          </Text>
-          <Text style={styles.cardTema} numberOfLines={2}>
-            {item.temaSesion}
-          </Text>
-
-          {/* Info adicional para Universidad detallada */}
-          {isUniversidadDetallada && (
-            <View style={styles.detalleCurso}>
-              <View style={styles.detalleItem}>
-                <MaterialIcons name="library-books" size={14} color={COLORS.textSecondary} />
-                <Text style={styles.detalleText}>
-                  {(item as PlaneacionUniversidad).semanas!.length} semanas
-                </Text>
-              </View>
-              {(item as PlaneacionUniversidad).evaluaciones &&
-                (item as PlaneacionUniversidad).evaluaciones!.length > 0 && (
-                  <View style={styles.detalleItem}>
-                    <MaterialIcons name="assessment" size={14} color={COLORS.textSecondary} />
-                    <Text style={styles.detalleText}>
-                      {(item as PlaneacionUniversidad).evaluaciones!.length} evaluaciones (
-                      {(item as PlaneacionUniversidad).evaluaciones!.reduce(
-                        (sum, ev) => sum + ev.porcentaje,
-                        0
-                      )}
-                      %)
-                    </Text>
-                  </View>
-                )}
-              <View style={styles.detalleItem}>
-                <MaterialIcons name="schedule" size={14} color={COLORS.textSecondary} />
-                <Text style={styles.detalleText}>
-                  {(item as PlaneacionUniversidad).configuracionCurso!.horasTeoricas +
-                    (item as PlaneacionUniversidad).configuracionCurso!.horasPracticas}{" "}
-                  hrs • {(item as PlaneacionUniversidad).configuracionCurso!.creditos} créditos
-                </Text>
-              </View>
-            </View>
-          )}
-
-          <View style={styles.cardFooter}>
-            <View style={styles.cardFooterItem}>
-              <MaterialIcons name="calendar-today" size={16} color={COLORS.textSecondary} />
-              <Text style={styles.cardFooterText}>{formatearFecha(item.fecha)}</Text>
-            </View>
-            {!isUniversidadDetallada && (
-              <View style={styles.cardFooterItem}>
-                <MaterialIcons name="access-time" size={16} color={COLORS.textSecondary} />
-                <Text style={styles.cardFooterText}>
-                  {item.horaInicio} • {item.duracionTotal} min
-                </Text>
-              </View>
-            )}
-          </View>
-        </TouchableOpacity>
+        <Pressable style={styles.menuItem} onPress={() => void vm.handleEliminar(doc.id)}>
+          <MaterialIcons name="delete-outline" size={16} color={colors.error} />
+          <Text style={[styles.menuItemText, { color: colors.error }]}>Eliminar</Text>
+        </Pressable>
       </View>
     );
   };
 
-  /**
-   * Renderiza el estado vacío
-   */
-  const renderEmptyState = () => (
-    <View style={styles.emptyState}>
-      <MaterialIcons name="description" size={80} color={COLORS.textSecondary} />
-      <Text style={styles.emptyTitle}>No hay planeaciones</Text>
-      <Text style={styles.emptySubtitle}>
-        {planeacionesFiltradas.length === 0 && planeaciones.length > 0
-          ? "No se encontraron planeaciones con los filtros aplicados"
-          : "Crea tu primera planeación para comenzar"}
-      </Text>
-      <TouchableOpacity style={styles.createButton} onPress={handleCrearNueva}>
-        <MaterialIcons name="add" size={24} color="white" />
-        <Text style={styles.createButtonText}>Nueva Planeación</Text>
-      </TouchableOpacity>
-    </View>
-  );
+  const renderCard = (doc: PlaneacionDocumento) => {
+    const nivelColor = vm.getColorNivel(doc.nivelAcademico);
+
+    return (
+      <View
+        key={doc.id}
+        style={[
+          styles.card,
+          {
+            backgroundColor: colors.surfaceContainerLowest,
+            borderColor: colors.borderLight,
+          },
+        ]}
+      >
+        <View style={styles.cardTopRow}>
+          <View style={[styles.nivelBadge, { backgroundColor: `${nivelColor}22` }]}> 
+            <Text style={[styles.nivelBadgeText, { color: nivelColor }]}>
+              {vm.getTextoNivel(doc.nivelAcademico)}
+            </Text>
+          </View>
+
+          <Pressable
+            style={styles.menuButton}
+            onPress={() => vm.setMenuVisible(vm.menuVisible === doc.id ? null : doc.id)}
+          >
+            <MaterialIcons name="more-vert" size={20} color={colors.onSurfaceVariant} />
+          </Pressable>
+        </View>
+
+        {renderMenu(doc)}
+
+        <Pressable style={styles.cardBody} onPress={() => vm.handleEditar(doc)}>
+          <Text style={[styles.cardTitle, { color: colors.onSurface }]}>
+            {doc.datosGenerales.asignatura || "Sin asignatura"}
+          </Text>
+
+          <Text style={[styles.cardSub, { color: colors.onSurfaceVariant }]}>
+            {doc.datosGenerales.grado || "Sin grado"}
+            {doc.datosGenerales.grupos.length > 0 ? ` • ${doc.datosGenerales.grupos.join(", ")}` : ""}
+          </Text>
+
+          <View style={styles.metaRow}>
+            <View style={styles.metaItem}>
+              <MaterialIcons name="calendar-today" size={14} color={colors.onSurfaceVariant} />
+              <Text style={[styles.metaText, { color: colors.onSurfaceVariant }]}>
+                {buildWeeksLabel(doc)}
+              </Text>
+            </View>
+            <View style={styles.metaItem}>
+              <MaterialIcons name="edit-calendar" size={14} color={colors.onSurfaceVariant} />
+              <Text style={[styles.metaText, { color: colors.onSurfaceVariant }]}>
+                {vm.formatFecha(doc.fechaModificacion)}
+              </Text>
+            </View>
+          </View>
+
+          <View style={[styles.syncPill, { backgroundColor: `${syncMeta.color}22` }]}> 
+            <MaterialIcons name={syncMeta.icon} size={13} color={syncMeta.color} />
+            <Text style={[styles.syncPillText, { color: syncMeta.color }]}>{syncMeta.label}</Text>
+          </View>
+        </Pressable>
+      </View>
+    );
+  };
+
+  const hasAnyFiltro =
+    Boolean(vm.filtroNivel) ||
+    Boolean(vm.filtroAsignatura.trim()) ||
+    Boolean(vm.filtroGrado.trim()) ||
+    Boolean(vm.filtroFechaInicio.trim()) ||
+    Boolean(vm.filtroFechaFin.trim());
 
   return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+    <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}> 
+      <View style={styles.header}>
+        <View style={styles.headerTitleWrap}>
+          <Text style={[styles.title, { color: colors.onSurface }]}>Mis planeaciones</Text>
+          <Text style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
+            {vm.documentosFiltrados.length} de {vm.documentos.length}
+          </Text>
+        </View>
 
-      <FlatList
-        data={planeacionesFiltradas}
-        renderItem={renderPlaneacion}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={renderEmptyState}
-        showsVerticalScrollIndicator={true}
-        ListHeaderComponent={
-          <>
-            {/* Header */}
-            <View style={styles.header}>
-              <View style={styles.headerLeft}>
-                <Text style={styles.title}>Mis Planeaciones</Text>
-                <SyncIndicator />
-              </View>
-              <View style={styles.headerButtons}>
-                <TouchableOpacity style={styles.iconButton} onPress={() => setShowFiltros(true)}>
-                  <MaterialIcons name="filter-list" size={24} color={COLORS.primary} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.iconButton} onPress={handleCrearNueva}>
-                  <MaterialIcons name="add-circle" size={24} color={COLORS.primary} />
-                </TouchableOpacity>
-              </View>
-            </View>
+        <View style={styles.headerActions}>
+          <Pressable
+            style={[
+              styles.iconButton,
+              { borderColor: colors.borderLight, backgroundColor: colors.surfaceContainerLow },
+            ]}
+            onPress={() => vm.setShowFiltros(true)}
+          >
+            <MaterialIcons name="filter-list" size={20} color={colors.primary} />
+          </Pressable>
 
-            {/* Chips de filtros activos */}
-            {(filtroNivel || filtroAsignatura || filtroGrado) && (
-              <View style={styles.activeFilters}>
-                {filtroNivel && (
-                  <View style={styles.filterChip}>
-                    <Text style={styles.filterChipText}>{getTextoNivel(filtroNivel)}</Text>
-                    <TouchableOpacity onPress={() => setFiltroNivel(undefined)}>
-                      <MaterialIcons name="close" size={16} color={COLORS.text} />
-                    </TouchableOpacity>
-                  </View>
-                )}
-                {filtroAsignatura && (
-                  <View style={styles.filterChip}>
-                    <Text style={styles.filterChipText}>{filtroAsignatura}</Text>
-                    <TouchableOpacity onPress={() => setFiltroAsignatura("")}>
-                      <MaterialIcons name="close" size={16} color={COLORS.text} />
-                    </TouchableOpacity>
-                  </View>
-                )}
-                {filtroGrado && (
-                  <View style={styles.filterChip}>
-                    <Text style={styles.filterChipText}>{filtroGrado}</Text>
-                    <TouchableOpacity onPress={() => setFiltroGrado("")}>
-                      <MaterialIcons name="close" size={16} color={COLORS.text} />
-                    </TouchableOpacity>
-                  </View>
-                )}
-                <TouchableOpacity style={styles.clearFiltersButton} onPress={limpiarFiltros}>
-                  <Text style={styles.clearFiltersText}>Limpiar</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </>
-        }
-      />
+          <Pressable
+            style={[
+              styles.iconButton,
+              { borderColor: colors.primary, backgroundColor: colors.primaryContainer },
+            ]}
+            onPress={vm.handleCrearNueva}
+          >
+            <MaterialIcons name="add" size={20} color={colors.primary} />
+          </Pressable>
+        </View>
+      </View>
 
-      {/* Modal de filtros */}
+      <View
+        style={[
+          styles.searchBox,
+          {
+            borderColor: colors.borderLight,
+            backgroundColor: colors.surfaceContainerLow,
+          },
+        ]}
+      >
+        <MaterialIcons name="search" size={18} color={colors.onSurfaceVariant} />
+        <TextInput
+          style={[styles.searchInput, { color: colors.onSurface }]}
+          placeholder="Buscar por asignatura, grado, contenido..."
+          placeholderTextColor={colors.textMuted}
+          value={vm.searchQuery}
+          onChangeText={vm.setSearchQuery}
+        />
+      </View>
+
+      {hasAnyFiltro ? (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterChipsRow}>
+          {vm.filtroNivel ? (
+            <Pressable
+              style={[styles.filterChip, { backgroundColor: colors.surfaceContainerLow, borderColor: colors.borderLight }]}
+              onPress={() => removeChip("nivel")}
+            >
+              <Text style={[styles.filterChipText, { color: colors.onSurface }]}>
+                {vm.getTextoNivel(vm.filtroNivel)}
+              </Text>
+              <MaterialIcons name="close" size={14} color={colors.onSurfaceVariant} />
+            </Pressable>
+          ) : null}
+
+          {vm.filtroAsignatura ? (
+            <Pressable
+              style={[styles.filterChip, { backgroundColor: colors.surfaceContainerLow, borderColor: colors.borderLight }]}
+              onPress={() => removeChip("asignatura")}
+            >
+              <Text style={[styles.filterChipText, { color: colors.onSurface }]}>{vm.filtroAsignatura}</Text>
+              <MaterialIcons name="close" size={14} color={colors.onSurfaceVariant} />
+            </Pressable>
+          ) : null}
+
+          {vm.filtroGrado ? (
+            <Pressable
+              style={[styles.filterChip, { backgroundColor: colors.surfaceContainerLow, borderColor: colors.borderLight }]}
+              onPress={() => removeChip("grado")}
+            >
+              <Text style={[styles.filterChipText, { color: colors.onSurface }]}>{vm.filtroGrado}</Text>
+              <MaterialIcons name="close" size={14} color={colors.onSurfaceVariant} />
+            </Pressable>
+          ) : null}
+
+          {vm.filtroFechaInicio ? (
+            <Pressable
+              style={[styles.filterChip, { backgroundColor: colors.surfaceContainerLow, borderColor: colors.borderLight }]}
+              onPress={() => removeChip("inicio")}
+            >
+              <Text style={[styles.filterChipText, { color: colors.onSurface }]}>Desde {vm.filtroFechaInicio}</Text>
+              <MaterialIcons name="close" size={14} color={colors.onSurfaceVariant} />
+            </Pressable>
+          ) : null}
+
+          {vm.filtroFechaFin ? (
+            <Pressable
+              style={[styles.filterChip, { backgroundColor: colors.surfaceContainerLow, borderColor: colors.borderLight }]}
+              onPress={() => removeChip("fin")}
+            >
+              <Text style={[styles.filterChipText, { color: colors.onSurface }]}>Hasta {vm.filtroFechaFin}</Text>
+              <MaterialIcons name="close" size={14} color={colors.onSurfaceVariant} />
+            </Pressable>
+          ) : null}
+
+          <Pressable onPress={vm.limpiarFiltros}>
+            <Text style={[styles.clearText, { color: colors.primary }]}>Limpiar</Text>
+          </Pressable>
+        </ScrollView>
+      ) : null}
+
+      <ScrollView contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
+        {vm.documentosFiltrados.length === 0 ? (
+          <View style={styles.emptyState}>
+            <MaterialIcons name="description" size={72} color={colors.onSurfaceVariant} />
+            <Text style={[styles.emptyTitle, { color: colors.onSurface }]}>No hay planeaciones</Text>
+            <Text style={[styles.emptySubtitle, { color: colors.onSurfaceVariant }]}>
+              Crea una nueva planeacion o ajusta tus filtros para ver resultados.
+            </Text>
+            <Pressable
+              style={[styles.primaryBtn, { backgroundColor: colors.primary }]}
+              onPress={vm.handleCrearNueva}
+            >
+              <MaterialIcons name="add" size={18} color={colors.surface} />
+              <Text style={[styles.primaryBtnText, { color: colors.surface }]}>Nueva planeacion</Text>
+            </Pressable>
+          </View>
+        ) : (
+          vm.documentosFiltrados.map(renderCard)
+        )}
+        <View style={{ height: 30 }} />
+      </ScrollView>
+
       <Modal
-        visible={showFiltros}
+        visible={vm.showFiltros}
         transparent
         animationType="slide"
-        onRequestClose={() => setShowFiltros(false)}
+        onRequestClose={() => vm.setShowFiltros(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View
+            style={[
+              styles.modalContent,
+              {
+                backgroundColor: colors.surfaceContainerLowest,
+                borderColor: colors.borderLight,
+              },
+            ]}
+          >
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Filtrar Planeaciones</Text>
-              <TouchableOpacity onPress={() => setShowFiltros(false)}>
-                <MaterialIcons name="close" size={24} color={COLORS.text} />
-              </TouchableOpacity>
+              <Text style={[styles.modalTitle, { color: colors.onSurface }]}>Filtros</Text>
+              <Pressable onPress={() => vm.setShowFiltros(false)}>
+                <MaterialIcons name="close" size={22} color={colors.onSurfaceVariant} />
+              </Pressable>
             </View>
 
-            {/* Filtro por nivel */}
-            <Text style={styles.filterLabel}>Nivel Académico</Text>
-            <View style={styles.nivelButtonsContainer}>
-              {Object.values(NivelAcademico).map((nivel) => (
-                <TouchableOpacity
-                  key={nivel}
+            <Text style={[styles.modalLabel, { color: colors.onSurfaceVariant }]}>Nivel academico</Text>
+            <View style={styles.levelsRow}>
+              {Object.values(NivelAcademico).map((nivel) => {
+                const selected = vm.filtroNivel === nivel;
+                const nivelColor = vm.getColorNivel(nivel);
+                return (
+                  <Pressable
+                    key={nivel}
+                    style={[
+                      styles.levelChip,
+                      {
+                        borderColor: selected ? nivelColor : colors.borderLight,
+                        backgroundColor: selected ? `${nivelColor}22` : colors.surfaceContainerLow,
+                      },
+                    ]}
+                    onPress={() => vm.setFiltroNivel(vm.filtroNivel === nivel ? undefined : nivel)}
+                  >
+                    <Text style={[styles.levelChipText, { color: selected ? nivelColor : colors.onSurfaceVariant }]}>
+                      {vm.getTextoNivel(nivel)}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <Text style={[styles.modalLabel, { color: colors.onSurfaceVariant }]}>Asignatura</Text>
+            <TextInput
+              style={[
+                styles.modalInput,
+                {
+                  borderColor: colors.borderLight,
+                  backgroundColor: colors.surfaceContainerLow,
+                  color: colors.onSurface,
+                },
+              ]}
+              value={vm.filtroAsignatura}
+              onChangeText={vm.setFiltroAsignatura}
+              placeholder="Espanol, Matematicas..."
+              placeholderTextColor={colors.textMuted}
+            />
+
+            <Text style={[styles.modalLabel, { color: colors.onSurfaceVariant }]}>Grado</Text>
+            <TextInput
+              style={[
+                styles.modalInput,
+                {
+                  borderColor: colors.borderLight,
+                  backgroundColor: colors.surfaceContainerLow,
+                  color: colors.onSurface,
+                },
+              ]}
+              value={vm.filtroGrado}
+              onChangeText={vm.setFiltroGrado}
+              placeholder="2do, 3A..."
+              placeholderTextColor={colors.textMuted}
+            />
+
+            <View style={styles.dualRow}>
+              <View style={styles.dualCol}>
+                <Text style={[styles.modalLabel, { color: colors.onSurfaceVariant }]}>Fecha inicio</Text>
+                <TextInput
                   style={[
-                    styles.nivelButton,
-                    filtroNivel === nivel && styles.nivelButtonActive,
-                    { borderColor: getColorNivel(nivel) },
-                    filtroNivel === nivel && {
-                      backgroundColor: getColorNivel(nivel),
+                    styles.modalInput,
+                    {
+                      borderColor: colors.borderLight,
+                      backgroundColor: colors.surfaceContainerLow,
+                      color: colors.onSurface,
                     },
                   ]}
-                  onPress={() => setFiltroNivel(filtroNivel === nivel ? undefined : nivel)}
-                >
-                  <Text
-                    style={[
-                      styles.nivelButtonText,
-                      filtroNivel === nivel && styles.nivelButtonTextActive,
-                    ]}
-                  >
-                    {getTextoNivel(nivel)}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+                  value={vm.filtroFechaInicio}
+                  onChangeText={vm.setFiltroFechaInicio}
+                  placeholder="YYYY-MM-DD"
+                  placeholderTextColor={colors.textMuted}
+                />
+              </View>
+
+              <View style={styles.dualCol}>
+                <Text style={[styles.modalLabel, { color: colors.onSurfaceVariant }]}>Fecha fin</Text>
+                <TextInput
+                  style={[
+                    styles.modalInput,
+                    {
+                      borderColor: colors.borderLight,
+                      backgroundColor: colors.surfaceContainerLow,
+                      color: colors.onSurface,
+                    },
+                  ]}
+                  value={vm.filtroFechaFin}
+                  onChangeText={vm.setFiltroFechaFin}
+                  placeholder="YYYY-MM-DD"
+                  placeholderTextColor={colors.textMuted}
+                />
+              </View>
             </View>
 
-            {/* Botones de acción */}
             <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonSecondary]}
-                onPress={limpiarFiltros}
+              <Pressable
+                style={[
+                  styles.secondaryBtn,
+                  {
+                    borderColor: colors.borderLight,
+                    backgroundColor: colors.surfaceContainerLow,
+                  },
+                ]}
+                onPress={vm.limpiarFiltros}
               >
-                <Text style={styles.modalButtonTextSecondary}>Limpiar Filtros</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonPrimary]}
-                onPress={aplicarFiltros}
+                <Text style={[styles.secondaryBtnText, { color: colors.onSurfaceVariant }]}>Limpiar</Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.primaryBtnModal, { backgroundColor: colors.primary }]}
+                onPress={vm.aplicarFiltros}
               >
-                <Text style={styles.modalButtonText}>Aplicar</Text>
-              </TouchableOpacity>
+                <Text style={[styles.primaryBtnText, { color: colors.surface }]}>Aplicar</Text>
+              </Pressable>
             </View>
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  safeArea: {
+  screen: {
     flex: 1,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
+    paddingHorizontal: 16,
+    paddingTop: 8,
     paddingBottom: 10,
   },
-  headerLeft: {
-    gap: 8,
+  headerTitleWrap: {
+    gap: 2,
   },
   title: {
-    fontSize: FONT_SIZES.xlarge,
-    fontWeight: "bold",
-    color: COLORS.primary,
+    fontSize: 24,
+    fontWeight: "800",
   },
-  headerButtons: {
+  subtitle: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  headerActions: {
     flexDirection: "row",
-    gap: 10,
-  },
-  iconButton: {
-    padding: 8,
-  },
-  activeFilters: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    paddingHorizontal: 20,
-    paddingBottom: 10,
     gap: 8,
   },
-  filterChip: {
+  iconButton: {
+    borderWidth: 1,
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  searchBox: {
+    marginHorizontal: 16,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderRadius: 12,
+    minHeight: 44,
+    paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.surface,
-    borderRadius: 20,
+    gap: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    paddingVertical: 8,
+  },
+  filterChipsRow: {
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    gap: 8,
+    alignItems: "center",
+  },
+  filterChip: {
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 10,
     paddingVertical: 6,
-    paddingHorizontal: 12,
-    gap: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
   },
   filterChipText: {
-    fontSize: FONT_SIZES.small,
-    color: COLORS.text,
+    fontSize: 12,
+    fontWeight: "600",
   },
-  clearFiltersButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-  },
-  clearFiltersText: {
-    fontSize: FONT_SIZES.small,
-    color: COLORS.primary,
-    fontWeight: "bold",
+  clearText: {
+    fontSize: 12,
+    fontWeight: "700",
+    paddingHorizontal: 4,
   },
   listContent: {
-    padding: 20,
-    paddingTop: 10,
-    paddingBottom: 28,
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+    gap: 10,
   },
   card: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 12,
-    marginBottom: 15,
-    overflow: "visible",
-    boxShadow: "0px 2px 4px rgba(26, 26, 26, 0.1)",
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: 12,
+    gap: 8,
+    position: "relative",
   },
-  badge: {
-    position: "absolute",
-    top: -8,
-    left: 15,
-    paddingHorizontal: 12,
+  cardTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  nivelBadge: {
+    borderRadius: 999,
+    paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 12,
-    zIndex: 1,
+    alignSelf: "flex-start",
   },
-  badgeText: {
-    color: "white",
-    fontSize: FONT_SIZES.small,
-    fontWeight: "bold",
-  },
-  badgeDetallado: {
-    left: 100,
-    backgroundColor: COLORS.indigo,
+  nivelBadgeText: {
+    fontSize: 11,
+    fontWeight: "700",
   },
   menuButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    padding: 8,
-    zIndex: 2,
+    width: 30,
+    height: 30,
+    justifyContent: "center",
+    alignItems: "center",
   },
   contextMenu: {
     position: "absolute",
-    top: 45,
-    right: 10,
-    backgroundColor: "white",
-    borderRadius: 8,
-    boxShadow: "0px 2px 8px rgba(26, 26, 26, 0.3)",
-    zIndex: 10,
-    minWidth: 150,
+    top: 38,
+    right: 12,
+    zIndex: 12,
+    minWidth: 142,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 4,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    elevation: 7,
   },
   menuItem: {
+    minHeight: 34,
+    paddingHorizontal: 10,
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
-    gap: 10,
+    gap: 8,
   },
   menuItemText: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.text,
+    fontSize: 13,
+    fontWeight: "600",
   },
-  cardContent: {
-    padding: 15,
-    paddingTop: 25,
-  },
-  cardAsignatura: {
-    fontSize: FONT_SIZES.large,
-    fontWeight: "bold",
-    color: COLORS.text,
-    marginBottom: 4,
-  },
-  cardGrado: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.textSecondary,
-    marginBottom: 8,
-  },
-  cardTema: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.text,
-    marginBottom: 12,
-  },
-  detalleCurso: {
-    backgroundColor: COLORS.surfaceTertiary,
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 12,
+  cardBody: {
     gap: 6,
   },
-  detalleItem: {
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  cardSub: {
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  metaRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  metaItem: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 5,
   },
-  detalleText: {
+  metaText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
   },
-  cardFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 15,
-  },
-  cardFooterItem: {
+  syncPill: {
+    borderRadius: 999,
+    alignSelf: "flex-start",
+    paddingHorizontal: 9,
+    paddingVertical: 5,
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 5,
   },
-  cardFooterText: {
-    fontSize: FONT_SIZES.small,
-    color: COLORS.textSecondary,
+  syncPillText: {
+    fontSize: 11,
+    fontWeight: "700",
   },
   emptyState: {
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 60,
-  },
-  emptyTitle: {
-    fontSize: FONT_SIZES.xlarge,
-    fontWeight: "bold",
-    color: COLORS.text,
-    marginTop: 20,
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.textSecondary,
-    textAlign: "center",
-    marginBottom: 30,
-    paddingHorizontal: 40,
-  },
-  createButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: COLORS.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 25,
+    paddingTop: 56,
+    paddingBottom: 40,
     gap: 8,
   },
-  createButtonText: {
-    color: "white",
-    fontSize: FONT_SIZES.medium,
-    fontWeight: "bold",
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+  },
+  emptySubtitle: {
+    fontSize: 13,
+    lineHeight: 20,
+    textAlign: "center",
+    maxWidth: 320,
+  },
+  primaryBtn: {
+    marginTop: 10,
+    minHeight: 42,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+  },
+  primaryBtnText: {
+    fontSize: 13,
+    fontWeight: "700",
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.45)",
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: COLORS.background,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    maxHeight: "80%",
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    borderWidth: 1,
+    borderBottomWidth: 0,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 20,
+    gap: 8,
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 4,
   },
   modalTitle: {
-    fontSize: FONT_SIZES.xlarge,
-    fontWeight: "bold",
-    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: "800",
   },
-  filterLabel: {
-    fontSize: FONT_SIZES.medium,
-    fontWeight: "bold",
-    color: COLORS.text,
-    marginBottom: 12,
+  modalLabel: {
+    fontSize: 12,
+    fontWeight: "700",
   },
-  nivelButtonsContainer: {
-    gap: 10,
-    marginBottom: 30,
+  levelsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 4,
   },
-  nivelButton: {
-    padding: 15,
-    borderRadius: 8,
-    borderWidth: 2,
-    backgroundColor: COLORS.surface,
+  levelChip: {
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
   },
-  nivelButtonActive: {
-    // backgroundColor set dynamically
+  levelChipText: {
+    fontSize: 12,
+    fontWeight: "700",
   },
-  nivelButtonText: {
-    fontSize: FONT_SIZES.medium,
-    color: COLORS.text,
-    textAlign: "center",
-    fontWeight: "600",
+  modalInput: {
+    borderWidth: 1,
+    borderRadius: 10,
+    minHeight: 40,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 13,
   },
-  nivelButtonTextActive: {
-    color: "white",
-    fontWeight: "bold",
+  dualRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  dualCol: {
+    flex: 1,
+    gap: 4,
   },
   modalActions: {
+    marginTop: 10,
     flexDirection: "row",
-    gap: 10,
+    gap: 8,
   },
-  modalButton: {
+  secondaryBtn: {
     flex: 1,
-    padding: 15,
-    borderRadius: 8,
+    borderWidth: 1,
+    borderRadius: 10,
+    minHeight: 40,
+    justifyContent: "center",
     alignItems: "center",
   },
-  modalButtonPrimary: {
-    backgroundColor: COLORS.primary,
+  secondaryBtnText: {
+    fontSize: 13,
+    fontWeight: "700",
   },
-  modalButtonSecondary: {
-    backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.primary,
-  },
-  modalButtonText: {
-    color: "white",
-    fontSize: FONT_SIZES.medium,
-    fontWeight: "bold",
-  },
-  modalButtonTextSecondary: {
-    color: COLORS.primary,
-    fontSize: FONT_SIZES.medium,
-    fontWeight: "bold",
+  primaryBtnModal: {
+    flex: 1,
+    borderRadius: 10,
+    minHeight: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

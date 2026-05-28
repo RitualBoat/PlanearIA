@@ -87,44 +87,44 @@ cp .env.example .env
 
 ```
 PlanearIA/
-├── App.tsx                      # Entry point
-├── plan_planeaciones.md         # Plan activo de refactorizacion
-├── .agents/skills/              # Skills de agentes IA
-├── backend/
-│   ├── api/                     # Vercel serverless endpoints
-│   │   ├── auth.js
-│   │   ├── health.js
-│   │   ├── planeaciones.js      # CRUD con userId isolation
-│   │   └── sync.js
-│   └── lib/
-│       ├── auth.js              # JWT verification, getUserFromToken
-│       ├── mongodb.js           # Atlas connection
-│       └── databaseIndexes.js
-├── src/
-│   ├── components/              # Componentes reutilizables
-│   ├── context/                 # AuthContext, PlaneacionesContext, NotificacionesContext
-│   ├── hooks/                   # Custom hooks (ViewModels)
-│   ├── navigation/              # StackNavigator.tsx
-│   ├── screens/
-│   │   ├── auth/                # Login
-│   │   ├── planeaciones/        # Planeaciones (refactorizacion activa)
-│   │   ├── grupos/              # Grupos
-│   │   ├── biblioteca/          # Recursos didacticos
-│   │   ├── cuenta/              # Perfil
-│   │   ├── notificaciones/
-│   │   └── ayuda/
-│   ├── services/                # Push notifications, etc.
-│   ├── sync/                    # Sync engine y services
-│   ├── themes/                  # colors.ts
-│   └── utils/                   # apiClient.ts, migrateV1toV2.ts
-├── types/
-│   ├── index.ts                 # Tipos generales
-│   ├── planeacion.ts            # V1 types (legacy)
-│   ├── planeacionV2.ts          # V2 types (NEM-aligned)
-│   └── plantillaDocumento.ts    # Template types
-├── context/
-│   └── planeaciones-reales/     # Ejemplos reales de planeaciones
-└── Documentacion/               # Documentacion tecnica
+â”œâ”€â”€ App.tsx                      # Entry point
+â”œâ”€â”€ plan_planeaciones.md         # Plan activo de refactorizacion
+â”œâ”€â”€ .agents/skills/              # Skills de agentes IA
+â”œâ”€â”€ backend/
+â”‚   â”œâ”€â”€ api/                     # Vercel serverless endpoints
+â”‚   â”‚   â”œâ”€â”€ auth.js
+â”‚   â”‚   â”œâ”€â”€ health.js
+â”‚   â”‚   â”œâ”€â”€ planeaciones.js      # CRUD con userId isolation
+â”‚   â”‚   â””â”€â”€ sync.js
+â”‚   â””â”€â”€ lib/
+â”‚       â”œâ”€â”€ auth.js              # JWT verification, getUserFromToken
+â”‚       â”œâ”€â”€ mongodb.js           # Atlas connection
+â”‚       â””â”€â”€ databaseIndexes.js
+â”œâ”€â”€ src/
+â”‚   â”œâ”€â”€ components/              # Componentes reutilizables
+â”‚   â”œâ”€â”€ context/                 # AuthContext, PlaneacionesContext, NotificacionesContext
+â”‚   â”œâ”€â”€ hooks/                   # Custom hooks (ViewModels)
+â”‚   â”œâ”€â”€ navigation/              # StackNavigator.tsx
+â”‚   â”œâ”€â”€ screens/
+â”‚   â”‚   â”œâ”€â”€ auth/                # Login
+â”‚   â”‚   â”œâ”€â”€ planeaciones/        # Planeaciones (refactorizacion activa)
+â”‚   â”‚   â”œâ”€â”€ grupos/              # Grupos
+â”‚   â”‚   â”œâ”€â”€ biblioteca/          # Recursos didacticos
+â”‚   â”‚   â”œâ”€â”€ cuenta/              # Perfil
+â”‚   â”‚   â”œâ”€â”€ notificaciones/
+â”‚   â”‚   â””â”€â”€ ayuda/
+â”‚   â”œâ”€â”€ services/                # Push notifications, etc.
+â”‚   â”œâ”€â”€ sync/                    # Sync engine y services
+â”‚   â”œâ”€â”€ themes/                  # colors.ts
+â”‚   â””â”€â”€ utils/                   # apiClient.ts, migrateV1toV2.ts
+â”œâ”€â”€ types/
+â”‚   â”œâ”€â”€ index.ts                 # Tipos generales
+â”‚   â”œâ”€â”€ planeacion.ts            # V1 types (legacy)
+â”‚   â”œâ”€â”€ planeacionV2.ts          # V2 types (NEM-aligned)
+â”‚   â””â”€â”€ plantillaDocumento.ts    # Template types
+â”œâ”€â”€ context/
+â”‚   â””â”€â”€ planeaciones-reales/     # Ejemplos reales de planeaciones
+â””â”€â”€ Documentacion/               # Documentacion tecnica
 ```
 
 ---
@@ -149,7 +149,7 @@ Cada plan sigue estas fases:
 
 | Modulo | Archivo | Estado |
 |--------|---------|--------|
-| **Planeaciones** | `plan_planeaciones.md` | En progreso (Fases 0-3 completadas) |
+| **Planeaciones** | `plan_planeaciones.md` | En progreso (Fases 0-4 completadas) |
 | Recursos | `plan_recursos.md` | Pendiente |
 | Grupos | `plan_grupos.md` | Pendiente |
 | Alumnos | `plan_alumnos.md` | Pendiente |
@@ -166,7 +166,7 @@ Cada plan sigue estas fases:
 - [x] Fase 1: Sistema de tipos V2 + modelo de datos NEM
 - [x] Fase 2: Capa de datos y sincronizacion
 - [x] Fase 3: Editor de texto enriquecido (tentap-editor)
-- [ ] Fase 4: Rediseno completo de pantallas del editor
+- [x] Fase 4: Rediseno completo de pantallas del editor
 - [ ] Fase 5: Escaner de plantillas
 - [ ] Fase 6: Copiloto IA integrado
 - [ ] Fase 7: Exportacion y navegacion
@@ -218,3 +218,4 @@ Proyecto privado. Todos los derechos reservados.
 
 **Repositorio:** [github.com/RitualBoat/PlanearIA](https://github.com/RitualBoat/PlanearIA)
 **Branch:** `development`
+

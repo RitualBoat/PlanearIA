@@ -683,13 +683,9 @@ export interface FiltrosPlaneacionV2 {
 - [x] **8.8** Ejecutar `npx tsc --noEmit` â€” verificar que no hay errores de TypeScript
 - [x] **8.9** Ejecutar `npm test` â€” verificar que los tests pasan (actualizar los que fallen)
 - [x] **8.10** Ejecutar `npm run lint` â€” verificar que no hay errores de linting
-- [ ] **8.11** Verificar el flujo completo manualmente:
-  - Crear planeaciÃ³n desde cero â†’ editar â†’ guardar â†’ listar â†’ exportar PDF
-  - Crear desde IA â†’ editar resultado â†’ guardar
-  - Importar PDF â†’ revisar campos extraÃ­dos â†’ guardar
-  - Escanear plantilla â†’ crear planeaciÃ³n desde plantilla
-  - Modo estÃ¡ndar (tablet) vs modo mÃ³vil (telÃ©fono)
-  - Offline: crear sin conexiÃ³n â†’ reconectar â†’ verificar sync
+
+> **Nota Fase 8:** la validacion manual end-to-end de 8.11 se mueve al cierre de la Fase 9, porque la auditoria real detecto deuda de flujo, editor y navegacion que debe corregirse antes de validar manualmente.
+
 - [x] **8.12** Verificar migraciÃ³n de datos existentes: cargar app con datos V1 en AsyncStorage â†’ verificar que migran a V2 sin pÃ©rdida
 
 > **Estado Fase 8 (2026-05-28):**
@@ -701,7 +697,127 @@ export interface FiltrosPlaneacionV2 {
 >   - `npm run lint -- --quiet`: **OK** (sin errores).
 >   - `npm test -- --runInBand`: **OK** (68 suites, 539 tests en verde).
 >   - Migracion V1->V2 validada con pruebas (`migrateV1toV2`, `SyncProvider.clonarPlaneacion`, `planeacionImportService`).
-> - Pendiente para cierre total de fase: validacion manual end-to-end en dispositivo real/tablet para 8.11.
+> - Pendiente real trasladado a Fase 9: auditoria/correccion funcional del flujo completo y validacion manual end-to-end final.
+
+---
+
+### FASE 9: Auditoria y Correccion Funcional del Flujo Real de Planeaciones
+
+> Objetivo: cerrar la brecha entre la arquitectura V2 implementada y la experiencia real que ve el docente. Esta fase no asume que el modulo esta listo solo porque TypeScript, lint y tests pasaron. La meta es que crear, editar, generar con IA, importar, guardar, listar y exportar siempre pasen por el flujo moderno, con editor robusto tipo Docs/Word, plantilla base por defecto y comportamiento correcto en web y movil.
+
+#### Diagnostico inicial observado para Fase 9
+
+- El editor rico existe tecnicamente mediante `@10play/tentap-editor` en `RichTextEditor`, pero actualmente aparece embebido sobre todo dentro de campos de sesiones, no como una experiencia central de documento tipo Word/Docs.
+- `DocEditorScreen` sigue siendo una composicion de secciones/formularios nativos con algunos editores ricos, por lo que la UX aun se percibe como formulario sofisticado.
+- `CrearNuevoModal` pide nivel antes de navegar y `CrearPlaneacionScreen` vuelve a pedir nivel en el wizard. Hay doble captura de nivel.
+- `CrearPlaneacionScreen` conserva compatibilidad temporal legacy: IA navega a `GenerarPlaneacionIA`, importar navega a `ImportarPlaneacion`, y existen handlers legacy dentro del ViewModel.
+- `GenerarPlaneacionIAScreen` consume el flujo legacy de `useCrearPlaneacionViewModel` y guarda una planeacion convertida desde modelo V1 antes de abrir/usar V2.
+- `PlaneacionesScreen` sigue registrada en navegacion y aun funciona como hub intermedio legacy desde Contenido/empty state.
+- Varias capas importan `usePlaneaciones` desde `sync/providers/SyncProvider`, que ya es alias deprecated hacia `PlaneacionesContext`; esto no rompe, pero oculta deuda legacy.
+- En web hay riesgo de scroll bloqueado por combinaciones de `SafeAreaView`, `FlatList`, `ScrollView`, modales, `Pressable` overlay y WebView/TenTap dentro de contenedores flex.
+- La plantilla base existe como `buildPlaneacionDocumentoBase`, pero es una base vacia, no una plantilla pedagogica predeterminada basada en las planeaciones reales del contexto.
+- La tab `Contenido` ya muestra planeaciones V2, pero todavia tiene entradas que navegan a `Planeaciones` y mezcla responsabilidades de contenido, recursos, plantillas y planeaciones.
+
+#### Tareas
+
+- [ ] **9.1 Auditar y documentar la IA usada en Planeaciones**:
+  - Confirmar todos los endpoints IA activos: `backend/api/planeaciones/generar.js`, `copiloto.js`, `mejorar.js`, `escanear-plantilla.js`.
+  - Documentar proveedor real: OpenAI via `https://api.openai.com/v1/chat/completions`.
+  - Documentar modelo por defecto: `OPENAI_MODEL || "gpt-4o-mini"`.
+  - Documentar variables requeridas: `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_TIMEOUT_MS`, `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_API_SECRET`.
+  - Separar comportamiento real vs fallback: `generar` y `mejorar` fallan sin API key; `copiloto` y `escanear-plantilla` devuelven heuristicas si falta API key o falla OpenAI.
+  - Agregar una nota visible en documentacion indicando que el contenido IA es sugerencia docente y debe revisarse.
+
+- [ ] **9.2 Definir criterio de aceptacion del editor tipo Word/Docs**:
+  - Debe existir un canvas principal de documento, no solo inputs por seccion.
+  - Debe permitir escribir texto libre, seleccionar texto, negritas, cursivas, encabezados, listas, checklist, tablas, undo/redo y guardado.
+  - Debe cargar una plantilla base visible desde el primer ingreso, con estructura real de planeacion y texto/placeholder util.
+  - Debe guardar y reabrir contenido rich text sin perder JSON ProseMirror/Tiptap.
+  - Debe funcionar en web, Android/iOS y modo movil/estandar sin bloquear scroll ni clicks.
+
+- [ ] **9.3 Redisenar la arquitectura del editor para que deje de sentirse como formulario**:
+  - Decidir si `DocEditorScreen` sera un documento unico con bloques editables o una pantalla hibrida con metadata lateral + canvas central.
+  - Mantener secciones pedagogicas solo como navegacion/estructura, no como sustituto del documento.
+  - Integrar `RichTextEditor` como superficie principal del documento, con bloques derivados de la plantilla.
+  - Conservar campos estructurados solo cuando sean necesarios para filtros/exportacion/sync.
+  - Definir como se sincronizan los cambios entre canvas rich text y `PlaneacionDocumento` V2.
+
+- [ ] **9.4 Corregir el flujo de creacion para eliminar doble nivel y legacy**:
+  - `CrearNuevoModal` no debe pedir nivel si `CrearPlaneacionScreen` lo pide, o debe pasar el nivel y el wizard debe saltar ese paso.
+  - Elegir una sola fuente de verdad para `nivelAcademico`.
+  - Crear manual debe abrir el editor moderno con plantilla base predeterminada, no un formulario vacio.
+  - Crear con IA debe generar documento V2 y abrir `DocEditor`, no quedarse en preview legacy V1.
+  - Importar debe terminar en `DocEditor` con documento V2 editable, no en lista o hub intermedio.
+  - Escanear plantilla debe poder crear inmediatamente un documento desde la plantilla detectada.
+
+- [ ] **9.5 Corregir la edicion de planeaciones existentes**:
+  - Verificar todos los puntos de entrada: card en Contenido, menu contextual, ListaPlaneaciones, borradores, exportacion, deep links y chat/feed si aplica.
+  - Toda edicion de planeacion debe navegar a `DocEditor` con `modo: "editar"` y `planeacionId` valido.
+  - Si una planeacion legacy aparece, debe migrarse silenciosamente a V2 antes de abrir el editor moderno.
+  - Eliminar o bloquear cualquier ruta que abra pantallas/formularios legacy para editar planeaciones.
+
+- [ ] **9.6 Crear una plantilla base predeterminada real**:
+  - Construir una `PlantillaDocumento` del sistema usando como fuente principal `context/planeaciones-reales/semana 33 y 34 primero/primero.md` y/o `segundo.md`.
+  - Incluir estructura minima siempre visible: info institucional, datos generales, elementos curriculares, sesiones, evaluacion, observaciones y firmas.
+  - Generar documento base desde esa plantilla en lugar de crear un documento totalmente vacio.
+  - Agregar fallback determinista si no hay plantillas de usuario ni plantillas escaneadas.
+  - Validar que la plantilla predeterminada funciona para primaria, secundaria, preparatoria y universidad con placeholders adaptados.
+
+- [ ] **9.7 Limpiar rutas, pantallas y handlers legacy restantes**:
+  - Evaluar eliminacion o redireccion de `PlaneacionesScreen` como hub legacy.
+  - Evaluar eliminacion o conversion de `GenerarPlaneacionIAScreen` a flujo V2 dentro de `DocEditor`/wizard.
+  - Quitar compatibilidad temporal legacy de `useCrearPlaneacionViewModel` cuando ya no sea necesaria.
+  - Reemplazar imports desde `sync/providers/SyncProvider` por imports directos desde `context/PlaneacionesContext` en el modulo de planeaciones/contenido.
+  - Actualizar tests que todavia esperan navegar a `Planeaciones` o `GenerarPlaneacionIA`.
+
+- [ ] **9.8 Corregir scroll y clicks en web**:
+  - Reproducir el bloqueo de scroll en `ContenidoScreen`, `CrearNuevoModal`, `CrearPlaneacionScreen` y `DocEditorScreen`.
+  - Auditar contenedores `FlatList`, `ScrollView`, `SafeAreaView`, overlays `Modal/Pressable`, FAB, z-index, `pointerEvents` y alturas `flex`.
+  - Asegurar que los modales no capturen clicks fuera de su area util ni bloqueen la lista al cerrarse.
+  - Validar que TenTap/WebView no intercepta scroll global cuando no esta enfocado.
+  - Agregar pruebas/smoke web para scroll vertical y clicks principales.
+
+- [ ] **9.9 Refinar la tab Contenido/Recursos sin sobrerrefactorizar**:
+  - Mantener `ContenidoScreen` como hub de contenido si sigue siendo la mejor entrada principal.
+  - Separar mentalmente las responsabilidades: planeaciones, recursos, entregables y plantillas.
+  - Cambiar CTA empty state de `Planeaciones` a `CrearPlaneacion` o al nuevo flujo decidido.
+  - Asegurar que el FAB `Crear nuevo` no duplique preguntas ni mande a rutas legacy.
+  - Verificar que acciones editar, duplicar, eliminar, exportar y compartir funcionen para planeaciones V2.
+
+- [ ] **9.10 Endurecer persistencia y sincronizacion del editor**:
+  - Verificar autosave local de `DocEditor` y recuperacion de borrador.
+  - Evitar que un draft de `modo: crear` sobreescriba otra planeacion del mismo nivel.
+  - Confirmar que guardar crea/actualiza exactamente un documento V2.
+  - Confirmar que `clonar`, `eliminar`, `buscar`, `filtrar` y exportar usan la misma fuente de verdad.
+  - Validar offline-first: crear/editar offline, reconectar, sincronizar y no duplicar documentos.
+
+- [ ] **9.11 Agregar pruebas automatizadas de flujo real**:
+  - Unit tests para ViewModels: crear manual, crear con IA V2, importar, abrir plantilla, editar existente.
+  - Tests de navegacion para asegurar que no se navega a pantallas legacy en flujos modernos.
+  - Tests de `ContenidoScreen` para CTA empty state, FAB, card press y menu editar.
+  - Tests de editor para guardar/reabrir rich text y preservar contenido.
+  - Tests de servicios IA para documentar provider/fallback y schema V2.
+
+- [ ] **9.12 Ejecutar validacion tecnica completa**:
+  - `npx tsc --noEmit`.
+  - `npm run lint -- --quiet`.
+  - `npm test -- --runInBand`.
+  - Verificacion focalizada de endpoints IA si hay backend configurado.
+  - Revision de diff para confirmar que no quedan imports/rutas legacy dentro del flujo principal.
+
+- [ ] **9.13 Validacion manual end-to-end final (movida desde 8.11)**:
+  - Crear planeacion desde cero -> abrir editor tipo Docs/Word -> editar -> guardar -> listar -> reabrir -> exportar PDF/DOCX.
+  - Crear con IA -> revisar propuesta V2 -> editar en DocEditor -> guardar.
+  - Importar PDF/DOCX -> revisar campos extraidos -> abrir DocEditor -> guardar.
+  - Escanear plantilla -> crear planeacion desde plantilla -> editar y guardar.
+  - Editar una planeacion existente desde Contenido, ListaPlaneaciones, borradores y menu contextual.
+  - Validar web: scroll vertical completo, clicks en FAB/modal/cards/toolbar, cierre de modales y edicion rich text.
+  - Validar movil: modo mobile por secciones, teclado, toolbar, guardado y navegacion.
+  - Validar modo estandar/tablet: canvas amplio, navegacion por secciones, toolbar visible y scroll correcto.
+  - Validar offline: crear/editar sin conexion -> reconectar -> verificar sync sin duplicados.
+
+> **Criterio de cierre Fase 9:** el docente no debe encontrar formularios legacy ni doble seleccion de nivel en el flujo principal. Todas las entradas de planeaciones deben llevar al editor moderno, con plantilla base predeterminada, IA documentada, scroll/clicks funcionando en web y validacion manual completa aprobada.
+
 ---
 
 ## Resumen de Archivos

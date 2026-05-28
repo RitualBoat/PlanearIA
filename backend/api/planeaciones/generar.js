@@ -16,6 +16,7 @@
  */
 const {
   validateAuth,
+  getUserFromToken,
   handleCors,
   applyCors,
   errorResponse,
@@ -43,7 +44,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { prompt, nivelAcademico, contexto = {} } = req.body || {};
+    const { prompt, nivelAcademico, contexto = {}, version } = req.body || {};
 
     if (!prompt || typeof prompt !== "string" || prompt.trim().length < 10) {
       return errorResponse(
@@ -65,14 +66,25 @@ module.exports = async (req, res) => {
       return errorResponse(res, 500, "OPENAI_API_KEY no está configurada en variables de entorno");
     }
 
-    const systemPrompt = buildSystemPrompt(nivelAcademico, contexto);
+    const targetVersion = Number(version) === 2 ? 2 : 1;
+    const tokenUser = getUserFromToken(req);
+    const userId = String(tokenUser?.userId || tokenUser?.id || contexto.userId || "server");
+
+    const systemPrompt =
+      targetVersion === 2
+        ? buildSystemPromptV2(nivelAcademico, contexto)
+        : buildSystemPrompt(nivelAcademico, contexto);
     const rawContent = await generateWithOpenAI(systemPrompt, prompt);
     const generated = extractJson(rawContent);
-    const planeacion = mapToPlaneacion(generated, nivelAcademico, contexto);
+    const planeacion =
+      targetVersion === 2
+        ? mapToPlaneacionV2(generated?.planeacion || generated, nivelAcademico, contexto, userId)
+        : mapToPlaneacion(generated, nivelAcademico, contexto);
 
     return successResponse(res, {
       provider: "openai",
       model: OPENAI_MODEL,
+      version: targetVersion,
       planeacion,
     });
   } catch (error) {
@@ -129,6 +141,79 @@ Reglas obligatorias:
 3) Incluye SIEMPRE las 3 actividades requeridas (inicio/desarrollo/cierre).
 4) Si falta información, infiere valores razonables para México.
 5) Respeta este contexto cuando exista: ${JSON.stringify(contexto)}.`;
+}
+
+function buildSystemPromptV2(nivelAcademico, contexto) {
+  const nivelTexto = {
+    primaria: "Primaria",
+    secundaria: "Secundaria",
+    preparatoria: "Preparatoria",
+    universidad: "Universidad",
+  };
+
+  return `Eres un asistente experto en planeaciones didacticas mexicanas y NEM.
+Genera una PlaneacionDocumento V2 completa para nivel ${nivelTexto[nivelAcademico]}.
+
+Reglas obligatorias:
+1) Responde UNICAMENTE JSON valido, sin markdown ni texto extra.
+2) Devuelve este esquema:
+{
+  "planeacion": {
+    "infoInstitucional": {
+      "institucion": "string",
+      "subsistema": "string",
+      "cicloEscolar": "string",
+      "lugar": "string"
+    },
+    "datosGenerales": {
+      "maestro": "string",
+      "asignatura": "string",
+      "fechaInicio": "YYYY-MM-DD",
+      "fechaFin": "YYYY-MM-DD",
+      "semanas": [number],
+      "trimestre": number,
+      "grado": "string",
+      "grupos": ["string"]
+    },
+    "elementosCurriculares": {
+      "proposito": "string",
+      "producto": "string",
+      "contenido": "string",
+      "pda": "string",
+      "campoFormativo": "string",
+      "ejeArticulador": "string",
+      "rasgosPerfilEgreso": ["string"],
+      "instrumentoEvaluacion": "string"
+    },
+    "sesiones": [
+      {
+        "numero": number,
+        "tipo": "regular|suspension|proyecto_lectura|evaluacion",
+        "inicio": "string",
+        "desarrollo": "string",
+        "cierre": "string",
+        "tarea": "string"
+      }
+    ],
+    "evaluacionInicial": {
+      "tipo": "escala_valoracion|escala_estimativa|rubrica|lista_cotejo|otro",
+      "escala": [{"etiqueta":"string","valor":10}],
+      "criterios": [{"descripcion":"string","mejora":"string"}]
+    },
+    "evaluacionFinal": {
+      "tipo": "escala_valoracion|escala_estimativa|rubrica|lista_cotejo|otro",
+      "escala": [{"etiqueta":"string","valor":10}],
+      "criterios": [{"descripcion":"string","mejora":"string"}]
+    },
+    "observaciones": [{"texto":"string","categoria":"flexibilidad|usaer|proyecto|general"}],
+    "firmas": [{"rol":"string","nombre":"string"}],
+    "camposNivel": {}
+  }
+}
+3) Genera entre 3 y 10 sesiones segun el prompt y contexto. Cada sesion debe incluir inicio, desarrollo, cierre y tarea.
+4) Usa evaluacion estructurada con criterios observables.
+5) Si falta informacion, deja strings vacios o valores razonables sin inventar datos criticos.
+6) Respeta este contexto cuando exista: ${JSON.stringify(contexto)}.`;
 }
 
 async function generateWithOpenAI(systemPrompt, userPrompt) {
@@ -250,6 +335,171 @@ function mapToPlaneacion(generated, nivelAcademico, contexto) {
   };
 }
 
+function mapToPlaneacionV2(generated, nivelAcademico, contexto, userId) {
+  const now = new Date();
+  const nowIso = now.toISOString();
+  const today = nowIso.slice(0, 10);
+  const datos = generated?.datosGenerales || {};
+  const curricular = generated?.elementosCurriculares || {};
+  const info = generated?.infoInstitucional || {};
+  const maestro = fallback(datos.maestro, contexto.maestro, contexto.docente, "");
+
+  const sesiones = normalizeSesionesV2(generated?.sesiones);
+
+  return {
+    id: `ia_v2_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    version: 2,
+    userId,
+    nivelAcademico,
+    infoInstitucional: {
+      institucion: fallback(info.institucion, contexto.institucion, ""),
+      subsistema: fallback(info.subsistema, contexto.subsistema, ""),
+      cicloEscolar: fallback(info.cicloEscolar, contexto.cicloEscolar, ""),
+      lugar: fallback(info.lugar, contexto.lugar, ""),
+    },
+    datosGenerales: {
+      maestro,
+      asignatura: fallback(datos.asignatura, contexto.asignatura, "Asignatura por definir"),
+      fechaInicio: normalizeFechaDateOnly(fallback(datos.fechaInicio, contexto.fechaInicio, contexto.fecha, today)),
+      fechaFin: normalizeFechaDateOnly(fallback(datos.fechaFin, contexto.fechaFin, contexto.fecha, today)),
+      semanas: toNumberArray(datos.semanas),
+      trimestre: Number.isFinite(Number(datos.trimestre)) ? Number(datos.trimestre) : undefined,
+      grado: fallback(datos.grado, contexto.grado, "Grado por definir"),
+      grupos: toArray(datos.grupos || contexto.grupos || contexto.grupo),
+    },
+    elementosCurriculares: {
+      proposito: fallback(curricular.proposito, generated?.proposito, ""),
+      producto: fallback(curricular.producto, generated?.producto, ""),
+      contenido: fallback(curricular.contenido, generated?.contenido, generated?.unidadTematica, ""),
+      pda: fallback(curricular.pda, generated?.pda, generated?.temaSesion, ""),
+      campoFormativo: fallback(curricular.campoFormativo, generated?.campoFormativo, ""),
+      ejeArticulador: fallback(curricular.ejeArticulador, generated?.ejeArticulador, ""),
+      rasgosPerfilEgreso: toArray(curricular.rasgosPerfilEgreso),
+      instrumentoEvaluacion: fallback(curricular.instrumentoEvaluacion, generated?.evaluacion, ""),
+    },
+    sesiones,
+    evaluacionInicial: generated?.evaluacionInicial
+      ? normalizeEvaluacionV2(generated.evaluacionInicial)
+      : undefined,
+    evaluacionFinal: normalizeEvaluacionV2(generated?.evaluacionFinal || generated?.evaluacion),
+    observaciones: normalizeObservacionesV2(generated?.observaciones),
+    firmas: normalizeFirmasV2(generated?.firmas, maestro),
+    contenidoRaw: "",
+    camposNivel: typeof generated?.camposNivel === "object" && !Array.isArray(generated.camposNivel)
+      ? generated.camposNivel
+      : {},
+    fechaCreacion: nowIso,
+    fechaModificacion: nowIso,
+  };
+}
+
+function normalizeSesionesV2(value) {
+  const input = Array.isArray(value) ? value : [];
+  const tipos = new Set(["regular", "suspension", "proyecto_lectura", "evaluacion"]);
+  const normalized = input
+    .map((item, index) => {
+      const tipo = tipos.has(item?.tipo) ? item.tipo : "regular";
+      return {
+        id: `sesion_${Date.now()}_${index + 1}`,
+        numero: Number(item?.numero) || index + 1,
+        tipo,
+        motivo: fallback(item?.motivo, ""),
+        inicio: toRichTextString(fallback(item?.inicio, "")),
+        desarrollo: toRichTextString(fallback(item?.desarrollo, "")),
+        cierre: toRichTextString(fallback(item?.cierre, "")),
+        tarea: toRichTextString(fallback(item?.tarea, "")),
+      };
+    })
+    .slice(0, 12);
+
+  if (normalized.length > 0) return normalized;
+
+  return [
+    {
+      id: `sesion_${Date.now()}_1`,
+      numero: 1,
+      tipo: "regular",
+      inicio: toRichTextString("Activacion de conocimientos previos."),
+      desarrollo: toRichTextString("Desarrollo del tema con actividades guiadas."),
+      cierre: toRichTextString("Cierre y retroalimentacion."),
+      tarea: toRichTextString(""),
+    },
+  ];
+}
+
+function normalizeEvaluacionV2(value) {
+  if (typeof value === "string") {
+    return {
+      tipo: "otro",
+      escala: [],
+      criterios: [{ id: `crit_${Date.now()}`, descripcion: value }],
+    };
+  }
+
+  const tipos = new Set(["escala_valoracion", "escala_estimativa", "rubrica", "lista_cotejo", "otro"]);
+  const tipo = tipos.has(value?.tipo) ? value.tipo : "rubrica";
+  const escala = Array.isArray(value?.escala)
+    ? value.escala
+        .map((item) => ({
+          etiqueta: fallback(item?.etiqueta, ""),
+          valor: Number.isFinite(Number(item?.valor)) ? Number(item.valor) : undefined,
+        }))
+        .filter((item) => item.etiqueta)
+        .slice(0, 6)
+    : [];
+  const criterios = Array.isArray(value?.criterios)
+    ? value.criterios
+        .map((item, index) => ({
+          id: `crit_${Date.now()}_${index}`,
+          descripcion: fallback(item?.descripcion, ""),
+          mejora: fallback(item?.mejora, ""),
+        }))
+        .filter((item) => item.descripcion)
+        .slice(0, 10)
+    : [];
+
+  return {
+    tipo,
+    escala,
+    criterios: criterios.length
+      ? criterios
+      : [{ id: `crit_${Date.now()}`, descripcion: "Criterio de evaluacion por completar" }],
+  };
+}
+
+function normalizeObservacionesV2(value) {
+  const input = Array.isArray(value) ? value : [];
+  const categorias = new Set(["flexibilidad", "usaer", "proyecto", "general"]);
+  const normalized = input
+    .map((item) => ({
+      texto: fallback(item?.texto, typeof item === "string" ? item : ""),
+      categoria: categorias.has(item?.categoria) ? item.categoria : "general",
+    }))
+    .filter((item) => item.texto)
+    .slice(0, 12);
+  return normalized.length ? normalized : [{ texto: "", categoria: "general" }];
+}
+
+function normalizeFirmasV2(value, maestro) {
+  const input = Array.isArray(value) ? value : [];
+  const normalized = input
+    .map((item) => ({
+      rol: fallback(item?.rol, "Docente"),
+      nombre: fallback(item?.nombre, ""),
+    }))
+    .slice(0, 8);
+  return normalized.length ? normalized : [{ rol: "Docente", nombre: maestro || "" }];
+}
+
+function toRichTextString(plainText = "") {
+  return JSON.stringify({
+    type: "doc",
+    content: plainText
+      ? [{ type: "paragraph", content: [{ type: "text", text: plainText }] }]
+      : [{ type: "paragraph" }],
+  });
+}
+
 function fallback(...values) {
   for (const value of values) {
     if (typeof value === "string" && value.trim()) {
@@ -270,6 +520,11 @@ function toArray(value) {
       .filter(Boolean);
   }
   return [];
+}
+
+function toNumberArray(value) {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => Number(item)).filter((item) => Number.isFinite(item));
 }
 
 function normalizeActividades(value) {
@@ -305,6 +560,14 @@ function normalizeFechaIso(value) {
     return new Date().toISOString();
   }
   return parsed.toISOString();
+}
+
+function normalizeFechaDateOnly(value) {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return new Date().toISOString().slice(0, 10);
+  }
+  return parsed.toISOString().slice(0, 10);
 }
 
 function normalizeModalidad(value) {

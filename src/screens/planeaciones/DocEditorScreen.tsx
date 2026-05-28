@@ -9,7 +9,9 @@ import type { RootStackParamList } from "../../navigation/StackNavigator";
 import { useTheme } from "../../context/ThemeContext";
 import { useEditorMode } from "../../hooks/useEditorMode";
 import { useDocEditorViewModel, type DocSectionId } from "../../hooks/useDocEditorViewModel";
+import { useCopiloto } from "../../hooks/useCopiloto";
 import { AIToolbar, EditorToolbar, SectionNavigator } from "../../components/editor";
+import type { AIActionType, AIToolbarResult } from "../../components/editor";
 import {
   SeccionCurricular,
   SeccionDatosGenerales,
@@ -19,6 +21,8 @@ import {
   SeccionObservaciones,
   SeccionSesiones,
 } from "../../components/editor/sections";
+import type { ActividadesCopiloto } from "../../services/copilotoService";
+import type { InstrumentoEvaluacion } from "../../../types/planeacionV2";
 
 type Nav = StackNavigationProp<RootStackParamList, "DocEditor">;
 
@@ -28,11 +32,70 @@ const formatDraftLabel = (value: string | null): string => {
   return `Borrador: ${date.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}`;
 };
 
+const toRichTextString = (plainText = ""): string => {
+  return JSON.stringify({
+    type: "doc",
+    content: plainText
+      ? [
+          {
+            type: "paragraph",
+            content: [{ type: "text", text: plainText }],
+          },
+        ]
+      : [{ type: "paragraph" }],
+  });
+};
+
+const stripRichText = (value?: string): string => {
+  if (!value) return "";
+  const trimmed = value.trim();
+  if (trimmed.startsWith("{")) {
+    try {
+      const json = JSON.parse(trimmed) as { content?: Array<{ content?: Array<{ text?: string }> }> };
+      return (json.content || [])
+        .flatMap((node) => node.content || [])
+        .map((node) => node.text || "")
+        .join(" ")
+        .trim();
+    } catch {
+      return value;
+    }
+  }
+  return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+};
+
+const buildSectionText = (sectionId: DocSectionId, vm: ReturnType<typeof useDocEditorViewModel>): string => {
+  const doc = vm.documento;
+  if (sectionId === "curricular") {
+    return [
+      doc.elementosCurriculares.proposito,
+      doc.elementosCurriculares.contenido,
+      doc.elementosCurriculares.pda,
+      doc.elementosCurriculares.producto,
+    ]
+      .filter(Boolean)
+      .join("\n");
+  }
+  if (sectionId === "sesiones") {
+    return doc.sesiones
+      .map((sesion) => [sesion.inicio, sesion.desarrollo, sesion.cierre, sesion.tarea].map(stripRichText).join("\n"))
+      .join("\n\n");
+  }
+  if (sectionId === "evaluacion") {
+    return doc.evaluacionFinal?.criterios.map((criterio) => criterio.descripcion).join("\n") || "";
+  }
+  if (sectionId === "observaciones") {
+    return doc.observaciones.map((item) => item.texto).join("\n");
+  }
+  return `${doc.datosGenerales.asignatura} ${doc.datosGenerales.grado}`.trim();
+};
+
 const DocEditorScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
   const { colors } = useTheme();
   const editorMode = useEditorMode();
   const vm = useDocEditorViewModel();
+  const copiloto = useCopiloto();
   const [activeInlineEditor, setActiveInlineEditor] = useState<EditorBridge | null>(null);
 
   const sections = useMemo(
@@ -45,6 +108,123 @@ const DocEditorScreen: React.FC = () => {
       })),
     [vm.sectionsProgress]
   );
+
+  const handleAIAction = async (action: AIActionType): Promise<AIToolbarResult> => {
+    if (action === "sugerir") {
+      const targetSession = vm.documento.sesiones.find((sesion) => sesion.tipo === "regular") || vm.documento.sesiones[0];
+      const response = await copiloto.sugerirActividades(vm.documento, targetSession);
+      const { actividades } = response.resultado;
+      return {
+        title: "Actividades sugeridas",
+        message: response.resultado.mensaje,
+        detail: `Inicio: ${actividades.inicio.slice(0, 90)}...`,
+        insertLabel: "Insertar en sesion",
+        payload: { kind: "actividades", actividades },
+      };
+    }
+
+    if (action === "mejorar") {
+      const selectedText = buildSectionText(vm.activeSectionId, vm);
+      const response = await copiloto.mejorarTexto(vm.documento, selectedText, vm.activeSectionId);
+      return {
+        title: "Texto mejorado",
+        message: response.resultado.mensaje,
+        detail: response.resultado.textoMejorado.slice(0, 220),
+        insertLabel: "Aplicar mejora",
+        payload: {
+          kind: "texto",
+          sectionId: vm.activeSectionId,
+          texto: response.resultado.textoMejorado,
+        },
+      };
+    }
+
+    if (action === "rubrica") {
+      const response = await copiloto.generarEvaluacion(vm.documento);
+      return {
+        title: "Rubrica generada",
+        message: response.resultado.mensaje,
+        detail: `${response.resultado.evaluacion.criterios.length} criterios listos para evaluacion final.`,
+        insertLabel: "Insertar rubrica",
+        payload: {
+          kind: "evaluacion",
+          evaluacion: response.resultado.evaluacion,
+        },
+      };
+    }
+
+    const response = await copiloto.revisarAlineamiento(vm.documento);
+    return {
+      title: "Revision de alineamiento",
+      message: response.resultado.resumen,
+      detail: response.resultado.hallazgos
+        .map((item) => `${item.prioridad}: ${item.descripcion}`)
+        .join("\n"),
+    };
+  };
+
+  const handleInsertAIResult = async (result: AIToolbarResult) => {
+    const payload = result.payload as
+      | { kind: "actividades"; actividades: ActividadesCopiloto }
+      | { kind: "texto"; sectionId: DocSectionId; texto: string }
+      | { kind: "evaluacion"; evaluacion: InstrumentoEvaluacion }
+      | undefined;
+
+    if (!payload) return;
+
+    if (payload.kind === "actividades") {
+      const targetId =
+        vm.documento.sesiones.find((sesion) => sesion.tipo === "regular")?.id || vm.documento.sesiones[0]?.id;
+      if (!targetId) return;
+      vm.setSesiones(
+        vm.documento.sesiones.map((sesion) =>
+          sesion.id === targetId
+            ? {
+                ...sesion,
+                inicio: toRichTextString(payload.actividades.inicio),
+                desarrollo: toRichTextString(payload.actividades.desarrollo),
+                cierre: toRichTextString(payload.actividades.cierre),
+                tarea: toRichTextString(payload.actividades.tarea || ""),
+              }
+            : sesion
+        )
+      );
+      vm.setActiveSectionId("sesiones");
+      return;
+    }
+
+    if (payload.kind === "evaluacion") {
+      vm.setEvaluacion({
+        evaluacionInicial: vm.documento.evaluacionInicial,
+        evaluacionFinal: payload.evaluacion,
+      });
+      vm.setActiveSectionId("evaluacion");
+      return;
+    }
+
+    if (payload.sectionId === "curricular") {
+      vm.setCurricular({
+        ...vm.documento.elementosCurriculares,
+        proposito: payload.texto,
+      });
+      return;
+    }
+
+    if (payload.sectionId === "observaciones") {
+      vm.setObservaciones([{ texto: payload.texto, categoria: "general" }]);
+      return;
+    }
+
+    if (payload.sectionId === "sesiones") {
+      const targetId = vm.documento.sesiones[0]?.id;
+      if (!targetId) return;
+      vm.setSesiones(
+        vm.documento.sesiones.map((sesion) =>
+          sesion.id === targetId ? { ...sesion, desarrollo: toRichTextString(payload.texto) } : sesion
+        )
+      );
+    }
+  };
 
   const renderSection = (sectionId: DocSectionId) => {
     const commonProps = {
@@ -180,10 +360,9 @@ const DocEditorScreen: React.FC = () => {
         <EditorToolbar editor={activeInlineEditor} mode={editorMode.mode} disabled={vm.isSaving} />
         <AIToolbar
           mode={editorMode.mode}
-          disabled={vm.isSaving}
-          onAction={async (action) =>
-            `Accion "${action}" registrada. La integracion real del copiloto se conecta en Fase 6.`
-          }
+          disabled={vm.isSaving || copiloto.isLoading}
+          onAction={handleAIAction}
+          onInsertResult={handleInsertAIResult}
         />
         <View style={styles.undoRow}>
           <Pressable

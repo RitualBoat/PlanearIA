@@ -599,7 +599,7 @@ export interface FiltrosPlaneacionV2 {
 
 > Crear el endpoint unificado de copiloto y conectarlo con el editor.
 
-- [ ] **6.1** Crear endpoint `backend/api/planeaciones/copiloto.js`:
+- [x] **6.1** Crear endpoint `backend/api/planeaciones/copiloto.js`:
   - Recibe: `{ accion, contexto, seleccion?, contenidoDocumento? }`
   - Acciones soportadas:
     - `sugerir_actividades` â€” genera inicio/desarrollo/cierre para una sesiÃ³n
@@ -609,21 +609,21 @@ export interface FiltrosPlaneacionV2 {
     - `mejorar_texto` â€” reescribe texto seleccionado con mejor redacciÃ³n
   - System prompt contextual: incluir nivel, asignatura, grado, NEM
   - Response format: JSON estructurado segÃºn la acciÃ³n
-- [ ] **6.2** Crear servicio `src/services/copilotoService.ts`:
+- [x] **6.2** Crear servicio `src/services/copilotoService.ts`:
   - AbstracciÃ³n del endpoint copiloto
   - MÃ©todos tipados: `sugerirActividades()`, `autocompletarSeccion()`, `generarEvaluacion()`, `revisarAlineamiento()`, `mejorarTexto()`
   - Manejo de timeout, retry, fallback offline (mostrar mensaje)
-- [ ] **6.3** Crear hook `src/hooks/useCopiloto.ts`:
+- [x] **6.3** Crear hook `src/hooks/useCopiloto.ts`:
   - Estado: `isLoading`, `resultado`, `error`
   - MÃ©todos que llaman al servicio
   - CachÃ© local de sugerencias recientes
   - IntegraciÃ³n con el editor: insertar resultado en la posiciÃ³n del cursor
-- [ ] **6.4** Integrar copiloto en `AIToolbar.tsx`:
+- [x] **6.4** Integrar copiloto en `AIToolbar.tsx`:
   - Botones contextuales (cambian segÃºn la secciÃ³n activa del editor)
   - Panel de sugerencias deslizable desde abajo
   - AnimaciÃ³n de "pensando..." durante generaciÃ³n
   - Acciones: Insertar, Descartar, Regenerar
-- [ ] **6.5** Actualizar endpoint existente [generar.js](file:///c:/Users/jarco/dev/PlanearIA/backend/api/planeaciones/generar.js):
+- [x] **6.5** Actualizar endpoint existente [generar.js](file:///c:/Users/jarco/dev/PlanearIA/backend/api/planeaciones/generar.js):
   - Actualizar el schema del system prompt para generar `PlaneacionDocumento` V2 (multi-sesiÃ³n, evaluaciÃ³n estructurada)
   - Agregar soporte para mÃ¡s niveles de detalle en el prompt
   - Mantener retrocompatibilidad: si `version` no se envÃ­a, generar V1

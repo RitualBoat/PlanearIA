@@ -16,6 +16,10 @@ export type AIActionType = "sugerir" | "mejorar" | "rubrica" | "revisar";
 
 export interface AIToolbarResult {
   message: string;
+  title?: string;
+  detail?: string;
+  insertLabel?: string;
+  payload?: unknown;
 }
 
 export interface AIToolbarProps {
@@ -23,6 +27,7 @@ export interface AIToolbarProps {
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
   onAction?: (action: AIActionType) => Promise<AIToolbarResult | string | void>;
+  onInsertResult?: (result: AIToolbarResult, action: AIActionType) => Promise<void> | void;
 }
 
 interface ActionConfig {
@@ -38,10 +43,17 @@ const ACTIONS: ActionConfig[] = [
   { id: "revisar", label: "Revisar", icon: "rule" },
 ];
 
-const resolveMessage = (result: AIToolbarResult | string | void, action: AIActionType): string => {
-  if (typeof result === "string") return result;
-  if (result && typeof result === "object" && typeof result.message === "string") return result.message;
-  return `Accion "${action}" lista. La integracion profunda del copiloto se cierra en la Fase 6.`;
+const resolveResult = (result: AIToolbarResult | string | void, action: AIActionType): AIToolbarResult => {
+  if (typeof result === "string") {
+    return { message: result };
+  }
+  if (result && typeof result === "object" && typeof result.message === "string") {
+    return result;
+  }
+  return {
+    message: `Accion "${action}" completada.`,
+    detail: "Revisa la sugerencia antes de insertarla en el documento.",
+  };
 };
 
 export const AIToolbar: React.FC<AIToolbarProps> = ({
@@ -49,10 +61,12 @@ export const AIToolbar: React.FC<AIToolbarProps> = ({
   disabled = false,
   style,
   onAction,
+  onInsertResult,
 }) => {
   const { colors } = useTheme();
   const [loadingAction, setLoadingAction] = useState<AIActionType | null>(null);
-  const [resultText, setResultText] = useState<string | null>(null);
+  const [lastAction, setLastAction] = useState<AIActionType | null>(null);
+  const [lastResult, setLastResult] = useState<AIToolbarResult | null>(null);
   const [errorText, setErrorText] = useState<string | null>(null);
 
   const compact = mode === "mobile";
@@ -62,10 +76,12 @@ export const AIToolbar: React.FC<AIToolbarProps> = ({
     async (action: AIActionType) => {
       if (disabled || loadingAction) return;
       setErrorText(null);
+      setLastResult(null);
       setLoadingAction(action);
       try {
         const result = onAction ? await onAction(action) : undefined;
-        setResultText(resolveMessage(result, action));
+        setLastAction(action);
+        setLastResult(resolveResult(result, action));
       } catch (error) {
         setErrorText(error instanceof Error ? error.message : "No fue posible completar la accion.");
       } finally {
@@ -74,6 +90,25 @@ export const AIToolbar: React.FC<AIToolbarProps> = ({
     },
     [disabled, loadingAction, onAction]
   );
+
+  const handleInsert = useCallback(async () => {
+    if (!lastResult || !lastAction || !onInsertResult) return;
+    setErrorText(null);
+    try {
+      await onInsertResult(lastResult, lastAction);
+      setLastResult({
+        message: "Sugerencia insertada en el documento.",
+        detail: "Puedes ajustar el texto manualmente si lo necesitas.",
+      });
+    } catch (error) {
+      setErrorText(error instanceof Error ? error.message : "No fue posible insertar la sugerencia.");
+    }
+  }, [lastAction, lastResult, onInsertResult]);
+
+  const handleRegenerate = useCallback(() => {
+    if (!lastAction) return;
+    void handlePress(lastAction);
+  }, [handlePress, lastAction]);
 
   return (
     <View
@@ -124,9 +159,42 @@ export const AIToolbar: React.FC<AIToolbarProps> = ({
         })}
       </View>
 
-      {resultText ? (
+      {lastResult ? (
         <View style={[styles.feedbackBox, { backgroundColor: colors.successTint, borderColor: colors.success }]}>
-          <Text style={[styles.feedbackText, { color: colors.textDark }]}>{resultText}</Text>
+          {lastResult.title ? (
+            <Text style={[styles.feedbackTitle, { color: colors.textDark }]}>{lastResult.title}</Text>
+          ) : null}
+          <Text style={[styles.feedbackText, { color: colors.textDark }]}>{lastResult.message}</Text>
+          {lastResult.detail ? (
+            <Text style={[styles.feedbackDetail, { color: colors.textSecondary }]}>{lastResult.detail}</Text>
+          ) : null}
+          <View style={styles.feedbackActions}>
+            {onInsertResult && lastResult.payload !== undefined ? (
+              <Pressable
+                style={[styles.feedbackButton, { backgroundColor: colors.primary }]}
+                onPress={() => {
+                  void handleInsert();
+                }}
+              >
+                <Text style={[styles.feedbackButtonText, { color: colors.surface }]}>
+                  {lastResult.insertLabel || "Insertar"}
+                </Text>
+              </Pressable>
+            ) : null}
+            <Pressable
+              style={[styles.feedbackButton, styles.feedbackButtonGhost, { borderColor: colors.borderLight }]}
+              onPress={handleRegenerate}
+              disabled={!lastAction || loadingAction !== null}
+            >
+              <Text style={[styles.feedbackButtonText, { color: colors.onSurfaceVariant }]}>Regenerar</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.feedbackButton, styles.feedbackButtonGhost, { borderColor: colors.borderLight }]}
+              onPress={() => setLastResult(null)}
+            >
+              <Text style={[styles.feedbackButtonText, { color: colors.onSurfaceVariant }]}>Descartar</Text>
+            </Pressable>
+          </View>
         </View>
       ) : null}
 
@@ -181,7 +249,36 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 17,
   },
+  feedbackTitle: {
+    fontSize: 13,
+    fontWeight: "800",
+  },
+  feedbackDetail: {
+    marginTop: 3,
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  feedbackActions: {
+    marginTop: 8,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  feedbackButton: {
+    minHeight: 32,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  feedbackButtonGhost: {
+    borderWidth: 1,
+    backgroundColor: "transparent",
+  },
+  feedbackButtonText: {
+    fontSize: 12,
+    fontWeight: "800",
+  },
 });
 
 export default AIToolbar;
-

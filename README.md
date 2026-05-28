@@ -149,7 +149,7 @@ Cada plan sigue estas fases:
 
 | Modulo | Archivo | Estado |
 |--------|---------|--------|
-| **Planeaciones** | `plan_planeaciones.md` | En progreso (Fases 0-5 completadas) |
+| **Planeaciones** | `plan_planeaciones.md` | En progreso (Fases 0-6 completadas) |
 | Recursos | `plan_recursos.md` | Pendiente |
 | Grupos | `plan_grupos.md` | Pendiente |
 | Alumnos | `plan_alumnos.md` | Pendiente |
@@ -168,7 +168,7 @@ Cada plan sigue estas fases:
 - [x] Fase 3: Editor de texto enriquecido (tentap-editor)
 - [x] Fase 4: Rediseno completo de pantallas del editor
 - [x] Fase 5: Escaner de plantillas
-- [ ] Fase 6: Copiloto IA integrado
+- [x] Fase 6: Copiloto IA integrado
 - [ ] Fase 7: Exportacion y navegacion
 - [ ] Fase 8: Limpieza y verificacion
 

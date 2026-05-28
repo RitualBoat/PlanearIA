@@ -37,7 +37,7 @@ El plan de refactorizacion del modulo de Planeaciones esta en la raiz del proyec
 
 Cada modulo recibira su propio plan siguiendo el mismo patron de fases. El orden previsto:
 
-1. Planeaciones (en progreso, Fase 5 completada)
+1. Planeaciones (en progreso, Fase 6 completada)
 2. Recursos didacticos
 3. Grupos y alumnos
 4. Login y autenticacion
@@ -50,6 +50,7 @@ Avance actual del modulo de Planeaciones:
 - Fase 3 completada (editor base con Tentap + toolbars + modo responsive)
 - Fase 4 completada (DocEditor + secciones modulares + wizard/lista V2)
 - Fase 5 completada (escaner de plantillas PDF/DOCX + flujo Desde plantilla V2)
+- Fase 6 completada (endpoint copiloto + servicio/hook + AIToolbar integrada + generacion V2)
 
 ---
 

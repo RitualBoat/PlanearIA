@@ -636,7 +636,89 @@ Cuando un modulo tenga edicion compleja, se debe preferir una experiencia tipo h
 
 ---
 
-## 10. Reglas de IA
+## 10. Reglas de Navegacion y UX/UI Global
+
+Cada plan de modulo debe incluir una auditoria de navegacion. No basta con que el modulo funcione aislado.
+
+Todo plan debe responder:
+
+- Desde donde entra el usuario al modulo.
+- A donde vuelve despues de crear, editar, guardar, cancelar, exportar o eliminar.
+- Que tab, hub, FAB, menu contextual, card, buscador o deep link lleva al modulo.
+- Que rutas deben desaparecer, redirigirse o quedar ocultas por legacy.
+- Que acciones cruzadas conectan con otros modulos.
+- Que ocurre en web, tablet y movil.
+- Que estado se conserva al volver: filtros, busqueda, tab activa, borrador o seleccion.
+- Que pantallas quedan bloqueadas si el usuario esta offline.
+- Que botones principales y secundarios deben existir.
+- Que flujos son redundantes y deben fusionarse.
+
+Todo plan debe incluir un mapa minimo de flujos:
+
+```markdown
+## Mapa de Navegacion del Modulo
+
+- Entrada principal: [tab/hub/ruta].
+- Entradas secundarias: [FAB/menu/card/deep link].
+- Crear: [origen] -> [selector/configuracion] -> [editor/detalle] -> [lista/detalle].
+- Editar: [lista/card/buscador] -> [editor] -> [detalle/lista].
+- Compartir/exportar/asignar: [origen] -> [accion] -> [resultado].
+- Salidas seguras: cancelar, guardar, volver, cerrar modal.
+- Rutas legacy: eliminar, ocultar o redirigir.
+```
+
+Todo plan debe incluir una fase o bloque dedicado a UX/UI y navegacion cuando:
+
+- El modulo toca tabs principales.
+- El modulo toca `ContenidoScreen`.
+- El modulo crea rutas nuevas.
+- El modulo elimina rutas legacy.
+- El modulo se conecta con otros modulos.
+- El modulo agrega FAB, modales, menus contextuales o cards.
+- El flujo actual queda profundo, duplicado o poco intuitivo.
+
+Puede existir un plan independiente llamado `Plan Maestro: UX/UI y Navegacion Global - PlanearIA` cuando el objetivo sea:
+
+- Auditar toda la app.
+- Redisenar tabs principales.
+- Unificar hubs.
+- Revisar todos los CTAs.
+- Reducir redundancia.
+- Mejorar accesibilidad.
+- Modernizar visualmente la app.
+- Asegurar que ningun modulo quede aislado.
+- Definir estandares visuales y de interaccion para todos los modulos.
+
+Ese plan global debe revisar como minimo:
+
+- `src/navigation/StackNavigator.tsx`.
+- `src/navigation/AppTabsNavigator.tsx`.
+- `src/screens/contenido/ContenidoScreen.tsx`.
+- `src/components/CrearNuevoModal.tsx`.
+- `src/components/FloatingActionIcons.tsx`.
+- Todos los menus contextuales.
+- Todos los empty states.
+- Todas las acciones de crear/editar/ver/detalle/exportar/compartir/asignar.
+
+Checklist obligatorio para UX/UI y navegacion:
+
+- [ ] Cada modulo tiene entrada principal clara.
+- [ ] Cada modulo tiene ruta para volver sin perder contexto.
+- [ ] Cada accion primaria tiene un CTA visible.
+- [ ] No hay doble captura de datos.
+- [ ] No hay dos pantallas haciendo lo mismo sin justificacion.
+- [ ] No hay rutas modernas escondidas detras de hubs legacy.
+- [ ] No hay modales que bloqueen clicks al cerrarse.
+- [ ] No hay botones activos ilegibles.
+- [ ] No hay cards sin accion clara.
+- [ ] No hay flujos que terminen en una pantalla sin salida evidente.
+- [ ] Los empty states llevan a la accion correcta.
+- [ ] Web, tablet y movil tienen navegacion usable.
+- [ ] Los lectores de pantalla tienen labels basicos en acciones principales.
+
+---
+
+## 11. Reglas de IA
 
 Todo plan con IA debe exigir:
 
@@ -654,9 +736,9 @@ Todo plan con IA debe exigir:
 
 ---
 
-## 11. Directrices por Modulo Futuro
+## 12. Directrices por Modulo Futuro
 
-### 11.1 Planeaciones
+### 12.1 Planeaciones
 
 No generar un plan nuevo sin leer `plan_planeaciones.md`.
 
@@ -666,7 +748,7 @@ Si se retoma:
 - Priorizar Fase 9 hasta cerrar web, movil, editor tipo Docs/Word e IA.
 - Actualizar README/documentacion si cambia arquitectura.
 
-### 11.2 Recursos Evaluables
+### 12.2 Recursos Evaluables
 
 Debe cubrir:
 
@@ -699,7 +781,7 @@ Debe exigir:
 - IA para crear reactivos, revisar respuestas y sugerir retroalimentacion.
 - Revision humana obligatoria.
 
-### 11.3 Recursos Didacticos
+### 12.3 Recursos Didacticos
 
 Debe cubrir:
 
@@ -725,7 +807,7 @@ Debe exigir:
 - Control de almacenamiento local.
 - Cache offline.
 
-### 11.4 Gestion de Grupos y Alumnos
+### 12.4 Gestion de Grupos y Alumnos
 
 Debe cubrir:
 
@@ -748,7 +830,7 @@ Debe exigir:
 - Cuidado de datos personales.
 - Offline-first robusto.
 
-### 11.5 Red Social Educativa
+### 12.5 Red Social Educativa
 
 Debe cubrir:
 
@@ -771,7 +853,7 @@ Debe exigir:
 - IA opcional para resumir, redactar y moderar.
 - Separacion entre contenido privado y compartido.
 
-### 11.6 Chat y Mensajeria
+### 12.6 Chat y Mensajeria
 
 Debe cubrir:
 
@@ -792,7 +874,7 @@ Debe exigir:
 - Privacidad.
 - No duplicar mensajes en sync.
 
-### 11.7 Plantillas
+### 12.7 Plantillas
 
 Debe cubrir:
 
@@ -811,7 +893,7 @@ Debe exigir:
 - Importacion/exportacion.
 - Sanitizacion de datos personales antes de compartir.
 
-### 11.8 Seguridad y Autenticacion
+### 12.8 Seguridad y Autenticacion
 
 Debe cubrir:
 
@@ -836,7 +918,7 @@ Debe exigir:
 - Manejo de secretos.
 - Plan de bajo costo para email.
 
-### 11.9 Infraestructura y DevOps
+### 12.9 Infraestructura y DevOps
 
 Debe cubrir:
 
@@ -862,7 +944,7 @@ Debe exigir:
 - Rollback.
 - Seguridad de secretos.
 
-### 11.10 Despliegue y Distribucion
+### 12.10 Despliegue y Distribucion
 
 Debe cubrir:
 
@@ -887,7 +969,7 @@ Debe exigir:
 - Crash reporting.
 - Analitica basica.
 
-### 11.11 Notificaciones
+### 12.11 Notificaciones
 
 Debe cubrir:
 
@@ -904,7 +986,7 @@ Debe exigir:
 - Opt-in/opt-out.
 - Costos.
 
-### 11.12 Cuenta, Perfil, Configuracion y Accesibilidad
+### 12.12 Cuenta, Perfil, Configuracion y Accesibilidad
 
 Debe cubrir:
 
@@ -924,7 +1006,7 @@ Debe exigir:
 - Sincronizacion de preferencias.
 - Separacion entre perfil publico y configuracion privada.
 
-### 11.13 Onboarding y Ayuda
+### 12.13 Onboarding y Ayuda
 
 Debe cubrir:
 
@@ -941,7 +1023,7 @@ Debe exigir:
 
 ---
 
-## 12. Tracking Obligatorio
+## 13. Tracking Obligatorio
 
 Cada tarea debe usar:
 
@@ -966,7 +1048,7 @@ Cada avance debe registrar:
 
 ---
 
-## 13. Reglas para IAs Durante Ejecucion
+## 14. Reglas para IAs Durante Ejecucion
 
 Cuando una IA implemente una fase:
 
@@ -975,6 +1057,7 @@ Cuando una IA implemente una fase:
 - Debe no revertir cambios ajenos.
 - Debe actualizar el plan al completar avances.
 - Debe actualizar documentacion si cambia arquitectura.
+- Debe validar que las rutas nuevas queden enlazadas desde tabs, hubs, CTAs, menus o cards reales.
 - Debe correr validaciones proporcionales.
 - Debe hacer commit solo si el usuario lo pide.
 - Debe pedir confirmacion antes de saltar a otra fase grande si el usuario lo solicito.
@@ -982,7 +1065,7 @@ Cuando una IA implemente una fase:
 
 ---
 
-## 14. Plantilla Rapida para Nuevo Plan
+## 15. Plantilla Rapida para Nuevo Plan
 
 ```markdown
 # Plan Maestro: [Modulo] - PlanearIA
@@ -1005,6 +1088,8 @@ Cuando una IA implemente una fase:
 ## Modelo de Datos Objetivo
 
 ## UX/UI Objetivo
+
+## Mapa de Navegacion y UX/UI Global
 
 ## IA y Automatizacion
 
@@ -1034,6 +1119,9 @@ Cuando una IA implemente una fase:
 ### FASE 5: IA / Funciones Avanzadas
 - [ ] ...
 
+### FASE 6: Integracion, Navegacion y UX/UI Global
+- [ ] ...
+
 ### FASE FINAL: Limpieza, Validacion y Documentacion
 - [ ] ...
 
@@ -1046,7 +1134,7 @@ Cuando una IA implemente una fase:
 
 ---
 
-## 15. Criterio de Calidad de un Buen Plan
+## 16. Criterio de Calidad de un Buen Plan
 
 Un plan es aceptable solo si:
 
@@ -1059,11 +1147,13 @@ Un plan es aceptable solo si:
 - Incluye validacion.
 - Incluye costos cuando aplica.
 - Considera dependencias entre modulos.
+- Garantiza que el modulo no queda aislado y que sus flujos de entrada/salida son claros.
+- Detecta redundancias de UX/UI y propone eliminarlas o consolidarlas.
 - Define criterio de cierre en lenguaje de usuario.
 
 ---
 
-## 16. Mandato Final
+## 17. Mandato Final
 
 PlanearIA debe crecer como una app profesional, pero con una estrategia realista para un estudiante que trabaja solo. Cada plan futuro debe ayudar a construir algo que pueda demostrarse, mantenerse y eventualmente lanzarse sin quedar atrapado en complejidad innecesaria.
 

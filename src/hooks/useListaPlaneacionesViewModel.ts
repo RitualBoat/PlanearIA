@@ -3,7 +3,7 @@ import { Alert, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
-import { usePlaneaciones } from "../sync/providers/SyncProvider";
+import { usePlaneaciones } from "../context/PlaneacionesContext";
 import {
   NivelAcademico,
   type FiltrosPlaneacionV2,

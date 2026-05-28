@@ -11,8 +11,6 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
 
 const mockNavigate = jest.fn();
 const mockFetch = jest.fn();
-const mockAgregarPlaneacion = jest.fn();
-const mockObtenerPlaneacion = jest.fn();
 const mockForceSync = jest.fn();
 const mockCrear = jest.fn();
 
@@ -30,11 +28,9 @@ jest.mock("../../sync/config/apiConfig", () => ({
   },
 }));
 
-jest.mock("../../sync/providers/SyncProvider", () => ({
+jest.mock("../../context/PlaneacionesContext", () => ({
   usePlaneaciones: () => ({
     crear: mockCrear,
-    agregarPlaneacion: mockAgregarPlaneacion,
-    obtenerPlaneacion: mockObtenerPlaneacion,
     forceSync: mockForceSync,
   }),
 }));
@@ -51,9 +47,7 @@ jest.mock("../../context/AuthContext", () => ({
 describe("useCrearPlaneacionViewModel", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockObtenerPlaneacion.mockReturnValue(undefined);
     mockForceSync.mockResolvedValue(undefined);
-    mockAgregarPlaneacion.mockResolvedValue(undefined);
     mockCrear.mockResolvedValue(undefined);
   });
 
@@ -214,7 +208,7 @@ describe("useCrearPlaneacionViewModel", () => {
       await result.current.handleGuardarPlaneacionIA();
     });
 
-    expect(mockAgregarPlaneacion).toHaveBeenCalledTimes(1);
+    expect(mockCrear).toHaveBeenCalledTimes(1);
     expect(mockForceSync).toHaveBeenCalledTimes(1);
     expect(result.current.showPreviewModal).toBe(false);
   });
@@ -252,7 +246,7 @@ describe("useCrearPlaneacionViewModel", () => {
       await result.current.handleEditarPlaneacionIA();
     });
 
-    expect(mockAgregarPlaneacion).toHaveBeenCalledTimes(1);
+    expect(mockCrear).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith(
       "DocEditor",
       expect.objectContaining({

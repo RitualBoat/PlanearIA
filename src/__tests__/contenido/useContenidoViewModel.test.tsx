@@ -21,7 +21,7 @@ let mockRecursos: Recurso[] = [];
 let mockEntregables: Tarea[] = [];
 let mockPlantillas: Plantilla[] = [];
 
-jest.mock("../../sync/providers/SyncProvider", () => ({
+jest.mock("../../context/PlaneacionesContext", () => ({
   usePlaneaciones: () => ({
     documentos: mockDocumentos,
     isLoading: false,

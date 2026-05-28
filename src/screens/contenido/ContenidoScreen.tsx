@@ -800,7 +800,7 @@ const ContenidoScreen: React.FC = () => {
       </Text>
       <TouchableOpacity
         style={styles.emptyPrimary}
-        onPress={() => navigation.navigate("Planeaciones")}
+        onPress={() => navigation.navigate("CrearPlaneacion")}
       >
         <LinearGradient
           colors={["#004580", "#005da8"]}
@@ -1186,6 +1186,7 @@ const ContenidoScreen: React.FC = () => {
               </View>
             }
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           />
         </View>
       )}
@@ -1228,8 +1229,8 @@ const ContenidoScreen: React.FC = () => {
       )}
 
       {/* Modals */}
-      {renderContextMenu()}
-      {renderDeleteModal()}
+      {menuItem ? renderContextMenu() : null}
+      {deleteConfirm ? renderDeleteModal() : null}
       {showContactSelector && (
         <ModalSelectorContactos
           visible={showContactSelector}
@@ -1577,6 +1578,7 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 100,
     paddingHorizontal: 0,
+    flexGrow: 1,
   },
 
   // Sidebar (desktop)

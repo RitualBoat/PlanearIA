@@ -27,6 +27,7 @@ const GenerarPlaneacionIAScreen: React.FC = () => {
     setNivelIA,
     handleGenerarConIA,
     handleGuardarPlaneacionIA,
+    handleEditarPlaneacionIA,
   } = useCrearPlaneacionViewModel();
 
   return (
@@ -35,26 +36,18 @@ const GenerarPlaneacionIAScreen: React.FC = () => {
 
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.headerRow}>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => navigation.goBack()}
-            accessibilityLabel="Regresar"
-          >
+          <TouchableOpacity style={styles.iconButton} onPress={() => navigation.goBack()} accessibilityLabel="Regresar">
             <MaterialIcons name="arrow-back" size={26} color={COLORS.text} />
           </TouchableOpacity>
 
-          <Text style={styles.headerTitle}>Generar Planeación</Text>
+          <Text style={styles.headerTitle}>Generar Planeacion</Text>
 
           <View style={styles.iconButton}>
             <MaterialIcons name="auto-awesome" size={22} color={COLORS.primary} />
           </View>
         </View>
 
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={true}
-          bounces={false}
-        >
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator bounces={false}>
           <Text style={styles.sectionCaption}>INSTRUCCIONES PARA LA IA</Text>
 
           <GenerarPlaneacionIAForm
@@ -77,7 +70,7 @@ const GenerarPlaneacionIAScreen: React.FC = () => {
           {planeacionGeneradaIA ? (
             <View style={styles.previewSection}>
               <View style={styles.previewHeaderRow}>
-                <Text style={styles.previewTitle}>Vista Previa</Text>
+                <Text style={styles.previewTitle}>Vista previa</Text>
                 <View style={styles.previewLine} />
               </View>
 
@@ -106,21 +99,26 @@ const GenerarPlaneacionIAScreen: React.FC = () => {
                 {planeacionGeneradaIA.recursos.length > 0 ? (
                   planeacionGeneradaIA.recursos.map((recurso, index) => (
                     <Text style={styles.resourceItem} key={`${recurso}_${index}`}>
-                      • {recurso}
+                      - {recurso}
                     </Text>
                   ))
                 ) : (
-                  <Text style={styles.resourceItem}>• Recursos sugeridos por IA</Text>
+                  <Text style={styles.resourceItem}>- Recursos sugeridos por IA</Text>
                 )}
               </View>
 
               <TouchableOpacity style={styles.saveButton} onPress={handleGuardarPlaneacionIA}>
                 <MaterialIcons name="save" size={20} color={COLORS.surface} />
-                <Text style={styles.saveButtonText}>Guardar Planeación</Text>
+                <Text style={styles.saveButtonText}>Guardar Planeacion</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.editButton} onPress={handleEditarPlaneacionIA}>
+                <MaterialIcons name="edit" size={20} color={COLORS.primary} />
+                <Text style={styles.editButtonText}>Editar en DocEditor</Text>
               </TouchableOpacity>
 
               <Text style={styles.warningText}>
-                La IA puede cometer errores. Revisa siempre el contenido pedagógico.
+                La IA puede cometer errores. Revisa siempre el contenido pedagogico.
               </Text>
             </View>
           ) : null}
@@ -273,6 +271,22 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: COLORS.surface,
     fontSize: FONT_SIZES.xlarge,
+    fontWeight: "700",
+  },
+  editButton: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 12,
+    minHeight: 52,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    gap: 10,
+    borderWidth: 1,
+    borderColor: COLORS.primary + "44",
+  },
+  editButtonText: {
+    color: COLORS.primary,
+    fontSize: FONT_SIZES.large,
     fontWeight: "700",
   },
   warningText: {

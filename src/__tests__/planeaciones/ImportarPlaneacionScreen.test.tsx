@@ -66,7 +66,7 @@ jest.mock("@react-navigation/native", () => ({
   }),
 }));
 
-jest.mock("../../sync/providers/SyncProvider", () => ({
+jest.mock("../../context/PlaneacionesContext", () => ({
   usePlaneaciones: () => ({
     agregarPlaneacion: mockAgregarPlaneacion,
     forceSync: mockForceSync,

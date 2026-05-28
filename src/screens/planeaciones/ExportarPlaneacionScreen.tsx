@@ -20,7 +20,7 @@ import type { RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import * as Sharing from "expo-sharing";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
-import { usePlaneaciones } from "../../sync/providers/SyncProvider";
+import { usePlaneaciones } from "../../context/PlaneacionesContext";
 import { COLORS } from "../../../types";
 import {
   exportPlaneacionToPdf,
@@ -197,6 +197,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
           <View style={styles.headerRow}>
             <TouchableOpacity style={styles.headerIconButton} onPress={() => navigation.goBack()}>
@@ -449,7 +450,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
                 style={styles.successSecondaryButton}
                 onPress={() => {
                   setShowSuccess(false);
-                  navigation.navigate("Planeaciones");
+                  navigation.navigate("ListaPlaneaciones");
                 }}
               >
                 <MaterialIcons name="home" size={18} color={COLORS.textSecondary} />
@@ -474,6 +475,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 110,
     gap: 12,
+    flexGrow: 1,
   },
   headerRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   headerIconButton: {

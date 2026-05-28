@@ -1,5 +1,5 @@
 import React from "react";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
@@ -9,303 +9,172 @@ const CrearPlaneacionScreen: React.FC = () => {
   const { colors } = useTheme();
   const vm = useCrearPlaneacionViewModel();
 
-  const StepHeader = (
-    <View style={styles.stepHeader}>
-      {[1, 2, 3].map((stepNumber) => {
-        const active = vm.step === stepNumber;
-        const done = vm.step > stepNumber;
-        return (
-          <View key={stepNumber} style={styles.stepItem}>
-            <View
-              style={[
-                styles.stepCircle,
-                {
-                  borderColor: active || done ? colors.primary : colors.borderLight,
-                  backgroundColor: done ? colors.primary : active ? colors.primaryContainer : colors.surfaceContainerLow,
-                },
-              ]}
-            >
-              {done ? (
-                <MaterialIcons name="check" size={16} color={colors.surface} />
-              ) : (
-                <Text style={[styles.stepText, { color: active ? colors.primary : colors.onSurfaceVariant }]}>
-                  {stepNumber}
-                </Text>
-              )}
-            </View>
-            {stepNumber < 3 ? (
-              <View
-                style={[
-                  styles.stepLine,
-                  {
-                    backgroundColor: vm.step > stepNumber ? colors.primary : colors.borderLight,
-                  },
-                ]}
-              />
-            ) : null}
-          </View>
-        );
-      })}
-    </View>
-  );
-
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={[styles.title, { color: colors.onSurface }]}>Nueva planeacion</Text>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={[styles.title, { color: colors.onSurface }]}>Crear planeacion</Text>
         <Text style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
-          Wizard en 3 pasos para abrir el nuevo DocEditor.
+          Selecciona una plantilla y abre directamente el documento en DocEditor.
         </Text>
-        {StepHeader}
 
-        {vm.step === 1 ? (
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.onSurface }]}>1. Selecciona nivel academico</Text>
-            <View style={styles.cardsGrid}>
-              {vm.niveles.map((nivel) => {
-                const selected = vm.nivelSeleccionado === nivel.nivel;
+        <View style={styles.levelRow}>
+          {vm.niveles.map((item) => {
+            const selected = vm.nivelSeleccionado === item.nivel;
+            return (
+              <Pressable
+                key={item.nivel}
+                style={[
+                  styles.levelChip,
+                  {
+                    borderColor: selected ? colors.primary : colors.borderLight,
+                    backgroundColor: selected ? colors.primaryContainer : colors.surfaceContainerLowest,
+                  },
+                ]}
+                onPress={() => vm.setNivelSeleccionado(item.nivel)}
+              >
+                <Text style={[styles.levelChipText, { color: selected ? colors.primary : colors.onSurfaceVariant }]}>
+                  {item.titulo}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        {vm.sections.map((section) => (
+          <View key={section.id} style={styles.sectionBlock}>
+            <Text style={[styles.sectionTitle, { color: colors.onSurface }]}>{section.title}</Text>
+
+            {section.items.length > 0 ? (
+              section.items.map((item) => {
+                const selected = vm.selectedTemplateId === item.id;
                 return (
                   <Pressable
-                    key={nivel.nivel}
+                    key={item.id}
                     style={[
-                      styles.selectCard,
+                      styles.templateCard,
                       {
                         borderColor: selected ? colors.primary : colors.borderLight,
                         backgroundColor: selected ? colors.primaryContainer : colors.surfaceContainerLowest,
+                        opacity: item.disabled ? 0.7 : 1,
                       },
                     ]}
-                    onPress={() => vm.seleccionarNivel(nivel.nivel)}
+                    onPress={() => vm.seleccionarPlantilla(item.id)}
                   >
-                    <MaterialIcons name={nivel.icon as any} size={26} color={selected ? colors.primary : colors.onSurfaceVariant} />
-                    <Text style={[styles.cardTitle, { color: selected ? colors.primary : colors.onSurface }]}>
-                      {nivel.titulo}
-                    </Text>
-                    <Text style={[styles.cardDescription, { color: colors.onSurfaceVariant }]}>{nivel.descripcion}</Text>
+                    <View style={styles.templateIcon}>
+                      <MaterialIcons
+                        name={selected ? "check-circle" : item.source === "online" ? "public" : "description"}
+                        size={20}
+                        color={selected ? colors.primary : colors.onSurfaceVariant}
+                      />
+                    </View>
+                    <View style={styles.templateText}>
+                      <Text style={[styles.templateTitle, { color: selected ? colors.primary : colors.onSurface }]}>
+                        {item.nombre}
+                      </Text>
+                      <Text style={[styles.templateDesc, { color: colors.onSurfaceVariant }]}>{item.descripcion}</Text>
+                    </View>
                   </Pressable>
                 );
-              })}
-            </View>
-          </View>
-        ) : null}
-
-        {vm.step === 2 ? (
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.onSurface }]}>2. Elige metodo de creacion</Text>
-            <View style={styles.cardsGrid}>
-              {vm.metodos.map((metodo) => {
-                const selected = vm.metodoSeleccionado === metodo.id;
-                return (
-                  <Pressable
-                    key={metodo.id}
-                    style={[
-                      styles.selectCard,
-                      {
-                        borderColor: selected ? colors.primary : colors.borderLight,
-                        backgroundColor: selected ? colors.primaryContainer : colors.surfaceContainerLowest,
-                      },
-                    ]}
-                    onPress={() => vm.seleccionarMetodo(metodo.id)}
-                  >
-                    <MaterialIcons name={metodo.icon as any} size={26} color={selected ? colors.primary : colors.onSurfaceVariant} />
-                    <Text style={[styles.cardTitle, { color: selected ? colors.primary : colors.onSurface }]}>
-                      {metodo.titulo}
-                    </Text>
-                    <Text style={[styles.cardDescription, { color: colors.onSurfaceVariant }]}>
-                      {metodo.descripcion}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </View>
-        ) : null}
-
-        {vm.step === 3 ? (
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.onSurface }]}>3. Configuracion inicial</Text>
-            <Text style={[styles.helper, { color: colors.onSurfaceVariant }]}>
-              {vm.metodoSeleccionado === "ia" || vm.metodoSeleccionado === "importar"
-                ? "Este metodo te llevara al flujo especializado."
-                : vm.metodoSeleccionado === "plantilla"
-                  ? "Selecciona una plantilla escaneada. Asignatura, grado y grupos son opcionales si la plantilla ya los incluye."
-                : "Estos datos se precargan en el documento antes de abrir DocEditor."}
-            </Text>
-
-            {vm.metodoSeleccionado === "plantilla" ? (
-              <View style={styles.templatesBlock}>
-                {vm.isLoadingPlantillas ? (
-                  <View style={[styles.templateEmptyCard, { borderColor: colors.borderLight, backgroundColor: colors.surfaceContainerLowest }]}>
-                    <ActivityIndicator size="small" color={colors.primary} />
-                    <Text style={[styles.templateEmptyText, { color: colors.onSurfaceVariant }]}>
-                      Cargando plantillas...
-                    </Text>
-                  </View>
-                ) : vm.plantillasDocumento.length > 0 ? (
-                  vm.plantillasDocumento.map((plantilla) => {
-                    const selected = vm.plantillaSeleccionadaId === plantilla.id;
-                    return (
-                      <Pressable
-                        key={plantilla.id}
-                        style={[
-                          styles.templateCard,
-                          {
-                            borderColor: selected ? colors.primary : colors.borderLight,
-                            backgroundColor: selected ? colors.primaryContainer : colors.surfaceContainerLowest,
-                          },
-                        ]}
-                        onPress={() => vm.setPlantillaSeleccionadaId(plantilla.id)}
-                      >
-                        <View style={styles.templateCardIcon}>
-                          <MaterialIcons
-                            name={selected ? "check-circle" : "view-quilt"}
-                            size={22}
-                            color={selected ? colors.primary : colors.onSurfaceVariant}
-                          />
-                        </View>
-                        <View style={styles.templateCardText}>
-                          <Text style={[styles.templateCardTitle, { color: selected ? colors.primary : colors.onSurface }]}>
-                            {plantilla.nombre}
-                          </Text>
-                          <Text style={[styles.templateCardMeta, { color: colors.onSurfaceVariant }]}>
-                            {plantilla.secciones.length} secciones | {plantilla.origen}
-                          </Text>
-                          {plantilla.descripcion ? (
-                            <Text style={[styles.templateCardDesc, { color: colors.onSurfaceVariant }]}>
-                              {plantilla.descripcion}
-                            </Text>
-                          ) : null}
-                        </View>
-                      </Pressable>
-                    );
-                  })
-                ) : (
-                  <View style={[styles.templateEmptyCard, { borderColor: colors.borderLight, backgroundColor: colors.surfaceContainerLowest }]}>
-                    <MaterialIcons name="document-scanner" size={26} color={colors.primary} />
-                    <Text style={[styles.templateEmptyTitle, { color: colors.onSurface }]}>Aun no hay plantillas V2</Text>
-                    <Text style={[styles.templateEmptyText, { color: colors.onSurfaceVariant }]}>
-                      Escanea una planeacion PDF/DOCX para convertir su formato en plantilla reutilizable.
-                    </Text>
-                  </View>
-                )}
-
-                <Pressable
-                  style={[styles.scanButton, { borderColor: colors.primary, backgroundColor: colors.primaryContainer }]}
-                  onPress={vm.handleEscanearPlantilla}
-                >
-                  <MaterialIcons name="document-scanner" size={18} color={colors.primary} />
-                  <Text style={[styles.scanButtonText, { color: colors.primary }]}>Escanear nueva plantilla</Text>
-                </Pressable>
+              })
+            ) : (
+              <View
+                style={[
+                  styles.emptyCard,
+                  {
+                    borderColor: colors.borderLight,
+                    backgroundColor: colors.surfaceContainerLowest,
+                  },
+                ]}
+              >
+                <MaterialIcons name="folder-open" size={18} color={colors.onSurfaceVariant} />
+                <Text style={[styles.emptyText, { color: colors.onSurfaceVariant }]}>
+                  {section.emptyText || "Sin plantillas disponibles."}
+                </Text>
               </View>
-            ) : null}
-
-            {vm.metodoSeleccionado !== "ia" && vm.metodoSeleccionado !== "importar" ? (
-              <>
-                <Text style={[styles.label, { color: colors.onSurfaceVariant }]}>Asignatura</Text>
-                <TextInput
-                  style={[
-                    styles.input,
-                    {
-                      borderColor: colors.borderLight,
-                      backgroundColor: colors.surfaceContainerLowest,
-                      color: colors.onSurface,
-                    },
-                  ]}
-                  value={vm.asignatura}
-                  placeholder="Ej. Espanol"
-                  placeholderTextColor={colors.textMuted}
-                  onChangeText={vm.setAsignatura}
-                />
-
-                <Text style={[styles.label, { color: colors.onSurfaceVariant }]}>Grado</Text>
-                <TextInput
-                  style={[
-                    styles.input,
-                    {
-                      borderColor: colors.borderLight,
-                      backgroundColor: colors.surfaceContainerLowest,
-                      color: colors.onSurface,
-                    },
-                  ]}
-                  value={vm.grado}
-                  placeholder="Ej. 2do, 3A"
-                  placeholderTextColor={colors.textMuted}
-                  onChangeText={vm.setGrado}
-                />
-
-                <Text style={[styles.label, { color: colors.onSurfaceVariant }]}>Grupos (coma separada, opcional)</Text>
-                <TextInput
-                  style={[
-                    styles.input,
-                    {
-                      borderColor: colors.borderLight,
-                      backgroundColor: colors.surfaceContainerLowest,
-                      color: colors.onSurface,
-                    },
-                  ]}
-                  value={vm.gruposInput}
-                  placeholder="A, B, C"
-                  placeholderTextColor={colors.textMuted}
-                  onChangeText={vm.setGruposInput}
-                />
-              </>
-            ) : null}
+            )}
           </View>
-        ) : null}
+        ))}
 
-        <View style={styles.actionsRow}>
+        <View style={styles.actions}>
           <Pressable
             style={[
-              styles.actionButton,
+              styles.primaryButton,
               {
-                borderColor: colors.borderLight,
-                backgroundColor: colors.surfaceContainerLow,
-                opacity: vm.step === 1 ? 0.45 : 1,
+                borderColor: colors.primary,
+                backgroundColor: colors.primary,
+                opacity: vm.isSubmitting ? 0.7 : 1,
               },
             ]}
-            disabled={vm.step === 1}
-            onPress={vm.irAnterior}
+            disabled={vm.isSubmitting}
+            onPress={() => {
+              void vm.crearDesdePlantillaSeleccionada();
+            }}
           >
-            <Text style={[styles.actionButtonText, { color: colors.onSurfaceVariant }]}>Atras</Text>
+            {vm.isSubmitting ? (
+              <ActivityIndicator size="small" color={colors.surface} />
+            ) : (
+              <>
+                <MaterialIcons name="description" size={18} color={colors.surface} />
+                <Text style={[styles.primaryButtonText, { color: colors.surface }]}>Abrir en DocEditor</Text>
+              </>
+            )}
           </Pressable>
 
-          {vm.step < 3 ? (
+          <View style={styles.secondaryActions}>
             <Pressable
               style={[
-                styles.actionButton,
+                styles.secondaryButton,
                 {
-                  borderColor: colors.primary,
-                  backgroundColor: colors.primary,
-                  opacity: vm.puedeAvanzar ? 1 : 0.45,
+                  borderColor: colors.borderLight,
+                  backgroundColor: colors.surfaceContainerLow,
                 },
               ]}
-              disabled={!vm.puedeAvanzar}
-              onPress={vm.irSiguiente}
+              onPress={vm.handleEscanearPlantilla}
             >
-              <Text style={[styles.actionButtonText, { color: colors.surface }]}>Siguiente</Text>
+              <MaterialIcons name="document-scanner" size={16} color={colors.onSurfaceVariant} />
+              <Text style={[styles.secondaryButtonText, { color: colors.onSurfaceVariant }]}>Importar plantilla</Text>
             </Pressable>
-          ) : (
+
             <Pressable
               style={[
-                styles.actionButton,
+                styles.secondaryButton,
                 {
-                  borderColor: colors.primary,
-                  backgroundColor: colors.primary,
-                  opacity: vm.puedeAvanzar ? 1 : 0.45,
+                  borderColor: colors.borderLight,
+                  backgroundColor: colors.surfaceContainerLow,
                 },
               ]}
-              disabled={!vm.puedeAvanzar || vm.isSubmitting}
-              onPress={() => {
-                void vm.finalizar();
-              }}
+              onPress={vm.handleImportarPlaneacion}
             >
-              {vm.isSubmitting ? (
-                <ActivityIndicator size="small" color={colors.surface} />
-              ) : (
-                <Text style={[styles.actionButtonText, { color: colors.surface }]}>Finalizar</Text>
-              )}
+              <MaterialIcons name="file-upload" size={16} color={colors.onSurfaceVariant} />
+              <Text style={[styles.secondaryButtonText, { color: colors.onSurfaceVariant }]}>Importar contenido</Text>
             </Pressable>
-          )}
+
+            <Pressable
+              style={[
+                styles.secondaryButton,
+                {
+                  borderColor: colors.borderLight,
+                  backgroundColor: colors.surfaceContainerLow,
+                },
+              ]}
+              onPress={vm.handleGenerarConIADesdeSelector}
+            >
+              <MaterialIcons name="auto-awesome" size={16} color={colors.onSurfaceVariant} />
+              <Text style={[styles.secondaryButtonText, { color: colors.onSurfaceVariant }]}>Generar con IA</Text>
+            </Pressable>
+          </View>
         </View>
+
+        {vm.isLoadingPlantillas ? (
+          <View style={styles.loadingRow}>
+            <ActivityIndicator size="small" color={colors.primary} />
+            <Text style={[styles.loadingText, { color: colors.onSurfaceVariant }]}>Cargando plantillas guardadas...</Text>
+          </View>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -319,71 +188,38 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 32,
     gap: 12,
+    flexGrow: 1,
   },
   title: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: "800",
   },
   subtitle: {
     fontSize: 13,
-    lineHeight: 19,
+    lineHeight: 18,
   },
-  stepHeader: {
+  levelRow: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 4,
+    flexWrap: "wrap",
+    gap: 8,
   },
-  stepItem: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  stepCircle: {
-    width: 30,
-    height: 30,
-    borderRadius: 999,
+  levelChip: {
     borderWidth: 1,
+    borderRadius: 999,
+    minHeight: 34,
+    paddingHorizontal: 12,
     justifyContent: "center",
-    alignItems: "center",
   },
-  stepText: {
-    fontSize: 13,
+  levelChipText: {
+    fontSize: 12,
     fontWeight: "700",
   },
-  stepLine: {
-    width: 48,
-    height: 2,
-  },
-  section: {
-    gap: 10,
+  sectionBlock: {
+    gap: 8,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  helper: {
-    fontSize: 12,
-    lineHeight: 17,
-  },
-  cardsGrid: {
-    gap: 8,
-  },
-  selectCard: {
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 12,
-    gap: 4,
-  },
-  cardTitle: {
     fontSize: 14,
-    fontWeight: "700",
-  },
-  cardDescription: {
-    fontSize: 12,
-    lineHeight: 17,
-  },
-  templatesBlock: {
-    gap: 8,
+    fontWeight: "800",
   },
   templateCard: {
     borderWidth: 1,
@@ -392,85 +228,76 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
   },
-  templateCardIcon: {
-    width: 28,
+  templateIcon: {
+    width: 24,
     alignItems: "center",
-    paddingTop: 1,
+    paddingTop: 2,
   },
-  templateCardText: {
+  templateText: {
     flex: 1,
-    gap: 3,
+    gap: 4,
   },
-  templateCardTitle: {
+  templateTitle: {
     fontSize: 14,
     fontWeight: "800",
   },
-  templateCardMeta: {
-    fontSize: 11,
-    fontWeight: "700",
-    textTransform: "uppercase",
-  },
-  templateCardDesc: {
+  templateDesc: {
     fontSize: 12,
     lineHeight: 17,
   },
-  templateEmptyCard: {
+  emptyCard: {
     borderWidth: 1,
-    borderRadius: 12,
-    padding: 14,
-    alignItems: "center",
-    gap: 6,
-  },
-  templateEmptyTitle: {
-    fontSize: 14,
-    fontWeight: "800",
-  },
-  templateEmptyText: {
-    fontSize: 12,
-    lineHeight: 17,
-    textAlign: "center",
-  },
-  scanButton: {
-    minHeight: 42,
     borderRadius: 10,
-    borderWidth: 1,
+    minHeight: 46,
+    paddingHorizontal: 10,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
+    gap: 8,
   },
-  scanButtonText: {
-    fontSize: 13,
-    fontWeight: "800",
-  },
-  label: {
+  emptyText: {
     fontSize: 12,
-    fontWeight: "600",
   },
-  input: {
+  actions: {
+    marginTop: 8,
+    gap: 8,
+  },
+  primaryButton: {
+    minHeight: 46,
     borderWidth: 1,
     borderRadius: 10,
-    minHeight: 42,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-  },
-  actionsRow: {
-    marginTop: 8,
+    alignItems: "center",
+    justifyContent: "center",
     flexDirection: "row",
     gap: 8,
   },
-  actionButton: {
-    flex: 1,
-    minHeight: 44,
-    borderRadius: 10,
-    borderWidth: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  actionButtonText: {
+  primaryButtonText: {
     fontSize: 14,
+    fontWeight: "800",
+  },
+  secondaryActions: {
+    gap: 8,
+  },
+  secondaryButton: {
+    minHeight: 42,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  secondaryButtonText: {
+    fontSize: 13,
     fontWeight: "700",
+  },
+  loadingRow: {
+    marginTop: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  loadingText: {
+    fontSize: 12,
   },
 });
 

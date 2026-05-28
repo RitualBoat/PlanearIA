@@ -230,13 +230,13 @@ describe("ContenidoScreen", () => {
     expect(getByText("Ver plantillas")).toBeTruthy();
   });
 
-  it("navega a Planeaciones al presionar 'Crear planeación' en empty state", () => {
+  it("navega a CrearPlaneacion al presionar 'Crear planeación' en empty state", () => {
     mockCurrentVm = { ...defaultVm, items: [], borradores: [], totalItems: 0 };
 
     const { getByText } = render(<ContenidoScreen />);
     fireEvent.press(getByText("Crear planeación"));
 
-    expect(mockNavigate).toHaveBeenCalledWith("Planeaciones");
+    expect(mockNavigate).toHaveBeenCalledWith("CrearPlaneacion");
   });
 
   it("muestra skeleton cuando isLoading", () => {

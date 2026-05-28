@@ -705,6 +705,16 @@ export interface FiltrosPlaneacionV2 {
 
 > Objetivo: cerrar la brecha entre la arquitectura V2 implementada y la experiencia real que ve el docente. Esta fase no asume que el modulo esta listo solo porque TypeScript, lint y tests pasaron. La meta es que crear, editar, generar con IA, importar, guardar, listar y exportar siempre pasen por el flujo moderno, con editor robusto tipo Docs/Word, plantilla base por defecto y comportamiento correcto en web y movil.
 
+#### Decisiones actualizadas para Fase 9
+
+- La app no esta en produccion, no tiene usuarios reales y los datos actuales son solo pruebas. Se permiten cambios bruscos, eliminacion de compatibilidad legacy y reseteos/migraciones agresivas si eso deja el modulo correcto.
+- No se debe optimizar esta fase para preservar datos V1/V2 de prueba. La prioridad es llegar al flujo final limpio.
+- Flujo objetivo principal: `Crear planeacion` -> selector de plantillas -> editor tipo Word/Docs.
+- El selector de plantillas debe incluir: plantilla base/default, plantillas guardadas, plantillas predeterminadas adicionales, plantillas online tipo galeria Canva y opcion para importar plantilla.
+- Importar plantilla significa subir una planeacion Word/PDF, escanearla con IA, conservar estructura/formato/campos y vaciar datos especificos como nombres, titulos, grupo, docente, fechas o contenido privado.
+- En web, el editor debe abrir como documento editable directo, visualmente parecido a Word/Docs.
+- En movil, debe existir un boton claro para alternar entre vista documento Word/Docs y formulario guiado. El formulario no reemplaza el documento: rellena los campos/placeholders del documento.
+
 #### Diagnostico inicial observado para Fase 9
 
 - El editor rico existe tecnicamente mediante `@10play/tentap-editor` en `RichTextEditor`, pero actualmente aparece embebido sobre todo dentro de campos de sesiones, no como una experiencia central de documento tipo Word/Docs.
@@ -731,24 +741,37 @@ export interface FiltrosPlaneacionV2 {
 - [ ] **9.2 Definir criterio de aceptacion del editor tipo Word/Docs**:
   - Debe existir un canvas principal de documento, no solo inputs por seccion.
   - Debe permitir escribir texto libre, seleccionar texto, negritas, cursivas, encabezados, listas, checklist, tablas, undo/redo y guardado.
-  - Debe cargar una plantilla base visible desde el primer ingreso, con estructura real de planeacion y texto/placeholder util.
-  - Debe guardar y reabrir contenido rich text sin perder JSON ProseMirror/Tiptap.
+  - Debe abrir siempre con una plantilla visible, aunque sea la default/base.
+  - Debe renderizar placeholders/campos dentro del documento, no solo labels externos de formulario.
+  - En web, la edicion primaria debe ocurrir directamente sobre el documento tipo Word/Docs.
+  - En movil, debe tener alternancia entre vista documento y formulario guiado, con sincronizacion bidireccional.
+  - Debe guardar y reabrir contenido rich text sin perder JSON ProseMirror/Tiptap ni mapeo de campos.
   - Debe funcionar en web, Android/iOS y modo movil/estandar sin bloquear scroll ni clicks.
 
 - [ ] **9.3 Redisenar la arquitectura del editor para que deje de sentirse como formulario**:
-  - Decidir si `DocEditorScreen` sera un documento unico con bloques editables o una pantalla hibrida con metadata lateral + canvas central.
+  - `DocEditorScreen` debe partir de un documento unico/canvas central, no de tarjetas de formulario como experiencia principal.
   - Mantener secciones pedagogicas solo como navegacion/estructura, no como sustituto del documento.
-  - Integrar `RichTextEditor` como superficie principal del documento, con bloques derivados de la plantilla.
+  - Integrar `RichTextEditor` como superficie principal del documento, con bloques derivados de la plantilla seleccionada.
+  - Definir un modelo de campos/placeholders dentro del documento para que la vista formulario movil pueda rellenarlos.
+  - En web, priorizar edicion directa del documento con toolbar persistente.
+  - En movil, agregar modo dual: `Documento` para revisar/editar visualmente y `Formulario` para capturar rapido campos estructurados.
   - Conservar campos estructurados solo cuando sean necesarios para filtros/exportacion/sync.
-  - Definir como se sincronizan los cambios entre canvas rich text y `PlaneacionDocumento` V2.
+  - Definir como se sincronizan los cambios entre canvas rich text, formulario movil y `PlaneacionDocumento` V2.
+  - **Avance aplicado 2026-05-28:** `DocEditorScreen` ahora abre con un canvas de documento enriquecido como superficie principal (editor tipo Word/Docs), con guardado en `contenidoRaw`.
+  - **Avance aplicado 2026-05-28:** en movil se agrego alternancia `Documento`/`Formulario` y en web/estandar el documento queda como experiencia primaria.
+  - **Avance aplicado 2026-05-28:** se agrego accion `Sincronizar plantilla` para regenerar el contenido del documento desde campos estructurados.
 
 - [ ] **9.4 Corregir el flujo de creacion para eliminar doble nivel y legacy**:
-  - `CrearNuevoModal` no debe pedir nivel si `CrearPlaneacionScreen` lo pide, o debe pasar el nivel y el wizard debe saltar ese paso.
-  - Elegir una sola fuente de verdad para `nivelAcademico`.
-  - Crear manual debe abrir el editor moderno con plantilla base predeterminada, no un formulario vacio.
-  - Crear con IA debe generar documento V2 y abrir `DocEditor`, no quedarse en preview legacy V1.
-  - Importar debe terminar en `DocEditor` con documento V2 editable, no en lista o hub intermedio.
-  - Escanear plantilla debe poder crear inmediatamente un documento desde la plantilla detectada.
+  - El flujo principal debe ser `Crear planeacion` -> `SelectorPlantillasPlaneacion` -> `DocEditor`.
+  - Eliminar la doble seleccion de nivel. Si el nivel se necesita, debe vivir dentro del selector/configuracion de plantilla y solo capturarse una vez.
+  - El selector debe ofrecer plantilla base/default, plantillas guardadas, plantillas predeterminadas adicionales, plantillas online y opcion importar plantilla.
+  - Si el usuario no elige plantilla personalizada, usar automaticamente la plantilla base/default.
+  - Crear manual debe abrir el editor moderno con documento visible, no un formulario vacio.
+  - Crear con IA debe operar sobre el documento V2 o sobre campos/placeholders de la plantilla seleccionada, y abrir `DocEditor`.
+  - Importar planeacion debe distinguir entre importar contenido y importar plantilla. Importar plantilla debe vaciar datos internos y conservar estructura.
+  - Escanear plantilla debe poder guardar la plantilla y crear inmediatamente una planeacion nueva desde ella.
+  - **Avance aplicado 2026-05-28:** `CrearPlaneacionScreen` ya funciona como selector de plantillas (base, predeterminadas, guardadas y online placeholder), elimina el wizard de 3 pasos y abre `DocEditor` directamente desde la plantilla elegida.
+  - **Avance aplicado 2026-05-28:** `CrearNuevoModal` ya no pide nivel para crear planeacion; navega directo a `CrearPlaneacion`.
 
 - [ ] **9.5 Corregir la edicion de planeaciones existentes**:
   - Verificar todos los puntos de entrada: card en Contenido, menu contextual, ListaPlaneaciones, borradores, exportacion, deep links y chat/feed si aplica.
@@ -756,11 +779,13 @@ export interface FiltrosPlaneacionV2 {
   - Si una planeacion legacy aparece, debe migrarse silenciosamente a V2 antes de abrir el editor moderno.
   - Eliminar o bloquear cualquier ruta que abra pantallas/formularios legacy para editar planeaciones.
 
-- [ ] **9.6 Crear una plantilla base predeterminada real**:
-  - Construir una `PlantillaDocumento` del sistema usando como fuente principal `context/planeaciones-reales/semana 33 y 34 primero/primero.md` y/o `segundo.md`.
+- [ ] **9.6 Crear sistema base de plantillas de planeacion**:
+  - Construir una `PlantillaDocumento` default del sistema usando como fuente principal `context/planeaciones-reales/semana 33 y 34 primero/primero.md` y/o `segundo.md`.
   - Incluir estructura minima siempre visible: info institucional, datos generales, elementos curriculares, sesiones, evaluacion, observaciones y firmas.
-  - Generar documento base desde esa plantilla en lugar de crear un documento totalmente vacio.
+  - Agregar varias plantillas predeterminadas locales por nivel/uso para que el selector no se sienta vacio.
+  - Generar documento base desde la plantilla seleccionada en lugar de crear un documento totalmente vacio.
   - Agregar fallback determinista si no hay plantillas de usuario ni plantillas escaneadas.
+  - Definir metadata para galeria: nombre, descripcion, nivel, etiquetas, miniatura/preview, origen y compatibilidad.
   - Validar que la plantilla predeterminada funciona para primaria, secundaria, preparatoria y universidad con placeholders adaptados.
 
 - [ ] **9.7 Limpiar rutas, pantallas y handlers legacy restantes**:
@@ -769,6 +794,8 @@ export interface FiltrosPlaneacionV2 {
   - Quitar compatibilidad temporal legacy de `useCrearPlaneacionViewModel` cuando ya no sea necesaria.
   - Reemplazar imports desde `sync/providers/SyncProvider` por imports directos desde `context/PlaneacionesContext` en el modulo de planeaciones/contenido.
   - Actualizar tests que todavia esperan navegar a `Planeaciones` o `GenerarPlaneacionIA`.
+  - **Avance aplicado 2026-05-28:** hooks y pantallas del modulo (`useDocEditorViewModel`, `useListaPlaneacionesViewModel`, `useContenidoViewModel`, `ImportarPlaneacionScreen`, `ExportarPlaneacionScreen`) ya importan `PlaneacionesContext`.
+  - **Avance aplicado 2026-05-28:** tests de contenido/planeaciones actualizados para mockear `context/PlaneacionesContext` en lugar de `SyncProvider`.
 
 - [ ] **9.8 Corregir scroll y clicks en web**:
   - Reproducir el bloqueo de scroll en `ContenidoScreen`, `CrearNuevoModal`, `CrearPlaneacionScreen` y `DocEditorScreen`.
@@ -776,6 +803,9 @@ export interface FiltrosPlaneacionV2 {
   - Asegurar que los modales no capturen clicks fuera de su area util ni bloqueen la lista al cerrarse.
   - Validar que TenTap/WebView no intercepta scroll global cuando no esta enfocado.
   - Agregar pruebas/smoke web para scroll vertical y clicks principales.
+  - **Avance aplicado 2026-05-28:** `CrearNuevoModal` ahora se desmonta por completo cuando `visible=false`, evitando overlays residuales que bloqueen clicks/scroll en web.
+  - **Avance aplicado 2026-05-28:** `ContenidoScreen`, `CrearPlaneacionScreen`, `ImportarPlaneacionScreen`, `ExportarPlaneacionScreen` y `DocEditorScreen` reforzaron `ScrollView/FlatList` con `keyboardShouldPersistTaps` y `flexGrow` para mejorar scroll/clicks.
+  - **Avance aplicado 2026-05-28:** `ContenidoScreen` renderiza modales contextuales solo cuando estan activos (en lugar de mantenerlos montados cerrados).
 
 - [ ] **9.9 Refinar la tab Contenido/Recursos sin sobrerrefactorizar**:
   - Mantener `ContenidoScreen` como hub de contenido si sigue siendo la mejor entrada principal.
@@ -783,6 +813,7 @@ export interface FiltrosPlaneacionV2 {
   - Cambiar CTA empty state de `Planeaciones` a `CrearPlaneacion` o al nuevo flujo decidido.
   - Asegurar que el FAB `Crear nuevo` no duplique preguntas ni mande a rutas legacy.
   - Verificar que acciones editar, duplicar, eliminar, exportar y compartir funcionen para planeaciones V2.
+  - **Avance aplicado 2026-05-28:** empty state de `ContenidoScreen` ya navega a `CrearPlaneacion` en lugar de `Planeaciones`.
 
 - [ ] **9.10 Endurecer persistencia y sincronizacion del editor**:
   - Verificar autosave local de `DocEditor` y recuperacion de borrador.
@@ -790,6 +821,7 @@ export interface FiltrosPlaneacionV2 {
   - Confirmar que guardar crea/actualiza exactamente un documento V2.
   - Confirmar que `clonar`, `eliminar`, `buscar`, `filtrar` y exportar usan la misma fuente de verdad.
   - Validar offline-first: crear/editar offline, reconectar, sincronizar y no duplicar documentos.
+  - **Avance aplicado 2026-05-28:** `useDocEditorViewModel` ahora usa clave de instancia por ruta para borradores de `modo: crear`, evitando colision entre borradores del mismo nivel.
 
 - [ ] **9.11 Agregar pruebas automatizadas de flujo real**:
   - Unit tests para ViewModels: crear manual, crear con IA V2, importar, abrir plantilla, editar existente.
@@ -797,6 +829,7 @@ export interface FiltrosPlaneacionV2 {
   - Tests de `ContenidoScreen` para CTA empty state, FAB, card press y menu editar.
   - Tests de editor para guardar/reabrir rich text y preservar contenido.
   - Tests de servicios IA para documentar provider/fallback y schema V2.
+  - **Avance aplicado 2026-05-28:** nuevo test `docEditorTemplate.test.ts` valida que el documento base siempre tenga estructura visible tipo Word/Docs y que `contenidoRaw` se genere cuando llega vacio.
 
 - [ ] **9.12 Ejecutar validacion tecnica completa**:
   - `npx tsc --noEmit`.
@@ -804,19 +837,96 @@ export interface FiltrosPlaneacionV2 {
   - `npm test -- --runInBand`.
   - Verificacion focalizada de endpoints IA si hay backend configurado.
   - Revision de diff para confirmar que no quedan imports/rutas legacy dentro del flujo principal.
+  - **Avance aplicado 2026-05-28:** `npx tsc --noEmit`, `npm run lint -- --quiet` y `npm test -- --runInBand` ejecutados en verde.
 
 - [ ] **9.13 Validacion manual end-to-end final (movida desde 8.11)**:
-  - Crear planeacion desde cero -> abrir editor tipo Docs/Word -> editar -> guardar -> listar -> reabrir -> exportar PDF/DOCX.
-  - Crear con IA -> revisar propuesta V2 -> editar en DocEditor -> guardar.
-  - Importar PDF/DOCX -> revisar campos extraidos -> abrir DocEditor -> guardar.
-  - Escanear plantilla -> crear planeacion desde plantilla -> editar y guardar.
+  - Crear planeacion -> selector de plantillas -> elegir default/base -> abrir documento tipo Word/Docs -> editar -> guardar -> listar -> reabrir -> exportar PDF/DOCX.
+  - Crear planeacion -> selector de plantillas -> elegir plantilla guardada/predeterminada -> abrir DocEditor con esa estructura.
+  - Importar plantilla desde Word/PDF -> IA escanea -> se vacian datos internos -> se conserva estructura/placeholders -> crear planeacion desde esa plantilla.
+  - Crear con IA -> generar contenido V2 sobre la plantilla seleccionada -> revisar en DocEditor -> guardar.
+  - Importar planeacion con contenido -> revisar campos extraidos -> abrir DocEditor -> guardar.
   - Editar una planeacion existente desde Contenido, ListaPlaneaciones, borradores y menu contextual.
-  - Validar web: scroll vertical completo, clicks en FAB/modal/cards/toolbar, cierre de modales y edicion rich text.
-  - Validar movil: modo mobile por secciones, teclado, toolbar, guardado y navegacion.
+  - Validar web: edicion directa sobre documento, scroll vertical completo, clicks en FAB/modal/cards/toolbar, cierre de modales y edicion rich text.
+  - Validar movil: boton para alternar Documento/Formulario, teclado, toolbar, autollenado de placeholders, guardado y navegacion.
   - Validar modo estandar/tablet: canvas amplio, navegacion por secciones, toolbar visible y scroll correcto.
   - Validar offline: crear/editar sin conexion -> reconectar -> verificar sync sin duplicados.
 
-> **Criterio de cierre Fase 9:** el docente no debe encontrar formularios legacy ni doble seleccion de nivel en el flujo principal. Todas las entradas de planeaciones deben llevar al editor moderno, con plantilla base predeterminada, IA documentada, scroll/clicks funcionando en web y validacion manual completa aprobada.
+- [ ] **9.14 Hotfix critico del editor multiplataforma**:
+  - Resolver error web `React Native WebView does not support this platform`.
+  - Separar implementacion del editor por plataforma: en web usar editor DOM/Tiptap nativo de navegador o fallback controlado; en Android/iOS conservar TenTap/WebView.
+  - Evitar que `RichTextEditor` intente montar `react-native-webview` cuando `Platform.OS === "web"`.
+  - Crear wrapper estable `DocumentRichTextEditor` con dos variantes: `WebDocumentEditor` y `NativeDocumentEditor`.
+  - Corregir `Maximum update depth exceeded` en movil, investigando principalmente loops entre `useEditorContent`, `onChange`, `setContenidoRaw`, `setContent` e `initialContent`.
+  - Hacer que `onEditorReady` no dispare `setState` repetidamente con la misma instancia de editor.
+  - Proteger actualizaciones por fingerprint: si el JSON entrante es igual al ultimo contenido emitido, no volver a setear estado ni llamar `editor.setContent`.
+  - Evitar que el autosave o historial registren cambios identicos emitidos por debounce del editor.
+  - Agregar pruebas unitarias/smoke para confirmar que web no importa/monta WebView y que movil no entra en loop al montar el editor.
+  - Validar manualmente en web y movil antes de continuar con mejoras visuales.
+
+- [ ] **9.15 Elevar DocEditor a experiencia real tipo Word/Docs**:
+  - Redisenar `DocEditorScreen` para que el documento sea el centro visual absoluto, con una hoja blanca de tamano carta/A4, margenes visibles y fondo gris claro de escritorio.
+  - Agregar controles de vista: `Documento`, `Formulario`, `Pantalla completa`, `Preview` y navegacion por paginas.
+  - Implementar modelo de paginas: crear, eliminar, duplicar y reordenar paginas sin perder compatibilidad con `contenidoRaw`.
+  - Agregar toolbar persistente con controles esperados: negrita, cursiva, subrayado, encabezado, titulo, subtitulo, parrafo, listas, numeradas, checklist, tabla, deshacer/rehacer, alineacion izquierda/centro/derecha/justificada, sangria, separador/salto de pagina y zoom.
+  - Agregar selector de formato de pagina: A4 como preset inicial estilo Word, Carta como opcion disponible, orientacion vertical/horizontal y margen normal/estrecho.
+  - Permitir cambiar formato de pagina dentro del editor sin perder contenido ni layout.
+  - Usar una direccion visual tipo Google Docs limpio: barra superior clara, hoja centrada, poco ruido visual y funciones avanzadas disponibles sin saturar la interfaz.
+  - Incorporar funciones tipo Word sin convertirlo en ribbon pesado: menus agrupados, botones iconograficos con tooltip y acciones frecuentes visibles.
+  - En web, permitir edicion directa sobre la hoja y mantener la toolbar fija arriba.
+  - En movil, abrir primero en vista `Documento`; `Formulario` queda como boton secundario para captura guiada.
+  - Crear una vista pantalla completa del documento con barra flotante minima para guardar, IA y navegacion de paginas.
+  - Mostrar paginas en vista continua tipo Google Docs, con separacion visual entre hojas y controles para saltar a pagina anterior/siguiente cuando haga falta.
+  - Mantener sincronizacion bidireccional entre campos estructurados y placeholders del documento.
+  - Asegurar que la plantilla predeterminada se renderice como hoja editable, no como cuadro grande generico.
+  - Ajustar estilos de botones activos/seleccionados para que el texto e iconos nunca desaparezcan sobre fondo azul; auditar contraste minimo en toolbar, selector de plantillas, chips, tabs y acciones IA.
+
+- [ ] **9.16 Validar y endurecer Copiloto IA dentro del editor**:
+  - Probar botones IA `Sugerir`, `Mejorar`, `Rubrica` y `Revisar` en web y movil despues de corregir el editor.
+  - Incorporar IA como herramienta contextual del documento: boton flotante/inline junto al bloque activo y acciones compactas en toolbar.
+  - Agregar texto predictivo/autocompletado mientras se escribe, con sugerencia fantasma aceptable por boton/tecla y cancelable sin modificar el texto.
+  - Controlar el autocompletado con debounce, contexto del bloque actual y limite de frecuencia para evitar costos innecesarios o llamadas repetitivas.
+  - Confirmar si el loading infinito viene de errores de UI/editor o de configuracion API.
+  - Verificar configuracion requerida: `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_TIMEOUT_MS`, `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_API_SECRET`.
+  - Si falta `OPENAI_API_KEY`, mostrar estado claro en UI y fallback pedagogico local cuando aplique, sin spinner infinito.
+  - Agregar timeout visible y manejo de error por accion IA.
+  - Insertar resultados IA en el documento actual y no solo en campos/formulario.
+  - Validar que `Mejorar` use texto seleccionado o bloque activo; si no hay seleccion, pedir contexto del bloque actual.
+  - Agregar tests de servicio/hook para exito, fallback, timeout y error de configuracion.
+
+- [ ] **9.17 Decisiones de diseno pendientes antes de implementar UI final**:
+  - **Decision confirmada:** usar A4 como preset inicial estilo Word e incorporar Carta como formato cambiable desde el editor.
+  - **Decision confirmada:** seguir una experiencia visual tipo Google Docs limpio, pero con funciones avanzadas suficientes para no sentirse inferior a Word en el flujo docente.
+  - **Decision confirmada:** en movil abrir primero en `Documento` y dejar `Formulario` como boton secundario.
+  - **Decision confirmada:** en pantalla completa usar barra flotante minima.
+  - **Decision confirmada:** paginas en vista continua tipo Google Docs.
+
+> **Criterio de cierre Fase 9:** el docente no debe encontrar formularios legacy ni doble seleccion de nivel en el flujo principal. Todas las entradas de planeaciones deben pasar por selector de plantillas y abrir el editor moderno tipo Word/Docs. En web se edita directo sobre el documento; en movil existe alternancia Documento/Formulario y ambos modos sincronizan los mismos campos/placeholders.
+
+---
+
+### FASE 10: Galeria Online y Ecosistema de Plantillas
+
+> Fase posterior opcional si se decide que el selector de plantillas debe evolucionar a una experiencia tipo Canva con catalogo online, comunidad y multiples templates predeterminados. Fase 9 debe dejar el selector preparado para esto, pero no necesita resolver toda la infraestructura online si bloquea el cierre funcional del editor.
+
+- [ ] **10.1 Definir modelo de galeria online de plantillas**:
+  - Plantillas del sistema, plantillas guardadas por usuario, plantillas compartidas/comunidad y plantillas destacadas.
+  - Metadata para busqueda: nivel, asignatura, grado, enfoque pedagogico, numero de sesiones, formato, etiquetas y popularidad.
+  - Preview visual antes de usar, similar a elegir un template en Canva.
+
+- [ ] **10.2 Crear fuente remota de plantillas**:
+  - Endpoint para listar, buscar, filtrar y descargar plantillas.
+  - Cache local para uso offline.
+  - Versionado de plantillas para actualizar sin romper documentos existentes.
+
+- [ ] **10.3 Crear experiencia de exploracion**:
+  - Galeria con categorias, filtros, busqueda y plantillas recomendadas.
+  - Acciones: usar plantilla, guardar en mis plantillas, duplicar y previsualizar.
+  - Estados vacios, loading, offline y errores.
+
+- [ ] **10.4 Preparar comunidad/marketplace futuro**:
+  - Reglas para publicar plantillas, moderacion y privacidad.
+  - Sanitizacion de datos personales antes de compartir.
+  - Reporte de plantillas inapropiadas o con datos sensibles.
 
 ---
 

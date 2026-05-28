@@ -17,7 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { COLORS } from "../../../types";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
-import { usePlaneaciones } from "../../sync/providers/SyncProvider";
+import { usePlaneaciones } from "../../context/PlaneacionesContext";
 import {
   buildPlaneacionFromImportDraft,
   parseImportedPlaneacionFile,
@@ -187,6 +187,7 @@ const ImportarPlaneacionScreen: React.FC = () => {
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
           <View style={styles.headerRow}>
             <TouchableOpacity
@@ -430,6 +431,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 110,
     gap: 12,
+    flexGrow: 1,
   },
   headerRow: {
     flexDirection: "row",

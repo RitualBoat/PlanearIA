@@ -478,6 +478,10 @@ Debe incluir:
 
 - Flujo principal.
 - Flujos alternos.
+- Mapa de entrada y salida del modulo.
+- Botones, CTAs y rutas que llevan al modulo.
+- Acciones internas que conectan con otros modulos.
+- Pantallas desde donde se puede crear, editar, ver, compartir, exportar o eliminar una entidad.
 - Estados vacios.
 - Estados loading/error/offline.
 - Web/tablet/movil.
@@ -485,6 +489,8 @@ Debe incluir:
 - Criterios visuales.
 - Eliminacion de pasos duplicados.
 - Pantallas legacy a eliminar o redirigir.
+- Validacion de que el modulo no queda aislado ni inaccesible desde tabs, hubs, menus, buscadores o acciones contextuales.
+- Recomendaciones de redisenio del flujo si la navegacion actual es redundante, confusa o profunda.
 
 ### 6.7 IA y Automatizacion
 
@@ -560,6 +566,8 @@ Debe incluir:
 - Validacion offline.
 - Validacion backend.
 - Validacion de costo/configuracion cuando aplique.
+- Validacion de navegacion: entrar al modulo desde todos los puntos esperados, ejecutar acciones principales y volver sin perder contexto.
+- Validacion UX/UI: revisar redundancia, claridad de CTAs, contraste, jerarquia visual, estados vacios y accesibilidad basica.
 
 ---
 

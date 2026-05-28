@@ -4,10 +4,11 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
-import { usePlaneaciones } from "../sync/providers/SyncProvider";
+import { usePlaneaciones } from "../context/PlaneacionesContext";
 import { useAuth } from "../context/AuthContext";
 import { buildPlaneacionDocumentoBase } from "../utils/createPlaneacionDocumentoBase";
 import { buildDocumentoFromPlantilla, getPlantillaDocumento } from "../services/plantillaDocumentoService";
+import { buildContenidoRawFromDocumento, ensureDocumentoContenidoRaw } from "../utils/docEditorTemplate";
 import type {
   ElementosCurriculares,
   Firma,
@@ -81,6 +82,8 @@ export interface DocEditorViewModel {
   setEvaluacion: (next: { evaluacionInicial?: InstrumentoEvaluacion; evaluacionFinal?: InstrumentoEvaluacion }) => void;
   setObservaciones: (next: Observacion[]) => void;
   setFirmas: (next: Firma[]) => void;
+  setContenidoRaw: (next: string) => void;
+  regenerarContenidoRawDesdeCampos: () => void;
   guardarDocumento: () => Promise<void>;
   undo: () => void;
   redo: () => void;
@@ -97,6 +100,7 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
   const sourceDocId = params?.planeacionId;
   const sourcePlantillaId = params?.plantillaId;
   const targetNivel = params?.nivelAcademico;
+  const routeInstanceKey = route.key;
   const userId = String(usuario?.id ?? "guest");
 
   const [documento, setDocumento] = useState<PlaneacionDocumento>(() =>
@@ -116,9 +120,14 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
   const isHydratingRef = useRef(true);
 
   const draftKey = useMemo(() => {
-    const ref = sourceDocId || sourcePlantillaId || `${mode}_${targetNivel || NivelAcademico.PRIMARIA}`;
+    const ref =
+      sourceDocId ||
+      sourcePlantillaId ||
+      (mode === "crear"
+        ? `create_${routeInstanceKey}`
+        : `${mode}_${targetNivel || NivelAcademico.PRIMARIA}`);
     return `${DOC_DRAFT_PREFIX}:${ref}`;
-  }, [mode, sourceDocId, sourcePlantillaId, targetNivel]);
+  }, [mode, routeInstanceKey, sourceDocId, sourcePlantillaId, targetNivel]);
 
   const pushHistory = (current: PlaneacionDocumento) => {
     setPast((prev) => {
@@ -170,16 +179,16 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
         }
       }
 
-      setDocumento(nextDocument);
+      setDocumento(ensureDocumentoContenidoRaw(nextDocument));
 
       const draft = parseWithFallback<PlaneacionDocumento | null>(await AsyncStorage.getItem(draftKey), null);
       if (
         draft?.id &&
         (draft.id === sourceDocId || draft.plantillaId === sourcePlantillaId || mode === "crear")
       ) {
-        setDocumento(draft);
+        setDocumento(ensureDocumentoContenidoRaw(draft));
       } else {
-        setDocumento(nextDocument);
+        setDocumento(ensureDocumentoContenidoRaw(nextDocument));
       }
 
       setPast([]);
@@ -329,6 +338,19 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
       })),
     setObservaciones: (next) => updateDoc((current) => ({ ...current, observaciones: next })),
     setFirmas: (next) => updateDoc((current) => ({ ...current, firmas: next })),
+    setContenidoRaw: (next) =>
+      updateDoc(
+        (current) => ({
+          ...current,
+          contenidoRaw: next,
+        }),
+        false
+      ),
+    regenerarContenidoRawDesdeCampos: () =>
+      updateDoc((current) => ({
+        ...current,
+        contenidoRaw: buildContenidoRawFromDocumento(current),
+      })),
     guardarDocumento,
     undo,
     redo,

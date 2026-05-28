@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Alert } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
-import { usePlaneaciones } from "../sync/providers/SyncProvider";
+import { usePlaneaciones } from "../context/PlaneacionesContext";
 import { useRecursos } from "../context/RecursosContext";
 import { useEntregables } from "../context/EntregablesContext";
 import { usePlantillas } from "../context/PlantillasContext";

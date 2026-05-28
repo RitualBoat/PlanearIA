@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -12,6 +12,7 @@ import { useDocEditorViewModel, type DocSectionId } from "../../hooks/useDocEdit
 import { useCopiloto } from "../../hooks/useCopiloto";
 import { AIToolbar, EditorToolbar, SectionNavigator } from "../../components/editor";
 import type { AIActionType, AIToolbarResult } from "../../components/editor";
+import { RichTextEditor } from "../../components/editor";
 import {
   SeccionCurricular,
   SeccionDatosGenerales,
@@ -64,6 +65,19 @@ const stripRichText = (value?: string): string => {
   return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 };
 
+const normalizeEditorInitialContent = (value?: string): string | Record<string, unknown> => {
+  if (!value) return "";
+  const trimmed = value.trim();
+  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+    try {
+      return JSON.parse(trimmed) as Record<string, unknown>;
+    } catch {
+      return value;
+    }
+  }
+  return value;
+};
+
 const buildSectionText = (sectionId: DocSectionId, vm: ReturnType<typeof useDocEditorViewModel>): string => {
   const doc = vm.documento;
   if (sectionId === "curricular") {
@@ -97,6 +111,8 @@ const DocEditorScreen: React.FC = () => {
   const vm = useDocEditorViewModel();
   const copiloto = useCopiloto();
   const [activeInlineEditor, setActiveInlineEditor] = useState<EditorBridge | null>(null);
+  const [mobileView, setMobileView] = useState<"documento" | "formulario">("documento");
+  const isMobileMode = editorMode.mode === "mobile";
 
   const sections = useMemo(
     () =>
@@ -307,9 +323,10 @@ const DocEditorScreen: React.FC = () => {
   }
 
   const contentSections =
-    editorMode.mode === "mobile"
-      ? [vm.activeSectionId]
-      : (vm.sectionsProgress.map((item) => item.id) as DocSectionId[]);
+    isMobileMode ? [vm.activeSectionId] : (vm.sectionsProgress.map((item) => item.id) as DocSectionId[]);
+
+  const showDocumentCanvas = !isMobileMode || mobileView === "documento";
+  const showStructuredFields = !isMobileMode || mobileView === "formulario";
 
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]} edges={["top", "left", "right"]}>
@@ -399,22 +416,113 @@ const DocEditorScreen: React.FC = () => {
       </View>
 
       <View style={styles.body}>
-        <SectionNavigator
-          sections={sections}
-          activeSectionId={vm.activeSectionId}
-          onSectionChange={(sectionId) => vm.setActiveSectionId(sectionId as DocSectionId)}
-          mode={editorMode.mode}
-        />
+        {isMobileMode ? (
+          <View style={styles.mobileViewTabs}>
+            <Pressable
+              style={[
+                styles.mobileViewTab,
+                mobileView === "documento" && {
+                  backgroundColor: colors.primaryContainer,
+                  borderColor: colors.primary,
+                },
+              ]}
+              onPress={() => setMobileView("documento")}
+            >
+              <Text
+                style={[
+                  styles.mobileViewTabText,
+                  { color: mobileView === "documento" ? colors.primary : colors.onSurfaceVariant },
+                ]}
+              >
+                Documento
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.mobileViewTab,
+                mobileView === "formulario" && {
+                  backgroundColor: colors.primaryContainer,
+                  borderColor: colors.primary,
+                },
+              ]}
+              onPress={() => setMobileView("formulario")}
+            >
+              <Text
+                style={[
+                  styles.mobileViewTabText,
+                  { color: mobileView === "formulario" ? colors.primary : colors.onSurfaceVariant },
+                ]}
+              >
+                Formulario
+              </Text>
+            </Pressable>
+          </View>
+        ) : null}
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          style={styles.scrollView}
+          nestedScrollEnabled
         >
-          {contentSections.map((sectionId) => (
-            <View key={sectionId} style={styles.sectionBlock}>
-              {renderSection(sectionId)}
+          {showDocumentCanvas ? (
+            <View
+              style={[
+                styles.documentCard,
+                {
+                  borderColor: colors.borderLight,
+                  backgroundColor: colors.surfaceContainerLowest,
+                },
+              ]}
+            >
+              <View style={styles.documentHeader}>
+                <View>
+                  <Text style={[styles.documentTitle, { color: colors.onSurface }]}>Documento</Text>
+                  <Text style={[styles.documentSubtitle, { color: colors.onSurfaceVariant }]}>
+                    Edicion principal tipo Word/Docs.
+                  </Text>
+                </View>
+                <Pressable
+                  style={[
+                    styles.syncButton,
+                    {
+                      borderColor: colors.borderLight,
+                      backgroundColor: colors.surfaceContainerLow,
+                    },
+                  ]}
+                  onPress={vm.regenerarContenidoRawDesdeCampos}
+                >
+                  <MaterialIcons name="sync" size={15} color={colors.onSurfaceVariant} />
+                  <Text style={[styles.syncButtonText, { color: colors.onSurfaceVariant }]}>
+                    Sincronizar plantilla
+                  </Text>
+                </Pressable>
+              </View>
+              <RichTextEditor
+                mode={editorMode.mode}
+                minHeight={editorMode.mode === "standard" ? 560 : 420}
+                initialContent={normalizeEditorInitialContent(vm.documento.contenidoRaw)}
+                onEditorReady={setActiveInlineEditor}
+                onChange={(content) => vm.setContenidoRaw(JSON.stringify(content))}
+              />
             </View>
-          ))}
+          ) : null}
+
+          {showStructuredFields ? (
+            <View style={styles.formSection}>
+              <SectionNavigator
+                sections={sections}
+                activeSectionId={vm.activeSectionId}
+                onSectionChange={(sectionId) => vm.setActiveSectionId(sectionId as DocSectionId)}
+                mode={editorMode.mode}
+              />
+              {contentSections.map((sectionId) => (
+                <View key={sectionId} style={styles.sectionBlock}>
+                  {renderSection(sectionId)}
+                </View>
+              ))}
+            </View>
+          ) : null}
           <View style={{ height: 28 }} />
         </ScrollView>
       </View>
@@ -500,9 +608,67 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 12,
   },
+  scrollView: {
+    flex: 1,
+  },
   scrollContent: {
     paddingTop: 10,
-    paddingBottom: 22,
+    paddingBottom: Platform.OS === "web" ? 110 : 22,
+    gap: 10,
+    flexGrow: 1,
+  },
+  mobileViewTabs: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 8,
+  },
+  mobileViewTab: {
+    flex: 1,
+    minHeight: 34,
+    borderRadius: 999,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "transparent",
+  },
+  mobileViewTabText: {
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  documentCard: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    gap: 10,
+  },
+  documentHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+    alignItems: "center",
+  },
+  documentTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  documentSubtitle: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  syncButton: {
+    minHeight: 32,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  syncButtonText: {
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  formSection: {
     gap: 10,
   },
   sectionBlock: {

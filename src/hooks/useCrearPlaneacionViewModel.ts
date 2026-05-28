@@ -5,8 +5,7 @@ import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
 import { API_CONFIG } from "../sync/config/apiConfig";
 import { useAuth } from "../context/AuthContext";
-import { usePlaneaciones } from "../sync/providers/SyncProvider";
-import { buildPlaneacionDocumentoBase } from "../utils/createPlaneacionDocumentoBase";
+import { usePlaneaciones } from "../context/PlaneacionesContext";
 import { mapResponseToPlaneacion } from "../utils/planeacionMapper";
 import {
   buildDocumentoFromPlantilla,
@@ -16,61 +15,53 @@ import {
   NivelAcademico as NivelAcademicoLegacy,
   type Planeacion,
 } from "../../types/planeacionLegacy";
-import { NivelAcademico as NivelAcademicoV2 } from "../../types/planeacionV2";
-import type { PlantillaDocumento } from "../../types/plantillaDocumento";
+import {
+  NivelAcademico as NivelAcademicoV2,
+  type PlaneacionDocumento,
+} from "../../types/planeacionV2";
+import type { PlantillaDocumento, SeccionPlantilla } from "../../types/plantillaDocumento";
 
 type Nav = StackNavigationProp<RootStackParamList, "CrearPlaneacion">;
 
-export type MetodoCreacion = "desde_cero" | "ia" | "importar" | "plantilla";
+type TemplateSource = "base" | "predeterminada" | "guardada" | "online";
 
-export interface NivelWizardOption {
+interface TemplateItem {
+  id: string;
+  source: TemplateSource;
+  nombre: string;
+  descripcion: string;
+  nivelAcademico: NivelAcademicoV2;
+  plantilla?: PlantillaDocumento;
+  disabled?: boolean;
+}
+
+export interface TemplateGallerySection {
+  id: string;
+  title: string;
+  items: TemplateItem[];
+  emptyText?: string;
+}
+
+export interface NivelOptionV2 {
   nivel: NivelAcademicoV2;
   titulo: string;
-  descripcion: string;
-  icon: string;
-}
-
-export interface MetodoWizardOption {
-  id: MetodoCreacion;
-  titulo: string;
-  descripcion: string;
-  icon: string;
-}
-
-export interface NivelOption {
-  nivel: NivelAcademicoLegacy;
-  titulo: string;
-  descripcion: string;
-  icon: string;
-  color: string;
 }
 
 export interface CrearPlaneacionViewModel {
-  step: 1 | 2 | 3;
-  nivelSeleccionado: NivelAcademicoV2 | null;
-  metodoSeleccionado: MetodoCreacion | null;
-  asignatura: string;
-  grado: string;
-  gruposInput: string;
-  plantillasDocumento: PlantillaDocumento[];
-  plantillaSeleccionadaId: string;
-  isSubmitting: boolean;
+  niveles: NivelOptionV2[];
+  nivelSeleccionado: NivelAcademicoV2;
+  sections: TemplateGallerySection[];
+  selectedTemplateId: string;
   isLoadingPlantillas: boolean;
-  puedeAvanzar: boolean;
-  niveles: NivelWizardOption[];
-  metodos: MetodoWizardOption[];
-  setAsignatura: (value: string) => void;
-  setGrado: (value: string) => void;
-  setGruposInput: (value: string) => void;
-  setPlantillaSeleccionadaId: (value: string) => void;
-  seleccionarNivel: (nivel: NivelAcademicoV2) => void;
-  seleccionarMetodo: (metodo: MetodoCreacion) => void;
-  irSiguiente: () => void;
-  irAnterior: () => void;
-  finalizar: () => Promise<void>;
+  isSubmitting: boolean;
+  setNivelSeleccionado: (nivel: NivelAcademicoV2) => void;
+  seleccionarPlantilla: (templateId: string) => void;
+  crearDesdePlantillaSeleccionada: () => Promise<void>;
   handleEscanearPlantilla: () => void;
+  handleImportarPlaneacion: () => void;
+  handleGenerarConIADesdeSelector: () => void;
 
-  // Compatibilidad temporal con flujo legacy de IA
+  // Compatibilidad temporal con flujo IA legacy
   showTemplateModal: boolean;
   showNivelModal: boolean;
   showPreviewModal: boolean;
@@ -79,13 +70,11 @@ export interface CrearPlaneacionViewModel {
   isGeneratingIA: boolean;
   iaError: string;
   planeacionGeneradaIA: Planeacion | null;
-  nivelesAcademicos: NivelOption[];
   setPromptIA: (value: string) => void;
   setNivelIA: (value: NivelAcademicoLegacy) => void;
   handleCrearDesdeCero: () => void;
   handleSeleccionarNivel: (nivel: NivelAcademicoLegacy) => void;
   handleCloseNivelModal: () => void;
-  handleGenerarPlantilla: () => void;
   handleCloseModal: () => void;
   handleClosePreview: () => void;
   handleGenerarConIA: () => Promise<void>;
@@ -93,20 +82,6 @@ export interface CrearPlaneacionViewModel {
   handleEditarPlaneacionIA: () => Promise<void>;
   handleRegenerarPlaneacionIA: () => Promise<void>;
 }
-
-const parseGroups = (input: string): string[] => {
-  return input
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-};
-
-const mapLegacyToV2Nivel = (nivel: NivelAcademicoLegacy): NivelAcademicoV2 => {
-  if (nivel === NivelAcademicoLegacy.SECUNDARIA) return NivelAcademicoV2.SECUNDARIA;
-  if (nivel === NivelAcademicoLegacy.PREPARATORIA) return NivelAcademicoV2.PREPARATORIA;
-  if (nivel === NivelAcademicoLegacy.UNIVERSIDAD) return NivelAcademicoV2.UNIVERSIDAD;
-  return NivelAcademicoV2.PRIMARIA;
-};
 
 const showInfoMessage = (title: string, message: string) => {
   if (Platform.OS === "web") {
@@ -116,20 +91,180 @@ const showInfoMessage = (title: string, message: string) => {
   Alert.alert(title, message);
 };
 
+const LEVEL_OPTIONS: NivelOptionV2[] = [
+  { nivel: NivelAcademicoV2.PRIMARIA, titulo: "Primaria" },
+  { nivel: NivelAcademicoV2.SECUNDARIA, titulo: "Secundaria" },
+  { nivel: NivelAcademicoV2.PREPARATORIA, titulo: "Preparatoria" },
+  { nivel: NivelAcademicoV2.UNIVERSIDAD, titulo: "Universidad" },
+];
+
+const baseSectionsForLevel = (nivel: NivelAcademicoV2): SeccionPlantilla[] => {
+  const sesionesLabel = nivel === NivelAcademicoV2.UNIVERSIDAD ? "Sesiones del curso" : "Sesiones";
+  return [
+    { id: "info_inst", tipo: "info_institucional", titulo: "Informacion institucional", visible: true, campos: [] },
+    { id: "datos", tipo: "datos_generales", titulo: "Datos generales", visible: true, campos: [] },
+    { id: "curricular", tipo: "curricular", titulo: "Elementos curriculares", visible: true, campos: [] },
+    { id: "sesiones", tipo: "sesiones", titulo: sesionesLabel, visible: true, campos: [] },
+    { id: "evaluacion", tipo: "evaluacion", titulo: "Evaluacion", visible: true, campos: [] },
+    { id: "observaciones", tipo: "observaciones", titulo: "Observaciones", visible: true, campos: [] },
+    { id: "firmas", tipo: "firmas", titulo: "Firmas", visible: true, campos: [] },
+  ];
+};
+
+const buildTemplateId = (prefix: string, nivel: NivelAcademicoV2) => `${prefix}_${nivel}`;
+
+const buildSystemTemplate = (
+  id: string,
+  nombre: string,
+  descripcion: string,
+  nivelAcademico: NivelAcademicoV2,
+  defaults?: Partial<PlaneacionDocumento>
+): PlantillaDocumento => {
+  const now = new Date().toISOString();
+  return {
+    id,
+    userId: "system",
+    nombre,
+    descripcion,
+    nivelAcademico,
+    origen: "comunidad",
+    secciones: baseSectionsForLevel(nivelAcademico),
+    defaults: {
+      ...defaults,
+      elementosCurriculares: {
+        proposito: "",
+        producto: "",
+        contenido: "",
+        pda: "",
+        campoFormativo: "",
+        ejeArticulador: "",
+        rasgosPerfilEgreso: [],
+        instrumentoEvaluacion: "",
+        ...(defaults?.elementosCurriculares || {}),
+      },
+    },
+    fechaCreacion: now,
+    fechaModificacion: now,
+  };
+};
+
+const getBaseTemplates = (): PlantillaDocumento[] => {
+  return LEVEL_OPTIONS.map((item) =>
+    buildSystemTemplate(
+      buildTemplateId("base", item.nivel),
+      `Plantilla base ${item.titulo}`,
+      "Estructura base editable para iniciar rapido en DocEditor.",
+      item.nivel
+    )
+  );
+};
+
+const getPredeterminedTemplates = (): PlantillaDocumento[] => {
+  return [
+    buildSystemTemplate(
+      "pred_primaria_proyecto",
+      "Proyecto por semanas (Primaria)",
+      "Plantilla con enfoque por proyecto y seguimiento semanal.",
+      NivelAcademicoV2.PRIMARIA
+    ),
+    buildSystemTemplate(
+      "pred_secu_laboratorio",
+      "Secuencia de laboratorio (Secundaria)",
+      "Plantilla para sesiones practicas con criterios de evaluacion.",
+      NivelAcademicoV2.SECUNDARIA
+    ),
+    buildSystemTemplate(
+      "pred_prep_competencias",
+      "Planeacion por competencias (Preparatoria)",
+      "Plantilla orientada a competencias y evidencias.",
+      NivelAcademicoV2.PREPARATORIA
+    ),
+    buildSystemTemplate(
+      "pred_uni_unidad",
+      "Unidad didactica universitaria",
+      "Plantilla para curso universitario por unidades y sesiones.",
+      NivelAcademicoV2.UNIVERSIDAD
+    ),
+  ];
+};
+
+const mapLegacyToV2Nivel = (nivel: NivelAcademicoLegacy): NivelAcademicoV2 => {
+  if (nivel === NivelAcademicoLegacy.SECUNDARIA) return NivelAcademicoV2.SECUNDARIA;
+  if (nivel === NivelAcademicoLegacy.PREPARATORIA) return NivelAcademicoV2.PREPARATORIA;
+  if (nivel === NivelAcademicoLegacy.UNIVERSIDAD) return NivelAcademicoV2.UNIVERSIDAD;
+  return NivelAcademicoV2.PRIMARIA;
+};
+
+const toRichTextString = (plainText = ""): string => {
+  return JSON.stringify({
+    type: "doc",
+    content: plainText
+      ? [
+          {
+            type: "paragraph",
+            content: [{ type: "text", text: plainText }],
+          },
+        ]
+      : [{ type: "paragraph" }],
+  });
+};
+
+const applyIAResultToDocument = (doc: PlaneacionDocumento, planeacion: Planeacion): PlaneacionDocumento => {
+  const byType = new Map<string, { descripcion?: string }>();
+  (planeacion.actividades || []).forEach((item) => {
+    byType.set(item.tipo, item);
+  });
+
+  const sesiones = [...doc.sesiones];
+  if (sesiones[0]) {
+    sesiones[0] = {
+      ...sesiones[0],
+      inicio: toRichTextString(byType.get("inicio")?.descripcion || ""),
+      desarrollo: toRichTextString(byType.get("desarrollo")?.descripcion || ""),
+      cierre: toRichTextString(byType.get("cierre")?.descripcion || ""),
+      tarea: toRichTextString(""),
+    };
+  }
+
+  return {
+    ...doc,
+    datosGenerales: {
+      ...doc.datosGenerales,
+      asignatura: planeacion.asignatura || doc.datosGenerales.asignatura,
+      grado: planeacion.grado || doc.datosGenerales.grado,
+      grupos: planeacion.grupo ? [planeacion.grupo] : doc.datosGenerales.grupos,
+    },
+    elementosCurriculares: {
+      ...doc.elementosCurriculares,
+      contenido: planeacion.unidadTematica || doc.elementosCurriculares.contenido,
+      pda: planeacion.temaSesion || doc.elementosCurriculares.pda,
+      proposito:
+        Array.isArray(planeacion.aprendizajesEsperados) && planeacion.aprendizajesEsperados.length > 0
+          ? planeacion.aprendizajesEsperados.join("\n")
+          : doc.elementosCurriculares.proposito,
+      producto:
+        Array.isArray(planeacion.evidencias) && planeacion.evidencias.length > 0
+          ? planeacion.evidencias.join("\n")
+          : doc.elementosCurriculares.producto,
+      instrumentoEvaluacion: planeacion.evaluacion || doc.elementosCurriculares.instrumentoEvaluacion,
+    },
+    sesiones,
+    camposNivel: {
+      ...doc.camposNivel,
+      recursos: planeacion.recursos || [],
+    },
+    fechaModificacion: new Date().toISOString(),
+  };
+};
+
 export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
   const navigation = useNavigation<Nav>();
   const { usuario } = useAuth();
-  const { crear, agregarPlaneacion, obtenerPlaneacion, forceSync } = usePlaneaciones();
+  const { crear, forceSync } = usePlaneaciones();
 
-  // Nuevo wizard (Fase 4)
-  const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [nivelSeleccionado, setNivelSeleccionado] = useState<NivelAcademicoV2 | null>(null);
-  const [metodoSeleccionado, setMetodoSeleccionado] = useState<MetodoCreacion | null>(null);
-  const [asignatura, setAsignatura] = useState("");
-  const [grado, setGrado] = useState("");
-  const [gruposInput, setGruposInput] = useState("");
-  const [plantillasDocumento, setPlantillasDocumento] = useState<PlantillaDocumento[]>([]);
-  const [plantillaSeleccionadaId, setPlantillaSeleccionadaId] = useState("");
+  const [nivelSeleccionado, setNivelSeleccionado] = useState<NivelAcademicoV2>(NivelAcademicoV2.PRIMARIA);
+  const [selectedTemplateId, setSelectedTemplateId] = useState(buildTemplateId("base", NivelAcademicoV2.PRIMARIA));
+  const [plantillasGuardadas, setPlantillasGuardadas] = useState<PlantillaDocumento[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingPlantillas, setIsLoadingPlantillas] = useState(false);
 
@@ -142,100 +277,10 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
   const [isGeneratingIA, setIsGeneratingIA] = useState(false);
   const [iaError, setIaError] = useState("");
   const [planeacionGeneradaIA, setPlaneacionGeneradaIA] = useState<Planeacion | null>(null);
+  const [iaDocId, setIaDocId] = useState<string | null>(null);
 
-  const niveles: NivelWizardOption[] = useMemo(
-    () => [
-      {
-        nivel: NivelAcademicoV2.PRIMARIA,
-        titulo: "Primaria",
-        descripcion: "Planeaciones para primero a sexto.",
-        icon: "school",
-      },
-      {
-        nivel: NivelAcademicoV2.SECUNDARIA,
-        titulo: "Secundaria",
-        descripcion: "Planeaciones para secundaria general o tecnica.",
-        icon: "menu-book",
-      },
-      {
-        nivel: NivelAcademicoV2.PREPARATORIA,
-        titulo: "Preparatoria",
-        descripcion: "Bachillerato por competencias.",
-        icon: "library-books",
-      },
-      {
-        nivel: NivelAcademicoV2.UNIVERSIDAD,
-        titulo: "Universidad",
-        descripcion: "Cursos universitarios por sesiones.",
-        icon: "account-balance",
-      },
-    ],
-    []
-  );
-
-  const metodos: MetodoWizardOption[] = useMemo(
-    () => [
-      {
-        id: "desde_cero",
-        titulo: "Desde cero",
-        descripcion: "Crear un documento nuevo y editarlo en DocEditor.",
-        icon: "edit-note",
-      },
-      {
-        id: "ia",
-        titulo: "Generar con IA",
-        descripcion: "Ir al flujo de generacion asistida para propuesta inicial.",
-        icon: "auto-awesome",
-      },
-      {
-        id: "importar",
-        titulo: "Importar",
-        descripcion: "Importar una planeacion existente y ajustarla.",
-        icon: "file-upload",
-      },
-      {
-        id: "plantilla",
-        titulo: "Desde plantilla",
-        descripcion: "Usar una plantilla V2 escaneada o compartida.",
-        icon: "view-quilt",
-      },
-    ],
-    []
-  );
-
-  const nivelesAcademicos: NivelOption[] = useMemo(
-    () => [
-      {
-        nivel: NivelAcademicoLegacy.PRIMARIA,
-        titulo: "Primaria",
-        descripcion: "1 a 6 grado",
-        icon: "school",
-        color: "#22c55e",
-      },
-      {
-        nivel: NivelAcademicoLegacy.SECUNDARIA,
-        titulo: "Secundaria",
-        descripcion: "1 a 3 grado",
-        icon: "menu-book",
-        color: "#3b82f6",
-      },
-      {
-        nivel: NivelAcademicoLegacy.PREPARATORIA,
-        titulo: "Preparatoria",
-        descripcion: "Bachillerato",
-        icon: "library-books",
-        color: "#f59e0b",
-      },
-      {
-        nivel: NivelAcademicoLegacy.UNIVERSIDAD,
-        titulo: "Universidad",
-        descripcion: "Licenciatura y posgrado",
-        icon: "account-balance",
-        color: "#7c3aed",
-      },
-    ],
-    []
-  );
+  const templatesBase = useMemo(() => getBaseTemplates(), []);
+  const templatesPredetermined = useMemo(() => getPredeterminedTemplates(), []);
 
   useEffect(() => {
     let isMounted = true;
@@ -244,7 +289,7 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
       setIsLoadingPlantillas(true);
       try {
         const items = await listPlantillasDocumento(String(usuario?.id ?? "guest"));
-        if (isMounted) setPlantillasDocumento(items);
+        if (isMounted) setPlantillasGuardadas(items);
       } finally {
         if (isMounted) setIsLoadingPlantillas(false);
       }
@@ -257,103 +302,117 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     };
   }, [usuario?.id]);
 
-  const plantillasDisponibles = useMemo(() => {
-    if (!nivelSeleccionado) return plantillasDocumento;
-    return plantillasDocumento.filter(
-      (plantilla) => plantilla.nivelAcademico === nivelSeleccionado
-    );
-  }, [nivelSeleccionado, plantillasDocumento]);
+  const onlineTemplates = useMemo<TemplateItem[]>(
+    () => [
+      {
+        id: "online_galeria",
+        source: "online",
+        nombre: "Galeria online de plantillas",
+        descripcion: "Explora plantillas estilo Canva. Se completa en Fase 10.",
+        nivelAcademico: nivelSeleccionado,
+        disabled: true,
+      },
+    ],
+    [nivelSeleccionado]
+  );
+
+  const currentTemplates = useMemo(() => {
+    const base = templatesBase.filter((item) => item.nivelAcademico === nivelSeleccionado);
+    const predetermined = templatesPredetermined.filter((item) => item.nivelAcademico === nivelSeleccionado);
+    const saved = plantillasGuardadas.filter((item) => item.nivelAcademico === nivelSeleccionado);
+    return { base, predetermined, saved };
+  }, [nivelSeleccionado, plantillasGuardadas, templatesBase, templatesPredetermined]);
+
+  const sections = useMemo<TemplateGallerySection[]>(() => {
+    return [
+      {
+        id: "base",
+        title: "Plantilla default",
+        items: currentTemplates.base.map((plantilla) => ({
+          id: plantilla.id,
+          source: "base",
+          nombre: plantilla.nombre,
+          descripcion: plantilla.descripcion || "Plantilla base del sistema.",
+          nivelAcademico: plantilla.nivelAcademico,
+          plantilla,
+        })),
+      },
+      {
+        id: "predeterminadas",
+        title: "Mas plantillas predeterminadas",
+        items: currentTemplates.predetermined.map((plantilla) => ({
+          id: plantilla.id,
+          source: "predeterminada",
+          nombre: plantilla.nombre,
+          descripcion: plantilla.descripcion || "Plantilla predeterminada.",
+          nivelAcademico: plantilla.nivelAcademico,
+          plantilla,
+        })),
+      },
+      {
+        id: "guardadas",
+        title: "Plantillas guardadas",
+        items: currentTemplates.saved.map((plantilla) => ({
+          id: plantilla.id,
+          source: "guardada",
+          nombre: plantilla.nombre,
+          descripcion: plantilla.descripcion || "Plantilla escaneada o personalizada.",
+          nivelAcademico: plantilla.nivelAcademico,
+          plantilla,
+        })),
+        emptyText: "Todavia no tienes plantillas guardadas para este nivel.",
+      },
+      {
+        id: "online",
+        title: "Plantillas online",
+        items: onlineTemplates,
+      },
+    ];
+  }, [currentTemplates.base, currentTemplates.predetermined, currentTemplates.saved, onlineTemplates]);
 
   useEffect(() => {
-    if (!plantillaSeleccionadaId) return;
-    const exists = plantillasDisponibles.some(
-      (plantilla) => plantilla.id === plantillaSeleccionadaId
-    );
-    if (!exists) setPlantillaSeleccionadaId("");
-  }, [plantillaSeleccionadaId, plantillasDisponibles]);
+    const allIds = sections.flatMap((section) => section.items.map((item) => item.id));
+    if (allIds.includes(selectedTemplateId)) return;
 
-  const puedeAvanzar = useMemo(() => {
-    if (step === 1) return Boolean(nivelSeleccionado);
-    if (step === 2) return Boolean(metodoSeleccionado);
-    if (metodoSeleccionado === "ia" || metodoSeleccionado === "importar") return true;
-    if (metodoSeleccionado === "plantilla") return Boolean(plantillaSeleccionadaId);
-    return Boolean(asignatura.trim() && grado.trim());
-  }, [asignatura, grado, metodoSeleccionado, nivelSeleccionado, plantillaSeleccionadaId, step]);
+    const fallbackId = buildTemplateId("base", nivelSeleccionado);
+    setSelectedTemplateId(fallbackId);
+  }, [nivelSeleccionado, sections, selectedTemplateId]);
 
-  const seleccionarNivel = useCallback(
-    (nivel: NivelAcademicoV2) => setNivelSeleccionado(nivel),
-    []
-  );
-  const seleccionarMetodo = useCallback(
-    (metodo: MetodoCreacion) => setMetodoSeleccionado(metodo),
-    []
-  );
-
-  const irSiguiente = useCallback(() => {
-    if (step === 1 && nivelSeleccionado) {
-      setStep(2);
-      return;
-    }
-    if (step === 2 && metodoSeleccionado) {
-      setStep(3);
-    }
-  }, [metodoSeleccionado, nivelSeleccionado, step]);
-
-  const irAnterior = useCallback(() => {
-    setStep((prev) => {
-      if (prev === 1) return 1;
-      if (prev === 2) return 1;
-      return 2;
+  const templateById = useMemo(() => {
+    const map = new Map<string, TemplateItem>();
+    sections.forEach((section) => {
+      section.items.forEach((item) => map.set(item.id, item));
     });
-  }, []);
+    return map;
+  }, [sections]);
 
-  const finalizar = useCallback(async () => {
-    if (!nivelSeleccionado || !metodoSeleccionado) return;
+  const seleccionarPlantilla = useCallback(
+    (templateId: string) => {
+      const selected = templateById.get(templateId);
+      if (!selected) return;
+      if (selected.disabled || selected.source === "online") {
+        showInfoMessage("Plantillas online", "La galeria online se completa en la Fase 10.");
+        return;
+      }
+      setSelectedTemplateId(templateId);
+    },
+    [templateById]
+  );
 
-    if (metodoSeleccionado === "ia") {
-      navigation.navigate("GenerarPlaneacionIA");
-      return;
-    }
+  const crearDesdePlantillaSeleccionada = useCallback(async () => {
+    const selected = templateById.get(selectedTemplateId);
+    if (!selected) return;
 
-    if (metodoSeleccionado === "importar") {
-      navigation.navigate("ImportarPlaneacion");
+    if (!selected.plantilla) {
+      showInfoMessage("Plantillas", "Selecciona una plantilla valida para continuar.");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      if (metodoSeleccionado === "plantilla") {
-        const selected = plantillasDisponibles.find((item) => item.id === plantillaSeleccionadaId);
-
-        if (!selected) {
-          showInfoMessage("Desde plantilla", "Selecciona una plantilla disponible para continuar.");
-          return;
-        }
-
-        const doc = buildDocumentoFromPlantilla(selected, {
-          userId: String(usuario?.id ?? "guest"),
-          usuario,
-          asignatura: asignatura.trim() || undefined,
-          grado: grado.trim() || undefined,
-          grupos: parseGroups(gruposInput),
-        });
-
-        await crear(doc);
-        navigation.navigate("DocEditor", {
-          modo: "editar",
-          planeacionId: doc.id,
-          nivelAcademico: doc.nivelAcademico,
-        });
-        return;
-      }
-
-      const doc = buildPlaneacionDocumentoBase({
-        nivelAcademico: nivelSeleccionado,
+      const doc = buildDocumentoFromPlantilla(selected.plantilla, {
         userId: String(usuario?.id ?? "guest"),
         usuario,
-        asignatura: asignatura.trim(),
-        grado: grado.trim(),
-        grupos: parseGroups(gruposInput),
       });
       await crear(doc);
       navigation.navigate("DocEditor", {
@@ -364,22 +423,23 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [
-    asignatura,
-    crear,
-    grado,
-    gruposInput,
-    metodoSeleccionado,
-    navigation,
-    nivelSeleccionado,
-    plantillaSeleccionadaId,
-    plantillasDisponibles,
-    usuario,
-  ]);
+  }, [crear, navigation, selectedTemplateId, templateById, usuario]);
 
   const handleEscanearPlantilla = useCallback(() => {
     navigation.navigate("EscanerPlantilla");
   }, [navigation]);
+
+  const handleImportarPlaneacion = useCallback(() => {
+    navigation.navigate("ImportarPlaneacion");
+  }, [navigation]);
+
+  const handleGenerarConIADesdeSelector = useCallback(() => {
+    navigation.navigate("GenerarPlaneacionIA");
+  }, [navigation]);
+
+  const handleCloseNivelModal = useCallback(() => {
+    setShowNivelModal(false);
+  }, []);
 
   const handleCrearDesdeCero = useCallback(() => {
     setShowNivelModal(true);
@@ -395,15 +455,6 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     },
     [navigation]
   );
-
-  const handleCloseNivelModal = useCallback(() => {
-    setShowNivelModal(false);
-  }, []);
-
-  const handleGenerarPlantilla = useCallback(() => {
-    setIaError("");
-    setShowTemplateModal(true);
-  }, []);
 
   const handleCloseModal = useCallback(() => {
     setShowTemplateModal(false);
@@ -464,13 +515,9 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
         throw new Error(payload?.error || "No se pudo generar la planeacion con IA.");
       }
 
-      const planeacionGenerada = mapResponseToPlaneacion(
-        payload?.data?.planeacion,
-        nivelIA,
-        prompt
-      );
-
+      const planeacionGenerada = mapResponseToPlaneacion(payload?.data?.planeacion, nivelIA, prompt);
       setPlaneacionGeneradaIA(planeacionGenerada);
+      setIaDocId(null);
       setShowTemplateModal(false);
       setShowPreviewModal(true);
     } catch (error) {
@@ -482,24 +529,44 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     }
   }, [nivelIA, promptIA]);
 
-  const ensurePlaneacionIAGuardada = useCallback(async (): Promise<Planeacion | null> => {
+  const ensurePlaneacionIAGuardada = useCallback(async (): Promise<{ docId: string; nivel: NivelAcademicoV2 } | null> => {
     if (!planeacionGeneradaIA) {
       setIaError("No hay una planeacion generada.");
       return null;
     }
 
-    const existente = obtenerPlaneacion(planeacionGeneradaIA.id);
-    if (!existente) {
-      await agregarPlaneacion(planeacionGeneradaIA);
+    const nivelV2 = mapLegacyToV2Nivel(planeacionGeneradaIA.nivelAcademico as NivelAcademicoLegacy);
+    const selectedTemplate = templateById.get(selectedTemplateId)?.plantilla;
+    const fallbackTemplate =
+      templatesBase.find((item) => item.nivelAcademico === nivelV2) || templatesBase[0];
+
+    const templateToUse =
+      selectedTemplate && selectedTemplate.nivelAcademico === nivelV2 ? selectedTemplate : fallbackTemplate;
+
+    if (!templateToUse) {
+      setIaError("No se encontro una plantilla base para crear el documento.");
+      return null;
     }
 
-    return planeacionGeneradaIA;
-  }, [agregarPlaneacion, obtenerPlaneacion, planeacionGeneradaIA]);
+    if (iaDocId) {
+      return { docId: iaDocId, nivel: nivelV2 };
+    }
+
+    const baseDoc = buildDocumentoFromPlantilla(templateToUse, {
+      userId: String(usuario?.id ?? "guest"),
+      usuario,
+    });
+    const completedDoc = applyIAResultToDocument(baseDoc, planeacionGeneradaIA);
+
+    await crear(completedDoc);
+    setIaDocId(completedDoc.id);
+    return { docId: completedDoc.id, nivel: completedDoc.nivelAcademico };
+  }, [crear, iaDocId, planeacionGeneradaIA, selectedTemplateId, templateById, templatesBase, usuario]);
 
   const handleGuardarPlaneacionIA = useCallback(async () => {
     try {
-      const planeacion = await ensurePlaneacionIAGuardada();
-      if (!planeacion) return;
+      const created = await ensurePlaneacionIAGuardada();
+      if (!created) return;
 
       await forceSync();
       setShowPreviewModal(false);
@@ -507,31 +574,27 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
       showInfoMessage("Planeacion IA", "Planeacion guardada y sincronizada correctamente.");
     } catch (error) {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "No se pudo guardar/sincronizar la planeacion generada.";
+        error instanceof Error ? error.message : "No se pudo guardar/sincronizar la planeacion generada.";
       setIaError(errorMessage);
     }
   }, [ensurePlaneacionIAGuardada, forceSync]);
 
   const handleEditarPlaneacionIA = useCallback(async () => {
     try {
-      const planeacion = await ensurePlaneacionIAGuardada();
-      if (!planeacion) return;
+      const created = await ensurePlaneacionIAGuardada();
+      if (!created) return;
 
       setShowPreviewModal(false);
       setShowTemplateModal(false);
 
       navigation.navigate("DocEditor", {
         modo: "editar",
-        planeacionId: planeacion.id,
-        nivelAcademico: mapLegacyToV2Nivel(planeacion.nivelAcademico as NivelAcademicoLegacy),
+        planeacionId: created.docId,
+        nivelAcademico: created.nivel,
       });
     } catch (error) {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "No se pudo abrir el editor de la planeacion generada.";
+        error instanceof Error ? error.message : "No se pudo abrir el editor de la planeacion generada.";
       setIaError(errorMessage);
     }
   }, [ensurePlaneacionIAGuardada, navigation]);
@@ -542,29 +605,18 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
   }, [handleGenerarConIA]);
 
   return {
-    step,
+    niveles: LEVEL_OPTIONS,
     nivelSeleccionado,
-    metodoSeleccionado,
-    asignatura,
-    grado,
-    gruposInput,
-    plantillasDocumento: plantillasDisponibles,
-    plantillaSeleccionadaId,
-    isSubmitting,
+    sections,
+    selectedTemplateId,
     isLoadingPlantillas,
-    puedeAvanzar,
-    niveles,
-    metodos,
-    setAsignatura,
-    setGrado,
-    setGruposInput,
-    setPlantillaSeleccionadaId,
-    seleccionarNivel,
-    seleccionarMetodo,
-    irSiguiente,
-    irAnterior,
-    finalizar,
+    isSubmitting,
+    setNivelSeleccionado,
+    seleccionarPlantilla,
+    crearDesdePlantillaSeleccionada,
     handleEscanearPlantilla,
+    handleImportarPlaneacion,
+    handleGenerarConIADesdeSelector,
     showTemplateModal,
     showNivelModal,
     showPreviewModal,
@@ -573,13 +625,11 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     isGeneratingIA,
     iaError,
     planeacionGeneradaIA,
-    nivelesAcademicos,
     setPromptIA,
     setNivelIA,
     handleCrearDesdeCero,
     handleSeleccionarNivel,
     handleCloseNivelModal,
-    handleGenerarPlantilla,
     handleCloseModal,
     handleClosePreview,
     handleGenerarConIA,

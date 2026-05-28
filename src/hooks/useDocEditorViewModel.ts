@@ -7,6 +7,7 @@ import type { RootStackParamList } from "../navigation/StackNavigator";
 import { usePlaneaciones } from "../sync/providers/SyncProvider";
 import { useAuth } from "../context/AuthContext";
 import { buildPlaneacionDocumentoBase } from "../utils/createPlaneacionDocumentoBase";
+import { buildDocumentoFromPlantilla, getPlantillaDocumento } from "../services/plantillaDocumentoService";
 import type {
   ElementosCurriculares,
   Firma,
@@ -94,7 +95,9 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
   const params = route.params;
   const mode = params?.modo || "crear";
   const sourceDocId = params?.planeacionId;
+  const sourcePlantillaId = params?.plantillaId;
   const targetNivel = params?.nivelAcademico;
+  const userId = String(usuario?.id ?? "guest");
 
   const [documento, setDocumento] = useState<PlaneacionDocumento>(() =>
     buildPlaneacionDocumentoBase({
@@ -113,9 +116,9 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
   const isHydratingRef = useRef(true);
 
   const draftKey = useMemo(() => {
-    const ref = sourceDocId || documento.id || "new";
+    const ref = sourceDocId || sourcePlantillaId || `${mode}_${targetNivel || NivelAcademico.PRIMARIA}`;
     return `${DOC_DRAFT_PREFIX}:${ref}`;
-  }, [documento.id, sourceDocId]);
+  }, [mode, sourceDocId, sourcePlantillaId, targetNivel]);
 
   const pushHistory = (current: PlaneacionDocumento) => {
     setPast((prev) => {
@@ -146,24 +149,37 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
       setIsLoading(true);
       const fallback = buildPlaneacionDocumentoBase({
         nivelAcademico: targetNivel || NivelAcademico.PRIMARIA,
-        userId: String(usuario?.id ?? "guest"),
+        userId,
         usuario: usuario || undefined,
       });
+
+      let nextDocument = fallback;
 
       if (mode === "editar" && sourceDocId) {
         const existing = obtenerDocumento(sourceDocId);
         if (existing) {
-          setDocumento(existing);
-        } else {
-          setDocumento(fallback);
+          nextDocument = existing;
         }
-      } else {
-        setDocumento(fallback);
+      } else if (mode === "plantilla" && sourcePlantillaId) {
+        const plantilla = await getPlantillaDocumento(sourcePlantillaId, userId);
+        if (plantilla) {
+          nextDocument = buildDocumentoFromPlantilla(plantilla, {
+            userId,
+            usuario: usuario || undefined,
+          });
+        }
       }
 
+      setDocumento(nextDocument);
+
       const draft = parseWithFallback<PlaneacionDocumento | null>(await AsyncStorage.getItem(draftKey), null);
-      if (draft?.id && (draft.id === sourceDocId || mode === "crear" || mode === "plantilla")) {
+      if (
+        draft?.id &&
+        (draft.id === sourceDocId || draft.plantillaId === sourcePlantillaId || mode === "crear")
+      ) {
         setDocumento(draft);
+      } else {
+        setDocumento(nextDocument);
       }
 
       setPast([]);
@@ -175,7 +191,18 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
     };
 
     void boot();
-  }, [draftKey, mode, obtenerDocumento, sourceDocId, targetNivel, usuario?.apellidos, usuario?.id, usuario?.nombre]);
+  }, [
+    draftKey,
+    mode,
+    obtenerDocumento,
+    sourceDocId,
+    sourcePlantillaId,
+    targetNivel,
+    userId,
+    usuario?.apellidos,
+    usuario?.id,
+    usuario?.nombre,
+  ]);
 
   useEffect(() => {
     if (isHydratingRef.current) return;

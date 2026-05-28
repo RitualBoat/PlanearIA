@@ -25,6 +25,7 @@ import ExportarPlaneacionScreen from "../screens/planeaciones/ExportarPlaneacion
 import EditorPlaneacionScreen from "../screens/planeaciones/EditorPlaneacionScreen";
 import ListaPlaneacionesScreen from "../screens/planeaciones/ListaPlaneacionesScreen";
 import DocEditorScreen from "../screens/planeaciones/DocEditorScreen";
+import EscanerPlantillaScreen from "../screens/planeaciones/EscanerPlantillaScreen";
 
 // ImportaciÃ³n de pantallas de Grupos (NUEVA ARQUITECTURA)
 import GruposScreen from "../screens/grupos/GruposScreen";
@@ -124,6 +125,7 @@ export type RootStackParamList = {
   CrearPlaneacion: undefined;
   GenerarPlaneacionIA: undefined;
   ImportarPlaneacion: undefined;
+  EscanerPlantilla: undefined;
   ExportarPlaneacion: { planeacionId?: string };
   EditorPlaneacion: {
     nivel: NivelAcademico;
@@ -375,6 +377,14 @@ const StackNavigator: React.FC = () => {
         component={ImportarPlaneacionScreen}
         options={{
           title: "Importar PlaneaciÃ³n",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="EscanerPlantilla"
+        component={EscanerPlantillaScreen}
+        options={{
+          title: "Escanear Plantilla",
           headerShown: false,
         }}
       />

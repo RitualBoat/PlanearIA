@@ -1,4 +1,4 @@
-# Plan Maestro: RefactorizaciÃ³n del MÃ³dulo de Planeaciones â€” PlanearIA
+﻿# Plan Maestro: RefactorizaciÃ³n del MÃ³dulo de Planeaciones â€” PlanearIA
 
 > **VersiÃ³n:** 1.0  
 > **Fecha:** 2026-05-27  
@@ -570,28 +570,28 @@ export interface FiltrosPlaneacionV2 {
 
 > Permitir que el docente suba un PDF/DOCX y la IA extraiga la estructura como plantilla reutilizable.
 
-- [ ] **5.1** Crear endpoint `backend/api/planeaciones/escanear-plantilla.js`:
+- [x] **5.1** Crear endpoint `backend/api/planeaciones/escanear-plantilla.js`:
   - Recibe: `{ textoRaw: string, nivelAcademico?: string }`
   - System prompt: "Analiza este documento de planeaciÃ³n didÃ¡ctica y extrae su estructura..."
   - Responde: `{ plantilla: PlantillaDocumento }` â€” esquema JSON de secciones y campos
   - Incluir inferencia de nivel acadÃ©mico si no se proporciona
-- [ ] **5.2** Refactorizar [planeacionImportService.ts](file:///c:/Users/jarco/dev/PlanearIA/src/services/planeacionImportService.ts):
+- [x] **5.2** Refactorizar [planeacionImportService.ts](file:///c:/Users/jarco/dev/PlanearIA/src/services/planeacionImportService.ts):
   - Mantener la extracciÃ³n de texto de PDF/DOCX (`extractTextFromPdf`, `extractTextFromDocx`)
   - Nuevo modo: `parseMode: "planeacion" | "plantilla"`
   - Modo "plantilla": envÃ­a texto al endpoint de escaneo IA
   - Modo "planeaciÃ³n": extrae campos y crea `PlaneacionDocumento` V2 (ya no hardcodea secundaria)
   - Usar `inferNivel()` correctamente para crear el tipo adecuado
-- [ ] **5.3** Crear pantalla `src/screens/planeaciones/EscanerPlantillaScreen.tsx`:
+- [x] **5.3** Crear pantalla `src/screens/planeaciones/EscanerPlantillaScreen.tsx`:
   - Paso 1: Seleccionar archivo (PDF/DOCX)
   - Paso 2: Vista previa del texto extraÃ­do
   - Paso 3: Loading de anÃ¡lisis IA
   - Paso 4: Vista previa de la plantilla detectada (secciones + campos)
   - Paso 5: Editar/confirmar plantilla â†’ guardar en `PlantillasContext`
-- [ ] **5.4** Crear ViewModel `src/hooks/useEscanerPlantillaViewModel.ts`:
+- [x] **5.4** Crear ViewModel `src/hooks/useEscanerPlantillaViewModel.ts`:
   - Estado del flujo (paso actual, archivo, texto, plantilla generada)
   - Llamada al endpoint de escaneo
   - Guardado de plantilla resultante
-- [ ] **5.5** Integrar las plantillas escaneadas con el flujo de creaciÃ³n: en `CrearPlaneacionScreen` paso "Desde plantilla" â†’ listar plantillas del usuario + comunidad â†’ seleccionar â†’ crear documento pre-poblado
+- [x] **5.5** Integrar las plantillas escaneadas con el flujo de creaciÃ³n: en `CrearPlaneacionScreen` paso "Desde plantilla" â†’ listar plantillas del usuario + comunidad â†’ seleccionar â†’ crear documento pre-poblado
 
 ---
 

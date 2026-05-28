@@ -126,8 +126,77 @@ const CrearPlaneacionScreen: React.FC = () => {
             <Text style={[styles.helper, { color: colors.onSurfaceVariant }]}>
               {vm.metodoSeleccionado === "ia" || vm.metodoSeleccionado === "importar"
                 ? "Este metodo te llevara al flujo especializado."
+                : vm.metodoSeleccionado === "plantilla"
+                  ? "Selecciona una plantilla escaneada. Asignatura, grado y grupos son opcionales si la plantilla ya los incluye."
                 : "Estos datos se precargan en el documento antes de abrir DocEditor."}
             </Text>
+
+            {vm.metodoSeleccionado === "plantilla" ? (
+              <View style={styles.templatesBlock}>
+                {vm.isLoadingPlantillas ? (
+                  <View style={[styles.templateEmptyCard, { borderColor: colors.borderLight, backgroundColor: colors.surfaceContainerLowest }]}>
+                    <ActivityIndicator size="small" color={colors.primary} />
+                    <Text style={[styles.templateEmptyText, { color: colors.onSurfaceVariant }]}>
+                      Cargando plantillas...
+                    </Text>
+                  </View>
+                ) : vm.plantillasDocumento.length > 0 ? (
+                  vm.plantillasDocumento.map((plantilla) => {
+                    const selected = vm.plantillaSeleccionadaId === plantilla.id;
+                    return (
+                      <Pressable
+                        key={plantilla.id}
+                        style={[
+                          styles.templateCard,
+                          {
+                            borderColor: selected ? colors.primary : colors.borderLight,
+                            backgroundColor: selected ? colors.primaryContainer : colors.surfaceContainerLowest,
+                          },
+                        ]}
+                        onPress={() => vm.setPlantillaSeleccionadaId(plantilla.id)}
+                      >
+                        <View style={styles.templateCardIcon}>
+                          <MaterialIcons
+                            name={selected ? "check-circle" : "view-quilt"}
+                            size={22}
+                            color={selected ? colors.primary : colors.onSurfaceVariant}
+                          />
+                        </View>
+                        <View style={styles.templateCardText}>
+                          <Text style={[styles.templateCardTitle, { color: selected ? colors.primary : colors.onSurface }]}>
+                            {plantilla.nombre}
+                          </Text>
+                          <Text style={[styles.templateCardMeta, { color: colors.onSurfaceVariant }]}>
+                            {plantilla.secciones.length} secciones | {plantilla.origen}
+                          </Text>
+                          {plantilla.descripcion ? (
+                            <Text style={[styles.templateCardDesc, { color: colors.onSurfaceVariant }]}>
+                              {plantilla.descripcion}
+                            </Text>
+                          ) : null}
+                        </View>
+                      </Pressable>
+                    );
+                  })
+                ) : (
+                  <View style={[styles.templateEmptyCard, { borderColor: colors.borderLight, backgroundColor: colors.surfaceContainerLowest }]}>
+                    <MaterialIcons name="document-scanner" size={26} color={colors.primary} />
+                    <Text style={[styles.templateEmptyTitle, { color: colors.onSurface }]}>Aun no hay plantillas V2</Text>
+                    <Text style={[styles.templateEmptyText, { color: colors.onSurfaceVariant }]}>
+                      Escanea una planeacion PDF/DOCX para convertir su formato en plantilla reutilizable.
+                    </Text>
+                  </View>
+                )}
+
+                <Pressable
+                  style={[styles.scanButton, { borderColor: colors.primary, backgroundColor: colors.primaryContainer }]}
+                  onPress={vm.handleEscanearPlantilla}
+                >
+                  <MaterialIcons name="document-scanner" size={18} color={colors.primary} />
+                  <Text style={[styles.scanButtonText, { color: colors.primary }]}>Escanear nueva plantilla</Text>
+                </Pressable>
+              </View>
+            ) : null}
 
             {vm.metodoSeleccionado !== "ia" && vm.metodoSeleccionado !== "importar" ? (
               <>
@@ -313,6 +382,67 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 17,
   },
+  templatesBlock: {
+    gap: 8,
+  },
+  templateCard: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    flexDirection: "row",
+    gap: 10,
+  },
+  templateCardIcon: {
+    width: 28,
+    alignItems: "center",
+    paddingTop: 1,
+  },
+  templateCardText: {
+    flex: 1,
+    gap: 3,
+  },
+  templateCardTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+  },
+  templateCardMeta: {
+    fontSize: 11,
+    fontWeight: "700",
+    textTransform: "uppercase",
+  },
+  templateCardDesc: {
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  templateEmptyCard: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 14,
+    alignItems: "center",
+    gap: 6,
+  },
+  templateEmptyTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+  },
+  templateEmptyText: {
+    fontSize: 12,
+    lineHeight: 17,
+    textAlign: "center",
+  },
+  scanButton: {
+    minHeight: 42,
+    borderRadius: 10,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
+  scanButtonText: {
+    fontSize: 13,
+    fontWeight: "800",
+  },
   label: {
     fontSize: 12,
     fontWeight: "600",
@@ -345,4 +475,3 @@ const styles = StyleSheet.create({
 });
 
 export default CrearPlaneacionScreen;
-

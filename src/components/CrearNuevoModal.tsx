@@ -196,6 +196,26 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({
               </Text>
             </View>
           </TouchableOpacity>
+
+          {/* Escaner de plantilla V2 */}
+          <TouchableOpacity
+            style={styles.optionRow}
+            onPress={() => handleDirectNav("EscanerPlantilla")}
+            activeOpacity={0.7}
+            accessibilityLabel="Escanear plantilla"
+          >
+            <View style={[styles.optionIconLg, { backgroundColor: DT.primaryFixed }]}>
+              <MaterialIcons name="document-scanner" size={24} color={DT.primary} />
+            </View>
+            <View style={styles.optionText}>
+              <Text style={styles.optionTitle}>Escanear plantilla</Text>
+              <Text style={styles.optionSubtitle}>
+                {isDesktop
+                  ? "Convierte un PDF o DOCX real en una estructura reutilizable para DocEditor."
+                  : "Crea una plantilla desde PDF o DOCX."}
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
 
         {/* Section: CONTENIDO */}

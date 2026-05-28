@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
@@ -8,8 +8,13 @@ import { useAuth } from "../context/AuthContext";
 import { usePlaneaciones } from "../sync/providers/SyncProvider";
 import { buildPlaneacionDocumentoBase } from "../utils/createPlaneacionDocumentoBase";
 import { mapResponseToPlaneacion } from "../utils/planeacionMapper";
+import {
+  buildDocumentoFromPlantilla,
+  listPlantillasDocumento,
+} from "../services/plantillaDocumentoService";
 import { NivelAcademico as NivelAcademicoLegacy, type Planeacion } from "../../types/planeacion";
 import { NivelAcademico as NivelAcademicoV2 } from "../../types/planeacionV2";
+import type { PlantillaDocumento } from "../../types/plantillaDocumento";
 
 type Nav = StackNavigationProp<RootStackParamList, "CrearPlaneacion">;
 
@@ -44,18 +49,23 @@ export interface CrearPlaneacionViewModel {
   asignatura: string;
   grado: string;
   gruposInput: string;
+  plantillasDocumento: PlantillaDocumento[];
+  plantillaSeleccionadaId: string;
   isSubmitting: boolean;
+  isLoadingPlantillas: boolean;
   puedeAvanzar: boolean;
   niveles: NivelWizardOption[];
   metodos: MetodoWizardOption[];
   setAsignatura: (value: string) => void;
   setGrado: (value: string) => void;
   setGruposInput: (value: string) => void;
+  setPlantillaSeleccionadaId: (value: string) => void;
   seleccionarNivel: (nivel: NivelAcademicoV2) => void;
   seleccionarMetodo: (metodo: MetodoCreacion) => void;
   irSiguiente: () => void;
   irAnterior: () => void;
   finalizar: () => Promise<void>;
+  handleEscanearPlantilla: () => void;
 
   // Compatibilidad temporal con flujo legacy de IA
   showTemplateModal: boolean;
@@ -115,7 +125,10 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
   const [asignatura, setAsignatura] = useState("");
   const [grado, setGrado] = useState("");
   const [gruposInput, setGruposInput] = useState("");
+  const [plantillasDocumento, setPlantillasDocumento] = useState<PlantillaDocumento[]>([]);
+  const [plantillaSeleccionadaId, setPlantillaSeleccionadaId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingPlantillas, setIsLoadingPlantillas] = useState(false);
 
   // Compatibilidad temporal con flujo IA legacy
   const [showTemplateModal, setShowTemplateModal] = useState(false);
@@ -180,7 +193,7 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
       {
         id: "plantilla",
         titulo: "Desde plantilla",
-        descripcion: "Crear desde una estructura base (temporal).",
+        descripcion: "Usar una plantilla V2 escaneada o compartida.",
         icon: "view-quilt",
       },
     ],
@@ -221,12 +234,44 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     []
   );
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadPlantillas = async () => {
+      setIsLoadingPlantillas(true);
+      try {
+        const items = await listPlantillasDocumento(String(usuario?.id ?? "guest"));
+        if (isMounted) setPlantillasDocumento(items);
+      } finally {
+        if (isMounted) setIsLoadingPlantillas(false);
+      }
+    };
+
+    void loadPlantillas();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [usuario?.id]);
+
+  const plantillasDisponibles = useMemo(() => {
+    if (!nivelSeleccionado) return plantillasDocumento;
+    return plantillasDocumento.filter((plantilla) => plantilla.nivelAcademico === nivelSeleccionado);
+  }, [nivelSeleccionado, plantillasDocumento]);
+
+  useEffect(() => {
+    if (!plantillaSeleccionadaId) return;
+    const exists = plantillasDisponibles.some((plantilla) => plantilla.id === plantillaSeleccionadaId);
+    if (!exists) setPlantillaSeleccionadaId("");
+  }, [plantillaSeleccionadaId, plantillasDisponibles]);
+
   const puedeAvanzar = useMemo(() => {
     if (step === 1) return Boolean(nivelSeleccionado);
     if (step === 2) return Boolean(metodoSeleccionado);
     if (metodoSeleccionado === "ia" || metodoSeleccionado === "importar") return true;
+    if (metodoSeleccionado === "plantilla") return Boolean(plantillaSeleccionadaId);
     return Boolean(asignatura.trim() && grado.trim());
-  }, [asignatura, grado, metodoSeleccionado, nivelSeleccionado, step]);
+  }, [asignatura, grado, metodoSeleccionado, nivelSeleccionado, plantillaSeleccionadaId, step]);
 
   const seleccionarNivel = useCallback((nivel: NivelAcademicoV2) => setNivelSeleccionado(nivel), []);
   const seleccionarMetodo = useCallback((metodo: MetodoCreacion) => setMetodoSeleccionado(metodo), []);
@@ -264,6 +309,31 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
 
     setIsSubmitting(true);
     try {
+      if (metodoSeleccionado === "plantilla") {
+        const selected = plantillasDisponibles.find((item) => item.id === plantillaSeleccionadaId);
+
+        if (!selected) {
+          showInfoMessage("Desde plantilla", "Selecciona una plantilla disponible para continuar.");
+          return;
+        }
+
+        const doc = buildDocumentoFromPlantilla(selected, {
+          userId: String(usuario?.id ?? "guest"),
+          usuario,
+          asignatura: asignatura.trim() || undefined,
+          grado: grado.trim() || undefined,
+          grupos: parseGroups(gruposInput),
+        });
+
+        await crear(doc);
+        navigation.navigate("DocEditor", {
+          modo: "editar",
+          planeacionId: doc.id,
+          nivelAcademico: doc.nivelAcademico,
+        });
+        return;
+      }
+
       const doc = buildPlaneacionDocumentoBase({
         nivelAcademico: nivelSeleccionado,
         userId: String(usuario?.id ?? "guest"),
@@ -281,7 +351,22 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [asignatura, crear, grado, gruposInput, metodoSeleccionado, navigation, nivelSeleccionado, usuario]);
+  }, [
+    asignatura,
+    crear,
+    grado,
+    gruposInput,
+    metodoSeleccionado,
+    navigation,
+    nivelSeleccionado,
+    plantillaSeleccionadaId,
+    plantillasDisponibles,
+    usuario,
+  ]);
+
+  const handleEscanearPlantilla = useCallback(() => {
+    navigation.navigate("EscanerPlantilla");
+  }, [navigation]);
 
   const handleCrearDesdeCero = useCallback(() => {
     setShowNivelModal(true);
@@ -443,18 +528,23 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     asignatura,
     grado,
     gruposInput,
+    plantillasDocumento: plantillasDisponibles,
+    plantillaSeleccionadaId,
     isSubmitting,
+    isLoadingPlantillas,
     puedeAvanzar,
     niveles,
     metodos,
     setAsignatura,
     setGrado,
     setGruposInput,
+    setPlantillaSeleccionadaId,
     seleccionarNivel,
     seleccionarMetodo,
     irSiguiente,
     irAnterior,
     finalizar,
+    handleEscanearPlantilla,
     showTemplateModal,
     showNivelModal,
     showPreviewModal,

@@ -431,18 +431,18 @@ export interface FiltrosPlaneacionV2 {
 
 > Migrar planeaciones del `syncService` legacy al `syncEngine` genérico. Unificar la estrategia de sync.
 
-- [ ] **2.1** Crear `PlaneacionesContext.tsx` en `src/context/` que reemplace el uso de `SyncProvider` para planeaciones:
+- [x] **2.1** Crear `PlaneacionesContext.tsx` en `src/context/` que reemplace el uso de `SyncProvider` para planeaciones:
   - Usar `syncEngine` (genérico) en lugar de `syncService` (legacy)
   - Exponer CRUD: `crear`, `actualizar`, `eliminar`, `clonar`, `buscar`
   - Soporte para `PlaneacionDocumento` (V2)
   - Mantener compatibilidad temporal con V1 via migración on-read
-- [ ] **2.2** Actualizar el `SyncProvider` actual — remover la lógica de planeaciones (queda como wrapper de sync puro o se elimina si ya no tiene propósito)
-- [ ] **2.3** Agregar lógica de migración automática en `PlaneacionesContext`: al cargar desde AsyncStorage, detectar `version !== 2` y migrar
-- [ ] **2.4** Actualizar las claves de AsyncStorage:
+- [x] **2.2** Actualizar el `SyncProvider` actual — remover la lógica de planeaciones (queda como wrapper de sync puro o se elimina si ya no tiene propósito)
+- [x] **2.3** Agregar lógica de migración automática en `PlaneacionesContext`: al cargar desde AsyncStorage, detectar `version !== 2` y migrar
+- [x] **2.4** Actualizar las claves de AsyncStorage:
   - `@planearia:planeaciones` → `@planearia:planeaciones_v2` (nueva clave para V2)
   - Mantener la clave vieja como lectura para migración
-- [ ] **2.5** Actualizar `App.tsx`: reemplazar `SyncProvider` por `PlaneacionesContext` en el provider tree
-- [ ] **2.6** Actualizar [backend/api/sync.js](file:///c:/Users/jarco/dev/PlanearIA/backend/api/sync.js) para manejar documentos V2 y deprecar el batch sync legacy
+- [x] **2.5** Actualizar `App.tsx`: reemplazar `SyncProvider` por `PlaneacionesContext` en el provider tree
+- [x] **2.6** Actualizar [backend/api/sync.js](file:///c:/Users/jarco/dev/PlanearIA/backend/api/sync.js) para manejar documentos V2 y deprecar el batch sync legacy
 
 ---
 

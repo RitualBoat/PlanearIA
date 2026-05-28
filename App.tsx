@@ -2,7 +2,7 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import StackNavigator from "./src/navigation/StackNavigator";
 import { AuthProvider } from "./src/context/AuthContext";
-import { SyncProvider } from "./src/sync/providers/SyncProvider";
+import { PlaneacionesProvider } from "./src/context/PlaneacionesContext";
 import { GruposProvider } from "./src/context/GruposContext";
 import { AlumnosProvider } from "./src/context/AlumnosContext";
 import { AsistenciaProvider } from "./src/context/AsistenciaContext";
@@ -25,7 +25,7 @@ const App: React.FC = () => {
       <FontSizeProvider>
         <DaltonismoProvider>
           <AuthProvider>
-            <SyncProvider>
+            <PlaneacionesProvider>
               <AlumnosProvider>
                 <GruposProvider>
                   <AsistenciaProvider>
@@ -51,7 +51,7 @@ const App: React.FC = () => {
                   </AsistenciaProvider>
                 </GruposProvider>
               </AlumnosProvider>
-            </SyncProvider>
+            </PlaneacionesProvider>
           </AuthProvider>
         </DaltonismoProvider>
       </FontSizeProvider>

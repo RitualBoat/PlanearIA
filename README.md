@@ -40,7 +40,7 @@ La app funciona offline-first: todos los datos se guardan localmente y se sincro
 | **Backend** | Vercel Serverless | Funciones Node.js sin servidor |
 | **Base de datos** | MongoDB Atlas M0 | Cloud database (free tier) |
 | **Autenticacion** | JWT | Tokens con userId isolation |
-| **Sync** | Custom sync engine | syncEngine.ts + syncService.ts |
+| **Sync** | Custom sync engine | syncEngine.ts + PlaneacionesContext V2 (syncService legacy en deprecacion) |
 | **Icons** | @expo/vector-icons | Direct imports (no barrel) |
 | **Testing** | Jest | Unit tests |
 
@@ -148,7 +148,7 @@ Cada plan sigue estas fases:
 
 | Modulo | Archivo | Estado |
 |--------|---------|--------|
-| **Planeaciones** | `plan_planeaciones.md` | En progreso (Fases 0-1 completadas) |
+| **Planeaciones** | `plan_planeaciones.md` | En progreso (Fases 0-2 completadas) |
 | Recursos | `plan_recursos.md` | Pendiente |
 | Grupos | `plan_grupos.md` | Pendiente |
 | Alumnos | `plan_alumnos.md` | Pendiente |
@@ -163,7 +163,7 @@ Cada plan sigue estas fases:
 
 - [x] Fase 0: Limpieza de codigo legacy
 - [x] Fase 1: Sistema de tipos V2 + modelo de datos NEM
-- [ ] Fase 2: Capa de datos y sincronizacion
+- [x] Fase 2: Capa de datos y sincronizacion
 - [ ] Fase 3: Editor de texto enriquecido (tentap-editor)
 - [ ] Fase 4: Rediseno completo de pantallas del editor
 - [ ] Fase 5: Escaner de plantillas

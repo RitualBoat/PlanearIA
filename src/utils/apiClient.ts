@@ -1,4 +1,7 @@
 import { API_CONFIG } from "../sync/config/apiConfig";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const AUTH_TOKEN_KEY = "@planearia:auth_token";
 
 /**
  * Función unificada para realizar peticiones HTTP a la API del backend
@@ -8,9 +11,12 @@ export const apiRequest = async (
   endpoint: string,
   options: RequestInit = {}
 ): Promise<Response> => {
+  const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+
   const headers: HeadersInit = {
     "Content-Type": "application/json",
     "X-API-Key": API_CONFIG.apiSecret,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
 

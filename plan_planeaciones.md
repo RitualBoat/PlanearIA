@@ -450,32 +450,33 @@ export interface FiltrosPlaneacionV2 {
 
 > Instalar `@10play/tentap-editor`, configurar el bridge RN ↔ WebView, crear las extensiones necesarias.
 
-- [ ] **3.1** Instalar `@10play/tentap-editor` y dependencias peer:
+- [x] **3.1** Instalar `@10play/tentap-editor` y dependencias peer:
   ```
   npx expo install @10play/tentap-editor
   ```
   Verificar compatibilidad con Expo 54 y React Native 0.81.5
-- [ ] **3.2** Si `tentap-editor` requiere prebuild (módulo nativo), evaluar si migrar de Expo Go a Dev Client. Documentar impacto
-- [ ] **3.3** Crear componente base `src/components/editor/RichTextEditor.tsx`:
+- [x] **3.2** Si `tentap-editor` requiere prebuild (módulo nativo), evaluar si migrar de Expo Go a Dev Client. Documentar impacto
+  - Resultado: Expo Go soporta uso básico; para capacidades avanzadas del editor (configuración extendida y flujo completo de planeaciones) se trabajará con Dev Client (`npm run start:dev`).
+- [x] **3.3** Crear componente base `src/components/editor/RichTextEditor.tsx`:
   - Wrapper de `TenTapEditor` con configuración base
   - Extensions: `StarterKit`, `Table`, `TaskList`, `Placeholder`, `Heading`
   - Props: `initialContent` (JSON), `onChange`, `editable`, `mode` (estándar/móvil)
   - Bridge para leer/escribir contenido como JSON serializable
-- [ ] **3.4** Crear componente `src/components/editor/EditorToolbar.tsx`:
+- [x] **3.4** Crear componente `src/components/editor/EditorToolbar.tsx`:
   - Toolbar nativa RN (no HTML) con botones de formato
   - Negrita, cursiva, listas, tablas, heading, checkbox
   - Estado reactivo: botones activos según la selección actual
   - Layout responsive: horizontal en tablet, compacto en móvil
-- [ ] **3.5** Crear componente `src/components/editor/AIToolbar.tsx`:
+- [x] **3.5** Crear componente `src/components/editor/AIToolbar.tsx`:
   - Barra de acciones IA: ✨ Sugerir, 🔄 Mejorar, 📋 Generar rúbrica, ✅ Revisar
   - Estado: loading, resultado inline, error
   - Integración con endpoints del copiloto
-- [ ] **3.6** Crear hook `src/hooks/useEditorMode.ts`:
+- [x] **3.6** Crear hook `src/hooks/useEditorMode.ts`:
   - Detectar modo estándar vs móvil
   - `useWindowDimensions()` + `Platform.isPad`
   - Threshold: ancho ≥ 768px → estándar
   - Exponer: `mode: "standard" | "mobile"`, `isTablet`, `breakpoint`
-- [ ] **3.7** Crear componente `src/components/editor/SectionNavigator.tsx`:
+- [x] **3.7** Crear componente `src/components/editor/SectionNavigator.tsx`:
   - Solo visible en modo móvil
   - Stepper/wizard con íconos para cada sección
   - Permite saltar entre secciones sin scroll largo

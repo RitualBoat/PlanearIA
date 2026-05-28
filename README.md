@@ -68,7 +68,8 @@ npm install
 cd backend && npm install && cd ..
 
 # Ejecutar
-npx expo start          # Expo Go (escanea QR)
+npx expo start          # Expo Go (modo basico)
+npm run start:dev       # Dev Client (recomendado para editor avanzado de planeaciones)
 npm run android         # Android
 npm run ios             # iOS (requiere Mac + Xcode)
 ```
@@ -148,7 +149,7 @@ Cada plan sigue estas fases:
 
 | Modulo | Archivo | Estado |
 |--------|---------|--------|
-| **Planeaciones** | `plan_planeaciones.md` | En progreso (Fases 0-2 completadas) |
+| **Planeaciones** | `plan_planeaciones.md` | En progreso (Fases 0-3 completadas) |
 | Recursos | `plan_recursos.md` | Pendiente |
 | Grupos | `plan_grupos.md` | Pendiente |
 | Alumnos | `plan_alumnos.md` | Pendiente |
@@ -164,7 +165,7 @@ Cada plan sigue estas fases:
 - [x] Fase 0: Limpieza de codigo legacy
 - [x] Fase 1: Sistema de tipos V2 + modelo de datos NEM
 - [x] Fase 2: Capa de datos y sincronizacion
-- [ ] Fase 3: Editor de texto enriquecido (tentap-editor)
+- [x] Fase 3: Editor de texto enriquecido (tentap-editor)
 - [ ] Fase 4: Rediseno completo de pantallas del editor
 - [ ] Fase 5: Escaner de plantillas
 - [ ] Fase 6: Copiloto IA integrado

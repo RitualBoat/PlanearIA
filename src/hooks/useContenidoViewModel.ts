@@ -6,7 +6,7 @@ import { useRecursos } from "../context/RecursosContext";
 import { useEntregables } from "../context/EntregablesContext";
 import { usePlantillas } from "../context/PlantillasContext";
 import type { Recurso, Plantilla, Tarea } from "../../types";
-import type { Planeacion } from "../../types/planeacion";
+import type { PlaneacionDocumento } from "../../types/planeacionV2";
 
 // ─── Tipos ───
 
@@ -30,7 +30,7 @@ export interface ContenidoItem {
   esBorrador: boolean;
   progreso?: number;
   usosCount?: number;
-  raw: Planeacion | Recurso | Tarea | Plantilla;
+  raw: PlaneacionDocumento | Recurso | Tarea | Plantilla;
 }
 
 export interface ContenidoViewModel {
@@ -79,20 +79,57 @@ const toISOString = (d: Date | string | undefined): string => {
   }
 };
 
-const calcularProgreso = (p: Planeacion): number => {
-  let filled = 0;
-  const total = 6;
-  if (p.asignatura) filled++;
-  if (p.temaSesion) filled++;
-  if (p.aprendizajesEsperados?.length > 0) filled++;
-  if (p.actividades?.length > 0) filled++;
-  if (p.evaluacion) filled++;
-  if (p.recursos?.length > 0) filled++;
-  return Math.round((filled / total) * 100);
+const hasText = (value?: string | null): boolean => Boolean(value?.trim());
+
+const richTextHasText = (value?: string | null): boolean => {
+  const raw = value?.trim();
+  if (!raw) return false;
+
+  if (raw.startsWith("{") || raw.startsWith("[")) {
+    try {
+      const collect = (node: unknown): string => {
+        if (!node) return "";
+        if (typeof node === "string") return node;
+        if (Array.isArray(node)) return node.map(collect).join("");
+        if (typeof node !== "object") return "";
+
+        const record = node as Record<string, unknown>;
+        return `${typeof record.text === "string" ? record.text : ""}${
+          Array.isArray(record.content) ? record.content.map(collect).join("") : ""
+        }`;
+      };
+      return Boolean(collect(JSON.parse(raw)).trim());
+    } catch {
+      return true;
+    }
+  }
+
+  return Boolean(raw.replace(/<[^>]+>/g, " ").trim());
 };
 
-const esBorradorPlaneacion = (p: Planeacion): boolean => {
-  return calcularProgreso(p) < 100;
+const calcularProgresoDocumento = (doc: PlaneacionDocumento): number => {
+  let filled = 0;
+  const total = 6;
+  if (hasText(doc.datosGenerales?.asignatura)) filled++;
+  if (hasText(doc.datosGenerales?.grado) && (doc.datosGenerales?.grupos || []).length > 0) filled++;
+  if (hasText(doc.elementosCurriculares?.contenido) || hasText(doc.elementosCurriculares?.pda))
+    filled++;
+  if (hasText(doc.elementosCurriculares?.proposito)) filled++;
+  if (
+    (doc.sesiones || []).some(
+      (sesion) =>
+        richTextHasText(sesion.inicio) ||
+        richTextHasText(sesion.desarrollo) ||
+        richTextHasText(sesion.cierre)
+    )
+  )
+    filled++;
+  if (
+    doc.evaluacionFinal?.criterios?.length ||
+    hasText(doc.elementosCurriculares?.instrumentoEvaluacion)
+  )
+    filled++;
+  return Math.round((filled / total) * 100);
 };
 
 const matchFecha = (fecha: string, filtro: FiltroFecha): boolean => {
@@ -124,7 +161,7 @@ const matchFecha = (fecha: string, filtro: FiltroFecha): boolean => {
 // ─── Hook ───
 
 export const useContenidoViewModel = (): ContenidoViewModel => {
-  const { planeaciones, isLoading: loadingPlan } = usePlaneaciones();
+  const { documentos, isLoading: loadingPlan, eliminar, clonar } = usePlaneaciones();
   const { recursos, isLoading: loadingRec } = useRecursos();
   const { entregables, isLoading: loadingEnt } = useEntregables();
   const { plantillas, isLoading: loadingPla } = usePlantillas();
@@ -157,14 +194,20 @@ export const useContenidoViewModel = (): ContenidoViewModel => {
   const allItems = useMemo<ContenidoItem[]>(() => {
     const items: ContenidoItem[] = [];
 
-    // Planeaciones
-    for (const p of planeaciones) {
-      const progreso = calcularProgreso(p);
+    // Planeaciones V2
+    for (const p of documentos) {
+      const progreso = calcularProgresoDocumento(p);
+      const grupos = p.datosGenerales?.grupos || [];
       items.push({
         id: `plan-${p.id}`,
         tipo: "planeaciones",
-        titulo: p.temaSesion || p.unidadTematica || "Planeación sin título",
-        subtitulo: `${p.asignatura || "Sin materia"} · ${p.grado || ""} ${p.grupo || ""}`.trim(),
+        titulo:
+          p.elementosCurriculares?.pda ||
+          p.elementosCurriculares?.contenido ||
+          "Planeacion sin titulo",
+        subtitulo: `${p.datosGenerales?.asignatura || "Sin materia"} - ${
+          p.datosGenerales?.grado || ""
+        } ${grupos.join(", ")}`.trim(),
         fechaModificacion: p.fechaModificacion || p.fechaCreacion || "",
         esBorrador: progreso < 100,
         progreso,
@@ -223,7 +266,7 @@ export const useContenidoViewModel = (): ContenidoViewModel => {
     });
 
     return items;
-  }, [planeaciones, recursos, entregables, plantillas]);
+  }, [documentos, recursos, entregables, plantillas]);
 
   // Counts
   const conteos = useMemo<Record<CategoriaContenido, number>>(
@@ -299,7 +342,6 @@ export const useContenidoViewModel = (): ContenidoViewModel => {
   }, []);
 
   // Actions
-  const { eliminarPlaneacion } = usePlaneaciones();
   const { eliminarRecurso } = useRecursos();
   const { eliminarEntregable } = useEntregables();
   const { eliminarPlantilla } = usePlantillas();
@@ -318,8 +360,7 @@ export const useContenidoViewModel = (): ContenidoViewModel => {
             onPress: async () => {
               try {
                 if (item.tipo === "planeaciones") {
-                  const rawId = (item.raw as Planeacion).id;
-                  await eliminarPlaneacion(rawId);
+                  await eliminar((item.raw as PlaneacionDocumento).id);
                 } else if (item.tipo === "recursos") {
                   await eliminarRecurso((item.raw as Recurso).id as number);
                 } else if (item.tipo === "entregables") {
@@ -335,10 +376,9 @@ export const useContenidoViewModel = (): ContenidoViewModel => {
         ]
       );
     },
-    [eliminarPlaneacion, eliminarRecurso, eliminarEntregable, eliminarPlantilla]
+    [eliminar, eliminarRecurso, eliminarEntregable, eliminarPlantilla]
   );
 
-  const { agregarPlaneacion, clonarPlaneacion } = usePlaneaciones();
   const { crearRecurso } = useRecursos();
   const { crearPlantilla } = usePlantillas();
 
@@ -347,7 +387,7 @@ export const useContenidoViewModel = (): ContenidoViewModel => {
       void (async () => {
         try {
           if (item.tipo === "planeaciones") {
-            await clonarPlaneacion((item.raw as Planeacion).id);
+            await clonar((item.raw as PlaneacionDocumento).id);
           } else if (item.tipo === "recursos") {
             const r = item.raw as Recurso;
             const { id, ...rest } = r;
@@ -363,7 +403,7 @@ export const useContenidoViewModel = (): ContenidoViewModel => {
         }
       })();
     },
-    [clonarPlaneacion, crearRecurso, crearPlantilla]
+    [clonar, crearRecurso, crearPlantilla]
   );
 
   return {

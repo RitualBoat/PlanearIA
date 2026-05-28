@@ -30,19 +30,19 @@ La app funciona offline-first: todos los datos se guardan localmente y se sincro
 
 ## Arquitectura
 
-| Capa | Tecnologia | Descripcion |
-|------|-----------|-------------|
-| **Frontend** | React Native + Expo Go | UI cross-platform |
-| **Lenguaje** | TypeScript 5.9.2 | Tipado estatico |
-| **Navegacion** | React Navigation 7.x | Stack navigator nativo |
-| **Estado** | React Context + Hooks | MVVM con hooks como ViewModels |
-| **Storage local** | AsyncStorage | Persistencia offline-first |
-| **Backend** | Vercel Serverless | Funciones Node.js sin servidor |
-| **Base de datos** | MongoDB Atlas M0 | Cloud database (free tier) |
-| **Autenticacion** | JWT | Tokens con userId isolation |
-| **Sync** | Custom sync engine | syncEngine.ts + PlaneacionesContext V2 (syncService legacy en deprecacion) |
-| **Icons** | @expo/vector-icons | Direct imports (no barrel) |
-| **Testing** | Jest | Unit tests |
+| Capa              | Tecnologia             | Descripcion                                                                |
+| ----------------- | ---------------------- | -------------------------------------------------------------------------- |
+| **Frontend**      | React Native + Expo Go | UI cross-platform                                                          |
+| **Lenguaje**      | TypeScript 5.9.2       | Tipado estatico                                                            |
+| **Navegacion**    | React Navigation 7.x   | Stack navigator nativo                                                     |
+| **Estado**        | React Context + Hooks  | MVVM con hooks como ViewModels                                             |
+| **Storage local** | AsyncStorage           | Persistencia offline-first                                                 |
+| **Backend**       | Vercel Serverless      | Funciones Node.js sin servidor                                             |
+| **Base de datos** | MongoDB Atlas M0       | Cloud database (free tier)                                                 |
+| **Autenticacion** | JWT                    | Tokens con userId isolation                                                |
+| **Sync**          | Custom sync engine     | syncEngine.ts + PlaneacionesContext V2 (syncService legacy en deprecacion) |
+| **Icons**         | @expo/vector-icons     | Direct imports (no barrel)                                                 |
+| **Testing**       | Jest                   | Unit tests                                                                 |
 
 ---
 
@@ -136,6 +136,7 @@ El proyecto sigue un enfoque modular: cada modulo de la app recibe su propio pla
 ### Patron por modulo
 
 Cada plan sigue estas fases:
+
 1. Limpieza de codigo legacy
 2. Nuevo sistema de tipos y modelo de datos
 3. Capa de datos y sincronizacion
@@ -147,14 +148,14 @@ Cada plan sigue estas fases:
 
 ### Planes de refactorizacion
 
-| Modulo | Archivo | Estado |
-|--------|---------|--------|
-| **Planeaciones** | `plan_planeaciones.md` | En progreso (Fases 0-6 completadas) |
-| Recursos | `plan_recursos.md` | Pendiente |
-| Grupos | `plan_grupos.md` | Pendiente |
-| Alumnos | `plan_alumnos.md` | Pendiente |
-| Login/Auth | `plan_login.md` | Pendiente |
-| Seguridad | `plan_seguridad.md` | Pendiente |
+| Modulo           | Archivo                | Estado                              |
+| ---------------- | ---------------------- | ----------------------------------- |
+| **Planeaciones** | `plan_planeaciones.md` | En progreso (Fases 0-7 completadas) |
+| Recursos         | `plan_recursos.md`     | Pendiente                           |
+| Grupos           | `plan_grupos.md`       | Pendiente                           |
+| Alumnos          | `plan_alumnos.md`      | Pendiente                           |
+| Login/Auth       | `plan_login.md`        | Pendiente                           |
+| Seguridad        | `plan_seguridad.md`    | Pendiente                           |
 
 ---
 
@@ -169,7 +170,8 @@ Cada plan sigue estas fases:
 - [x] Fase 4: Rediseno completo de pantallas del editor
 - [x] Fase 5: Escaner de plantillas
 - [x] Fase 6: Copiloto IA integrado
-- [ ] Fase 7: Exportacion y navegacion
+- [x] Fase 7: Exportacion y navegacion
+  - PDF/DOCX V2, exportacion segura de rich text, Mi Contenido conectado a documentos V2 y navegacion limpia hacia DocEditor/EscanerPlantilla.
 - [ ] Fase 8: Limpieza y verificacion
 
 ### v4.1+ - Refactorizacion por modulos
@@ -191,22 +193,22 @@ Cada plan sigue estas fases:
 
 La documentacion tecnica esta en [`Documentacion/`](./Documentacion/):
 
-| Documento | Descripcion |
-|-----------|-------------|
-| [ARQUITECTURA.md](./Documentacion/ARQUITECTURA.md) | Arquitectura del sistema y decisiones tecnicas |
-| [FLUJO_SINCRONIZACION.md](./Documentacion/FLUJO_SINCRONIZACION.md) | Flujo de datos y sincronizacion offline-first |
-| [DIAGRAMA_NAVEGACION.md](./Documentacion/DIAGRAMA_NAVEGACION.md) | Diagrama de navegacion entre pantallas |
-| [MAPA_NAVEGACION.md](./Documentacion/MAPA_NAVEGACION.md) | Mapa de rutas y relaciones entre modulos |
-| [GUIA_PRUEBAS.md](./Documentacion/GUIA_PRUEBAS.md) | Guia de testing |
+| Documento                                                          | Descripcion                                    |
+| ------------------------------------------------------------------ | ---------------------------------------------- |
+| [ARQUITECTURA.md](./Documentacion/ARQUITECTURA.md)                 | Arquitectura del sistema y decisiones tecnicas |
+| [FLUJO_SINCRONIZACION.md](./Documentacion/FLUJO_SINCRONIZACION.md) | Flujo de datos y sincronizacion offline-first  |
+| [DIAGRAMA_NAVEGACION.md](./Documentacion/DIAGRAMA_NAVEGACION.md)   | Diagrama de navegacion entre pantallas         |
+| [MAPA_NAVEGACION.md](./Documentacion/MAPA_NAVEGACION.md)           | Mapa de rutas y relaciones entre modulos       |
+| [GUIA_PRUEBAS.md](./Documentacion/GUIA_PRUEBAS.md)                 | Guia de testing                                |
 
 ---
 
 ## Plataformas
 
-| Plataforma | Estado | Compatibilidad |
-|------------|--------|----------------|
+| Plataforma  | Estado    | Compatibilidad         |
+| ----------- | --------- | ---------------------- |
 | **Android** | Funcional | Android 8.0+ (Expo Go) |
-| **iOS** | Funcional | iOS 13+ (Expo Go) |
+| **iOS**     | Funcional | iOS 13+ (Expo Go)      |
 
 ---
 
@@ -218,4 +220,3 @@ Proyecto privado. Todos los derechos reservados.
 
 **Repositorio:** [github.com/RitualBoat/PlanearIA](https://github.com/RitualBoat/PlanearIA)
 **Branch:** `development`
-

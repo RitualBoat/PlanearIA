@@ -22,7 +22,6 @@ import CrearPlaneacionScreen from "../screens/planeaciones/CrearPlaneacionScreen
 import GenerarPlaneacionIAScreen from "../screens/planeaciones/GenerarPlaneacionIAScreen";
 import ImportarPlaneacionScreen from "../screens/planeaciones/ImportarPlaneacionScreen";
 import ExportarPlaneacionScreen from "../screens/planeaciones/ExportarPlaneacionScreen";
-import EditorPlaneacionScreen from "../screens/planeaciones/EditorPlaneacionScreen";
 import ListaPlaneacionesScreen from "../screens/planeaciones/ListaPlaneacionesScreen";
 import DocEditorScreen from "../screens/planeaciones/DocEditorScreen";
 import EscanerPlantillaScreen from "../screens/planeaciones/EscanerPlantillaScreen";
@@ -127,11 +126,6 @@ export type RootStackParamList = {
   ImportarPlaneacion: undefined;
   EscanerPlantilla: undefined;
   ExportarPlaneacion: { planeacionId?: string };
-  EditorPlaneacion: {
-    nivel: NivelAcademico;
-    modo: "crear" | "editar";
-    planeacionId?: string;
-  };
   DocEditor: {
     modo: "crear" | "editar" | "plantilla";
     planeacionId?: string;
@@ -393,14 +387,6 @@ const StackNavigator: React.FC = () => {
         component={ExportarPlaneacionScreen}
         options={{
           title: "Exportar PlaneaciÃ³n",
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="EditorPlaneacion"
-        component={EditorPlaneacionScreen}
-        options={{
-          title: "Editor de PlaneaciÃ³n",
           headerShown: false,
         }}
       />

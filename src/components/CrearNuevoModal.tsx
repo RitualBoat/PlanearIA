@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
-import { NivelAcademico } from "../../types/planeacion";
+import { NivelAcademico } from "../../types/planeacionV2";
 
 // ─── Design tokens (Stitch 3.3.1) ───
 const DT = {

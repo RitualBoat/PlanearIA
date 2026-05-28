@@ -18,8 +18,16 @@ import { usePlaneaciones } from "../sync/providers/SyncProvider";
 import logger from "../utils/logger";
 import { useUniversityDetailMode } from "./useUniversityDetailMode";
 
-type Nav = StackNavigationProp<RootStackParamList, "EditorPlaneacion">;
-type Route = RouteProp<RootStackParamList, "EditorPlaneacion">;
+type LegacyEditorPlaneacionParamList = {
+  EditorPlaneacion: {
+    nivel: NivelAcademico;
+    modo: "crear" | "editar";
+    planeacionId?: string;
+  };
+};
+
+type Nav = StackNavigationProp<RootStackParamList>;
+type Route = RouteProp<LegacyEditorPlaneacionParamList, "EditorPlaneacion">;
 
 export interface EditorPlaneacionViewModel {
   // Route params

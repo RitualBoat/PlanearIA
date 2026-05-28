@@ -1,4 +1,4 @@
-﻿# Plan Maestro: RefactorizaciÃ³n del MÃ³dulo de Planeaciones â€” PlanearIA
+# Plan Maestro: RefactorizaciÃ³n del MÃ³dulo de Planeaciones â€” PlanearIA
 
 > **VersiÃ³n:** 1.0  
 > **Fecha:** 2026-05-27  
@@ -20,16 +20,16 @@
 
 Las planeaciones reales tienen una estructura **radicalmente distinta** al modelo de datos actual del MVP:
 
-| Aspecto                | Modelo Actual (MVP)                                   | Realidad Docente                                                          |
-| ---------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------- |
-| Sesiones               | 1 sesiÃ³n con 3 actividades (inicio/desarrollo/cierre) | **10 sesiones** multi-semana, cada una con inicio/desarrollo/cierre/tarea |
-| EvaluaciÃ³n             | Campo string simple                                   | Instrumentos dinÃ¡micos (escalas de 3 o 4 puntos, rÃºbricas con criterios)  |
-| Metadata institucional | No existe                                             | InstituciÃ³n, subsistema, ciclo escolar, lugar                             |
-| Curriculum NEM         | Parcial                                               | PropÃ³sito, PDA, campo formativo, eje articulador, rasgos perfil egreso    |
-| Firmas                 | No existe                                             | Coordinadora acadÃ©mica + docente                                          |
-| Observaciones          | String simple                                         | Array de notas estructuradas (flexibilidad, USAER, proyectos)             |
-| Actividades embebidas  | No existen                                            | Verdadero/falso (â˜), preguntas guÃ­a numeradas, matching, escritura guiada |
-| Cobertura temporal     | 1 fecha                                               | Rango de fechas multi-semana                                              |
+| Aspecto                | Modelo Actual (MVP)                                    | Realidad Docente                                                            |
+| ---------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------- |
+| Sesiones               | 1 sesiÃ³n con 3 actividades (inicio/desarrollo/cierre) | **10 sesiones** multi-semana, cada una con inicio/desarrollo/cierre/tarea   |
+| EvaluaciÃ³n            | Campo string simple                                    | Instrumentos dinÃ¡micos (escalas de 3 o 4 puntos, rÃºbricas con criterios)  |
+| Metadata institucional | No existe                                              | InstituciÃ³n, subsistema, ciclo escolar, lugar                              |
+| Curriculum NEM         | Parcial                                                | PropÃ³sito, PDA, campo formativo, eje articulador, rasgos perfil egreso     |
+| Firmas                 | No existe                                              | Coordinadora acadÃ©mica + docente                                           |
+| Observaciones          | String simple                                          | Array de notas estructuradas (flexibilidad, USAER, proyectos)               |
+| Actividades embebidas  | No existen                                             | Verdadero/falso (â˜), preguntas guÃ­a numeradas, matching, escritura guiada |
+| Cobertura temporal     | 1 fecha                                                | Rango de fechas multi-semana                                                |
 
 ---
 
@@ -88,7 +88,7 @@ end
 
 ### Archivos Indirectamente Afectados
 
-| Archivo                                                                                                      | RazÃ³n                                                         |
+| Archivo                                                                                                      | RazÃ³n                                                        |
 | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
 | [ContenidoScreen.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/screens/contenido/ContenidoScreen.tsx) (59KB) | Tab principal que muestra planeaciones, recursos y plantillas |
 | [useContenidoViewModel.ts](file:///c:/Users/jarco/dev/PlanearIA/src/hooks/useContenidoViewModel.ts) (13KB)   | ViewModel del contenido, importa planeaciones                 |
@@ -106,12 +106,12 @@ end
 
 No existe un componente nativo de React Native que proporcione una experiencia tipo Word/Docs con formato real. Las opciones evaluadas:
 
-| OpciÃ³n                                   | Veredicto      | RazÃ³n                                                                                                   |
-| ---------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------- |
-| `TextInput` multiline                    | âŒ Descartado  | Sin formato, sin tablas, sin listas                                                                     |
-| `react-native-pell-rich-editor`          | âŒ Descartado  | Abandonado, bugs crÃ­ticos en Expo                                                                       |
+| OpciÃ³n                                  | Veredicto       | RazÃ³n                                                                                                  |
+| ---------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------- |
+| `TextInput` multiline                    | âŒ Descartado   | Sin formato, sin tablas, sin listas                                                                     |
+| `react-native-pell-rich-editor`          | âŒ Descartado   | Abandonado, bugs crÃ­ticos en Expo                                                                      |
 | `@10play/tentap-editor` (Tiptap para RN) | âœ… **ELEGIDO** | Tiptap/ProseMirror en WebView. Modular, extensible, soporte offline. Toolbar nativa RN + canvas WebView |
-| Custom WebView + Quill/Tiptap            | âš ï¸ Fallback    | Si tentap tiene limitaciones, WebView con Tiptap puro como plan B                                       |
+| Custom WebView + Quill/Tiptap            | âš ï¸ Fallback  | Si tentap tiene limitaciones, WebView con Tiptap puro como plan B                                       |
 
 **JustificaciÃ³n de `@10play/tentap-editor`:**
 
@@ -152,10 +152,10 @@ No existe un componente nativo de React Native que proporcione una experiencia t
 
 ### 2. Dualidad EstÃ¡ndar vs MÃ³vil
 
-| Modo         | Dispositivo              | Comportamiento                                                                                                          |
-| ------------ | ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
-| **EstÃ¡ndar** | Tablets, teclado externo | Editor completo tipo Docs con todas las secciones visibles. Toolbar horizontal. NavegaciÃ³n por teclado                  |
-| **MÃ³vil**    | TelÃ©fonos celulares      | NavegaciÃ³n por secciones (wizard/stepper). Una secciÃ³n a la vez. Inputs optimizados para touch. Acciones IA prominentes |
+| Modo          | Dispositivo              | Comportamiento                                                                                                            |
+| ------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| **EstÃ¡ndar** | Tablets, teclado externo | Editor completo tipo Docs con todas las secciones visibles. Toolbar horizontal. NavegaciÃ³n por teclado                   |
+| **MÃ³vil**    | TelÃ©fonos celulares     | NavegaciÃ³n por secciones (wizard/stepper). Una secciÃ³n a la vez. Inputs optimizados para touch. Acciones IA prominentes |
 
 **DetecciÃ³n:** `useWindowDimensions()` + `Platform.isPad` + ancho > 768px â†’ modo estÃ¡ndar.
 
@@ -172,14 +172,14 @@ No existe un componente nativo de React Native que proporcione una experiencia t
 
 ### 4. IntegraciÃ³n de IA como Copiloto
 
-| FunciÃ³n IA                      | Trigger                                      | Endpoint                                                               |
-| ------------------------------- | -------------------------------------------- | ---------------------------------------------------------------------- |
-| **Generar planeaciÃ³n completa** | BotÃ³n "Generar con IA" en creaciÃ³n           | `POST /api/planeaciones/generar` (existente, se amplÃ­a)                |
+| FunciÃ³n IA                      | Trigger                                          | Endpoint                                                               |
+| -------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------- |
+| **Generar planeaciÃ³n completa** | BotÃ³n "Generar con IA" en creaciÃ³n             | `POST /api/planeaciones/generar` (existente, se amplÃ­a)               |
 | **Autocompletar secciÃ³n**       | Cursor en secciÃ³n vacÃ­a + botÃ³n âœ¨           | `POST /api/planeaciones/copiloto` (NUEVO)                              |
-| **Sugerir actividades**         | Dentro de una sesiÃ³n, botÃ³n "Sugerir"        | `POST /api/planeaciones/copiloto` con `accion: "sugerir_actividades"`  |
-| **Mejorar texto**               | Seleccionar texto + botÃ³n "Mejorar"          | `POST /api/planeaciones/mejorar` (existente, se amplÃ­a)                |
+| **Sugerir actividades**          | Dentro de una sesiÃ³n, botÃ³n "Sugerir"          | `POST /api/planeaciones/copiloto` con `accion: "sugerir_actividades"`  |
+| **Mejorar texto**                | Seleccionar texto + botÃ³n "Mejorar"             | `POST /api/planeaciones/mejorar` (existente, se amplÃ­a)               |
 | **Generar evaluaciÃ³n**          | SecciÃ³n evaluaciÃ³n + botÃ³n "Generar rÃºbrica" | `POST /api/planeaciones/copiloto` con `accion: "generar_evaluacion"`   |
-| **Revisar alineamiento**        | BotÃ³n "Revisar" en toolbar IA                | `POST /api/planeaciones/copiloto` con `accion: "revisar_alineamiento"` |
+| **Revisar alineamiento**         | BotÃ³n "Revisar" en toolbar IA                   | `POST /api/planeaciones/copiloto` con `accion: "revisar_alineamiento"` |
 
 ---
 
@@ -634,16 +634,16 @@ export interface FiltrosPlaneacionV2 {
 
 > Actualizar la exportaciÃ³n para renderizar documentos V2 y limpiar la navegaciÃ³n.
 
-- [ ] **7.1** Refactorizar [planeacionExportService.ts](file:///c:/Users/jarco/dev/PlanearIA/src/services/planeacionExportService.ts):
+- [x] **7.1** Refactorizar [planeacionExportService.ts](file:///c:/Users/jarco/dev/PlanearIA/src/services/planeacionExportService.ts):
   - `buildPlaneacionPdfHtml()` â†’ recibe `PlaneacionDocumento` V2
   - Renderizar todas las secciones: info institucional, datos generales, curricular, N sesiones, evaluaciÃ³n (tabla), observaciones, firmas
   - Template HTML profesional con estilos del PDF original (tablas, bordes, checkboxes)
   - Mantener exportaciÃ³n DOCX actualizada con la misma estructura
-- [ ] **7.2** Actualizar pantalla [ExportarPlaneacionScreen.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/screens/planeaciones/ExportarPlaneacionScreen.tsx):
+- [x] **7.2** Actualizar pantalla [ExportarPlaneacionScreen.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/screens/planeaciones/ExportarPlaneacionScreen.tsx):
   - Vista previa del documento completo antes de exportar
   - Opciones granulares: quÃ© secciones incluir
   - Formatos: PDF, DOCX
-- [ ] **7.3** Actualizar navegaciÃ³n en [StackNavigator.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/navigation/StackNavigator.tsx):
+- [x] **7.3** Actualizar navegaciÃ³n en [StackNavigator.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/navigation/StackNavigator.tsx):
   - Reemplazar ruta `EditorPlaneacion` por `DocEditor` con nuevo tipado:
     ```typescript
     DocEditor: {
@@ -656,13 +656,16 @@ export interface FiltrosPlaneacionV2 {
   - Agregar ruta `EscanerPlantilla: undefined`
   - Eliminar ruta `Home` (si se confirma en Fase 0.4)
   - Eliminar ruta `Planeaciones` si se confirma redundante con ContenidoScreen (Fase 0.5)
-- [ ] **7.4** Actualizar [ContenidoScreen.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/screens/contenido/ContenidoScreen.tsx):
+- [x] **7.4** Actualizar [ContenidoScreen.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/screens/contenido/ContenidoScreen.tsx):
   - La pestaÃ±a "Planeaciones" debe usar `PlaneacionesContext` (V2)
   - BotÃ³n "Crear" â†’ navega a `CrearPlaneacion` (wizard rediseÃ±ado)
   - Cards de planeaciÃ³n con nuevo formato (multi-semana, asignatura, sync status)
-- [ ] **7.5** Actualizar [CrearNuevoModal.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/components/CrearNuevoModal.tsx):
+- [x] **7.5** Actualizar [CrearNuevoModal.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/components/CrearNuevoModal.tsx):
   - OpciÃ³n "PlaneaciÃ³n" â†’ navega a `CrearPlaneacion`
   - Agregar opciÃ³n "Escanear Plantilla" â†’ navega a `EscanerPlantilla`
+
+> **Estado Fase 7:** completada el 2026-05-28. Correcciones finales aplicadas: exportacion PDF/DOCX consume PlaneacionDocumento V2, convierte rich text/Tiptap a texto seguro, ExportarPlaneacion y Mi Contenido usan documentos V2, la navegacion queda orientada a DocEditor/EscanerPlantilla, y las pruebas de exportacion/contenido quedaron actualizadas.
+> **Validacion:** Jest focalizado de exportacion/contenido OK, filtro TypeScript de archivos Fase 7 sin errores, diff-check OK. TypeScript global aun falla por errores historicos fuera de Planeaciones Fase 7.
 
 ---
 
@@ -726,7 +729,7 @@ export interface FiltrosPlaneacionV2 {
 
 ### Archivos a ELIMINAR
 
-| Archivo                                               | Fase | RazÃ³n                                 |
+| Archivo                                               | Fase | RazÃ³n                                |
 | ----------------------------------------------------- | ---- | ------------------------------------- |
 | `src/screens/planeaciones/EditorPlaneacionScreen.tsx` | 8.1  | Reemplazado por DocEditorScreen       |
 | `src/hooks/useEditorPlaneacionViewModel.ts`           | 8.2  | Reemplazado por useDocEditorViewModel |
@@ -745,13 +748,13 @@ export interface FiltrosPlaneacionV2 {
 | `navigation/StackNavigator.tsx`                     | 7.3     | Actualizar rutas de planeaciones                       |
 | `services/planeacionImportService.ts`               | 5.2     | Soporte V2 + modo plantilla                            |
 | `services/planeacionExportService.ts`               | 7.1     | Renderizar PlaneacionDocumento V2                      |
-| `screens/planeaciones/CrearPlaneacionScreen.tsx`    | 4B.3    | Wizard rediseÃ±ado                                      |
+| `screens/planeaciones/CrearPlaneacionScreen.tsx`    | 4B.3    | Wizard rediseÃ±ado                                     |
 | `screens/planeaciones/ListaPlaneacionesScreen.tsx`  | 4B.4    | Adaptar a V2                                           |
 | `screens/planeaciones/ExportarPlaneacionScreen.tsx` | 7.2     | Adaptar a V2                                           |
 | `screens/contenido/ContenidoScreen.tsx`             | 7.4     | Usar PlaneacionesContext V2                            |
 | `hooks/useListaPlaneacionesViewModel.ts`            | 4B.5    | Adaptar a V2                                           |
-| `hooks/useCrearPlaneacionViewModel.ts`              | 4B.3    | Wizard rediseÃ±ado                                      |
-| `components/CrearNuevoModal.tsx`                    | 7.5     | Agregar opciÃ³n escanear                                |
+| `hooks/useCrearPlaneacionViewModel.ts`              | 4B.3    | Wizard rediseÃ±ado                                     |
+| `components/CrearNuevoModal.tsx`                    | 7.5     | Agregar opciÃ³n escanear                               |
 | `backend/api/planeaciones.js`                       | 1.6     | Filtrar por userId                                     |
 | `backend/api/planeaciones/generar.js`               | 6.5     | Schema V2                                              |
 | `backend/api/sync.js`                               | 2.6     | Soporte V2                                             |
@@ -809,4 +812,3 @@ gantt
 - Fase 3 â†’ Fase 4 (editor base necesario para pantallas)
 - Fases 4, 5, 6 pueden avanzar en paralelo una vez completadas las bases
 - Fase 8 es siempre la Ãºltima
-

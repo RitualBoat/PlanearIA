@@ -25,17 +25,22 @@ import {
   useContenidoViewModel,
   CategoriaContenido,
   ContenidoItem,
+  FiltroEstado,
+  FiltroFecha,
 } from "../../hooks/useContenidoViewModel";
 import { CrearNuevoModal } from "../../components/CrearNuevoModal";
 import {
   exportPlaneacionToPdf,
   exportPlaneacionToDocx,
 } from "../../services/planeacionExportService";
-import type { Planeacion } from "../../../types/planeacion";
+import type { PlaneacionDocumento } from "../../../types/planeacionV2";
 import { ModalSelectorContactos } from "../../components/social/ModalSelectorContactos";
 import type { Contacto } from "../../../types";
 import { useMensajes } from "../../context/MensajesContext";
-import { asignarRecursosAGrupo, asignarEntregablesAGrupo } from "../../services/grupoAsignacionesService";
+import {
+  asignarRecursosAGrupo,
+  asignarEntregablesAGrupo,
+} from "../../services/grupoAsignacionesService";
 
 type Nav = StackNavigationProp<RootStackParamList>;
 
@@ -116,14 +121,14 @@ const FILTER_TIPOS = [
   { key: "imagen", label: "Imagen" },
 ];
 
-const FILTER_FECHAS = [
+const FILTER_FECHAS: { key: Exclude<FiltroFecha, "">; label: string }[] = [
   { key: "hoy", label: "Hoy" },
   { key: "semana", label: "Esta semana" },
   { key: "mes", label: "Este mes" },
   { key: "anio", label: "Este año" },
 ];
 
-const FILTER_ESTADOS = [
+const FILTER_ESTADOS: { key: Exclude<FiltroEstado, "">; label: string }[] = [
   { key: "completo", label: "Completo" },
   { key: "borrador", label: "Borrador" },
 ];
@@ -275,7 +280,12 @@ const ContentItemCard: React.FC<{
       style={[
         styles.contentCard,
         isDesktop && { borderLeftWidth: 4, borderLeftColor: catColors.text },
-        selectionMode && selected && { backgroundColor: `${catColors.bg}80`, borderColor: catColors.text, borderWidth: 1 }
+        selectionMode &&
+          selected && {
+            backgroundColor: `${catColors.bg}80`,
+            borderColor: catColors.text,
+            borderWidth: 1,
+          },
       ]}
       onPress={selectionMode ? onToggleSelect : onPress}
       activeOpacity={0.85}
@@ -283,10 +293,10 @@ const ContentItemCard: React.FC<{
     >
       {selectionMode && (
         <View style={styles.selectionCheckbox}>
-          <MaterialIcons 
-            name={selected ? "check-circle" : "radio-button-unchecked"} 
-            size={24} 
-            color={selected ? catColors.text : DT.outlineVariant} 
+          <MaterialIcons
+            name={selected ? "check-circle" : "radio-button-unchecked"}
+            size={24}
+            color={selected ? catColors.text : DT.outlineVariant}
           />
         </View>
       )}
@@ -329,7 +339,7 @@ const ContenidoScreen: React.FC = () => {
   const route = useRoute<any>();
   const vm = useContenidoViewModel();
   const searchRef = useRef<TextInput>(null);
-  const { enviarMensaje, crearConversacionDesdeContacto } = useMensajes();
+  const { enviarMensaje, crearConversacion, getConversacionByContacto } = useMensajes();
 
   // Selection mode params
   const isSelectionMode = route.params?.selectionMode === true;
@@ -347,16 +357,14 @@ const ContenidoScreen: React.FC = () => {
   // ─── Handlers ───
 
   const handleToggleSelect = useCallback((item: ContenidoItem) => {
-    setSelectedIds((prev) => 
-      prev.includes(item.id) 
-        ? prev.filter(id => id !== item.id)
-        : [...prev, item.id]
+    setSelectedIds((prev) =>
+      prev.includes(item.id) ? prev.filter((id) => id !== item.id) : [...prev, item.id]
     );
   }, []);
 
   const handleConfirmSelection = useCallback(async () => {
     if (selectedIds.length === 0 || !targetGroupId) return;
-    
+
     setIsAssigning(true);
     try {
       // Separar IDs por tipo (recursos vs entregables vs planeaciones)
@@ -364,15 +372,15 @@ const ContenidoScreen: React.FC = () => {
       // IDs vienen como "rec-123", "ent-456", "plan-789"
       const numIdsRecursos: number[] = [];
       const numIdsEntregables: number[] = [];
-      
-      selectedIds.forEach(idStr => {
+
+      selectedIds.forEach((idStr) => {
         if (idStr.startsWith("rec-")) {
           numIdsRecursos.push(parseInt(idStr.replace("rec-", ""), 10));
         } else if (idStr.startsWith("ent-")) {
           numIdsEntregables.push(parseInt(idStr.replace("ent-", ""), 10));
         }
       });
-      
+
       const promises = [];
       if (numIdsRecursos.length > 0) {
         promises.push(asignarRecursosAGrupo(targetGroupId, numIdsRecursos));
@@ -380,7 +388,7 @@ const ContenidoScreen: React.FC = () => {
       if (numIdsEntregables.length > 0) {
         promises.push(asignarEntregablesAGrupo(targetGroupId, numIdsEntregables));
       }
-      
+
       await Promise.all(promises);
       Alert.alert("Éxito", "Elementos asignados correctamente.");
       navigation.goBack();
@@ -399,8 +407,7 @@ const ContenidoScreen: React.FC = () => {
       }
       if (item.tipo === "planeaciones") {
         const raw = item.raw as { id: string; nivelAcademico: string };
-        navigation.navigate("EditorPlaneacion", {
-          nivel: raw.nivelAcademico as any,
+        navigation.navigate("DocEditor", {
           modo: "editar",
           planeacionId: raw.id,
         });
@@ -462,8 +469,8 @@ const ContenidoScreen: React.FC = () => {
                 type: currentItem.tipo === "planeaciones" ? "planeacion" : "recurso",
                 url: `planearia://${currentItem.tipo}/${(currentItem.raw as any).id}`,
                 name: currentItem.titulo,
-              }
-            }
+              },
+            },
           });
           break;
         case "enviar_chat":
@@ -483,19 +490,33 @@ const ContenidoScreen: React.FC = () => {
     async (contacto: Contacto) => {
       if (!itemToSend) return;
       try {
-        const conversacionId = await crearConversacionDesdeContacto(contacto.id);
+        const existing = getConversacionByContacto(contacto.id);
+        const conversacion =
+          existing ||
+          (await crearConversacion({
+            participantes: [String(contacto.usuarioId)],
+            contactoId: contacto.id,
+            contactoNombre: `${contacto.nombre} ${contacto.apellidos || ""}`.trim(),
+            contactoAvatar: contacto.avatar,
+            contactoColor: DT.primary,
+            contactoEnLinea: contacto.enLinea,
+          }));
+        const conversacionId = conversacion.id;
         const tipoMensaje = itemToSend.tipo === "planeaciones" ? "planeacion" : "recurso";
-        
+
         let extraData = {};
         if (tipoMensaje === "planeacion") {
-          const raw = itemToSend.raw as any;
+          const raw = itemToSend.raw as PlaneacionDocumento;
           extraData = {
             planeacion: {
               planeacionId: raw.id,
-              titulo: raw.temaSesion || raw.titulo || itemToSend.titulo,
-              materia: raw.asignatura || "General",
-              grado: raw.grado || "N/A"
-            }
+              titulo:
+                raw.elementosCurriculares?.pda ||
+                raw.elementosCurriculares?.contenido ||
+                itemToSend.titulo,
+              materia: raw.datosGenerales?.asignatura || "General",
+              grado: raw.datosGenerales?.grado || "N/A",
+            },
           };
         } else {
           const raw = itemToSend.raw as any;
@@ -504,13 +525,14 @@ const ContenidoScreen: React.FC = () => {
               recursoId: raw.id,
               titulo: raw.titulo || itemToSend.titulo,
               tipo: raw.tipo || "otro",
-              formato: raw.formato || ""
-            }
+              formato: raw.formato || "",
+            },
           };
         }
 
         const mensajeData = {
           conversacionId,
+          remitenteId: "me",
           tipo: tipoMensaje,
           contenido: `Te compartí un${tipoMensaje === "planeacion" ? "a planeación" : " recurso"}: ${itemToSend.titulo}`,
           ...extraData,
@@ -521,7 +543,7 @@ const ContenidoScreen: React.FC = () => {
         Alert.alert("Error", "No se pudo enviar el mensaje.");
       }
     },
-    [itemToSend, crearConversacionDesdeContacto, enviarMensaje]
+    [itemToSend, crearConversacion, getConversacionByContacto, enviarMensaje]
   );
 
   const handleCompartir = useCallback(async (item: ContenidoItem) => {
@@ -533,10 +555,10 @@ const ContenidoScreen: React.FC = () => {
       return;
     }
     try {
-      const planeacion = item.raw as Planeacion;
+      const planeacion = item.raw as PlaneacionDocumento;
       const result = await exportPlaneacionToPdf(planeacion, {
         portada: true,
-        actividades: true,
+        sesiones: true,
         evaluacion: true,
         observaciones: true,
       });
@@ -562,8 +584,8 @@ const ContenidoScreen: React.FC = () => {
       );
       return;
     }
-    const planeacion = item.raw as Planeacion;
-    const options = { portada: true, actividades: true, evaluacion: true, observaciones: true };
+    const planeacion = item.raw as PlaneacionDocumento;
+    const options = { portada: true, sesiones: true, evaluacion: true, observaciones: true };
     Alert.alert("Exportar planeación", "Selecciona el formato de exportación", [
       {
         text: "PDF",
@@ -875,7 +897,11 @@ const ContenidoScreen: React.FC = () => {
                 { key: "editar", icon: "edit" as const, label: "Editar" },
                 { key: "duplicar", icon: "content-copy" as const, label: "Duplicar" },
                 { key: "asignar", icon: "group-add" as const, label: "Asignar a grupo" },
-                { key: "compartir_feed", icon: "dynamic-feed" as const, label: "Compartir en Feed" },
+                {
+                  key: "compartir_feed",
+                  icon: "dynamic-feed" as const,
+                  label: "Compartir en Feed",
+                },
                 { key: "enviar_chat", icon: "send" as const, label: "Enviar por chat" },
               ].map((opt) => (
                 <TouchableOpacity
@@ -1112,7 +1138,10 @@ const ContenidoScreen: React.FC = () => {
       <View style={styles.header}>
         {isSelectionMode ? (
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-            <TouchableOpacity onPress={() => navigation.goBack()} accessibilityLabel="Cancelar asignación">
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              accessibilityLabel="Cancelar asignación"
+            >
               <MaterialIcons name="close" size={24} color={DT.onSurfaceVariant} />
             </TouchableOpacity>
             <View>
@@ -1165,14 +1194,17 @@ const ContenidoScreen: React.FC = () => {
       {isSelectionMode ? (
         <View style={styles.selectionBar}>
           <Text style={styles.selectionBarText}>
-            {selectedIds.length} {selectedIds.length === 1 ? "elemento seleccionado" : "elementos seleccionados"}
+            {selectedIds.length}{" "}
+            {selectedIds.length === 1 ? "elemento seleccionado" : "elementos seleccionados"}
           </Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.selectionBarBtn, selectedIds.length === 0 && { opacity: 0.5 }]}
             disabled={selectedIds.length === 0 || isAssigning}
             onPress={handleConfirmSelection}
           >
-            <Text style={styles.selectionBarBtnText}>{isAssigning ? "Asignando..." : "Asignar a Grupo"}</Text>
+            <Text style={styles.selectionBarBtnText}>
+              {isAssigning ? "Asignando..." : "Asignar a Grupo"}
+            </Text>
           </TouchableOpacity>
         </View>
       ) : (

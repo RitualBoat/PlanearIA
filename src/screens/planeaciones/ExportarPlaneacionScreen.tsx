@@ -26,29 +26,37 @@ import {
   exportPlaneacionToPdf,
   exportPlaneacionToDocx,
 } from "../../services/planeacionExportService";
+import type { PlaneacionDocumento } from "../../../types/planeacionV2";
 
 type Nav = StackNavigationProp<RootStackParamList, "ExportarPlaneacion">;
 type ExportarRoute = RouteProp<RootStackParamList, "ExportarPlaneacion">;
 
-type ExportFormat = "pdf" | "docx" | "xlsx";
+type ExportFormat = "pdf" | "docx";
 
 type ExportOptions = {
   portada: boolean;
-  actividades: boolean;
+  infoInstitucional: boolean;
+  datosGenerales: boolean;
+  curricular: boolean;
+  sesiones: boolean;
   evaluacion: boolean;
   observaciones: boolean;
+  firmas: boolean;
 };
 
 const formatLabel: Record<ExportFormat, string> = {
   pdf: "Archivo PDF (.pdf)",
   docx: "Documento Word (.docx)",
-  xlsx: "Hoja de cálculo Excel (.xlsx)",
 };
 
 const formatIcon: Record<ExportFormat, keyof typeof MaterialIcons.glyphMap> = {
   pdf: "picture-as-pdf",
   docx: "description",
-  xlsx: "table-chart",
+};
+
+const stripHtml = (html?: string | null): string => {
+  if (!html) return "";
+  return html.replace(/<[^>]*>?/gm, "").trim();
 };
 
 const ExportarPlaneacionScreen: React.FC = () => {
@@ -57,16 +65,23 @@ const ExportarPlaneacionScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const wideLayout = width >= 980;
 
-  const { planeaciones, obtenerPlaneacion } = usePlaneaciones();
+  const { documentos, obtenerDocumento } = usePlaneaciones();
   const planeacionId = route.params?.planeacionId;
-  const planeacion = planeacionId ? obtenerPlaneacion(planeacionId) : planeaciones[0];
+  const planeacion = React.useMemo<PlaneacionDocumento | undefined>(
+    () => (planeacionId ? obtenerDocumento(planeacionId) : documentos[0]),
+    [documentos, obtenerDocumento, planeacionId]
+  );
 
   const [selectedFormat, setSelectedFormat] = React.useState<ExportFormat>("pdf");
   const [options, setOptions] = React.useState<ExportOptions>({
     portada: true,
-    actividades: true,
+    infoInstitucional: true,
+    datosGenerales: true,
+    curricular: true,
+    sesiones: true,
     evaluacion: true,
     observaciones: false,
+    firmas: true,
   });
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [showSuccess, setShowSuccess] = React.useState(false);
@@ -85,16 +100,20 @@ const ExportarPlaneacionScreen: React.FC = () => {
 
   const estimatedSize = React.useMemo(() => {
     const optionCount = Object.values(options).filter(Boolean).length;
-    const base = selectedFormat === "pdf" ? 1.1 : selectedFormat === "docx" ? 0.9 : 0.7;
+    const base = selectedFormat === "pdf" ? 1.1 : 0.9;
     return `${(base + optionCount * 0.1).toFixed(1)} MB`;
   }, [options, selectedFormat]);
 
   const selectedSections = React.useMemo(() => {
     const labels: string[] = [];
     if (options.portada) labels.push("Portada");
-    if (options.actividades) labels.push("Actividades");
-    if (options.evaluacion) labels.push("Evaluación");
+    if (options.infoInstitucional) labels.push("Institucion");
+    if (options.datosGenerales) labels.push("Datos generales");
+    if (options.curricular) labels.push("Elementos curriculares");
+    if (options.sesiones) labels.push("Sesiones");
+    if (options.evaluacion) labels.push("EvaluaciÃ³n");
     if (options.observaciones) labels.push("Observaciones");
+    if (options.firmas) labels.push("Firmas");
     return labels;
   }, [options]);
 
@@ -104,7 +123,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
 
   const handleExportar = async () => {
     if (!planeacion) {
-      showMessage("Exportar", "No se encontró la planeación para exportar.");
+      showMessage("Exportar", "No se encontrÃ³ la planeaciÃ³n para exportar.");
       return;
     }
 
@@ -114,14 +133,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
       const result =
         selectedFormat === "pdf"
           ? await exportPlaneacionToPdf(planeacion, options)
-          : selectedFormat === "docx"
-            ? await exportPlaneacionToDocx(planeacion, options)
-            : null;
-
-      if (!result) {
-        showMessage("Exportar", "Excel se habilitará en la siguiente tarea.");
-        return;
-      }
+          : await exportPlaneacionToDocx(planeacion, options);
 
       const sizeMb = (result.sizeBytes / (1024 * 1024)).toFixed(1);
 
@@ -132,7 +144,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
     } catch (error) {
       showMessage(
         "Exportar",
-        error instanceof Error ? error.message : "No se pudo generar el archivo PDF."
+        error instanceof Error ? error.message : "No se pudo generar el archivo."
       );
     } finally {
       setIsGenerating(false);
@@ -148,7 +160,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
     try {
       const isAvailable = await Sharing.isAvailableAsync();
       if (!isAvailable) {
-        showMessage("Compartir", "Compartir no está disponible en este dispositivo.");
+        showMessage("Compartir", "Compartir no estÃ¡ disponible en este dispositivo.");
         return;
       }
 
@@ -157,10 +169,10 @@ const ExportarPlaneacionScreen: React.FC = () => {
           selectedFormat === "pdf"
             ? "application/pdf"
             : "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        dialogTitle: "Compartir planeación",
+        dialogTitle: "Compartir planeaciÃ³n",
       });
     } catch {
-      showMessage("Compartir", "No se pudo abrir el menú de compartir.");
+      showMessage("Compartir", "No se pudo abrir el menÃº de compartir.");
     }
   };
 
@@ -192,7 +204,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
             </TouchableOpacity>
 
             <View style={styles.headerTitleWrap}>
-              <Text style={styles.headerTitle}>Exportar Planeación</Text>
+              <Text style={styles.headerTitle}>Exportar PlaneaciÃ³n</Text>
               <Text style={styles.headerSubtitle}>Genera y comparte en distintos formatos</Text>
             </View>
 
@@ -206,7 +218,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
               <View style={styles.card}>
                 <Text style={styles.sectionTitle}>Seleccionar formato</Text>
 
-                {(["pdf", "docx", "xlsx"] as ExportFormat[]).map((format) => {
+                {(["pdf", "docx"] as ExportFormat[]).map((format) => {
                   const active = selectedFormat === format;
                   return (
                     <TouchableOpacity
@@ -220,9 +232,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
                         <MaterialIcons
                           name={formatIcon[format]}
                           size={18}
-                          color={
-                            format === "pdf" ? "#E53935" : format === "docx" ? "#2463EB" : "#16A34A"
-                          }
+                          color={format === "pdf" ? "#E53935" : "#2463EB"}
                         />
                         <Text style={[styles.formatText, active && styles.formatTextActive]}>
                           {formatLabel[format]}
@@ -241,14 +251,32 @@ const ExportarPlaneacionScreen: React.FC = () => {
                   <Switch value={options.portada} onValueChange={() => toggleOption("portada")} />
                 </View>
                 <View style={styles.switchRow}>
-                  <Text style={styles.switchText}>Incluir actividades detalladas</Text>
+                  <Text style={styles.switchText}>Incluir informacion institucional</Text>
                   <Switch
-                    value={options.actividades}
-                    onValueChange={() => toggleOption("actividades")}
+                    value={options.infoInstitucional}
+                    onValueChange={() => toggleOption("infoInstitucional")}
                   />
                 </View>
                 <View style={styles.switchRow}>
-                  <Text style={styles.switchText}>Incluir rúbrica/evaluación</Text>
+                  <Text style={styles.switchText}>Incluir datos generales</Text>
+                  <Switch
+                    value={options.datosGenerales}
+                    onValueChange={() => toggleOption("datosGenerales")}
+                  />
+                </View>
+                <View style={styles.switchRow}>
+                  <Text style={styles.switchText}>Incluir elementos curriculares</Text>
+                  <Switch
+                    value={options.curricular}
+                    onValueChange={() => toggleOption("curricular")}
+                  />
+                </View>
+                <View style={styles.switchRow}>
+                  <Text style={styles.switchText}>Incluir sesiones detalladas</Text>
+                  <Switch value={options.sesiones} onValueChange={() => toggleOption("sesiones")} />
+                </View>
+                <View style={styles.switchRow}>
+                  <Text style={styles.switchText}>Incluir rÃºbrica/evaluaciÃ³n</Text>
                   <Switch
                     value={options.evaluacion}
                     onValueChange={() => toggleOption("evaluacion")}
@@ -260,6 +288,10 @@ const ExportarPlaneacionScreen: React.FC = () => {
                     value={options.observaciones}
                     onValueChange={() => toggleOption("observaciones")}
                   />
+                </View>
+                <View style={styles.switchRow}>
+                  <Text style={styles.switchText}>Incluir firmas</Text>
+                  <Switch value={options.firmas} onValueChange={() => toggleOption("firmas")} />
                 </View>
               </View>
             </View>
@@ -277,23 +309,39 @@ const ExportarPlaneacionScreen: React.FC = () => {
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>ASIGNATURA</Text>
                     <Text style={styles.infoValue}>
-                      {planeacion?.asignatura || "Sin asignatura"}
+                      {planeacion?.datosGenerales?.asignatura || "Sin asignatura"}
                     </Text>
                   </View>
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>GRADO Y GRUPO</Text>
                     <Text style={styles.infoValue}>
                       {planeacion
-                        ? `${planeacion.grado} ${planeacion.grupo ? `- ${planeacion.grupo}` : ""}`
+                        ? `${planeacion.datosGenerales?.grado || ""} ${(planeacion.datosGenerales?.grupos || []).join(", ")}`
                         : "Sin datos"}
                     </Text>
                   </View>
                   <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>TEMA PRINCIPAL</Text>
-                    <Text style={styles.infoValue}>{planeacion?.temaSesion || "Sin tema"}</Text>
+                    <Text style={styles.infoLabel}>SESIONES</Text>
+                    <Text style={styles.infoValue}>
+                      {planeacion ? `${planeacion.sesiones?.length || 0} sesiones` : "Sin datos"}
+                    </Text>
                   </View>
                   <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>TAMAÑO</Text>
+                    <Text style={styles.infoLabel}>EVALUACION</Text>
+                    <Text style={styles.infoValue}>
+                      {planeacion?.evaluacionFinal?.criterios?.length
+                        ? `${planeacion.evaluacionFinal.criterios.length} criterios`
+                        : "Sin criterios"}
+                    </Text>
+                  </View>
+                  <View style={styles.infoItem}>
+                    <Text style={styles.infoLabel}>TEMA PRINCIPAL</Text>
+                    <Text style={styles.infoValue}>
+                      {stripHtml(planeacion?.elementosCurriculares?.pda) || "Sin tema"}
+                    </Text>
+                  </View>
+                  <View style={styles.infoItem}>
+                    <Text style={styles.infoLabel}>TAMAÃ‘O</Text>
                     <Text style={styles.infoValue}>{estimatedSize}</Text>
                   </View>
                 </View>
@@ -301,7 +349,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
                 <View style={styles.previewBody}>
                   <MaterialIcons name="description" size={42} color={COLORS.primary} />
                   <Text style={styles.previewBodyText}>
-                    El documento se generará con formato profesional listo para compartir o
+                    El documento se generarÃ¡ con formato profesional listo para compartir o
                     imprimir.
                   </Text>
                 </View>
@@ -363,9 +411,9 @@ const ExportarPlaneacionScreen: React.FC = () => {
             <View style={styles.successIconWrap}>
               <MaterialIcons name="check" size={34} color={COLORS.surface} />
             </View>
-            <Text style={styles.successTitle}>¡Planeación exportada!</Text>
+            <Text style={styles.successTitle}>Â¡PlaneaciÃ³n exportada!</Text>
             <Text style={styles.successSubtitle}>
-              El archivo {selectedFormat.toUpperCase()} se generó correctamente y está listo para
+              El archivo {selectedFormat.toUpperCase()} se generÃ³ correctamente y estÃ¡ listo para
               usarse.
             </Text>
 
@@ -374,10 +422,10 @@ const ExportarPlaneacionScreen: React.FC = () => {
               <View style={styles.fileCardTextWrap}>
                 <Text style={styles.fileCardTitle} numberOfLines={1}>
                   {exportedFileName ||
-                    `Planeacion_${planeacion?.asignatura || "sin_asignatura"}.${selectedFormat}`}
+                    `Planeacion_${planeacion?.datosGenerales?.asignatura || "sin_asignatura"}.${selectedFormat}`}
                 </Text>
                 <Text style={styles.fileCardMeta}>
-                  {(exportedFileSize || estimatedSize) + " • Creado ahora mismo"}
+                  {(exportedFileSize || estimatedSize) + " â€¢ Creado ahora mismo"}
                 </Text>
               </View>
             </View>

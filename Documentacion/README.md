@@ -14,6 +14,7 @@ Documentacion tecnica del proyecto PlanearIA.
 | [FLUJO_SINCRONIZACION.md](./FLUJO_SINCRONIZACION.md) | Flujo de datos offline-first y sincronizacion con MongoDB Atlas |
 | [DIAGRAMA_NAVEGACION.md](./DIAGRAMA_NAVEGACION.md)   | Diagrama visual del flujo de navegacion                         |
 | [MAPA_NAVEGACION.md](./MAPA_NAVEGACION.md)           | Mapa de rutas y relaciones entre modulos                        |
+| [meta_guia_planes.md](./meta_guia_planes.md)         | Guia maestra para crear planes futuros de refactorizacion       |
 
 ### Testing
 

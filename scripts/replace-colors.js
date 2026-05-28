@@ -147,13 +147,10 @@ const COLOR_MAP = {
   "#f5f5f5": "COLORS.surfaceTertiary",
   "#e9eef5": "COLORS.progressTrack",
   "#eef2f7": "COLORS.skeleton",
-  "#e8edf5": "COLORS.progressTrack",
   "#eaf0fa": "COLORS.primaryTint",
   "#eaf2ff": "COLORS.primaryTint",
-  "#f2f5fa": "COLORS.surfaceTertiary",
   "#f2f6fb": "COLORS.surfaceTertiary",
   "#f2f8ff": "COLORS.backgroundSoft",
-  "#f5f8fc": "COLORS.surfaceHover",
 
   // Short hex codes
   "#666": "COLORS.textMuted",

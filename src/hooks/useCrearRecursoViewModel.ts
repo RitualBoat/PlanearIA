@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Alert } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import type { Recurso } from "../../types";
 import { useRecursos } from "../context/RecursosContext";
 
@@ -111,6 +111,7 @@ export const useCrearRecursoViewModel = (recursoId?: number): CrearRecursoViewMo
       setUploadedFile({
         name: existing.archivo,
         size: existing.tamaño ? `${(existing.tamaño / (1024 * 1024)).toFixed(1)} MB` : "",
+        uri: existing.url ?? "",
       });
     }
   }, [recursoId, obtenerRecursoPorId]);
@@ -274,3 +275,8 @@ export const useCrearRecursoViewModel = (recursoId?: number): CrearRecursoViewMo
     tipoOptions: TIPO_OPTIONS,
   };
 };
+
+
+
+
+

@@ -168,7 +168,7 @@ const TabContent: React.FC<{
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: COLORS.secondary, marginTop: 8 }]}
+              style={[styles.actionButton, { backgroundColor: COLORS.primaryDark, marginTop: 8 }]}
               onPress={navigatePromediosCalificaciones}
             >
               <MaterialIcons name="bar-chart" size={24} color="white" />
@@ -216,7 +216,7 @@ const TabContent: React.FC<{
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: COLORS.secondary, marginTop: 8 }]}
+              style={[styles.actionButton, { backgroundColor: COLORS.primaryDark, marginTop: 8 }]}
               onPress={navigateHistorialAsistencia}
             >
               <MaterialIcons name="history" size={24} color="white" />
@@ -350,7 +350,7 @@ const TabContent: React.FC<{
           </View>
         );
 
-      case "graficas":
+      case "graficas": {
         const stats = calcularEstadisticasGrupo({
           alumnos,
           calificaciones,
@@ -455,7 +455,8 @@ const TabContent: React.FC<{
               </TouchableOpacity>
             </View>
           </View>
-        );
+          );
+      }
 
       case "notas":
         return (
@@ -1929,3 +1930,4 @@ const styles = StyleSheet.create({
 });
 
 export default DetalleGrupoScreen;
+

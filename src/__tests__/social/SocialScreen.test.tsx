@@ -2,6 +2,7 @@ import React from "react";
 import { Alert } from "react-native";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import SocialScreen from "../../screens/social/SocialScreen";
+import type { SocialTab } from "../../hooks/useSocialViewModel";
 
 jest.mock("@expo/vector-icons/MaterialIcons", () => "MaterialIcons");
 
@@ -72,7 +73,33 @@ const mockHandleEnviarSolicitud = jest.fn();
 const mockHandleSelectContacto = jest.fn();
 const mockSetSolicitudesSubTab = jest.fn();
 
-const defaultVm = {
+type MockVm = {
+  activeTab: SocialTab;
+  searchQuery: string;
+  isLoading: boolean;
+  isRefreshing: boolean;
+  error: string | null;
+  selectedContacto: null;
+  solicitudesSubTab: "recibidas" | "enviadas";
+  contactos: any[];
+  solicitudesRecibidas: any[];
+  solicitudesEnviadas: any[];
+  stats: { totalContactos: number; totalGrupos: number; pendientes: number };
+  userId: string;
+  userName: string;
+  isGuest: boolean;
+  handleTabChange: (tab: SocialTab) => void;
+  setSearchQuery: (value: string) => void;
+  handleRefresh: () => void;
+  handleAceptarSolicitud: (id: number) => void;
+  handleRechazarSolicitud: (id: number) => void;
+  handleEliminarContacto: (id: number) => void;
+  handleEnviarSolicitud: (userId: string, mensaje?: string) => void;
+  handleSelectContacto: (contacto: any) => void;
+  setSolicitudesSubTab: (tab: "recibidas" | "enviadas") => void;
+};
+
+const defaultVm: MockVm = {
   activeTab: "contactos" as const,
   searchQuery: "",
   isLoading: false,
@@ -135,7 +162,7 @@ const defaultVm = {
   setSolicitudesSubTab: mockSetSolicitudesSubTab,
 };
 
-let mockCurrentVm = { ...defaultVm };
+let mockCurrentVm: MockVm = { ...defaultVm };
 
 jest.mock("../../hooks/useSocialViewModel", () => ({
   useSocialViewModel: () => mockCurrentVm,

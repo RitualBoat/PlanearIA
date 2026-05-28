@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import ExportarPlaneacionScreen from "../../screens/planeaciones/ExportarPlaneacionScreen";
 import {
@@ -22,21 +22,37 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("../../sync/providers/SyncProvider", () => ({
   usePlaneaciones: () => ({
-    planeaciones: [
+    documentos: [
       {
         id: "p1",
-        asignatura: "Matemáticas",
-        grado: "3° Secundaria",
-        grupo: "Grupo B",
-        temaSesion: "Ecuaciones Cuadráticas",
+        nivelAcademico: "secundaria",
+        datosGenerales: {
+          asignatura: "Matematicas",
+          grado: "3 Secundaria",
+          grupos: ["Grupo B"],
+          semanas: [12],
+        },
+        elementosCurriculares: {
+          pda: "Ecuaciones Cuadraticas",
+        },
+        sesiones: [{ id: "s1" }],
+        evaluacionFinal: { criterios: [{ id: "c1" }] },
       },
     ],
-    obtenerPlaneacion: () => ({
+    obtenerDocumento: () => ({
       id: "p1",
-      asignatura: "Matemáticas",
-      grado: "3° Secundaria",
-      grupo: "Grupo B",
-      temaSesion: "Ecuaciones Cuadráticas",
+      nivelAcademico: "secundaria",
+      datosGenerales: {
+        asignatura: "Matematicas",
+        grado: "3 Secundaria",
+        grupos: ["Grupo B"],
+        semanas: [12],
+      },
+      elementosCurriculares: {
+        pda: "Ecuaciones Cuadraticas",
+      },
+      sesiones: [{ id: "s1" }],
+      evaluacionFinal: { criterios: [{ id: "c1" }] },
     }),
   }),
 }));
@@ -77,7 +93,7 @@ describe("ExportarPlaneacionScreen", () => {
   it("renderiza secciones principales", () => {
     const { getByText } = render(<ExportarPlaneacionScreen />);
 
-    expect(getByText("Exportar Planeación")).toBeTruthy();
+    expect(getByText("Exportar PlaneaciÃ³n")).toBeTruthy();
     expect(getByText("Seleccionar formato")).toBeTruthy();
     expect(getByText("Opciones de contenido")).toBeTruthy();
     expect(getByText("Vista previa")).toBeTruthy();
@@ -85,7 +101,7 @@ describe("ExportarPlaneacionScreen", () => {
     expect(getByText("Compartir")).toBeTruthy();
   });
 
-  it("muestra flujo visual de generación y éxito", async () => {
+  it("muestra flujo visual de generaciÃ³n y Ã©xito", async () => {
     const { getByText, queryByText } = render(<ExportarPlaneacionScreen />);
 
     fireEvent.press(getByText("Exportar"));
@@ -95,7 +111,7 @@ describe("ExportarPlaneacionScreen", () => {
     await waitFor(
       () => {
         expect(queryByText("Generando archivo...")).toBeNull();
-        expect(getByText("¡Planeación exportada!")).toBeTruthy();
+        expect(getByText("Â¡PlaneaciÃ³n exportada!")).toBeTruthy();
       },
       {
         timeout: 3000,
@@ -114,7 +130,7 @@ describe("ExportarPlaneacionScreen", () => {
     await waitFor(
       () => {
         expect(exportPlaneacionToDocx).toHaveBeenCalled();
-        expect(getByText("¡Planeación exportada!")).toBeTruthy();
+        expect(getByText("Â¡PlaneaciÃ³n exportada!")).toBeTruthy();
       },
       { timeout: 3000 }
     );
@@ -127,7 +143,7 @@ describe("ExportarPlaneacionScreen", () => {
 
     await waitFor(
       () => {
-        expect(getByText("¡Planeación exportada!")).toBeTruthy();
+        expect(getByText("Â¡PlaneaciÃ³n exportada!")).toBeTruthy();
       },
       { timeout: 3000 }
     );

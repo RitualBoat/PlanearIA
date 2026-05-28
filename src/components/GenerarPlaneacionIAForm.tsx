@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { COLORS, FONT_SIZES } from "../../types";
-import { NivelAcademico } from "../../types/planeacion";
+import { NivelAcademico } from "../../types/planeacionLegacy";
 
 interface GenerarPlaneacionIAFormProps {
   prompt: string;

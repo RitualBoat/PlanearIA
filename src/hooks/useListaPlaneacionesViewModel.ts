@@ -10,7 +10,7 @@ import {
   type PlaneacionDocumento,
   type Sesion,
 } from "../../types/planeacionV2";
-import { NivelAcademico as NivelAcademicoLegacy } from "../../types/planeacion";
+import { NivelAcademico as NivelAcademicoLegacy } from "../../types/planeacionLegacy";
 
 type Nav = StackNavigationProp<RootStackParamList, "ListaPlaneaciones">;
 
@@ -82,7 +82,8 @@ const buildSesionFromLegacy = (legacy: any): Sesion => {
 };
 
 const fromLegacyPlaneacion = (legacy: any): PlaneacionDocumento => {
-  const fecha = typeof legacy?.fecha === "string" ? legacy.fecha : new Date().toISOString().slice(0, 10);
+  const fecha =
+    typeof legacy?.fecha === "string" ? legacy.fecha : new Date().toISOString().slice(0, 10);
 
   return {
     id: String(legacy?.id || `legacy_${Date.now()}`),
@@ -164,12 +165,19 @@ const localSearch = (docs: PlaneacionDocumento[], query: string): PlaneacionDocu
   });
 };
 
-const localFilter = (docs: PlaneacionDocumento[], filtros: FiltrosPlaneacionV2): PlaneacionDocumento[] => {
+const localFilter = (
+  docs: PlaneacionDocumento[],
+  filtros: FiltrosPlaneacionV2
+): PlaneacionDocumento[] => {
   return docs.filter((doc) => {
     if (filtros.nivelAcademico && doc.nivelAcademico !== filtros.nivelAcademico) return false;
-    if (filtros.asignatura && !includesNormalized(doc.datosGenerales.asignatura || "", filtros.asignatura))
+    if (
+      filtros.asignatura &&
+      !includesNormalized(doc.datosGenerales.asignatura || "", filtros.asignatura)
+    )
       return false;
-    if (filtros.grado && !includesNormalized(doc.datosGenerales.grado || "", filtros.grado)) return false;
+    if (filtros.grado && !includesNormalized(doc.datosGenerales.grado || "", filtros.grado))
+      return false;
     if (filtros.maestro && !includesNormalized(doc.datosGenerales.maestro || "", filtros.maestro))
       return false;
     if (filtros.fechaInicio && doc.datosGenerales.fechaInicio < filtros.fechaInicio) return false;
@@ -203,7 +211,8 @@ export const useListaPlaneacionesViewModel = (): ListaPlaneacionesViewModel => {
   }, []);
 
   const buscarFn = typeof context?.buscar === "function" ? context.buscar : undefined;
-  const filtrarFn = typeof context?.filtrarDocumentos === "function" ? context.filtrarDocumentos : undefined;
+  const filtrarFn =
+    typeof context?.filtrarDocumentos === "function" ? context.filtrarDocumentos : undefined;
 
   const docsByText = useMemo(() => {
     if (!searchQuery.trim()) return documentos;

@@ -1,11 +1,11 @@
-/**
+﻿/**
  * Tests unitarios para syncEngine.ts
  *
  * Cubre:
  *  - enqueueOperation: encola, deduplica updates y borra
  *  - flushQueue: procesa ops, maneja reintentos y MAX_RETRIES
  *  - resolveConflict: Last-Write-Wins
- *  - mergeWithLocal: fusión correcta de datos
+ *  - mergeWithLocal: fusiÃ³n correcta de datos
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -20,7 +20,7 @@ import {
   GenericPendingOp,
 } from "../../sync/services/syncEngine";
 
-// ─── Mocks ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Mocks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   getItem: jest.fn(() => Promise.resolve(null)),
@@ -28,11 +28,9 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   removeItem: jest.fn(() => Promise.resolve()),
 }));
 
-// Mock NetInfo — siempre en línea por defecto
+// Mock NetInfo â€” siempre en lÃ­nea por defecto
 jest.mock("@react-native-community/netinfo", () => ({
-  fetch: jest.fn(() =>
-    Promise.resolve({ isConnected: true, isInternetReachable: true })
-  ),
+  fetch: jest.fn(() => Promise.resolve({ isConnected: true, isInternetReachable: true })),
 }));
 
 // Mock apiConfig
@@ -54,7 +52,7 @@ jest.mock("../../sync/config/apiConfig", () => ({
 const mockFetch = jest.fn();
 global.fetch = mockFetch as unknown as typeof fetch;
 
-// ─── Utilidades de test ───────────────────────────────────────────────────────
+// â”€â”€â”€ Utilidades de test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const ENTITY = "test_entity";
 const ENDPOINT = "/api/test";
@@ -66,7 +64,7 @@ const mockStorageGet = (data: GenericPendingOp[]) => {
   (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(JSON.stringify(data));
 };
 
-// ─── Suite de pruebas ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Suite de pruebas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 describe("syncEngine", () => {
   beforeEach(() => {
@@ -76,10 +74,10 @@ describe("syncEngine", () => {
     (AsyncStorage.removeItem as jest.Mock).mockResolvedValue(undefined);
   });
 
-  // ─── enqueueOperation ─────────────────────────────────────────────────────
+  // â”€â”€â”€ enqueueOperation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   describe("enqueueOperation", () => {
-    it("encola una operación de creación correctamente", async () => {
+    it("encola una operaciÃ³n de creaciÃ³n correctamente", async () => {
       const item: TestItem = { id: "abc", nombre: "Test" };
       await enqueueOperation(ENTITY, ENDPOINT, "create", item);
 
@@ -117,7 +115,7 @@ describe("syncEngine", () => {
       expect((queue[0].payload as TestItem).nombre).toBe("Nuevo");
     });
 
-    it("una operación delete elimina operaciones previas del mismo id", async () => {
+    it("una operaciÃ³n delete elimina operaciones previas del mismo id", async () => {
       const existingOp: GenericPendingOp<TestItem> = {
         opId: "op_2",
         entity: ENTITY,
@@ -140,7 +138,7 @@ describe("syncEngine", () => {
     });
   });
 
-  // ─── flushQueue ───────────────────────────────────────────────────────────
+  // â”€â”€â”€ flushQueue â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   describe("flushQueue", () => {
     it("procesa operaciones exitosas y devuelve resultado correcto", async () => {
@@ -165,7 +163,7 @@ describe("syncEngine", () => {
       expect(result.success).toBe(true);
     });
 
-    it("reencola la operación cuando el servidor devuelve error (< MAX_RETRIES)", async () => {
+    it("reencola la operaciÃ³n cuando el servidor devuelve error (< MAX_RETRIES)", async () => {
       const op: GenericPendingOp<TestItem> = {
         opId: "retry_op_1",
         entity: ENTITY,
@@ -193,7 +191,7 @@ describe("syncEngine", () => {
       expect(persistedQueue[0].failed).toBe(false);
     });
 
-    it("mueve operación a fallidas cuando supera MAX_RETRIES (5)", async () => {
+    it("mueve operaciÃ³n a fallidas cuando supera MAX_RETRIES (5)", async () => {
       const op: GenericPendingOp<TestItem> = {
         opId: "max_retry_op",
         entity: ENTITY,
@@ -201,13 +199,13 @@ describe("syncEngine", () => {
         endpoint: ENDPOINT,
         payload: { id: "mr1", nombre: "Max Retry" },
         createdAt: new Date().toISOString(),
-        retries: 4, // 4 intentos previos → el próximo fallo llega a 5
+        retries: 4, // 4 intentos previos â†’ el prÃ³ximo fallo llega a 5
         failed: false,
       };
       mockStorageGet([op]);
       // Para failed ops (getItem para FAILED_OPS_KEY)
       (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(JSON.stringify([op]));
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(null); // failed ops vacío
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(null); // failed ops vacÃ­o
       mockFetch.mockRejectedValueOnce(new Error("Persistent error"));
 
       const result = await flushQueue(ENTITY);
@@ -241,10 +239,10 @@ describe("syncEngine", () => {
     });
   });
 
-  // ─── resolveConflict ─────────────────────────────────────────────────────
+  // â”€â”€â”€ resolveConflict â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   describe("resolveConflict", () => {
-    it("elige el documento con fecha más reciente", () => {
+    it("elige el documento con fecha mÃ¡s reciente", () => {
       const local: TestItem = {
         id: "c1",
         nombre: "Local",
@@ -260,7 +258,7 @@ describe("syncEngine", () => {
       expect(winner.nombre).toBe("Remote");
     });
 
-    it("elige el local cuando es más reciente que el remoto", () => {
+    it("elige el local cuando es mÃ¡s reciente que el remoto", () => {
       const local: TestItem = {
         id: "c2",
         nombre: "Local Nuevo",
@@ -276,7 +274,7 @@ describe("syncEngine", () => {
       expect(winner.nombre).toBe("Local Nuevo");
     });
 
-    it("elige el local cuando no hay fechas de modificación", () => {
+    it("elige el local cuando no hay fechas de modificaciÃ³n", () => {
       const local: TestItem = { id: "c3", nombre: "Local" };
       const remote: TestItem = { id: "c3", nombre: "Remote" };
       const winner = resolveConflict(local, remote);
@@ -284,7 +282,7 @@ describe("syncEngine", () => {
     });
   });
 
-  // ─── mergeWithLocal ────────────────────────────────────────────────────────
+  // â”€â”€â”€ mergeWithLocal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   describe("mergeWithLocal", () => {
     it("agrega elementos remotos no presentes en local", () => {
@@ -295,7 +293,7 @@ describe("syncEngine", () => {
       expect(merged).toHaveLength(2);
     });
 
-    it("conserva la versión más reciente en caso de conflicto", () => {
+    it("conserva la versiÃ³n mÃ¡s reciente en caso de conflicto", () => {
       const local: TestItem[] = [
         { id: "1", nombre: "Viejo", fechaModificacion: "2026-01-01T00:00:00Z" },
       ];
@@ -318,19 +316,19 @@ describe("syncEngine", () => {
     });
   });
 
-  // ─── getFailedOps y clearFailedOps ────────────────────────────────────────
+  // â”€â”€â”€ getFailedOps y clearFailedOps â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   describe("getFailedOps y clearFailedOps", () => {
-    it("retorna array vacío cuando no hay operaciones fallidas", async () => {
+    it("retorna array vacÃ­o cuando no hay operaciones fallidas", async () => {
+      (AsyncStorage.getItem as jest.Mock).mockReset();
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
       const failed = await getFailedOps();
       expect(failed).toEqual([]);
     });
 
     it("clearFailedOps elimina la clave de AsyncStorage", async () => {
       await clearFailedOps();
-      expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
-        "@planearia:failed_ops_v2"
-      );
+      expect(AsyncStorage.removeItem).toHaveBeenCalledWith("@planearia:failed_ops_v2");
     });
   });
 });

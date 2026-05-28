@@ -14,6 +14,7 @@ export function useFeedViewModel() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const userId = usuario?.id?.toString() || "";
+  const userNumericId = typeof usuario?.id === "number" ? usuario.id : Number(usuario?.id) || 0;
   const userName = usuario
     ? `${usuario.nombre}${usuario.apellidos ? ` ${usuario.apellidos}` : ""}`
     : "Usuario";
@@ -135,7 +136,7 @@ export function useFeedViewModel() {
           asignadoComoTarea: false,
           acceso: "privado",
           origen: "manual",
-          profesorId: userId,
+          profesorId: userNumericId,
           versionActual: 1,
         });
         Alert.alert("Guardado", "El recurso se añadió a tu biblioteca.");
@@ -143,7 +144,7 @@ export function useFeedViewModel() {
         Alert.alert("Error", "No se pudo guardar el recurso.");
       }
     },
-    [isGuest, crearRecurso, userId]
+    [isGuest, crearRecurso, userNumericId]
   );
 
   const handleDownload = useCallback((attachment: PostAttachment) => {
@@ -172,7 +173,7 @@ export function useFeedViewModel() {
           asignadoComoTarea: false,
           acceso: "privado",
           origen: "manual",
-          profesorId: userId,
+          profesorId: userNumericId,
           versionActual: 1,
         });
         Alert.alert(
@@ -183,7 +184,7 @@ export function useFeedViewModel() {
         Alert.alert("Error", "No se pudo guardar el examen.");
       }
     },
-    [isGuest, crearRecurso, userId]
+    [isGuest, crearRecurso, userNumericId]
   );
 
   return {

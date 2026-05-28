@@ -7,7 +7,7 @@ import { useMensajes } from "../context/MensajesContext";
 import { usePlaneaciones } from "../sync/providers/SyncProvider";
 import { useRecursos } from "../context/RecursosContext";
 import { Conversacion, Mensaje, TipoMensaje } from "../../types";
-import type { Planeacion } from "../../types/planeacion";
+import type { Planeacion } from "../../types/planeacionLegacy";
 import type { Recurso } from "../../types";
 
 export interface ConversacionViewModel {

@@ -18,7 +18,7 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import * as Sharing from "expo-sharing";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { COLORS, Recurso } from "../../../types";
 import { useListaRecursosViewModel } from "../../hooks/useListaRecursosViewModel";

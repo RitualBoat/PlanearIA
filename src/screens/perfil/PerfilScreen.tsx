@@ -131,16 +131,16 @@ const PerfilScreen: React.FC = () => {
       if (statIndex === 0) {
         items = planeaciones.slice(0, 10).map((p) => ({
           label: p.temaSesion || "Sin título",
-          subtitle: p.nivel || undefined,
+          subtitle: p.nivelAcademico || undefined,
         }));
       } else if (statIndex === 1) {
         items = grupos.slice(0, 10).map((g) => ({
           label: g.nombre || "Sin nombre",
-          subtitle: `${g.alumnos?.length ?? 0} alumnos`,
+          subtitle: `${g.cantidadAlumnos ?? 0} alumnos`,
         }));
       } else if (statIndex === 2) {
         items = recursos.slice(0, 10).map((r) => ({
-          label: r.titulo || r.nombre || "Sin título",
+          label: r.titulo || "Sin título",
         }));
       }
       setExpandedStat({
@@ -897,3 +897,4 @@ const styles = StyleSheet.create({
 });
 
 export default PerfilScreen;
+

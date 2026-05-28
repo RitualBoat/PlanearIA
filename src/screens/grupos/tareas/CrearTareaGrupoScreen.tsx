@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   grupoLabel: {
-    fontSize: FONT_SIZES.tiny,
+    fontSize: FONT_SIZES.small,
     fontWeight: "bold",
     color: COLORS.primary,
     letterSpacing: 0.5,
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
   toggleSubtitle: {
-    fontSize: FONT_SIZES.tiny,
+    fontSize: FONT_SIZES.small,
     color: COLORS.textSecondary,
     marginTop: 2,
   },
@@ -568,3 +568,4 @@ const styles = StyleSheet.create({
 });
 
 export default CrearTareaGrupoScreen;
+

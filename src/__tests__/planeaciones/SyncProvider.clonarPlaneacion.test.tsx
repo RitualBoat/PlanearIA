@@ -1,6 +1,6 @@
 import React from "react";
 import { act, render, waitFor } from "@testing-library/react-native";
-import { NivelAcademico, Planeacion } from "../../../types/planeacion";
+import { NivelAcademico, Planeacion } from "../../../types/planeacionLegacy";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   setItem: jest.fn().mockResolvedValue(null),
@@ -8,26 +8,9 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   removeItem: jest.fn().mockResolvedValue(null),
 }));
 
-const mockSaveLocalPlaneaciones = jest.fn().mockResolvedValue(undefined);
-const mockLoadLocalPlaneaciones = jest.fn().mockResolvedValue([]);
-const mockAddPendingOperation = jest.fn().mockResolvedValue(undefined);
-
-jest.mock("../../sync/services/syncService", () => ({
-  saveLocalPlaneaciones: (...args: any[]) => mockSaveLocalPlaneaciones(...args),
-  loadLocalPlaneaciones: (...args: any[]) => mockLoadLocalPlaneaciones(...args),
-  addPendingOperation: (...args: any[]) => mockAddPendingOperation(...args),
-}));
-
-jest.mock("../../sync/hooks/useSync", () => ({
-  useSync: () => ({
-    syncStatus: "idle",
-    isOnline: true,
-    pendingCount: 0,
-    lastSync: null,
-    forceSync: jest.fn().mockResolvedValue(undefined),
-    isSyncConfigured: true,
-    justReconnected: false,
-  }),
+jest.mock("@react-native-community/netinfo", () => ({
+  addEventListener: jest.fn(() => jest.fn()),
+  fetch: jest.fn().mockResolvedValue({ isConnected: true, isInternetReachable: true }),
 }));
 
 const { SyncProvider, usePlaneaciones } = require("../../sync/providers/SyncProvider");
@@ -71,7 +54,6 @@ describe("SyncProvider.clonarPlaneacion", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     contextRef.current = null;
-    mockLoadLocalPlaneaciones.mockResolvedValue([]);
   });
 
   it("crea copia con ID distinto, nombre con '(Copia)' y estado independiente", async () => {
@@ -120,7 +102,5 @@ describe("SyncProvider.clonarPlaneacion", () => {
 
     expect(originalDespues?.temaSesion).toBe("Suma y resta");
     expect(original?.temaSesion).toBe("Suma y resta");
-    expect(mockSaveLocalPlaneaciones).toHaveBeenCalled();
-    expect(mockAddPendingOperation).toHaveBeenCalled();
   });
 });

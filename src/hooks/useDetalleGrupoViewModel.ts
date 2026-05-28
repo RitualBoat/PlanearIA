@@ -9,6 +9,7 @@ import type {
   Alumno,
   Asistencia,
   Calificacion,
+  EntregaTarea,
   Grupo,
   GrupoMiembro,
   RolGrupo,
@@ -265,7 +266,7 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
   const navigateAsignarDeBiblioteca = useCallback(() => {
     navigation.navigate("MainTabs", {
       screen: "ContenidoTab",
-      params: { selectionMode: true, targetGroupId: grupoId },
+      params: { selectionMode: true, targetGroupId: String(grupoId) },
     });
   }, [navigation, grupoId]);
 

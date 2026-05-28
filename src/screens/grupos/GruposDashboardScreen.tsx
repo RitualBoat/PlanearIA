@@ -206,7 +206,7 @@ const CompararGruposModal: React.FC<CompararGruposModalProps> = ({ visible, grup
       <View style={compareStyles.overlay}>
         <View style={compareStyles.sheet}>
           <View style={compareStyles.handle} />
-          <View style={compareStyles.headerRow}>
+          <View style={[compareStyles.row, compareStyles.headerRowBg]}>
             <View>
               <Text style={compareStyles.title}>Comparar Grupos</Text>
               <Text style={compareStyles.subtitle}>Análisis comparativo de rendimiento</Text>
@@ -2028,3 +2028,4 @@ const compareStyles = StyleSheet.create({
 });
 
 export default GruposDashboardScreen;
+

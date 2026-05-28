@@ -65,7 +65,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
   const { width } = useWindowDimensions();
   const wideLayout = width >= 920;
   const { recursos } = useRecursos();
-  const scrollY = React.useRef(new Animated.Value(0)).current;
+  const [scrollY] = React.useState(() => new Animated.Value(0));
   const mobilePillOpacity = scrollY.interpolate({
     inputRange: [0, 12, 34],
     outputRange: [1, 0.45, 0],
@@ -76,6 +76,13 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
     outputRange: [0, -14],
     extrapolate: "clamp",
   });
+  const handleScroll = React.useMemo(
+    () =>
+      Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+        useNativeDriver: true,
+      }),
+    [scrollY]
+  );
 
   const getCountByTipo = (tipo: string) =>
     tipo === "todos" ? recursos.length : recursos.filter((r) => r.tipo === tipo).length;
@@ -88,9 +95,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
         <Animated.ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
-          onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-            useNativeDriver: true,
-          })}
+          onScroll={handleScroll}
           scrollEventThrottle={16}
         >
           {/* Header pill */}

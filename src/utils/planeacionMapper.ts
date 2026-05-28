@@ -5,7 +5,7 @@ import {
   PlaneacionSecundaria,
   PlaneacionPreparatoria,
   PlaneacionUniversidad,
-} from "../../types/planeacion";
+} from "../../types/planeacionLegacy";
 
 export const toStringArray = (value: unknown): string[] => {
   if (Array.isArray(value)) {

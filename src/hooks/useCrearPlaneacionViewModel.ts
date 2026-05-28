@@ -12,7 +12,10 @@ import {
   buildDocumentoFromPlantilla,
   listPlantillasDocumento,
 } from "../services/plantillaDocumentoService";
-import { NivelAcademico as NivelAcademicoLegacy, type Planeacion } from "../../types/planeacion";
+import {
+  NivelAcademico as NivelAcademicoLegacy,
+  type Planeacion,
+} from "../../types/planeacionLegacy";
 import { NivelAcademico as NivelAcademicoV2 } from "../../types/planeacionV2";
 import type { PlantillaDocumento } from "../../types/plantillaDocumento";
 
@@ -256,12 +259,16 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
 
   const plantillasDisponibles = useMemo(() => {
     if (!nivelSeleccionado) return plantillasDocumento;
-    return plantillasDocumento.filter((plantilla) => plantilla.nivelAcademico === nivelSeleccionado);
+    return plantillasDocumento.filter(
+      (plantilla) => plantilla.nivelAcademico === nivelSeleccionado
+    );
   }, [nivelSeleccionado, plantillasDocumento]);
 
   useEffect(() => {
     if (!plantillaSeleccionadaId) return;
-    const exists = plantillasDisponibles.some((plantilla) => plantilla.id === plantillaSeleccionadaId);
+    const exists = plantillasDisponibles.some(
+      (plantilla) => plantilla.id === plantillaSeleccionadaId
+    );
     if (!exists) setPlantillaSeleccionadaId("");
   }, [plantillaSeleccionadaId, plantillasDisponibles]);
 
@@ -273,8 +280,14 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     return Boolean(asignatura.trim() && grado.trim());
   }, [asignatura, grado, metodoSeleccionado, nivelSeleccionado, plantillaSeleccionadaId, step]);
 
-  const seleccionarNivel = useCallback((nivel: NivelAcademicoV2) => setNivelSeleccionado(nivel), []);
-  const seleccionarMetodo = useCallback((metodo: MetodoCreacion) => setMetodoSeleccionado(metodo), []);
+  const seleccionarNivel = useCallback(
+    (nivel: NivelAcademicoV2) => setNivelSeleccionado(nivel),
+    []
+  );
+  const seleccionarMetodo = useCallback(
+    (metodo: MetodoCreacion) => setMetodoSeleccionado(metodo),
+    []
+  );
 
   const irSiguiente = useCallback(() => {
     if (step === 1 && nivelSeleccionado) {
@@ -375,7 +388,10 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
   const handleSeleccionarNivel = useCallback(
     (nivel: NivelAcademicoLegacy) => {
       setShowNivelModal(false);
-      navigation.navigate("DocEditor", { modo: "crear", nivelAcademico: mapLegacyToV2Nivel(nivel) });
+      navigation.navigate("DocEditor", {
+        modo: "crear",
+        nivelAcademico: mapLegacyToV2Nivel(nivel),
+      });
     },
     [navigation]
   );
@@ -448,7 +464,11 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
         throw new Error(payload?.error || "No se pudo generar la planeacion con IA.");
       }
 
-      const planeacionGenerada = mapResponseToPlaneacion(payload?.data?.planeacion, nivelIA, prompt);
+      const planeacionGenerada = mapResponseToPlaneacion(
+        payload?.data?.planeacion,
+        nivelIA,
+        prompt
+      );
 
       setPlaneacionGeneradaIA(planeacionGenerada);
       setShowTemplateModal(false);

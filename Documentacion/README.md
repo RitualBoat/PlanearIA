@@ -53,6 +53,7 @@ Avance actual del modulo de Planeaciones:
 - Fase 5 completada (escaner de plantillas PDF/DOCX + flujo Desde plantilla V2)
 - Fase 6 completada (endpoint copiloto + servicio/hook + AIToolbar integrada + generacion V2)
 - Fase 7 completada (exportacion PDF/DOCX V2, navegacion DocEditor/EscanerPlantilla, Mi Contenido conectado a documentos V2)
+- Fase 8 en cierre (8.1-8.10 y 8.12 completadas con TS/lint/tests en verde; pendiente validacion manual 8.11)
 
 ---
 

@@ -1,5 +1,8 @@
 import type { DocumentPickerAsset } from "expo-document-picker";
-import { NivelAcademico as NivelAcademicoLegacy, type Actividad } from "../../types/planeacion";
+import {
+  NivelAcademico as NivelAcademicoLegacy,
+  type Actividad,
+} from "../../types/planeacionLegacy";
 import {
   NivelAcademico,
   type InstrumentoEvaluacion,
@@ -87,7 +90,10 @@ const DEFAULT_DRAFT: PlaneacionImportDraft = {
 };
 
 const cleanText = (value: string): string => {
-  return value.replace(/\r/g, "").replace(/\t/g, " ").replace(/\u00A0/g, " ");
+  return value
+    .replace(/\r/g, "")
+    .replace(/\t/g, " ")
+    .replace(/\u00A0/g, " ");
 };
 
 const readLabelValue = (text: string, labels: string[]): string => {
@@ -128,7 +134,8 @@ const readSectionItems = (text: string, sectionTitles: string[]): string[] => {
 const inferActividades = (text: string): Actividad[] => {
   const extractByTipo = (tipo: Actividad["tipo"], labels: string[]): Actividad => {
     const description = readLabelValue(text, labels);
-    const defaultItem = DEFAULT_ACTIVIDADES.find((item) => item.tipo === tipo) || DEFAULT_ACTIVIDADES[0];
+    const defaultItem =
+      DEFAULT_ACTIVIDADES.find((item) => item.tipo === tipo) || DEFAULT_ACTIVIDADES[0];
 
     return {
       tipo,
@@ -147,8 +154,10 @@ const inferActividades = (text: string): Actividad[] => {
 export const inferNivel = (text: string): NivelAcademico => {
   const lower = text.toLowerCase();
 
-  if (lower.includes("universidad") || lower.includes("licenciatura")) return NivelAcademico.UNIVERSIDAD;
-  if (lower.includes("preparatoria") || lower.includes("bachillerato")) return NivelAcademico.PREPARATORIA;
+  if (lower.includes("universidad") || lower.includes("licenciatura"))
+    return NivelAcademico.UNIVERSIDAD;
+  if (lower.includes("preparatoria") || lower.includes("bachillerato"))
+    return NivelAcademico.PREPARATORIA;
   if (lower.includes("secundaria")) return NivelAcademico.SECUNDARIA;
   if (lower.includes("primaria")) return NivelAcademico.PRIMARIA;
 
@@ -159,7 +168,10 @@ export const inferNivel = (text: string): NivelAcademico => {
 };
 
 const fallbackSubjectFromFileName = (fileName: string): string => {
-  return fileName.replace(/\.(pdf|docx|doc)$/i, "").replace(/[-_]+/g, " ").trim();
+  return fileName
+    .replace(/\.(pdf|docx|doc)$/i, "")
+    .replace(/[-_]+/g, " ")
+    .trim();
 };
 
 const parseRawTextToDraft = (
@@ -170,12 +182,18 @@ const parseRawTextToDraft = (
   const text = cleanText(rawText);
   const inferredNivel = nivelAcademico || inferNivel(`${text}\n${fileName}`);
 
-  const asignatura = readLabelValue(text, ["asignatura", "materia"]) || fallbackSubjectFromFileName(fileName);
+  const asignatura =
+    readLabelValue(text, ["asignatura", "materia"]) || fallbackSubjectFromFileName(fileName);
   const grado = readLabelValue(text, ["grado", "nivel", "semestre"]);
   const grupo = readLabelValue(text, ["grupo", "salon", "salón"]);
   const unidadTematica = readLabelValue(text, ["unidad tematica", "unidad temática", "unidad"]);
-  const temaSesion = readLabelValue(text, ["tema de la sesion", "tema de la sesión", "tema"]) || unidadTematica;
-  const evaluacion = readLabelValue(text, ["evaluacion", "evaluación", "instrumento de evaluacion"]);
+  const temaSesion =
+    readLabelValue(text, ["tema de la sesion", "tema de la sesión", "tema"]) || unidadTematica;
+  const evaluacion = readLabelValue(text, [
+    "evaluacion",
+    "evaluación",
+    "instrumento de evaluacion",
+  ]);
   const observaciones = readLabelValue(text, ["observaciones", "notas"]);
 
   return {
@@ -326,7 +344,9 @@ export const scanPlantillaFromRawText = async (
   );
 };
 
-export function parseImportedPlaneacionFile(asset: DocumentPickerAsset): Promise<PlaneacionImportDraft>;
+export function parseImportedPlaneacionFile(
+  asset: DocumentPickerAsset
+): Promise<PlaneacionImportDraft>;
 export function parseImportedPlaneacionFile(
   asset: DocumentPickerAsset,
   options: ParseImportedFileOptions & { parseMode: "planeacion" }

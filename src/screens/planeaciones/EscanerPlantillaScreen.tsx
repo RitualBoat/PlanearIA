@@ -238,8 +238,8 @@ const EscanerPlantillaScreen: React.FC = () => {
         </View>
         <Text style={[styles.cardTitle, { color: colors.onSurface }]}>Plantilla lista</Text>
         <Text style={[styles.cardText, { color: colors.onSurfaceVariant }]}>
-          La plantilla quedo guardada en el sistema V2. Puedes usarla desde "Nueva planeacion" y elegir
-          "Desde plantilla".
+          La plantilla quedo guardada en el sistema V2. Puedes usarla desde Nueva planeacion y elegir
+          Desde plantilla.
         </Text>
         <View style={styles.successActions}>
           <Pressable

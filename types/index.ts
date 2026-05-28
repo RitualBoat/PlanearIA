@@ -280,8 +280,6 @@ export interface ConfiguracionSeguridad extends BaseEntity {
   ultimaActualizacion: Date;
 }
 
-
-
 // ==========================================
 // TIPOS PARA EL FEED SOCIAL
 // ==========================================
@@ -492,8 +490,6 @@ export interface LoginFormData {
   username: string;
   password: string;
 }
-
-
 
 /**
  * Datos del formulario de Alumno
@@ -733,4 +729,4 @@ export {
   ConfiguracionCurso,
   Evaluacion,
   TipoEvaluacion,
-} from "./planeacion";
+} from "./planeacionLegacy";

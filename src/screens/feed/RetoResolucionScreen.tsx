@@ -283,12 +283,12 @@ const RetoResolucionScreen: React.FC<RetoResolucionScreenProps> = ({ route, navi
           <MaterialIcons
             name="arrow-back"
             size={16}
-            color={currentIndex === 0 ? colors.outline : colors.onSurface}
+            color={currentIndex === 0 ? colors.onSurfaceVariant : colors.onSurface}
           />
           <Text
             style={[
               styles.prevBtnText,
-              { color: currentIndex === 0 ? colors.outline : colors.onSurface },
+              { color: currentIndex === 0 ? colors.onSurfaceVariant : colors.onSurface },
             ]}
           >
             Anterior

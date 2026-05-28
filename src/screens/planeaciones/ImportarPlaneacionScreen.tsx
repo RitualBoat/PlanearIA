@@ -74,9 +74,9 @@ const ImportarPlaneacionScreen: React.FC = () => {
     if (!selectedFileName) return "Matemáticas Aplicadas";
     return selectedFileName
       .replace(/\.(pdf|docx|doc)$/i, "")
-      .replace(/[\-_]+/g, " ")
+      .replace(/[-_]+/g, " ")
       .trim();
-  }, [importDraft?.asignatura, selectedFileName]);
+  }, [importDraft, selectedFileName]);
 
   const showPendingMessage = () => {
     Alert.alert("Importar planeación", "Opciones avanzadas disponibles en próximas tareas.");
@@ -819,3 +819,4 @@ const styles = StyleSheet.create({
 });
 
 export default ImportarPlaneacionScreen;
+

@@ -4,7 +4,6 @@ import { NavigatorScreenParams } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COLORS } from "../../types";
-import { NivelAcademico } from "../../types/planeacion";
 import { NivelAcademico as NivelAcademicoV2 } from "../../types/planeacionV2";
 import AppTabsNavigator, { MainTabParamList } from "./AppTabsNavigator";
 import { useAuth } from "../context/AuthContext";
@@ -14,7 +13,6 @@ import { useDeepLinkHandler } from "../hooks/useDeepLinkHandler";
 import LoginScreen from "../screens/auth/LoginScreen";
 import RegistroScreen from "../screens/auth/RegistroScreen";
 import RecuperarContrasenaScreen from "../screens/auth/RecuperarContrasenaScreen";
-
 
 // ImportaciÃ³n de pantallas de Planeaciones
 import PlaneacionesScreen from "../screens/planeaciones/PlaneacionesScreen";
@@ -117,7 +115,6 @@ export type RootStackParamList = {
   Registro: undefined;
   RecuperarContrasena: undefined;
   MainTabs: NavigatorScreenParams<MainTabParamList>;
-
 
   // Planeaciones (se mantiene igual)
   Planeaciones: undefined;
@@ -769,4 +766,3 @@ const StackNavigator: React.FC = () => {
   );
 };
 export default StackNavigator;
-

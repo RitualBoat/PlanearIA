@@ -94,14 +94,10 @@ export const useGrupos = (): UseGruposResult => {
    */
   const agregarNuevoGrupo = useCallback(
     async (grupo: Partial<Grupo>): Promise<void> => {
-      try {
-        await agregarGrupo(grupo);
-        await recargarGrupos();
-      } catch (err) {
-        throw err;
-      }
+      await agregarGrupo(grupo);
+      await recargarGrupos();
     },
-    [recargarGrupos]
+    [agregarGrupo, recargarGrupos]
   );
 
   /**
@@ -109,14 +105,10 @@ export const useGrupos = (): UseGruposResult => {
    */
   const actualizarGrupoExistente = useCallback(
     async (id: number, actualizacion: Partial<Grupo>): Promise<void> => {
-      try {
-        await actualizarGrupo(id, actualizacion);
-        await recargarGrupos();
-      } catch (err) {
-        throw err;
-      }
+      await actualizarGrupo(id, actualizacion);
+      await recargarGrupos();
     },
-    [recargarGrupos]
+    [actualizarGrupo, recargarGrupos]
   );
 
   /**
@@ -124,14 +116,10 @@ export const useGrupos = (): UseGruposResult => {
    */
   const eliminarGrupoExistente = useCallback(
     async (id: number): Promise<void> => {
-      try {
-        await eliminarGrupo(id);
-        await recargarGrupos();
-      } catch (err) {
-        throw err;
-      }
+      await eliminarGrupo(id);
+      await recargarGrupos();
     },
-    [recargarGrupos]
+    [eliminarGrupo, recargarGrupos]
   );
 
   // Retorna la interfaz pública del hook

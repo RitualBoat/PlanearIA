@@ -39,8 +39,8 @@ const AnimatedTopPill: React.FC<AnimatedTopPillProps> = ({
   children,
 }) => {
   const navigation = React.useContext(NavigationContext);
-  const ringShift = React.useRef(new Animated.Value(0)).current;
-  const ringOpacity = React.useRef(new Animated.Value(0)).current;
+  const [ringShift] = React.useState(() => new Animated.Value(0));
+  const [ringOpacity] = React.useState(() => new Animated.Value(0));
 
   const runGlow = React.useCallback(() => {
     ringShift.setValue(0);

@@ -20,7 +20,7 @@ import {
   type PlaneacionUniversidad,
   type Actividad,
   NivelAcademico as NivelAcademicoLegacy,
-} from "../../types/planeacion";
+} from "../../types/planeacionLegacy";
 import {
   type PlaneacionDocumento,
   type FiltrosPlaneacionV2,
@@ -30,7 +30,12 @@ import {
   NivelAcademico,
 } from "../../types/planeacionV2";
 import { migrateV1toV2 } from "../utils/migrateV1toV2";
-import { enqueueOperation, flushQueue, getPendingOps, mergeWithLocal } from "../sync/services/syncEngine";
+import {
+  enqueueOperation,
+  flushQueue,
+  getPendingOps,
+  mergeWithLocal,
+} from "../sync/services/syncEngine";
 import { apiRequest } from "../utils/apiClient";
 import { STORAGE_KEYS, SYNC_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
 import logger from "../utils/logger";
@@ -127,14 +132,16 @@ const toLegacyFromV2 = (doc: PlaneacionDocumento): Planeacion => {
 
   const base: PlaneacionBase = {
     id: doc.id,
-    nivelAcademico: (doc.nivelAcademico as unknown as NivelAcademicoLegacy) || NivelAcademicoLegacy.PRIMARIA,
+    nivelAcademico:
+      (doc.nivelAcademico as unknown as NivelAcademicoLegacy) || NivelAcademicoLegacy.PRIMARIA,
     asignatura: doc.datosGenerales.asignatura || "",
     grado: doc.datosGenerales.grado || "",
     grupo: doc.datosGenerales.grupos?.[0] || "",
     fecha: doc.datosGenerales.fechaInicio || doc.fechaCreacion,
     horaInicio:
-      (typeof doc.camposNivel?.horaInicio === "string" ? (doc.camposNivel.horaInicio as string) : "") ||
-      "08:00",
+      (typeof doc.camposNivel?.horaInicio === "string"
+        ? (doc.camposNivel.horaInicio as string)
+        : "") || "08:00",
     duracionTotal:
       typeof doc.camposNivel?.duracionTotal === "number"
         ? (doc.camposNivel.duracionTotal as number)
@@ -149,7 +156,9 @@ const toLegacyFromV2 = (doc: PlaneacionDocumento): Planeacion => {
     ],
     recursos,
     evaluacion: evaluacionTexto,
-    evidencias: doc.elementosCurriculares.producto ? splitLines(doc.elementosCurriculares.producto) : [],
+    evidencias: doc.elementosCurriculares.producto
+      ? splitLines(doc.elementosCurriculares.producto)
+      : [],
     observaciones,
     fechaCreacion: doc.fechaCreacion,
     fechaModificacion: doc.fechaModificacion,
@@ -213,7 +222,8 @@ const toLegacyFromV2 = (doc: PlaneacionDocumento): Planeacion => {
       ? (doc.camposNivel.bibliografia as string[])
       : [],
     modalidad:
-      (doc.camposNivel?.modalidad as "presencial" | "hibrida" | "virtual" | undefined) || "presencial",
+      (doc.camposNivel?.modalidad as "presencial" | "hibrida" | "virtual" | undefined) ||
+      "presencial",
     configuracionCurso:
       doc.camposNivel?.configuracionCurso && typeof doc.camposNivel.configuracionCurso === "object"
         ? (doc.camposNivel.configuracionCurso as PlaneacionUniversidad["configuracionCurso"])
@@ -242,11 +252,14 @@ const toV2FromLegacy = (planeacion: Planeacion, userId: string): PlaneacionDocum
   if (planeacion.nivelAcademico === NivelAcademicoLegacy.PRIMARIA) {
     camposNivel.ejeTransversal = (planeacion as PlaneacionPrimaria).ejeTransversal;
   } else if (planeacion.nivelAcademico === NivelAcademicoLegacy.SECUNDARIA) {
-    camposNivel.competenciasDisciplinares = (planeacion as PlaneacionSecundaria).competenciasDisciplinares || [];
+    camposNivel.competenciasDisciplinares =
+      (planeacion as PlaneacionSecundaria).competenciasDisciplinares || [];
     camposNivel.productoFinal = (planeacion as PlaneacionSecundaria).productoFinal;
   } else if (planeacion.nivelAcademico === NivelAcademicoLegacy.PREPARATORIA) {
-    camposNivel.competenciasGenericas = (planeacion as PlaneacionPreparatoria).competenciasGenericas || [];
-    camposNivel.competenciasDisciplinares = (planeacion as PlaneacionPreparatoria).competenciasDisciplinares || [];
+    camposNivel.competenciasGenericas =
+      (planeacion as PlaneacionPreparatoria).competenciasGenericas || [];
+    camposNivel.competenciasDisciplinares =
+      (planeacion as PlaneacionPreparatoria).competenciasDisciplinares || [];
     camposNivel.bibliografia = (planeacion as PlaneacionPreparatoria).bibliografia || [];
   } else if (planeacion.nivelAcademico === NivelAcademicoLegacy.UNIVERSIDAD) {
     const u = planeacion as PlaneacionUniversidad;
@@ -314,12 +327,14 @@ const patchDocumentWithLegacyUpdates = (
 
   if (typeof updates.asignatura === "string") next.datosGenerales.asignatura = updates.asignatura;
   if (typeof updates.grado === "string") next.datosGenerales.grado = updates.grado;
-  if (typeof updates.grupo === "string") next.datosGenerales.grupos = updates.grupo ? [updates.grupo] : [];
+  if (typeof updates.grupo === "string")
+    next.datosGenerales.grupos = updates.grupo ? [updates.grupo] : [];
   if (typeof updates.fecha === "string") {
     next.datosGenerales.fechaInicio = updates.fecha;
     next.datosGenerales.fechaFin = updates.fecha;
   }
-  if (typeof updates.horaInicio === "string") next.camposNivel = { ...next.camposNivel, horaInicio: updates.horaInicio };
+  if (typeof updates.horaInicio === "string")
+    next.camposNivel = { ...next.camposNivel, horaInicio: updates.horaInicio };
   if (typeof updates.duracionTotal === "number")
     next.camposNivel = { ...next.camposNivel, duracionTotal: updates.duracionTotal };
   if (typeof updates.unidadTematica === "string")
@@ -327,7 +342,8 @@ const patchDocumentWithLegacyUpdates = (
   if (typeof updates.temaSesion === "string") next.elementosCurriculares.pda = updates.temaSesion;
   if (Array.isArray(updates.aprendizajesEsperados))
     next.elementosCurriculares.proposito = updates.aprendizajesEsperados.join("\n");
-  if (Array.isArray(updates.recursos)) next.camposNivel = { ...next.camposNivel, recursos: updates.recursos };
+  if (Array.isArray(updates.recursos))
+    next.camposNivel = { ...next.camposNivel, recursos: updates.recursos };
   if (typeof updates.evaluacion === "string") {
     next.elementosCurriculares.instrumentoEvaluacion = updates.evaluacion;
     next.evaluacionFinal = normalizeEvaluacion(updates.evaluacion);
@@ -417,7 +433,9 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [planeacionActual, setPlaneacionActual] = useState<Planeacion | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "synced" | "error" | "offline">("idle");
+  const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "synced" | "error" | "offline">(
+    "idle"
+  );
   const [isOnline, setIsOnline] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
   const [lastSync, setLastSync] = useState<string | null>(null);
@@ -448,7 +466,9 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
       let docs: PlaneacionDocumento[] = [];
 
       if (v2Parsed.length > 0) {
-        docs = v2Parsed.map((item) => normalizeInputToV2(item as Planeacion | PlaneacionDocumento, userId));
+        docs = v2Parsed.map((item) =>
+          normalizeInputToV2(item as Planeacion | PlaneacionDocumento, userId)
+        );
       } else if (legacyParsed.length > 0) {
         docs = legacyParsed.map((item) => toV2FromLegacy(item, userId));
       }
@@ -585,7 +605,10 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
       const current = documentos.find((doc) => doc.id === id);
       if (!current) return;
       const nextDocs = documentos.filter((doc) => doc.id !== id);
-      await upsertLocalAndQueue(nextDocs, "delete", { id: current.id, userId: current.userId || userId });
+      await upsertLocalAndQueue(nextDocs, "delete", {
+        id: current.id,
+        userId: current.userId || userId,
+      });
       if (planeacionActual?.id === id) setPlaneacionActual(null);
     },
     [documentos, planeacionActual?.id, upsertLocalAndQueue, userId]
@@ -626,7 +649,11 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
           doc.elementosCurriculares.proposito,
           ...doc.observaciones.map((obs) => obs.texto),
         ];
-        return values.some((value) => String(value || "").toLowerCase().includes(q));
+        return values.some((value) =>
+          String(value || "")
+            .toLowerCase()
+            .includes(q)
+        );
       });
     },
     [documentos]
@@ -643,9 +670,11 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
           return false;
         if (filtros.grado && doc.datosGenerales.grado !== filtros.grado) return false;
         if (filtros.maestro && doc.datosGenerales.maestro !== filtros.maestro) return false;
-        if (filtros.fechaInicio && doc.datosGenerales.fechaInicio < filtros.fechaInicio) return false;
+        if (filtros.fechaInicio && doc.datosGenerales.fechaInicio < filtros.fechaInicio)
+          return false;
         if (filtros.fechaFin && doc.datosGenerales.fechaFin > filtros.fechaFin) return false;
-        if (filtros.busqueda && buscar(filtros.busqueda).every((item) => item.id !== doc.id)) return false;
+        if (filtros.busqueda && buscar(filtros.busqueda).every((item) => item.id !== doc.id))
+          return false;
         return true;
       });
     },
@@ -677,9 +706,12 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
     [actualizar, documentos]
   );
 
-  const eliminarPlaneacion = useCallback(async (id: string) => {
-    await eliminar(id);
-  }, [eliminar]);
+  const eliminarPlaneacion = useCallback(
+    async (id: string) => {
+      await eliminar(id);
+    },
+    [eliminar]
+  );
 
   const obtenerPlaneacion = useCallback(
     (id: string): Planeacion | undefined => {
@@ -689,9 +721,12 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
     [obtenerDocumento]
   );
 
-  const clonarPlaneacion = useCallback(async (id: string) => {
-    await clonar(id);
-  }, [clonar]);
+  const clonarPlaneacion = useCallback(
+    async (id: string) => {
+      await clonar(id);
+    },
+    [clonar]
+  );
 
   const filtrarPlaneaciones = useCallback(
     (filtros: FiltrosPlaneacion): Planeacion[] => {

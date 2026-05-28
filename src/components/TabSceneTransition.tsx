@@ -9,7 +9,7 @@ interface TabSceneTransitionProps {
 
 const TabSceneTransition: React.FC<TabSceneTransitionProps> = ({ children, style }) => {
   const navigation = React.useContext(NavigationContext);
-  const progress = React.useRef(new Animated.Value(1)).current;
+  const [progress] = React.useState(() => new Animated.Value(1));
 
   const runAnimation = React.useCallback(() => {
     progress.setValue(0);

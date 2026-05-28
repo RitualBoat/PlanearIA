@@ -265,7 +265,7 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
             </TouchableOpacity>
           </View>
 
-          {!!error ? (
+          {error ? (
             <View style={styles.inlineError}>
               <Text style={styles.inlineErrorText}>{error}</Text>
             </View>

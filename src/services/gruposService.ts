@@ -351,7 +351,7 @@ export const agregarGrupo = async (grupo: Partial<Grupo>): Promise<void> => {
     const nuevoGrupo = {
       ...grupo,
       id: nuevoId,
-      fechaCreacion: grupo.fechaCreacion || new Date().toISOString(),
+      fechaCreacion: grupo.fechaCreacion || new Date(),
     };
 
     await guardarGrupos([...grupos, nuevoGrupo]);

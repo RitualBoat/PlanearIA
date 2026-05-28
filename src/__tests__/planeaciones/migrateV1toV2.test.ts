@@ -1,5 +1,5 @@
 import { migrateV1toV2 } from "../../utils/migrateV1toV2";
-import { NivelAcademico as NivelV1 } from "../../../types/planeacion";
+import { NivelAcademico as NivelV1 } from "../../../types/planeacionLegacy";
 import { NivelAcademico as NivelV2 } from "../../../types/planeacionV2";
 
 describe("migrateV1toV2", () => {
@@ -17,11 +17,22 @@ describe("migrateV1toV2", () => {
       duracionTotal: 50,
       unidadTematica: "Fábulas y leyendas",
       temaSesion: "Identificar moralejas",
-      aprendizajesEsperados: ["Reconoce la moraleja en fábulas", "Identifica características de la fábula"],
+      aprendizajesEsperados: [
+        "Reconoce la moraleja en fábulas",
+        "Identifica características de la fábula",
+      ],
       actividades: [
-        { tipo: "inicio" as const, descripcion: "Leer en plenaria la fábula del león", duracion: 10 },
-        { tipo: "desarrollo" as const, descripcion: "Contestar preguntas en el cuaderno sobre el texto", duracion: 30 },
-        { tipo: "cierre" as const, descripcion: "Discutir la moraleja grupalmente", duracion: 10 }
+        {
+          tipo: "inicio" as const,
+          descripcion: "Leer en plenaria la fábula del león",
+          duracion: 10,
+        },
+        {
+          tipo: "desarrollo" as const,
+          descripcion: "Contestar preguntas en el cuaderno sobre el texto",
+          duracion: 30,
+        },
+        { tipo: "cierre" as const, descripcion: "Discutir la moraleja grupalmente", duracion: 10 },
       ],
       recursos: ["Libro de texto", "Cuaderno"],
       evaluacion: "Lista de cotejo sobre la fábula",
@@ -29,7 +40,7 @@ describe("migrateV1toV2", () => {
       observaciones: "Ajuste razonable para alumno con USAER",
       fechaCreacion: "2026-05-27T10:00:00.000Z",
       fechaModificacion: "2026-05-27T12:00:00.000Z",
-      campoFormativo: "Lenguajes"
+      campoFormativo: "Lenguajes",
     };
 
     const v2Plan = migrateV1toV2(v1Plan, mockUserId);
@@ -93,22 +104,30 @@ describe("migrateV1toV2", () => {
           temas: ["Proposiciones", "Conectores"],
           objetivos: ["Comprender proposiciones simples y compuestas"],
           actividadesPresenciales: [
-            { metodologia: "Clase magistral", descripcion: "Explicación de proposiciones lógicas", duracion: 60 },
-            { metodologia: "Trabajo en equipo", descripcion: "Resolución de ejercicios prácticos", duracion: 60 }
+            {
+              metodologia: "Clase magistral",
+              descripcion: "Explicación de proposiciones lógicas",
+              duracion: 60,
+            },
+            {
+              metodologia: "Trabajo en equipo",
+              descripcion: "Resolución de ejercicios prácticos",
+              duracion: 60,
+            },
           ],
           actividadesAutonomas: ["Estudiar apuntes", "Resolver problemas de tarea"],
           recursos: ["Libro de texto"],
           entregables: "Tarea 1: Ejercicios lógicos",
-          evaluacion: "Examen 1"
-        }
-      ]
+          evaluacion: "Examen 1",
+        },
+      ],
     };
 
     const v2Plan = migrateV1toV2(v1Plan, mockUserId);
 
     expect(v2Plan.nivelAcademico).toBe(NivelV2.UNIVERSIDAD);
     expect(v2Plan.sesiones.length).toBe(1);
-    
+
     const sesion1 = v2Plan.sesiones[0];
     expect(sesion1.numero).toBe(1);
     expect(sesion1.inicio).toContain("Comprender proposiciones");

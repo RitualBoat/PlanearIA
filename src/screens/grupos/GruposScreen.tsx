@@ -35,7 +35,7 @@ interface GruposScreenProps {
 const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
   const { width } = useWindowDimensions();
   const wideLayout = width >= 920;
-  const scrollY = React.useRef(new Animated.Value(0)).current;
+  const [scrollY] = React.useState(() => new Animated.Value(0));
   const mobilePillOpacity = scrollY.interpolate({
     inputRange: [0, 22, 56],
     outputRange: [1, 0.55, 0],
@@ -46,6 +46,13 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
     outputRange: [0, -16],
     extrapolate: "clamp",
   });
+  const handleScroll = React.useMemo(
+    () =>
+      Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+        useNativeDriver: true,
+      }),
+    [scrollY]
+  );
 
   /**
    * Navega a crear nuevo grupo
@@ -116,9 +123,7 @@ const GruposScreen: React.FC<GruposScreenProps> = ({ navigation }) => {
       <SafeAreaView style={styles.safeArea}>
         <Animated.ScrollView
           contentContainerStyle={styles.scrollContent}
-          onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-            useNativeDriver: true,
-          })}
+          onScroll={handleScroll}
           scrollEventThrottle={16}
         >
           <View style={styles.headerBlock}>

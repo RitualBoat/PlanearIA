@@ -20,7 +20,7 @@ import { useRecursos } from "../../context/RecursosContext";
 import { useGruposContext } from "../../context/GruposContext";
 import { asignarRecursosAGrupo } from "../../services/grupoAsignacionesService";
 import { Mensaje } from "../../../types";
-import type { Planeacion } from "../../../types/planeacion";
+import type { Planeacion } from "../../../types/planeacionLegacy";
 import type { Recurso } from "../../../types";
 
 // ─── Design Tokens ───
@@ -54,7 +54,6 @@ const getThemeTokens = (colors: any) => ({
   textSecondary: colors.textSecondary,
   textMuted: colors.textMuted,
 });
-
 
 // ─── Message Bubble ───
 const MessageBubble: React.FC<{
@@ -143,7 +142,9 @@ const MessageBubble: React.FC<{
                     activeOpacity={0.7}
                   >
                     <MaterialIcons name="groups" size={16} color={DT.primary} />
-                    <Text style={[styles.addToLibraryText, { color: DT.primary }]}>Asignar a Grupo</Text>
+                    <Text style={[styles.addToLibraryText, { color: DT.primary }]}>
+                      Asignar a Grupo
+                    </Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -198,12 +199,17 @@ const MessageBubble: React.FC<{
                 )}
                 {onAssignToGroup && (
                   <TouchableOpacity
-                    style={[styles.addToLibraryBtnRecurso, { backgroundColor: DT.surfaceContainer }]}
+                    style={[
+                      styles.addToLibraryBtnRecurso,
+                      { backgroundColor: DT.surfaceContainer },
+                    ]}
                     onPress={() => onAssignToGroup(mensaje)}
                     activeOpacity={0.7}
                   >
                     <MaterialIcons name="groups" size={16} color="#7C3AED" />
-                    <Text style={[styles.addToLibraryText, { color: "#7C3AED" }]}>Asignar a Grupo</Text>
+                    <Text style={[styles.addToLibraryText, { color: "#7C3AED" }]}>
+                      Asignar a Grupo
+                    </Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -278,43 +284,47 @@ const AttachModal: React.FC<{
   const DT = getThemeTokens(colors);
   const styles = getStyles(DT, isDark);
   return (
-  <Modal visible={visible} transparent animationType="slide">
-    <TouchableOpacity style={styles.attachOverlay} activeOpacity={1} onPress={onClose}>
-      <View style={styles.attachSheet}>
-        <View style={styles.handleBar} />
-        <Text style={styles.attachTitle}>Compartir</Text>
-        <View style={styles.attachGrid}>
-          <TouchableOpacity style={styles.attachOption} onPress={onPlaneacion} activeOpacity={0.7}>
-            <View style={[styles.attachIconCircle, { backgroundColor: DT.primaryTint }]}>
-              <MaterialIcons name="auto-stories" size={24} color={DT.primary} />
-            </View>
-            <Text style={styles.attachLabel}>Planeación</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.attachOption} onPress={onArchivo} activeOpacity={0.7}>
-            <View style={[styles.attachIconCircle, { backgroundColor: "#E7F9F3" }]}>
-              <MaterialIcons name="upload-file" size={24} color={DT.success} />
-            </View>
-            <Text style={styles.attachLabel}>Archivo</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.attachOption} onPress={onFoto} activeOpacity={0.7}>
-            <View style={[styles.attachIconCircle, { backgroundColor: DT.warningTint }]}>
-              <MaterialIcons name="photo-camera" size={24} color={DT.warning} />
-            </View>
-            <Text style={styles.attachLabel}>Foto</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.attachOption} onPress={onRecurso} activeOpacity={0.7}>
-            <View style={[styles.attachIconCircle, { backgroundColor: "#F3E8FF" }]}>
-              <MaterialIcons name="library-books" size={24} color="#7C3AED" />
-            </View>
-            <Text style={styles.attachLabel}>Recurso</Text>
+    <Modal visible={visible} transparent animationType="slide">
+      <TouchableOpacity style={styles.attachOverlay} activeOpacity={1} onPress={onClose}>
+        <View style={styles.attachSheet}>
+          <View style={styles.handleBar} />
+          <Text style={styles.attachTitle}>Compartir</Text>
+          <View style={styles.attachGrid}>
+            <TouchableOpacity
+              style={styles.attachOption}
+              onPress={onPlaneacion}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.attachIconCircle, { backgroundColor: DT.primaryTint }]}>
+                <MaterialIcons name="auto-stories" size={24} color={DT.primary} />
+              </View>
+              <Text style={styles.attachLabel}>Planeación</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.attachOption} onPress={onArchivo} activeOpacity={0.7}>
+              <View style={[styles.attachIconCircle, { backgroundColor: "#E7F9F3" }]}>
+                <MaterialIcons name="upload-file" size={24} color={DT.success} />
+              </View>
+              <Text style={styles.attachLabel}>Archivo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.attachOption} onPress={onFoto} activeOpacity={0.7}>
+              <View style={[styles.attachIconCircle, { backgroundColor: DT.warningTint }]}>
+                <MaterialIcons name="photo-camera" size={24} color={DT.warning} />
+              </View>
+              <Text style={styles.attachLabel}>Foto</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.attachOption} onPress={onRecurso} activeOpacity={0.7}>
+              <View style={[styles.attachIconCircle, { backgroundColor: "#F3E8FF" }]}>
+                <MaterialIcons name="library-books" size={24} color="#7C3AED" />
+              </View>
+              <Text style={styles.attachLabel}>Recurso</Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={styles.attachCancelBtn} onPress={onClose} activeOpacity={0.7}>
+            <Text style={styles.attachCancelText}>Cancelar</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.attachCancelBtn} onPress={onClose} activeOpacity={0.7}>
-          <Text style={styles.attachCancelText}>Cancelar</Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  </Modal>
+      </TouchableOpacity>
+    </Modal>
   );
 };
 
@@ -332,48 +342,48 @@ const PickerModal: React.FC<{
   const DT = getThemeTokens(colors);
   const styles = getStyles(DT, isDark);
   return (
-  <Modal visible={visible} transparent animationType="slide">
-    <TouchableOpacity style={styles.attachOverlay} activeOpacity={1} onPress={onClose}>
-      <View style={styles.pickerSheet}>
-        <View style={styles.handleBar} />
-        <Text style={styles.attachTitle}>{title}</Text>
-        {items.length === 0 ? (
-          <View style={styles.pickerEmpty}>
-            <Text style={styles.pickerEmptyText}>No hay elementos disponibles</Text>
-          </View>
-        ) : (
-          <FlatList
-            data={items}
-            keyExtractor={(item) => String(item.id)}
-            style={styles.pickerList}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.pickerItem}
-                onPress={() => onSelect(item.id)}
-                activeOpacity={0.7}
-              >
-                <View style={[styles.pickerIconCircle, { backgroundColor: `${iconColor}20` }]}>
-                  <MaterialIcons name={icon as any} size={20} color={iconColor} />
-                </View>
-                <View style={styles.pickerItemInfo}>
-                  <Text style={styles.pickerItemTitle} numberOfLines={1}>
-                    {item.title}
-                  </Text>
-                  <Text style={styles.pickerItemSubtitle} numberOfLines={1}>
-                    {item.subtitle}
-                  </Text>
-                </View>
-                <MaterialIcons name="chevron-right" size={20} color={DT.textMuted} />
-              </TouchableOpacity>
-            )}
-          />
-        )}
-        <TouchableOpacity style={styles.attachCancelBtn} onPress={onClose} activeOpacity={0.7}>
-          <Text style={styles.attachCancelText}>Cancelar</Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  </Modal>
+    <Modal visible={visible} transparent animationType="slide">
+      <TouchableOpacity style={styles.attachOverlay} activeOpacity={1} onPress={onClose}>
+        <View style={styles.pickerSheet}>
+          <View style={styles.handleBar} />
+          <Text style={styles.attachTitle}>{title}</Text>
+          {items.length === 0 ? (
+            <View style={styles.pickerEmpty}>
+              <Text style={styles.pickerEmptyText}>No hay elementos disponibles</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={items}
+              keyExtractor={(item) => String(item.id)}
+              style={styles.pickerList}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.pickerItem}
+                  onPress={() => onSelect(item.id)}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.pickerIconCircle, { backgroundColor: `${iconColor}20` }]}>
+                    <MaterialIcons name={icon as any} size={20} color={iconColor} />
+                  </View>
+                  <View style={styles.pickerItemInfo}>
+                    <Text style={styles.pickerItemTitle} numberOfLines={1}>
+                      {item.title}
+                    </Text>
+                    <Text style={styles.pickerItemSubtitle} numberOfLines={1}>
+                      {item.subtitle}
+                    </Text>
+                  </View>
+                  <MaterialIcons name="chevron-right" size={20} color={DT.textMuted} />
+                </TouchableOpacity>
+              )}
+            />
+          )}
+          <TouchableOpacity style={styles.attachCancelBtn} onPress={onClose} activeOpacity={0.7}>
+            <Text style={styles.attachCancelText}>Cancelar</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Modal>
   );
 };
 
@@ -485,7 +495,10 @@ const ConversacionScreen: React.FC = () => {
           Alert.alert("Éxito", "El recurso fue añadido a la biblioteca y asignado al grupo.");
         }
       } else if (mensajeParaAsignar.tipo === "planeacion") {
-        Alert.alert("No soportado", "Aún no se pueden asignar planeaciones a grupos directamente desde el chat.");
+        Alert.alert(
+          "No soportado",
+          "Aún no se pueden asignar planeaciones a grupos directamente desde el chat."
+        );
       }
     } catch {
       Alert.alert("Error", "No se pudo asignar al grupo.");
@@ -696,508 +709,509 @@ const ConversacionScreen: React.FC = () => {
 export default ConversacionScreen;
 
 // ─── Styles ───
-const getStyles = (DT: any, isDark: boolean) => StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: DT.surface,
-  },
-  // Chat Header
-  chatHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: DT.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: DT.border,
-    gap: 10,
-  },
-  chatHeaderBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: DT.surfaceContainer,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  chatHeaderAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  chatHeaderAvatarText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#FFFFFF",
-  },
-  chatHeaderInfo: {
-    flex: 1,
-  },
-  chatHeaderName: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: DT.text,
-  },
-  chatHeaderOnlineRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  chatHeaderOnlineDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 999,
-    backgroundColor: DT.success,
-  },
-  chatHeaderOnlineText: {
-    fontSize: 11,
-    color: DT.success,
-  },
-  chatHeaderOfflineText: {
-    fontSize: 11,
-    color: DT.textMuted,
-  },
-  // Messages Area
-  messagesArea: {
-    flex: 1,
-    backgroundColor: DT.background,
-  },
-  messagesList: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    paddingBottom: 8,
-  },
-  // Bubble common
-  bubbleWrap: {
-    marginBottom: 6,
-  },
-  bubbleWrapLeft: {
-    alignItems: "flex-start",
-  },
-  bubbleWrapRight: {
-    alignItems: "flex-end",
-  },
-  textBubble: {
-    maxWidth: 280,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  textBubbleOther: {
-    backgroundColor: DT.surface,
-    borderRadius: 16,
-    borderBottomLeftRadius: 4,
-    ...Platform.select({
-      web: { boxShadow: "0px 2px 8px rgba(0,72,132,0.04)" } as any,
-      default: {
-        shadowColor: "#004884",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.04,
-        shadowRadius: 8,
-        elevation: 1,
-      },
-    }),
-  },
-  textBubbleOwn: {
-    backgroundColor: DT.primary,
-    borderRadius: 16,
-    borderBottomRightRadius: 4,
-    ...Platform.select({
-      web: { boxShadow: "0px 2px 8px rgba(22,118,210,0.15)" } as any,
-      default: {
-        shadowColor: DT.primary,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 2,
-      },
-    }),
-  },
-  textBubbleError: {
-    backgroundColor: DT.error,
-  },
-  bubbleText: {
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  bubbleFooter: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    marginTop: 4,
-  },
-  bubbleTime: {
-    fontSize: 10,
-    color: DT.textMuted,
-  },
-  // Error in bubble
-  errorRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  errorText: {
-    fontSize: 10,
-    color: "rgba(255,255,255,0.7)",
-  },
-  retryText: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: "#FFFFFF",
-    textDecorationLine: "underline",
-    marginLeft: 4,
-  },
-  // File bubble
-  fileBubble: {
-    maxWidth: 280,
-    borderRadius: 16,
-    padding: 12,
-  },
-  fileBubbleOther: {
-    backgroundColor: DT.surface,
-    borderBottomLeftRadius: 4,
-  },
-  fileBubbleOwn: {
-    backgroundColor: DT.primary,
-    borderBottomRightRadius: 4,
-  },
-  fileRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  fileIconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  fileInfo: {
-    flex: 1,
-  },
-  fileName: {
-    fontSize: 14,
-    fontWeight: "700",
-  },
-  fileSize: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  fileDownload: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: DT.primary,
-  },
-  // Planeacion bubble
-  planeacionBubble: {
-    maxWidth: 280,
-    backgroundColor: DT.surface,
-    borderRadius: 16,
-    overflow: "hidden",
-  },
-  planeacionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: DT.primaryTint,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  planeacionHeaderText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: DT.primary,
-  },
-  planeacionBody: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  planeacionTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: DT.text,
-  },
-  planeacionMeta: {
-    fontSize: 13,
-    color: DT.textSecondary,
-    marginTop: 4,
-  },
-  planeacionLink: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: DT.primary,
-    marginTop: 8,
-  },
-  // Recurso bubble
-  recursoBubble: {
-    maxWidth: 280,
-    backgroundColor: DT.surface,
-    borderRadius: 16,
-    overflow: "hidden",
-  },
-  recursoHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: "#F3E8FF",
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  recursoHeaderText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#7C3AED",
-  },
-  recursoBody: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  recursoTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: DT.text,
-  },
-  recursoMeta: {
-    fontSize: 13,
-    color: DT.textSecondary,
-    marginTop: 4,
-  },
-  // Add to library button
-  addToLibraryBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    backgroundColor: DT.primary,
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    marginTop: 10,
-  },
-  addToLibraryBtnRecurso: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    backgroundColor: "#7C3AED",
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    marginTop: 10,
-  },
-  addToLibraryText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#FFFFFF",
-  },
-  // Empty conversation
-  emptyConvContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: DT.background,
-  },
-  emptyConvText: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: DT.textMuted,
-    marginTop: 12,
-  },
-  emptyConvLink: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: DT.primary,
-    marginTop: 12,
-  },
-  // Empty messages
-  emptyMsgContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 40,
-  },
-  emptyMsgAvatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  emptyMsgAvatarText: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#FFFFFF",
-  },
-  emptyMsgName: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: DT.text,
-    marginTop: 12,
-    textAlign: "center",
-  },
-  emptyMsgHint: {
-    fontSize: 14,
-    color: DT.textMuted,
-    marginTop: 16,
-    textAlign: "center",
-    maxWidth: 260,
-  },
-  // Input Bar
-  inputBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    backgroundColor: DT.surface,
-    borderTopWidth: 1,
-    borderTopColor: DT.border,
-    gap: 8,
-  },
-  inputAttachBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: DT.surfaceContainerLow,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  inputField: {
-    flex: 1,
-    backgroundColor: DT.surfaceContainerLow,
-    borderRadius: 20,
-    minHeight: 40,
-    maxHeight: 100,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    fontSize: 15,
-    color: DT.text,
-  },
-  inputSendBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  inputSendBtnActive: {
-    backgroundColor: DT.primary,
-  },
-  inputSendBtnDisabled: {
-    backgroundColor: DT.surfaceContainer,
-  },
-  // Attach Modal
-  attachOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(19, 30, 49, 0.42)",
-    justifyContent: "flex-end",
-  },
-  attachSheet: {
-    backgroundColor: DT.surface,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingBottom: Platform.OS === "ios" ? 34 : 16,
-  },
-  handleBar: {
-    width: 36,
-    height: 4,
-    borderRadius: 999,
-    backgroundColor: DT.outlineVariant,
-    alignSelf: "center",
-    marginTop: 8,
-  },
-  attachTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: DT.text,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  attachGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    paddingHorizontal: 16,
-    gap: 12,
-  },
-  attachOption: {
-    width: "47%",
-    backgroundColor: DT.surfaceContainerLow,
-    borderRadius: 14,
-    padding: 16,
-    alignItems: "center",
-  },
-  attachIconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  attachLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: DT.text,
-    marginTop: 8,
-  },
-  attachCancelBtn: {
-    height: 44,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 4,
-  },
-  attachCancelText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: DT.textSecondary,
-  },
-  // Picker Modal
-  pickerSheet: {
-    backgroundColor: DT.surface,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: "60%",
-    paddingBottom: Platform.OS === "ios" ? 34 : 16,
-  },
-  pickerList: {
-    maxHeight: 300,
-  },
-  pickerItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: DT.border,
-  },
-  pickerIconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  pickerItemInfo: {
-    flex: 1,
-  },
-  pickerItemTitle: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: DT.text,
-  },
-  pickerItemSubtitle: {
-    fontSize: 13,
-    color: DT.textSecondary,
-    marginTop: 2,
-  },
-  pickerEmpty: {
-    padding: 32,
-    alignItems: "center",
-  },
-  pickerEmptyText: {
-    fontSize: 15,
-    color: DT.textMuted,
-  },
-});
+const getStyles = (DT: any, isDark: boolean) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: DT.surface,
+    },
+    // Chat Header
+    chatHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      backgroundColor: DT.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: DT.border,
+      gap: 10,
+    },
+    chatHeaderBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 10,
+      backgroundColor: DT.surfaceContainer,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    chatHeaderAvatar: {
+      width: 36,
+      height: 36,
+      borderRadius: 999,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    chatHeaderAvatarText: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: "#FFFFFF",
+    },
+    chatHeaderInfo: {
+      flex: 1,
+    },
+    chatHeaderName: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: DT.text,
+    },
+    chatHeaderOnlineRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    chatHeaderOnlineDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 999,
+      backgroundColor: DT.success,
+    },
+    chatHeaderOnlineText: {
+      fontSize: 11,
+      color: DT.success,
+    },
+    chatHeaderOfflineText: {
+      fontSize: 11,
+      color: DT.textMuted,
+    },
+    // Messages Area
+    messagesArea: {
+      flex: 1,
+      backgroundColor: DT.background,
+    },
+    messagesList: {
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      paddingBottom: 8,
+    },
+    // Bubble common
+    bubbleWrap: {
+      marginBottom: 6,
+    },
+    bubbleWrapLeft: {
+      alignItems: "flex-start",
+    },
+    bubbleWrapRight: {
+      alignItems: "flex-end",
+    },
+    textBubble: {
+      maxWidth: 280,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+    },
+    textBubbleOther: {
+      backgroundColor: DT.surface,
+      borderRadius: 16,
+      borderBottomLeftRadius: 4,
+      ...Platform.select({
+        web: { boxShadow: "0px 2px 8px rgba(0,72,132,0.04)" } as any,
+        default: {
+          shadowColor: "#004884",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.04,
+          shadowRadius: 8,
+          elevation: 1,
+        },
+      }),
+    },
+    textBubbleOwn: {
+      backgroundColor: DT.primary,
+      borderRadius: 16,
+      borderBottomRightRadius: 4,
+      ...Platform.select({
+        web: { boxShadow: "0px 2px 8px rgba(22,118,210,0.15)" } as any,
+        default: {
+          shadowColor: DT.primary,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.15,
+          shadowRadius: 8,
+          elevation: 2,
+        },
+      }),
+    },
+    textBubbleError: {
+      backgroundColor: DT.error,
+    },
+    bubbleText: {
+      fontSize: 15,
+      lineHeight: 22,
+    },
+    bubbleFooter: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      marginTop: 4,
+    },
+    bubbleTime: {
+      fontSize: 10,
+      color: DT.textMuted,
+    },
+    // Error in bubble
+    errorRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    errorText: {
+      fontSize: 10,
+      color: "rgba(255,255,255,0.7)",
+    },
+    retryText: {
+      fontSize: 10,
+      fontWeight: "700",
+      color: "#FFFFFF",
+      textDecorationLine: "underline",
+      marginLeft: 4,
+    },
+    // File bubble
+    fileBubble: {
+      maxWidth: 280,
+      borderRadius: 16,
+      padding: 12,
+    },
+    fileBubbleOther: {
+      backgroundColor: DT.surface,
+      borderBottomLeftRadius: 4,
+    },
+    fileBubbleOwn: {
+      backgroundColor: DT.primary,
+      borderBottomRightRadius: 4,
+    },
+    fileRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
+    fileIconCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 999,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    fileInfo: {
+      flex: 1,
+    },
+    fileName: {
+      fontSize: 14,
+      fontWeight: "700",
+    },
+    fileSize: {
+      fontSize: 12,
+      marginTop: 2,
+    },
+    fileDownload: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: DT.primary,
+    },
+    // Planeacion bubble
+    planeacionBubble: {
+      maxWidth: 280,
+      backgroundColor: DT.surface,
+      borderRadius: 16,
+      overflow: "hidden",
+    },
+    planeacionHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      backgroundColor: DT.primaryTint,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+    },
+    planeacionHeaderText: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: DT.primary,
+    },
+    planeacionBody: {
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+    },
+    planeacionTitle: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: DT.text,
+    },
+    planeacionMeta: {
+      fontSize: 13,
+      color: DT.textSecondary,
+      marginTop: 4,
+    },
+    planeacionLink: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: DT.primary,
+      marginTop: 8,
+    },
+    // Recurso bubble
+    recursoBubble: {
+      maxWidth: 280,
+      backgroundColor: DT.surface,
+      borderRadius: 16,
+      overflow: "hidden",
+    },
+    recursoHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      backgroundColor: "#F3E8FF",
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+    },
+    recursoHeaderText: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: "#7C3AED",
+    },
+    recursoBody: {
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+    },
+    recursoTitle: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: DT.text,
+    },
+    recursoMeta: {
+      fontSize: 13,
+      color: DT.textSecondary,
+      marginTop: 4,
+    },
+    // Add to library button
+    addToLibraryBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      backgroundColor: DT.primary,
+      borderRadius: 10,
+      paddingVertical: 8,
+      paddingHorizontal: 14,
+      marginTop: 10,
+    },
+    addToLibraryBtnRecurso: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      backgroundColor: "#7C3AED",
+      borderRadius: 10,
+      paddingVertical: 8,
+      paddingHorizontal: 14,
+      marginTop: 10,
+    },
+    addToLibraryText: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: "#FFFFFF",
+    },
+    // Empty conversation
+    emptyConvContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: DT.background,
+    },
+    emptyConvText: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: DT.textMuted,
+      marginTop: 12,
+    },
+    emptyConvLink: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: DT.primary,
+      marginTop: 12,
+    },
+    // Empty messages
+    emptyMsgContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      paddingHorizontal: 40,
+    },
+    emptyMsgAvatar: {
+      width: 64,
+      height: 64,
+      borderRadius: 999,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    emptyMsgAvatarText: {
+      fontSize: 22,
+      fontWeight: "700",
+      color: "#FFFFFF",
+    },
+    emptyMsgName: {
+      fontSize: 17,
+      fontWeight: "700",
+      color: DT.text,
+      marginTop: 12,
+      textAlign: "center",
+    },
+    emptyMsgHint: {
+      fontSize: 14,
+      color: DT.textMuted,
+      marginTop: 16,
+      textAlign: "center",
+      maxWidth: 260,
+    },
+    // Input Bar
+    inputBar: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      backgroundColor: DT.surface,
+      borderTopWidth: 1,
+      borderTopColor: DT.border,
+      gap: 8,
+    },
+    inputAttachBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 10,
+      backgroundColor: DT.surfaceContainerLow,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    inputField: {
+      flex: 1,
+      backgroundColor: DT.surfaceContainerLow,
+      borderRadius: 20,
+      minHeight: 40,
+      maxHeight: 100,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      fontSize: 15,
+      color: DT.text,
+    },
+    inputSendBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 999,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    inputSendBtnActive: {
+      backgroundColor: DT.primary,
+    },
+    inputSendBtnDisabled: {
+      backgroundColor: DT.surfaceContainer,
+    },
+    // Attach Modal
+    attachOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(19, 30, 49, 0.42)",
+      justifyContent: "flex-end",
+    },
+    attachSheet: {
+      backgroundColor: DT.surface,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      paddingBottom: Platform.OS === "ios" ? 34 : 16,
+    },
+    handleBar: {
+      width: 36,
+      height: 4,
+      borderRadius: 999,
+      backgroundColor: DT.outlineVariant,
+      alignSelf: "center",
+      marginTop: 8,
+    },
+    attachTitle: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: DT.text,
+      paddingHorizontal: 16,
+      paddingTop: 16,
+      paddingBottom: 8,
+    },
+    attachGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      paddingHorizontal: 16,
+      gap: 12,
+    },
+    attachOption: {
+      width: "47%",
+      backgroundColor: DT.surfaceContainerLow,
+      borderRadius: 14,
+      padding: 16,
+      alignItems: "center",
+    },
+    attachIconCircle: {
+      width: 48,
+      height: 48,
+      borderRadius: 14,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    attachLabel: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: DT.text,
+      marginTop: 8,
+    },
+    attachCancelBtn: {
+      height: 44,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 4,
+    },
+    attachCancelText: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: DT.textSecondary,
+    },
+    // Picker Modal
+    pickerSheet: {
+      backgroundColor: DT.surface,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      maxHeight: "60%",
+      paddingBottom: Platform.OS === "ios" ? 34 : 16,
+    },
+    pickerList: {
+      maxHeight: 300,
+    },
+    pickerItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      gap: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: DT.border,
+    },
+    pickerIconCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 10,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    pickerItemInfo: {
+      flex: 1,
+    },
+    pickerItemTitle: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: DT.text,
+    },
+    pickerItemSubtitle: {
+      fontSize: 13,
+      color: DT.textSecondary,
+      marginTop: 2,
+    },
+    pickerEmpty: {
+      padding: 32,
+      alignItems: "center",
+    },
+    pickerEmptyText: {
+      fontSize: 15,
+      color: DT.textMuted,
+    },
+  });

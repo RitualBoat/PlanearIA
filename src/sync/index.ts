@@ -1,9 +1,9 @@
-/**
- * Exportaciones del módulo de sincronización
+﻿/**
+ * Exportaciones del modulo de sincronizacion
  * Usa API Vercel + MongoDB Atlas
  */
 
-// Configuración
+// Configuracion
 export {
   API_CONFIG,
   SYNC_CONFIG,
@@ -13,24 +13,7 @@ export {
   logConfigStatus,
 } from "./config/apiConfig";
 
-// Servicios
-export {
-  saveLocalPlaneaciones,
-  loadLocalPlaneaciones,
-  getPendingOperations,
-  addPendingOperation,
-  clearPendingOperations,
-  fullSync,
-  getLastSyncTime,
-  getDeviceId,
-  checkConnectivity,
-  checkAPIHealth,
-  type PendingOperation,
-  type SyncStatus,
-  type SyncResult,
-} from "./services/syncService";
-
-// Motor de sincronización unificado (genérico)
+// Motor de sincronizacion unificado (generico)
 export {
   enqueueOperation,
   getPendingOps,
@@ -45,12 +28,5 @@ export {
   type EngineResult,
 } from "./services/syncEngine";
 
-// Hooks
-export { useSync, type UseSyncResult } from "./hooks/useSync";
-
 // Provider
-export {
-  SyncProvider,
-  useSyncPlaneaciones,
-  usePlaneaciones,
-} from "./providers/SyncProvider";
+export { SyncProvider, useSyncPlaneaciones, usePlaneaciones } from "./providers/SyncProvider";

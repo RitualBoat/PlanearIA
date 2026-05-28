@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from "react";
+import React, { useRef, useState, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -91,13 +91,16 @@ const OnboardingScreen: React.FC = () => {
   const isDesktop = windowWidth >= DESKTOP_BREAKPOINT;
   const slideWidth = isDesktop ? Math.min(MAX_CONTAINER_WIDTH, windowWidth) : windowWidth;
 
-  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
-    if (viewableItems.length > 0 && viewableItems[0].index != null) {
-      setCurrentIndex(viewableItems[0].index);
-    }
-  }).current;
+  const onViewableItemsChanged = useCallback(
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      if (viewableItems.length > 0 && viewableItems[0].index != null) {
+        setCurrentIndex(viewableItems[0].index);
+      }
+    },
+    []
+  );
 
-  const viewabilityConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
+  const viewabilityConfig = useMemo(() => ({ viewAreaCoveragePercentThreshold: 50 }), []);
 
   const finishOnboarding = useCallback(async () => {
     await AsyncStorage.setItem(ONBOARDING_KEY, "true");
@@ -282,12 +285,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingVertical: 16,
   },
-  headerGlass: {
-    // @ts-ignore — web-only property
-    backdropFilter: "blur(24px)",
-    // @ts-ignore
-    WebkitBackdropFilter: "blur(24px)",
-    backgroundColor: "rgba(255,255,255,0.8)",
+  headerGlass: {    backgroundColor: "rgba(255,255,255,0.8)",
   },
   headerLeft: {
     flexDirection: "row",
@@ -417,3 +415,4 @@ const styles = StyleSheet.create({
 });
 
 export default OnboardingScreen;
+

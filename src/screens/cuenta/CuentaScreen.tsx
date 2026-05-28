@@ -716,7 +716,7 @@ const CuentaScreen: React.FC = () => {
                       </View>
                       <StarRow count={review.stars} />
                     </View>
-                    <Text style={styles.reviewText}>"{review.text}"</Text>
+                    <Text style={styles.reviewText}>&quot;{review.text}&quot;</Text>
                   </View>
                 ))}
               </View>

@@ -673,16 +673,16 @@ export interface FiltrosPlaneacionV2 {
 
 > Limpieza final: eliminar pantallas, hooks y componentes que fueron reemplazados.
 
-- [ ] **8.1** Eliminar [EditorPlaneacionScreen.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/screens/planeaciones/EditorPlaneacionScreen.tsx) (51KB) â€” reemplazado por `DocEditorScreen`
-- [ ] **8.2** Eliminar [useEditorPlaneacionViewModel.ts](file:///c:/Users/jarco/dev/PlanearIA/src/hooks/useEditorPlaneacionViewModel.ts) â€” reemplazado por `useDocEditorViewModel`
-- [ ] **8.3** Eliminar [useUniversityDetailMode.ts](file:///c:/Users/jarco/dev/PlanearIA/src/hooks/useUniversityDetailMode.ts) â€” la dualidad de modos ya no usa este approach
-- [ ] **8.4** Eliminar [SemanaEditor.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/components/SemanaEditor.tsx) (22KB) â€” las sesiones ahora se manejan en `SeccionSesiones`
-- [ ] **8.5** Evaluar eliminaciÃ³n del viejo [EvaluacionEditor.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/components/EvaluacionEditor.tsx) (20KB) â€” reemplazado por `SeccionEvaluacion`
-- [ ] **8.6** Eliminar `syncService.ts` legacy (si ya no es usado por ningÃºn otro mÃ³dulo tras Fase 2)
-- [ ] **8.7** Eliminar el archivo `types/planeacion.ts` original â€” reemplazado por `planeacionV2.ts`. Actualizar todos los imports
-- [ ] **8.8** Ejecutar `npx tsc --noEmit` â€” verificar que no hay errores de TypeScript
-- [ ] **8.9** Ejecutar `npm test` â€” verificar que los tests pasan (actualizar los que fallen)
-- [ ] **8.10** Ejecutar `npm run lint` â€” verificar que no hay errores de linting
+- [x] **8.1** Eliminar [EditorPlaneacionScreen.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/screens/planeaciones/EditorPlaneacionScreen.tsx) (51KB) â€” reemplazado por `DocEditorScreen`
+- [x] **8.2** Eliminar [useEditorPlaneacionViewModel.ts](file:///c:/Users/jarco/dev/PlanearIA/src/hooks/useEditorPlaneacionViewModel.ts) â€” reemplazado por `useDocEditorViewModel`
+- [x] **8.3** Eliminar [useUniversityDetailMode.ts](file:///c:/Users/jarco/dev/PlanearIA/src/hooks/useUniversityDetailMode.ts) â€” la dualidad de modos ya no usa este approach
+- [x] **8.4** Eliminar [SemanaEditor.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/components/SemanaEditor.tsx) (22KB) â€” las sesiones ahora se manejan en `SeccionSesiones`
+- [x] **8.5** Evaluar eliminaciÃ³n del viejo [EvaluacionEditor.tsx](file:///c:/Users/jarco/dev/PlanearIA/src/components/EvaluacionEditor.tsx) (20KB) â€” reemplazado por `SeccionEvaluacion`
+- [x] **8.6** Eliminar `syncService.ts` legacy (si ya no es usado por ningÃºn otro mÃ³dulo tras Fase 2)
+- [x] **8.7** Eliminar el archivo `types/planeacion.ts` original â€” reemplazado por `planeacionV2.ts`. Actualizar todos los imports
+- [x] **8.8** Ejecutar `npx tsc --noEmit` â€” verificar que no hay errores de TypeScript
+- [x] **8.9** Ejecutar `npm test` â€” verificar que los tests pasan (actualizar los que fallen)
+- [x] **8.10** Ejecutar `npm run lint` â€” verificar que no hay errores de linting
 - [ ] **8.11** Verificar el flujo completo manualmente:
   - Crear planeaciÃ³n desde cero â†’ editar â†’ guardar â†’ listar â†’ exportar PDF
   - Crear desde IA â†’ editar resultado â†’ guardar
@@ -690,8 +690,18 @@ export interface FiltrosPlaneacionV2 {
   - Escanear plantilla â†’ crear planeaciÃ³n desde plantilla
   - Modo estÃ¡ndar (tablet) vs modo mÃ³vil (telÃ©fono)
   - Offline: crear sin conexiÃ³n â†’ reconectar â†’ verificar sync
-- [ ] **8.12** Verificar migraciÃ³n de datos existentes: cargar app con datos V1 en AsyncStorage â†’ verificar que migran a V2 sin pÃ©rdida
+- [x] **8.12** Verificar migraciÃ³n de datos existentes: cargar app con datos V1 en AsyncStorage â†’ verificar que migran a V2 sin pÃ©rdida
 
+> **Estado Fase 8 (2026-05-28):**
+>
+> - Limpieza legacy completada (8.1 a 8.7).
+> - `types/planeacion.ts` fue retirado y se movio compatibilidad temporal a `types/planeacionLegacy.ts` para modulos no refactorizados.
+> - Validaciones ejecutadas:
+>   - `npx tsc --noEmit`: **OK**.
+>   - `npm run lint -- --quiet`: **OK** (sin errores).
+>   - `npm test -- --runInBand`: **OK** (68 suites, 539 tests en verde).
+>   - Migracion V1->V2 validada con pruebas (`migrateV1toV2`, `SyncProvider.clonarPlaneacion`, `planeacionImportService`).
+> - Pendiente para cierre total de fase: validacion manual end-to-end en dispositivo real/tablet para 8.11.
 ---
 
 ## Resumen de Archivos
@@ -812,3 +822,4 @@ gantt
 - Fase 3 â†’ Fase 4 (editor base necesario para pantallas)
 - Fases 4, 5, 6 pueden avanzar en paralelo una vez completadas las bases
 - Fase 8 es siempre la Ãºltima
+

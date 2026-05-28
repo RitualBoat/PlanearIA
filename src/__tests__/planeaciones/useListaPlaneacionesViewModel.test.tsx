@@ -1,6 +1,6 @@
-import { Alert } from "react-native";
+﻿import { Alert } from "react-native";
 import { act, renderHook, waitFor } from "@testing-library/react-native";
-import { NivelAcademico } from "../../../types/planeacion";
+import { NivelAcademico } from "../../../types/planeacionLegacy";
 import { useListaPlaneacionesViewModel } from "../../hooks/useListaPlaneacionesViewModel";
 
 const mockNavigate = jest.fn();
@@ -21,21 +21,21 @@ jest.mock("../../sync/providers/SyncProvider", () => ({
   }),
 }));
 
-describe("useListaPlaneacionesViewModel - eliminación", () => {
+describe("useListaPlaneacionesViewModel - eliminaciÃ³n", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockPlaneaciones = [
       {
         id: "p1",
         nivelAcademico: NivelAcademico.PRIMARIA,
-        asignatura: "Matemáticas",
-        grado: "3°",
+        asignatura: "MatemÃ¡ticas",
+        grado: "3Â°",
       },
       {
         id: "p2",
         nivelAcademico: NivelAcademico.SECUNDARIA,
         asignatura: "Historia",
-        grado: "1°",
+        grado: "1Â°",
       },
     ];
 
@@ -58,7 +58,7 @@ describe("useListaPlaneacionesViewModel - eliminación", () => {
     });
   });
 
-  it("muestra diálogo de confirmación al eliminar", () => {
+  it("muestra diÃ¡logo de confirmaciÃ³n al eliminar", () => {
     const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(jest.fn());
     const { result } = renderHook(() => useListaPlaneacionesViewModel());
 
@@ -67,11 +67,11 @@ describe("useListaPlaneacionesViewModel - eliminación", () => {
     });
 
     expect(alertSpy).toHaveBeenCalledWith(
-      "Eliminar Planeación",
-      "¿Estás seguro de que deseas eliminar esta planeación? Esta acción no se puede deshacer.",
+      "Eliminar planeacion",
+      "Esta accion no se puede deshacer.",
       expect.arrayContaining([
         expect.objectContaining({ text: "Cancelar", style: "cancel" }),
-        expect.objectContaining({ text: "Confirmar" }),
+        expect.objectContaining({ text: "Eliminar" }),
       ])
     );
   });
@@ -89,14 +89,14 @@ describe("useListaPlaneacionesViewModel - eliminación", () => {
       text?: string;
       onPress?: () => void | Promise<void>;
     }>;
-    const confirmButton = buttons.find((button) => button.text === "Confirmar");
+    const confirmButton = buttons.find((button) => button.text === "Eliminar");
 
     await act(async () => {
       await confirmButton?.onPress?.();
     });
 
     expect(mockEliminarPlaneacion).toHaveBeenCalledWith("plan-2");
-    expect(alertSpy).toHaveBeenCalledWith("Eliminada", "Planeación eliminada correctamente");
+    expect(alertSpy).toHaveBeenCalledWith("Planeaciones", "Planeacion eliminada.");
   });
 
   it("no elimina al cancelar", async () => {
@@ -138,7 +138,7 @@ describe("useListaPlaneacionesViewModel - eliminación", () => {
     });
   });
 
-  it("aplica búsqueda por asignatura", async () => {
+  it("aplica bÃºsqueda por asignatura", async () => {
     const { result } = renderHook(() => useListaPlaneacionesViewModel());
 
     act(() => {
@@ -155,7 +155,7 @@ describe("useListaPlaneacionesViewModel - eliminación", () => {
     });
   });
 
-  it("navega a pantalla de exportación", () => {
+  it("navega a pantalla de exportaciÃ³n", () => {
     const { result } = renderHook(() => useListaPlaneacionesViewModel());
 
     act(() => {

@@ -1,4 +1,4 @@
-import { Planeacion as PlaneacionV1 } from "../../types/planeacion";
+import { Planeacion as PlaneacionV1 } from "../../types/planeacionLegacy";
 import {
   PlaneacionDocumento,
   NivelAcademico,
@@ -13,10 +13,7 @@ import {
  * @param v1 Documento en formato V1
  * @param userId Identificador del usuario creador (para aislamiento)
  */
-export const migrateV1toV2 = (
-  v1: PlaneacionV1,
-  userId: string = ""
-): PlaneacionDocumento => {
+export const migrateV1toV2 = (v1: PlaneacionV1, userId: string = ""): PlaneacionDocumento => {
   // 1. Mapeo de Nivel Académico
   let nivelV2 = NivelAcademico.PRIMARIA;
   if (v1.nivelAcademico === "secundaria") {
@@ -39,18 +36,26 @@ export const migrateV1toV2 = (
   ) {
     sesiones = v1.semanas.map((sem, idx) => {
       const num = sem.numero || idx + 1;
-      
-      const inicioHtml = sem.objetivos && sem.objetivos.length > 0
-        ? `<p><strong>Objetivos:</strong></p><ul>${sem.objetivos.map(o => `<li>${o}</li>`).join("")}</ul>`
-        : "";
 
-      const desarrolloHtml = sem.actividadesPresenciales && sem.actividadesPresenciales.length > 0
-        ? sem.actividadesPresenciales.map(act => `<p><strong>${act.metodologia || "Actividad"}:</strong> ${act.descripcion} (${act.duracion} min)</p>`).join("")
-        : "";
+      const inicioHtml =
+        sem.objetivos && sem.objetivos.length > 0
+          ? `<p><strong>Objetivos:</strong></p><ul>${sem.objetivos.map((o) => `<li>${o}</li>`).join("")}</ul>`
+          : "";
 
-      const cierreHtml = sem.actividadesAutonomas && sem.actividadesAutonomas.length > 0
-        ? `<p><strong>Actividades Autónomas:</strong></p><ul>${sem.actividadesAutonomas.map(a => `<li>${a}</li>`).join("")}</ul>`
-        : "";
+      const desarrolloHtml =
+        sem.actividadesPresenciales && sem.actividadesPresenciales.length > 0
+          ? sem.actividadesPresenciales
+              .map(
+                (act) =>
+                  `<p><strong>${act.metodologia || "Actividad"}:</strong> ${act.descripcion} (${act.duracion} min)</p>`
+              )
+              .join("")
+          : "";
+
+      const cierreHtml =
+        sem.actividadesAutonomas && sem.actividadesAutonomas.length > 0
+          ? `<p><strong>Actividades Autónomas:</strong></p><ul>${sem.actividadesAutonomas.map((a) => `<li>${a}</li>`).join("")}</ul>`
+          : "";
 
       return {
         id: `session_${num}`,
@@ -64,9 +69,9 @@ export const migrateV1toV2 = (
     });
   } else {
     // Para primaria, secundaria, preparatoria o universidad simple (1 sola sesión/semana)
-    const inicioAct = v1.actividades?.find(a => a.tipo === "inicio");
-    const desAct = v1.actividades?.find(a => a.tipo === "desarrollo");
-    const cieAct = v1.actividades?.find(a => a.tipo === "cierre");
+    const inicioAct = v1.actividades?.find((a) => a.tipo === "inicio");
+    const desAct = v1.actividades?.find((a) => a.tipo === "desarrollo");
+    const cieAct = v1.actividades?.find((a) => a.tipo === "cierre");
 
     sesiones = [
       {

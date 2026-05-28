@@ -36,6 +36,7 @@ jest.mock("../../context/ThemeContext", () => ({
 describe("QuestionEditorScreen", () => {
   const mockNavigation = {
     goBack: jest.fn(),
+    navigate: jest.fn(),
   };
 
   beforeEach(() => {

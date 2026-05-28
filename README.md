@@ -30,19 +30,19 @@ La app funciona offline-first: todos los datos se guardan localmente y se sincro
 
 ## Arquitectura
 
-| Capa              | Tecnologia             | Descripcion                                                                |
-| ----------------- | ---------------------- | -------------------------------------------------------------------------- |
-| **Frontend**      | React Native + Expo Go | UI cross-platform                                                          |
-| **Lenguaje**      | TypeScript 5.9.2       | Tipado estatico                                                            |
-| **Navegacion**    | React Navigation 7.x   | Stack navigator nativo                                                     |
-| **Estado**        | React Context + Hooks  | MVVM con hooks como ViewModels                                             |
-| **Storage local** | AsyncStorage           | Persistencia offline-first                                                 |
-| **Backend**       | Vercel Serverless      | Funciones Node.js sin servidor                                             |
-| **Base de datos** | MongoDB Atlas M0       | Cloud database (free tier)                                                 |
-| **Autenticacion** | JWT                    | Tokens con userId isolation                                                |
-| **Sync**          | Custom sync engine     | syncEngine.ts + PlaneacionesContext V2 (syncService legacy en deprecacion) |
-| **Icons**         | @expo/vector-icons     | Direct imports (no barrel)                                                 |
-| **Testing**       | Jest                   | Unit tests                                                                 |
+| Capa              | Tecnologia             | Descripcion                            |
+| ----------------- | ---------------------- | -------------------------------------- |
+| **Frontend**      | React Native + Expo Go | UI cross-platform                      |
+| **Lenguaje**      | TypeScript 5.9.2       | Tipado estatico                        |
+| **Navegacion**    | React Navigation 7.x   | Stack navigator nativo                 |
+| **Estado**        | React Context + Hooks  | MVVM con hooks como ViewModels         |
+| **Storage local** | AsyncStorage           | Persistencia offline-first             |
+| **Backend**       | Vercel Serverless      | Funciones Node.js sin servidor         |
+| **Base de datos** | MongoDB Atlas M0       | Cloud database (free tier)             |
+| **Autenticacion** | JWT                    | Tokens con userId isolation            |
+| **Sync**          | Custom sync engine     | syncEngine.ts + PlaneacionesContext V2 |
+| **Icons**         | @expo/vector-icons     | Direct imports (no barrel)             |
+| **Testing**       | Jest                   | Unit tests                             |
 
 ---
 
@@ -119,7 +119,7 @@ PlanearIA/
 â”‚   â””â”€â”€ utils/                   # apiClient.ts, migrateV1toV2.ts
 â”œâ”€â”€ types/
 â”‚   â”œâ”€â”€ index.ts                 # Tipos generales
-â”‚   â”œâ”€â”€ planeacion.ts            # V1 types (legacy)
+â”‚   â”œâ”€â”€ planeacionLegacy.ts      # V1 types (legacy temporal)
 â”‚   â”œâ”€â”€ planeacionV2.ts          # V2 types (NEM-aligned)
 â”‚   â””â”€â”€ plantillaDocumento.ts    # Template types
 â”œâ”€â”€ context/
@@ -150,7 +150,7 @@ Cada plan sigue estas fases:
 
 | Modulo           | Archivo                | Estado                              |
 | ---------------- | ---------------------- | ----------------------------------- |
-| **Planeaciones** | `plan_planeaciones.md` | En progreso (Fases 0-7 completadas) |
+| **Planeaciones** | `plan_planeaciones.md` | En cierre (Fases 0-8.10 y 8.12 completadas) |
 | Recursos         | `plan_recursos.md`     | Pendiente                           |
 | Grupos           | `plan_grupos.md`       | Pendiente                           |
 | Alumnos          | `plan_alumnos.md`      | Pendiente                           |
@@ -173,6 +173,7 @@ Cada plan sigue estas fases:
 - [x] Fase 7: Exportacion y navegacion
   - PDF/DOCX V2, exportacion segura de rich text, Mi Contenido conectado a documentos V2 y navegacion limpia hacia DocEditor/EscanerPlantilla.
 - [ ] Fase 8: Limpieza y verificacion
+  - Completados 8.1-8.10 y 8.12 (TS, lint y test global en verde); pendiente solamente validacion manual end-to-end (8.11).
 
 ### v4.1+ - Refactorizacion por modulos
 
@@ -220,3 +221,4 @@ Proyecto privado. Todos los derechos reservados.
 
 **Repositorio:** [github.com/RitualBoat/PlanearIA](https://github.com/RitualBoat/PlanearIA)
 **Branch:** `development`
+

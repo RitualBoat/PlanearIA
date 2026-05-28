@@ -1,12 +1,20 @@
-import { act, renderHook } from "@testing-library/react-native";
-import { NivelAcademico } from "../../../types/planeacion";
+﻿import { act, renderHook } from "@testing-library/react-native";
+import { NivelAcademico } from "../../../types/planeacionLegacy";
+import { NivelAcademico as NivelAcademicoV2 } from "../../../types/planeacionV2";
 import { useCrearPlaneacionViewModel } from "../../hooks/useCrearPlaneacionViewModel";
+
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  getItem: jest.fn(() => Promise.resolve(null)),
+  setItem: jest.fn(() => Promise.resolve()),
+  removeItem: jest.fn(() => Promise.resolve()),
+}));
 
 const mockNavigate = jest.fn();
 const mockFetch = jest.fn();
 const mockAgregarPlaneacion = jest.fn();
 const mockObtenerPlaneacion = jest.fn();
 const mockForceSync = jest.fn();
+const mockCrear = jest.fn();
 
 (global as typeof globalThis & { fetch: typeof fetch }).fetch = mockFetch as typeof fetch;
 
@@ -24,9 +32,19 @@ jest.mock("../../sync/config/apiConfig", () => ({
 
 jest.mock("../../sync/providers/SyncProvider", () => ({
   usePlaneaciones: () => ({
+    crear: mockCrear,
     agregarPlaneacion: mockAgregarPlaneacion,
     obtenerPlaneacion: mockObtenerPlaneacion,
     forceSync: mockForceSync,
+  }),
+}));
+
+jest.mock("../../context/AuthContext", () => ({
+  useAuth: () => ({
+    usuario: {
+      id: "test-user-id",
+      nombre: "Usuario Test",
+    },
   }),
 }));
 
@@ -36,6 +54,7 @@ describe("useCrearPlaneacionViewModel", () => {
     mockObtenerPlaneacion.mockReturnValue(undefined);
     mockForceSync.mockResolvedValue(undefined);
     mockAgregarPlaneacion.mockResolvedValue(undefined);
+    mockCrear.mockResolvedValue(undefined);
   });
 
   it("abre modal de nivel y navega al editor al seleccionar nivel", () => {
@@ -52,24 +71,24 @@ describe("useCrearPlaneacionViewModel", () => {
     });
 
     expect(result.current.showNivelModal).toBe(false);
-    expect(mockNavigate).toHaveBeenCalledWith("EditorPlaneacion", {
-      nivel: NivelAcademico.SECUNDARIA,
+    expect(mockNavigate).toHaveBeenCalledWith("DocEditor", {
       modo: "crear",
+      nivelAcademico: NivelAcademicoV2.SECUNDARIA,
     });
   });
 
-  it("genera planeación con IA y mapea respuesta al modelo", async () => {
+  it("genera planeacion con IA y mapea respuesta al modelo", async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         success: true,
         data: {
           planeacion: {
-            asignatura: "Matemáticas",
+            asignatura: "Matematicas",
             actividades: [
               { tipo: "inicio", descripcion: "Repaso breve", duracion: 10 },
-              { tipo: "desarrollo", descripcion: "Resolución de ejercicios", duracion: 30 },
-              { tipo: "cierre", descripcion: "Reflexión final", duracion: 10 },
+              { tipo: "desarrollo", descripcion: "Resolucion de ejercicios", duracion: 30 },
+              { tipo: "cierre", descripcion: "Reflexion final", duracion: 10 },
             ],
           },
         },
@@ -79,7 +98,7 @@ describe("useCrearPlaneacionViewModel", () => {
     const { result } = renderHook(() => useCrearPlaneacionViewModel());
 
     act(() => {
-      result.current.setPromptIA("Genera una planeación de fracciones para 3ro de primaria");
+      result.current.setPromptIA("Genera una planeacion de fracciones para 3ro de primaria");
       result.current.setNivelIA(NivelAcademico.PRIMARIA);
     });
 
@@ -111,9 +130,9 @@ describe("useCrearPlaneacionViewModel", () => {
         success: true,
         data: {
           planeacion: {
-            asignatura: "Física",
-            competenciasGenericas: ["Piensa crítica y reflexivamente"],
-            competenciasDisciplinares: ["Explica fenómenos naturales"],
+            asignatura: "Fisica",
+            competenciasGenericas: ["Piensa critica y reflexivamente"],
+            competenciasDisciplinares: ["Explica fenomenos naturales"],
           },
         },
       }),
@@ -122,7 +141,7 @@ describe("useCrearPlaneacionViewModel", () => {
     const { result } = renderHook(() => useCrearPlaneacionViewModel());
 
     act(() => {
-      result.current.setPromptIA("Genera una planeación de física para preparatoria");
+      result.current.setPromptIA("Genera una planeacion de fisica para preparatoria");
       result.current.setNivelIA(NivelAcademico.PREPARATORIA);
     });
 
@@ -136,8 +155,8 @@ describe("useCrearPlaneacionViewModel", () => {
     expect(planeacion?.nivelAcademico).toBe(NivelAcademico.PREPARATORIA);
     expect(planeacion?.actividades).toHaveLength(3);
     expect(planeacion?.evaluacion).toBe("Evaluación formativa");
-    expect((planeacion as any)?.competenciasGenericas).toEqual(["Piensa crítica y reflexivamente"]);
-    expect((planeacion as any)?.competenciasDisciplinares).toEqual(["Explica fenómenos naturales"]);
+    expect((planeacion as any)?.competenciasGenericas).toEqual(["Piensa critica y reflexivamente"]);
+    expect((planeacion as any)?.competenciasDisciplinares).toEqual(["Explica fenomenos naturales"]);
   });
 
   it("muestra error cuando el backend responde error", async () => {
@@ -149,21 +168,21 @@ describe("useCrearPlaneacionViewModel", () => {
     const { result } = renderHook(() => useCrearPlaneacionViewModel());
 
     act(() => {
-      result.current.setPromptIA("Genera una planeación válida para secundaria");
+      result.current.setPromptIA("Genera una planeacion valida para secundaria");
     });
 
     await act(async () => {
       try {
         await result.current.handleGenerarConIA();
       } catch {
-        // El ViewModel nunca debe propagar excepción al UI
+        // El ViewModel no debe propagar excepcion al UI.
       }
     });
 
     expect(result.current.iaError).toBe("Error IA");
   });
 
-  it("guarda y sincroniza la planeación generada", async () => {
+  it("guarda y sincroniza la planeacion generada", async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -184,7 +203,7 @@ describe("useCrearPlaneacionViewModel", () => {
     const { result } = renderHook(() => useCrearPlaneacionViewModel());
 
     act(() => {
-      result.current.setPromptIA("Genera una planeación de historia para secundaria");
+      result.current.setPromptIA("Genera una planeacion de historia para secundaria");
     });
 
     await act(async () => {
@@ -200,14 +219,14 @@ describe("useCrearPlaneacionViewModel", () => {
     expect(result.current.showPreviewModal).toBe(false);
   });
 
-  it("abre editor con la planeación IA generada", async () => {
+  it("abre editor con la planeacion IA generada", async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         success: true,
         data: {
           planeacion: {
-            asignatura: "Química",
+            asignatura: "Quimica",
             actividades: [
               { tipo: "inicio", descripcion: "Inicio", duracion: 10 },
               { tipo: "desarrollo", descripcion: "Desarrollo", duracion: 30 },
@@ -221,7 +240,7 @@ describe("useCrearPlaneacionViewModel", () => {
     const { result } = renderHook(() => useCrearPlaneacionViewModel());
 
     act(() => {
-      result.current.setPromptIA("Genera una planeación de química para preparatoria");
+      result.current.setPromptIA("Genera una planeacion de quimica para preparatoria");
       result.current.setNivelIA(NivelAcademico.PREPARATORIA);
     });
 
@@ -235,10 +254,10 @@ describe("useCrearPlaneacionViewModel", () => {
 
     expect(mockAgregarPlaneacion).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith(
-      "EditorPlaneacion",
+      "DocEditor",
       expect.objectContaining({
-        nivel: NivelAcademico.PREPARATORIA,
         modo: "editar",
+        nivelAcademico: NivelAcademicoV2.PREPARATORIA,
       })
     );
   });

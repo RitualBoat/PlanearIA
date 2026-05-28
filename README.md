@@ -1,15 +1,15 @@
-﻿# PlanearIA - Planeación Educativa Inteligente
+# PlanearIA - Planeacion Educativa Inteligente
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.0-blue.svg)
+![Version](https://img.shields.io/badge/version-4.0-blue.svg)
 ![React Native](https://img.shields.io/badge/React%20Native-0.81.5-61dafb.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9.2-3178c6.svg)
 ![Expo](https://img.shields.io/badge/Expo-54.0.21-000020.svg)
 
-**Aplicación móvil y web para la gestión completa de planeaciones educativas**
+Aplicacion movil para la gestion de planeaciones educativas con asistencia de IA.
 
-[Características](#-características) • [Instalación](#-instalación) • [Uso](#-uso) • [Documentación](#-documentación) • [Estructura](#-estructura-del-proyecto)
+[Arquitectura](#arquitectura) | [Instalacion](#instalacion) | [Estructura](#estructura-del-proyecto) | [Roadmap](#roadmap)
 
 </div>
 
@@ -17,86 +17,67 @@
 
 ## Acerca del Proyecto
 
-**PlanearIA** es una aplicación cross-platform (iOS, Android, Web) diseñada para facilitar la vida de los docentes mediante la gestión integral de:
+**PlanearIA** es una aplicacion cross-platform (iOS, Android) para docentes mexicanos. Gestiona:
 
-- **Planeaciones Académicas** - Crea y edita planeaciones por nivel educativo
-- **Grupos** - Administra grupos con alumnos, calificaciones, asistencias y tareas
-- **Biblioteca de Recursos** - Exámenes, presentaciones, mapas mentales y líneas de tiempo
-- **Tareas y Evaluaciones** - Sistema completo de asignación, seguimiento y calificación
-- **Perfil y Configuración** - Gestión de cuenta personal
+- **Planeaciones** - Editor de planeaciones con estructura NEM (en refactorizacion activa)
+- **Grupos** - Administracion de grupos, alumnos, calificaciones y asistencias
+- **Recursos** - Examenes, presentaciones, mapas mentales y lineas de tiempo
+- **Cuenta** - Perfil, configuracion y seguridad
 
----
-
-## Características v3.0
-
-### Novedades
-
-- **Tareas integradas en Grupos** - Gestión completa dentro de cada grupo
-- **6 Módulos por Grupo** - Alumnos, Calificaciones, Asistencias, Comentarios, Tareas, Gráficas
-- **Asignación Directa** - Asigna recursos de tu biblioteca a grupos específicos
-- **Scroll Optimizado Web** - Interfaz fluida en navegadores con scrollbar personalizada
-- **Navegación Simplificada** - 4 módulos principales en home
-
-### Interfaz
-
-- **Responsive** - Adaptación automática a móvil, tablet y escritorio
-- **Material Design** - Iconos y componentes modernos
-- **Cross-Platform** - Una base de código para web, iOS y Android
-- **Performance** - Optimizado para carga rápida y fluidez
+La app funciona offline-first: todos los datos se guardan localmente y se sincronizan con el servidor cuando hay conexion.
 
 ---
 
-## Instalación
+## Arquitectura
+
+| Capa | Tecnologia | Descripcion |
+|------|-----------|-------------|
+| **Frontend** | React Native + Expo Go | UI cross-platform |
+| **Lenguaje** | TypeScript 5.9.2 | Tipado estatico |
+| **Navegacion** | React Navigation 7.x | Stack navigator nativo |
+| **Estado** | React Context + Hooks | MVVM con hooks como ViewModels |
+| **Storage local** | AsyncStorage | Persistencia offline-first |
+| **Backend** | Vercel Serverless | Funciones Node.js sin servidor |
+| **Base de datos** | MongoDB Atlas M0 | Cloud database (free tier) |
+| **Autenticacion** | JWT | Tokens con userId isolation |
+| **Sync** | Custom sync engine | syncEngine.ts + syncService.ts |
+| **Icons** | @expo/vector-icons | Direct imports (no barrel) |
+| **Testing** | Jest | Unit tests |
+
+---
+
+## Instalacion
 
 ### Prerequisitos
 
 ```bash
-# Verifica que tengas instalado:
-node --version # >= 16.x
-npm --version # >= 8.x
+node --version   # >= 18.x
+npm --version    # >= 9.x
 ```
 
-### Pasos
+### Setup
 
 ```bash
-# 1. Clonar repositorio
 git clone https://github.com/RitualBoat/PlanearIA.git
 cd PlanearIA
 
-# 2. Instalar dependencias
+# Frontend
 npm install
 
-# 3. Ejecutar en desarrollo
-npm run web # Para web (navegador)
-npm run ios # Para iOS (requiere Mac + Xcode)
-npm run android # Para Android (requiere Android Studio)
+# Backend
+cd backend && npm install && cd ..
+
+# Ejecutar
+npx expo start          # Expo Go (escanea QR)
+npm run android         # Android
+npm run ios             # iOS (requiere Mac + Xcode)
 ```
 
----
-
-## Uso
-
-### Desarrollo Local
+### Variables de entorno
 
 ```bash
-# Iniciar en web (http://localhost:19006)
-npm run web
-
-# Iniciar con Expo Go (escanea QR en tu dispositivo)
-npx expo start
-```
-
-### Build para Producción
-
-```bash
-# Web
-npx expo export:web
-
-# iOS
-eas build --platform ios
-
-# Android
-eas build --platform android
+cp .env.example .env
+# Editar .env con las credenciales de MongoDB Atlas
 ```
 
 ---
@@ -105,111 +86,134 @@ eas build --platform android
 
 ```
 PlanearIA/
-├── App.tsx # Punto de entrada
-├── package.json # Dependencias
-├── Documentacion/ # Documentación técnica completa
+├── App.tsx                      # Entry point
+├── plan_planeaciones.md         # Plan activo de refactorizacion
+├── .agents/skills/              # Skills de agentes IA
+├── backend/
+│   ├── api/                     # Vercel serverless endpoints
+│   │   ├── auth.js
+│   │   ├── health.js
+│   │   ├── planeaciones.js      # CRUD con userId isolation
+│   │   └── sync.js
+│   └── lib/
+│       ├── auth.js              # JWT verification, getUserFromToken
+│       ├── mongodb.js           # Atlas connection
+│       └── databaseIndexes.js
 ├── src/
-│ ├── components/ # Componentes reutilizables
-│ ├── screens/ # Pantallas por módulo
-│ │ ├── auth/ # Login
-│ │ ├── home/ # Home principal
-│ │ ├── grupos/ # Grupos (con tareas integradas)
-│ │ ├── planeaciones/ # Planeaciones
-│ │ ├── biblioteca/ # Recursos didácticos
-│ │ └── cuenta/ # Perfil de usuario
-│ ├── navigation/ # Rutas y navegación
-│ ├── context/ # Contexts de React
-│ └── utils/ # Utilidades
-├── types/ # Tipos de TypeScript
-└── assets/ # Imágenes e iconos
+│   ├── components/              # Componentes reutilizables
+│   ├── context/                 # AuthContext, PlaneacionesContext, NotificacionesContext
+│   ├── hooks/                   # Custom hooks (ViewModels)
+│   ├── navigation/              # StackNavigator.tsx
+│   ├── screens/
+│   │   ├── auth/                # Login
+│   │   ├── planeaciones/        # Planeaciones (refactorizacion activa)
+│   │   ├── grupos/              # Grupos
+│   │   ├── biblioteca/          # Recursos didacticos
+│   │   ├── cuenta/              # Perfil
+│   │   ├── notificaciones/
+│   │   └── ayuda/
+│   ├── services/                # Push notifications, etc.
+│   ├── sync/                    # Sync engine y services
+│   ├── themes/                  # colors.ts
+│   └── utils/                   # apiClient.ts, migrateV1toV2.ts
+├── types/
+│   ├── index.ts                 # Tipos generales
+│   ├── planeacion.ts            # V1 types (legacy)
+│   ├── planeacionV2.ts          # V2 types (NEM-aligned)
+│   └── plantillaDocumento.ts    # Template types
+├── context/
+│   └── planeaciones-reales/     # Ejemplos reales de planeaciones
+└── Documentacion/               # Documentacion tecnica
 ```
 
 ---
 
-## Documentación
+## Estrategia de Refactorizacion
 
-La documentación técnica completa se encuentra en la carpeta [`Documentacion/`](./Documentacion/):
+El proyecto sigue un enfoque modular: cada modulo de la app recibe su propio plan de refactorizacion con fases estandarizadas.
 
-| Documento | Descripción |
-| --------------------------------------------------------------------- | ------------------------------------------------- |
-| [ README](./Documentacion/README.md) | Índice completo de documentación |
-| [ ARQUITECTURA](./Documentacion/ARQUITECTURA.md) | Estructura y decisiones técnicas |
-| [ FLUJO DE SINCRONIZACIÓN](./Documentacion/FLUJO_SINCRONIZACION.md) | **Flujo de datos y sincronización offline-first** |
-| [ NAVEGACION](./Documentacion/MAPA_NAVEGACION.md) | Mapa de rutas y pantallas |
-| [ CAMBIOS v3.0](./Documentacion/RESUMEN_CAMBIOS_V3.md) | Changelog de la versión 3.0 |
-| [ PRUEBAS](./Documentacion/GUIA_PRUEBAS.md) | Guía de testing |
+### Patron por modulo
+
+Cada plan sigue estas fases:
+1. Limpieza de codigo legacy
+2. Nuevo sistema de tipos y modelo de datos
+3. Capa de datos y sincronizacion
+4. Instalacion de dependencias y editor base
+5. Rediseno de pantallas
+6. Integracion de IA
+7. Exportacion y navegacion
+8. Limpieza y verificacion
+
+### Planes de refactorizacion
+
+| Modulo | Archivo | Estado |
+|--------|---------|--------|
+| **Planeaciones** | `plan_planeaciones.md` | En progreso (Fases 0-1 completadas) |
+| Recursos | `plan_recursos.md` | Pendiente |
+| Grupos | `plan_grupos.md` | Pendiente |
+| Alumnos | `plan_alumnos.md` | Pendiente |
+| Login/Auth | `plan_login.md` | Pendiente |
+| Seguridad | `plan_seguridad.md` | Pendiente |
 
 ---
 
-## Tecnologías
+## Roadmap
 
-| Tecnología | Versión | Uso |
-| --------------------- | ------- | ---------------------------- |
-| **React Native** | 0.81.5 | Framework principal |
-| **Expo** | 54.0.21 | Herramientas de desarrollo |
-| **TypeScript** | 5.9.2 | Tipado estático |
-| **React Navigation** | 7.x | Navegación entre pantallas |
-| **Expo Vector Icons** | - | Iconografía (Material Icons) |
+### v4.0 - Refactorizacion de Planeaciones (actual)
+
+- [x] Fase 0: Limpieza de codigo legacy
+- [x] Fase 1: Sistema de tipos V2 + modelo de datos NEM
+- [ ] Fase 2: Capa de datos y sincronizacion
+- [ ] Fase 3: Editor de texto enriquecido (tentap-editor)
+- [ ] Fase 4: Rediseno completo de pantallas del editor
+- [ ] Fase 5: Escaner de plantillas
+- [ ] Fase 6: Copiloto IA integrado
+- [ ] Fase 7: Exportacion y navegacion
+- [ ] Fase 8: Limpieza y verificacion
+
+### v4.1+ - Refactorizacion por modulos
+
+- [ ] Recursos didacticos
+- [ ] Grupos y alumnos
+- [ ] Login y autenticacion
+- [ ] Seguridad (expo-secure-store, etc.)
+
+### v5.0 - Futuro
+
+- [ ] Docker self-hosting
+- [ ] Colaboracion multi-docente
+- [ ] Analiticas avanzadas
+
+---
+
+## Documentacion
+
+La documentacion tecnica esta en [`Documentacion/`](./Documentacion/):
+
+| Documento | Descripcion |
+|-----------|-------------|
+| [ARQUITECTURA.md](./Documentacion/ARQUITECTURA.md) | Arquitectura del sistema y decisiones tecnicas |
+| [FLUJO_SINCRONIZACION.md](./Documentacion/FLUJO_SINCRONIZACION.md) | Flujo de datos y sincronizacion offline-first |
+| [DIAGRAMA_NAVEGACION.md](./Documentacion/DIAGRAMA_NAVEGACION.md) | Diagrama de navegacion entre pantallas |
+| [MAPA_NAVEGACION.md](./Documentacion/MAPA_NAVEGACION.md) | Mapa de rutas y relaciones entre modulos |
+| [GUIA_PRUEBAS.md](./Documentacion/GUIA_PRUEBAS.md) | Guia de testing |
 
 ---
 
 ## Plataformas
 
 | Plataforma | Estado | Compatibilidad |
-| -------------- | ------------ | ----------------------------- |
-| **Web** | Probado | Chrome, Firefox, Safari, Edge |
-| **iOS** | Funcional | iOS 13+ |
-| **Android** | Funcional | Android 8.0+ |
-
----
-
-## Roadmap
-
-### v3.1 (Próximamente)
-
-- [ ] Exportación de recursos (PDF, DOCX, PPTX)
-- [ ] Gráficas interactivas de rendimiento
-- [ ] Notificaciones push
-- [ ] Modo oscuro
-
-### v4.0 (Futuro)
-
-- [ ] Integración con IA para sugerencias
-- [ ] Colaboración multi-docente
-- [ ] App nativa (sin Expo)
-- [ ] Backend con API REST
-
----
-
-## Contribución
-
-Este es un proyecto en desarrollo activo. Para contribuir:
-
-1. Fork el repositorio
-2. Crea una rama: `git checkout -b feature/nueva-funcionalidad`
-3. Commit tus cambios: `git commit -m 'Add: nueva funcionalidad'`
-4. Push a la rama: `git push origin feature/nueva-funcionalidad`
-5. Abre un Pull Request
+|------------|--------|----------------|
+| **Android** | Funcional | Android 8.0+ (Expo Go) |
+| **iOS** | Funcional | iOS 13+ (Expo Go) |
 
 ---
 
 ## Licencia
 
-Este proyecto es de código privado. Todos los derechos reservados.
+Proyecto privado. Todos los derechos reservados.
 
 ---
-
-## Contacto
 
 **Repositorio:** [github.com/RitualBoat/PlanearIA](https://github.com/RitualBoat/PlanearIA)
-**Branch Principal:** `development`
-
----
-
-<div align="center">
-
-**Desarrollado con para facilitar la labor docente**
-
- Si te gusta el proyecto, dale una estrella en GitHub
-
-</div>
+**Branch:** `development`

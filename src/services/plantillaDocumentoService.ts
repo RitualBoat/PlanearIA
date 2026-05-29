@@ -95,6 +95,7 @@ const mergeDefaultsIntoDoc = (
       ...base.camposNivel,
       ...defaults.camposNivel,
     },
+    contenidoRaw: defaults.contenidoRaw ?? base.contenidoRaw,
   };
 };
 

@@ -822,22 +822,29 @@ export interface FiltrosPlaneacionV2 {
   - Confirmar que `clonar`, `eliminar`, `buscar`, `filtrar` y exportar usan la misma fuente de verdad.
   - Validar offline-first: crear/editar offline, reconectar, sincronizar y no duplicar documentos.
   - **Avance aplicado 2026-05-28:** `useDocEditorViewModel` ahora usa clave de instancia por ruta para borradores de `modo: crear`, evitando colision entre borradores del mismo nivel.
+  - **Avance aplicado 2026-05-28:** `setContenidoRaw` ahora ignora payloads identicos para evitar writes redundantes y ruido en autosave/historial.
 
-- [ ] **9.11 Agregar pruebas automatizadas de flujo real**:
+- [~] **9.11 Agregar pruebas automatizadas de flujo real**:
   - Unit tests para ViewModels: crear manual, crear con IA V2, importar, abrir plantilla, editar existente.
   - Tests de navegacion para asegurar que no se navega a pantallas legacy en flujos modernos.
   - Tests de `ContenidoScreen` para CTA empty state, FAB, card press y menu editar.
   - Tests de editor para guardar/reabrir rich text y preservar contenido.
   - Tests de servicios IA para documentar provider/fallback y schema V2.
   - **Avance aplicado 2026-05-28:** nuevo test `docEditorTemplate.test.ts` valida que el documento base siempre tenga estructura visible tipo Word/Docs y que `contenidoRaw` se genere cuando llega vacio.
+  - **Avance aplicado 2026-05-28:** `docEditorTemplate.test.ts` ahora protege la plantilla robusta basada en ground truth real: encabezado de instrumentacion didactica, tablas, indicadores, matriz de evaluacion y regeneracion de plantillas legacy autogeneradas.
+  - **Avance aplicado 2026-05-28:** nuevo test `RichTextEditor.test.tsx` cubre fallback web sin WebView y deduplicacion de emisiones para evitar loops en remount/rerender.
 
-- [ ] **9.12 Ejecutar validacion tecnica completa**:
+- [~] **9.12 Ejecutar validacion tecnica completa**:
   - `npx tsc --noEmit`.
   - `npm run lint -- --quiet`.
   - `npm test -- --runInBand`.
   - Verificacion focalizada de endpoints IA si hay backend configurado.
   - Revision de diff para confirmar que no quedan imports/rutas legacy dentro del flujo principal.
   - **Avance aplicado 2026-05-28:** `npx tsc --noEmit`, `npm run lint -- --quiet` y `npm test -- --runInBand` ejecutados en verde.
+  - **Avance aplicado 2026-05-28:** validacion focalizada adicional en este bloque: `npm test -- --runInBand src/__tests__/planeaciones/RichTextEditor.test.tsx`, `npx tsc --noEmit` y `npx eslint` sobre archivos tocados en verde.
+  - **Avance aplicado 2026-05-28:** validacion completa posterior al hotfix robusto: `npx tsc --noEmit` OK, `npm run lint -- --quiet` OK y `npm test -- --runInBand` OK (70 suites, 530 tests).
+  - **Avance aplicado 2026-05-28:** validacion posterior al segundo bloque de correcciones criticas: `npx tsc --noEmit` OK, `npm run lint -- --quiet` OK y `npm test -- --runInBand` OK (71 suites, 533 tests).
+  - **Avance aplicado 2026-05-28:** validacion focalizada del editor/IA/plantilla: `RichTextEditor.test.tsx`, `copilotoService.test.ts` y `docEditorTemplate.test.ts` en verde.
 
 - [ ] **9.13 Validacion manual end-to-end final (movida desde 8.11)**:
   - Crear planeacion -> selector de plantillas -> elegir default/base -> abrir documento tipo Word/Docs -> editar -> guardar -> listar -> reabrir -> exportar PDF/DOCX.
@@ -851,7 +858,7 @@ export interface FiltrosPlaneacionV2 {
   - Validar modo estandar/tablet: canvas amplio, navegacion por secciones, toolbar visible y scroll correcto.
   - Validar offline: crear/editar sin conexion -> reconectar -> verificar sync sin duplicados.
 
-- [ ] **9.14 Hotfix critico del editor multiplataforma**:
+- [~] **9.14 Hotfix critico del editor multiplataforma**:
   - Resolver error web `React Native WebView does not support this platform`.
   - Separar implementacion del editor por plataforma: en web usar editor DOM/Tiptap nativo de navegador o fallback controlado; en Android/iOS conservar TenTap/WebView.
   - Evitar que `RichTextEditor` intente montar `react-native-webview` cuando `Platform.OS === "web"`.
@@ -862,8 +869,15 @@ export interface FiltrosPlaneacionV2 {
   - Evitar que el autosave o historial registren cambios identicos emitidos por debounce del editor.
   - Agregar pruebas unitarias/smoke para confirmar que web no importa/monta WebView y que movil no entra en loop al montar el editor.
   - Validar manualmente en web y movil antes de continuar con mejoras visuales.
+  - **Avance aplicado 2026-05-28:** `RichTextEditor` ahora separa runtime por plataforma: en web usa fallback controlado (sin TenTap WebView), en nativo mantiene TenTap.
+  - **Avance aplicado 2026-05-28:** se agrego deduplicacion por fingerprint en `RichTextEditor`, callback estable de `onChange` y guardas en `DocEditorScreen/useDocEditorViewModel` para reducir riesgo de `Maximum update depth exceeded`.
+  - **Avance aplicado 2026-05-28:** el fallback web usa `contentEditable` DOM con conversion TipTap JSON <-> HTML, toolbar basica de documento y proteccion para no reinyectar HTML propio en cada tecla.
+  - **Avance aplicado 2026-05-28:** pruebas smoke agregadas en `src/__tests__/planeaciones/RichTextEditor.test.tsx`.
+  - **Avance aplicado 2026-05-28:** en nativo, TenTap recibe `initialContent` serializado como string JSON estable, evitando plantilla vacia en movil cuando el contenido venia como objeto TipTap.
+  - **Avance aplicado 2026-05-28:** `onEditorReady` ahora se emite una sola vez por montaje para evitar ciclos de estado si el bridge/editor nativo cambia de referencia entre renders.
+  - **Avance aplicado 2026-05-28:** `DocEditorScreen` refuerza scroll web normal con contenedor `100vh`, body interno con `minHeight: 0` y `ScrollView` con overflow propio para que no dependa de pantalla completa.
 
-- [ ] **9.15 Elevar DocEditor a experiencia real tipo Word/Docs**:
+- [~] **9.15 Elevar DocEditor a experiencia real tipo Word/Docs**:
   - Redisenar `DocEditorScreen` para que el documento sea el centro visual absoluto, con una hoja blanca de tamano carta/A4, margenes visibles y fondo gris claro de escritorio.
   - Agregar controles de vista: `Documento`, `Formulario`, `Pantalla completa`, `Preview` y navegacion por paginas.
   - Implementar modelo de paginas: crear, eliminar, duplicar y reordenar paginas sin perder compatibilidad con `contenidoRaw`.
@@ -879,8 +893,16 @@ export interface FiltrosPlaneacionV2 {
   - Mantener sincronizacion bidireccional entre campos estructurados y placeholders del documento.
   - Asegurar que la plantilla predeterminada se renderice como hoja editable, no como cuadro grande generico.
   - Ajustar estilos de botones activos/seleccionados para que el texto e iconos nunca desaparezcan sobre fondo azul; auditar contraste minimo en toolbar, selector de plantillas, chips, tabs y acciones IA.
+  - **Avance aplicado 2026-05-28:** `DocEditorScreen` agrega vista mas centrada en documento (hoja sobre workspace), selector de formato `A4/Carta`, vista `Mixto/Documento/Formulario` en escritorio y toggle de pantalla completa.
+  - **Avance aplicado 2026-05-28:** tabs `Documento/Formulario` en movil y chips/controles de vista usan contraste reforzado para evitar texto ilegible en estado activo.
+  - **Avance aplicado 2026-05-28:** la plantilla default se elevo desde texto plano a estructura tipo instrumentacion real con tablas, logos placeholder, secciones pedagogicas, indicadores, niveles de desempeno, matriz de evaluacion, sesiones, observaciones y firmas.
+  - **Avance aplicado 2026-05-28:** el formulario moderno agrega panel para reemplazar logos del documento con validacion PNG/JPG, maximo 2 MB y 1500 px por lado.
+  - **Avance aplicado 2026-05-28:** se reforzo contraste de estados seleccionados en selector de plantillas, tabs, toolbar, navegador de secciones y escaner de plantillas.
+  - **Avance aplicado 2026-05-28:** se agrego `KeyboardAvoidingView` y boton movil `Ocultar teclado` para cerrar el teclado sin depender de tocar zonas vacias de la pantalla.
+  - **Avance aplicado 2026-05-28:** se corrigio contraste restante de chips/botones activos en secciones del formulario moderno: datos generales, curricular, evaluacion, sesiones, observaciones y firmas.
+  - **Avance aplicado 2026-05-28:** la carga movil de plantilla default, sincronizacion y cambio A4/Carta quedan cubiertos por la normalizacion de contenido nativo y pruebas del editor.
 
-- [ ] **9.16 Validar y endurecer Copiloto IA dentro del editor**:
+- [~] **9.16 Validar y endurecer Copiloto IA dentro del editor**:
   - Probar botones IA `Sugerir`, `Mejorar`, `Rubrica` y `Revisar` en web y movil despues de corregir el editor.
   - Incorporar IA como herramienta contextual del documento: boton flotante/inline junto al bloque activo y acciones compactas en toolbar.
   - Agregar texto predictivo/autocompletado mientras se escribe, con sugerencia fantasma aceptable por boton/tecla y cancelable sin modificar el texto.
@@ -892,6 +914,10 @@ export interface FiltrosPlaneacionV2 {
   - Insertar resultados IA en el documento actual y no solo en campos/formulario.
   - Validar que `Mejorar` use texto seleccionado o bloque activo; si no hay seleccion, pedir contexto del bloque actual.
   - Agregar tests de servicio/hook para exito, fallback, timeout y error de configuracion.
+  - **Avance aplicado 2026-05-28:** `copilotoService` ahora parsea respuestas como texto antes de JSON para evitar `JSON Parse error` cuando el backend devuelve HTML/texto plano.
+  - **Avance aplicado 2026-05-28:** si falta configuracion IA (`EXPO_PUBLIC_API_SECRET`/backend) o falla el fetch, los botones IA responden con fallback pedagogico local en vez de quedarse en spinner/error duro.
+  - **Avance aplicado 2026-05-28:** se agrego fallback local por accion: sugerencias, mejora de texto, rubrica/evaluacion, revision de alineamiento y autocompletado de seccion.
+  - **Avance aplicado 2026-05-28:** nuevo test `copilotoService.test.ts` cubre API no configurada y backend con respuesta no JSON.
 
 - [ ] **9.17 Decisiones de diseno pendientes antes de implementar UI final**:
   - **Decision confirmada:** usar A4 como preset inicial estilo Word e incorporar Carta como formato cambiable desde el editor.

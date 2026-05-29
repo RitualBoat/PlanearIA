@@ -82,6 +82,7 @@ export interface DocEditorViewModel {
   setEvaluacion: (next: { evaluacionInicial?: InstrumentoEvaluacion; evaluacionFinal?: InstrumentoEvaluacion }) => void;
   setObservaciones: (next: Observacion[]) => void;
   setFirmas: (next: Firma[]) => void;
+  setCamposNivel: (next: Record<string, unknown>) => void;
   setContenidoRaw: (next: string) => void;
   regenerarContenidoRawDesdeCampos: () => void;
   guardarDocumento: () => Promise<void>;
@@ -141,14 +142,15 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
   const updateDoc = useCallback(
     (updater: (current: PlaneacionDocumento) => PlaneacionDocumento, trackHistory = true) => {
       setDocumento((current) => {
-        if (trackHistory) pushHistory(current);
         const next = updater(current);
+        if (next === current) return current;
+        if (trackHistory) pushHistory(current);
+        setIsDirty(true);
         return {
           ...next,
           fechaModificacion: getNow(),
         };
       });
-      setIsDirty(true);
     },
     []
   );
@@ -338,12 +340,16 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
       })),
     setObservaciones: (next) => updateDoc((current) => ({ ...current, observaciones: next })),
     setFirmas: (next) => updateDoc((current) => ({ ...current, firmas: next })),
+    setCamposNivel: (next) => updateDoc((current) => ({ ...current, camposNivel: next })),
     setContenidoRaw: (next) =>
       updateDoc(
-        (current) => ({
-          ...current,
-          contenidoRaw: next,
-        }),
+        (current) => {
+          if (current.contenidoRaw === next) return current;
+          return {
+            ...current,
+            contenidoRaw: next,
+          };
+        },
         false
       ),
     regenerarContenidoRawDesdeCampos: () =>

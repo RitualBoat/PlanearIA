@@ -1,4 +1,5 @@
 import { apiRequest } from "../utils/apiClient";
+import { isAPIConfigured } from "../sync/config/apiConfig";
 import type { InstrumentoEvaluacion, PlaneacionDocumento, Sesion } from "../../types/planeacionV2";
 
 export type CopilotoAccion =
@@ -84,6 +85,132 @@ export interface CopilotoResponse<T extends CopilotoResultado = CopilotoResultad
 
 const MAX_RETRIES = 1;
 
+const truncate = (value = "", max = 240): string => {
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (normalized.length <= max) return normalized;
+  return `${normalized.slice(0, max - 3)}...`;
+};
+
+const localEvaluacion = (documento?: PlaneacionDocumento): InstrumentoEvaluacion => ({
+  tipo: "rubrica",
+  escala: [
+    { etiqueta: "Excelente", valor: 100 },
+    { etiqueta: "Satisfactorio", valor: 85 },
+    { etiqueta: "En proceso", valor: 70 },
+    { etiqueta: "Requiere apoyo", valor: 60 },
+  ],
+  criterios: [
+    {
+      id: `crit_${Date.now()}_comprension`,
+      descripcion: `Comprende y aplica el contenido ${documento?.elementosCurriculares.contenido || "central"} de la planeacion.`,
+      mejora: "Revisar ejemplos guiados y explicar el procedimiento con sus propias palabras.",
+    },
+    {
+      id: `crit_${Date.now()}_producto`,
+      descripcion: `Elabora el producto o evidencia esperado${documento?.elementosCurriculares.producto ? `: ${documento.elementosCurriculares.producto}` : "."}`,
+      mejora: "Completar la evidencia con claridad, orden y relacion con el PDA.",
+    },
+    {
+      id: `crit_${Date.now()}_participacion`,
+      descripcion: "Participa de forma colaborativa y argumenta sus decisiones durante las actividades.",
+      mejora: "Aportar ideas, escuchar a sus companeros y justificar sus respuestas.",
+    },
+  ],
+});
+
+const buildHeuristicResponse = <T extends CopilotoResultado>(
+  payload: CopilotoRequest,
+  reason?: string
+): CopilotoResponse<T> => {
+  const doc = payload.contenidoDocumento;
+  const asignatura = doc?.datosGenerales.asignatura || payload.contexto?.asignatura || "la asignatura";
+  const grado = doc?.datosGenerales.grado || payload.contexto?.grado || "el grupo";
+  const contenido = doc?.elementosCurriculares.contenido || payload.contexto?.contenido || "el contenido central";
+  const pda = doc?.elementosCurriculares.pda || payload.contexto?.pda || "el aprendizaje esperado";
+  const fallbackNote = reason ? ` Modo local activado: ${reason}` : " Modo local activado.";
+
+  let resultado: CopilotoResultado;
+
+  if (payload.accion === "sugerir_actividades") {
+    resultado = {
+      mensaje: `Sugerencia local para ${asignatura}.${fallbackNote}`,
+      actividades: {
+        inicio: `Activar saberes previos sobre ${contenido} con una pregunta detonadora y una breve lluvia de ideas.`,
+        desarrollo: `Organizar al grupo ${grado} en equipos para resolver una situacion relacionada con ${pda}. Cada equipo registra procedimiento, dudas y evidencia.`,
+        cierre: "Socializar hallazgos, recuperar errores frecuentes y cerrar con una autoevaluacion breve.",
+        tarea: `Traer un ejemplo cotidiano donde se observe ${contenido}.`,
+      },
+    };
+  } else if (payload.accion === "mejorar_texto") {
+    const base = truncate(payload.seleccion || String(contenido));
+    resultado = {
+      mensaje: `Texto mejorado localmente.${fallbackNote}`,
+      textoMejorado: base
+        ? `${base}\n\nVersion mejorada: se precisa el objetivo didactico, se explicita la evidencia esperada y se conecta con el PDA para facilitar la evaluacion.`
+        : `Se propone redactar esta seccion vinculando contenido, PDA, actividad observable y evidencia de aprendizaje.`,
+      cambios: [
+        "Se clarifico la intencion pedagogica.",
+        "Se agrego conexion con el PDA.",
+        "Se sugirio evidencia observable.",
+      ],
+    };
+  } else if (payload.accion === "generar_evaluacion") {
+    resultado = {
+      mensaje: `Rubrica local generada para ${asignatura}.${fallbackNote}`,
+      evaluacion: localEvaluacion(doc),
+    };
+  } else if (payload.accion === "revisar_alineamiento") {
+    resultado = {
+      mensaje: `Revision local completada.${fallbackNote}`,
+      resumen: "La planeacion tiene una base usable; conviene revisar que contenido, PDA, actividades y evaluacion apunten a la misma evidencia.",
+      hallazgos: [
+        {
+          tipo: "fortaleza",
+          prioridad: "media",
+          descripcion: `La planeacion ya identifica asignatura (${asignatura}) y grupo (${grado}).`,
+        },
+        {
+          tipo: "sugerencia",
+          prioridad: "alta",
+          descripcion: "Asegura que cada actividad produzca una evidencia evaluable vinculada al PDA.",
+        },
+        {
+          tipo: "riesgo",
+          prioridad: "media",
+          descripcion: "Si la rubrica no usa los mismos criterios que las actividades, la evaluacion puede sentirse desconectada.",
+        },
+      ],
+    };
+  } else {
+    resultado = {
+      mensaje: `Autocompletado local para ${payload.contexto?.seccion || "la seccion"}.${fallbackNote}`,
+      seccion: String(payload.contexto?.seccion || "general"),
+      contenido: `Completa esta seccion describiendo ${contenido}, su relacion con ${pda}, actividades observables y evidencia esperada.`,
+    };
+  }
+
+  return {
+    provider: reason ? "heuristic_fallback" : "heuristic",
+    model: null,
+    accion: payload.accion,
+    resultado: resultado as T,
+  };
+};
+
+const readResponseJson = async (response: Response): Promise<Record<string, any>> => {
+  const raw = await response.text();
+  if (!raw.trim()) return {};
+  try {
+    return JSON.parse(raw) as Record<string, any>;
+  } catch {
+    throw new Error(
+      response.ok
+        ? `El backend respondio texto no JSON: ${truncate(raw, 120)}`
+        : `Backend IA no disponible (${response.status}): ${truncate(raw, 120)}`
+    );
+  }
+};
+
 const buildContextFromDocumento = (
   documento: PlaneacionDocumento,
   extra: CopilotoContexto = {}
@@ -99,6 +226,10 @@ const buildContextFromDocumento = (
 const requestCopiloto = async <T extends CopilotoResultado>(
   payload: CopilotoRequest
 ): Promise<CopilotoResponse<T>> => {
+  if (!isAPIConfigured()) {
+    return buildHeuristicResponse<T>(payload, "falta configurar EXPO_PUBLIC_API_SECRET o backend IA");
+  }
+
   let lastError: unknown;
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
@@ -107,7 +238,7 @@ const requestCopiloto = async <T extends CopilotoResultado>(
         method: "POST",
         body: JSON.stringify(payload),
       });
-      const json = await response.json();
+      const json = await readResponseJson(response);
 
       if (!response.ok || !json?.success) {
         throw new Error(json?.error || "No se pudo ejecutar el copiloto IA.");
@@ -124,7 +255,7 @@ const requestCopiloto = async <T extends CopilotoResultado>(
     lastError instanceof Error
       ? lastError.message
       : "No se pudo conectar con el copiloto IA. Revisa tu conexion o configuracion del backend.";
-  throw new Error(message);
+  return buildHeuristicResponse<T>(payload, message);
 };
 
 export const sugerirActividades = async (

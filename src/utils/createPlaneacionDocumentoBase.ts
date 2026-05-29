@@ -29,6 +29,21 @@ const buildSesion = (): Sesion => {
   };
 };
 
+const buildDefaultLogoSlots = () => [
+  {
+    id: "tecnm",
+    label: "Logo izquierdo",
+    maxWidthPx: 1300,
+    maxHeightPx: 400,
+  },
+  {
+    id: "institucion",
+    label: "Logo derecho",
+    maxWidthPx: 500,
+    maxHeightPx: 500,
+  },
+];
+
 export interface BuildDocOptions {
   nivelAcademico: NivelAcademico;
   userId: string;
@@ -91,7 +106,9 @@ export const buildPlaneacionDocumentoBase = (options: BuildDocOptions): Planeaci
     contenidoRaw: "",
     fechaCreacion: now,
     fechaModificacion: now,
-    camposNivel: {},
+    camposNivel: {
+      plantillaVisualVersion: 2,
+      plantillaLogos: buildDefaultLogoSlots(),
+    },
   };
 };
-

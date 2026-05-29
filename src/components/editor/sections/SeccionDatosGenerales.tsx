@@ -214,12 +214,12 @@ export const SeccionDatosGenerales: React.FC<SeccionDatosGeneralesProps> = ({
                 styles.quickChip,
                 {
                   borderColor: active ? colors.primary : colors.borderLight,
-                  backgroundColor: active ? colors.primaryContainer : colors.surfaceContainerLow,
+                  backgroundColor: active ? colors.primary : colors.surfaceContainerLow,
                 },
               ]}
               onPress={() => updateField("trimestre", trimestre)}
             >
-              <Text style={[styles.quickChipText, { color: active ? colors.primary : colors.onSurfaceVariant }]}>
+              <Text style={[styles.quickChipText, { color: active ? colors.surface : colors.onSurfaceVariant }]}>
                 Trim. {trimestre}
               </Text>
             </Pressable>
@@ -278,4 +278,3 @@ const styles = StyleSheet.create({
 });
 
 export default SeccionDatosGenerales;
-

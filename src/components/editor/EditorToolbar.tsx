@@ -78,7 +78,7 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({
         compact && styles.buttonCompact,
         {
           backgroundColor: isActive
-            ? colors.primaryContainer
+            ? colors.primary
             : pressed
               ? colors.surfaceContainerHigh
               : colors.surfaceContainerLow,
@@ -90,14 +90,14 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({
       <MaterialIcons
         name={icon}
         size={compact ? 17 : 19}
-        color={isActive ? colors.primary : colors.onSurfaceVariant}
+        color={isActive ? colors.surface : colors.onSurfaceVariant}
       />
       {!compact && (
         <Text
           style={[
             styles.buttonLabel,
             {
-              color: isActive ? colors.primary : colors.onSurfaceVariant,
+              color: isActive ? colors.surface : colors.onSurfaceVariant,
             },
           ]}
         >

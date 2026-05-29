@@ -86,11 +86,11 @@ export const SeccionObservaciones: React.FC<SeccionObservacionesProps> = ({ valu
                     styles.chip,
                     {
                       borderColor: active ? colors.primary : colors.borderLight,
-                      backgroundColor: active ? colors.primaryContainer : colors.surfaceContainerLowest,
+                      backgroundColor: active ? colors.primary : colors.surfaceContainerLowest,
                     },
                   ]}
                 >
-                  <Text style={[styles.chipText, { color: active ? colors.primary : colors.onSurfaceVariant }]}>
+                  <Text style={[styles.chipText, { color: active ? colors.surface : colors.onSurfaceVariant }]}>
                     {categoria}
                   </Text>
                 </Pressable>
@@ -122,7 +122,7 @@ export const SeccionObservaciones: React.FC<SeccionObservacionesProps> = ({ valu
             styles.addButton,
             {
               borderColor: colors.primary,
-              backgroundColor: colors.primaryContainer,
+              backgroundColor: colors.surfaceContainerLowest,
             },
           ]}
           onPress={() => add()}
@@ -219,4 +219,3 @@ const styles = StyleSheet.create({
 });
 
 export default SeccionObservaciones;
-

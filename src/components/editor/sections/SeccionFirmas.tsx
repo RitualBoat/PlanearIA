@@ -109,7 +109,7 @@ export const SeccionFirmas: React.FC<SeccionFirmasProps> = ({ value, defaultNomb
             styles.actionButton,
             {
               borderColor: colors.primary,
-              backgroundColor: colors.primaryContainer,
+              backgroundColor: colors.surfaceContainerLowest,
             },
           ]}
           onPress={() => add()}
@@ -205,4 +205,3 @@ const styles = StyleSheet.create({
 });
 
 export default SeccionFirmas;
-

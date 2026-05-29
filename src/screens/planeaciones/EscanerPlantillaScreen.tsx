@@ -40,14 +40,14 @@ const EscanerPlantillaScreen: React.FC = () => {
                 styles.progressDot,
                 {
                   borderColor: active || done ? colors.primary : colors.borderLight,
-                  backgroundColor: done ? colors.primary : active ? colors.primaryContainer : colors.surfaceContainerLow,
+                  backgroundColor: done || active ? colors.primary : colors.surfaceContainerLow,
                 },
               ]}
             >
               {done ? (
                 <MaterialIcons name="check" size={14} color={colors.surface} />
               ) : (
-                <Text style={[styles.progressDotText, { color: active ? colors.primary : colors.onSurfaceVariant }]}>
+                <Text style={[styles.progressDotText, { color: active ? colors.surface : colors.onSurfaceVariant }]}>
                   {step}
                 </Text>
               )}
@@ -77,12 +77,12 @@ const EscanerPlantillaScreen: React.FC = () => {
               styles.chip,
               {
                 borderColor: selected ? colors.primary : colors.borderLight,
-                backgroundColor: selected ? colors.primaryContainer : colors.surfaceContainerLowest,
+                backgroundColor: selected ? colors.primary : colors.surfaceContainerLowest,
               },
             ]}
             onPress={() => vm.setNivelAcademico(nivel.id)}
           >
-            <Text style={[styles.chipText, { color: selected ? colors.primary : colors.onSurfaceVariant }]}>
+            <Text style={[styles.chipText, { color: selected ? colors.surface : colors.onSurfaceVariant }]}>
               {nivel.label}
             </Text>
           </Pressable>

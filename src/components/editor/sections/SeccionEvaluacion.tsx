@@ -185,7 +185,7 @@ const InstrumentoCard: React.FC<InstrumentoCardProps> = ({ title, value, optiona
                     styles.chip,
                     {
                       borderColor: active ? colors.primary : colors.borderLight,
-                      backgroundColor: active ? colors.primaryContainer : colors.surfaceContainerLowest,
+                      backgroundColor: active ? colors.primary : colors.surfaceContainerLowest,
                     },
                   ]}
                   onPress={() =>
@@ -196,7 +196,7 @@ const InstrumentoCard: React.FC<InstrumentoCardProps> = ({ title, value, optiona
                     })
                   }
                 >
-                  <Text style={[styles.chipText, { color: active ? colors.primary : colors.onSurfaceVariant }]}>
+                  <Text style={[styles.chipText, { color: active ? colors.surface : colors.onSurfaceVariant }]}>
                     {getTipoLabel(tipo)}
                   </Text>
                 </Pressable>
@@ -248,7 +248,7 @@ const InstrumentoCard: React.FC<InstrumentoCardProps> = ({ title, value, optiona
               styles.outlineButton,
               {
                 borderColor: colors.primary,
-                backgroundColor: colors.primaryContainer,
+                backgroundColor: colors.surfaceContainerLowest,
               },
             ]}
             onPress={addScale}
@@ -301,7 +301,7 @@ const InstrumentoCard: React.FC<InstrumentoCardProps> = ({ title, value, optiona
               styles.outlineButton,
               {
                 borderColor: colors.primary,
-                backgroundColor: colors.primaryContainer,
+                backgroundColor: colors.surfaceContainerLowest,
               },
             ]}
             onPress={addCriteria}
@@ -469,4 +469,3 @@ const styles = StyleSheet.create({
 });
 
 export default SeccionEvaluacion;
-

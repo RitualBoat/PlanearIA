@@ -27,16 +27,16 @@ const CrearPlaneacionScreen: React.FC = () => {
             return (
               <Pressable
                 key={item.nivel}
-                style={[
-                  styles.levelChip,
-                  {
-                    borderColor: selected ? colors.primary : colors.borderLight,
-                    backgroundColor: selected ? colors.primaryContainer : colors.surfaceContainerLowest,
-                  },
-                ]}
-                onPress={() => vm.setNivelSeleccionado(item.nivel)}
-              >
-                <Text style={[styles.levelChipText, { color: selected ? colors.primary : colors.onSurfaceVariant }]}>
+                    style={[
+                      styles.levelChip,
+                      {
+                        borderColor: selected ? colors.primary : colors.borderLight,
+                        backgroundColor: selected ? colors.primary : colors.surfaceContainerLowest,
+                      },
+                    ]}
+                    onPress={() => vm.setNivelSeleccionado(item.nivel)}
+                  >
+                <Text style={[styles.levelChipText, { color: selected ? colors.surface : colors.onSurfaceVariant }]}>
                   {item.titulo}
                 </Text>
               </Pressable>
@@ -58,7 +58,7 @@ const CrearPlaneacionScreen: React.FC = () => {
                       styles.templateCard,
                       {
                         borderColor: selected ? colors.primary : colors.borderLight,
-                        backgroundColor: selected ? colors.primaryContainer : colors.surfaceContainerLowest,
+                        backgroundColor: colors.surfaceContainerLowest,
                         opacity: item.disabled ? 0.7 : 1,
                       },
                     ]}
@@ -72,7 +72,7 @@ const CrearPlaneacionScreen: React.FC = () => {
                       />
                     </View>
                     <View style={styles.templateText}>
-                      <Text style={[styles.templateTitle, { color: selected ? colors.primary : colors.onSurface }]}>
+                      <Text style={[styles.templateTitle, { color: colors.onSurface }]}>
                         {item.nombre}
                       </Text>
                       <Text style={[styles.templateDesc, { color: colors.onSurfaceVariant }]}>{item.descripcion}</Text>

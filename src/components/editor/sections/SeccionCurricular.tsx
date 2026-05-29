@@ -134,7 +134,7 @@ export const SeccionCurricular: React.FC<SeccionCurricularProps> = ({
             styles.aiButton,
             {
               borderColor: colors.primary,
-              backgroundColor: colors.primaryContainer,
+              backgroundColor: colors.surfaceContainerLowest,
               opacity: onSuggestPda ? 1 : 0.6,
             },
           ]}
@@ -178,11 +178,11 @@ export const SeccionCurricular: React.FC<SeccionCurricularProps> = ({
                 styles.chip,
                 {
                   borderColor: active ? colors.primary : colors.borderLight,
-                  backgroundColor: active ? colors.primaryContainer : colors.surfaceContainerLow,
+                  backgroundColor: active ? colors.primary : colors.surfaceContainerLow,
                 },
               ]}
             >
-              <Text style={[styles.chipText, { color: active ? colors.primary : colors.onSurfaceVariant }]}>
+              <Text style={[styles.chipText, { color: active ? colors.surface : colors.onSurfaceVariant }]}>
                 {campo}
               </Text>
             </Pressable>
@@ -202,11 +202,11 @@ export const SeccionCurricular: React.FC<SeccionCurricularProps> = ({
                 styles.chip,
                 {
                   borderColor: active ? colors.primary : colors.borderLight,
-                  backgroundColor: active ? colors.primaryContainer : colors.surfaceContainerLow,
+                  backgroundColor: active ? colors.primary : colors.surfaceContainerLow,
                 },
               ]}
             >
-              <Text style={[styles.chipText, { color: active ? colors.primary : colors.onSurfaceVariant }]}>
+              <Text style={[styles.chipText, { color: active ? colors.surface : colors.onSurfaceVariant }]}>
                 {eje}
               </Text>
             </Pressable>
@@ -329,4 +329,3 @@ const styles = StyleSheet.create({
 });
 
 export default SeccionCurricular;
-

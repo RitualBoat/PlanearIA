@@ -96,7 +96,7 @@ export const SeccionSesiones: React.FC<SeccionSesionesProps> = ({
           style={[
             styles.addButton,
             {
-              backgroundColor: colors.primaryContainer,
+              backgroundColor: colors.surfaceContainerLowest,
               borderColor: colors.primary,
             },
           ]}

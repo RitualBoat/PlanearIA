@@ -109,7 +109,7 @@ export const SesionCard: React.FC<SesionCardProps> = ({
                     styles.typeChip,
                     {
                       borderColor: active ? colors.primary : colors.borderLight,
-                      backgroundColor: active ? colors.primaryContainer : colors.surfaceContainerLow,
+                      backgroundColor: active ? colors.primary : colors.surfaceContainerLow,
                     },
                   ]}
                   onPress={() => updateField("tipo", option.value)}
@@ -117,9 +117,9 @@ export const SesionCard: React.FC<SesionCardProps> = ({
                   <MaterialIcons
                     name={option.icon}
                     size={14}
-                    color={active ? colors.primary : colors.onSurfaceVariant}
+                    color={active ? colors.surface : colors.onSurfaceVariant}
                   />
-                  <Text style={[styles.typeLabel, { color: active ? colors.primary : colors.onSurfaceVariant }]}>
+                  <Text style={[styles.typeLabel, { color: active ? colors.surface : colors.onSurfaceVariant }]}>
                     {option.label}
                   </Text>
                 </Pressable>

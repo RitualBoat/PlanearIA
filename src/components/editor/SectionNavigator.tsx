@@ -86,7 +86,7 @@ export const SectionNavigator: React.FC<SectionNavigatorProps> = ({
                 styles.sectionChip,
                 {
                   backgroundColor: isActive
-                    ? colors.primaryContainer
+                    ? colors.primary
                     : pressed
                       ? colors.surfaceContainerHigh
                       : colors.surfaceContainerLow,
@@ -98,14 +98,14 @@ export const SectionNavigator: React.FC<SectionNavigatorProps> = ({
               <MaterialIcons
                 name={section.completed ? "check-circle" : iconName}
                 size={16}
-                color={section.completed ? colors.success : isActive ? colors.primary : colors.onSurfaceVariant}
+                color={section.completed && !isActive ? colors.success : isActive ? colors.surface : colors.onSurfaceVariant}
               />
               <Text
                 numberOfLines={1}
                 style={[
                   styles.sectionLabel,
                   {
-                    color: isActive ? colors.primary : colors.onSurface,
+                    color: isActive ? colors.surface : colors.onSurface,
                   },
                 ]}
               >

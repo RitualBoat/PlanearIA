@@ -85,8 +85,41 @@ export interface CopilotoResponse<T extends CopilotoResultado = CopilotoResultad
 
 const MAX_RETRIES = 1;
 
-const truncate = (value = "", max = 240): string => {
-  const normalized = value.replace(/\s+/g, " ").trim();
+const readableTextFromUnknown = (value: unknown): string => {
+  if (value == null) return "";
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) return "";
+
+    if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+      try {
+        return readableTextFromUnknown(JSON.parse(trimmed) as unknown);
+      } catch {
+        return trimmed.replace(/<[^>]+>/g, " ");
+      }
+    }
+
+    return trimmed.replace(/<[^>]+>/g, " ");
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(readableTextFromUnknown).filter(Boolean).join(" ");
+  }
+
+  if (typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    if (typeof record.text === "string") return record.text;
+    if (Array.isArray(record.content)) {
+      return record.content.map(readableTextFromUnknown).filter(Boolean).join(" ");
+    }
+  }
+
+  return String(value);
+};
+
+const truncate = (value: unknown = "", max = 240): string => {
+  const normalized = readableTextFromUnknown(value).replace(/\s+/g, " ").trim();
   if (normalized.length <= max) return normalized;
   return `${normalized.slice(0, max - 3)}...`;
 };
@@ -125,9 +158,9 @@ const buildHeuristicResponse = <T extends CopilotoResultado>(
   const doc = payload.contenidoDocumento;
   const asignatura = doc?.datosGenerales.asignatura || payload.contexto?.asignatura || "la asignatura";
   const grado = doc?.datosGenerales.grado || payload.contexto?.grado || "el grupo";
-  const contenido = doc?.elementosCurriculares.contenido || payload.contexto?.contenido || "el contenido central";
-  const pda = doc?.elementosCurriculares.pda || payload.contexto?.pda || "el aprendizaje esperado";
-  const fallbackNote = reason ? ` Modo local activado: ${reason}` : " Modo local activado.";
+  const contenido = readableTextFromUnknown(doc?.elementosCurriculares.contenido || payload.contexto?.contenido) || "el contenido central";
+  const pda = readableTextFromUnknown(doc?.elementosCurriculares.pda || payload.contexto?.pda) || "el aprendizaje esperado";
+  const fallbackNote = reason ? " Respuesta local temporal mientras se conecta la IA en la nube." : " Modo local activado.";
 
   let resultado: CopilotoResultado;
 
@@ -142,7 +175,7 @@ const buildHeuristicResponse = <T extends CopilotoResultado>(
       },
     };
   } else if (payload.accion === "mejorar_texto") {
-    const base = truncate(payload.seleccion || String(contenido));
+    const base = truncate(payload.seleccion || contenido);
     resultado = {
       mensaje: `Texto mejorado localmente.${fallbackNote}`,
       textoMejorado: base

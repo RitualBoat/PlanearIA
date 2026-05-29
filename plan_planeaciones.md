@@ -845,6 +845,13 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** validacion completa posterior al hotfix robusto: `npx tsc --noEmit` OK, `npm run lint -- --quiet` OK y `npm test -- --runInBand` OK (70 suites, 530 tests).
   - **Avance aplicado 2026-05-28:** validacion posterior al segundo bloque de correcciones criticas: `npx tsc --noEmit` OK, `npm run lint -- --quiet` OK y `npm test -- --runInBand` OK (71 suites, 533 tests).
   - **Avance aplicado 2026-05-28:** validacion focalizada del editor/IA/plantilla: `RichTextEditor.test.tsx`, `copilotoService.test.ts` y `docEditorTemplate.test.ts` en verde.
+  - **Avance aplicado 2026-05-28:** validacion de microajustes finales: `npx tsc --noEmit` OK, `npm run lint -- --quiet` OK y `npm test -- --runInBand src/__tests__/planeaciones` OK (13 suites, 39 tests).
+  - **Avance aplicado 2026-05-28:** suite completa posterior a microajustes OK: `npm test -- --runInBand` (71 suites, 535 tests).
+  - **Avance aplicado 2026-05-28:** validacion focalizada posterior a correccion de editor web/movil: `npx tsc --noEmit` OK, `npm run lint -- --quiet` OK y `RichTextEditor/docEditorTemplate/copilotoService` OK (3 suites, 10 tests).
+  - **Avance aplicado 2026-05-28:** suite del modulo posterior al ajuste final de editor OK: `npm test -- --runInBand src/__tests__/planeaciones` (13 suites, 39 tests).
+  - **Avance aplicado 2026-05-28:** validacion focalizada posterior al ajuste de edicion web/teclado movil: `npx tsc --noEmit` OK y `RichTextEditor/docEditorTemplate/copilotoService` OK (3 suites, 10 tests).
+  - **Avance aplicado 2026-05-28:** validacion final de este bloque OK: `npm run lint -- --quiet` y `npm test -- --runInBand src/__tests__/planeaciones` (13 suites, 39 tests).
+  - **Avance aplicado 2026-05-28:** validacion del FAB global de teclado OK: `npx tsc --noEmit`, `npm run lint -- --quiet` y suite de planeaciones (13 suites, 39 tests).
 
 - [ ] **9.13 Validacion manual end-to-end final (movida desde 8.11)**:
   - Crear planeacion -> selector de plantillas -> elegir default/base -> abrir documento tipo Word/Docs -> editar -> guardar -> listar -> reabrir -> exportar PDF/DOCX.
@@ -873,9 +880,12 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** se agrego deduplicacion por fingerprint en `RichTextEditor`, callback estable de `onChange` y guardas en `DocEditorScreen/useDocEditorViewModel` para reducir riesgo de `Maximum update depth exceeded`.
   - **Avance aplicado 2026-05-28:** el fallback web usa `contentEditable` DOM con conversion TipTap JSON <-> HTML, toolbar basica de documento y proteccion para no reinyectar HTML propio en cada tecla.
   - **Avance aplicado 2026-05-28:** pruebas smoke agregadas en `src/__tests__/planeaciones/RichTextEditor.test.tsx`.
-  - **Avance aplicado 2026-05-28:** en nativo, TenTap recibe `initialContent` serializado como string JSON estable, evitando plantilla vacia en movil cuando el contenido venia como objeto TipTap.
+  - **Avance aplicado 2026-05-28:** en nativo, TenTap recibe `initialContent` normalizado de forma estable, evitando plantilla vacia en movil cuando el contenido venia como objeto TipTap.
   - **Avance aplicado 2026-05-28:** `onEditorReady` ahora se emite una sola vez por montaje para evitar ciclos de estado si el bridge/editor nativo cambia de referencia entre renders.
   - **Avance aplicado 2026-05-28:** `DocEditorScreen` refuerza scroll web normal con contenedor `100vh`, body interno con `minHeight: 0` y `ScrollView` con overflow propio para que no dependa de pantalla completa.
+  - **Avance aplicado 2026-05-28:** ajuste posterior: TenTap nativo recibe objetos TipTap parseados cuando `contenidoRaw` viene como JSON string, evitando que movil muestre la plantilla como codigo/JSON literal.
+  - **Avance aplicado 2026-05-28:** ajuste final de compatibilidad nativa: el JSON TipTap se convierte a HTML antes de entrar a TenTap en Android/iOS, evitando tanto el JSON literal como el documento vacio con plantillas complejas.
+  - **Avance aplicado 2026-05-28:** el fallback web dejo de controlar/reinyectar `innerHTML` en cada render; ahora hidrata el contenido una vez y solo reemplaza HTML ante cambios externos reales, evitando que el cursor salte a la primera linea o que el borrado se revierta.
 
 - [~] **9.15 Elevar DocEditor a experiencia real tipo Word/Docs**:
   - Redisenar `DocEditorScreen` para que el documento sea el centro visual absoluto, con una hoja blanca de tamano carta/A4, margenes visibles y fondo gris claro de escritorio.
@@ -901,6 +911,12 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** se agrego `KeyboardAvoidingView` y boton movil `Ocultar teclado` para cerrar el teclado sin depender de tocar zonas vacias de la pantalla.
   - **Avance aplicado 2026-05-28:** se corrigio contraste restante de chips/botones activos en secciones del formulario moderno: datos generales, curricular, evaluacion, sesiones, observaciones y firmas.
   - **Avance aplicado 2026-05-28:** la carga movil de plantilla default, sincronizacion y cambio A4/Carta quedan cubiertos por la normalizacion de contenido nativo y pruebas del editor.
+  - **Avance aplicado 2026-05-28:** `CrearPlaneacionScreen` ahora usa contenedor web de `100vh` y scroll interno propio para corregir el contenido cortado antes de entrar a DocEditor.
+  - **Avance aplicado 2026-05-28:** el guardado del DocEditor se separo en `Guardar` (permanece en el editor con confirmacion visual) y `Guardar y salir` (regresa al hub `Contenido`), evitando volver accidentalmente al selector de plantillas.
+  - **Avance aplicado 2026-05-28:** se agrego proteccion de salida con cambios sin guardar en navegacion interna y cierre/recarga de pestana web.
+  - **Avance aplicado 2026-05-28:** el fallback web `contentEditable` ahora es focusable/editable explicitamente y detiene propagacion de click/teclado para que `ScrollView` web no bloquee la edicion directa sobre el documento.
+  - **Avance aplicado 2026-05-28:** el boton movil para ocultar teclado se redujo a un circulo flotante minimalista con flecha y ahora llama `editor.blur()` ademas de `Keyboard.dismiss()`, mejorando el caso de escritura directa dentro del documento TenTap.
+  - **Avance aplicado 2026-05-28:** el boton de ocultar teclado se movio a un FAB global en `App`, aparece solo con `keyboardDidShow`, desaparece al presionarlo o con `keyboardDidHide` y DocEditor registra un handler opcional para desenfocar TenTap.
 
 - [~] **9.16 Validar y endurecer Copiloto IA dentro del editor**:
   - Probar botones IA `Sugerir`, `Mejorar`, `Rubrica` y `Revisar` en web y movil despues de corregir el editor.
@@ -918,6 +934,8 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** si falta configuracion IA (`EXPO_PUBLIC_API_SECRET`/backend) o falla el fetch, los botones IA responden con fallback pedagogico local en vez de quedarse en spinner/error duro.
   - **Avance aplicado 2026-05-28:** se agrego fallback local por accion: sugerencias, mejora de texto, rubrica/evaluacion, revision de alineamiento y autocompletado de seccion.
   - **Avance aplicado 2026-05-28:** nuevo test `copilotoService.test.ts` cubre API no configurada y backend con respuesta no JSON.
+  - **Avance aplicado 2026-05-28:** los mensajes visibles del fallback IA ya no exponen errores tecnicos como `failed to fetch`; se muestran como respuesta local temporal.
+  - **Avance aplicado 2026-05-28:** el servicio IA sanitiza HTML/JSON TipTap antes de generar textos locales, evitando que movil muestre codigo raro en respuestas o mejoras.
 
 - [ ] **9.17 Decisiones de diseno pendientes antes de implementar UI final**:
   - **Decision confirmada:** usar A4 como preset inicial estilo Word e incorporar Carta como formato cambiable desde el editor.

@@ -47,6 +47,21 @@ describe("copilotoService", () => {
 
     expect(apiRequest).toHaveBeenCalledTimes(2);
     expect(response.provider).toBe("heuristic_fallback");
+    expect(response.resultado.mensaje).not.toMatch(/html error|failed to fetch/i);
     expect(response.resultado.textoMejorado).toContain("Version mejorada");
+  });
+
+  it("sanitizes rich text JSON before generating local text improvements", async () => {
+    (isAPIConfigured as jest.Mock).mockReturnValue(false);
+
+    const selectedText = JSON.stringify({
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "Resolver ecuaciones lineales" }] }],
+    });
+
+    const response = await mejorarTexto(buildDoc(), selectedText, "curricular");
+
+    expect(response.resultado.textoMejorado).toContain("Resolver ecuaciones lineales");
+    expect(response.resultado.textoMejorado).not.toContain('"type":"doc"');
   });
 });

@@ -85,7 +85,7 @@ export interface DocEditorViewModel {
   setCamposNivel: (next: Record<string, unknown>) => void;
   setContenidoRaw: (next: string) => void;
   regenerarContenidoRawDesdeCampos: () => void;
-  guardarDocumento: () => Promise<void>;
+  guardarDocumento: (options?: { salir?: boolean }) => Promise<void>;
   undo: () => void;
   redo: () => void;
 }
@@ -228,7 +228,7 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
     return () => clearInterval(interval);
   }, [documento, draftKey]);
 
-  const guardarDocumento = useCallback(async () => {
+  const guardarDocumento = useCallback(async (options?: { salir?: boolean }) => {
     try {
       setIsSaving(true);
       const exists = Boolean(obtenerDocumento(documento.id));
@@ -240,7 +240,11 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
       await AsyncStorage.removeItem(draftKey);
       setIsDirty(false);
       setDraftSavedAt(getNow());
-      navigation.goBack();
+      if (options?.salir) {
+        navigation.navigate("MainTabs", {
+          screen: "ContenidoTab",
+        });
+      }
     } finally {
       setIsSaving(false);
     }

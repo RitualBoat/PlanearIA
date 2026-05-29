@@ -1,5 +1,5 @@
 import React from "react";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
@@ -8,13 +8,15 @@ import { useCrearPlaneacionViewModel } from "../../hooks/useCrearPlaneacionViewM
 const CrearPlaneacionScreen: React.FC = () => {
   const { colors } = useTheme();
   const vm = useCrearPlaneacionViewModel();
+  const isWeb = Platform.OS === "web";
 
   return (
-    <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }, isWeb && styles.webScreen]}>
       <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.content, isWeb && styles.webContent]}
+        showsVerticalScrollIndicator={isWeb}
         keyboardShouldPersistTaps="handled"
+        style={[styles.scrollView, isWeb && styles.webScrollView]}
       >
         <Text style={[styles.title, { color: colors.onSurface }]}>Crear planeacion</Text>
         <Text style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
@@ -27,15 +29,15 @@ const CrearPlaneacionScreen: React.FC = () => {
             return (
               <Pressable
                 key={item.nivel}
-                    style={[
-                      styles.levelChip,
-                      {
-                        borderColor: selected ? colors.primary : colors.borderLight,
-                        backgroundColor: selected ? colors.primary : colors.surfaceContainerLowest,
-                      },
-                    ]}
-                    onPress={() => vm.setNivelSeleccionado(item.nivel)}
-                  >
+                style={[
+                  styles.levelChip,
+                  {
+                    borderColor: selected ? colors.primary : colors.borderLight,
+                    backgroundColor: selected ? colors.primary : colors.surfaceContainerLowest,
+                  },
+                ]}
+                onPress={() => vm.setNivelSeleccionado(item.nivel)}
+              >
                 <Text style={[styles.levelChipText, { color: selected ? colors.surface : colors.onSurfaceVariant }]}>
                   {item.titulo}
                 </Text>
@@ -184,11 +186,27 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
   },
+  webScreen: {
+    height: "100vh" as never,
+    maxHeight: "100vh" as never,
+    overflow: "hidden" as never,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  webScrollView: {
+    height: "100%" as never,
+    overflow: "scroll" as never,
+  },
   content: {
     padding: 16,
     paddingBottom: 32,
     gap: 12,
     flexGrow: 1,
+  },
+  webContent: {
+    minHeight: "100%" as never,
+    paddingBottom: 120,
   },
   title: {
     fontSize: 24,

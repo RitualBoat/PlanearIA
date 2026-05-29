@@ -61,11 +61,14 @@ describe("RichTextEditor", () => {
     });
 
     const onChange = jest.fn();
-    const { getByText, queryByTestId } = render(
+    const { getByText, getByTestId, queryByTestId } = render(
       <RichTextEditor initialContent='{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Base"}]}]}' onChange={onChange} />
     );
 
     expect(getByText("Titulo")).toBeTruthy();
+    expect(getByTestId("web-richtext-editor").props.contentEditable).toBe("true");
+    expect(getByTestId("web-richtext-editor").props.tabIndex).toBe(0);
+    expect(getByTestId("web-richtext-editor").props.dangerouslySetInnerHTML).toBeUndefined();
     expect(queryByTestId("native-richtext")).toBeNull();
   });
 
@@ -88,7 +91,7 @@ describe("RichTextEditor", () => {
     expect(onChangeSecond).not.toHaveBeenCalled();
   });
 
-  it("passes serialized JSON to native TenTap and reports editor ready once", () => {
+  it("passes HTML rendered from JSON to native TenTap and reports editor ready once", () => {
     Object.defineProperty(Platform, "OS", {
       configurable: true,
       get: () => "ios",
@@ -112,9 +115,39 @@ describe("RichTextEditor", () => {
 
     expect(mockUseEditorBridge).toHaveBeenCalledWith(
       expect.objectContaining({
-        initialContent: JSON.stringify(initialContent),
+        initialContent: expect.stringContaining("Base nativa"),
+      })
+    );
+    expect(mockUseEditorBridge).toHaveBeenCalledWith(
+      expect.objectContaining({
+        initialContent: expect.not.stringContaining('"type":"doc"'),
       })
     );
     expect(onEditorReady).toHaveBeenCalledTimes(1);
+  });
+
+  it("converts JSON strings to HTML before passing content to native TenTap", () => {
+    Object.defineProperty(Platform, "OS", {
+      configurable: true,
+      get: () => "android",
+    });
+
+    const initialContent = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "Plantilla movil" }] }],
+    };
+
+    render(<RichTextEditor initialContent={JSON.stringify(initialContent)} />);
+
+    expect(mockUseEditorBridge).toHaveBeenCalledWith(
+      expect.objectContaining({
+        initialContent: expect.stringContaining("Plantilla movil"),
+      })
+    );
+    expect(mockUseEditorBridge).toHaveBeenCalledWith(
+      expect.objectContaining({
+        initialContent: expect.not.stringContaining('"type":"doc"'),
+      })
+    );
   });
 });

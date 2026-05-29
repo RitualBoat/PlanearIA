@@ -17,6 +17,7 @@ import { NotificacionesProvider } from "./src/context/NotificacionesContext";
 import { ThemeProvider } from "./src/context/ThemeContext";
 import { FontSizeProvider } from "./src/context/FontSizeContext";
 import { DaltonismoProvider } from "./src/context/DaltonismoContext";
+import KeyboardDismissFab from "./src/components/KeyboardDismissFab";
 import "./src/locales/i18n";
 
 const App: React.FC = () => {
@@ -40,6 +41,7 @@ const App: React.FC = () => {
                                     <NavigationContainer>
                                       <StackNavigator />
                                     </NavigationContainer>
+                                    <KeyboardDismissFab />
                                   </NotificacionesProvider>
                                 </MensajesProvider>
                               </ContactosProvider>

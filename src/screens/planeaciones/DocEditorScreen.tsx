@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Alert,
   Image,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -38,6 +37,7 @@ import {
 } from "../../components/editor/sections";
 import type { ActividadesCopiloto } from "../../services/copilotoService";
 import type { InstrumentoEvaluacion } from "../../../types/planeacionV2";
+import { setGlobalKeyboardDismissHandler } from "../../utils/keyboardDismissController";
 
 type Nav = StackNavigationProp<RootStackParamList, "DocEditor">;
 type PageFormat = "a4" | "carta";
@@ -192,10 +192,12 @@ const DocEditorScreen: React.FC = () => {
   const [desktopView, setDesktopView] = useState<"mixto" | "documento" | "formulario">("mixto");
   const [isFullscreenDoc, setIsFullscreenDoc] = useState(false);
   const [pageFormat, setPageFormat] = useState<PageFormat>("a4");
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [saveFeedback, setSaveFeedback] = useState<string | null>(null);
   const isMobileMode = editorMode.mode === "mobile";
   const isWeb = Platform.OS === "web";
   const lastEditorPayloadRef = useRef(vm.documento.contenidoRaw || "");
+  const skipUnsavedPromptRef = useRef(false);
+  const saveFeedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const logoSlots = useMemo(
     () => normalizeLogoSlots(vm.documento.camposNivel?.plantillaLogos),
@@ -208,17 +210,81 @@ const DocEditorScreen: React.FC = () => {
 
   useEffect(() => {
     if (isWeb || !isMobileMode) return undefined;
-    const showSub = Keyboard.addListener("keyboardDidShow", (event) => {
-      setKeyboardHeight(event.endCoordinates.height);
-    });
-    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
-      setKeyboardHeight(0);
-    });
+    const handler = () => activeInlineEditor?.blur?.();
+    setGlobalKeyboardDismissHandler(handler);
     return () => {
-      showSub.remove();
-      hideSub.remove();
+      setGlobalKeyboardDismissHandler(null);
     };
-  }, [isMobileMode, isWeb]);
+  }, [activeInlineEditor, isMobileMode, isWeb]);
+
+  useEffect(() => {
+    return () => {
+      if (saveFeedbackTimerRef.current) {
+        clearTimeout(saveFeedbackTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isWeb) return undefined;
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!vm.isDirty || skipUnsavedPromptRef.current) return;
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isWeb, vm.isDirty]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", (event) => {
+      if (!vm.isDirty || skipUnsavedPromptRef.current) return;
+      (event as { preventDefault?: () => void }).preventDefault?.();
+
+      const continueNavigation = () => {
+        skipUnsavedPromptRef.current = true;
+        navigation.dispatch(event.data.action);
+      };
+
+      if (isWeb) {
+        if (window.confirm("Tienes cambios sin guardar. ¿Quieres salir sin guardar?")) {
+          continueNavigation();
+        }
+        return;
+      }
+
+      Alert.alert("Cambios sin guardar", "Guarda la planeacion antes de salir o descarta los cambios.", [
+        { text: "Seguir editando", style: "cancel" },
+        { text: "Salir sin guardar", style: "destructive", onPress: continueNavigation },
+      ]);
+    });
+
+    return unsubscribe;
+  }, [isWeb, navigation, vm.isDirty]);
+
+  const showSaveFeedback = useCallback((message: string) => {
+    setSaveFeedback(message);
+    if (saveFeedbackTimerRef.current) {
+      clearTimeout(saveFeedbackTimerRef.current);
+    }
+    saveFeedbackTimerRef.current = setTimeout(() => {
+      setSaveFeedback(null);
+    }, 3200);
+  }, []);
+
+  const handleSaveDocument = useCallback(
+    async (salir = false) => {
+      try {
+        if (salir) skipUnsavedPromptRef.current = true;
+        await vm.guardarDocumento({ salir });
+        if (!salir) showSaveFeedback("Planeacion guardada correctamente.");
+      } catch (caught) {
+        skipUnsavedPromptRef.current = false;
+        showMessage("No se pudo guardar", caught instanceof Error ? caught.message : "Intenta nuevamente.");
+      }
+    },
+    [showSaveFeedback, vm]
+  );
 
   const handleEditorContentChange = useCallback(
     (content: Record<string, unknown>) => {
@@ -536,26 +602,60 @@ const DocEditorScreen: React.FC = () => {
             {formatDraftLabel(vm.draftSavedAt)}
           </Text>
         </View>
-        <Pressable
+        <View style={styles.headerActions}>
+          <Pressable
+            style={[
+              styles.saveButton,
+              {
+                backgroundColor: vm.isSaving ? colors.surfaceContainerHigh : colors.primary,
+              },
+            ]}
+            onPress={() => {
+              void handleSaveDocument(false);
+            }}
+            disabled={vm.isSaving}
+          >
+            {vm.isSaving ? (
+              <ActivityIndicator size="small" color={colors.surface} />
+            ) : (
+              <MaterialIcons name="save" size={18} color={colors.surface} />
+            )}
+            <Text style={[styles.saveButtonText, { color: colors.surface }]}>Guardar</Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.saveExitButton,
+              {
+                borderColor: colors.borderLight,
+                backgroundColor: colors.surfaceContainerLow,
+                opacity: vm.isSaving ? 0.6 : 1,
+              },
+            ]}
+            onPress={() => {
+              void handleSaveDocument(true);
+            }}
+            disabled={vm.isSaving}
+          >
+            <MaterialIcons name="exit-to-app" size={17} color={colors.onSurfaceVariant} />
+            <Text style={[styles.saveExitButtonText, { color: colors.onSurfaceVariant }]}>Guardar y salir</Text>
+          </Pressable>
+        </View>
+      </View>
+
+      {saveFeedback ? (
+        <View
           style={[
-            styles.saveButton,
+            styles.saveFeedback,
             {
-              backgroundColor: vm.isSaving ? colors.surfaceContainerHigh : colors.primary,
+              borderBottomColor: colors.borderLight,
+              backgroundColor: colors.successTint,
             },
           ]}
-          onPress={() => {
-            void vm.guardarDocumento();
-          }}
-          disabled={vm.isSaving}
         >
-          {vm.isSaving ? (
-            <ActivityIndicator size="small" color={colors.surface} />
-          ) : (
-            <MaterialIcons name="save" size={18} color={colors.surface} />
-          )}
-          <Text style={[styles.saveButtonText, { color: colors.surface }]}>Guardar</Text>
-        </Pressable>
-      </View>
+          <MaterialIcons name="check-circle" size={16} color={colors.success} />
+          <Text style={[styles.saveFeedbackText, { color: colors.textDark }]}>{saveFeedback}</Text>
+        </View>
+      ) : null}
 
       {!isFullscreenDoc ? (
         <View style={styles.toolbarStack}>
@@ -898,22 +998,6 @@ const DocEditorScreen: React.FC = () => {
         </ScrollView>
       </View>
       </KeyboardAvoidingView>
-      {!isWeb && isMobileMode && keyboardHeight > 0 ? (
-        <Pressable
-          style={[
-            styles.keyboardDismissButton,
-            {
-              bottom: keyboardHeight + 8,
-              borderColor: colors.borderLight,
-              backgroundColor: colors.surfaceContainerLowest,
-            },
-          ]}
-          onPress={Keyboard.dismiss}
-        >
-          <MaterialIcons name="keyboard-hide" size={18} color={colors.onSurfaceVariant} />
-          <Text style={[styles.keyboardDismissText, { color: colors.onSurfaceVariant }]}>Ocultar teclado</Text>
-        </Pressable>
-      ) : null}
     </SafeAreaView>
   );
 };
@@ -960,6 +1044,12 @@ const styles = StyleSheet.create({
     minHeight: 50,
     justifyContent: "center",
   },
+  headerActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-end",
+    gap: 8,
+  },
   title: {
     fontSize: 16,
     fontWeight: "800",
@@ -981,6 +1071,31 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     fontSize: 13,
+    fontWeight: "700",
+  },
+  saveExitButton: {
+    borderWidth: 1,
+    borderRadius: 10,
+    minHeight: 36,
+    paddingHorizontal: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  saveExitButtonText: {
+    fontSize: 12,
+    fontWeight: "800",
+  },
+  saveFeedback: {
+    minHeight: 34,
+    borderBottomWidth: 1,
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  saveFeedbackText: {
+    fontSize: 12,
     fontWeight: "700",
   },
   toolbarStack: {
@@ -1242,29 +1357,6 @@ const styles = StyleSheet.create({
   },
   sectionBlock: {
     gap: 8,
-  },
-  keyboardDismissButton: {
-    position: "absolute",
-    left: 16,
-    right: 16,
-    zIndex: 10000,
-    minHeight: 42,
-    borderRadius: 999,
-    borderWidth: 1,
-    paddingHorizontal: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    shadowColor: "#000000",
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
-  },
-  keyboardDismissText: {
-    fontSize: 13,
-    fontWeight: "800",
   },
 });
 

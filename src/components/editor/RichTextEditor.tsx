@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import {
   Platform,
   Pressable,
@@ -39,12 +39,19 @@ const normalizeContent = (value?: SerializableEditorContent): SerializableEditor
 
 const normalizeNativeContent = (value?: SerializableEditorContent): string => {
   const normalized = normalizeContent(value);
-  if (typeof normalized === "string") return normalized;
-  try {
-    return JSON.stringify(normalized);
-  } catch {
-    return "";
+  if (typeof normalized === "string") {
+    const trimmed = normalized.trim();
+    if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+      try {
+        return tipTapToHtml(JSON.parse(trimmed) as Record<string, unknown>);
+      } catch {
+        return normalized;
+      }
+    }
+    return normalized;
   }
+
+  return tipTapToHtml(normalized);
 };
 
 const fingerprintContent = (value: SerializableEditorContent): string => {
@@ -410,11 +417,11 @@ const WebFallbackRichTextEditor: React.FC<RichTextEditorProps> = ({
   const { colors } = useTheme();
   const safeInitialContent = normalizeContent(initialContent);
   const incomingFingerprint = fingerprintContent(safeInitialContent);
-  const [htmlContent, setHtmlContent] = useState(() => tipTapToHtml(safeInitialContent));
   const lastIncomingFingerprintRef = useRef(incomingFingerprint);
   const lastEmittedFingerprintRef = useRef("");
   const latestOnChangeRef = useRef(onChange);
   const editableElementRef = useRef<any>(null);
+  const hasHydratedWebEditorRef = useRef(false);
 
   const emitCurrentHtml = useCallback(() => {
     const html = String(editableElementRef.current?.innerHTML || "");
@@ -425,17 +432,37 @@ const WebFallbackRichTextEditor: React.FC<RichTextEditorProps> = ({
     latestOnChangeRef.current?.(jsonDoc);
   }, []);
 
+  const stopEditorEvent = useCallback((event: { stopPropagation?: () => void }) => {
+    event.stopPropagation?.();
+  }, []);
+
+  const focusEditableElement = useCallback(
+    (event: { stopPropagation?: () => void }) => {
+      event.stopPropagation?.();
+      if (!editable) return;
+      editableElementRef.current?.focus?.();
+    },
+    [editable]
+  );
+
   useEffect(() => {
     latestOnChangeRef.current = onChange;
   }, [onChange]);
+
+  useLayoutEffect(() => {
+    if (!editableElementRef.current || hasHydratedWebEditorRef.current) return;
+    editableElementRef.current.innerHTML = tipTapToHtml(safeInitialContent);
+    hasHydratedWebEditorRef.current = true;
+  }, [safeInitialContent]);
 
   useEffect(() => {
     if (lastIncomingFingerprintRef.current === incomingFingerprint) return;
     lastIncomingFingerprintRef.current = incomingFingerprint;
     if (lastEmittedFingerprintRef.current === incomingFingerprint) return;
     const nextHtml = tipTapToHtml(safeInitialContent);
-    setHtmlContent(nextHtml);
-    if (editableElementRef.current) editableElementRef.current.innerHTML = nextHtml;
+    if (editableElementRef.current && editableElementRef.current.innerHTML !== nextHtml) {
+      editableElementRef.current.innerHTML = nextHtml;
+    }
   }, [incomingFingerprint, safeInitialContent]);
 
   const computedMinHeight = minHeight ?? (mode === "standard" ? 420 : 300);
@@ -624,14 +651,23 @@ const WebFallbackRichTextEditor: React.FC<RichTextEditorProps> = ({
           })}
           {React.createElement("div", {
             ref: editableElementRef,
-            contentEditable: editable,
+            contentEditable: editable ? "true" : "false",
             suppressContentEditableWarning: true,
             role: "textbox",
+            tabIndex: 0,
+            spellCheck: true,
             "aria-label": placeholder,
+            testID: "web-richtext-editor",
             "data-testid": "web-richtext-editor",
+            onMouseDown: stopEditorEvent,
+            onPointerDown: stopEditorEvent,
+            onTouchStart: stopEditorEvent,
+            onClick: focusEditableElement,
+            onKeyDown: stopEditorEvent,
+            onKeyUp: stopEditorEvent,
+            onBeforeInput: stopEditorEvent,
             onInput: emitCurrentHtml,
             onBlur: emitCurrentHtml,
-            dangerouslySetInnerHTML: { __html: htmlContent },
             style: {
               minHeight: pageMinHeight - 72,
               color: colors.onSurface,
@@ -640,6 +676,10 @@ const WebFallbackRichTextEditor: React.FC<RichTextEditorProps> = ({
               lineHeight: "20px",
               fontFamily: "Arial, sans-serif",
               whiteSpace: "normal",
+              cursor: editable ? "text" : "default",
+              userSelect: "text",
+              WebkitUserSelect: "text",
+              pointerEvents: "auto",
             },
           })}
         </View>

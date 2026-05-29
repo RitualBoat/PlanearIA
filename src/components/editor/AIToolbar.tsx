@@ -12,12 +12,13 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 import type { EditorMode } from "../../hooks/useEditorMode";
 
-export type AIActionType = "sugerir" | "mejorar" | "rubrica" | "revisar";
+export type AIActionType = "sugerir" | "mejorar" | "autocompletar" | "rubrica" | "revisar";
 
 export interface AIToolbarResult {
   message: string;
   title?: string;
   detail?: string;
+  warning?: string;
   insertLabel?: string;
   payload?: unknown;
 }
@@ -26,6 +27,7 @@ export interface AIToolbarProps {
   mode?: EditorMode;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
+  iaStatusText?: string;
   onAction?: (action: AIActionType) => Promise<AIToolbarResult | string | void>;
   onInsertResult?: (result: AIToolbarResult, action: AIActionType) => Promise<void> | void;
 }
@@ -39,6 +41,7 @@ interface ActionConfig {
 const ACTIONS: ActionConfig[] = [
   { id: "sugerir", label: "Sugerir", icon: "auto-awesome" },
   { id: "mejorar", label: "Mejorar", icon: "auto-fix-high" },
+  { id: "autocompletar", label: "Completar", icon: "edit-note" },
   { id: "rubrica", label: "Rubrica", icon: "fact-check" },
   { id: "revisar", label: "Revisar", icon: "rule" },
 ];
@@ -60,6 +63,7 @@ export const AIToolbar: React.FC<AIToolbarProps> = ({
   mode = "mobile",
   disabled = false,
   style,
+  iaStatusText,
   onAction,
   onInsertResult,
 }) => {
@@ -122,6 +126,12 @@ export const AIToolbar: React.FC<AIToolbarProps> = ({
       ]}
     >
       <Text style={[styles.title, { color: colors.onSurface }]}>Copiloto IA</Text>
+      {iaStatusText ? (
+        <View style={[styles.statusChip, { borderColor: colors.borderLight, backgroundColor: colors.surfaceContainerLow }]}>
+          <MaterialIcons name="info-outline" size={14} color={colors.onSurfaceVariant} />
+          <Text style={[styles.statusChipText, { color: colors.onSurfaceVariant }]}>{iaStatusText}</Text>
+        </View>
+      ) : null}
       <View style={styles.actionsRow}>
         {actions.map((action) => {
           const isLoading = loadingAction === action.id;
@@ -167,6 +177,12 @@ export const AIToolbar: React.FC<AIToolbarProps> = ({
           <Text style={[styles.feedbackText, { color: colors.textDark }]}>{lastResult.message}</Text>
           {lastResult.detail ? (
             <Text style={[styles.feedbackDetail, { color: colors.textSecondary }]}>{lastResult.detail}</Text>
+          ) : null}
+          {lastResult.warning ? (
+            <View style={[styles.warningBox, { backgroundColor: colors.warningTint }]}>
+              <MaterialIcons name="warning-amber" size={14} color={colors.warning} />
+              <Text style={[styles.warningText, { color: colors.warning }]}>{lastResult.warning}</Text>
+            </View>
           ) : null}
           <View style={styles.feedbackActions}>
             {onInsertResult && lastResult.payload !== undefined ? (
@@ -218,6 +234,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "700",
   },
+  statusChip: {
+    minHeight: 30,
+    borderRadius: 999,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  statusChipText: {
+    fontSize: 11,
+    fontWeight: "700",
+  },
   actionsRow: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -257,6 +286,21 @@ const styles = StyleSheet.create({
     marginTop: 3,
     fontSize: 12,
     lineHeight: 17,
+  },
+  warningBox: {
+    marginTop: 8,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 6,
+  },
+  warningText: {
+    flex: 1,
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: "700",
   },
   feedbackActions: {
     marginTop: 8,

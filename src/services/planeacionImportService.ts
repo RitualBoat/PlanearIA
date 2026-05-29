@@ -9,8 +9,13 @@ import {
   type PlaneacionDocumento,
   type Sesion,
 } from "../../types/planeacionV2";
-import type { PlantillaDocumento } from "../../types/plantillaDocumento";
+import type {
+  CampoPlantilla,
+  PlantillaDocumento,
+  SeccionPlantilla,
+} from "../../types/plantillaDocumento";
 import type { Usuario } from "../context/AuthContext";
+import { isAPIConfigured } from "../sync/config/apiConfig";
 import { apiRequest } from "../utils/apiClient";
 import { buildPlaneacionDocumentoBase } from "../utils/createPlaneacionDocumentoBase";
 
@@ -314,6 +319,210 @@ const normalizePlantillaFromApi = (
   };
 };
 
+const truncateMessage = (value: string, max = 140): string => {
+  const normalized = value.replace(/\s+/g, " ").replace(/<[^>]+>/g, " ").trim();
+  return normalized.length <= max ? normalized : `${normalized.slice(0, max - 3)}...`;
+};
+
+const readResponseJson = async (response: Response): Promise<Record<string, any>> => {
+  const raw = await response.text();
+  if (!raw.trim()) return {};
+
+  try {
+    return JSON.parse(raw) as Record<string, any>;
+  } catch {
+    throw new Error(
+      response.ok
+        ? `El backend respondio texto no JSON: ${truncateMessage(raw)}`
+        : `Backend IA no disponible (${response.status}): ${truncateMessage(raw)}`
+    );
+  }
+};
+
+const field = (
+  id: string,
+  etiqueta: string,
+  tipo: CampoPlantilla["tipo"],
+  requerido = false,
+  opciones?: string[]
+): CampoPlantilla => ({
+  id,
+  etiqueta,
+  tipo,
+  requerido,
+  opciones,
+});
+
+const slug = (value: string): string => {
+  const normalized = value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  return normalized || `campo_${Date.now()}`;
+};
+
+const cleanTitle = (value: string): string => {
+  const title = value.replace(/[:.-]+$/g, "").replace(/\s+/g, " ").trim();
+  return title ? title.charAt(0).toUpperCase() + title.slice(1).toLowerCase() : "";
+};
+
+const detectTemplateHeadings = (text: string): string[] => {
+  const headings: string[] = [];
+  const lines = cleanText(text)
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter((line) => line.length >= 4 && line.length <= 80);
+
+  for (const line of lines) {
+    const looksLikeHeading =
+      /^[A-ZÁÉÍÓÚÑ0-9\s().:-]+$/.test(line) ||
+      /^(datos|informacion|información|elementos|sesion|sesión|evaluacion|evaluación|observaciones|firmas|proposito|propósito|contenido|instrumentacion|instrumentación)/i.test(
+        line
+      );
+
+    const title = cleanTitle(line);
+    if (looksLikeHeading && title && !headings.some((item) => slug(item) === slug(title))) {
+      headings.push(title);
+    }
+  }
+
+  return headings.slice(0, 10);
+};
+
+const buildLocalTemplateSections = (text: string): SeccionPlantilla[] => {
+  const base: SeccionPlantilla[] = [
+    {
+      id: "info_institucional",
+      tipo: "info_institucional",
+      titulo: "Informacion institucional",
+      visible: true,
+      campos: [
+        field("institucion", "Institucion", "text", true),
+        field("subsistema", "Subsistema", "text"),
+        field("ciclo_escolar", "Ciclo escolar", "text", true),
+        field("lugar", "Lugar", "text"),
+      ],
+    },
+    {
+      id: "datos_generales",
+      tipo: "datos_generales",
+      titulo: "Datos generales",
+      visible: true,
+      campos: [
+        field("docente", "Docente", "text", true),
+        field("asignatura", "Asignatura", "text", true),
+        field("grado", "Grado", "text", true),
+        field("grupos", "Grupos", "multiselect"),
+        field("fecha_inicio", "Fecha de inicio", "date", true),
+        field("fecha_fin", "Fecha de cierre", "date", true),
+      ],
+    },
+    {
+      id: "curricular",
+      tipo: "curricular",
+      titulo: "Elementos curriculares",
+      visible: true,
+      campos: [
+        field("proposito", "Proposito", "richtext", true),
+        field("contenido", "Contenido", "richtext", true),
+        field("pda", "PDA o aprendizaje esperado", "richtext", true),
+        field("campo_formativo", "Campo formativo", "text"),
+        field("eje_articulador", "Eje articulador", "text"),
+        field("producto", "Producto o evidencia", "richtext"),
+      ],
+    },
+    {
+      id: "sesiones",
+      tipo: "sesiones",
+      titulo: "Secuencia didactica",
+      visible: true,
+      campos: [
+        field("inicio", "Inicio", "richtext", true),
+        field("desarrollo", "Desarrollo", "richtext", true),
+        field("cierre", "Cierre", "richtext", true),
+        field("tarea", "Tarea", "richtext"),
+      ],
+    },
+    {
+      id: "evaluacion",
+      tipo: "evaluacion",
+      titulo: "Evaluacion",
+      visible: true,
+      campos: [
+        field("instrumento", "Instrumento", "select", true, [
+          "Rubrica",
+          "Lista de cotejo",
+          "Escala de valoracion",
+          "Escala estimativa",
+        ]),
+        field("criterios", "Criterios", "table", true),
+        field("evidencias", "Evidencias", "checkbox_list"),
+      ],
+    },
+    {
+      id: "observaciones",
+      tipo: "observaciones",
+      titulo: "Observaciones",
+      visible: true,
+      campos: [field("observaciones", "Observaciones", "richtext")],
+    },
+    {
+      id: "firmas",
+      tipo: "firmas",
+      titulo: "Firmas",
+      visible: true,
+      campos: [
+        field("firma_docente", "Firma docente", "text"),
+        field("firma_coordinacion", "Firma coordinacion", "text"),
+      ],
+    },
+  ];
+
+  const baseSlugs = new Set(base.map((section) => slug(section.titulo)));
+  const customSections = detectTemplateHeadings(text)
+    .filter((title) => !baseSlugs.has(slug(title)))
+    .slice(0, 4)
+    .map<SeccionPlantilla>((title) => ({
+      id: slug(title),
+      tipo: "custom",
+      titulo: title,
+      visible: true,
+      campos: [field(slug(title), title, "richtext")],
+    }));
+
+  return [...base, ...customSections];
+};
+
+const buildLocalPlantillaFromText = (
+  text: string,
+  nivelAcademico: NivelAcademico,
+  userId: string
+): PlantillaDocumento => {
+  const now = new Date().toISOString();
+  const subject = readLabelValue(text, ["asignatura", "materia", "campo formativo"]);
+
+  return {
+    id: `plantilla_local_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+    userId,
+    nombre: subject ? `Plantilla ${subject}` : "Plantilla escaneada",
+    descripcion:
+      "Plantilla detectada con reglas locales cuando el gateway IA no esta disponible.",
+    nivelAcademico,
+    origen: "escaner",
+    secciones: buildLocalTemplateSections(text),
+    defaults: {
+      nivelAcademico,
+      firmas: [{ rol: "Docente", nombre: "" }],
+      observaciones: [{ texto: "", categoria: "general" }],
+      camposNivel: {},
+    },
+    fechaCreacion: now,
+    fechaModificacion: now,
+  };
+};
+
 export const scanPlantillaFromRawText = async (
   textoRaw: string,
   options: { nivelAcademico?: NivelAcademico; userId?: string } = {}
@@ -324,24 +533,34 @@ export const scanPlantillaFromRawText = async (
   }
 
   const nivelAcademico = options.nivelAcademico || inferNivel(text);
-  const response = await apiRequest("/api/planeaciones/escanear-plantilla", {
-    method: "POST",
-    body: JSON.stringify({
-      textoRaw: text,
-      nivelAcademico,
-    }),
-  });
+  const userId = options.userId || "guest";
 
-  const payload = await response.json();
-  if (!response.ok || !payload?.success || !payload?.data?.plantilla) {
-    throw new Error(payload?.error || "No se pudo escanear la plantilla.");
+  if (!isAPIConfigured()) {
+    return buildLocalPlantillaFromText(text, nivelAcademico, userId);
   }
 
-  return normalizePlantillaFromApi(
-    payload.data.plantilla as PlantillaDocumento,
-    options.userId || "guest",
-    nivelAcademico
-  );
+  try {
+    const response = await apiRequest("/api/planeaciones/escanear-plantilla", {
+      method: "POST",
+      body: JSON.stringify({
+        textoRaw: text,
+        nivelAcademico,
+      }),
+    });
+
+    const payload = await readResponseJson(response);
+    if (!response.ok || !payload?.success || !payload?.data?.plantilla) {
+      throw new Error(payload?.error || "No se pudo escanear la plantilla.");
+    }
+
+    return normalizePlantillaFromApi(
+      payload.data.plantilla as PlantillaDocumento,
+      userId,
+      nivelAcademico
+    );
+  } catch {
+    return buildLocalPlantillaFromText(text, nivelAcademico, userId);
+  }
 };
 
 export function parseImportedPlaneacionFile(

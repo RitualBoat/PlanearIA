@@ -16,9 +16,9 @@ const {
   errorResponse,
   successResponse,
 } = require("../../lib/auth");
+const { hasConfiguredProviders, runChatCompletion } = require("../../lib/aiGateway");
+const { assertAiUsageLimit } = require("../../lib/aiUsageLimiter");
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 const OPENAI_TIMEOUT_MS = parseInt(process.env.OPENAI_TIMEOUT_MS || "25000", 10);
 const MAX_TEXT_CHARS = 18000;
 
@@ -74,7 +74,7 @@ module.exports = async (req, res) => {
     const tokenUser = getUserFromToken(req);
     const userId = String(tokenUser?.userId || tokenUser?.id || "server");
 
-    if (!OPENAI_API_KEY) {
+    if (!hasConfiguredProviders()) {
       const plantilla = buildFallbackPlantilla(text, nivel, userId);
       return successResponse(res, {
         provider: "heuristic",
@@ -84,24 +84,36 @@ module.exports = async (req, res) => {
     }
 
     try {
+      const usage = assertAiUsageLimit(req, "escanear_plantilla");
       const systemPrompt = buildSystemPrompt(nivel);
       const userPrompt = buildUserPrompt(text);
-      const rawContent = await scanWithOpenAI(systemPrompt, userPrompt);
+      const ai = await runChatCompletion({
+        systemPrompt,
+        userPrompt,
+        temperature: 0.2,
+        responseFormatJson: true,
+        timeoutMs: OPENAI_TIMEOUT_MS,
+      });
+      const rawContent = ai.content;
       const parsed = extractJson(rawContent);
       const plantilla = normalizePlantilla(parsed?.plantilla || parsed, nivel, userId, text);
 
       return successResponse(res, {
-        provider: "openai",
-        model: OPENAI_MODEL,
+        provider: ai.provider,
+        model: ai.model,
+        usage,
         plantilla,
       });
     } catch (aiError) {
       console.warn("Fallback heuristico en /api/planeaciones/escanear-plantilla:", aiError);
+      if (aiError?.statusCode === 429) {
+        return errorResponse(res, 429, aiError.message);
+      }
       const plantilla = buildFallbackPlantilla(text, nivel, userId);
 
       return successResponse(res, {
         provider: "heuristic_fallback",
-        model: OPENAI_MODEL,
+        model: null,
         plantilla,
       });
     }
@@ -165,47 +177,6 @@ Reglas obligatorias:
 
 function buildUserPrompt(text) {
   return `Texto extraido del documento:\n${text.slice(0, MAX_TEXT_CHARS)}`;
-}
-
-async function scanWithOpenAI(systemPrompt, userPrompt) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
-
-  try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: OPENAI_MODEL,
-        temperature: 0.2,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
-      signal: controller.signal,
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      const msg = data?.error?.message || `Error OpenAI (${response.status})`;
-      throw new Error(msg);
-    }
-
-    const content = data?.choices?.[0]?.message?.content;
-    if (!content || typeof content !== "string") {
-      throw new Error("La IA no devolvio contenido utilizable");
-    }
-
-    return content;
-  } finally {
-    clearTimeout(timeoutId);
-  }
 }
 
 function extractJson(raw) {

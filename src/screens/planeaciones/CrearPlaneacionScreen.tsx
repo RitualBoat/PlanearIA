@@ -78,6 +78,38 @@ const CrearPlaneacionScreen: React.FC = () => {
                         {item.nombre}
                       </Text>
                       <Text style={[styles.templateDesc, { color: colors.onSurfaceVariant }]}>{item.descripcion}</Text>
+                      {item.etiquetas?.length ? (
+                        <View style={styles.templateTagsRow}>
+                          {item.etiquetas.slice(0, 4).map((tag) => (
+                            <View
+                              key={`${item.id}_${tag}`}
+                              style={[
+                                styles.templateTag,
+                                {
+                                  borderColor: colors.borderLight,
+                                  backgroundColor: colors.surfaceContainerLow,
+                                },
+                              ]}
+                            >
+                              <Text style={[styles.templateTagText, { color: colors.onSurfaceVariant }]}>
+                                {tag}
+                              </Text>
+                            </View>
+                          ))}
+                        </View>
+                      ) : null}
+                      {item.compatibilidad ? (
+                        <Text style={[styles.templateMeta, { color: colors.onSurfaceVariant }]}>
+                          Compatibilidad:{" "}
+                          {[
+                            item.compatibilidad.web ? "Web" : null,
+                            item.compatibilidad.android ? "Android" : null,
+                            item.compatibilidad.ios ? "iOS" : null,
+                          ]
+                            .filter(Boolean)
+                            .join(" / ")}
+                        </Text>
+                      ) : null}
                     </View>
                   </Pressable>
                 );
@@ -161,12 +193,18 @@ const CrearPlaneacionScreen: React.FC = () => {
                 {
                   borderColor: colors.borderLight,
                   backgroundColor: colors.surfaceContainerLow,
+                  opacity: vm.isSubmitting ? 0.7 : 1,
                 },
               ]}
-              onPress={vm.handleGenerarConIADesdeSelector}
+              disabled={vm.isSubmitting}
+              onPress={() => {
+                void vm.handleGenerarConIADesdeSelector();
+              }}
             >
               <MaterialIcons name="auto-awesome" size={16} color={colors.onSurfaceVariant} />
-              <Text style={[styles.secondaryButtonText, { color: colors.onSurfaceVariant }]}>Generar con IA</Text>
+              <Text style={[styles.secondaryButtonText, { color: colors.onSurfaceVariant }]}>
+                Abrir con IA
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -262,6 +300,28 @@ const styles = StyleSheet.create({
   templateDesc: {
     fontSize: 12,
     lineHeight: 17,
+  },
+  templateTagsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginTop: 2,
+  },
+  templateTag: {
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    minHeight: 22,
+    justifyContent: "center",
+  },
+  templateTagText: {
+    fontSize: 10,
+    fontWeight: "700",
+    textTransform: "uppercase",
+  },
+  templateMeta: {
+    fontSize: 11,
+    marginTop: 2,
   },
   emptyCard: {
     borderWidth: 1,

@@ -730,15 +730,18 @@ export interface FiltrosPlaneacionV2 {
 
 #### Tareas
 
-- [ ] **9.1 Auditar y documentar la IA usada en Planeaciones**:
+- [x] **9.1 Auditar y documentar la IA usada en Planeaciones**:
   - Confirmar todos los endpoints IA activos: `backend/api/planeaciones/generar.js`, `copiloto.js`, `mejorar.js`, `escanear-plantilla.js`.
   - Documentar proveedor real: OpenAI via `https://api.openai.com/v1/chat/completions`.
   - Documentar modelo por defecto: `OPENAI_MODEL || "gpt-4o-mini"`.
   - Documentar variables requeridas: `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_TIMEOUT_MS`, `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_API_SECRET`.
   - Separar comportamiento real vs fallback: `generar` y `mejorar` fallan sin API key; `copiloto` y `escanear-plantilla` devuelven heuristicas si falta API key o falla OpenAI.
   - Agregar una nota visible en documentacion indicando que el contenido IA es sugerencia docente y debe revisarse.
+  - **Avance aplicado 2026-05-28:** documento de auditoria publicado en `Documentacion/PLANEACIONES_IA_EDITOR_FASE9.md` con endpoints, proveedor real, modelo default, variables requeridas y matriz real/fallback por endpoint.
+  - **Avance aplicado 2026-05-28:** nota pedagogica visible agregada: toda salida IA es sugerencia y requiere validacion docente.
+  - **Avance aplicado 2026-05-29:** auditoria actualizada: los endpoints IA ahora pasan por `backend/lib/aiGateway.js`, con cascada OpenAI-compatible (`OPENROUTER_API_KEY`, `GROQ_API_KEY`, `OPENAI_API_KEY`, `TOGETHER_API_KEY` o `AI_GATEWAY_PROVIDERS`) y limite por accion (`AI_MAX_REQUESTS_PER_ACTION`, default 10).
 
-- [ ] **9.2 Definir criterio de aceptacion del editor tipo Word/Docs**:
+- [x] **9.2 Definir criterio de aceptacion del editor tipo Word/Docs**:
   - Debe existir un canvas principal de documento, no solo inputs por seccion.
   - Debe permitir escribir texto libre, seleccionar texto, negritas, cursivas, encabezados, listas, checklist, tablas, undo/redo y guardado.
   - Debe abrir siempre con una plantilla visible, aunque sea la default/base.
@@ -747,8 +750,9 @@ export interface FiltrosPlaneacionV2 {
   - En movil, debe tener alternancia entre vista documento y formulario guiado, con sincronizacion bidireccional.
   - Debe guardar y reabrir contenido rich text sin perder JSON ProseMirror/Tiptap ni mapeo de campos.
   - Debe funcionar en web, Android/iOS y modo movil/estandar sin bloquear scroll ni clicks.
+  - **Avance aplicado 2026-05-28:** criterio de aceptacion consolidado y publicado en `Documentacion/PLANEACIONES_IA_EDITOR_FASE9.md` con checklist funcional de cierre.
 
-- [ ] **9.3 Redisenar la arquitectura del editor para que deje de sentirse como formulario**:
+- [~] **9.3 Redisenar la arquitectura del editor para que deje de sentirse como formulario**:
   - `DocEditorScreen` debe partir de un documento unico/canvas central, no de tarjetas de formulario como experiencia principal.
   - Mantener secciones pedagogicas solo como navegacion/estructura, no como sustituto del documento.
   - Integrar `RichTextEditor` como superficie principal del documento, con bloques derivados de la plantilla seleccionada.
@@ -761,7 +765,7 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** en movil se agrego alternancia `Documento`/`Formulario` y en web/estandar el documento queda como experiencia primaria.
   - **Avance aplicado 2026-05-28:** se agrego accion `Sincronizar plantilla` para regenerar el contenido del documento desde campos estructurados.
 
-- [ ] **9.4 Corregir el flujo de creacion para eliminar doble nivel y legacy**:
+- [x] **9.4 Corregir el flujo de creacion para eliminar doble nivel y legacy**:
   - El flujo principal debe ser `Crear planeacion` -> `SelectorPlantillasPlaneacion` -> `DocEditor`.
   - Eliminar la doble seleccion de nivel. Si el nivel se necesita, debe vivir dentro del selector/configuracion de plantilla y solo capturarse una vez.
   - El selector debe ofrecer plantilla base/default, plantillas guardadas, plantillas predeterminadas adicionales, plantillas online y opcion importar plantilla.
@@ -772,14 +776,17 @@ export interface FiltrosPlaneacionV2 {
   - Escanear plantilla debe poder guardar la plantilla y crear inmediatamente una planeacion nueva desde ella.
   - **Avance aplicado 2026-05-28:** `CrearPlaneacionScreen` ya funciona como selector de plantillas (base, predeterminadas, guardadas y online placeholder), elimina el wizard de 3 pasos y abre `DocEditor` directamente desde la plantilla elegida.
   - **Avance aplicado 2026-05-28:** `CrearNuevoModal` ya no pide nivel para crear planeacion; navega directo a `CrearPlaneacion`.
+  - **Avance aplicado 2026-05-28:** `Generar con IA` desde selector deja de abrir `GenerarPlaneacionIA`; ahora crea documento V2 desde plantilla y abre `DocEditor` para trabajar IA in-editor.
 
-- [ ] **9.5 Corregir la edicion de planeaciones existentes**:
+- [x] **9.5 Corregir la edicion de planeaciones existentes**:
   - Verificar todos los puntos de entrada: card en Contenido, menu contextual, ListaPlaneaciones, borradores, exportacion, deep links y chat/feed si aplica.
   - Toda edicion de planeacion debe navegar a `DocEditor` con `modo: "editar"` y `planeacionId` valido.
   - Si una planeacion legacy aparece, debe migrarse silenciosamente a V2 antes de abrir el editor moderno.
   - Eliminar o bloquear cualquier ruta que abra pantallas/formularios legacy para editar planeaciones.
+  - **Avance aplicado 2026-05-28:** auditoria de entradas principales completada (`ContenidoScreen` card/menu/borradores y `useListaPlaneacionesViewModel`), todas navegan a `DocEditor` en modo `editar`.
+  - **Avance aplicado 2026-05-28:** flujos legacy de edicion retirados del camino principal; no quedan pantallas legacy activas para editar planeaciones.
 
-- [ ] **9.6 Crear sistema base de plantillas de planeacion**:
+- [x] **9.6 Crear sistema base de plantillas de planeacion**:
   - Construir una `PlantillaDocumento` default del sistema usando como fuente principal `context/planeaciones-reales/semana 33 y 34 primero/primero.md` y/o `segundo.md`.
   - Incluir estructura minima siempre visible: info institucional, datos generales, elementos curriculares, sesiones, evaluacion, observaciones y firmas.
   - Agregar varias plantillas predeterminadas locales por nivel/uso para que el selector no se sienta vacio.
@@ -787,8 +794,11 @@ export interface FiltrosPlaneacionV2 {
   - Agregar fallback determinista si no hay plantillas de usuario ni plantillas escaneadas.
   - Definir metadata para galeria: nombre, descripcion, nivel, etiquetas, miniatura/preview, origen y compatibilidad.
   - Validar que la plantilla predeterminada funciona para primaria, secundaria, preparatoria y universidad con placeholders adaptados.
+  - **Avance aplicado 2026-05-28:** `PlantillaDocumento` ahora incluye metadata de galeria local (`etiquetas`, `miniaturaUri`, `compatibilidad`) para preparar Fase 10 sin bloquear cierre funcional de Fase 9.
+  - **Avance aplicado 2026-05-28:** `useCrearPlaneacionViewModel` fortalece plantillas base/predeterminadas con defaults y placeholders por nivel (primaria, secundaria, preparatoria y universidad), manteniendo fallback determinista en selector.
+  - **Avance aplicado 2026-05-28:** `CrearPlaneacionScreen` muestra metadata visible de plantilla (tags + compatibilidad) para mejorar seleccion y trazabilidad de origen.
 
-- [ ] **9.7 Limpiar rutas, pantallas y handlers legacy restantes**:
+- [x] **9.7 Limpiar rutas, pantallas y handlers legacy restantes**:
   - Evaluar eliminacion o redireccion de `PlaneacionesScreen` como hub legacy.
   - Evaluar eliminacion o conversion de `GenerarPlaneacionIAScreen` a flujo V2 dentro de `DocEditor`/wizard.
   - Quitar compatibilidad temporal legacy de `useCrearPlaneacionViewModel` cuando ya no sea necesaria.
@@ -796,8 +806,11 @@ export interface FiltrosPlaneacionV2 {
   - Actualizar tests que todavia esperan navegar a `Planeaciones` o `GenerarPlaneacionIA`.
   - **Avance aplicado 2026-05-28:** hooks y pantallas del modulo (`useDocEditorViewModel`, `useListaPlaneacionesViewModel`, `useContenidoViewModel`, `ImportarPlaneacionScreen`, `ExportarPlaneacionScreen`) ya importan `PlaneacionesContext`.
   - **Avance aplicado 2026-05-28:** tests de contenido/planeaciones actualizados para mockear `context/PlaneacionesContext` en lugar de `SyncProvider`.
+  - **Avance aplicado 2026-05-28:** rutas legacy `Planeaciones` y `GenerarPlaneacionIA` se mantienen por compatibilidad pero redirigidas al selector moderno (`CrearPlaneacionScreen`), evitando aislamiento de flujos viejos.
+  - **Avance aplicado 2026-05-28:** imports activos restantes que consumian `usePlaneaciones` desde `sync/providers/SyncProvider` (`SyncIndicator`, `ConversacionScreen`, `useConversacionViewModel`, `PerfilScreen`) migrados a `context/PlaneacionesContext`.
+  - **Avance aplicado 2026-05-28:** eliminadas pantallas legacy sin uso del flujo moderno: `PlaneacionesScreen.tsx`, `GenerarPlaneacionIAScreen.tsx` y `GenerarPlaneacionIAForm.tsx`; pruebas legacy asociadas retiradas.
 
-- [ ] **9.8 Corregir scroll y clicks en web**:
+- [~] **9.8 Corregir scroll y clicks en web**:
   - Reproducir el bloqueo de scroll en `ContenidoScreen`, `CrearNuevoModal`, `CrearPlaneacionScreen` y `DocEditorScreen`.
   - Auditar contenedores `FlatList`, `ScrollView`, `SafeAreaView`, overlays `Modal/Pressable`, FAB, z-index, `pointerEvents` y alturas `flex`.
   - Asegurar que los modales no capturen clicks fuera de su area util ni bloqueen la lista al cerrarse.
@@ -806,16 +819,19 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** `CrearNuevoModal` ahora se desmonta por completo cuando `visible=false`, evitando overlays residuales que bloqueen clicks/scroll en web.
   - **Avance aplicado 2026-05-28:** `ContenidoScreen`, `CrearPlaneacionScreen`, `ImportarPlaneacionScreen`, `ExportarPlaneacionScreen` y `DocEditorScreen` reforzaron `ScrollView/FlatList` con `keyboardShouldPersistTaps` y `flexGrow` para mejorar scroll/clicks.
   - **Avance aplicado 2026-05-28:** `ContenidoScreen` renderiza modales contextuales solo cuando estan activos (en lugar de mantenerlos montados cerrados).
+  - **Avance aplicado 2026-05-28:** hardening adicional web en `ContenidoScreen` con layout `100vh` + `FlatList` con scroll interno explicito para reducir cortes de contenido y bloqueos de scroll.
+  - **Avance aplicado 2026-05-29:** `EscanerPlantillaScreen` recibe scroll web interno, preview de texto con scroll propio y ajustes de layout para evitar texto sobrepuesto debajo del boton `Analizar estructura`.
 
-- [ ] **9.9 Refinar la tab Contenido/Recursos sin sobrerrefactorizar**:
+- [~] **9.9 Refinar la tab Contenido/Recursos sin sobrerrefactorizar**:
   - Mantener `ContenidoScreen` como hub de contenido si sigue siendo la mejor entrada principal.
   - Separar mentalmente las responsabilidades: planeaciones, recursos, entregables y plantillas.
   - Cambiar CTA empty state de `Planeaciones` a `CrearPlaneacion` o al nuevo flujo decidido.
   - Asegurar que el FAB `Crear nuevo` no duplique preguntas ni mande a rutas legacy.
   - Verificar que acciones editar, duplicar, eliminar, exportar y compartir funcionen para planeaciones V2.
   - **Avance aplicado 2026-05-28:** empty state de `ContenidoScreen` ya navega a `CrearPlaneacion` en lugar de `Planeaciones`.
+  - **Avance aplicado 2026-05-28:** ajuste de layout web en `ContenidoScreen` para mantener accesibilidad del hub sin romper navegacion entre tarjetas, FAB y menu contextual.
 
-- [ ] **9.10 Endurecer persistencia y sincronizacion del editor**:
+- [~] **9.10 Endurecer persistencia y sincronizacion del editor**:
   - Verificar autosave local de `DocEditor` y recuperacion de borrador.
   - Evitar que un draft de `modo: crear` sobreescriba otra planeacion del mismo nivel.
   - Confirmar que guardar crea/actualiza exactamente un documento V2.
@@ -823,6 +839,7 @@ export interface FiltrosPlaneacionV2 {
   - Validar offline-first: crear/editar offline, reconectar, sincronizar y no duplicar documentos.
   - **Avance aplicado 2026-05-28:** `useDocEditorViewModel` ahora usa clave de instancia por ruta para borradores de `modo: crear`, evitando colision entre borradores del mismo nivel.
   - **Avance aplicado 2026-05-28:** `setContenidoRaw` ahora ignora payloads identicos para evitar writes redundantes y ruido en autosave/historial.
+  - **Avance aplicado 2026-05-28:** autosave de borrador endurecido: solo escribe cuando hay cambios (`isDirty`) y evita escrituras repetidas con fingerprint serializado de documento.
 
 - [~] **9.11 Agregar pruebas automatizadas de flujo real**:
   - Unit tests para ViewModels: crear manual, crear con IA V2, importar, abrir plantilla, editar existente.
@@ -833,6 +850,8 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** nuevo test `docEditorTemplate.test.ts` valida que el documento base siempre tenga estructura visible tipo Word/Docs y que `contenidoRaw` se genere cuando llega vacio.
   - **Avance aplicado 2026-05-28:** `docEditorTemplate.test.ts` ahora protege la plantilla robusta basada en ground truth real: encabezado de instrumentacion didactica, tablas, indicadores, matriz de evaluacion y regeneracion de plantillas legacy autogeneradas.
   - **Avance aplicado 2026-05-28:** nuevo test `RichTextEditor.test.tsx` cubre fallback web sin WebView y deduplicacion de emisiones para evitar loops en remount/rerender.
+  - **Avance aplicado 2026-05-28:** `useCrearPlaneacionViewModel.test.tsx` agrega cobertura para metadata de plantillas base y flujo `Abrir con IA` desde selector (crea doc V2 y navega a `DocEditor`).
+  - **Avance aplicado 2026-05-29:** `planeacionImportService.test.ts` cubre fallback local del escaner cuando falta backend IA o el backend responde texto no JSON.
 
 - [~] **9.12 Ejecutar validacion tecnica completa**:
   - `npx tsc --noEmit`.
@@ -852,11 +871,20 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** validacion focalizada posterior al ajuste de edicion web/teclado movil: `npx tsc --noEmit` OK y `RichTextEditor/docEditorTemplate/copilotoService` OK (3 suites, 10 tests).
   - **Avance aplicado 2026-05-28:** validacion final de este bloque OK: `npm run lint -- --quiet` y `npm test -- --runInBand src/__tests__/planeaciones` (13 suites, 39 tests).
   - **Avance aplicado 2026-05-28:** validacion del FAB global de teclado OK: `npx tsc --noEmit`, `npm run lint -- --quiet` y suite de planeaciones (13 suites, 39 tests).
+  - **Avance aplicado 2026-05-28:** validacion posterior a limpieza de flujo IA/legacy y auditoria documental: `npx tsc --noEmit` OK, `npm run lint -- --quiet` OK y `npm test -- --runInBand src/__tests__/planeaciones` OK (13 suites, 39 tests).
+  - **Avance aplicado 2026-05-28:** validacion cruzada tras migrar imports legacy de `SyncProvider`: `npx tsc --noEmit` OK, `npm run lint -- --quiet` OK y `npm test -- --runInBand src/__tests__/planeaciones src/__tests__/perfil/PerfilScreen.test.tsx src/__tests__/chat/ChatIntegration.test.tsx` OK (15 suites, 60 tests).
+  - **Avance aplicado 2026-05-28:** validacion posterior al bloque de plantillas base + autosave robusto: `npx tsc --noEmit` OK, `npm run lint -- --quiet` OK y pruebas focalizadas `useCrearPlaneacionViewModel/docEditorTemplate/RichTextEditor` OK (3 suites, 15 tests).
+  - **Avance aplicado 2026-05-28:** validacion posterior al hardening web de `ContenidoScreen`: `npx tsc --noEmit` OK y `npm run lint -- --quiet` OK.
+  - **Avance aplicado 2026-05-28:** smoke test del hub web/contenido en verde: `npm test -- --runInBand src/__tests__/contenido/ContenidoScreen.test.tsx` (1 suite, 25 tests).
+  - **Avance aplicado 2026-05-28:** validacion integrada posterior a limpieza final de legacy de planeaciones: `npx tsc --noEmit` OK, `npm run lint -- --quiet` OK y `npm test -- --runInBand src/__tests__/planeaciones src/__tests__/contenido/ContenidoScreen.test.tsx src/__tests__/perfil/PerfilScreen.test.tsx src/__tests__/chat/ChatIntegration.test.tsx` OK (15 suites, 85 tests).
+  - **Avance aplicado 2026-05-28:** validacion posterior a mejoras IA finales (`Autocompletar` + estado IA visible): `npx tsc --noEmit` OK, `npm run lint -- --quiet` OK y `npm test -- --runInBand src/__tests__/planeaciones` OK (12 suites, 39 tests).
+  - **Avance aplicado 2026-05-29:** validacion posterior al gateway IA y hotfix del escaner: `cmd /c npx tsc --noEmit` OK, `cmd /c npm run lint -- --quiet` OK y `cmd /c npm test -- --runInBand src/__tests__/planeaciones` OK (12 suites, 41 tests).
 
 - [ ] **9.13 Validacion manual end-to-end final (movida desde 8.11)**:
   - Crear planeacion -> selector de plantillas -> elegir default/base -> abrir documento tipo Word/Docs -> editar -> guardar -> listar -> reabrir -> exportar PDF/DOCX.
   - Crear planeacion -> selector de plantillas -> elegir plantilla guardada/predeterminada -> abrir DocEditor con esa estructura.
   - Importar plantilla desde Word/PDF -> IA escanea -> se vacian datos internos -> se conserva estructura/placeholders -> crear planeacion desde esa plantilla.
+  - Revalidar especificamente C4 despues del hotfix: el escaner no debe mostrar `Failed to fetch`, `JSON Parse error`, texto sobrepuesto ni botones/badges azules ilegibles.
   - Crear con IA -> generar contenido V2 sobre la plantilla seleccionada -> revisar en DocEditor -> guardar.
   - Importar planeacion con contenido -> revisar campos extraidos -> abrir DocEditor -> guardar.
   - Editar una planeacion existente desde Contenido, ListaPlaneaciones, borradores y menu contextual.
@@ -864,6 +892,7 @@ export interface FiltrosPlaneacionV2 {
   - Validar movil: boton para alternar Documento/Formulario, teclado, toolbar, autollenado de placeholders, guardado y navegacion.
   - Validar modo estandar/tablet: canvas amplio, navegacion por secciones, toolbar visible y scroll correcto.
   - Validar offline: crear/editar sin conexion -> reconectar -> verificar sync sin duplicados.
+  - **Checklist oficial de ejecucion manual:** `Documentacion/CHECKLIST_VALIDACION_MANUAL_FASE9.md`.
 
 - [~] **9.14 Hotfix critico del editor multiplataforma**:
   - Resolver error web `React Native WebView does not support this platform`.
@@ -936,8 +965,14 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** nuevo test `copilotoService.test.ts` cubre API no configurada y backend con respuesta no JSON.
   - **Avance aplicado 2026-05-28:** los mensajes visibles del fallback IA ya no exponen errores tecnicos como `failed to fetch`; se muestran como respuesta local temporal.
   - **Avance aplicado 2026-05-28:** el servicio IA sanitiza HTML/JSON TipTap antes de generar textos locales, evitando que movil muestre codigo raro en respuestas o mejoras.
+  - **Avance aplicado 2026-05-28:** `AIToolbar` integra accion `Autocompletar` conectada a `autocompletar_seccion` para insertar contenido contextual por seccion activa.
+  - **Avance aplicado 2026-05-28:** `AIToolbar` ahora muestra estado visible de IA (`backend configurado` vs `modo local temporal`) para evitar ambiguedad cuando se usa fallback.
+  - **Avance aplicado 2026-05-28:** `DocEditorScreen` inserta autocompletado en secciones `curricular`, `sesiones` y `observaciones` directamente sobre el documento estructurado.
+  - **Avance aplicado 2026-05-29:** `copiloto`, `escanear-plantilla`, `mejorar` y `generar` usan gateway IA multi-provider; `copiloto/escaner/mejorar` mantienen fallback heuristico/local para no bloquear la UX si no hay keys o se agota un proveedor.
+  - **Avance aplicado 2026-05-29:** limite backend por accion IA agregado con default de 10 solicitudes por ventana (`AI_MAX_REQUESTS_PER_ACTION`), preparado para migrarse a MongoDB/Redis cuando haya usuarios reales.
+  - **Avance aplicado 2026-05-29:** modo dev de IA agregado: `AI_DEV_MODE=true` habilita limite ampliado (`AI_DEV_MAX_REQUESTS_PER_ACTION`, default 100) solo para token dev/admin-dev, devuelve `usage.warning` y el Copiloto lo muestra como advertencia visible; invitados y usuarios registrados conservan limite estandar de 10.
 
-- [ ] **9.17 Decisiones de diseno pendientes antes de implementar UI final**:
+- [x] **9.17 Decisiones de diseno pendientes antes de implementar UI final**:
   - **Decision confirmada:** usar A4 como preset inicial estilo Word e incorporar Carta como formato cambiable desde el editor.
   - **Decision confirmada:** seguir una experiencia visual tipo Google Docs limpio, pero con funciones avanzadas suficientes para no sentirse inferior a Word en el flujo docente.
   - **Decision confirmada:** en movil abrir primero en `Documento` y dejar `Formulario` como boton secundario.

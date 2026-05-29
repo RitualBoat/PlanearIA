@@ -17,7 +17,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { useAuth } from "../../context/AuthContext";
-import { usePlaneaciones } from "../../sync/providers/SyncProvider";
+import { usePlaneaciones } from "../../context/PlaneacionesContext";
 import { useGruposContext } from "../../context/GruposContext";
 import { useRecursos } from "../../context/RecursosContext";
 import { useTheme } from "../../context/ThemeContext";

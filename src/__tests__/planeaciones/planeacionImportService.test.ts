@@ -4,10 +4,27 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   removeItem: jest.fn(),
 }));
 
-import { buildPlaneacionFromImportDraft } from "../../services/planeacionImportService";
+jest.mock("../../sync/config/apiConfig", () => ({
+  isAPIConfigured: jest.fn(),
+}));
+
+jest.mock("../../utils/apiClient", () => ({
+  apiRequest: jest.fn(),
+}));
+
+import {
+  buildPlaneacionFromImportDraft,
+  scanPlantillaFromRawText,
+} from "../../services/planeacionImportService";
+import { apiRequest } from "../../utils/apiClient";
+import { isAPIConfigured } from "../../sync/config/apiConfig";
 import { NivelAcademico } from "../../../types/planeacionV2";
 
 describe("planeacionImportService", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("mapea un draft importado a un PlaneacionDocumento V2 valido", () => {
     const draft = {
       asignatura: "Historia",
@@ -40,5 +57,39 @@ describe("planeacionImportService", () => {
     expect(planeacion.camposNivel?.duracionTotal).toBe(50);
     expect(planeacion.evaluacionFinal?.criterios[0]?.descripcion).toBe("Rubrica");
     expect(planeacion.id).toBeTruthy();
+  });
+
+  it("escanea plantilla con fallback local si no hay backend IA configurado", async () => {
+    (isAPIConfigured as jest.Mock).mockReturnValue(false);
+
+    const plantilla = await scanPlantillaFromRawText(
+      "Tecnologico Nacional de Mexico\nInstrumentacion Didactica\nDatos generales\nEvaluacion\nFirmas",
+      { nivelAcademico: NivelAcademico.UNIVERSIDAD, userId: "user-test" }
+    );
+
+    expect(apiRequest).not.toHaveBeenCalled();
+    expect(plantilla.origen).toBe("escaner");
+    expect(plantilla.nivelAcademico).toBe(NivelAcademico.UNIVERSIDAD);
+    expect(plantilla.secciones.some((section) => section.tipo === "evaluacion")).toBe(true);
+    expect(plantilla.descripcion).toContain("reglas locales");
+  });
+
+  it("escanea plantilla con fallback local cuando el backend responde texto no JSON", async () => {
+    (isAPIConfigured as jest.Mock).mockReturnValue(true);
+    (apiRequest as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 500,
+      text: async () => "The backend returned an HTML error page",
+    });
+
+    const plantilla = await scanPlantillaFromRawText(
+      "Subdireccion Academica\nInstrumentacion Didactica para Competencias Profesionales\nPeriodo\nAgosto-diciembre 2022\nNombre de la Asignatura",
+      { nivelAcademico: NivelAcademico.UNIVERSIDAD, userId: "user-test" }
+    );
+
+    expect(apiRequest).toHaveBeenCalledTimes(1);
+    expect(plantilla.nombre).toMatch(/Plantilla/);
+    expect(plantilla.secciones.length).toBeGreaterThanOrEqual(7);
+    expect(plantilla.secciones.map((section) => section.tipo)).toContain("datos_generales");
   });
 });

@@ -44,7 +44,7 @@ jest.mock("../../context/AuthContext", () => ({
   useAuth: () => mockAuthReturn,
 }));
 
-jest.mock("../../sync/providers/SyncProvider", () => ({
+jest.mock("../../context/PlaneacionesContext", () => ({
   usePlaneaciones: () => ({
     planeaciones: [{ temaSesion: "Fracciones", nivel: "Primaria" }],
   }),

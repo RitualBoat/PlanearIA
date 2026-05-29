@@ -76,9 +76,18 @@ export type CopilotoResultado =
   | RevisarAlineamientoResultado
   | MejorarTextoResultado;
 
+export interface AiUsageInfo {
+  limit: number;
+  remaining: number;
+  resetAt: string;
+  mode?: "standard" | "dev" | string;
+  warning?: string;
+}
+
 export interface CopilotoResponse<T extends CopilotoResultado = CopilotoResultado> {
-  provider: "openai" | "heuristic" | "heuristic_fallback";
+  provider: "openai" | "openrouter" | "groq" | "together" | "heuristic" | "heuristic_fallback" | string;
   model?: string | null;
+  usage?: AiUsageInfo;
   accion: CopilotoAccion;
   resultado: T;
 }

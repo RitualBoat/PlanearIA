@@ -15,7 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useConversacionViewModel } from "../../hooks/useConversacionViewModel";
-import { usePlaneaciones } from "../../sync/providers/SyncProvider";
+import { usePlaneaciones } from "../../context/PlaneacionesContext";
 import { useRecursos } from "../../context/RecursosContext";
 import { useGruposContext } from "../../context/GruposContext";
 import { asignarRecursosAGrupo } from "../../services/grupoAsignacionesService";

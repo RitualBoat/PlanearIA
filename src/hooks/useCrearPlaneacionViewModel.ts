@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
@@ -22,6 +23,7 @@ import {
 import type { PlantillaDocumento, SeccionPlantilla } from "../../types/plantillaDocumento";
 
 type Nav = StackNavigationProp<RootStackParamList, "CrearPlaneacion">;
+const AUTH_TOKEN_KEY = "@planearia:auth_token";
 
 type TemplateSource = "base" | "predeterminada" | "guardada" | "online";
 
@@ -32,6 +34,9 @@ interface TemplateItem {
   descripcion: string;
   nivelAcademico: NivelAcademicoV2;
   plantilla?: PlantillaDocumento;
+  etiquetas?: string[];
+  miniaturaUri?: string;
+  compatibilidad?: PlantillaDocumento["compatibilidad"];
   disabled?: boolean;
 }
 
@@ -59,7 +64,7 @@ export interface CrearPlaneacionViewModel {
   crearDesdePlantillaSeleccionada: () => Promise<void>;
   handleEscanearPlantilla: () => void;
   handleImportarPlaneacion: () => void;
-  handleGenerarConIADesdeSelector: () => void;
+  handleGenerarConIADesdeSelector: () => Promise<void>;
 
   // Compatibilidad temporal con flujo IA legacy
   showTemplateModal: boolean;
@@ -118,9 +123,19 @@ const buildSystemTemplate = (
   nombre: string,
   descripcion: string,
   nivelAcademico: NivelAcademicoV2,
-  defaults?: Partial<PlaneacionDocumento>
+  defaults?: Partial<PlaneacionDocumento>,
+  metadata?: Pick<PlantillaDocumento, "etiquetas" | "miniaturaUri" | "compatibilidad">
 ): PlantillaDocumento => {
   const now = new Date().toISOString();
+  const nivelEtiqueta =
+    nivelAcademico === NivelAcademicoV2.PRIMARIA
+      ? "primaria"
+      : nivelAcademico === NivelAcademicoV2.SECUNDARIA
+        ? "secundaria"
+        : nivelAcademico === NivelAcademicoV2.PREPARATORIA
+          ? "preparatoria"
+          : "universidad";
+
   return {
     id,
     userId: "system",
@@ -143,20 +158,71 @@ const buildSystemTemplate = (
         ...(defaults?.elementosCurriculares || {}),
       },
     },
+    etiquetas: metadata?.etiquetas || ["base", nivelEtiqueta, "planeacion"],
+    miniaturaUri: metadata?.miniaturaUri,
+    compatibilidad: metadata?.compatibilidad || { web: true, android: true, ios: true },
     fechaCreacion: now,
     fechaModificacion: now,
   };
 };
 
 const getBaseTemplates = (): PlantillaDocumento[] => {
-  return LEVEL_OPTIONS.map((item) =>
-    buildSystemTemplate(
+  const byLevelDefaults: Partial<Record<NivelAcademicoV2, Partial<PlaneacionDocumento>>> = {
+    [NivelAcademicoV2.PRIMARIA]: {
+      datosGenerales: {
+        grado: "3ro",
+      } as PlaneacionDocumento["datosGenerales"],
+      elementosCurriculares: {
+        campoFormativo: "Lenguajes",
+        ejeArticulador: "Pensamiento critico",
+      } as PlaneacionDocumento["elementosCurriculares"],
+      camposNivel: {
+        planEstudios: "NEM 2022",
+      },
+    },
+    [NivelAcademicoV2.SECUNDARIA]: {
+      datosGenerales: {
+        grado: "1ro",
+      } as PlaneacionDocumento["datosGenerales"],
+      elementosCurriculares: {
+        campoFormativo: "Saberes y pensamiento cientifico",
+        ejeArticulador: "Interculturalidad critica",
+      } as PlaneacionDocumento["elementosCurriculares"],
+      camposNivel: {
+        planEstudios: "NEM 2022",
+      },
+    },
+    [NivelAcademicoV2.PREPARATORIA]: {
+      datosGenerales: {
+        grado: "4to semestre",
+      } as PlaneacionDocumento["datosGenerales"],
+      camposNivel: {
+        planEstudios: "Marco Curricular Comun EMS",
+      },
+    },
+    [NivelAcademicoV2.UNIVERSIDAD]: {
+      datosGenerales: {
+        grado: "4to semestre",
+      } as PlaneacionDocumento["datosGenerales"],
+      camposNivel: {
+        planEstudios: "Programa de asignatura institucional",
+      },
+    },
+  };
+
+  return LEVEL_OPTIONS.map((item) => {
+    const defaults = byLevelDefaults[item.nivel] || {};
+    return buildSystemTemplate(
       buildTemplateId("base", item.nivel),
       `Plantilla base ${item.titulo}`,
-      "Estructura base editable para iniciar rapido en DocEditor.",
-      item.nivel
-    )
-  );
+      "Estructura robusta editable en DocEditor con tablas y secciones pedagogicas.",
+      item.nivel,
+      defaults,
+      {
+        etiquetas: ["base", item.titulo.toLowerCase(), "doceditor", "word-docs"],
+      }
+    );
+  });
 };
 
 const getPredeterminedTemplates = (): PlantillaDocumento[] => {
@@ -165,25 +231,67 @@ const getPredeterminedTemplates = (): PlantillaDocumento[] => {
       "pred_primaria_proyecto",
       "Proyecto por semanas (Primaria)",
       "Plantilla con enfoque por proyecto y seguimiento semanal.",
-      NivelAcademicoV2.PRIMARIA
+      NivelAcademicoV2.PRIMARIA,
+      {
+        datosGenerales: {
+          grado: "4to",
+        } as PlaneacionDocumento["datosGenerales"],
+        camposNivel: {
+          enfoque: "ABP",
+          numeroSesionesSugeridas: 8,
+        },
+      },
+      {
+        etiquetas: ["proyecto", "abp", "primaria"],
+      }
     ),
     buildSystemTemplate(
       "pred_secu_laboratorio",
       "Secuencia de laboratorio (Secundaria)",
       "Plantilla para sesiones practicas con criterios de evaluacion.",
-      NivelAcademicoV2.SECUNDARIA
+      NivelAcademicoV2.SECUNDARIA,
+      {
+        datosGenerales: {
+          grado: "2do",
+        } as PlaneacionDocumento["datosGenerales"],
+        camposNivel: {
+          enfoque: "laboratorio",
+          numeroSesionesSugeridas: 6,
+        },
+      },
+      {
+        etiquetas: ["laboratorio", "secundaria", "experimentacion"],
+      }
     ),
     buildSystemTemplate(
       "pred_prep_competencias",
       "Planeacion por competencias (Preparatoria)",
       "Plantilla orientada a competencias y evidencias.",
-      NivelAcademicoV2.PREPARATORIA
+      NivelAcademicoV2.PREPARATORIA,
+      {
+        camposNivel: {
+          enfoque: "competencias",
+          numeroSesionesSugeridas: 5,
+        },
+      },
+      {
+        etiquetas: ["competencias", "preparatoria", "evidencias"],
+      }
     ),
     buildSystemTemplate(
       "pred_uni_unidad",
       "Unidad didactica universitaria",
       "Plantilla para curso universitario por unidades y sesiones.",
-      NivelAcademicoV2.UNIVERSIDAD
+      NivelAcademicoV2.UNIVERSIDAD,
+      {
+        camposNivel: {
+          enfoque: "unidad_didactica",
+          numeroSesionesSugeridas: 10,
+        },
+      },
+      {
+        etiquetas: ["universidad", "unidad", "planeacion"],
+      }
     ),
   ];
 };
@@ -310,6 +418,8 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
         nombre: "Galeria online de plantillas",
         descripcion: "Explora plantillas estilo Canva. Se completa en Fase 10.",
         nivelAcademico: nivelSeleccionado,
+        etiquetas: ["galeria", "online", "fase10"],
+        compatibilidad: { web: true, android: true, ios: true },
         disabled: true,
       },
     ],
@@ -334,6 +444,9 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
           nombre: plantilla.nombre,
           descripcion: plantilla.descripcion || "Plantilla base del sistema.",
           nivelAcademico: plantilla.nivelAcademico,
+          etiquetas: plantilla.etiquetas,
+          miniaturaUri: plantilla.miniaturaUri,
+          compatibilidad: plantilla.compatibilidad,
           plantilla,
         })),
       },
@@ -346,6 +459,9 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
           nombre: plantilla.nombre,
           descripcion: plantilla.descripcion || "Plantilla predeterminada.",
           nivelAcademico: plantilla.nivelAcademico,
+          etiquetas: plantilla.etiquetas,
+          miniaturaUri: plantilla.miniaturaUri,
+          compatibilidad: plantilla.compatibilidad,
           plantilla,
         })),
       },
@@ -358,6 +474,9 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
           nombre: plantilla.nombre,
           descripcion: plantilla.descripcion || "Plantilla escaneada o personalizada.",
           nivelAcademico: plantilla.nivelAcademico,
+          etiquetas: plantilla.etiquetas,
+          miniaturaUri: plantilla.miniaturaUri,
+          compatibilidad: plantilla.compatibilidad,
           plantilla,
         })),
         emptyText: "Todavia no tienes plantillas guardadas para este nivel.",
@@ -433,9 +552,35 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     navigation.navigate("ImportarPlaneacion");
   }, [navigation]);
 
-  const handleGenerarConIADesdeSelector = useCallback(() => {
-    navigation.navigate("GenerarPlaneacionIA");
-  }, [navigation]);
+  const handleGenerarConIADesdeSelector = useCallback(async () => {
+    const selected = templateById.get(selectedTemplateId);
+    if (!selected) return;
+
+    if (!selected.plantilla) {
+      showInfoMessage("Plantillas", "Selecciona una plantilla valida para continuar.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const doc = buildDocumentoFromPlantilla(selected.plantilla, {
+        userId: String(usuario?.id ?? "guest"),
+        usuario,
+      });
+      await crear(doc);
+      navigation.navigate("DocEditor", {
+        modo: "editar",
+        planeacionId: doc.id,
+        nivelAcademico: doc.nivelAcademico,
+      });
+      showInfoMessage(
+        "Copiloto IA",
+        "Documento creado. Usa la barra de Copiloto IA dentro del editor para sugerir, mejorar, crear rubricas y revisar."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [crear, navigation, selectedTemplateId, templateById, usuario]);
 
   const handleCloseNivelModal = useCallback(() => {
     setShowNivelModal(false);
@@ -491,6 +636,7 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     setIsGeneratingIA(true);
 
     try {
+      const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
 
@@ -499,6 +645,7 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
         headers: {
           "Content-Type": "application/json",
           "X-API-Key": API_CONFIG.apiSecret,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           prompt,

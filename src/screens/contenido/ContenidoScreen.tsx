@@ -335,6 +335,7 @@ const ContenidoScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1280;
   const isTablet = width >= 768;
+  const isWeb = Platform.OS === "web";
   const navigation = useNavigation<Nav>();
   const route = useRoute<any>();
   const vm = useContenidoViewModel();
@@ -1125,7 +1126,7 @@ const ContenidoScreen: React.FC = () => {
   const showEmpty = vm.totalItems === 0;
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    <SafeAreaView style={[styles.safe, isWeb && styles.webSafe]} edges={["top"]}>
       {/* Offline banner */}
       {vm.isOffline && (
         <View style={styles.offlineBanner}>
@@ -1169,11 +1170,12 @@ const ContenidoScreen: React.FC = () => {
             data={vm.items}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
-            style={styles.list}
+            style={[styles.list, isWeb && styles.webList]}
             contentContainerStyle={[
               styles.listContent,
               isDesktop && { paddingHorizontal: 32 },
               isTablet && !isDesktop && { paddingHorizontal: 24 },
+              isWeb && styles.webListContent,
             ]}
             ListHeaderComponent={mainContent}
             ListEmptyComponent={
@@ -1251,6 +1253,11 @@ const ContenidoScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: DT.surface },
+  webSafe: {
+    height: "100vh" as never,
+    maxHeight: "100vh" as never,
+    overflow: "hidden" as never,
+  },
 
   // Header
   header: {
@@ -1575,10 +1582,18 @@ const styles = StyleSheet.create({
   list: {
     flex: 1,
   },
+  webList: {
+    height: "100%" as never,
+    overflow: "scroll" as never,
+  },
   listContent: {
     paddingBottom: 100,
     paddingHorizontal: 0,
     flexGrow: 1,
+  },
+  webListContent: {
+    minHeight: "100%" as never,
+    paddingBottom: 150,
   },
 
   // Sidebar (desktop)

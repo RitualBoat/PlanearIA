@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { PlaneacionDocumento, Sesion } from "../../types/planeacionV2";
+import { isAPIConfigured } from "../sync/config/apiConfig";
 import {
   autocompletarSeccion as autocompletarSeccionService,
   generarEvaluacion as generarEvaluacionService,
@@ -28,6 +29,7 @@ export interface CopilotoCacheItem {
 }
 
 export interface UseCopilotoResult {
+  isBackendConfigured: boolean;
   isLoading: boolean;
   loadingAction: CopilotoAccion | null;
   resultado: CopilotoResultado | null;
@@ -66,6 +68,7 @@ const safeParseCache = (value: string | null): CopilotoCacheItem[] => {
 };
 
 export const useCopiloto = (): UseCopilotoResult => {
+  const isBackendConfigured = isAPIConfigured();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState<CopilotoAccion | null>(null);
   const [resultado, setResultado] = useState<CopilotoResultado | null>(null);
@@ -157,6 +160,7 @@ export const useCopiloto = (): UseCopilotoResult => {
   );
 
   return {
+    isBackendConfigured,
     isLoading,
     loadingAction,
     resultado,

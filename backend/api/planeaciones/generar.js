@@ -22,9 +22,9 @@ const {
   errorResponse,
   successResponse,
 } = require("../../lib/auth");
+const { hasConfiguredProviders, runChatCompletion } = require("../../lib/aiGateway");
+const { assertAiUsageLimit } = require("../../lib/aiUsageLimiter");
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 const OPENAI_TIMEOUT_MS = parseInt(process.env.OPENAI_TIMEOUT_MS || "20000", 10);
 
 const NIVELES_VALIDOS = ["primaria", "secundaria", "preparatoria", "universidad"];
@@ -62,8 +62,8 @@ module.exports = async (req, res) => {
       );
     }
 
-    if (!OPENAI_API_KEY) {
-      return errorResponse(res, 500, "OPENAI_API_KEY no está configurada en variables de entorno");
+    if (!hasConfiguredProviders()) {
+      return errorResponse(res, 500, "No hay proveedores IA configurados en el gateway");
     }
 
     const targetVersion = Number(version) === 2 ? 2 : 1;
@@ -74,7 +74,18 @@ module.exports = async (req, res) => {
       targetVersion === 2
         ? buildSystemPromptV2(nivelAcademico, contexto)
         : buildSystemPrompt(nivelAcademico, contexto);
-    const rawContent = await generateWithOpenAI(systemPrompt, prompt);
+    const usage = assertAiUsageLimit(
+      req,
+      targetVersion === 2 ? "generar_planeacion_v2" : "generar_planeacion"
+    );
+    const ai = await runChatCompletion({
+      systemPrompt,
+      userPrompt: prompt,
+      temperature: 0.4,
+      responseFormatJson: true,
+      timeoutMs: OPENAI_TIMEOUT_MS,
+    });
+    const rawContent = ai.content;
     const generated = extractJson(rawContent);
     const planeacion =
       targetVersion === 2
@@ -82,14 +93,19 @@ module.exports = async (req, res) => {
         : mapToPlaneacion(generated, nivelAcademico, contexto);
 
     return successResponse(res, {
-      provider: "openai",
-      model: OPENAI_MODEL,
+      provider: ai.provider,
+      model: ai.model,
+      usage,
       version: targetVersion,
       planeacion,
     });
   } catch (error) {
     if (error?.name === "AbortError") {
       return errorResponse(res, 504, "La generación con IA excedió el tiempo límite");
+    }
+
+    if (error?.statusCode === 429) {
+      return errorResponse(res, 429, error.message);
     }
 
     console.error("❌ Error en /api/planeaciones/generar:", error);
@@ -214,47 +230,6 @@ Reglas obligatorias:
 4) Usa evaluacion estructurada con criterios observables.
 5) Si falta informacion, deja strings vacios o valores razonables sin inventar datos criticos.
 6) Respeta este contexto cuando exista: ${JSON.stringify(contexto)}.`;
-}
-
-async function generateWithOpenAI(systemPrompt, userPrompt) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
-
-  try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: OPENAI_MODEL,
-        temperature: 0.4,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
-      signal: controller.signal,
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      const msg = data?.error?.message || `Error OpenAI (${response.status})`;
-      throw new Error(msg);
-    }
-
-    const content = data?.choices?.[0]?.message?.content;
-    if (!content || typeof content !== "string") {
-      throw new Error("La IA no devolvió contenido utilizable");
-    }
-
-    return content;
-  } finally {
-    clearTimeout(timeoutId);
-  }
 }
 
 function extractJson(raw) {

@@ -3,17 +3,21 @@
 API serverless para sincronización de PlanearIA con MongoDB Atlas.
 Diseñado para desplegarse en Vercel (100% gratis).
 
-## 🤖 Integración IA (Task 1.2.1.2)
+## 🤖 Integración IA (Gateway multi-provider)
 
-- **Proveedor seleccionado:** OpenAI
-- **Modelo por defecto:** `gpt-4o-mini` (configurable con `OPENAI_MODEL`)
-- **Endpoint usado:** `POST /api/planeaciones/generar`
-- **API key en backend:** `OPENAI_API_KEY` (variable de entorno en Vercel, nunca hardcodeada en el endpoint)
+- **Gateway:** `backend/lib/aiGateway.js`
+- **Endpoints usados:** `POST /api/planeaciones/generar`, `mejorar`, `copiloto`, `escanear-plantilla`
+- **Proveedores soportados:** OpenRouter, Groq, OpenAI, Together y cualquier endpoint OpenAI-compatible via `AI_GATEWAY_PROVIDERS`
+- **API keys:** siempre en backend/Vercel, nunca en la app movil/web
+- **Limite por accion:** `AI_MAX_REQUESTS_PER_ACTION` (default `10`) y `AI_LIMIT_WINDOW_MS` (default 24h)
+- **Modo dev:** `AI_DEV_MODE=true` activa limite ampliado solo para token dev/admin-dev y devuelve `usage.warning` en cada uso.
 
-### Criterio de selección (resumen)
+### Criterio de seleccion (resumen)
 
-- OpenAI se eligió por compatibilidad con salida JSON estructurada y buena latencia para generación breve de planeaciones.
-- El endpoint ya valida timeout (`OPENAI_TIMEOUT_MS`) y parsea JSON de forma robusta.
+- El gateway permite empezar con proveedores gratuitos/free-tier y cambiar automaticamente al siguiente proveedor si uno falla o agota cuota.
+- OpenRouter puede usar `OPENROUTER_MODEL=openrouter/free`; Groq/Together requieren configurar un modelo vigente desde su dashboard.
+- `copiloto`, `mejorar` y `escanear-plantilla` tienen fallback heuristico para no bloquear la UX si no hay keys.
+- `generar` requiere al menos un proveedor IA configurado porque produce una planeacion completa nueva.
 
 ### Evidencia de PoC
 
@@ -80,13 +84,24 @@ vercel env add API_SECRET
 # Cuando pregunte el valor, usa:
 # planearia-dev-secret-2025
 
-# Configurar OpenAI API Key
+# Configurar al menos un proveedor IA del gateway
+vercel env add OPENROUTER_API_KEY
+vercel env add OPENROUTER_MODEL
+
+# Opcionales: otros proveedores OpenAI-compatible
+vercel env add GROQ_API_KEY
+vercel env add GROQ_MODEL
 vercel env add OPENAI_API_KEY
-
-# Opcional: modelo de OpenAI
 vercel env add OPENAI_MODEL
+vercel env add TOGETHER_API_KEY
+vercel env add TOGETHER_MODEL
 
-# Opcional: timeout en ms (default 20000)
+# Opcional: limites y timeout
+vercel env add AI_MAX_REQUESTS_PER_ACTION
+vercel env add AI_DEV_MODE
+vercel env add AI_DEV_MAX_REQUESTS_PER_ACTION
+vercel env add AI_DEV_TOKEN
+vercel env add AI_LIMIT_WINDOW_MS
 vercel env add OPENAI_TIMEOUT_MS
 ```
 

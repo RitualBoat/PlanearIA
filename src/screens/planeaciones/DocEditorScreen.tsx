@@ -180,6 +180,16 @@ const buildSectionText = (sectionId: DocSectionId, vm: ReturnType<typeof useDocE
   return `${doc.datosGenerales.asignatura} ${doc.datosGenerales.grado}`.trim();
 };
 
+const sectionIdToCopiloto = (sectionId: DocSectionId): string => {
+  if (sectionId === "info_institucional") return "info_institucional";
+  if (sectionId === "datos_generales") return "datos_generales";
+  if (sectionId === "curricular") return "curricular";
+  if (sectionId === "sesiones") return "sesiones";
+  if (sectionId === "evaluacion") return "evaluacion";
+  if (sectionId === "observaciones") return "observaciones";
+  return "firmas";
+};
+
 const DocEditorScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
   const { width: viewportWidth } = useWindowDimensions();
@@ -364,6 +374,7 @@ const DocEditorScreen: React.FC = () => {
         title: "Actividades sugeridas",
         message: response.resultado.mensaje,
         detail: `Inicio: ${actividades.inicio.slice(0, 90)}...`,
+        warning: response.usage?.warning,
         insertLabel: "Insertar en sesion",
         payload: { kind: "actividades", actividades },
       };
@@ -376,6 +387,7 @@ const DocEditorScreen: React.FC = () => {
         title: "Texto mejorado",
         message: response.resultado.mensaje,
         detail: response.resultado.textoMejorado.slice(0, 220),
+        warning: response.usage?.warning,
         insertLabel: "Aplicar mejora",
         payload: {
           kind: "texto",
@@ -391,10 +403,28 @@ const DocEditorScreen: React.FC = () => {
         title: "Rubrica generada",
         message: response.resultado.mensaje,
         detail: `${response.resultado.evaluacion.criterios.length} criterios listos para evaluacion final.`,
+        warning: response.usage?.warning,
         insertLabel: "Insertar rubrica",
         payload: {
           kind: "evaluacion",
           evaluacion: response.resultado.evaluacion,
+        },
+      };
+    }
+
+    if (action === "autocompletar") {
+      const seccion = sectionIdToCopiloto(vm.activeSectionId);
+      const response = await copiloto.autocompletarSeccion(vm.documento, seccion);
+      return {
+        title: "Seccion autocompletada",
+        message: response.resultado.mensaje,
+        detail: response.resultado.contenido.slice(0, 220),
+        warning: response.usage?.warning,
+        insertLabel: "Insertar completado",
+        payload: {
+          kind: "autocompletar",
+          sectionId: vm.activeSectionId,
+          contenido: response.resultado.contenido,
         },
       };
     }
@@ -406,6 +436,7 @@ const DocEditorScreen: React.FC = () => {
       detail: response.resultado.hallazgos
         .map((item) => `${item.prioridad}: ${item.descripcion}`)
         .join("\n"),
+      warning: response.usage?.warning,
     };
   };
 
@@ -413,6 +444,7 @@ const DocEditorScreen: React.FC = () => {
     const payload = result.payload as
       | { kind: "actividades"; actividades: ActividadesCopiloto }
       | { kind: "texto"; sectionId: DocSectionId; texto: string }
+      | { kind: "autocompletar"; sectionId: DocSectionId; contenido: string }
       | { kind: "evaluacion"; evaluacion: InstrumentoEvaluacion }
       | undefined;
 
@@ -448,27 +480,56 @@ const DocEditorScreen: React.FC = () => {
       return;
     }
 
-    if (payload.sectionId === "curricular") {
-      vm.setCurricular({
-        ...vm.documento.elementosCurriculares,
-        proposito: payload.texto,
-      });
-      return;
+    if (payload.kind === "texto") {
+      if (payload.sectionId === "curricular") {
+        vm.setCurricular({
+          ...vm.documento.elementosCurriculares,
+          proposito: payload.texto,
+        });
+        return;
+      }
+
+      if (payload.sectionId === "observaciones") {
+        vm.setObservaciones([{ texto: payload.texto, categoria: "general" }]);
+        return;
+      }
+
+      if (payload.sectionId === "sesiones") {
+        const targetId = vm.documento.sesiones[0]?.id;
+        if (!targetId) return;
+        vm.setSesiones(
+          vm.documento.sesiones.map((sesion) =>
+            sesion.id === targetId ? { ...sesion, desarrollo: toRichTextString(payload.texto) } : sesion
+          )
+        );
+      }
     }
 
-    if (payload.sectionId === "observaciones") {
-      vm.setObservaciones([{ texto: payload.texto, categoria: "general" }]);
-      return;
-    }
+    if (payload.kind === "autocompletar") {
+      if (payload.sectionId === "curricular") {
+        vm.setCurricular({
+          ...vm.documento.elementosCurriculares,
+          proposito: payload.contenido,
+        });
+        return;
+      }
 
-    if (payload.sectionId === "sesiones") {
-      const targetId = vm.documento.sesiones[0]?.id;
-      if (!targetId) return;
-      vm.setSesiones(
-        vm.documento.sesiones.map((sesion) =>
-          sesion.id === targetId ? { ...sesion, desarrollo: toRichTextString(payload.texto) } : sesion
-        )
-      );
+      if (payload.sectionId === "observaciones") {
+        vm.setObservaciones([{ texto: payload.contenido, categoria: "general" }]);
+        return;
+      }
+
+      if (payload.sectionId === "sesiones") {
+        const targetId = vm.documento.sesiones[0]?.id;
+        if (!targetId) return;
+        vm.setSesiones(
+          vm.documento.sesiones.map((sesion) =>
+            sesion.id === targetId
+              ? { ...sesion, desarrollo: toRichTextString(payload.contenido) }
+              : sesion
+          )
+        );
+      }
     }
   };
 
@@ -663,6 +724,11 @@ const DocEditorScreen: React.FC = () => {
           <AIToolbar
             mode={editorMode.mode}
             disabled={vm.isSaving || copiloto.isLoading}
+            iaStatusText={
+              copiloto.isBackendConfigured
+                ? "IA en nube configurada."
+                : "Modo local temporal: configura backend para IA en nube."
+            }
             onAction={handleAIAction}
             onInsertResult={handleInsertAIResult}
           />

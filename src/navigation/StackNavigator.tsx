@@ -15,9 +15,7 @@ import RegistroScreen from "../screens/auth/RegistroScreen";
 import RecuperarContrasenaScreen from "../screens/auth/RecuperarContrasenaScreen";
 
 // ImportaciÃ³n de pantallas de Planeaciones
-import PlaneacionesScreen from "../screens/planeaciones/PlaneacionesScreen";
 import CrearPlaneacionScreen from "../screens/planeaciones/CrearPlaneacionScreen";
-import GenerarPlaneacionIAScreen from "../screens/planeaciones/GenerarPlaneacionIAScreen";
 import ImportarPlaneacionScreen from "../screens/planeaciones/ImportarPlaneacionScreen";
 import ExportarPlaneacionScreen from "../screens/planeaciones/ExportarPlaneacionScreen";
 import ListaPlaneacionesScreen from "../screens/planeaciones/ListaPlaneacionesScreen";
@@ -341,9 +339,9 @@ const StackNavigator: React.FC = () => {
       {/* ========== PLANEACIONES ========== */}
       <Stack.Screen
         name="Planeaciones"
-        component={PlaneacionesScreen}
+        component={CrearPlaneacionScreen}
         options={{
-          title: "Planeaciones",
+          title: "Crear Planeacion",
           headerShown: false,
         }}
       />
@@ -357,7 +355,7 @@ const StackNavigator: React.FC = () => {
       />
       <Stack.Screen
         name="GenerarPlaneacionIA"
-        component={GenerarPlaneacionIAScreen}
+        component={CrearPlaneacionScreen}
         options={{
           title: "Generar PlaneaciÃ³n IA",
           headerShown: false,

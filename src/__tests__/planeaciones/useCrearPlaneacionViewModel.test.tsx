@@ -255,4 +255,35 @@ describe("useCrearPlaneacionViewModel", () => {
       })
     );
   });
+
+  it("expone metadata de plantillas base para galeria local", () => {
+    const { result } = renderHook(() => useCrearPlaneacionViewModel());
+    const baseSection = result.current.sections.find((section) => section.id === "base");
+
+    expect(baseSection).toBeTruthy();
+    expect(baseSection?.items.length).toBeGreaterThan(0);
+    expect(baseSection?.items[0].etiquetas?.length).toBeGreaterThan(0);
+    expect(baseSection?.items[0].compatibilidad).toEqual({
+      web: true,
+      android: true,
+      ios: true,
+    });
+  });
+
+  it("abrir con IA desde selector crea doc V2 y navega a DocEditor", async () => {
+    const { result } = renderHook(() => useCrearPlaneacionViewModel());
+
+    await act(async () => {
+      await result.current.handleGenerarConIADesdeSelector();
+    });
+
+    expect(mockCrear).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "DocEditor",
+      expect.objectContaining({
+        modo: "editar",
+        planeacionId: expect.any(String),
+      })
+    );
+  });
 });

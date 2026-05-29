@@ -142,7 +142,7 @@ Casos previstos o en evolucion:
 - Autocompletar campos o texto en editores.
 - Resumir, transformar o adaptar recursos.
 
-Cada plan futuro debe documentar proveedor, modelo, variables de entorno, prompts, fallback si no hay API key, costo aproximado y validacion humana.
+Cada plan futuro debe documentar proveedor, modelo, variables de entorno, prompts, fallback si no hay API key, costo aproximado y validacion humana. El backend ya cuenta con un gateway IA multi-provider para Planeaciones (`backend/lib/aiGateway.js`) y un limite por accion configurable (`AI_MAX_REQUESTS_PER_ACTION`, default 10), por lo que los nuevos modulos deben intentar reutilizar esa capa antes de crear integraciones aisladas. El modo dev puede ampliar el limite con advertencia visible, pero invitados y usuarios registrados deben conservar limites conservadores.
 
 ---
 
@@ -294,6 +294,7 @@ La documentacion tecnica esta en [`Documentacion/`](./Documentacion/):
 | --------- | ----------- |
 | [`Documentacion/README.md`](./Documentacion/README.md) | Indice tecnico de documentacion. |
 | [`Documentacion/meta_guia_planes.md`](./Documentacion/meta_guia_planes.md) | Guia maestra para planes futuros por modulo. |
+| [`Documentacion/PLANEACIONES_IA_EDITOR_FASE9.md`](./Documentacion/PLANEACIONES_IA_EDITOR_FASE9.md) | Ground truth de IA en Planeaciones + criterio de aceptacion del editor Word/Docs en Fase 9. |
 | [`Documentacion/ARQUITECTURA.md`](./Documentacion/ARQUITECTURA.md) | Arquitectura del sistema y decisiones tecnicas. |
 | [`Documentacion/FLUJO_SINCRONIZACION.md`](./Documentacion/FLUJO_SINCRONIZACION.md) | Flujo offline-first y sincronizacion. |
 | [`Documentacion/DIAGRAMA_NAVEGACION.md`](./Documentacion/DIAGRAMA_NAVEGACION.md) | Diagrama de navegacion. |

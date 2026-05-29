@@ -1,6 +1,7 @@
 import React from "react";
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -27,6 +28,8 @@ const EscanerPlantillaScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const vm = useEscanerPlantillaViewModel();
   const isWide = width >= 960;
+  const isWeb = Platform.OS === "web";
+  const activeTextColor = "#FFFFFF";
 
   const renderProgress = () => (
     <View style={styles.progressRow}>
@@ -45,9 +48,9 @@ const EscanerPlantillaScreen: React.FC = () => {
               ]}
             >
               {done ? (
-                <MaterialIcons name="check" size={14} color={colors.surface} />
+                <MaterialIcons name="check" size={14} color={activeTextColor} />
               ) : (
-                <Text style={[styles.progressDotText, { color: active ? colors.surface : colors.onSurfaceVariant }]}>
+                <Text style={[styles.progressDotText, { color: active ? activeTextColor : colors.onSurfaceVariant }]}>
                   {step}
                 </Text>
               )}
@@ -82,7 +85,7 @@ const EscanerPlantillaScreen: React.FC = () => {
             ]}
             onPress={() => vm.setNivelAcademico(nivel.id)}
           >
-            <Text style={[styles.chipText, { color: selected ? colors.surface : colors.onSurfaceVariant }]}>
+            <Text style={[styles.chipText, { color: selected ? activeTextColor : colors.onSurfaceVariant }]}>
               {nivel.label}
             </Text>
           </Pressable>
@@ -110,11 +113,11 @@ const EscanerPlantillaScreen: React.FC = () => {
             disabled={vm.isExtracting}
           >
             {vm.isExtracting ? (
-              <ActivityIndicator size="small" color={colors.surface} />
+              <ActivityIndicator size="small" color={activeTextColor} />
             ) : (
-              <MaterialIcons name="upload-file" size={20} color={colors.surface} />
+              <MaterialIcons name="upload-file" size={20} color={activeTextColor} />
             )}
-            <Text style={[styles.primaryButtonText, { color: colors.surface }]}>
+            <Text style={[styles.primaryButtonText, { color: activeTextColor }]}>
               {vm.isExtracting ? "Extrayendo..." : "Seleccionar PDF o DOCX"}
             </Text>
           </Pressable>
@@ -131,9 +134,16 @@ const EscanerPlantillaScreen: React.FC = () => {
           </Text>
           {renderNivelSelector()}
           <View style={[styles.previewBox, { backgroundColor: colors.surfaceContainerLow, borderColor: colors.borderLight }]}>
-            <Text style={[styles.previewText, { color: colors.onSurfaceVariant }]}>
-              {vm.textoPreview || "Sin texto disponible."}
-            </Text>
+            <ScrollView
+              nestedScrollEnabled
+              style={styles.previewTextScroll}
+              contentContainerStyle={styles.previewTextContent}
+              showsVerticalScrollIndicator
+            >
+              <Text style={[styles.previewText, { color: colors.onSurfaceVariant }]}>
+                {vm.textoPreview || "Sin texto disponible."}
+              </Text>
+            </ScrollView>
           </View>
           <Pressable
             style={[
@@ -148,8 +158,8 @@ const EscanerPlantillaScreen: React.FC = () => {
             }}
             disabled={!vm.puedeAnalizar}
           >
-            <MaterialIcons name="auto-awesome" size={20} color={colors.surface} />
-            <Text style={[styles.primaryButtonText, { color: colors.surface }]}>Analizar estructura</Text>
+            <MaterialIcons name="auto-awesome" size={20} color={activeTextColor} />
+            <Text style={[styles.primaryButtonText, { color: activeTextColor }]}>Analizar estructura</Text>
           </Pressable>
         </View>
       );
@@ -221,11 +231,11 @@ const EscanerPlantillaScreen: React.FC = () => {
             disabled={!vm.puedeGuardar}
           >
             {vm.isSaving ? (
-              <ActivityIndicator size="small" color={colors.surface} />
+              <ActivityIndicator size="small" color={activeTextColor} />
             ) : (
-              <MaterialIcons name="save" size={20} color={colors.surface} />
+              <MaterialIcons name="save" size={20} color={activeTextColor} />
             )}
-            <Text style={[styles.primaryButtonText, { color: colors.surface }]}>Guardar plantilla</Text>
+            <Text style={[styles.primaryButtonText, { color: activeTextColor }]}>Guardar plantilla</Text>
           </Pressable>
         </View>
       );
@@ -246,8 +256,8 @@ const EscanerPlantillaScreen: React.FC = () => {
             style={[styles.primaryButton, { backgroundColor: colors.primary }]}
             onPress={vm.irACrearDesdePlantilla}
           >
-            <MaterialIcons name="post-add" size={20} color={colors.surface} />
-            <Text style={[styles.primaryButtonText, { color: colors.surface }]}>Crear desde plantilla</Text>
+            <MaterialIcons name="post-add" size={20} color={activeTextColor} />
+            <Text style={[styles.primaryButtonText, { color: activeTextColor }]}>Crear desde plantilla</Text>
           </Pressable>
           <Pressable
             style={[styles.secondaryButton, { borderColor: colors.borderLight, backgroundColor: colors.surfaceContainerLow }]}
@@ -263,14 +273,14 @@ const EscanerPlantillaScreen: React.FC = () => {
   const renderPlantillaPreview = () => (
     <View style={[styles.card, { backgroundColor: colors.surfaceContainerLowest, borderColor: colors.borderLight }]}>
       <View style={styles.previewHeader}>
-        <View>
+        <View style={styles.previewHeaderText}>
           <Text style={[styles.sideTitle, { color: colors.onSurface }]}>Estructura detectada</Text>
           <Text style={[styles.sideSubtitle, { color: colors.onSurfaceVariant }]}>
             {vm.plantilla?.secciones.length || 0} secciones
           </Text>
         </View>
-        <View style={[styles.badge, { backgroundColor: colors.primaryContainer }]}>
-          <Text style={[styles.badgeText, { color: colors.primary }]}>
+        <View style={[styles.badge, { backgroundColor: colors.primary }]}>
+          <Text style={[styles.badgeText, { color: activeTextColor }]}>
             {vm.plantilla?.nivelAcademico || vm.nivelAcademico}
           </Text>
         </View>
@@ -314,8 +324,14 @@ const EscanerPlantillaScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={[styles.screen, isWeb && styles.webScreen, { backgroundColor: colors.background }]}>
+      <ScrollView
+        style={[styles.scrollView, isWeb && styles.webScrollView]}
+        contentContainerStyle={[styles.content, isWeb && styles.webContent]}
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled
+        showsVerticalScrollIndicator={isWeb}
+      >
         <View style={styles.headerRow}>
           <Pressable
             style={[styles.iconButton, { backgroundColor: colors.surfaceContainerLowest, borderColor: colors.borderLight }]}
@@ -386,6 +402,18 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
   },
+  webScreen: {
+    height: "100vh" as any,
+    maxHeight: "100vh" as any,
+    overflow: "hidden" as any,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  webScrollView: {
+    minHeight: 0,
+    overflow: "scroll",
+  },
   content: {
     width: "100%",
     maxWidth: 1180,
@@ -393,6 +421,9 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 40,
     gap: 12,
+  },
+  webContent: {
+    minHeight: "100%" as any,
   },
   headerRow: {
     flexDirection: "row",
@@ -409,11 +440,12 @@ const styles = StyleSheet.create({
   },
   headerText: {
     flex: 1,
+    minWidth: 0,
   },
   title: {
     fontSize: 28,
     fontWeight: "800",
-    letterSpacing: -0.4,
+    letterSpacing: 0,
   },
   subtitle: {
     marginTop: 2,
@@ -473,10 +505,12 @@ const styles = StyleSheet.create({
   },
   fileMeta: {
     flex: 1,
+    minWidth: 0,
   },
   fileName: {
     fontSize: 13,
     fontWeight: "800",
+    flexShrink: 1,
   },
   fileDetails: {
     fontSize: 12,
@@ -490,6 +524,7 @@ const styles = StyleSheet.create({
   },
   mainColumn: {
     gap: 12,
+    minWidth: 0,
   },
   leftColumn: {
     flex: 0.92,
@@ -502,6 +537,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     gap: 12,
+    minWidth: 0,
   },
   centerCard: {
     alignItems: "center",
@@ -573,8 +609,14 @@ const styles = StyleSheet.create({
   previewBox: {
     borderWidth: 1,
     borderRadius: 12,
+    maxHeight: 340,
+    overflow: "hidden",
+  },
+  previewTextScroll: {
+    maxHeight: 340,
+  },
+  previewTextContent: {
     padding: 12,
-    maxHeight: 270,
   },
   previewText: {
     fontSize: 12,
@@ -606,6 +648,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 10,
   },
+  previewHeaderText: {
+    flex: 1,
+    minWidth: 0,
+  },
   sideTitle: {
     fontSize: 18,
     fontWeight: "800",
@@ -618,11 +664,13 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 6,
+    maxWidth: 190,
   },
   badgeText: {
     fontSize: 11,
     fontWeight: "800",
     textTransform: "uppercase",
+    textAlign: "center",
   },
   sectionsList: {
     gap: 8,
@@ -640,6 +688,7 @@ const styles = StyleSheet.create({
   },
   sectionPreviewTitle: {
     flex: 1,
+    minWidth: 0,
     fontSize: 14,
     fontWeight: "800",
   },
@@ -656,6 +705,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 5,
+    maxWidth: "100%",
   },
   fieldPillText: {
     fontSize: 11,

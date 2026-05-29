@@ -17,9 +17,9 @@ const {
   errorResponse,
   successResponse,
 } = require("../../lib/auth");
+const { hasConfiguredProviders, runChatCompletion } = require("../../lib/aiGateway");
+const { assertAiUsageLimit } = require("../../lib/aiUsageLimiter");
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 const OPENAI_TIMEOUT_MS = parseInt(process.env.OPENAI_TIMEOUT_MS || "25000", 10);
 
 const ACCIONES_VALIDAS = new Set([
@@ -59,7 +59,7 @@ module.exports = async (req, res) => {
       return errorResponse(res, 400, "Incluye 'contenidoDocumento' o 'seleccion' para dar contexto");
     }
 
-    if (!OPENAI_API_KEY) {
+    if (!hasConfiguredProviders()) {
       return successResponse(res, {
         provider: "heuristic",
         model: null,
@@ -69,23 +69,35 @@ module.exports = async (req, res) => {
     }
 
     try {
+      const usage = assertAiUsageLimit(req, `copiloto_${accion}`);
       const systemPrompt = buildSystemPrompt(accion);
       const userPrompt = buildUserPrompt({ accion, contexto, seleccion, contenidoDocumento });
-      const rawContent = await runOpenAI(systemPrompt, userPrompt);
+      const ai = await runChatCompletion({
+        systemPrompt,
+        userPrompt,
+        temperature: 0.35,
+        responseFormatJson: true,
+        timeoutMs: OPENAI_TIMEOUT_MS,
+      });
+      const rawContent = ai.content;
       const parsed = extractJson(rawContent);
       const resultado = normalizeResult(accion, parsed?.resultado || parsed, contexto, seleccion, contenidoDocumento);
 
       return successResponse(res, {
-        provider: "openai",
-        model: OPENAI_MODEL,
+        provider: ai.provider,
+        model: ai.model,
+        usage,
         accion,
         resultado,
       });
     } catch (aiError) {
       console.warn("Fallback heuristico en /api/planeaciones/copiloto:", aiError);
+      if (aiError?.statusCode === 429) {
+        return errorResponse(res, 429, aiError.message);
+      }
       return successResponse(res, {
         provider: "heuristic_fallback",
-        model: OPENAI_MODEL,
+        model: null,
         accion,
         resultado: buildFallbackResult(accion, contexto, seleccion, contenidoDocumento),
       });
@@ -165,47 +177,6 @@ ${schemas[accion]}
 
 function buildUserPrompt(payload) {
   return `Contexto y documento:\n${JSON.stringify(payload).slice(0, 22000)}`;
-}
-
-async function runOpenAI(systemPrompt, userPrompt) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
-
-  try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: OPENAI_MODEL,
-        temperature: 0.35,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
-      signal: controller.signal,
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      const msg = data?.error?.message || `Error OpenAI (${response.status})`;
-      throw new Error(msg);
-    }
-
-    const content = data?.choices?.[0]?.message?.content;
-    if (!content || typeof content !== "string") {
-      throw new Error("La IA no devolvio contenido utilizable");
-    }
-
-    return content;
-  } finally {
-    clearTimeout(timeoutId);
-  }
 }
 
 function extractJson(raw) {

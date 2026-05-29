@@ -24,7 +24,7 @@ jest.mock("@react-navigation/native", () => ({
 }));
 
 const mockAgregarPlaneacion = jest.fn().mockResolvedValue(undefined);
-jest.mock("../../sync/providers/SyncProvider", () => ({
+jest.mock("../../context/PlaneacionesContext", () => ({
   usePlaneaciones: () => ({
     planeaciones: [],
     agregarPlaneacion: mockAgregarPlaneacion,

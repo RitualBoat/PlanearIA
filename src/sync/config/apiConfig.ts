@@ -13,6 +13,8 @@ import logger from "../../utils/logger";
 // =====================================
 
 const API_SECRET_FROM_ENV = process.env.EXPO_PUBLIC_API_SECRET?.trim() ?? "";
+const API_BASE_URL_FROM_ENV = process.env.EXPO_PUBLIC_API_URL?.trim() ?? "";
+const FALLBACK_API_BASE_URL = "https://backend-eight-chi-54.vercel.app";
 
 /**
  * Configuración del backend Vercel
@@ -27,7 +29,7 @@ export const API_CONFIG = {
    * Desarrollo local: http://localhost:3000
    * Producción: https://tu-proyecto.vercel.app
    */
-  baseUrl: "https://backend-eight-chi-54.vercel.app", // URL de produccion
+  baseUrl: API_BASE_URL_FROM_ENV || FALLBACK_API_BASE_URL,
 
   /**
    * Clave secreta para autenticación

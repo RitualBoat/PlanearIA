@@ -13,7 +13,7 @@ export interface CampoPlantilla {
     | "table"
     | "checkbox_list";
   requerido: boolean;
-  opciones?: string[]; // Para select/multiselect
+  opciones?: string[];
   valorDefecto?: string;
 }
 
@@ -40,11 +40,18 @@ export interface PlantillaDocumento {
   descripcion?: string;
   nivelAcademico: NivelAcademico;
   origen: "manual" | "escaner" | "ia" | "comunidad";
-
-  // Estructura: qué secciones y campos contiene la plantilla
   secciones: SeccionPlantilla[];
 
-  // Valores por defecto (metadata institucional, firmas, etc.)
+  // Metadata for local selector (Phase 9) and future online gallery (Phase 10).
+  etiquetas?: string[];
+  miniaturaUri?: string;
+  compatibilidad?: {
+    web?: boolean;
+    android?: boolean;
+    ios?: boolean;
+  };
+
+  // Default values to prefill generated documents.
   defaults?: Partial<PlaneacionDocumento>;
 
   fechaCreacion: string;

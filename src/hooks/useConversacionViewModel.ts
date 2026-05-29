@@ -4,7 +4,7 @@ import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
 import { useMensajes } from "../context/MensajesContext";
-import { usePlaneaciones } from "../sync/providers/SyncProvider";
+import { usePlaneaciones } from "../context/PlaneacionesContext";
 import { useRecursos } from "../context/RecursosContext";
 import { Conversacion, Mensaje, TipoMensaje } from "../../types";
 import type { Planeacion } from "../../types/planeacionLegacy";

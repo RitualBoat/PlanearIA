@@ -13,6 +13,8 @@ PlanearIA esta evolucionando de una app de planeaciones a una plataforma integra
 | Documento | Descripcion |
 | --------- | ----------- |
 | [meta_guia_planes.md](./meta_guia_planes.md) | Guia maestra para crear futuros planes de refactorizacion o construccion de modulos. Define estructura, tracking, reglas de IA, offline-first, bajo costo, navegacion y UX/UI global. |
+| [PLANEACIONES_IA_EDITOR_FASE9.md](./PLANEACIONES_IA_EDITOR_FASE9.md) | Auditoria real de IA en Planeaciones y criterio de aceptacion del editor tipo Word/Docs para cierre de Fase 9. |
+| [CHECKLIST_VALIDACION_MANUAL_FASE9.md](./CHECKLIST_VALIDACION_MANUAL_FASE9.md) | Checklist manual E2E para cerrar formalmente la Fase 9 del modulo de Planeaciones. |
 | [ARQUITECTURA.md](./ARQUITECTURA.md) | Arquitectura del sistema, stack tecnologico, capas MVVM y decisiones tecnicas. |
 | [FLUJO_SINCRONIZACION.md](./FLUJO_SINCRONIZACION.md) | Flujo de datos offline-first y sincronizacion con MongoDB Atlas. |
 | [DIAGRAMA_NAVEGACION.md](./DIAGRAMA_NAVEGACION.md) | Diagrama visual del flujo de navegacion. |
@@ -142,7 +144,7 @@ AsyncStorage es la fuente local inmediata; MongoDB Atlas es persistencia remota.
 
 ### IA
 
-La IA debe tener uso pedagogico claro, fallback si no hay API key, validacion humana y documentacion de costos.
+La IA debe tener uso pedagogico claro, fallback si no hay API key, validacion humana y documentacion de costos. Para Planeaciones ya existe un gateway multi-provider en backend (`backend/lib/aiGateway.js`) con limite por accion (`AI_MAX_REQUESTS_PER_ACTION`, default 10); futuros modulos deben reutilizarlo o justificar por que necesitan otro flujo. El modo dev puede ampliar el limite con `AI_DEV_MODE=true`, pero debe mostrar advertencia y nunca sustituir los limites de invitados/usuarios registrados.
 
 ---
 

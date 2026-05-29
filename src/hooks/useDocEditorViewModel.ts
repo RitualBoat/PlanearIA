@@ -119,6 +119,7 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
   const [past, setPast] = useState<PlaneacionDocumento[]>([]);
   const [future, setFuture] = useState<PlaneacionDocumento[]>([]);
   const isHydratingRef = useRef(true);
+  const lastDraftSerializedRef = useRef("");
 
   const draftKey = useMemo(() => {
     const ref =
@@ -188,9 +189,13 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
         draft?.id &&
         (draft.id === sourceDocId || draft.plantillaId === sourcePlantillaId || mode === "crear")
       ) {
-        setDocumento(ensureDocumentoContenidoRaw(draft));
+        const hydratedDraft = ensureDocumentoContenidoRaw(draft);
+        setDocumento(hydratedDraft);
+        lastDraftSerializedRef.current = JSON.stringify(hydratedDraft);
       } else {
-        setDocumento(ensureDocumentoContenidoRaw(nextDocument));
+        const hydratedDoc = ensureDocumentoContenidoRaw(nextDocument);
+        setDocumento(hydratedDoc);
+        lastDraftSerializedRef.current = JSON.stringify(hydratedDoc);
       }
 
       setPast([]);
@@ -217,16 +222,20 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
 
   useEffect(() => {
     if (isHydratingRef.current) return;
+    if (!isDirty) return;
     const interval = setInterval(() => {
       const run = async () => {
-        await AsyncStorage.setItem(draftKey, JSON.stringify(documento));
+        const serialized = JSON.stringify(documento);
+        if (lastDraftSerializedRef.current === serialized) return;
+        await AsyncStorage.setItem(draftKey, serialized);
+        lastDraftSerializedRef.current = serialized;
         setDraftSavedAt(getNow());
       };
       void run();
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [documento, draftKey]);
+  }, [documento, draftKey, isDirty]);
 
   const guardarDocumento = useCallback(async (options?: { salir?: boolean }) => {
     try {
@@ -238,6 +247,7 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
         await crear(documento);
       }
       await AsyncStorage.removeItem(draftKey);
+      lastDraftSerializedRef.current = "";
       setIsDirty(false);
       setDraftSavedAt(getNow());
       if (options?.salir) {

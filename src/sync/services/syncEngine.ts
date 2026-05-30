@@ -13,6 +13,7 @@ import NetInfo from "@react-native-community/netinfo";
 import { SYNC_CONFIG } from "../config/apiConfig";
 import { apiRequest } from "../../utils/apiClient";
 import logger from "../../utils/logger";
+import { isNetworkRequestError } from "../../utils/networkErrors";
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 
@@ -215,10 +216,16 @@ export const flushQueue = async (
 
       if (nextRetries >= MAX_RETRIES) {
         // Marcar como fallida y mover a cola de errores
-        logger.error(
-          `[syncEngine] ✗ ${op.type} ${entity} superó MAX_RETRIES (${MAX_RETRIES})`,
-          err
-        );
+        if (isNetworkRequestError(err)) {
+          logger.debug(
+            `[syncEngine] ${op.type} ${entity} agoto reintentos por backend no disponible.`
+          );
+        } else {
+          logger.error(
+            `[syncEngine] ✗ ${op.type} ${entity} superó MAX_RETRIES (${MAX_RETRIES})`,
+            err
+          );
+        }
         newFailed.push({ ...op, retries: nextRetries, failed: true });
         result.errors.push(
           `${entity}/${op.type} falló después de ${MAX_RETRIES} intentos`

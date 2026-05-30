@@ -71,7 +71,7 @@ Regla: la documentacion puede estar desfasada. La fuente de verdad para planear 
 - `src/screens/`.
 - `backend/api/`.
 - `types/`.
-- `plan_planeaciones.md`.
+- `Documentacion/plan_planeaciones.md`.
 
 ---
 
@@ -83,9 +83,9 @@ Esta seccion no es un plan de refactorizacion. Es un mapa de referencia para que
 
 Estado:
 
-- Tiene plan maestro activo en `plan_planeaciones.md`.
-- Ya existe modelo V2, contexto nuevo, editor, escaner, exportacion y copiloto IA.
-- Sigue en Fase 9 con hotfixes y evolucion de DocEditor.
+- Tiene plan maestro cerrado en `Documentacion/plan_planeaciones.md`.
+- Ya existe modelo V2, contexto nuevo, editor, escaner, exportacion, copiloto IA y flujo moderno tipo Word/Docs.
+- Fase 9 quedo completada documentalmente el 2026-05-30; el foco nuevo pasa a reorientacion global y planes maestros futuros.
 
 Archivos principales:
 
@@ -98,7 +98,7 @@ Archivos principales:
 - `backend/api/planeaciones.js`.
 - `backend/api/planeaciones/*`.
 
-Regla: no crear otro plan de planeaciones sin leer completo `plan_planeaciones.md`.
+Regla: no crear otro plan de planeaciones sin leer completo `Documentacion/plan_planeaciones.md`.
 
 ### 3.2 Contenido / Hub de Recursos
 
@@ -387,12 +387,13 @@ Antes de redactar cualquier plan futuro, la IA debe:
 - Leer `Documentacion/ARQUITECTURA.md`.
 - Leer `Documentacion/FLUJO_SINCRONIZACION.md`.
 - Leer `Documentacion/meta_guia_planes.md`.
-- Leer `plan_planeaciones.md` como ejemplo de calidad y tracking.
+- Leer `Documentacion/plan_planeaciones.md` como ejemplo de calidad y tracking.
 - Revisar `src/navigation/StackNavigator.tsx`.
 - Revisar `src/navigation/AppTabsNavigator.tsx`.
 - Revisar carpetas del modulo objetivo en `src/screens`, `src/hooks`, `src/context`, `src/services`, `types` y `backend/api`.
 - Revisar tests existentes del modulo.
 - Revisar si hay datos reales o ejemplos en `context/`.
+- Revisar `context/referencias-opensource/README.md` si el modulo se beneficia de referencias externas; usar esas referencias solo como inspiracion arquitectonica y respetar las restricciones de licencia indicadas.
 - Ejecutar busquedas con `rg` para detectar rutas legacy, nombres duplicados y dependencias cruzadas.
 - Verificar si la documentacion esta desfasada contra el codigo.
 - Identificar que otros modulos dependen del modulo objetivo.
@@ -740,12 +741,12 @@ Todo plan con IA debe exigir:
 
 ### 12.1 Planeaciones
 
-No generar un plan nuevo sin leer `plan_planeaciones.md`.
+No generar un plan nuevo sin leer `Documentacion/plan_planeaciones.md`.
 
 Si se retoma:
 
-- Continuar desde la fase activa.
-- Priorizar Fase 9 hasta cerrar web, movil, editor tipo Docs/Word e IA.
+- Partir de Fase 9 como completada/cerrada.
+- Solo reabrir Planeaciones si aparece un bug critico o si un plan futuro necesita integrarlo con Classroom, Canva o UX global.
 - Actualizar README/documentacion si cambia arquitectura.
 
 ### 12.2 Recursos Evaluables

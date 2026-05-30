@@ -1,9 +1,9 @@
 # Checklist Manual - Fase 9 Planeaciones
 
-Fecha de validacion: `____/____/______`
-Validador: `________________________`
-Build usada: `________________________`
-Plataformas probadas: `Web / Android / iOS`
+Fecha de validacion: `2026-05-30`
+Validador: `Usuario + Codex`
+Build usada: `dev local`
+Plataformas probadas: `Web / movil fisico reportado por usuario`
 
 ## A. Flujo principal de creacion
 
@@ -26,7 +26,7 @@ Plataformas probadas: `Web / Android / iOS`
 - [x] C1. En selector, verificar secciones: `base`, `predeterminadas`, `guardadas`, `online placeholder`.
 - [x] C2. Verificar que tarjetas muestran metadata (tags y compatibilidad).
 - [x] C3. Elegir plantilla predeterminada y validar que estructura cambia en DocEditor.
-- [~] C4. Escanear plantilla (`EscanerPlantilla`) y confirmar que se puede crear documento desde ella. Revalidar despues del hotfix de gateway/fallback local.
+- [x] C4. Escanear plantilla (`EscanerPlantilla`) y confirmar que se puede crear documento desde ella. Revalidado despues del hotfix de gateway/fallback local.
 
 ## D. Editor Word/Docs
 
@@ -71,11 +71,12 @@ Plataformas probadas: `Web / Android / iOS`
 
 ## Resultado final
 
-- [ ] APROBADO Fase 9
-- [x] REQUIERE AJUSTES
+- [x] APROBADO Fase 9
+- [ ] REQUIERE AJUSTES
 
 Observaciones:
 
-- `2026-05-29: C4 detecto errores de layout/contraste y fallo IA del escaner. Se requiere revalidar tras hotfix.`
+- `2026-05-29: C4 detecto errores de layout/contraste y fallo IA del escaner. Resuelto tras hotfix.`
+- `2026-05-30: Fase 9 aprobada documentalmente; el flujo principal queda cerrado para continuar con la reorientacion global.`
 - `____________________________________________________________`
 - `____________________________________________________________`

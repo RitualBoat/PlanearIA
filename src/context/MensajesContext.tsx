@@ -12,6 +12,7 @@ import {
 import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
 import { mergeWithLocal } from "../sync/services/syncEngine";
 import logger from "../utils/logger";
+import { isNetworkRequestError } from "../utils/networkErrors";
 
 const CONVERSACIONES_STORAGE_KEY = "APP_CONVERSACIONES_DATA";
 const MENSAJES_STORAGE_KEY = "APP_MENSAJES_DATA";
@@ -130,7 +131,12 @@ export const MensajesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         return merged;
       });
     } catch (err) {
-      if (__DEV__) logger.error("[MensajesContext] Polling error:", err);
+      if (!__DEV__) return;
+      if (isNetworkRequestError(err)) {
+        logger.debug("[MensajesContext] Backend no disponible, polling omitido.");
+        return;
+      }
+      logger.warn("[MensajesContext] Polling no pudo actualizar conversaciones:", err);
     }
   };
 

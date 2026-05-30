@@ -1,0 +1,44 @@
+﻿# Mapa de rutas arquitectonicas
+
+> No copiar codigo directamente. Usar estos paths como mapa de investigacion y modelado.
+
+- apps/admin/app/admin/dashboard/_components/button.tsx
+- apps/admin/app/admin/dashboard/page.tsx
+- apps/learner/.eslintrc.js
+- apps/learner/.gitignore
+- apps/learner/README.md
+- apps/learner/app/favicon.ico
+- apps/learner/app/layout.tsx
+- apps/learner/app/page.tsx
+- apps/learner/next.config.mjs
+- apps/learner/package.json
+- apps/learner/postcss.config.js
+- apps/learner/public/next.svg
+- apps/learner/public/vercel.svg
+- apps/learner/tailwind.config.ts
+- apps/learner/tsconfig.json
+- packages/ui/src/components/dashboard-layout/content/body/content-wrapper.tsx
+- packages/ui/src/components/dashboard-layout/content/body/grid-box.tsx
+- packages/ui/src/components/dashboard-layout/content/body/index.ts
+- packages/ui/src/components/dashboard-layout/content/body/user-banner.tsx
+- packages/ui/src/components/dashboard-layout/content/header/header.tsx
+- packages/ui/src/components/dashboard-layout/content/header/index.ts
+- packages/ui/src/components/dashboard-layout/content/index.ts
+- packages/ui/src/components/dashboard-layout/content/layout.tsx
+- packages/ui/src/components/dashboard-layout/index.ts
+- packages/ui/src/components/dashboard-layout/layout.tsx
+- packages/ui/src/components/dashboard-layout/sidebar/body.tsx
+- packages/ui/src/components/dashboard-layout/sidebar/content.tsx
+- packages/ui/src/components/dashboard-layout/sidebar/footer.tsx
+- packages/ui/src/components/dashboard-layout/sidebar/index.ts
+- packages/ui/src/components/dashboard-layout/sidebar/item.tsx
+- packages/ui/src/components/dashboard-layout/sidebar/logo.tsx
+- packages/ui/src/components/dashboard-layout/sidebar/state.ts
+- services/api/db/Oauth/serializers.py
+- services/api/db/Oauth/views.py
+- services/api/db/migrations/0001_initial.py
+- services/api/db/models.py
+- services/api/db/serializers.py
+- services/api/db/userSerializers.py
+- services/api/db/utils.py
+- services/api/db/views.py

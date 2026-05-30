@@ -17,7 +17,18 @@ PlanearIA es una plataforma educativa offline-first para ayudar a docentes a cre
 
 ## Vision del Producto
 
-PlanearIA nace como una app para planeaciones educativas, pero su objetivo es crecer hasta convertirse en una plataforma integral para docentes. La vision es que un profesor pueda trabajar desde un solo lugar:
+PlanearIA nace como una app para planeaciones educativas, pero su objetivo es crecer hasta convertirse en una plataforma integral para docentes con una regla nueva y central: **cero friccion**. Un profesor no deberia sentir que aprende software nuevo, sino que abre herramientas familiares dentro de un solo ecosistema.
+
+La vision actual organiza el producto por experiencias:
+
+- **Planeaciones = Word/Docs:** crear, importar, editar y exportar planeaciones como documentos reales, con IA pedagogica y plantillas.
+- **Grupos y recursos = Classroom:** clases, unidades, alumnos, actividades, materiales, entregas, asistencia y calificaciones en un flujo unico.
+- **Diseno didactico = Canva/Genially:** crear presentaciones, examenes visuales, actividades y materiales desde un editor visual opcional.
+- **Listas y registros = Excel:** hojas/listas libres para asistencia, calificaciones, notas y registros sincronizables con Classroom.
+- **Mensajeria docente = WhatsApp profesional:** contactos, chat y envio de recursos entre docentes.
+- **Reportes = hub separado:** analisis y gamificacion sin saturar la experiencia diaria.
+
+La vision practica sigue siendo que un profesor pueda trabajar desde un solo lugar:
 
 - Crear planeaciones didacticas con plantillas, editor tipo Word/Docs e IA pedagogica.
 - Administrar grupos, alumnos, asistencia, calificaciones y reportes.
@@ -28,7 +39,7 @@ PlanearIA nace como una app para planeaciones educativas, pero su objetivo es cr
 - Trabajar sin internet y sincronizar cuando vuelva la conexion.
 - Mantener una arquitectura profesional, pero realista para un proyecto construido por un estudiante con presupuesto limitado.
 
-El principio rector es simple: la app debe sentirse util para docentes reales, no solo tecnicamente interesante.
+El principio rector es simple: la app debe sentirse util para docentes reales, no solo tecnicamente interesante. La arquitectura objetivo es monolito modular, desarrollo local primero, bajo costo y despliegue gradual.
 
 ---
 
@@ -50,9 +61,9 @@ Lo que ya existe en la app:
 
 Estado del trabajo principal actual:
 
-- El modulo de Planeaciones es el foco activo.
-- Las fases 0 a 8 dejaron modelo V2, contexto, editor, escaner, exportacion y copiloto IA como base.
-- La Fase 9 de `plan_planeaciones.md` esta destinada a corregir el flujo real: editor tipo Word/Docs, WebView en web, errores moviles, botones ilegibles, navegacion legacy, plantilla default y experiencia centrada en documento.
+- El modulo de Planeaciones cerro su Fase 9 como primera gran refactorizacion terminada.
+- Planeaciones ya deja modelo V2, contexto, editor tipo Word/Docs, escaner, exportacion, plantilla default robusta, copiloto IA y limpieza de legacy principal como base.
+- La nueva prioridad es `Documentacion/PLAN_PASOS_INICIALES.md`: organizacion del proyecto, GitHub/GitHub Projects, entorno local, CI inicial y secuencia de nuevos planes maestros.
 - La guia `Documentacion/meta_guia_planes.md` define el estandar para futuros planes de refactorizacion.
 
 ---
@@ -61,17 +72,17 @@ Estado del trabajo principal actual:
 
 | Modulo | Estado actual | Vision |
 | ------ | ------------- | ------ |
-| Planeaciones | Refactor activo con plan maestro. Hay modelo V2, editor, escaner, exportacion y copiloto IA, pero falta cerrar Fase 9. | Editor tipo Word/Docs con plantillas, IA, importacion, exportacion y flujo mobile/web profesional. |
+| Planeaciones | Fase 9 completada. Hay modelo V2, editor tipo Word/Docs, escaner, exportacion, plantilla default robusta, copiloto IA, flujo moderno y limpieza legacy principal. | Mantener como experiencia Word/Docs e integrarla despues con Classroom y plantillas/diseno. |
 | Contenido / Hub de Recursos | Hub transversal para planeaciones, recursos, entregables y plantillas. | Convertirse en un centro claro, sin flujos duplicados ni rutas legacy escondidas. |
 | Recursos Didacticos / Biblioteca | Existen lista, creacion, contexto y ViewModels. | Gestionar diapositivas, PDFs, videos, notas, mapas mentales y lineas de tiempo. |
 | Recursos Evaluables / Tareas / Entregables | Hay tareas dentro de grupos, entregables, calificacion y asignacion de recursos. | Examenes, trabajos, rubricas, proyectos, revision, asignacion y calificacion conectada con alumnos. |
-| Grupos | Modulo amplio con dashboard, lista, detalle, reportes, importacion y tareas. | Ser el centro operativo de grupos, alumnos, asistencia, calificaciones y entregables. |
+| Grupos | Modulo amplio con dashboard, lista, detalle, reportes, importacion y tareas. | Fusionarse con alumnos, recursos, entregables, asistencia y calificaciones como experiencia tipo Classroom. |
 | Alumnos | CRUD, detalle, notas, importacion, exportacion y reportes. | Perfil academico completo con historial, estadisticas y conexion a todos los modulos. |
 | Asistencia | Registro e historial. | Control rapido por grupo, reportes y sincronizacion offline robusta. |
 | Calificaciones | Captura y promedios. | Calificaciones conectadas con rubricas, entregables, reportes y analitica. |
 | Plantillas | Biblioteca, lista, detalle y editor legacy/generico. | Ecosistema de plantillas reutilizables, importables, compartibles y sanitizadas. |
-| Feed / Red Social Educativa | Feed, detalle de posts, retos, preguntas y resultados. | Comunidad docente para compartir recursos, ideas, retos y materiales. |
-| Social / Contactos | Pantalla social, buscador de perfiles e invitaciones. | Red de contactos docentes con colaboracion y permisos claros. |
+| Feed / Red Social Educativa | Feed, detalle de posts, retos, preguntas y resultados. | Queda en segundo plano; el foco futuro sera comunicacion directa y colaboracion docente. |
+| Social / Contactos | Pantalla social, buscador de perfiles e invitaciones. | Base para WhatsApp docente: contactos, solicitudes y permisos claros. |
 | Chat / Mensajeria | Lista de chats y conversacion; puede compartir texto, planeaciones y recursos. | Mensajeria docente con privacidad, adjuntos educativos y sync estable. |
 | Notificaciones | Contexto, pantalla y servicio push. | Alertas utiles, configurables y compatibles con dev builds. |
 | Cuenta, Perfil y Accesibilidad | Perfil, roles, terminos, tema, fuente y daltonismo. | Configuracion profesional, accesible y separada entre perfil publico y privacidad. |
@@ -169,7 +180,8 @@ Planes actuales:
 
 | Plan | Archivo | Estado |
 | ---- | ------- | ------ |
-| Planeaciones | [`plan_planeaciones.md`](./plan_planeaciones.md) | Activo, Fase 9 pendiente/en preparacion. |
+| Pasos iniciales | [`Documentacion/PLAN_PASOS_INICIALES.md`](./Documentacion/PLAN_PASOS_INICIALES.md) | Nuevo plan rector activo para organizacion, GitHub, entorno local, CI y secuencia de planes futuros. |
+| Planeaciones | [`Documentacion/plan_planeaciones.md`](./Documentacion/plan_planeaciones.md) | Completado/cerrado documentalmente el 2026-05-30, Fase 9 completada. |
 | Meta guia de planes | [`Documentacion/meta_guia_planes.md`](./Documentacion/meta_guia_planes.md) | Vigente, define reglas para futuros planes. |
 
 ---
@@ -178,25 +190,23 @@ Planes actuales:
 
 ### Corto plazo
 
-- Cerrar Fase 9 de Planeaciones.
-- Corregir WebView en web y error de maximum update depth en movil.
-- Convertir el editor de planeaciones en una experiencia centrada en documento.
-- Eliminar flujos legacy y duplicados al crear/editar planeaciones.
-- Asegurar plantilla predeterminada y selector de plantillas.
-- Probar botones de IA y documentar API keys requeridas.
+- Ejecutar `Documentacion/PLAN_PASOS_INICIALES.md`.
+- Organizar GitHub Projects, labels, milestones, issue templates y PR template.
+- Preparar entorno local documentado para web y celular fisico.
+- Crear GitHub Actions basico para typecheck, lint y tests.
+- Crear el siguiente plan maestro: Classroom / Grupos y Recursos.
 
 ### Mediano plazo
 
-- Profesionalizar Recursos Evaluables.
-- Profesionalizar Recursos Didacticos.
-- Reforzar Grupos, Alumnos, Asistencia y Calificaciones.
-- Mejorar Feed, Social, Chat y Notificaciones.
-- Endurecer Auth, Seguridad, Cuenta y Accesibilidad.
-- Crear un plan global de UX/UI y navegacion si los flujos empiezan a fragmentarse.
+- Fusionar Grupos, Alumnos, Tareas, Recursos, Asistencia y Calificaciones en experiencia tipo Classroom.
+- Crear plan UX/UI y Navegacion Global si el flujo empieza a fragmentarse.
+- Preparar plan de infraestructura local/CI/deploy basico.
+- Endurecer Auth y Seguridad antes de beta con usuarios reales.
+- Planear Excel/Listas y Calificacion con IA como apoyo, no sustituto docente.
 
 ### Largo plazo
 
-- Evaluar infraestructura final: Vercel, servidor propio, Docker, FastAPI, Azure o GitHub Actions segun costo y facilidad de entrega.
+- Evaluar infraestructura final: free tier cloud, servidor local/self-hosted, VPS economico, Vercel/Render/Railway, Docker o hibrido segun costo y facilidad de entrega.
 - Preparar despliegue web y distribucion en app stores.
 - Crear landing page y documentacion de lanzamiento.
 - Agregar analitica, crash reporting y monitoreo basico.
@@ -256,7 +266,6 @@ Configurar credenciales de MongoDB Atlas, endpoints y claves de IA cuando el mod
 PlanearIA/
 +-- App.tsx
 +-- README.md
-+-- plan_planeaciones.md
 +-- Documentacion/
 |   +-- README.md
 |   +-- ARQUITECTURA.md
@@ -265,6 +274,8 @@ PlanearIA/
 |   +-- MAPA_NAVEGACION.md
 |   +-- GUIA_PRUEBAS.md
 |   +-- meta_guia_planes.md
+|   +-- plan_planeaciones.md
+|   +-- PLAN_PASOS_INICIALES.md
 +-- backend/
 |   +-- api/
 |   +-- lib/
@@ -293,7 +304,10 @@ La documentacion tecnica esta en [`Documentacion/`](./Documentacion/):
 | Documento | Descripcion |
 | --------- | ----------- |
 | [`Documentacion/README.md`](./Documentacion/README.md) | Indice tecnico de documentacion. |
+| [`Documentacion/VISION_ACTUAL.md`](./Documentacion/VISION_ACTUAL.md) | Manifiesto actual de cero friccion: Word, Classroom, Canva, Excel, WhatsApp y reportes. |
+| [`Documentacion/PLAN_PASOS_INICIALES.md`](./Documentacion/PLAN_PASOS_INICIALES.md) | Nuevo plan rector activo para organizar GitHub, entorno local, CI y orden de planes futuros. |
 | [`Documentacion/meta_guia_planes.md`](./Documentacion/meta_guia_planes.md) | Guia maestra para planes futuros por modulo. |
+| [`Documentacion/INFRAESTRUCTURA_SUGERIDA.md`](./Documentacion/INFRAESTRUCTURA_SUGERIDA.md) | Estrategia de infraestructura realista para estudiante: monolito modular, bajo costo y despliegue gradual. |
 | [`Documentacion/PLANEACIONES_IA_EDITOR_FASE9.md`](./Documentacion/PLANEACIONES_IA_EDITOR_FASE9.md) | Ground truth de IA en Planeaciones + criterio de aceptacion del editor Word/Docs en Fase 9. |
 | [`Documentacion/ARQUITECTURA.md`](./Documentacion/ARQUITECTURA.md) | Arquitectura del sistema y decisiones tecnicas. |
 | [`Documentacion/FLUJO_SINCRONIZACION.md`](./Documentacion/FLUJO_SINCRONIZACION.md) | Flujo offline-first y sincronizacion. |

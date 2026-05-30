@@ -1,3 +1,4 @@
+import { Platform } from "react-native";
 import logger from "../../utils/logger";
 /**
  * Configuración del API de sincronización
@@ -15,6 +16,9 @@ import logger from "../../utils/logger";
 const API_SECRET_FROM_ENV = process.env.EXPO_PUBLIC_API_SECRET?.trim() ?? "";
 const API_BASE_URL_FROM_ENV = process.env.EXPO_PUBLIC_API_URL?.trim() ?? "";
 const FALLBACK_API_BASE_URL = "https://backend-eight-chi-54.vercel.app";
+const LOCALHOST_API_PATTERN = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?/i;
+const ALLOW_NATIVE_LOCALHOST =
+  process.env.EXPO_PUBLIC_ALLOW_NATIVE_LOCALHOST?.trim().toLowerCase() === "true";
 
 /**
  * Configuración del backend Vercel
@@ -42,6 +46,10 @@ export const API_CONFIG = {
    * Timeout para requests (ms)
    */
   timeout: 15000,
+};
+
+export const isNativeLocalhostAPI = (): boolean => {
+  return Platform.OS !== "web" && LOCALHOST_API_PATTERN.test(API_CONFIG.baseUrl);
 };
 
 // =====================================
@@ -134,7 +142,8 @@ export const isAPIConfigured = (): boolean => {
   return (
     API_CONFIG.baseUrl !== "" &&
     !API_CONFIG.baseUrl.includes("tu-proyecto") &&
-    API_CONFIG.apiSecret !== ""
+    API_CONFIG.apiSecret !== "" &&
+    (!isNativeLocalhostAPI() || ALLOW_NATIVE_LOCALHOST)
   );
 };
 
@@ -145,6 +154,9 @@ export const logConfigStatus = (): void => {
   if (isAPIConfigured()) {
     logger.log("[config] Sync API configured");
     logger.log(`   URL: ${API_CONFIG.baseUrl}`);
+  } else if (isNativeLocalhostAPI() && !ALLOW_NATIVE_LOCALHOST) {
+    logger.log("[config] Native localhost API detected, local-only mode");
+    logger.log("   Usa la IP LAN de tu laptop para probar backend/IA en celular.");
   } else {
     logger.log("[config] API not configured, local-only mode");
     logger.log("   Actualiza API_CONFIG.baseUrl después del deploy en Vercel");

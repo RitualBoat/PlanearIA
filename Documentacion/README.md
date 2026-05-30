@@ -12,7 +12,12 @@ PlanearIA esta evolucionando de una app de planeaciones a una plataforma integra
 
 | Documento | Descripcion |
 | --------- | ----------- |
+| [VISION_ACTUAL.md](./VISION_ACTUAL.md) | Manifiesto vigente de cero friccion: experiencias Word, Classroom, Canva, Excel, WhatsApp y reportes. |
+| [PLAN_PASOS_INICIALES.md](./PLAN_PASOS_INICIALES.md) | Plan rector activo para organizacion del proyecto, GitHub/GitHub Projects, entorno local, CI y secuencia de futuros planes maestros. |
 | [meta_guia_planes.md](./meta_guia_planes.md) | Guia maestra para crear futuros planes de refactorizacion o construccion de modulos. Define estructura, tracking, reglas de IA, offline-first, bajo costo, navegacion y UX/UI global. |
+| [INFRAESTRUCTURA_SUGERIDA.md](./INFRAESTRUCTURA_SUGERIDA.md) | Estrategia de infraestructura realista para un estudiante: monolito modular, desarrollo local, bajo costo y despliegue gradual. |
+| [OPINION_DE_IA_TRAS_LEER_META_GUIA_PLANEACIONES.md](./OPINION_DE_IA_TRAS_LEER_META_GUIA_PLANEACIONES.md) | Analisis estrategico posterior a la meta guia y nueva vision del producto. |
+| [REVISION-GPT-TRAS-LEER-ARCHIVOS-DOCUMENTACION.md](./REVISION-GPT-TRAS-LEER-ARCHIVOS-DOCUMENTACION.md) | Revision adicional de documentacion fundacional y alineacion estrategica. |
 | [PLANEACIONES_IA_EDITOR_FASE9.md](./PLANEACIONES_IA_EDITOR_FASE9.md) | Auditoria real de IA en Planeaciones y criterio de aceptacion del editor tipo Word/Docs para cierre de Fase 9. |
 | [CHECKLIST_VALIDACION_MANUAL_FASE9.md](./CHECKLIST_VALIDACION_MANUAL_FASE9.md) | Checklist manual E2E para cerrar formalmente la Fase 9 del modulo de Planeaciones. |
 | [ARQUITECTURA.md](./ARQUITECTURA.md) | Arquitectura del sistema, stack tecnologico, capas MVVM y decisiones tecnicas. |
@@ -31,11 +36,11 @@ PlanearIA esta evolucionando de una app de planeaciones a una plataforma integra
 
 ## Estado General de la App
 
-PlanearIA ya cuenta con una base funcional y varios modulos implementados o parcialmente implementados:
+PlanearIA ya cuenta con una base funcional y varios modulos implementados o parcialmente implementados. La vision vigente reorganiza esos modulos en experiencias docentes familiares: Planeaciones como Word/Docs, Grupos/Recursos como Classroom, Diseno Didactico como Canva, Listas como Excel, Mensajeria como WhatsApp profesional y Reportes como hub separado.
 
 - Auth: login, registro y recuperacion de contrasena.
 - Navegacion: tabs principales y stack navigator.
-- Planeaciones: modelo V2, contexto, editor, escaner, exportacion y copiloto IA en refactorizacion activa.
+- Planeaciones: modelo V2, contexto, editor tipo Word/Docs, escaner, exportacion, copiloto IA y Fase 9 cerrada como primera gran refactorizacion.
 - Contenido: hub transversal para planeaciones, recursos, entregables y plantillas.
 - Recursos didacticos: biblioteca, lista y creacion de recursos.
 - Recursos evaluables: tareas, entregables, calificacion y asignacion de recursos desde grupos.
@@ -56,11 +61,15 @@ La app no esta en produccion y no tiene usuarios reales, por lo que los planes p
 
 ---
 
-## Plan de Refactorizacion Activo
+## Planes Activos y Cerrados
 
-El plan activo del modulo de Planeaciones esta en la raiz del proyecto:
+El plan rector activo actual es:
 
-**[plan_planeaciones.md](../plan_planeaciones.md)**
+**[PLAN_PASOS_INICIALES.md](./PLAN_PASOS_INICIALES.md)**
+
+El plan cerrado de Planeaciones queda como referencia de calidad:
+
+**[plan_planeaciones.md](./plan_planeaciones.md)**
 
 Estado actual:
 
@@ -72,8 +81,9 @@ Estado actual:
 - Fase 5 completada: escaner de plantillas PDF/DOCX y flujo desde plantilla V2.
 - Fase 6 completada: endpoint copiloto, servicio/hook y AIToolbar integrada.
 - Fase 7 completada: exportacion PDF/DOCX V2, navegacion DocEditor/EscanerPlantilla y Mi Contenido conectado.
-- Fase 8 mayormente completada: limpieza y validaciones tecnicas.
-- Fase 9 pendiente/en preparacion: auditoria y correccion funcional del flujo real, editor tipo Word/Docs, web/movil, IA, plantillas default y navegacion sin legacy.
+- Fase 8 completada: limpieza y validaciones tecnicas.
+- Fase 9 completada/cerrada el 2026-05-30: auditoria y correccion funcional del flujo real, editor tipo Word/Docs, web/movil, IA, plantillas default y navegacion sin legacy.
+- Nueva prioridad: ejecutar `PLAN_PASOS_INICIALES.md` y crear despues el Plan Maestro Classroom / Grupos y Recursos.
 
 ---
 
@@ -111,7 +121,8 @@ Toda IA o persona que cree un nuevo plan debe leer primero:
 - [ARQUITECTURA.md](./ARQUITECTURA.md).
 - [FLUJO_SINCRONIZACION.md](./FLUJO_SINCRONIZACION.md).
 - [meta_guia_planes.md](./meta_guia_planes.md).
-- [plan_planeaciones.md](../plan_planeaciones.md) como ejemplo de calidad.
+- [plan_planeaciones.md](./plan_planeaciones.md) como ejemplo de calidad.
+- [PLAN_PASOS_INICIALES.md](./PLAN_PASOS_INICIALES.md) como plan rector actual.
 
 Cada plan debe incluir:
 
@@ -133,6 +144,10 @@ Cada plan debe incluir:
 ### Bajo costo
 
 El proyecto lo construye un estudiante trabajando solo. Antes de proponer infraestructura, IA, hosting, email, storage, push o monitoreo, se deben evaluar costos, free tiers y alternativas simples.
+
+### Vision de cero friccion
+
+La vision vigente esta en `VISION_ACTUAL.md`: PlanearIA debe sentirse como Word/Docs para planeaciones, Classroom para grupos/recursos, Canva para diseno didactico, Excel para listas y WhatsApp profesional para comunicacion docente. Los planes futuros deben fusionar modulos en esas experiencias madre y evitar pantallas aisladas.
 
 ### Navegacion y UX/UI global
 
@@ -156,6 +171,7 @@ La IA debe tener uso pedagogico claro, fallback si no hay API key, validacion hu
 - AsyncStorage.
 - MongoDB Atlas M0.
 - Vercel serverless.
+- Monolito modular y desarrollo local primero.
 - JWT auth con `userId` isolation.
 - Jest + Testing Library.
 - Tentap/TipTap/WebView para editor enriquecido.

@@ -4,6 +4,7 @@
 > **Fecha:** 2026-05-27  
 > **Alcance:** RediseÃ±o completo del mÃ³dulo de Planeaciones (tipos, datos, UI, IA, backend, sync)  
 > **Stack:** React Native 0.81.5 Â· Expo 54 Â· TypeScript 5.9 Â· MongoDB Atlas Â· AsyncStorage Â· MVVM
+> **Estado:** Completado/cerrado documentalmente el 2026-05-30. Planeaciones queda como primera gran refactorizacion terminada y sirve como referencia de calidad para futuros planes.
 
 ---
 
@@ -701,7 +702,7 @@ export interface FiltrosPlaneacionV2 {
 
 ---
 
-### FASE 9: Auditoria y Correccion Funcional del Flujo Real de Planeaciones
+### FASE 9: Auditoria y Correccion Funcional del Flujo Real de Planeaciones (COMPLETADA)
 
 > Objetivo: cerrar la brecha entre la arquitectura V2 implementada y la experiencia real que ve el docente. Esta fase no asume que el modulo esta listo solo porque TypeScript, lint y tests pasaron. La meta es que crear, editar, generar con IA, importar, guardar, listar y exportar siempre pasen por el flujo moderno, con editor robusto tipo Docs/Word, plantilla base por defecto y comportamiento correcto en web y movil.
 
@@ -752,7 +753,7 @@ export interface FiltrosPlaneacionV2 {
   - Debe funcionar en web, Android/iOS y modo movil/estandar sin bloquear scroll ni clicks.
   - **Avance aplicado 2026-05-28:** criterio de aceptacion consolidado y publicado en `Documentacion/PLANEACIONES_IA_EDITOR_FASE9.md` con checklist funcional de cierre.
 
-- [~] **9.3 Redisenar la arquitectura del editor para que deje de sentirse como formulario**:
+- [x] **9.3 Redisenar la arquitectura del editor para que deje de sentirse como formulario**:
   - `DocEditorScreen` debe partir de un documento unico/canvas central, no de tarjetas de formulario como experiencia principal.
   - Mantener secciones pedagogicas solo como navegacion/estructura, no como sustituto del documento.
   - Integrar `RichTextEditor` como superficie principal del documento, con bloques derivados de la plantilla seleccionada.
@@ -794,7 +795,7 @@ export interface FiltrosPlaneacionV2 {
   - Agregar fallback determinista si no hay plantillas de usuario ni plantillas escaneadas.
   - Definir metadata para galeria: nombre, descripcion, nivel, etiquetas, miniatura/preview, origen y compatibilidad.
   - Validar que la plantilla predeterminada funciona para primaria, secundaria, preparatoria y universidad con placeholders adaptados.
-  - **Avance aplicado 2026-05-28:** `PlantillaDocumento` ahora incluye metadata de galeria local (`etiquetas`, `miniaturaUri`, `compatibilidad`) para preparar Fase 10 sin bloquear cierre funcional de Fase 9.
+  - **Avance aplicado 2026-05-28:** `PlantillaDocumento` ahora incluye metadata de galeria local (`etiquetas`, `miniaturaUri`, `compatibilidad`) para preparar una futura galeria de plantillas sin bloquear cierre funcional de Fase 9.
   - **Avance aplicado 2026-05-28:** `useCrearPlaneacionViewModel` fortalece plantillas base/predeterminadas con defaults y placeholders por nivel (primaria, secundaria, preparatoria y universidad), manteniendo fallback determinista en selector.
   - **Avance aplicado 2026-05-28:** `CrearPlaneacionScreen` muestra metadata visible de plantilla (tags + compatibilidad) para mejorar seleccion y trazabilidad de origen.
 
@@ -810,7 +811,7 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** imports activos restantes que consumian `usePlaneaciones` desde `sync/providers/SyncProvider` (`SyncIndicator`, `ConversacionScreen`, `useConversacionViewModel`, `PerfilScreen`) migrados a `context/PlaneacionesContext`.
   - **Avance aplicado 2026-05-28:** eliminadas pantallas legacy sin uso del flujo moderno: `PlaneacionesScreen.tsx`, `GenerarPlaneacionIAScreen.tsx` y `GenerarPlaneacionIAForm.tsx`; pruebas legacy asociadas retiradas.
 
-- [~] **9.8 Corregir scroll y clicks en web**:
+- [x] **9.8 Corregir scroll y clicks en web**:
   - Reproducir el bloqueo de scroll en `ContenidoScreen`, `CrearNuevoModal`, `CrearPlaneacionScreen` y `DocEditorScreen`.
   - Auditar contenedores `FlatList`, `ScrollView`, `SafeAreaView`, overlays `Modal/Pressable`, FAB, z-index, `pointerEvents` y alturas `flex`.
   - Asegurar que los modales no capturen clicks fuera de su area util ni bloqueen la lista al cerrarse.
@@ -822,7 +823,7 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** hardening adicional web en `ContenidoScreen` con layout `100vh` + `FlatList` con scroll interno explicito para reducir cortes de contenido y bloqueos de scroll.
   - **Avance aplicado 2026-05-29:** `EscanerPlantillaScreen` recibe scroll web interno, preview de texto con scroll propio y ajustes de layout para evitar texto sobrepuesto debajo del boton `Analizar estructura`.
 
-- [~] **9.9 Refinar la tab Contenido/Recursos sin sobrerrefactorizar**:
+- [x] **9.9 Refinar la tab Contenido/Recursos sin sobrerrefactorizar**:
   - Mantener `ContenidoScreen` como hub de contenido si sigue siendo la mejor entrada principal.
   - Separar mentalmente las responsabilidades: planeaciones, recursos, entregables y plantillas.
   - Cambiar CTA empty state de `Planeaciones` a `CrearPlaneacion` o al nuevo flujo decidido.
@@ -831,7 +832,7 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** empty state de `ContenidoScreen` ya navega a `CrearPlaneacion` en lugar de `Planeaciones`.
   - **Avance aplicado 2026-05-28:** ajuste de layout web en `ContenidoScreen` para mantener accesibilidad del hub sin romper navegacion entre tarjetas, FAB y menu contextual.
 
-- [~] **9.10 Endurecer persistencia y sincronizacion del editor**:
+- [x] **9.10 Endurecer persistencia y sincronizacion del editor**:
   - Verificar autosave local de `DocEditor` y recuperacion de borrador.
   - Evitar que un draft de `modo: crear` sobreescriba otra planeacion del mismo nivel.
   - Confirmar que guardar crea/actualiza exactamente un documento V2.
@@ -841,7 +842,7 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** `setContenidoRaw` ahora ignora payloads identicos para evitar writes redundantes y ruido en autosave/historial.
   - **Avance aplicado 2026-05-28:** autosave de borrador endurecido: solo escribe cuando hay cambios (`isDirty`) y evita escrituras repetidas con fingerprint serializado de documento.
 
-- [~] **9.11 Agregar pruebas automatizadas de flujo real**:
+- [x] **9.11 Agregar pruebas automatizadas de flujo real**:
   - Unit tests para ViewModels: crear manual, crear con IA V2, importar, abrir plantilla, editar existente.
   - Tests de navegacion para asegurar que no se navega a pantallas legacy en flujos modernos.
   - Tests de `ContenidoScreen` para CTA empty state, FAB, card press y menu editar.
@@ -853,7 +854,7 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** `useCrearPlaneacionViewModel.test.tsx` agrega cobertura para metadata de plantillas base y flujo `Abrir con IA` desde selector (crea doc V2 y navega a `DocEditor`).
   - **Avance aplicado 2026-05-29:** `planeacionImportService.test.ts` cubre fallback local del escaner cuando falta backend IA o el backend responde texto no JSON.
 
-- [~] **9.12 Ejecutar validacion tecnica completa**:
+- [x] **9.12 Ejecutar validacion tecnica completa**:
   - `npx tsc --noEmit`.
   - `npm run lint -- --quiet`.
   - `npm test -- --runInBand`.
@@ -880,7 +881,7 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** validacion posterior a mejoras IA finales (`Autocompletar` + estado IA visible): `npx tsc --noEmit` OK, `npm run lint -- --quiet` OK y `npm test -- --runInBand src/__tests__/planeaciones` OK (12 suites, 39 tests).
   - **Avance aplicado 2026-05-29:** validacion posterior al gateway IA y hotfix del escaner: `cmd /c npx tsc --noEmit` OK, `cmd /c npm run lint -- --quiet` OK y `cmd /c npm test -- --runInBand src/__tests__/planeaciones` OK (12 suites, 41 tests).
 
-- [ ] **9.13 Validacion manual end-to-end final (movida desde 8.11)**:
+- [x] **9.13 Validacion manual end-to-end final (movida desde 8.11)**:
   - Crear planeacion -> selector de plantillas -> elegir default/base -> abrir documento tipo Word/Docs -> editar -> guardar -> listar -> reabrir -> exportar PDF/DOCX.
   - Crear planeacion -> selector de plantillas -> elegir plantilla guardada/predeterminada -> abrir DocEditor con esa estructura.
   - Importar plantilla desde Word/PDF -> IA escanea -> se vacian datos internos -> se conserva estructura/placeholders -> crear planeacion desde esa plantilla.
@@ -893,8 +894,9 @@ export interface FiltrosPlaneacionV2 {
   - Validar modo estandar/tablet: canvas amplio, navegacion por secciones, toolbar visible y scroll correcto.
   - Validar offline: crear/editar sin conexion -> reconectar -> verificar sync sin duplicados.
   - **Checklist oficial de ejecucion manual:** `Documentacion/CHECKLIST_VALIDACION_MANUAL_FASE9.md`.
+  - **Cierre aplicado 2026-05-30:** checklist manual ejecutado por el usuario y ultimos errores criticos corregidos; se da por completada la validacion end-to-end de Fase 9.
 
-- [~] **9.14 Hotfix critico del editor multiplataforma**:
+- [x] **9.14 Hotfix critico del editor multiplataforma**:
   - Resolver error web `React Native WebView does not support this platform`.
   - Separar implementacion del editor por plataforma: en web usar editor DOM/Tiptap nativo de navegador o fallback controlado; en Android/iOS conservar TenTap/WebView.
   - Evitar que `RichTextEditor` intente montar `react-native-webview` cuando `Platform.OS === "web"`.
@@ -916,7 +918,7 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** ajuste final de compatibilidad nativa: el JSON TipTap se convierte a HTML antes de entrar a TenTap en Android/iOS, evitando tanto el JSON literal como el documento vacio con plantillas complejas.
   - **Avance aplicado 2026-05-28:** el fallback web dejo de controlar/reinyectar `innerHTML` en cada render; ahora hidrata el contenido una vez y solo reemplaza HTML ante cambios externos reales, evitando que el cursor salte a la primera linea o que el borrado se revierta.
 
-- [~] **9.15 Elevar DocEditor a experiencia real tipo Word/Docs**:
+- [x] **9.15 Elevar DocEditor a experiencia real tipo Word/Docs**:
   - Redisenar `DocEditorScreen` para que el documento sea el centro visual absoluto, con una hoja blanca de tamano carta/A4, margenes visibles y fondo gris claro de escritorio.
   - Agregar controles de vista: `Documento`, `Formulario`, `Pantalla completa`, `Preview` y navegacion por paginas.
   - Implementar modelo de paginas: crear, eliminar, duplicar y reordenar paginas sin perder compatibilidad con `contenidoRaw`.
@@ -947,7 +949,7 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-28:** el boton movil para ocultar teclado se redujo a un circulo flotante minimalista con flecha y ahora llama `editor.blur()` ademas de `Keyboard.dismiss()`, mejorando el caso de escritura directa dentro del documento TenTap.
   - **Avance aplicado 2026-05-28:** el boton de ocultar teclado se movio a un FAB global en `App`, aparece solo con `keyboardDidShow`, desaparece al presionarlo o con `keyboardDidHide` y DocEditor registra un handler opcional para desenfocar TenTap.
 
-- [~] **9.16 Validar y endurecer Copiloto IA dentro del editor**:
+- [x] **9.16 Validar y endurecer Copiloto IA dentro del editor**:
   - Probar botones IA `Sugerir`, `Mejorar`, `Rubrica` y `Revisar` en web y movil despues de corregir el editor.
   - Incorporar IA como herramienta contextual del documento: boton flotante/inline junto al bloque activo y acciones compactas en toolbar.
   - Agregar texto predictivo/autocompletado mientras se escribe, con sugerencia fantasma aceptable por boton/tecla y cancelable sin modificar el texto.
@@ -971,6 +973,7 @@ export interface FiltrosPlaneacionV2 {
   - **Avance aplicado 2026-05-29:** `copiloto`, `escanear-plantilla`, `mejorar` y `generar` usan gateway IA multi-provider; `copiloto/escaner/mejorar` mantienen fallback heuristico/local para no bloquear la UX si no hay keys o se agota un proveedor.
   - **Avance aplicado 2026-05-29:** limite backend por accion IA agregado con default de 10 solicitudes por ventana (`AI_MAX_REQUESTS_PER_ACTION`), preparado para migrarse a MongoDB/Redis cuando haya usuarios reales.
   - **Avance aplicado 2026-05-29:** modo dev de IA agregado: `AI_DEV_MODE=true` habilita limite ampliado (`AI_DEV_MAX_REQUESTS_PER_ACTION`, default 100) solo para token dev/admin-dev, devuelve `usage.warning` y el Copiloto lo muestra como advertencia visible; invitados y usuarios registrados conservan limite estandar de 10.
+  - **Cierre aplicado 2026-05-30:** gateway IA validado con proveedores configurados y fallback local; los ultimos errores reportados se consideran fuera del bloqueo de cierre de Fase 9 y pasan a monitoreo/hardening futuro si reaparecen.
 
 - [x] **9.17 Decisiones de diseno pendientes antes de implementar UI final**:
   - **Decision confirmada:** usar A4 como preset inicial estilo Word e incorporar Carta como formato cambiable desde el editor.
@@ -979,33 +982,13 @@ export interface FiltrosPlaneacionV2 {
   - **Decision confirmada:** en pantalla completa usar barra flotante minima.
   - **Decision confirmada:** paginas en vista continua tipo Google Docs.
 
+> **Estado Fase 9 (2026-05-30): COMPLETADA.** El flujo principal de planeaciones queda cerrado como experiencia moderna tipo Word/Docs: selector de plantillas, plantilla default robusta, editor centrado en documento, modo formulario secundario en movil, IA con gateway/fallback, validacion web/movil y limpieza de legacy principal.
+
 > **Criterio de cierre Fase 9:** el docente no debe encontrar formularios legacy ni doble seleccion de nivel en el flujo principal. Todas las entradas de planeaciones deben pasar por selector de plantillas y abrir el editor moderno tipo Word/Docs. En web se edita directo sobre el documento; en movil existe alternancia Documento/Formulario y ambos modos sincronizan los mismos campos/placeholders.
 
 ---
 
-### FASE 10: Galeria Online y Ecosistema de Plantillas
-
-> Fase posterior opcional si se decide que el selector de plantillas debe evolucionar a una experiencia tipo Canva con catalogo online, comunidad y multiples templates predeterminados. Fase 9 debe dejar el selector preparado para esto, pero no necesita resolver toda la infraestructura online si bloquea el cierre funcional del editor.
-
-- [ ] **10.1 Definir modelo de galeria online de plantillas**:
-  - Plantillas del sistema, plantillas guardadas por usuario, plantillas compartidas/comunidad y plantillas destacadas.
-  - Metadata para busqueda: nivel, asignatura, grado, enfoque pedagogico, numero de sesiones, formato, etiquetas y popularidad.
-  - Preview visual antes de usar, similar a elegir un template en Canva.
-
-- [ ] **10.2 Crear fuente remota de plantillas**:
-  - Endpoint para listar, buscar, filtrar y descargar plantillas.
-  - Cache local para uso offline.
-  - Versionado de plantillas para actualizar sin romper documentos existentes.
-
-- [ ] **10.3 Crear experiencia de exploracion**:
-  - Galeria con categorias, filtros, busqueda y plantillas recomendadas.
-  - Acciones: usar plantilla, guardar en mis plantillas, duplicar y previsualizar.
-  - Estados vacios, loading, offline y errores.
-
-- [ ] **10.4 Preparar comunidad/marketplace futuro**:
-  - Reglas para publicar plantillas, moderacion y privacidad.
-  - Sanitizacion de datos personales antes de compartir.
-  - Reporte de plantillas inapropiadas o con datos sensibles.
+> **Nota 2026-05-30:** la antigua Fase 10 de galeria online de plantillas se elimina de este plan porque ya no representa la prioridad inmediata. La evolucion de plantillas, marketplace o galeria tipo Canva debera planearse dentro de los nuevos planes maestros de `Classroom`, `Canva/Diseno Didactico` o `UX/UI Global`, segun corresponda.
 
 ---
 

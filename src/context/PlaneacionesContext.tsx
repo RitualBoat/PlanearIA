@@ -39,6 +39,7 @@ import {
 import { apiRequest } from "../utils/apiClient";
 import { STORAGE_KEYS, SYNC_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
 import logger from "../utils/logger";
+import { isNetworkRequestError } from "../utils/networkErrors";
 
 const PLANEACIONES_V2_KEY = "@planearia:planeaciones_v2";
 const LAST_SYNC_V2_KEY = "@planearia:last_sync_planeaciones_v2";
@@ -557,6 +558,12 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
 
       setSyncStatus(flushResult.success ? "synced" : "error");
     } catch (error) {
+      if (isNetworkRequestError(error)) {
+        logger.debug("[planeaciones-context] Backend no disponible en forceSync, modo offline.");
+        setIsOnline(false);
+        setSyncStatus("offline");
+        return;
+      }
       logger.error("[planeaciones-context] Error en forceSync", error);
       setSyncStatus("error");
     }

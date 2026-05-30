@@ -6,6 +6,7 @@ import { registerForPushNotificationsAsync } from "../services/pushNotificationS
 import { Notificacion, TipoNotificacion } from "../../types";
 import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
 import logger from "../utils/logger";
+import { isNetworkRequestError } from "../utils/networkErrors";
 import { useAuth } from "./AuthContext";
 
 const NOTIFICACIONES_STORAGE_KEY = "APP_NOTIFICACIONES_DATA";
@@ -92,7 +93,13 @@ export const NotificacionesProvider: React.FC<{ children: React.ReactNode }> = (
       const json = await response.json();
       return (json.data?.notificaciones ?? []) as Notificacion[];
     } catch (err) {
-      if (__DEV__) logger.error("[NotificacionesContext] Error al obtener del backend:", err);
+      if (__DEV__) {
+        if (isNetworkRequestError(err)) {
+          logger.debug("[NotificacionesContext] Backend no disponible, usando datos locales.");
+        } else {
+          logger.warn("[NotificacionesContext] No se pudieron obtener notificaciones:", err);
+        }
+      }
       return [];
     }
   };
@@ -214,7 +221,11 @@ export const NotificacionesProvider: React.FC<{ children: React.ReactNode }> = (
         }
         if (isAuthenticated && !isGuest) {
           actualizarPerfil({ expoPushToken: token }).catch((err) => {
-            logger.error("Failed to sync push token with backend:", err);
+            if (isNetworkRequestError(err)) {
+              logger.debug("[NotificacionesContext] Backend no disponible para token push.");
+              return;
+            }
+            logger.warn("Failed to sync push token with backend:", err);
           });
         }
       }

@@ -1,0 +1,63 @@
+﻿{
+  "name": "classroomio",
+  "version": "0.1.13",
+  "scripts": {
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "dev": "turbo prepare --concurrency 13 && turbo run dev",
+    "lint": "turbo run lint",
+    "clean": "turbo clean && find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
+    "clean:pnpm": "pnpm clean && pnpm store prune",
+    "format": "turbo run format",
+    "format:check": "git diff --name-only -z --diff-filter=d HEAD~1 | xargs -0 -I{} sh -c '[ ! -L \"{}\" ] && printf \"%s\\0\" \"{}\"' | xargs -0 prettier --check --ignore-unknown",
+    "postinstall": "test -d .git && lefthook install || true",
+    "release": "standard-version",
+    "db:reset": "pnpm --filter @cio/db db:reset",
+    "dashboard:dev": "pnpm --filter=@cio/dashboard run dev",
+    "api:dev": "pnpm --filter=@cio/api --filter=@cio/jobs-worker run dev",
+    "jobs:dev": "pnpm --filter=@cio/jobs-worker run dev",
+    "dev:all": "pnpm concurrently -n dash,api,jobs -c green,blue,yellow \"pnpm dashboard:dev\" \"pnpm api:dev\" \"pnpm jobs:dev\"",
+    "docs:dev": "pnpm --filter @cio/docs dev",
+    "docs:build": "pnpm --filter @cio/docs build",
+    "docs:types:check": "pnpm --filter @cio/docs types:check",
+    "website:dev": "pnpm --filter=@cio/website run dev",
+    "embeds:dev": "pnpm --filter=@cio/embeds --filter=@cio/ui run dev",
+    "storybook:dev": "pnpm --filter=@cio/storybook --filter=@cio/ui --filter=@cio/question-types run dev",
+    "mcp:build": "pnpm --filter=@classroomio/mcp run build",
+    "db:push": "pnpm --filter @cio/db db push"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "turbo": "^1.10.16"
+  },
+  "devDependencies": {
+    "@babel/plugin-syntax-jsx": "^7.28.6",
+    "@babel/preset-typescript": "^7.28.5",
+    "@cio/tsconfig": "workspace:*",
+    "@evilmartians/lefthook": "^1.13.6",
+    "concurrently": "^8.2.2",
+    "eslint": "^9.36.0",
+    "prettier": "^3.6.2",
+    "prettier-plugin-svelte": "^3.4.1",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "standard-version": "^9.5.0",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": "^20.19.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "@tailwindcss/oxide"
+    ],
+    "patchedDependencies": {
+      "layerchart@2.0.0-next.27": "patches/layerchart@2.0.0-next.27.patch"
+    },
+    "overrides": {
+      "zod": "^4.1.8",
+      "miniflare>zod": "3.22.3"
+    }
+  },
+  "packageManager": "pnpm@10.19.0+sha512.c9fc7236e92adf5c8af42fd5bf1612df99c2ceb62f27047032f4720b33f8eacdde311865e91c411f2774f618d82f320808ecb51718bfa82c060c4ba7c76a32b8"
+}

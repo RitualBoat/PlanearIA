@@ -21,8 +21,9 @@ PlanearIA es una aplicacion movil para docentes mexicanos. Permite gestionar pla
 
 1. **Offline-first**: Todos los datos se guardan localmente en AsyncStorage. MongoDB Atlas es el respaldo en la nube.
 2. **MVVM**: Pantallas (View) consumen hooks personalizados (ViewModel) que acceden a Context providers (Model).
-3. **Modular**: Cada modulo (planeaciones, grupos, recursos) se refactoriza de forma independiente con su propio plan.
-4. **Vision de editor**: Cada modulo de creacion/edicion evolucionara de formularios nativos simples a editores de texto enriquecido tipo Google Docs, usando @10play/tentap-editor.
+3. **Monolito modular**: PlanearIA debe mantenerse como una aplicacion unificada y un backend logico simple, separando dominios por carpetas y contratos internos antes de pensar en microservicios.
+4. **Cero friccion**: cada modulo debe sentirse como una herramienta conocida por docentes: Word/Docs, Classroom, Canva, Excel o WhatsApp profesional.
+5. **Vision de editor**: Cada modulo de creacion/edicion evolucionara de formularios nativos simples a experiencias profesionales, empezando por Planeaciones como Word/Docs.
 
 ---
 
@@ -101,7 +102,9 @@ PlanearIA es una aplicacion movil para docentes mexicanos. Permite gestionar pla
 ```
 PlanearIA/
 ├── App.tsx                      # Entry point principal
-├── plan_planeaciones.md         # Plan de refactorizacion activo
+├── Documentacion/
+│   ├── plan_planeaciones.md     # Plan de Planeaciones cerrado como referencia
+│   ├── PLAN_PASOS_INICIALES.md  # Plan rector activo actual
 ├── .agents/skills/              # Skills para agentes IA
 │   ├── token-efficiency/        # Control de verbosidad adaptativo
 │   ├── writing-style/           # Convenciones de escritura
@@ -283,15 +286,17 @@ Cada modulo de la app recibe su propio plan de refactorizacion. El plan sigue un
 
 ### Vision
 
-Transformar cada modulo de formularios nativos simples a editores de texto enriquecido (tipo Google Docs/Word) con:
-- Edicion WYSIWYG via @10play/tentap-editor
-- Copiloto IA contextual que sugiere mejoras
-- Estructura NEM integrada
-- Exportacion profesional
+Transformar cada modulo de formularios nativos simples a experiencias docentes familiares:
+- Planeaciones como Word/Docs.
+- Grupos, recursos y tareas como Classroom.
+- Diseno didactico como Canva/Genially.
+- Listas y registros como Excel.
+- Comunicacion docente como WhatsApp profesional.
+- IA contextual con validacion humana, fallback local y costos controlados.
 
 ### Estado actual
 
-El modulo de **Planeaciones** esta en refactorizacion activa. Fases 0 y 1 completadas. Los demas modulos esperan su turno.
+El modulo de **Planeaciones** cerro Fase 9 como primera gran refactorizacion. La prioridad actual es ejecutar `Documentacion/PLAN_PASOS_INICIALES.md` y preparar el siguiente plan maestro: Classroom / Grupos y Recursos.
 
 ---
 

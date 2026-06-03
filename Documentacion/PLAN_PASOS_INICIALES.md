@@ -103,17 +103,17 @@ Convertir GitHub en el centro de control del desarrollo, sin burocracia de empre
   - `docs/*`: cambios documentales grandes.
   - `fix/*`: bugs puntuales.
 
-- [~] **0.2 Crear GitHub Project principal:**
+- [x] **0.2 Crear GitHub Project principal:**
   - **Avance:** guia operativa creada en `Documentacion/GITHUB_PRODUCT_OS.md`.
-  - **Bloqueo:** `gh` no esta instalado; crear/verificar Project remoto requiere GitHub CLI autenticado o accion manual en GitHub.
+  - **Cierre 2026-06-03:** Project v2 verificado en GitHub (`PlanearIA Product OS`) y vinculado al repo.
   - Nombre recomendado: `PlanearIA Product OS`.
   - Vista 1: Kanban operativo.
   - Vista 2: Roadmap por epic.
   - Vista 3: Bugs y validacion manual.
 
-- [~] **0.3 Definir columnas del tablero:**
+- [x] **0.3 Definir columnas del tablero:**
   - **Avance:** columnas definidas en `Documentacion/GITHUB_PRODUCT_OS.md`.
-  - **Bloqueo:** falta aplicar columnas/vistas en GitHub Project remoto.
+  - **Cierre 2026-06-03:** campo `Status` verificado con columnas Inbox, Backlog, Ready, In progress, Review Manual, Blocked, Done y Parked.
   - `Inbox`.
   - `Backlog`.
   - `Ready`.
@@ -123,9 +123,9 @@ Convertir GitHub en el centro de control del desarrollo, sin burocracia de empre
   - `Done`.
   - `Parked`.
 
-- [~] **0.4 Crear labels base:**
+- [x] **0.4 Crear labels base:**
   - **Avance:** labels documentadas y script `scripts/github-bootstrap.ps1` preparado.
-  - **Bloqueo:** falta ejecutar script con `gh` instalado/autenticado.
+  - **Cierre 2026-06-03:** `scripts/github-bootstrap.ps1` ejecutado con `gh`; labels base creadas/verificadas.
   - `epic`.
   - `plan-maestro`.
   - `fase`.
@@ -140,9 +140,9 @@ Convertir GitHub en el centro de control del desarrollo, sin burocracia de empre
   - `needs-input`.
   - `low-cost`.
 
-- [~] **0.5 Crear milestones/ciclos ligeros:**
+- [x] **0.5 Crear milestones/ciclos ligeros:**
   - **Avance:** milestones documentados y script `scripts/github-bootstrap.ps1` preparado.
-  - **Bloqueo:** falta ejecutar script con `gh` instalado/autenticado.
+  - **Cierre 2026-06-03:** `scripts/github-bootstrap.ps1` ejecutado con `gh`; milestones creados/verificados.
   - `Ciclo 0 - Reorientacion y GitHub`.
   - `Ciclo 1 - Plan Classroom`.
   - `Ciclo 2 - Fundacion Classroom`.
@@ -354,8 +354,8 @@ Duracion sugerida: 3 a 5 dias.
 
 - [x] Cerrar/documentar Fase 9 de Planeaciones.
 - [ ] Commitear documentos fundacionales y referencias open source.
-- [ ] Crear GitHub Project.
-- [~] Crear labels y milestones.
+- [x] Crear GitHub Project.
+- [x] Crear labels y milestones.
 - [x] Crear templates de issue/PR.
 - [x] Crear primer workflow CI sin deploy.
 - [x] Actualizar `.env.example` y docs de entorno local.
@@ -364,15 +364,19 @@ Duracion sugerida: 3 a 5 dias.
 
 Duracion sugerida: 2 a 4 dias para planear, no programar.
 
-- [ ] Leer meta guia completa.
-- [ ] Leer referencias Classroom curadas.
-- [ ] Auditar codigo actual de grupos/alumnos/tareas/asistencia/calificaciones.
-- [ ] Crear plan maestro Classroom con fases y tracking.
-- [ ] Decidir que se fusiona, que se oculta y que se elimina.
+- [x] Leer meta guia completa.
+- [x] Leer referencias Classroom curadas.
+- [x] Auditar codigo actual de grupos/alumnos/tareas/asistencia/calificaciones.
+- [x] Crear plan maestro Classroom con fases y tracking.
+- [x] Decidir que se fusiona, que se oculta y que se elimina.
+
+**Cierre 2026-06-03:** se creo `Documentacion/PLAN_CLASSROOM.md` como siguiente plan maestro. Classroom queda definido como experiencia madre para grupos, alumnos, materiales, actividades, entregables, asistencia, calificaciones y reportes operativos.
 
 ### Ciclo 2 - Fundacion Classroom
 
 Duracion sugerida: 1 a 2 semanas.
+
+Estado: transferido a `Documentacion/PLAN_CLASSROOM.md`. Este ciclo ya no se ejecuta dentro del plan inicial; se retomara cuando el usuario confirme empezar el Plan Maestro Classroom.
 
 - [ ] Implementar solo la primera fase del plan Classroom.
 - [ ] Crear flujo central: grupo -> unidades -> materiales/actividades -> alumnos.
@@ -384,13 +388,14 @@ Duracion sugerida: 1 a 2 semanas.
 
 Este plan se puede cerrar cuando:
 
-- [~] GitHub Project existe y refleja los modulos madre.
-- [~] Labels, milestones e issue templates estan listos.
+- [x] GitHub Project existe y refleja los modulos madre.
+- [x] Labels, milestones e issue templates estan listos.
 - [~] CI basico corre en GitHub Actions. Workflow creado y validado localmente; falta observar primera corrida remota tras push/PR.
 - [x] README y documentacion explican la nueva vision.
 - [x] El entorno local esta documentado para web y celular fisico.
 - [x] Existe un orden aceptado de planes maestros futuros.
 - [x] El siguiente plan maestro elegido es Classroom.
+- [x] Existe `Documentacion/PLAN_CLASSROOM.md` como plan maestro listo para ejecutar.
 - [x] No quedan dudas sobre que Planeaciones Fase 9 esta cerrada y el proyecto entra a reorientacion.
 
 ---
@@ -412,5 +417,5 @@ Este plan se puede cerrar cuando:
 - [x] **T.1 Crear este plan maestro inicial.**
 - [x] **T.2 Registrar nueva prioridad: organizacion + Classroom como siguiente gran plan.**
 - [x] **T.3 Vincular este plan con README y documentacion principal.**
-- [~] **T.4 Ejecutar Ciclo 0.**
-- [ ] **T.5 Crear Plan Maestro Classroom.**
+- [~] **T.4 Ejecutar Ciclo 0.** Project, labels, milestones, templates, docs y CI local listos; falta commit/push y observar primera corrida remota de Actions.
+- [x] **T.5 Crear Plan Maestro Classroom.** Creado en `Documentacion/PLAN_CLASSROOM.md`.

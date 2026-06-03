@@ -64,6 +64,7 @@ Estado del trabajo principal actual:
 - El modulo de Planeaciones cerro su Fase 9 como primera gran refactorizacion terminada.
 - Planeaciones ya deja modelo V2, contexto, editor tipo Word/Docs, escaner, exportacion, plantilla default robusta, copiloto IA y limpieza de legacy principal como base.
 - La nueva prioridad es `Documentacion/PLAN_PASOS_INICIALES.md`: organizacion del proyecto, GitHub/GitHub Projects, entorno local, CI inicial y secuencia de nuevos planes maestros.
+- El siguiente plan maestro ya esta creado en `Documentacion/PLAN_CLASSROOM.md`: fusionar grupos, alumnos, recursos, tareas, asistencia, calificaciones y reportes en una experiencia tipo Classroom.
 - La guia `Documentacion/meta_guia_planes.md` define el estandar para futuros planes de refactorizacion.
 
 ---
@@ -183,6 +184,7 @@ Planes actuales:
 | Plan | Archivo | Estado |
 | ---- | ------- | ------ |
 | Pasos iniciales | [`Documentacion/PLAN_PASOS_INICIALES.md`](./Documentacion/PLAN_PASOS_INICIALES.md) | Nuevo plan rector activo para organizacion, GitHub, entorno local, CI y secuencia de planes futuros. |
+| Classroom / Grupos y Recursos | [`Documentacion/PLAN_CLASSROOM.md`](./Documentacion/PLAN_CLASSROOM.md) | Plan maestro creado y listo para ejecutar cuando se confirme el inicio del siguiente ciclo. |
 | Planeaciones | [`Documentacion/plan_planeaciones.md`](./Documentacion/plan_planeaciones.md) | Completado/cerrado documentalmente el 2026-05-30, Fase 9 completada. |
 | Meta guia de planes | [`Documentacion/meta_guia_planes.md`](./Documentacion/meta_guia_planes.md) | Vigente, define reglas para futuros planes. |
 
@@ -196,7 +198,7 @@ Planes actuales:
 - Organizar GitHub Projects, labels, milestones, issue templates y PR template.
 - Preparar entorno local documentado para web y celular fisico.
 - Crear GitHub Actions basico para typecheck, lint y tests.
-- Crear el siguiente plan maestro: Classroom / Grupos y Recursos.
+- Ejecutar el siguiente plan maestro: Classroom / Grupos y Recursos.
 
 ### Mediano plazo
 
@@ -278,6 +280,7 @@ PlanearIA/
 |   +-- meta_guia_planes.md
 |   +-- plan_planeaciones.md
 |   +-- PLAN_PASOS_INICIALES.md
+|   +-- PLAN_CLASSROOM.md
 +-- backend/
 |   +-- api/
 |   +-- lib/
@@ -308,6 +311,7 @@ La documentacion tecnica esta en [`Documentacion/`](./Documentacion/):
 | [`Documentacion/README.md`](./Documentacion/README.md) | Indice tecnico de documentacion. |
 | [`Documentacion/VISION_ACTUAL.md`](./Documentacion/VISION_ACTUAL.md) | Manifiesto actual de cero friccion: Word, Classroom, Canva, Excel, WhatsApp y reportes. |
 | [`Documentacion/PLAN_PASOS_INICIALES.md`](./Documentacion/PLAN_PASOS_INICIALES.md) | Nuevo plan rector activo para organizar GitHub, entorno local, CI y orden de planes futuros. |
+| [`Documentacion/PLAN_CLASSROOM.md`](./Documentacion/PLAN_CLASSROOM.md) | Plan maestro para fusionar grupos, alumnos, recursos, tareas, asistencia y calificaciones en una experiencia tipo Classroom. |
 | [`Documentacion/GITHUB_PRODUCT_OS.md`](./Documentacion/GITHUB_PRODUCT_OS.md) | Guia operativa de ramas, GitHub Project, labels, milestones, templates y criterio de merge. |
 | [`Documentacion/ENTORNO_LOCAL.md`](./Documentacion/ENTORNO_LOCAL.md) | Guia para levantar frontend/backend local, usar IP LAN en celular fisico y configurar env vars. |
 | [`Documentacion/MAPA_MODULOS_ACTUALES.md`](./Documentacion/MAPA_MODULOS_ACTUALES.md) | Fotografia inicial de modulos, tabs y experiencias madre antes del Plan Classroom. |

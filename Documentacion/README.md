@@ -14,6 +14,7 @@ PlanearIA esta evolucionando de una app de planeaciones a una plataforma integra
 | --------- | ----------- |
 | [VISION_ACTUAL.md](./VISION_ACTUAL.md) | Manifiesto vigente de cero friccion: experiencias Word, Classroom, Canva, Excel, WhatsApp y reportes. |
 | [PLAN_PASOS_INICIALES.md](./PLAN_PASOS_INICIALES.md) | Plan rector activo para organizacion del proyecto, GitHub/GitHub Projects, entorno local, CI y secuencia de futuros planes maestros. |
+| [PLAN_CLASSROOM.md](./PLAN_CLASSROOM.md) | Plan maestro listo para ejecutar: fusionar grupos, alumnos, materiales, actividades, entregables, asistencia, calificaciones y reportes operativos en una experiencia tipo Classroom. |
 | [GITHUB_PRODUCT_OS.md](./GITHUB_PRODUCT_OS.md) | Guia operativa de ramas, Project, labels, milestones, templates y criterio de merge. |
 | [ENTORNO_LOCAL.md](./ENTORNO_LOCAL.md) | Guia de desarrollo local para frontend/backend, IP LAN en celular fisico, env vars e IA local temporal. |
 | [MAPA_MODULOS_ACTUALES.md](./MAPA_MODULOS_ACTUALES.md) | Fotografia inicial de pantallas, tabs, rutas y experiencias madre para preparar Classroom. |
@@ -66,9 +67,13 @@ La app no esta en produccion y no tiene usuarios reales, por lo que los planes p
 
 ## Planes Activos y Cerrados
 
-El plan rector activo actual es:
+El plan rector inicial actual es:
 
 **[PLAN_PASOS_INICIALES.md](./PLAN_PASOS_INICIALES.md)**
+
+El siguiente plan maestro listo para ejecucion es:
+
+**[PLAN_CLASSROOM.md](./PLAN_CLASSROOM.md)**
 
 El plan cerrado de Planeaciones queda como referencia de calidad:
 
@@ -86,7 +91,7 @@ Estado actual:
 - Fase 7 completada: exportacion PDF/DOCX V2, navegacion DocEditor/EscanerPlantilla y Mi Contenido conectado.
 - Fase 8 completada: limpieza y validaciones tecnicas.
 - Fase 9 completada/cerrada el 2026-05-30: auditoria y correccion funcional del flujo real, editor tipo Word/Docs, web/movil, IA, plantillas default y navegacion sin legacy.
-- Nueva prioridad: ejecutar `PLAN_PASOS_INICIALES.md` y crear despues el Plan Maestro Classroom / Grupos y Recursos.
+- Nueva prioridad: cerrar `PLAN_PASOS_INICIALES.md` con CI remoto y ejecutar despues `PLAN_CLASSROOM.md` cuando el usuario confirme el inicio del siguiente ciclo.
 
 ---
 

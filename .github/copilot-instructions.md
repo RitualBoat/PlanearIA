@@ -68,15 +68,15 @@ await collection.createIndex({ fechaModificacion: -1 });
 
 **Indices por coleccion:**
 
-| Coleccion | Indices requeridos |
-|---|---|
-| `planeaciones` | `{ userId: 1, fechaModificacion: -1 }`, `{ id: 1 }` unique |
-| `grupos` | `{ id: 1 }` unique, `{ fechaModificacion: -1 }` |
-| `alumnos` | `{ id: 1 }` unique, `{ grupoId: 1 }` |
-| `entregables` | `{ id: 1 }` unique, `{ grupoId: 1 }` |
-| `usuarios` | `{ id: 1 }` unique, `{ email: 1 }` unique |
-| `asistencias` | `{ id: 1 }` unique, `{ grupoId: 1, fecha: -1 }` |
-| `calificaciones` | `{ id: 1 }` unique, `{ alumnoId: 1 }` |
+| Coleccion        | Indices requeridos                                         |
+| ---------------- | ---------------------------------------------------------- |
+| `planeaciones`   | `{ userId: 1, fechaModificacion: -1 }`, `{ id: 1 }` unique |
+| `grupos`         | `{ id: 1 }` unique, `{ fechaModificacion: -1 }`            |
+| `alumnos`        | `{ id: 1 }` unique, `{ grupoId: 1 }`                       |
+| `entregables`    | `{ id: 1 }` unique, `{ grupoId: 1 }`                       |
+| `usuarios`       | `{ id: 1 }` unique, `{ email: 1 }` unique                  |
+| `asistencias`    | `{ id: 1 }` unique, `{ grupoId: 1, fecha: -1 }`            |
+| `calificaciones` | `{ id: 1 }` unique, `{ alumnoId: 1 }`                      |
 
 `createIndex` es idempotente. Seguro llamarlo en cada invocacion.
 

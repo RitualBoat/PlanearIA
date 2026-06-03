@@ -76,7 +76,19 @@
     "typescript": "~5.9.2"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/context/referencias-opensource",
+      "<rootDir>/context/planeaciones-ground-truth/referencias-opensource"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/context/referencias-opensource",
+      "<rootDir>/context/planeaciones-ground-truth/referencias-opensource"
+    ]
   },
   "private": true
 }

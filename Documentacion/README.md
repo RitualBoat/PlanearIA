@@ -14,6 +14,9 @@ PlanearIA esta evolucionando de una app de planeaciones a una plataforma integra
 | --------- | ----------- |
 | [VISION_ACTUAL.md](./VISION_ACTUAL.md) | Manifiesto vigente de cero friccion: experiencias Word, Classroom, Canva, Excel, WhatsApp y reportes. |
 | [PLAN_PASOS_INICIALES.md](./PLAN_PASOS_INICIALES.md) | Plan rector activo para organizacion del proyecto, GitHub/GitHub Projects, entorno local, CI y secuencia de futuros planes maestros. |
+| [GITHUB_PRODUCT_OS.md](./GITHUB_PRODUCT_OS.md) | Guia operativa de ramas, Project, labels, milestones, templates y criterio de merge. |
+| [ENTORNO_LOCAL.md](./ENTORNO_LOCAL.md) | Guia de desarrollo local para frontend/backend, IP LAN en celular fisico, env vars e IA local temporal. |
+| [MAPA_MODULOS_ACTUALES.md](./MAPA_MODULOS_ACTUALES.md) | Fotografia inicial de pantallas, tabs, rutas y experiencias madre para preparar Classroom. |
 | [meta_guia_planes.md](./meta_guia_planes.md) | Guia maestra para crear futuros planes de refactorizacion o construccion de modulos. Define estructura, tracking, reglas de IA, offline-first, bajo costo, navegacion y UX/UI global. |
 | [INFRAESTRUCTURA_SUGERIDA.md](./INFRAESTRUCTURA_SUGERIDA.md) | Estrategia de infraestructura realista para un estudiante: monolito modular, desarrollo local, bajo costo y despliegue gradual. |
 | [OPINION_DE_IA_TRAS_LEER_META_GUIA_PLANEACIONES.md](./OPINION_DE_IA_TRAS_LEER_META_GUIA_PLANEACIONES.md) | Analisis estrategico posterior a la meta guia y nueva vision del producto. |
@@ -152,6 +155,12 @@ La vision vigente esta en `VISION_ACTUAL.md`: PlanearIA debe sentirse como Word/
 ### Navegacion y UX/UI global
 
 Cada modulo debe quedar accesible desde rutas claras. Ningun plan debe crear pantallas aisladas, flujos duplicados o botones sin destino. Si la navegacion global empieza a romperse, debe crearse un plan dedicado: `Plan Maestro: UX/UI y Navegacion Global - PlanearIA`.
+
+El plan global de UX/UI debe usar las 10 heuristicas de Jakob Nielsen, clasificar hallazgos con severidad `0` a `4` y priorizar cero friccion, carga cognitiva baja, accesibilidad, consistencia visual y tokens centralizados en `ThemeContext` o equivalente.
+
+### Seguridad pragmatica y low-cost
+
+El plan de Auth/Seguridad debe asumir presupuesto cero o bajo costo. Debe contemplar RBAC con roles `Dev/Desarrollador`, `Admin`, `Docente` y `Alumno`; validacion real en backend/APIs/queries; rate limiting en endpoints criticos; `bcrypt`, JWT, secretos en variables de entorno, CORS/cabeceras seguras y compatibilidad con local/free tiers como Render, Vercel, EAS y MongoDB Atlas M0.
 
 ### Offline-first
 

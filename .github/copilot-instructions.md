@@ -10,14 +10,16 @@ Auth: JWT con userId isolation.
 
 ## Plan de Trabajo Activo
 
-- El archivo `plan_planeaciones.md` en la raiz del proyecto es la **fuente de verdad** de las tareas del modulo de Planeaciones.
-- Cada modulo tendra su propio plan: `plan_recursos.md`, `plan_grupos.md`, `plan_alumnos.md`, `plan_login.md`, `plan_seguridad.md`.
+- El plan rector actual es `Documentacion/PLAN_PASOS_INICIALES.md`.
+- El plan de Planeaciones quedo cerrado como referencia en `Documentacion/plan_planeaciones.md`.
+- La guia obligatoria para nuevos planes maestros es `Documentacion/meta_guia_planes.md`.
+- Cada modulo importante tendra su propio plan maestro dentro de `Documentacion/`, siguiendo tracking `[ ]`, `[~]`, `[x]`.
 - Las tareas se marcan con: `[ ]` pendiente, `[~]` en progreso, `[x]` completado.
 - Al completar una tarea, actualizar su estado en el plan.
 
 ### Cuando el usuario pida "trabajar en la proxima tarea"
 
-1. Leer `plan_planeaciones.md` para encontrar la siguiente tarea pendiente `[ ]`
+1. Leer `Documentacion/PLAN_PASOS_INICIALES.md` y el plan maestro del modulo activo para encontrar la siguiente tarea pendiente `[ ]`
 2. Implementar la tarea en el codigo
 3. **Ejecutar tests** relacionados (`npm test -- --testPathPattern="<patron>"`)
 4. Cambiar su estado en el plan a `[x]`
@@ -45,9 +47,10 @@ Auth: JWT con userId isolation.
 
 La app tiene pantallas/modulos que existen como esqueleto visual pero **no tienen funcionalidad implementada**. Al desarrollar:
 
-- **NUNCA elimines ni ocultes** estas pantallas de la navegacion. Deben seguir visibles.
+- No elimines pantallas esqueleto sin revisar el plan maestro vigente y la navegacion global.
 - Cuando el usuario intente usar una funcionalidad no implementada, mostrar un mensaje como: "Esta funcion se implementara proximamente".
 - Al implementar un modulo nuevo, verificar si ya tiene pantalla esqueleto y **reutilizarla**.
+- Si un boton, card o ruta `Proximamente` aumenta carga cognitiva o parece accion real rota, documentarlo para UX/UI Global y considerar ocultarlo/redirigirlo con aprobacion del plan.
 
 ### MongoDB -- Base de Datos y Endpoints Backend
 

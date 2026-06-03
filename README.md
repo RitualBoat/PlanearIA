@@ -86,7 +86,7 @@ Estado del trabajo principal actual:
 | Chat / Mensajeria | Lista de chats y conversacion; puede compartir texto, planeaciones y recursos. | Mensajeria docente con privacidad, adjuntos educativos y sync estable. |
 | Notificaciones | Contexto, pantalla y servicio push. | Alertas utiles, configurables y compatibles con dev builds. |
 | Cuenta, Perfil y Accesibilidad | Perfil, roles, terminos, tema, fuente y daltonismo. | Configuracion profesional, accesible y separada entre perfil publico y privacidad. |
-| Auth / Seguridad | Login, registro, recuperacion, AuthContext y backend auth. | Auth real endurecida con JWT, almacenamiento seguro, emails y recuperacion confiable. |
+| Auth / Seguridad | Login, registro, recuperacion, AuthContext y backend auth. | Auth real endurecida con JWT, RBAC para `Dev/Desarrollador`, `Admin`, `Docente` y `Alumno`, almacenamiento seguro, emails y recuperacion confiable. |
 | Onboarding y Ayuda | Existen pantallas de onboarding y ayuda. | Guias actualizadas segun los flujos reales de la app. |
 | Infraestructura, Sync y Backend | Vercel serverless, MongoDB Atlas, endpoints por modulo y sync local/remoto. | Infraestructura de bajo costo, facil de lanzar y con opcion de self-hosting local/Docker cuando convenga. |
 | UX/UI y Navegacion Global | Reglas nuevas en la meta guia. | Asegurar que ningun modulo quede aislado, redundante o dificil de encontrar. |
@@ -103,6 +103,8 @@ Estado del trabajo principal actual:
 - **Sin legacy innecesario:** si una pantalla vieja duplica una nueva, se elimina, oculta o redirige.
 - **Bajo costo:** priorizar free tiers, servicios simples y despliegues que un estudiante pueda mantener.
 - **Escalable sin sobredisenar:** construir profesionalmente, pero sin complejidad prematura.
+- **Seguridad pragmatica:** RBAC real en backend, rate limiting, bcrypt, JWT, secretos fuera del frontend y despliegues compatibles con free tiers.
+- **UX/UI con rigor IHC:** el plan global de UX/UI debe usar las 10 heuristicas de Jakob Nielsen, severidad 0-4 y foco en carga cognitiva/cero friccion.
 
 ---
 
@@ -306,6 +308,9 @@ La documentacion tecnica esta en [`Documentacion/`](./Documentacion/):
 | [`Documentacion/README.md`](./Documentacion/README.md) | Indice tecnico de documentacion. |
 | [`Documentacion/VISION_ACTUAL.md`](./Documentacion/VISION_ACTUAL.md) | Manifiesto actual de cero friccion: Word, Classroom, Canva, Excel, WhatsApp y reportes. |
 | [`Documentacion/PLAN_PASOS_INICIALES.md`](./Documentacion/PLAN_PASOS_INICIALES.md) | Nuevo plan rector activo para organizar GitHub, entorno local, CI y orden de planes futuros. |
+| [`Documentacion/GITHUB_PRODUCT_OS.md`](./Documentacion/GITHUB_PRODUCT_OS.md) | Guia operativa de ramas, GitHub Project, labels, milestones, templates y criterio de merge. |
+| [`Documentacion/ENTORNO_LOCAL.md`](./Documentacion/ENTORNO_LOCAL.md) | Guia para levantar frontend/backend local, usar IP LAN en celular fisico y configurar env vars. |
+| [`Documentacion/MAPA_MODULOS_ACTUALES.md`](./Documentacion/MAPA_MODULOS_ACTUALES.md) | Fotografia inicial de modulos, tabs y experiencias madre antes del Plan Classroom. |
 | [`Documentacion/meta_guia_planes.md`](./Documentacion/meta_guia_planes.md) | Guia maestra para planes futuros por modulo. |
 | [`Documentacion/INFRAESTRUCTURA_SUGERIDA.md`](./Documentacion/INFRAESTRUCTURA_SUGERIDA.md) | Estrategia de infraestructura realista para estudiante: monolito modular, bajo costo y despliegue gradual. |
 | [`Documentacion/PLANEACIONES_IA_EDITOR_FASE9.md`](./Documentacion/PLANEACIONES_IA_EDITOR_FASE9.md) | Ground truth de IA en Planeaciones + criterio de aceptacion del editor Word/Docs en Fase 9. |

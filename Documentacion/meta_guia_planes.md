@@ -19,9 +19,9 @@ PlanearIA es una plataforma integral para docentes, construida principalmente po
 
 El desarrollador cuenta con una laptop potente:
 
-- Ryzen 7.
-- RTX 4060.
-- 64 GB RAM.
+- Ryzen 7 7735h.
+- RTX 4060 8GB VRAM GDDR6.
+- 64 GB RAM DDR5 4800MHZ.
 
 Por lo tanto, futuros planes de infraestructura deben considerar tambien:
 
@@ -71,7 +71,7 @@ Regla: la documentacion puede estar desfasada. La fuente de verdad para planear 
 - `src/screens/`.
 - `backend/api/`.
 - `types/`.
-- `Documentacion/plan_planeaciones.md`.
+- `plan_planeaciones.md`.
 
 ---
 
@@ -83,9 +83,9 @@ Esta seccion no es un plan de refactorizacion. Es un mapa de referencia para que
 
 Estado:
 
-- Tiene plan maestro cerrado en `Documentacion/plan_planeaciones.md`.
-- Ya existe modelo V2, contexto nuevo, editor, escaner, exportacion, copiloto IA y flujo moderno tipo Word/Docs.
-- Fase 9 quedo completada documentalmente el 2026-05-30; el foco nuevo pasa a reorientacion global y planes maestros futuros.
+- Tiene plan maestro activo en `plan_planeaciones.md`.
+- Ya existe modelo V2, contexto nuevo, editor, escaner, exportacion y copiloto IA.
+- Sigue en Fase 9 con hotfixes y evolucion de DocEditor.
 
 Archivos principales:
 
@@ -98,7 +98,7 @@ Archivos principales:
 - `backend/api/planeaciones.js`.
 - `backend/api/planeaciones/*`.
 
-Regla: no crear otro plan de planeaciones sin leer completo `Documentacion/plan_planeaciones.md`.
+Regla: no crear otro plan de planeaciones sin leer completo `plan_planeaciones.md`.
 
 ### 3.2 Contenido / Hub de Recursos
 
@@ -387,17 +387,18 @@ Antes de redactar cualquier plan futuro, la IA debe:
 - Leer `Documentacion/ARQUITECTURA.md`.
 - Leer `Documentacion/FLUJO_SINCRONIZACION.md`.
 - Leer `Documentacion/meta_guia_planes.md`.
-- Leer `Documentacion/plan_planeaciones.md` como ejemplo de calidad y tracking.
+- Leer `plan_planeaciones.md` como ejemplo de calidad y tracking.
 - Revisar `src/navigation/StackNavigator.tsx`.
 - Revisar `src/navigation/AppTabsNavigator.tsx`.
 - Revisar carpetas del modulo objetivo en `src/screens`, `src/hooks`, `src/context`, `src/services`, `types` y `backend/api`.
 - Revisar tests existentes del modulo.
 - Revisar si hay datos reales o ejemplos en `context/`.
-- Revisar `context/referencias-opensource/README.md` si el modulo se beneficia de referencias externas; usar esas referencias solo como inspiracion arquitectonica y respetar las restricciones de licencia indicadas.
 - Ejecutar busquedas con `rg` para detectar rutas legacy, nombres duplicados y dependencias cruzadas.
 - Verificar si la documentacion esta desfasada contra el codigo.
 - Identificar que otros modulos dependen del modulo objetivo.
 - Identificar restricciones de costo, despliegue y tiempo de entrega.
+
+- Consultar el directorio `referencias-opensource/README.md`. Si el módulo a planificar tiene una arquitectura de referencia asignada en ese documento (ej. `kalvi` para el módulo de Classroom), la IA DEBE analizar los archivos de base de datos o lógica guardados en esa subcarpeta. La IA utilizará estas referencias estrictamente como inspiración arquitectónica, absteniéndose de copiar código literal y encargándose de traducir los conceptos lógicos a nuestro stack local (React Native, TypeScript, MongoDB).
 
 ---
 
@@ -635,6 +636,19 @@ Todo plan debe exigir:
 
 Cuando un modulo tenga edicion compleja, se debe preferir una experiencia tipo herramienta real, no solo un formulario.
 
+### 9.1 Metodologia IHC obligatoria para el Plan Maestro UX/UI
+
+El `Plan Maestro: UX/UI y Navegacion Global - PlanearIA` sera una fase de pulido posterior a los modulos funcionales principales. Cuando se genere, no debe basarse en gustos subjetivos. Debe usar rigor de Interaccion Humano-Computadora:
+
+- Usar las **10 Heuristicas de Usabilidad de Jakob Nielsen** como marco obligatorio de auditoria y propuesta.
+- Clasificar cada hallazgo con severidad clasica: `0` no es problema, `1` cosmetico, `2` menor, `3` mayor, `4` catastrofe.
+- Priorizar reduccion de carga cognitiva y cero friccion.
+- Auditar consistencia entre sistema y mundo real docente.
+- Prevenir errores: ocultar, eliminar o desactivar botones `Proximamente`, acciones sin destino, rutas aisladas y CTAs que no hacen nada.
+- Revisar accesibilidad: labels, roles, contraste, tamanos tocables, navegacion por teclado/web y lectores de pantalla en acciones principales.
+- Centralizar tokens visuales en `ThemeContext` o capa equivalente para evitar interfaces Frankenstein entre modulos.
+- Convertir recomendaciones en cambios accionables, con criterio de aceptacion verificable en web, tablet y movil.
+
 ---
 
 ## 10. Reglas de Navegacion y UX/UI Global
@@ -741,12 +755,12 @@ Todo plan con IA debe exigir:
 
 ### 12.1 Planeaciones
 
-No generar un plan nuevo sin leer `Documentacion/plan_planeaciones.md`.
+No generar un plan nuevo sin leer `plan_planeaciones.md`.
 
 Si se retoma:
 
-- Partir de Fase 9 como completada/cerrada.
-- Solo reabrir Planeaciones si aparece un bug critico o si un plan futuro necesita integrarlo con Classroom, Canva o UX global.
+- Continuar desde la fase activa.
+- Priorizar Fase 9 hasta cerrar web, movil, editor tipo Docs/Word e IA.
 - Actualizar README/documentacion si cambia arquitectura.
 
 ### 12.2 Recursos Evaluables
@@ -907,6 +921,7 @@ Debe cubrir:
 - Roles.
 - Permisos.
 - Proteccion de rutas.
+- RBAC pragmatico para roles `Dev/Desarrollador`, `Admin`, `Docente` y `Alumno`.
 
 Debe exigir:
 
@@ -918,6 +933,20 @@ Debe exigir:
 - Politica de privacidad.
 - Manejo de secretos.
 - Plan de bajo costo para email.
+
+Reglas obligatorias de seguridad pragmatica y low-cost:
+
+- El plan debe asumir presupuesto cero o muy bajo: local primero, free tiers y servicios con HTTPS/SSL incluido cuando aplique.
+- No proponer servicios empresariales de seguridad salvo que se justifique como opcional futuro.
+- Implementar RBAC en frontend solo como ayuda UX; la autorizacion real debe validarse en backend, APIs y queries a base de datos.
+- Toda consulta multiusuario debe filtrar por `userId`, rol y permisos cuando corresponda.
+- El rol `Dev/Desarrollador` debe existir para desarrollo, soporte y pruebas internas; debe quedar separado de `Admin` y no debe habilitar privilegios peligrosos en produccion sin validacion explicita.
+- Endpoints criticos como login, recuperacion, registro, sync, creacion masiva e IA deben evaluar rate limiting.
+- Contrasenas con `bcrypt` o equivalente estandar; nunca texto plano.
+- Sesiones con JWT y plan claro para expiracion, refresh token y revocacion basica.
+- Variables de entorno y secretos nunca deben almacenarse en frontend ni en commits.
+- Agregar cabeceras HTTP seguras y CORS estricto con herramientas simples como `helmet`/config equivalente si el backend lo permite.
+- Debe funcionar en local, Render/Vercel/EAS/MongoDB Atlas free tier o alternativas gratuitas razonables.
 
 ### 12.9 Infraestructura y DevOps
 
@@ -1103,27 +1132,35 @@ Cuando una IA implemente una fase:
 ## Fases de Ejecucion
 
 ### FASE 0: Auditoria y Preparacion
+
 - [ ] ...
 
 ### FASE 1: Modelo y Tipos
+
 - [ ] ...
 
 ### FASE 2: Datos, Contexto y Sync
+
 - [ ] ...
 
 ### FASE 3: Componentes Base
+
 - [ ] ...
 
 ### FASE 4: Pantallas y Flujo Principal
+
 - [ ] ...
 
 ### FASE 5: IA / Funciones Avanzadas
+
 - [ ] ...
 
 ### FASE 6: Integracion, Navegacion y UX/UI Global
+
 - [ ] ...
 
 ### FASE FINAL: Limpieza, Validacion y Documentacion
+
 - [ ] ...
 
 ## Resumen de Archivos

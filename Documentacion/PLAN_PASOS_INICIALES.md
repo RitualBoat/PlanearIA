@@ -96,20 +96,24 @@ Convertir GitHub en el centro de control del desarrollo, sin burocracia de empre
 
 ### Tareas
 
-- [ ] **0.1 Definir ramas oficiales:**
+- [x] **0.1 Definir ramas oficiales:**
   - `main`: estable, solo commits validados.
   - `development`: rama activa diaria.
   - `feature/*`: cambios por plan/fase.
   - `docs/*`: cambios documentales grandes.
   - `fix/*`: bugs puntuales.
 
-- [ ] **0.2 Crear GitHub Project principal:**
+- [~] **0.2 Crear GitHub Project principal:**
+  - **Avance:** guia operativa creada en `Documentacion/GITHUB_PRODUCT_OS.md`.
+  - **Bloqueo:** `gh` no esta instalado; crear/verificar Project remoto requiere GitHub CLI autenticado o accion manual en GitHub.
   - Nombre recomendado: `PlanearIA Product OS`.
   - Vista 1: Kanban operativo.
   - Vista 2: Roadmap por epic.
   - Vista 3: Bugs y validacion manual.
 
-- [ ] **0.3 Definir columnas del tablero:**
+- [~] **0.3 Definir columnas del tablero:**
+  - **Avance:** columnas definidas en `Documentacion/GITHUB_PRODUCT_OS.md`.
+  - **Bloqueo:** falta aplicar columnas/vistas en GitHub Project remoto.
   - `Inbox`.
   - `Backlog`.
   - `Ready`.
@@ -119,7 +123,9 @@ Convertir GitHub en el centro de control del desarrollo, sin burocracia de empre
   - `Done`.
   - `Parked`.
 
-- [ ] **0.4 Crear labels base:**
+- [~] **0.4 Crear labels base:**
+  - **Avance:** labels documentadas y script `scripts/github-bootstrap.ps1` preparado.
+  - **Bloqueo:** falta ejecutar script con `gh` instalado/autenticado.
   - `epic`.
   - `plan-maestro`.
   - `fase`.
@@ -134,20 +140,22 @@ Convertir GitHub en el centro de control del desarrollo, sin burocracia de empre
   - `needs-input`.
   - `low-cost`.
 
-- [ ] **0.5 Crear milestones/ciclos ligeros:**
+- [~] **0.5 Crear milestones/ciclos ligeros:**
+  - **Avance:** milestones documentados y script `scripts/github-bootstrap.ps1` preparado.
+  - **Bloqueo:** falta ejecutar script con `gh` instalado/autenticado.
   - `Ciclo 0 - Reorientacion y GitHub`.
   - `Ciclo 1 - Plan Classroom`.
   - `Ciclo 2 - Fundacion Classroom`.
   - `Ciclo 3 - UX/Navegacion Global`.
 
-- [ ] **0.6 Crear templates de issues:**
+- [x] **0.6 Crear templates de issues:**
   - Bug report.
   - Tarea tecnica.
   - Validacion manual.
   - Solicitud de plan maestro.
   - Decision arquitectonica.
 
-- [ ] **0.7 Crear plantilla de Pull Request:**
+- [x] **0.7 Crear plantilla de Pull Request:**
   - Resumen.
   - Archivos tocados.
   - Validacion ejecutada.
@@ -165,36 +173,36 @@ Que el proyecto pueda levantarse de forma repetible en la laptop y en celular fi
 
 ### Tareas
 
-- [ ] **1.1 Documentar flujo local frontend:**
+- [x] **1.1 Documentar flujo local frontend:**
   - `npm install`.
   - `npm run web`.
   - `npm run android`.
   - `npm run start:dev` para dev client cuando haga falta.
 
-- [ ] **1.2 Documentar flujo local backend:**
+- [x] **1.2 Documentar flujo local backend:**
   - `cd backend`.
   - `npm install`.
   - `vercel dev` o alternativa local Node si se migra.
   - Confirmar puerto local.
 
-- [ ] **1.3 Corregir/documentar uso de IP LAN:**
+- [x] **1.3 Corregir/documentar uso de IP LAN:**
   - En web puede usarse `http://localhost:3000`.
   - En celular fisico debe usarse `http://IP_DE_LA_LAPTOP:3000`.
   - Documentar esto en `.env.example` y docs de desarrollo.
 
-- [ ] **1.4 Preparar variables de entorno seguras:**
+- [x] **1.4 Preparar variables de entorno seguras:**
   - `.env.example` raiz.
   - `backend/.env.example`.
   - No commitear secrets.
   - Explicar `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_API_SECRET`, `API_SECRET`, proveedores IA y `AI_DEV_MODE`.
 
-- [ ] **1.5 Decidir estrategia IA local temporal:**
+- [x] **1.5 Decidir estrategia IA local temporal:**
   - Mantener gateway multi-provider actual.
   - Usar fallbacks heuristicos durante desarrollo.
   - Evaluar despues Ollama/LM Studio si aporta valor real.
   - No gastar APIs salvo demo o validacion especifica.
 
-- [ ] **1.6 Registrar comandos de verificacion rapida:**
+- [x] **1.6 Registrar comandos de verificacion rapida:**
   - `npx tsc --noEmit`.
   - `npm run lint -- --quiet`.
   - `npm test -- --runInBand`.
@@ -210,30 +218,33 @@ Automatizar validaciones basicas sin sobredisenar CI/CD.
 
 ### Tareas
 
-- [ ] **2.1 Crear workflow `ci.yml`:**
+- [x] **2.1 Crear workflow `ci.yml`:**
+  - **Avance:** workflow creado en `.github/workflows/ci.yml`.
+  - **Validacion local:** `npx tsc --noEmit`, `npm run lint -- --quiet` y `npm test -- --runInBand` OK.
+  - **Pendiente externo:** confirmar corrida remota al hacer push/PR.
   - Instalar dependencias.
   - Ejecutar TypeScript.
   - Ejecutar lint.
   - Ejecutar tests.
 
-- [ ] **2.2 Agregar cache de npm:**
+- [x] **2.2 Agregar cache de npm:**
   - Reducir tiempo de CI.
   - Evitar pasos innecesarios.
 
-- [ ] **2.3 Separar jobs opcionales:**
+- [x] **2.3 Separar jobs opcionales:**
   - `typecheck`.
   - `lint`.
   - `test`.
 
-- [ ] **2.4 No desplegar todavia:**
+- [x] **2.4 No desplegar todavia:**
   - El primer GitHub Actions debe validar, no publicar.
   - Deploy vendra cuando haya beta cerrada o demo estable.
 
-- [ ] **2.5 Agregar proteccion contra secrets:**
+- [x] **2.5 Agregar proteccion contra secrets:**
   - Verificar que `.env.local`, `backend/.env.local` y keys no se suban.
   - Revisar `.gitignore`.
 
-- [ ] **2.6 Definir criterio de merge:**
+- [x] **2.6 Definir criterio de merge:**
   - No mergear a `main` si CI falla.
   - No cerrar plan/fase sin validacion manual cuando toque UX.
 
@@ -247,7 +258,7 @@ Crear una fotografia real de modulos actuales antes de empezar Classroom.
 
 ### Tareas
 
-- [ ] **3.1 Crear inventario de pantallas actuales:**
+- [x] **3.1 Crear inventario de pantallas actuales:**
   - `src/screens/grupos`.
   - `src/screens/alumnos`.
   - `src/screens/asistencia`.
@@ -259,19 +270,19 @@ Crear una fotografia real de modulos actuales antes de empezar Classroom.
   - `src/screens/social`.
   - `src/screens/chat`.
 
-- [ ] **3.2 Clasificar cada pantalla:**
+- [x] **3.2 Clasificar cada pantalla:**
   - Fusionar dentro de experiencia madre.
   - Mantener como subflujo.
   - Ocultar temporalmente.
   - Eliminar cuando haya reemplazo.
 
-- [ ] **3.3 Auditar navegacion global:**
+- [x] **3.3 Auditar navegacion global:**
   - `StackNavigator`.
   - `AppTabsNavigator`.
   - Entradas desde `ContenidoScreen`.
   - FAB y modales de creacion.
 
-- [ ] **3.4 Definir mapa de experiencias madre:**
+- [x] **3.4 Definir mapa de experiencias madre:**
   - Word.
   - Classroom.
   - Canva.
@@ -280,7 +291,7 @@ Crear una fotografia real de modulos actuales antes de empezar Classroom.
   - Reportes.
   - Cuenta/Auth.
 
-- [ ] **3.5 Crear decision record:**
+- [x] **3.5 Crear decision record:**
   - Que se fusiona primero.
   - Que se deja congelado.
   - Que no se tocara todavia.
@@ -295,42 +306,42 @@ Definir el orden de planes futuros sin escribirlos todavia.
 
 ### Orden recomendado
 
-- [ ] **4.1 Plan Maestro: Classroom / Grupos y Recursos.**
+- [x] **4.1 Plan Maestro: Classroom / Grupos y Recursos.**
   - Siguiente prioridad real.
   - Debe fusionar grupos, alumnos, tareas, recursos, entregables, asistencia y calificaciones dentro de una experiencia tipo Google Classroom.
   - Debe leer `context/referencias-opensource/classroomio-classroom`, `kalvi-classroom` y `webdesk-legacy-classroom` como inspiracion, sin copiar codigo AGPL/no-license.
 
-- [ ] **4.2 Plan Maestro: UX/UI y Navegacion Global.**
+- [x] **4.2 Plan Maestro: UX/UI y Navegacion Global.**
   - Debe asegurar que los modulos no queden aislados.
   - Puede ir antes o en paralelo al plan Classroom si la navegacion actual empieza a estorbar.
 
-- [ ] **4.3 Plan Maestro: Infraestructura Local, GitHub Actions y Deploy Basico.**
+- [x] **4.3 Plan Maestro: Infraestructura Local, GitHub Actions y Deploy Basico.**
   - Debe formalizar entorno local, CI, variables, backend, GitHub Actions y opcion de demo.
   - No debe saltar a infraestructura cara.
 
-- [ ] **4.4 Plan Maestro: Auth, Seguridad y Sesion Real.**
+- [x] **4.4 Plan Maestro: Auth, Seguridad y Sesion Real.**
   - Necesario antes de beta con usuarios reales.
   - JWT, recovery, emails, secure storage y roles.
 
-- [ ] **4.5 Plan Maestro: Excel / Listas y Sincronizacion Bidireccional.**
+- [x] **4.5 Plan Maestro: Excel / Listas y Sincronizacion Bidireccional.**
   - Despues de Classroom base.
   - Debe conectar listas libres con alumnos, asistencia y calificaciones.
 
-- [ ] **4.6 Plan Maestro: Calificacion y Revision de Tareas.**
+- [x] **4.6 Plan Maestro: Calificacion y Revision de Tareas.**
   - Debe construir post-its inteligentes IA sin que la IA califique automaticamente.
   - Puede integrarse al plan Classroom si se decide reducir planes.
 
-- [ ] **4.7 Plan Maestro: Calendario y Seguimiento Personal.**
+- [x] **4.7 Plan Maestro: Calendario y Seguimiento Personal.**
   - Debe sincronizar con calendario nativo/web cuando sea viable.
 
-- [ ] **4.8 Plan Maestro: WhatsApp Docente / Chat y Contactos.**
+- [x] **4.8 Plan Maestro: WhatsApp Docente / Chat y Contactos.**
   - Debe reemplazar el enfoque de red social pesada por comunicacion directa.
 
-- [ ] **4.9 Plan Maestro: Canva / Diseno Didactico.**
+- [x] **4.9 Plan Maestro: Canva / Diseno Didactico.**
   - Debe esperar a que Classroom tenga base, salvo que se necesite demo visual.
   - Debe leer `yft-canva` y `rishah-canvas`.
 
-- [ ] **4.10 Plan Maestro: Reportes y Gamificacion.**
+- [x] **4.10 Plan Maestro: Reportes y Gamificacion.**
   - Debe dejarse al final porque depende de datos reales de clases, tareas, asistencia y calificaciones.
 
 ---
@@ -344,10 +355,10 @@ Duracion sugerida: 3 a 5 dias.
 - [x] Cerrar/documentar Fase 9 de Planeaciones.
 - [ ] Commitear documentos fundacionales y referencias open source.
 - [ ] Crear GitHub Project.
-- [ ] Crear labels y milestones.
-- [ ] Crear templates de issue/PR.
-- [ ] Crear primer workflow CI sin deploy.
-- [ ] Actualizar `.env.example` y docs de entorno local.
+- [~] Crear labels y milestones.
+- [x] Crear templates de issue/PR.
+- [x] Crear primer workflow CI sin deploy.
+- [x] Actualizar `.env.example` y docs de entorno local.
 
 ### Ciclo 1 - Plan Classroom
 
@@ -373,13 +384,13 @@ Duracion sugerida: 1 a 2 semanas.
 
 Este plan se puede cerrar cuando:
 
-- [ ] GitHub Project existe y refleja los modulos madre.
-- [ ] Labels, milestones e issue templates estan listos.
-- [ ] CI basico corre en GitHub Actions.
+- [~] GitHub Project existe y refleja los modulos madre.
+- [~] Labels, milestones e issue templates estan listos.
+- [~] CI basico corre en GitHub Actions. Workflow creado y validado localmente; falta observar primera corrida remota tras push/PR.
 - [x] README y documentacion explican la nueva vision.
-- [ ] El entorno local esta documentado para web y celular fisico.
-- [ ] Existe un orden aceptado de planes maestros futuros.
-- [ ] El siguiente plan maestro elegido es Classroom.
+- [x] El entorno local esta documentado para web y celular fisico.
+- [x] Existe un orden aceptado de planes maestros futuros.
+- [x] El siguiente plan maestro elegido es Classroom.
 - [x] No quedan dudas sobre que Planeaciones Fase 9 esta cerrada y el proyecto entra a reorientacion.
 
 ---
@@ -401,5 +412,5 @@ Este plan se puede cerrar cuando:
 - [x] **T.1 Crear este plan maestro inicial.**
 - [x] **T.2 Registrar nueva prioridad: organizacion + Classroom como siguiente gran plan.**
 - [x] **T.3 Vincular este plan con README y documentacion principal.**
-- [ ] **T.4 Ejecutar Ciclo 0.**
+- [~] **T.4 Ejecutar Ciclo 0.**
 - [ ] **T.5 Crear Plan Maestro Classroom.**

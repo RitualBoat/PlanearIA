@@ -1,4 +1,10 @@
 {
   "compilerOptions": {},
-  "extends": "expo/tsconfig.base"
+  "extends": "expo/tsconfig.base",
+  "exclude": [
+    "node_modules",
+    "backend/node_modules",
+    "context/referencias-opensource",
+    "context/planeaciones-ground-truth/referencias-opensource"
+  ]
 }

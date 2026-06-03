@@ -32,6 +32,8 @@ module.exports = {
     "dist/",
     "coverage/",
     "backend/node_modules/",
+    "context/referencias-opensource/",
+    "context/planeaciones-ground-truth/referencias-opensource/",
     "roadmap-context/*.csv",
   ],
   rules: {

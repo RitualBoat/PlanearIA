@@ -2,7 +2,7 @@
 
 > **Version:** 1.0  
 > **Fecha:** 2026-05-30  
-> **Estado:** [~] Plan activo inicial  
+> **Estado:** [x] Plan inicial completado
 > **Alcance:** ordenar el proyecto despues del cierre de Planeaciones Fase 9, alinear GitHub/GitHub Projects, preparar entorno local, definir la secuencia de nuevos planes maestros y convertir la nueva vision de producto en una ruta ejecutable.  
 > **Stack base:** React Native 0.81.5, Expo 54, TypeScript 5.9, React Navigation 7, AsyncStorage, backend Node actual en `backend/api`, MongoDB Atlas/free tier, IA gateway multi-provider, Jest + Testing Library.  
 > **Mandato:** monolito modular, desarrollo local primero, bajo costo, cero friccion para docentes y UX inspirada en Word, Classroom, Canva, Excel y WhatsApp.
@@ -221,7 +221,8 @@ Automatizar validaciones basicas sin sobredisenar CI/CD.
 - [x] **2.1 Crear workflow `ci.yml`:**
   - **Avance:** workflow creado en `.github/workflows/ci.yml`.
   - **Validacion local:** `npx tsc --noEmit`, `npm run lint -- --quiet` y `npm test -- --runInBand` OK.
-  - **Pendiente externo:** confirmar corrida remota al hacer push/PR.
+  - **Cierre 2026-06-03:** corrida remota de GitHub Actions observada en verde despues del push a `development`; jobs TypeScript, ESLint y Jest OK.
+  - **Hardening 2026-06-03:** `actions/checkout` y `actions/setup-node` actualizados a v6 para evitar la advertencia de deprecacion de Node 20 en Actions.
   - Instalar dependencias.
   - Ejecutar TypeScript.
   - Ejecutar lint.
@@ -353,7 +354,7 @@ Definir el orden de planes futuros sin escribirlos todavia.
 Duracion sugerida: 3 a 5 dias.
 
 - [x] Cerrar/documentar Fase 9 de Planeaciones.
-- [ ] Commitear documentos fundacionales y referencias open source.
+- [x] Commitear documentos fundacionales y referencias open source.
 - [x] Crear GitHub Project.
 - [x] Crear labels y milestones.
 - [x] Crear templates de issue/PR.
@@ -390,7 +391,7 @@ Este plan se puede cerrar cuando:
 
 - [x] GitHub Project existe y refleja los modulos madre.
 - [x] Labels, milestones e issue templates estan listos.
-- [~] CI basico corre en GitHub Actions. Workflow creado y validado localmente; falta observar primera corrida remota tras push/PR.
+- [x] CI basico corre en GitHub Actions. Workflow creado, validado localmente y observado en verde en `development`.
 - [x] README y documentacion explican la nueva vision.
 - [x] El entorno local esta documentado para web y celular fisico.
 - [x] Existe un orden aceptado de planes maestros futuros.
@@ -417,5 +418,7 @@ Este plan se puede cerrar cuando:
 - [x] **T.1 Crear este plan maestro inicial.**
 - [x] **T.2 Registrar nueva prioridad: organizacion + Classroom como siguiente gran plan.**
 - [x] **T.3 Vincular este plan con README y documentacion principal.**
-- [~] **T.4 Ejecutar Ciclo 0.** Project, labels, milestones, templates, docs y CI local listos; falta commit/push y observar primera corrida remota de Actions.
+- [x] **T.4 Ejecutar Ciclo 0.** Project, labels, milestones, templates, docs, commit/push y CI remoto observados en verde.
 - [x] **T.5 Crear Plan Maestro Classroom.** Creado en `Documentacion/PLAN_CLASSROOM.md`.
+
+**Cierre del plan inicial 2026-06-03:** PlanearIA queda organizado para la nueva vision: Planeaciones Fase 9 cerrada, GitHub Product OS creado, CI inicial operativo, entorno local documentado y `PLAN_CLASSROOM.md` listo como siguiente ciclo de trabajo.

@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -17,91 +17,38 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../../types";
-import type { Alumno, Asistencia, Calificacion, EntregaTarea, Recurso, Tarea } from "../../../types";
+import type { Alumno, Recurso, Tarea } from "../../../types";
 import type { PlaneacionDocumento } from "../../../types/planeacionV2";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
 import { useAlumnos } from "../../context/AlumnosContext";
-import { useGruposContext } from "../../context/GruposContext";
 import { usePlaneaciones } from "../../context/PlaneacionesContext";
 import { useRecursos } from "../../context/RecursosContext";
-import { useClassroomGroupViewModel } from "../../hooks/classroom/useClassroomGroupViewModel";
 import {
-  generarRubricaClassroom,
+  type ClassroomContentItem,
+  type ClassroomContentSection,
+  useClassroomGroupViewModel,
+} from "../../hooks/classroom/useClassroomGroupViewModel";
+import {
   resumirProgresoClassroom,
   sugerirActividadClassroom,
-  type ClassroomAiAccion,
   type ClassroomAiResponse,
-  type GenerarRubricaResultado,
   type ResumirProgresoResultado,
   type SugerirActividadResultado,
 } from "../../services/classroom/classroomAiService";
 
 type Navigation = StackNavigationProp<RootStackParamList>;
 type Route = RouteProp<RootStackParamList, "ClassroomGroup">;
-
-type ClassroomTab = "novedades" | "trabajo" | "personas" | "calificaciones";
+type ClassroomTab = "tablon" | "trabajo" | "personas";
 
 const CLASSROOM_TABS: { key: ClassroomTab; label: string }[] = [
-  { key: "novedades", label: "Novedades" },
+  { key: "tablon", label: "Tablon" },
   { key: "trabajo", label: "Trabajo de clase" },
   { key: "personas", label: "Personas" },
-  { key: "calificaciones", label: "Calificaciones" },
 ];
 
-type MaterialFilter =
-  | "todos"
-  | "planeaciones"
-  | "pdf"
-  | "video"
-  | "enlaces"
-  | "imagenes"
-  | "archivos"
-  | "otros";
-
-type ActivityFilter = "todas" | "borrador" | "publicada" | "en_curso" | "cerrada" | "calificada";
-
-const MATERIAL_FILTERS: { key: MaterialFilter; label: string }[] = [
-  { key: "todos", label: "Todos" },
-  { key: "planeaciones", label: "Planeaciones" },
-  { key: "pdf", label: "PDF" },
-  { key: "video", label: "Video" },
-  { key: "enlaces", label: "Enlaces" },
-  { key: "imagenes", label: "Imagenes" },
-  { key: "archivos", label: "Archivo" },
-  { key: "otros", label: "Otros" },
-];
-
-const ACTIVITY_FILTERS: { key: ActivityFilter; label: string }[] = [
-  { key: "todas", label: "Todas" },
-  { key: "borrador", label: "Borrador" },
-  { key: "publicada", label: "Publicada" },
-  { key: "en_curso", label: "En curso" },
-  { key: "cerrada", label: "Cerrada" },
-  { key: "calificada", label: "Calificada" },
-];
-
-const isPlaneacionResource = (recurso: Recurso): boolean => {
-  const tags = recurso.tags ?? [];
-  return (
-    recurso.url?.startsWith("planeacion://") === true ||
-    tags.some((tag) => tag.toLowerCase() === "planeacion")
-  );
-};
-
-const resolveMaterialFilter = (recurso: Recurso): MaterialFilter => {
-  const formato = recurso.formato?.toLowerCase() ?? "";
-  const archivo = recurso.archivo?.toLowerCase() ?? "";
-
-  if (isPlaneacionResource(recurso)) return "planeaciones";
-  if (formato === "pdf" || archivo.endsWith(".pdf")) return "pdf";
-  if (recurso.tipo === "video") return "video";
-  if (recurso.tipo === "enlace" || recurso.url?.startsWith("http") === true) return "enlaces";
-  if (recurso.tipo === "imagen") return "imagenes";
-  if (recurso.archivo || ["documento", "presentacion", "audio", "examen"].includes(recurso.tipo)) {
-    return "archivos";
-  }
-  return "otros";
-};
+const isPlaneacionResource = (recurso: Recurso): boolean =>
+  recurso.url?.startsWith("planeacion://") === true ||
+  Boolean(recurso.tags?.some((tag) => tag.toLowerCase() === "planeacion"));
 
 const getPlaneacionTitle = (doc: PlaneacionDocumento): string => {
   const asignatura = doc.datosGenerales.asignatura || doc.elementosCurriculares.contenido || "Planeacion";
@@ -110,132 +57,12 @@ const getPlaneacionTitle = (doc: PlaneacionDocumento): string => {
   return `${asignatura}${grado}${grupo}`.trim();
 };
 
-const getEntregasForTarea = (tarea: Tarea, entregas: EntregaTarea[]): EntregaTarea[] =>
-  entregas.filter((entrega) => entrega.tareaId === tarea.id);
-
-const isEntregaRealizada = (entrega: EntregaTarea): boolean =>
-  entrega.estado === "entregada" || entrega.estado === "tarde" || entrega.estado === "calificada";
-
-const isActividadCalificada = (tarea: Tarea, entregas: EntregaTarea[], totalAlumnos: number): boolean => {
-  if (totalAlumnos === 0) return false;
-  const entregasTarea = getEntregasForTarea(tarea, entregas);
-  const calificadas = entregasTarea.filter((entrega) => entrega.calificada || entrega.estado === "calificada");
-  return calificadas.length >= totalAlumnos;
-};
-
-const resolveActivityFilter = (
-  tarea: Tarea,
-  entregas: EntregaTarea[],
-  totalAlumnos: number,
-): Exclude<ActivityFilter, "todas" | "borrador"> => {
-  if (isActividadCalificada(tarea, entregas, totalAlumnos)) return "calificada";
-  if (tarea.estado === "en_progreso") return "en_curso";
-  if (tarea.estado === "finalizada") return "cerrada";
-  return "publicada";
-};
-
-const getActivityLabel = (filter: ActivityFilter): string => {
-  const item = ACTIVITY_FILTERS.find((candidate) => candidate.key === filter);
-  return item?.label ?? "Publicada";
-};
-
-const getActivitySummary = (tarea: Tarea, entregas: EntregaTarea[], alumnos: Alumno[]) => {
-  const entregasTarea = getEntregasForTarea(tarea, entregas);
-  const entregadas = entregasTarea.filter(isEntregaRealizada).length;
-  const calificadas = entregasTarea.filter((entrega) => entrega.calificada || entrega.estado === "calificada").length;
-  const pendientes = Math.max(alumnos.length - entregadas, 0);
-  const progress = alumnos.length > 0 ? Math.min(100, Math.round((entregadas / alumnos.length) * 100)) : 0;
-  const estado = resolveActivityFilter(tarea, entregas, alumnos.length);
-
-  return { calificadas, entregadas, estado, pendientes, progress, total: alumnos.length };
-};
-
-const formatActivityDate = (value: Date | string): string => {
+const formatDate = (value?: Date | string): string => {
+  if (!value) return "Sin fecha";
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Sin fecha";
+  if (!Number.isFinite(date.getTime())) return "Sin fecha";
   return date.toLocaleDateString();
 };
-
-const getAlumnoEntregaStatus = (
-  alumno: Alumno,
-  tarea: Tarea,
-  entregas: EntregaTarea[],
-): "pendiente" | "entregado" | "revisado" | "calificado" => {
-  const entrega = entregas.find((item) => item.tareaId === tarea.id && item.alumnoId === alumno.id);
-  if (!entrega) return "pendiente";
-  if (entrega.calificada || entrega.estado === "calificada") return "calificado";
-  if (entrega.retroalimentacion) return "revisado";
-  if (isEntregaRealizada(entrega)) return "entregado";
-  return "pendiente";
-};
-
-const normalizeDateKey = (value: Date | string): string => {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toISOString().slice(0, 10);
-};
-
-const getLatestAttendanceDate = (asistencias: Asistencia[]): string | null => {
-  const dates = asistencias.map((asistencia) => normalizeDateKey(asistencia.fecha)).filter(Boolean).sort();
-  return dates.at(-1) ?? null;
-};
-
-const getAttendanceSummary = (asistencias: Asistencia[], totalAlumnos: number) => {
-  const latestDate = getLatestAttendanceDate(asistencias);
-  const latestRecords = latestDate
-    ? asistencias.filter((asistencia) => normalizeDateKey(asistencia.fecha) === latestDate)
-    : [];
-  const presentes = latestRecords.filter((asistencia) => asistencia.estado === "presente").length;
-  const retardos = latestRecords.filter((asistencia) => asistencia.estado === "retardo").length;
-  const ausentes = latestRecords.filter((asistencia) => asistencia.estado === "ausente").length;
-  const justificadas = latestRecords.filter((asistencia) => asistencia.estado === "justificada").length;
-  const pendientes = Math.max(totalAlumnos - latestRecords.length, 0);
-
-  return { ausentes, justificadas, latestDate, pendientes, presentes, registros: latestRecords.length, retardos };
-};
-
-const getGradesSummary = (calificaciones: Calificacion[], totalAlumnos: number) => {
-  const values = calificaciones.map((calificacion) => Number(calificacion.promedio)).filter(Number.isFinite);
-  const promedio = values.length > 0 ? Math.round((values.reduce((sum, value) => sum + value, 0) / values.length) * 10) / 10 : 0;
-  const aprobados = calificaciones.filter((calificacion) => calificacion.estado === "aprobado").length;
-  const reprobados = calificaciones.filter((calificacion) => calificacion.estado === "reprobado").length;
-  const pendientes = Math.max(totalAlumnos - calificaciones.length, 0);
-
-  return { aprobados, pendientes, promedio, registrados: calificaciones.length, reprobados };
-};
-
-const getStudentFollowUp = (
-  alumnos: Alumno[],
-  asistencias: Asistencia[],
-  calificaciones: Calificacion[],
-  actividades: Tarea[],
-  entregas: EntregaTarea[],
-) =>
-  alumnos
-    .map((alumno) => {
-      const asistenciasAlumno = asistencias.filter((asistencia) => asistencia.alumnoId === alumno.id);
-      const presentes = asistenciasAlumno.filter((asistencia) => asistencia.estado === "presente").length;
-      const asistenciaPct =
-        asistenciasAlumno.length > 0 ? Math.round((presentes / asistenciasAlumno.length) * 100) : null;
-      const calificacion = calificaciones.find((item) => item.alumnoId === alumno.id);
-      const entregasAlumno = entregas.filter((entrega) => entrega.alumnoId === alumno.id && isEntregaRealizada(entrega));
-      const pendientes = Math.max(actividades.length - entregasAlumno.length, 0);
-      const reasons = [
-        asistenciaPct !== null && asistenciaPct < 80 ? `asistencia ${asistenciaPct}%` : null,
-        calificacion?.estado === "reprobado" ? `promedio ${calificacion.promedio}` : null,
-        pendientes > 0 ? `${pendientes} actividades pendientes` : null,
-      ].filter(Boolean) as string[];
-
-      return {
-        alumno,
-        asistenciaPct,
-        promedio: calificacion?.promedio,
-        pendientes,
-        reasons,
-      };
-    })
-    .filter((item) => item.reasons.length > 0)
-    .sort((a, b) => b.reasons.length - a.reasons.length);
 
 const formatAiActivity = (response: ClassroomAiResponse<SugerirActividadResultado>): string => {
   const { actividad, mensaje } = response.resultado;
@@ -252,21 +79,9 @@ const formatAiActivity = (response: ClassroomAiResponse<SugerirActividadResultad
   ].join("\n");
 };
 
-const formatAiRubric = (response: ClassroomAiResponse<GenerarRubricaResultado>): string => {
-  const { rubrica, mensaje } = response.resultado;
-  const criterios = rubrica.criterios
-    .map(
-      (item, index) =>
-        `${index + 1}. ${item.criterio}\nExcelente: ${item.excelente}\nSatisfactorio: ${item.satisfactorio}\nEn proceso: ${item.enProceso}`,
-    )
-    .join("\n\n");
-  return [mensaje, "", rubrica.titulo, "", criterios].join("\n");
-};
-
 const formatAiProgress = (response: ClassroomAiResponse<ResumirProgresoResultado>): string => {
   const { hallazgos, mensaje, resumen } = response.resultado;
-  const lines = hallazgos.map((item) => `- ${item.prioridad}/${item.tipo}: ${item.descripcion}`);
-  return [mensaje, "", resumen, "", ...lines].join("\n");
+  return [mensaje, "", resumen, "", ...hallazgos.map((item) => `- ${item.prioridad}/${item.tipo}: ${item.descripcion}`)].join("\n");
 };
 
 const ClassroomGroupScreen: React.FC = () => {
@@ -274,50 +89,44 @@ const ClassroomGroupScreen: React.FC = () => {
   const route = useRoute<Route>();
   const { width } = useWindowDimensions();
   const { grupoId, grupoNombre } = route.params;
-  const { model, alumnos, actividades, entregas, asistencias, calificaciones, materiales, isLoading, error, reload } =
-    useClassroomGroupViewModel(grupoId);
+  const {
+    model,
+    alumnos,
+    actividades,
+    entregas,
+    materiales,
+    contentSections,
+    feedItems,
+    isLoading,
+    error,
+    crearUnidad,
+    renombrarUnidad,
+    toggleUnidad,
+    eliminarUnidad,
+    reload,
+  } = useClassroomGroupViewModel(grupoId);
   const { actualizarAlumno } = useAlumnos();
-  const { grupos } = useGruposContext();
   const { documentos } = usePlaneaciones();
   const { crearRecurso } = useRecursos();
-  const [materialFilter, setMaterialFilter] = React.useState<MaterialFilter>("todos");
-  const [activityFilter, setActivityFilter] = React.useState<ActivityFilter>("todas");
-  const [activeTab, setActiveTab] = React.useState<ClassroomTab>("novedades");
-  const [aiLoadingAction, setAiLoadingAction] = React.useState<ClassroomAiAccion | null>(null);
+  const [activeTab, setActiveTab] = React.useState<ClassroomTab>("tablon");
+  const [aiLoading, setAiLoading] = React.useState(false);
   const [aiWarning, setAiWarning] = React.useState<string | null>(null);
+
+  const isCompact = width < 780;
   const nombre = model?.grupo.nombre ?? grupoNombre ?? "Grupo";
   const materia = model?.grupo.materia ?? "Materia sin definir";
   const periodo = model?.grupo.periodo ?? "Periodo sin definir";
-  const isCompact = width < 760;
-  const alumnosPreview = alumnos.slice(0, 4);
-  const materialesFiltrados = materiales.filter((recurso) => {
-    if (materialFilter === "todos") return true;
-    return resolveMaterialFilter(recurso) === materialFilter;
-  });
-  const materialesPreview = materialesFiltrados.slice(0, 6);
-  const actividadesFiltradas = actividades.filter((actividad) => {
-    if (activityFilter === "todas") return true;
-    if (activityFilter === "borrador") return false;
-    return resolveActivityFilter(actividad, entregas, alumnos.length) === activityFilter;
-  });
-  const actividadesPreview = actividadesFiltradas.slice(0, 6);
-  const asistenciaSummary = getAttendanceSummary(asistencias, alumnos.length);
-  const calificacionesSummary = getGradesSummary(calificaciones, alumnos.length);
-  const seguimientoAlumnos = getStudentFollowUp(alumnos, asistencias, calificaciones, actividades, entregas);
-  const seguimientoPreview = seguimientoAlumnos.slice(0, 4);
-  const gruposDestino = grupos.filter((grupo) => typeof grupo.id === "number" && grupo.id !== grupoId);
-  const showNovedades = activeTab === "novedades";
-  const showTrabajo = activeTab === "trabajo";
-  const showPersonas = activeTab === "personas";
-  const showCalificaciones = activeTab === "calificaciones";
-  const classroomAiContext = React.useMemo(
+  const proximasEntregas = React.useMemo(
+    () =>
+      actividades
+        .filter((actividad) => actividad.estado !== "finalizada")
+        .sort((a, b) => new Date(a.fechaEntrega).getTime() - new Date(b.fechaEntrega).getTime())
+        .slice(0, 4),
+    [actividades],
+  );
+  const aiContext = React.useMemo(
     () => ({
-      grupo: {
-        id: grupoId,
-        nombre,
-        materia,
-        periodo,
-      },
+      grupo: { id: grupoId, nombre, materia, periodo },
       resumen: model?.resumen,
       alumnos: alumnos.map((alumno) => ({
         id: alumno.id,
@@ -339,16 +148,6 @@ const ClassroomGroupScreen: React.FC = () => {
         titulo: material.titulo,
         tipo: material.tipo,
       })),
-      asistencias: asistencias.map((asistencia) => ({
-        alumnoId: asistencia.alumnoId,
-        fecha: asistencia.fecha,
-        estado: asistencia.estado,
-      })),
-      calificaciones: calificaciones.map((calificacion) => ({
-        alumnoId: calificacion.alumnoId,
-        promedio: calificacion.promedio,
-        estado: calificacion.estado,
-      })),
       entregas: entregas.map((entrega) => ({
         tareaId: entrega.tareaId,
         alumnoId: entrega.alumnoId,
@@ -357,7 +156,7 @@ const ClassroomGroupScreen: React.FC = () => {
         calificada: entrega.calificada,
       })),
     }),
-    [actividades, alumnos, asistencias, calificaciones, entregas, grupoId, materiales, materia, model?.resumen, nombre, periodo],
+    [actividades, alumnos, entregas, grupoId, materiales, materia, model?.resumen, nombre, periodo],
   );
 
   const showMessage = React.useCallback((title: string, message: string) => {
@@ -365,184 +164,83 @@ const ClassroomGroupScreen: React.FC = () => {
       window.alert(`${title}\n\n${message}`);
       return;
     }
-
     Alert.alert(title, message);
   }, []);
 
-  const applyAiUsageMeta = React.useCallback((response: ClassroomAiResponse) => {
-    setAiWarning(response.usage?.warning ?? null);
-  }, []);
-
-  const reviewAiActivity = React.useCallback(
-    (response: ClassroomAiResponse<SugerirActividadResultado>) => {
-      applyAiUsageMeta(response);
-      const body = formatAiActivity(response);
-
+  const askText = React.useCallback(
+    (title: string, message: string, fallback: string, onSubmit: (value: string) => void) => {
       if (Platform.OS === "web") {
-        const shouldCreate = window.confirm(
-          `Sugerencia IA: actividad\n\n${body}\n\nRevisala antes de guardar. ¿Quieres abrir el creador de actividad?`,
-        );
-        if (shouldCreate) {
-          navigation.navigate("CrearTareaGrupo", { grupoId });
-        }
+        const value = window.prompt(`${title}\n\n${message}`, fallback);
+        if (value?.trim()) onSubmit(value.trim());
         return;
       }
 
-      Alert.alert("Sugerencia IA: actividad", body, [
-        { text: "Cerrar", style: "cancel" },
-        {
-          text: "Crear actividad",
-          onPress: () => navigation.navigate("CrearTareaGrupo", { grupoId }),
-        },
-      ]);
-    },
-    [applyAiUsageMeta, grupoId, navigation],
-  );
+      const nativePrompt = (Alert as typeof Alert & {
+        prompt?: (
+          title: string,
+          message?: string,
+          callbackOrButtons?: (value: string) => void,
+          type?: "plain-text",
+          defaultValue?: string,
+        ) => void;
+      }).prompt;
 
-  const reviewAiRubric = React.useCallback(
-    (response: ClassroomAiResponse<GenerarRubricaResultado>) => {
-      applyAiUsageMeta(response);
-      showMessage("Sugerencia IA: rubrica", `${formatAiRubric(response)}\n\nRevisa antes de copiarla a una actividad.`);
-    },
-    [applyAiUsageMeta, showMessage],
-  );
-
-  const reviewAiProgress = React.useCallback(
-    (response: ClassroomAiResponse<ResumirProgresoResultado>) => {
-      applyAiUsageMeta(response);
-      showMessage("Resumen IA de progreso", `${formatAiProgress(response)}\n\nEsto no sustituye la revision docente.`);
-    },
-    [applyAiUsageMeta, showMessage],
-  );
-
-  const runClassroomAi = React.useCallback(
-    async (accion: ClassroomAiAccion) => {
-      if (aiLoadingAction) return;
-
-      setAiLoadingAction(accion);
-      try {
-        if (accion === "sugerir_actividad") {
-          const response = await sugerirActividadClassroom(classroomAiContext);
-          reviewAiActivity(response);
-        } else if (accion === "generar_rubrica") {
-          const response = await generarRubricaClassroom(classroomAiContext);
-          reviewAiRubric(response);
-        } else if (accion === "resumir_progreso") {
-          const response = await resumirProgresoClassroom(classroomAiContext);
-          reviewAiProgress(response);
-        }
-      } catch (error) {
-        showMessage(
-          "IA Classroom no disponible",
-          error instanceof Error ? error.message : "No se pudo ejecutar la accion IA.",
-        );
-      } finally {
-        setAiLoadingAction(null);
-      }
-    },
-    [
-      aiLoadingAction,
-      classroomAiContext,
-      reviewAiActivity,
-      reviewAiProgress,
-      reviewAiRubric,
-      showMessage,
-    ],
-  );
-
-  const removeAlumnoFromGroup = React.useCallback(
-    async (alumno: Alumno) => {
-      await actualizarAlumno(alumno.id, { grupoId: undefined });
-      await reload();
-    },
-    [actualizarAlumno, reload]
-  );
-
-  const moveAlumnoToGroup = React.useCallback(
-    async (alumno: Alumno, targetGrupoId: number) => {
-      await actualizarAlumno(alumno.id, { grupoId: targetGrupoId });
-      await reload();
-    },
-    [actualizarAlumno, reload]
-  );
-
-  const handleRemoveAlumno = React.useCallback(
-    (alumno: Alumno) => {
-      const fullName = `${alumno.nombre} ${alumno.apellidos}`.trim();
-      const message = `Esto quitara a ${fullName} de ${nombre}, pero no eliminara su perfil.`;
-
-      if (Platform.OS === "web") {
-        if (window.confirm(`Quitar alumno\n\n${message}`)) {
-          void removeAlumnoFromGroup(alumno);
-        }
+      if (Platform.OS === "ios" && nativePrompt) {
+        nativePrompt(title, message, (value) => {
+          if (value?.trim()) onSubmit(value.trim());
+        }, "plain-text", fallback);
         return;
       }
 
-      Alert.alert("Quitar alumno", message, [
+      showMessage(title, "En Android se usara el nombre sugerido por ahora. Lo podremos reemplazar por un modal propio.");
+      onSubmit(fallback);
+    },
+    [showMessage],
+  );
+
+  const handleCreateUnidad = React.useCallback(() => {
+    askText("Nueva seccion", "Ejemplo: Unidad 1 - Introduccion", "Unidad 1", (value) => {
+      void crearUnidad(value);
+    });
+  }, [askText, crearUnidad]);
+
+  const handleRenameUnidad = React.useCallback(
+    (section: ClassroomContentSection) => {
+      if (section.isUnassigned) return;
+      askText("Renombrar seccion", "Escribe el nuevo nombre de la seccion.", section.nombre, (value) => {
+        void renombrarUnidad(section.id, value);
+      });
+    },
+    [askText, renombrarUnidad],
+  );
+
+  const handleDeleteUnidad = React.useCallback(
+    (section: ClassroomContentSection) => {
+      if (section.isUnassigned) return;
+      const message =
+        "La seccion se quitara del curso. Sus materiales y actividades no se eliminan; apareceran en Sin seccion.";
+      if (Platform.OS === "web") {
+        if (window.confirm(`Eliminar seccion\n\n${message}`)) void eliminarUnidad(section.id);
+        return;
+      }
+      Alert.alert("Eliminar seccion", message, [
         { text: "Cancelar", style: "cancel" },
-        {
-          text: "Quitar",
-          style: "destructive",
-          onPress: () => void removeAlumnoFromGroup(alumno),
-        },
+        { text: "Eliminar", style: "destructive", onPress: () => void eliminarUnidad(section.id) },
       ]);
     },
-    [nombre, removeAlumnoFromGroup]
-  );
-
-  const handleMoveAlumno = React.useCallback(
-    (alumno: Alumno) => {
-      if (gruposDestino.length === 0) {
-        showMessage("Sin grupos destino", "Crea otro grupo para poder mover este alumno.");
-        return;
-      }
-
-      if (Platform.OS === "web") {
-        const promptText = gruposDestino
-          .map((grupo) => `${grupo.id} - ${grupo.nombre ?? "Grupo sin nombre"}`)
-          .join("\n");
-        const selected = window.prompt(`Escribe el ID del grupo destino:\n\n${promptText}`);
-        if (!selected) return;
-
-        const targetId = Number(selected);
-        const exists = gruposDestino.some((grupo) => grupo.id === targetId);
-        if (!Number.isFinite(targetId) || !exists) {
-          showMessage("Grupo invalido", "El ID seleccionado no coincide con un grupo disponible.");
-          return;
-        }
-
-        void moveAlumnoToGroup(alumno, targetId);
-        return;
-      }
-
-      Alert.alert(
-        "Mover alumno",
-        `Selecciona el grupo destino para ${alumno.nombre}.`,
-        [
-          ...gruposDestino.slice(0, 6).map((grupo) => ({
-            text: grupo.nombre ?? `Grupo ${grupo.id}`,
-            onPress: () => {
-              if (typeof grupo.id === "number") {
-                void moveAlumnoToGroup(alumno, grupo.id);
-              }
-            },
-          })),
-          { text: "Cancelar", style: "cancel" as const },
-        ]
-      );
-    },
-    [gruposDestino, moveAlumnoToGroup, showMessage]
+    [eliminarUnidad],
   );
 
   const attachPlaneacion = React.useCallback(
-    async (doc: PlaneacionDocumento) => {
+    async (doc: PlaneacionDocumento, unidadId?: string) => {
       const now = new Date();
       await crearRecurso({
         titulo: getPlaneacionTitle(doc),
         tipo: "documento",
-        descripcion: `Planeacion adjunta a la clase ${nombre}.`,
+        descripcion: `Planeacion adjunta a ${nombre}.`,
         url: `planeacion://${doc.id}`,
         grupoId,
+        unidadId,
         asignadoComoTarea: false,
         tags: ["planeacion", doc.nivelAcademico, doc.datosGenerales.asignatura].filter(Boolean),
         fechaCreacion: now,
@@ -555,89 +253,161 @@ const ClassroomGroupScreen: React.FC = () => {
         versionActual: 1,
       });
       await reload();
-      showMessage("Planeacion adjunta", "La planeacion ya aparece como material de esta clase.");
+      showMessage("Planeacion adjunta", unidadId ? "Aparece dentro de la seccion elegida." : "Aparece en Sin seccion.");
     },
-    [crearRecurso, grupoId, nombre, reload, showMessage]
+    [crearRecurso, grupoId, nombre, reload, showMessage],
   );
 
-  const handleAttachPlaneacion = React.useCallback(() => {
-    if (documentos.length === 0) {
-      showMessage("Sin planeaciones", "Crea una planeacion para poder adjuntarla como material.");
-      return;
-    }
+  const handleAttachPlaneacion = React.useCallback(
+    (unidadId?: string) => {
+      if (documentos.length === 0) {
+        showMessage("Sin planeaciones", "Crea una planeacion para adjuntarla como material.");
+        return;
+      }
+      const opciones = documentos.slice(0, 8);
+      if (Platform.OS === "web") {
+        const promptText = opciones.map((doc, index) => `${index + 1}. ${getPlaneacionTitle(doc)}`).join("\n");
+        const selected = window.prompt(`Elige una planeacion:\n\n${promptText}`);
+        const doc = opciones[Number(selected) - 1];
+        if (doc) void attachPlaneacion(doc, unidadId);
+        return;
+      }
+      Alert.alert("Adjuntar planeacion", "Selecciona una planeacion.", [
+        ...opciones.slice(0, 6).map((doc) => ({
+          text: getPlaneacionTitle(doc),
+          onPress: () => void attachPlaneacion(doc, unidadId),
+        })),
+        { text: "Cancelar", style: "cancel" },
+      ]);
+    },
+    [attachPlaneacion, documentos, showMessage],
+  );
 
-    const opciones = documentos.slice(0, 8);
+  const handleCreateForSection = React.useCallback(
+    (section: ClassroomContentSection) => {
+      const unidadId = section.isUnassigned ? undefined : section.id;
+      const options = [
+        {
+          text: "Actividad",
+          onPress: () => navigation.navigate("CrearTareaGrupo", { grupoId, unidadId }),
+        },
+        {
+          text: "Material",
+          onPress: () => navigation.navigate("CrearRecurso", { grupoId, unidadId }),
+        },
+        {
+          text: "Adjuntar planeacion",
+          onPress: () => handleAttachPlaneacion(unidadId),
+        },
+      ];
 
-    if (Platform.OS === "web") {
-      const promptText = opciones
-        .map((doc, index) => `${index + 1}. ${getPlaneacionTitle(doc)}`)
-        .join("\n");
-      const selected = window.prompt(`Elige una planeacion para adjuntar:\n\n${promptText}`);
-      if (!selected) return;
-
-      const index = Number(selected) - 1;
-      const doc = opciones[index];
-      if (!doc) {
-        showMessage("Seleccion invalida", "El numero seleccionado no coincide con una planeacion.");
+      if (Platform.OS === "web") {
+        const selected = window.prompt(
+          `Agregar a ${section.nombre}\n\n1. Actividad\n2. Material\n3. Adjuntar planeacion`,
+          "1",
+        );
+        if (selected === "1") options[0].onPress();
+        if (selected === "2") options[1].onPress();
+        if (selected === "3") options[2].onPress();
         return;
       }
 
-      void attachPlaneacion(doc);
-      return;
-    }
-
-    Alert.alert(
-      "Adjuntar planeacion",
-      "Selecciona una planeacion para convertirla en material de clase.",
-      [
-        ...opciones.slice(0, 6).map((doc) => ({
-          text: getPlaneacionTitle(doc),
-          onPress: () => void attachPlaneacion(doc),
-        })),
-        { text: "Cancelar", style: "cancel" as const },
-      ]
-    );
-  }, [attachPlaneacion, documentos, showMessage]);
-
-  const handleOpenMaterial = React.useCallback(
-    (recurso: Recurso) => {
-      if (isPlaneacionResource(recurso) && recurso.url) {
-        const planeacionId = recurso.url.replace("planeacion://", "");
-        if (planeacionId) {
-          navigation.navigate("DocEditor", { modo: "editar", planeacionId });
-          return;
-        }
-      }
-
-      navigation.navigate("CrearRecurso", { recursoId: recurso.id, grupoId });
+      Alert.alert(`Agregar a ${section.nombre}`, "Elige el tipo de contenido.", [
+        ...options,
+        { text: "Cancelar", style: "cancel" },
+      ]);
     },
-    [grupoId, navigation]
+    [grupoId, handleAttachPlaneacion, navigation],
   );
+
+  const handleOpenContentItem = React.useCallback(
+    (item: ClassroomContentItem) => {
+      if (item.kind === "actividad") {
+        navigation.navigate("DetalleActividadClassroom", { tareaId: item.rawId, grupoId });
+        return;
+      }
+      const recurso = item.raw as Recurso;
+      if (isPlaneacionResource(recurso) && recurso.url) {
+        navigation.navigate("DocEditor", { modo: "editar", planeacionId: recurso.url.replace("planeacion://", "") });
+        return;
+      }
+      navigation.navigate("CrearRecurso", { recursoId: recurso.id, grupoId, unidadId: recurso.unidadId });
+    },
+    [grupoId, navigation],
+  );
+
+  const handleRemoveAlumno = React.useCallback(
+    (alumno: Alumno) => {
+      const fullName = `${alumno.nombre} ${alumno.apellidos}`.trim();
+      const message = `Esto quitara a ${fullName} de ${nombre}, pero no eliminara su perfil.`;
+      if (Platform.OS === "web") {
+        if (window.confirm(`Quitar alumno\n\n${message}`)) {
+          void actualizarAlumno(alumno.id, { grupoId: undefined }).then(() => reload());
+        }
+        return;
+      }
+      Alert.alert("Quitar alumno", message, [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Quitar",
+          style: "destructive",
+          onPress: () => void actualizarAlumno(alumno.id, { grupoId: undefined }).then(() => reload()),
+        },
+      ]);
+    },
+    [actualizarAlumno, nombre, reload],
+  );
+
+  const runAiSummary = React.useCallback(async () => {
+    if (aiLoading) return;
+    setAiLoading(true);
+    try {
+      const response = await resumirProgresoClassroom(aiContext);
+      setAiWarning(response.usage?.warning ?? null);
+      showMessage("Resumen IA", `${formatAiProgress(response)}\n\nEsto no sustituye la revision docente.`);
+    } finally {
+      setAiLoading(false);
+    }
+  }, [aiContext, aiLoading, showMessage]);
+
+  const runAiActivity = React.useCallback(async () => {
+    if (aiLoading) return;
+    setAiLoading(true);
+    try {
+      const response = await sugerirActividadClassroom(aiContext);
+      setAiWarning(response.usage?.warning ?? null);
+      showMessage("Sugerencia IA", `${formatAiActivity(response)}\n\nRevisala antes de crear una actividad real.`);
+    } finally {
+      setAiLoading(false);
+    }
+  }, [aiContext, aiLoading, showMessage]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
         style={styles.scroller}
         contentContainerStyle={[styles.content, isCompact ? styles.contentCompact : null]}
-        showsVerticalScrollIndicator={Platform.OS === "web"}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => void reload()} />}
+        showsVerticalScrollIndicator={Platform.OS === "web"}
       >
         <View style={[styles.banner, isCompact ? styles.bannerCompact : null]}>
-          <View style={styles.bannerPatternOne} />
-          <View style={styles.bannerPatternTwo} />
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <MaterialIcons name="arrow-back" size={22} color="#0F172A" />
           </TouchableOpacity>
-          <View style={[styles.bannerCopy, isCompact ? styles.bannerCopyCompact : null]}>
+          <View style={styles.bannerCopy}>
             <Text style={styles.eyebrow}>Classroom</Text>
             <Text style={[styles.title, isCompact ? styles.titleCompact : null]}>{nombre}</Text>
-            <Text style={[styles.subtitle, isCompact ? styles.subtitleCompact : null]}>
-              {materia} - {periodo}
-            </Text>
+            <Text style={styles.subtitle}>{materia} - {periodo}</Text>
+          </View>
+          <View style={[styles.headerActions, isCompact ? styles.headerActionsCompact : null]}>
+            <TouchableOpacity style={styles.headerAction} onPress={runAiSummary} disabled={aiLoading}>
+              <MaterialIcons name="psychology" size={18} color="#1E7D4F" />
+              <Text style={styles.headerActionText}>{aiLoading ? "IA..." : "IA"}</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
-        <View style={[styles.tabsBar, isCompact ? styles.tabsBarCompact : null]}>
+        <View style={styles.tabsBar}>
           {CLASSROOM_TABS.map((tab) => (
             <TouchableOpacity
               key={tab.key}
@@ -652,10 +422,7 @@ const ClassroomGroupScreen: React.FC = () => {
         {error ? (
           <View style={styles.warningCard}>
             <MaterialIcons name="cloud-off" size={22} color="#B45309" />
-            <View style={styles.warningCopy}>
-              <Text style={styles.warningTitle}>Datos locales</Text>
-              <Text style={styles.warningText}>{error}</Text>
-            </View>
+            <Text style={styles.warningText}>{error}</Text>
           </View>
         ) : null}
 
@@ -671,702 +438,290 @@ const ClassroomGroupScreen: React.FC = () => {
             <MaterialIcons name="search-off" size={34} color={COLORS.primary} />
             <Text style={styles.emptyTitle}>No encontramos este grupo</Text>
             <Text style={styles.emptyText}>Puede haberse eliminado o estar pendiente de sincronizacion.</Text>
-            <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("ListaGrupos")}>
-              <Text style={styles.primaryButtonText}>Ir a lista legacy</Text>
-            </TouchableOpacity>
           </View>
         ) : null}
 
-        {model ? (
-          <View style={styles.classroomLayout}>
+        {model && activeTab === "tablon" ? (
+          <ClassStream
+            aiWarning={aiWarning}
+            feedItems={feedItems}
+            isCompact={isCompact}
+            onCreateActivity={() => setActiveTab("trabajo")}
+            onOpenItem={handleOpenContentItem}
+            proximasEntregas={proximasEntregas}
+          />
+        ) : null}
 
-            <View style={[styles.mainRail, isCompact ? styles.mainRailCompact : null]}>
-              {showNovedades ? (
-                <>
-                  <View style={styles.announcementCard}>
-                    <View style={styles.teacherAvatar}>
-                      <MaterialIcons name="person" size={22} color="#FFFFFF" />
-                    </View>
-                    <View style={styles.announcementCopy}>
-                      <Text style={styles.announcementTitle}>Publica o prepara algo para tu clase</Text>
-                      <Text style={styles.announcementText}>
-                        Accesos rapidos para crear trabajo, asignar recursos y registrar el avance diario.
-                      </Text>
-                    </View>
-                  </View>
+        {model && activeTab === "trabajo" ? (
+          <CourseworkTab
+            sections={contentSections}
+            onAddContent={handleCreateForSection}
+            onCreateUnidad={handleCreateUnidad}
+            onDeleteUnidad={handleDeleteUnidad}
+            onOpenItem={handleOpenContentItem}
+            onRenameUnidad={handleRenameUnidad}
+            onSuggestActivity={runAiActivity}
+            onToggleUnidad={(id) => void toggleUnidad(id)}
+          />
+        ) : null}
 
-                  <View style={styles.actionsGrid}>
-                    <ActionCard
-                      title="Alumnos"
-                      description="Lista del grupo, perfiles e importacion."
-                      icon="groups"
-                      onPress={() => navigation.navigate("CrearAlumno", { grupoId })}
-                    />
-                    <ActionCard
-                      title="Actividades"
-                      description="Crear tarea o revisar entregas."
-                      icon="assignment-add"
-                      onPress={() => navigation.navigate("CrearTareaGrupo", { grupoId })}
-                    />
-                    <ActionCard
-                      title="Materiales"
-                      description="Recursos y planeaciones asignadas."
-                      icon="folder-special"
-                      onPress={() => navigation.navigate("CrearRecurso", { grupoId })}
-                    />
-                    <ActionCard
-                      title="Asistencia"
-                      description="Registro del dia e historial."
-                      icon="event-available"
-                      onPress={() => navigation.navigate("RegistrarAsistencia", { grupoId })}
-                    />
-                    <ActionCard
-                      title="Calificaciones"
-                      description="Captura y promedios."
-                      icon="grading"
-                      onPress={() => navigation.navigate("CapturarCalificaciones", { grupoId })}
-                    />
-                    <ActionCard
-                      title="Reportes"
-                      description="Seguimiento accionable."
-                      icon="insights"
-                      onPress={() => navigation.navigate("ReportesGrupo", { grupoId, grupoNombre: nombre })}
-                    />
-                  </View>
-
-                  <View style={styles.feedCard}>
-                    <View style={styles.feedHeader}>
-                      <View>
-                        <Text style={styles.sectionTitle}>Copiloto IA Classroom</Text>
-                        <Text style={styles.sectionHint}>Sugerencias revisables; nada se guarda sin aprobacion docente.</Text>
-                      </View>
-                      <Text style={styles.feedCount}>Beta</Text>
-                    </View>
-
-                    {aiWarning ? (
-                      <View style={styles.aiWarningBox}>
-                        <MaterialIcons name="warning" size={18} color="#B45309" />
-                        <Text style={styles.aiWarningText}>{aiWarning}</Text>
-                      </View>
-                    ) : null}
-
-                    <View style={styles.inlineActions}>
-                      <TouchableOpacity
-                        style={[styles.inlineActionButton, aiLoadingAction ? styles.disabledActionButton : null]}
-                        disabled={Boolean(aiLoadingAction)}
-                        onPress={() => void runClassroomAi("resumir_progreso")}
-                      >
-                        <MaterialIcons name="psychology" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>
-                          {aiLoadingAction === "resumir_progreso" ? "Analizando..." : "Resumir progreso"}
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[styles.inlineActionButton, aiLoadingAction ? styles.disabledActionButton : null]}
-                        disabled={Boolean(aiLoadingAction)}
-                        onPress={() => void runClassroomAi("sugerir_actividad")}
-                      >
-                        <MaterialIcons name="auto-awesome" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>
-                          {aiLoadingAction === "sugerir_actividad" ? "Generando..." : "Sugerir actividad"}
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[styles.inlineActionButton, aiLoadingAction ? styles.disabledActionButton : null]}
-                        disabled={Boolean(aiLoadingAction)}
-                        onPress={() => void runClassroomAi("generar_rubrica")}
-                      >
-                        <MaterialIcons name="rule" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>
-                          {aiLoadingAction === "generar_rubrica" ? "Generando..." : "Sugerir rubrica"}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-
-                  <View style={styles.feedCard}>
-                    <View style={styles.feedHeader}>
-                      <Text style={styles.sectionTitle}>Pendientes</Text>
-                      <Text style={styles.feedCount}>{model.pendientes.length}</Text>
-                    </View>
-                    {model.pendientes.length === 0 ? (
-                      <EmptyFeedLine icon="check-circle" text="Sin pendientes academicos detectados." />
-                    ) : (
-                      model.pendientes.slice(0, 5).map((pendiente) => (
-                        <FeedItem key={pendiente.id} icon="flag" title={pendiente.titulo} meta={pendiente.tipo} />
-                      ))
-                    )}
-                  </View>
-
-                  <View style={styles.feedCard}>
-                    <View style={styles.feedHeader}>
-                      <Text style={styles.sectionTitle}>Actividad reciente</Text>
-                      <Text style={styles.feedCount}>{model.actividadReciente.length}</Text>
-                    </View>
-                    {model.actividadReciente.length === 0 ? (
-                      <EmptyFeedLine icon="history" text="Aun no hay actividad reciente." />
-                    ) : (
-                      model.actividadReciente.slice(0, 5).map((actividad) => (
-                        <FeedItem
-                          key={actividad.id}
-                          icon="history"
-                          title={actividad.titulo}
-                          meta={`${actividad.entidadOrigen} - ${new Date(actividad.fecha).toLocaleDateString()}`}
-                        />
-                      ))
-                    )}
-                  </View>
-                </>
-              ) : null}
-
-              {showTrabajo ? (
-                <>
-                  <View style={styles.feedCard}>
-                    <View style={styles.feedHeader}>
-                      <View>
-                        <Text style={styles.sectionTitle}>Actividades y entregas</Text>
-                        <Text style={styles.sectionHint}>Tareas evaluables dentro de esta clase.</Text>
-                      </View>
-                      <Text style={styles.feedCount}>
-                        {actividadesFiltradas.length}/{actividades.length}
-                      </Text>
-                    </View>
-
-                    <View style={styles.inlineActions}>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={() => navigation.navigate("CrearTareaGrupo", { grupoId })}
-                      >
-                        <MaterialIcons name="assignment-add" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Crear actividad</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={() => navigation.navigate("ListaEntregables")}
-                      >
-                        <MaterialIcons name="fact-check" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Entregables</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.filterPills}>
-                      {ACTIVITY_FILTERS.map((filter) => (
-                        <TouchableOpacity
-                          key={filter.key}
-                          style={[
-                            styles.filterPill,
-                            activityFilter === filter.key ? styles.filterPillActive : null,
-                          ]}
-                          onPress={() => setActivityFilter(filter.key)}
-                        >
-                          <Text
-                            style={[
-                              styles.filterPillText,
-                              activityFilter === filter.key ? styles.filterPillTextActive : null,
-                            ]}
-                          >
-                            {filter.label}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-
-                    <View style={styles.rubricHint}>
-                      <MaterialIcons name="rule" size={18} color="#1E7D4F" />
-                      <Text style={styles.rubricHintText}>
-                        Rubricas preparadas como extension futura: visibles en el flujo, sin calificacion automatica por IA.
-                      </Text>
-                    </View>
-
-                    {actividadesPreview.length === 0 ? (
-                      <EmptyFeedLine icon="assignment" text="No hay actividades para este filtro." />
-                    ) : (
-                      actividadesPreview.map((actividad) => (
-                        <ActivityRow
-                          key={actividad.id}
-                          actividad={actividad}
-                          alumnos={alumnos}
-                          entregas={entregas}
-                          onPress={() => navigation.navigate("DetalleTarea", { tareaId: actividad.id, grupoId })}
-                          onGrade={() => navigation.navigate("CalificarEntregas", { tareaId: actividad.id, grupoId })}
-                        />
-                      ))
-                    )}
-                  </View>
-
-                  <View style={styles.feedCard}>
-                    <View style={styles.feedHeader}>
-                      <View>
-                        <Text style={styles.sectionTitle}>Materiales de clase</Text>
-                        <Text style={styles.sectionHint}>Recursos asignados al grupo.</Text>
-                      </View>
-                      <Text style={styles.feedCount}>
-                        {materialesFiltrados.length}/{materiales.length}
-                      </Text>
-                    </View>
-
-                    <View style={styles.inlineActions}>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={() => navigation.navigate("CrearRecurso", { grupoId })}
-                      >
-                        <MaterialIcons name="add-to-drive" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Crear material</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={() => navigation.navigate("AsignarRecurso", { grupoId })}
-                      >
-                        <MaterialIcons name="library-add" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Asignar existente</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={handleAttachPlaneacion}
-                      >
-                        <MaterialIcons name="article" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Adjuntar planeacion</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={() => navigation.navigate("ListaRecursos", { filtroTipo: undefined })}
-                      >
-                        <MaterialIcons name="folder-open" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Biblioteca</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.filterPills}>
-                      {MATERIAL_FILTERS.map((filter) => (
-                        <TouchableOpacity
-                          key={filter.key}
-                          style={[
-                            styles.filterPill,
-                            materialFilter === filter.key ? styles.filterPillActive : null,
-                          ]}
-                          onPress={() => setMaterialFilter(filter.key)}
-                        >
-                          <Text
-                            style={[
-                              styles.filterPillText,
-                              materialFilter === filter.key ? styles.filterPillTextActive : null,
-                            ]}
-                          >
-                            {filter.label}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-
-                    {materialesPreview.length === 0 ? (
-                      <EmptyFeedLine icon="folder-open" text="No hay materiales para este filtro." />
-                    ) : (
-                      materialesPreview.map((recurso) => (
-                        <MaterialRow
-                          key={recurso.id}
-                          recurso={recurso}
-                          onPress={() => handleOpenMaterial(recurso)}
-                        />
-                      ))
-                    )}
-                  </View>
-                </>
-              ) : null}
-
-              {showPersonas ? (
-                <>
-                  <View style={styles.feedCard}>
-                    <View style={styles.feedHeader}>
-                      <View>
-                        <Text style={styles.sectionTitle}>Alumnos del grupo</Text>
-                        <Text style={styles.sectionHint}>Participantes vinculados a esta clase.</Text>
-                      </View>
-                      <Text style={styles.feedCount}>{alumnos.length}</Text>
-                    </View>
-
-                    <View style={styles.inlineActions}>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={() => navigation.navigate("CrearAlumno", { grupoId })}
-                      >
-                        <MaterialIcons name="person-add" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Agregar</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={() => navigation.navigate("ImportarAlumnos", { grupoId, grupoNombre: nombre })}
-                      >
-                        <MaterialIcons name="upload-file" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Importar</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={() => navigation.navigate("ExportarAlumnos", { grupoId, grupoNombre: nombre })}
-                      >
-                        <MaterialIcons name="download" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Exportar</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    {alumnosPreview.length === 0 ? (
-                      <EmptyFeedLine icon="person-add" text="Aun no hay alumnos vinculados a este grupo." />
-                    ) : (
-                      alumnosPreview.map((alumno) => (
-                        <StudentRow
-                          key={alumno.id}
-                          alumno={alumno}
-                          onPress={() => navigation.navigate("DetalleAlumno", { alumnoId: alumno.id })}
-                          onMove={() => handleMoveAlumno(alumno)}
-                          onRemove={() => handleRemoveAlumno(alumno)}
-                        />
-                      ))
-                    )}
-                  </View>
-
-                  <View style={styles.feedCard}>
-                    <View style={styles.feedHeader}>
-                      <View>
-                        <Text style={styles.sectionTitle}>Asistencia</Text>
-                        <Text style={styles.sectionHint}>Registro diario e historial de la clase.</Text>
-                      </View>
-                      <Text style={styles.feedCount}>{model.resumen.porcentajeAsistencia}%</Text>
-                    </View>
-
-                    <View style={styles.inlineActions}>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={() => navigation.navigate("RegistrarAsistencia", { grupoId })}
-                      >
-                        <MaterialIcons name="event-available" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Registrar hoy</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={() => navigation.navigate("HistorialAsistencia", { grupoId })}
-                      >
-                        <MaterialIcons name="history" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Historial</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.summaryGrid}>
-                      <SummaryMetric label="Ultimo registro" value={asistenciaSummary.latestDate ?? "Sin datos"} />
-                      <SummaryMetric label="Presentes" value={asistenciaSummary.presentes} />
-                      <SummaryMetric label="Retardos" value={asistenciaSummary.retardos} />
-                      <SummaryMetric label="Ausentes" value={asistenciaSummary.ausentes} />
-                      <SummaryMetric label="Justificadas" value={asistenciaSummary.justificadas} />
-                      <SummaryMetric label="Pendientes" value={asistenciaSummary.pendientes} />
-                    </View>
-                  </View>
-                </>
-              ) : null}
-
-              {showCalificaciones ? (
-                <>
-                  <View style={styles.feedCard}>
-                    <View style={styles.feedHeader}>
-                      <View>
-                        <Text style={styles.sectionTitle}>Calificaciones</Text>
-                        <Text style={styles.sectionHint}>Promedios conectados con registros existentes.</Text>
-                      </View>
-                      <Text style={styles.feedCount}>{calificacionesSummary.promedio || "N/A"}</Text>
-                    </View>
-
-                    <View style={styles.inlineActions}>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={() => navigation.navigate("CapturarCalificaciones", { grupoId })}
-                      >
-                        <MaterialIcons name="grading" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Capturar</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={() => navigation.navigate("PromediosCalificaciones", { grupoId })}
-                      >
-                        <MaterialIcons name="leaderboard" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Promedios</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={() => navigation.navigate("ReportesGrupo", { grupoId, grupoNombre: nombre })}
-                      >
-                        <MaterialIcons name="download" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Exportar/reporte</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.summaryGrid}>
-                      <SummaryMetric label="Registrados" value={calificacionesSummary.registrados} />
-                      <SummaryMetric label="Pendientes" value={calificacionesSummary.pendientes} />
-                      <SummaryMetric label="Aprobados" value={calificacionesSummary.aprobados} />
-                      <SummaryMetric label="Reprobados" value={calificacionesSummary.reprobados} />
-                    </View>
-                  </View>
-
-                  <View style={styles.feedCard}>
-                    <View style={styles.feedHeader}>
-                      <View>
-                        <Text style={styles.sectionTitle}>Reportes y seguimiento</Text>
-                        <Text style={styles.sectionHint}>Alertas simples para detectar alumnos que requieren atencion.</Text>
-                      </View>
-                      <Text style={styles.feedCount}>{seguimientoAlumnos.length}</Text>
-                    </View>
-
-                    <View style={styles.inlineActions}>
-                      <TouchableOpacity
-                        style={styles.inlineActionButton}
-                        onPress={() => navigation.navigate("ReportesGrupo", { grupoId, grupoNombre: nombre })}
-                      >
-                        <MaterialIcons name="insights" size={18} color={COLORS.primary} />
-                        <Text style={styles.inlineActionText}>Abrir reporte</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    {seguimientoPreview.length === 0 ? (
-                      <EmptyFeedLine icon="verified" text="Sin alertas academicas con los datos actuales." />
-                    ) : (
-                      seguimientoPreview.map((item) => (
-                        <FollowUpRow
-                          key={item.alumno.id}
-                          alumno={item.alumno}
-                          reasons={item.reasons}
-                          onPress={() => navigation.navigate("DetalleAlumno", { alumnoId: item.alumno.id })}
-                        />
-                      ))
-                    )}
-                  </View>
-                </>
-              ) : null}
-            </View>
-            <View style={[styles.sideRail, isCompact ? styles.sideRailCompact : null]}>
-              <View style={styles.classCodeCard}>
-                <Text style={styles.cardLabel}>Resumen de clase</Text>
-                <Text style={styles.classCode}>{String(grupoId).padStart(3, "0")}</Text>
-                <Text style={styles.classCodeHelp}>Codigo local del grupo</Text>
-              </View>
-
-              <View style={[styles.metricsStack, isCompact ? styles.metricsStackCompact : null]}>
-                <KpiCard label="Alumnos" value={model.resumen.totalAlumnos} icon="school" />
-                <KpiCard label="Actividades" value={model.resumen.totalActividades} icon="assignment" />
-                <KpiCard label="Materiales" value={model.resumen.totalMateriales} icon="folder" />
-                <KpiCard label="Asistencia" value={`${model.resumen.porcentajeAsistencia}%`} icon="how-to-reg" />
-              </View>
-
-            </View>
-          </View>
+        {model && activeTab === "personas" ? (
+          <PeopleTab
+            alumnos={alumnos}
+            grupoId={grupoId}
+            grupoNombre={nombre}
+            navigation={navigation}
+            onRemoveAlumno={handleRemoveAlumno}
+          />
         ) : null}
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-const KpiCard: React.FC<{ label: string; value: number | string; icon: keyof typeof MaterialIcons.glyphMap }> = ({
-  icon,
-  label,
-  value,
-}) => (
-  <View style={styles.kpiCard}>
-    <MaterialIcons name={icon} size={20} color={COLORS.primary} />
-    <View>
-      <Text style={styles.kpiValue}>{value}</Text>
-      <Text style={styles.kpiLabel}>{label}</Text>
+const ClassStream: React.FC<{
+  aiWarning: string | null;
+  feedItems: ClassroomContentItem[];
+  isCompact: boolean;
+  proximasEntregas: Tarea[];
+  onCreateActivity: () => void;
+  onOpenItem: (item: ClassroomContentItem) => void;
+}> = ({ aiWarning, feedItems, isCompact, onCreateActivity, onOpenItem, proximasEntregas }) => (
+  <View style={[styles.streamLayout, isCompact ? styles.streamLayoutCompact : null]}>
+    <View style={[styles.upcomingCard, isCompact ? styles.upcomingCardCompact : null]}>
+      <Text style={styles.cardLabel}>Proximas entregas</Text>
+      {proximasEntregas.length === 0 ? (
+        <Text style={styles.emptyTextLeft}>No tienes entregas pendientes.</Text>
+      ) : (
+        proximasEntregas.map((actividad) => (
+          <View key={actividad.id} style={styles.upcomingItem}>
+            <Text style={styles.upcomingTitle}>{actividad.titulo}</Text>
+            <Text style={styles.upcomingDate}>{formatDate(actividad.fechaEntrega)}</Text>
+          </View>
+        ))
+      )}
+    </View>
+
+    <View style={styles.streamMain}>
+      <TouchableOpacity style={styles.announceCard} onPress={onCreateActivity}>
+        <View style={styles.teacherAvatar}>
+          <MaterialIcons name="person" size={20} color="#FFFFFF" />
+        </View>
+        <Text style={styles.announceText}>Publica una actividad o material para tu clase</Text>
+      </TouchableOpacity>
+
+      {aiWarning ? (
+        <View style={styles.aiWarningBox}>
+          <MaterialIcons name="warning" size={18} color="#B45309" />
+          <Text style={styles.aiWarningText}>{aiWarning}</Text>
+        </View>
+      ) : null}
+
+      {feedItems.length === 0 ? (
+        <View style={styles.emptyCard}>
+          <MaterialIcons name="dynamic-feed" size={30} color={COLORS.primary} />
+          <Text style={styles.emptyTitle}>Aun no hay publicaciones</Text>
+          <Text style={styles.emptyText}>Crea contenido desde Trabajo de clase para llenar el tablon.</Text>
+        </View>
+      ) : (
+        feedItems.map((item) => <StreamPost key={item.id} item={item} onPress={() => onOpenItem(item)} />)
+      )}
     </View>
   </View>
 );
 
-const ActionCard: React.FC<{
-  title: string;
-  description: string;
-  icon: keyof typeof MaterialIcons.glyphMap;
-  onPress: () => void;
-}> = ({ title, description, icon, onPress }) => (
-  <TouchableOpacity style={styles.actionCard} onPress={onPress}>
-    <View style={styles.actionIcon}>
-      <MaterialIcons name={icon} size={22} color={COLORS.primary} />
+const StreamPost: React.FC<{ item: ClassroomContentItem; onPress: () => void }> = ({ item, onPress }) => (
+  <TouchableOpacity style={styles.streamPost} onPress={onPress}>
+    <View style={styles.postAvatar}>
+      <MaterialIcons name={item.kind === "actividad" ? "assignment" : "description"} size={20} color={COLORS.primary} />
     </View>
-    <View style={styles.actionCopy}>
-      <Text style={styles.actionTitle}>{title}</Text>
-      <Text style={styles.actionDescription}>{description}</Text>
+    <View style={styles.postCopy}>
+      <Text style={styles.postMeta}>Profesor publico {item.kind === "actividad" ? "una actividad" : "un material"}</Text>
+      <Text style={styles.postTitle}>{item.titulo}</Text>
+      <Text style={styles.postDescription} numberOfLines={2}>{item.descripcion || item.tipo}</Text>
+      <Text style={styles.postDate}>{formatDate(item.fecha)}</Text>
     </View>
-    <MaterialIcons name="chevron-right" size={22} color="#94A3B8" />
+    <MaterialIcons name="more-vert" size={22} color="#64748B" />
   </TouchableOpacity>
 );
 
-const StudentRow: React.FC<{
-  alumno: Alumno;
-  onPress: () => void;
-  onMove: () => void;
-  onRemove: () => void;
-}> = ({ alumno, onMove, onPress, onRemove }) => (
-  <TouchableOpacity style={styles.studentRow} onPress={onPress}>
-    <View style={styles.studentAvatar}>
-      <Text style={styles.studentAvatarText}>
-        {(alumno.nombre?.[0] ?? "A").toUpperCase()}
-      </Text>
-    </View>
-    <View style={styles.studentCopy}>
-      <Text style={styles.studentName}>{`${alumno.nombre} ${alumno.apellidos}`.trim()}</Text>
-      <Text style={styles.studentMeta}>
-        {alumno.numeroControl} - {alumno.carrera} - {alumno.estado}
-      </Text>
-    </View>
-    <View style={styles.rowActions}>
-      <TouchableOpacity
-        style={styles.rowActionButton}
-        onPress={(event) => {
-          event.stopPropagation();
-          onMove();
-        }}
-      >
-        <MaterialIcons name="drive-file-move" size={16} color={COLORS.primary} />
-        <Text style={styles.rowActionText}>Mover</Text>
+const CourseworkTab: React.FC<{
+  sections: ClassroomContentSection[];
+  onAddContent: (section: ClassroomContentSection) => void;
+  onCreateUnidad: () => void;
+  onDeleteUnidad: (section: ClassroomContentSection) => void;
+  onOpenItem: (item: ClassroomContentItem) => void;
+  onRenameUnidad: (section: ClassroomContentSection) => void;
+  onSuggestActivity: () => void;
+  onToggleUnidad: (id: string) => void;
+}> = ({
+  sections,
+  onAddContent,
+  onCreateUnidad,
+  onDeleteUnidad,
+  onOpenItem,
+  onRenameUnidad,
+  onSuggestActivity,
+  onToggleUnidad,
+}) => (
+  <View style={styles.coursework}>
+    <View style={styles.courseworkToolbar}>
+      <TouchableOpacity style={styles.primaryAction} onPress={onCreateUnidad}>
+        <MaterialIcons name="topic" size={18} color="#FFFFFF" />
+        <Text style={styles.primaryActionText}>Crear seccion</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.rowActionButton, styles.rowActionDanger]}
-        onPress={(event) => {
-          event.stopPropagation();
-          onRemove();
-        }}
-      >
-        <MaterialIcons name="person-remove" size={16} color="#B91C1C" />
-        <Text style={[styles.rowActionText, styles.rowActionDangerText]}>Quitar</Text>
+      <TouchableOpacity style={styles.secondaryAction} onPress={onSuggestActivity}>
+        <MaterialIcons name="auto-awesome" size={18} color={COLORS.primary} />
+        <Text style={styles.secondaryActionText}>Sugerir actividad</Text>
       </TouchableOpacity>
     </View>
-    <MaterialIcons name="chevron-right" size={22} color="#94A3B8" />
-  </TouchableOpacity>
+
+    {sections.map((section) => (
+      <CourseSection
+        key={section.id}
+        section={section}
+        onAddContent={() => onAddContent(section)}
+        onDelete={() => onDeleteUnidad(section)}
+        onOpenItem={onOpenItem}
+        onRename={() => onRenameUnidad(section)}
+        onToggle={() => onToggleUnidad(section.id)}
+      />
+    ))}
+  </View>
 );
 
-const ActivityRow: React.FC<{
-  actividad: Tarea;
-  alumnos: Alumno[];
-  entregas: EntregaTarea[];
-  onPress: () => void;
-  onGrade: () => void;
-}> = ({ actividad, alumnos, entregas, onGrade, onPress }) => {
-  const summary = getActivitySummary(actividad, entregas, alumnos);
-  const previewAlumnos = alumnos.slice(0, 3);
-
-  return (
-    <TouchableOpacity style={styles.activityRow} onPress={onPress}>
-      <View style={styles.activityTopLine}>
-        <View style={styles.materialAvatar}>
-          <MaterialIcons name="assignment" size={20} color={COLORS.primary} />
-        </View>
-        <View style={styles.studentCopy}>
-          <Text style={styles.studentName}>{actividad.titulo}</Text>
-          <Text style={styles.studentMeta}>
-            {actividad.tipo} - entrega {formatActivityDate(actividad.fechaEntrega)} - {actividad.valor} pts
+const CourseSection: React.FC<{
+  section: ClassroomContentSection;
+  onAddContent: () => void;
+  onDelete: () => void;
+  onOpenItem: (item: ClassroomContentItem) => void;
+  onRename: () => void;
+  onToggle: () => void;
+}> = ({ onAddContent, onDelete, onOpenItem, onRename, onToggle, section }) => (
+  <View style={styles.sectionCard}>
+    <View style={styles.sectionHeader}>
+      <TouchableOpacity style={styles.sectionTitleWrap} onPress={onToggle}>
+        <MaterialIcons name={section.colapsada ? "keyboard-arrow-down" : "keyboard-arrow-up"} size={24} color="#1F2937" />
+        <View>
+          <Text style={styles.unitTitle}>{section.nombre}</Text>
+          <Text style={styles.unitMeta}>
+            {section.actividadesCount} actividades - {section.materialesCount} materiales
           </Text>
         </View>
-        <View style={styles.activityStatusBadge}>
-          <Text style={styles.activityStatusText}>{getActivityLabel(summary.estado)}</Text>
+      </TouchableOpacity>
+      <View style={styles.sectionActions}>
+        <TouchableOpacity style={styles.iconButton} onPress={onAddContent}>
+          <MaterialIcons name="add" size={22} color={COLORS.primary} />
+        </TouchableOpacity>
+        {!section.isUnassigned ? (
+          <>
+            <TouchableOpacity style={styles.iconButton} onPress={onRename}>
+              <MaterialIcons name="edit" size={20} color="#64748B" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton} onPress={onDelete}>
+              <MaterialIcons name="delete-outline" size={20} color="#B91C1C" />
+            </TouchableOpacity>
+          </>
+        ) : null}
+      </View>
+    </View>
+
+    {!section.colapsada ? (
+      <View style={styles.sectionItems}>
+        {section.items.length === 0 ? (
+          <Text style={styles.emptyTextLeft}>No hay contenido en esta seccion.</Text>
+        ) : (
+          section.items.map((item) => <CourseContentRow key={item.id} item={item} onPress={() => onOpenItem(item)} />)
+        )}
+      </View>
+    ) : null}
+  </View>
+);
+
+const CourseContentRow: React.FC<{ item: ClassroomContentItem; onPress: () => void }> = ({ item, onPress }) => (
+  <TouchableOpacity style={styles.contentRow} onPress={onPress}>
+    <View style={styles.contentIcon}>
+      <MaterialIcons name={item.icon as keyof typeof MaterialIcons.glyphMap} size={22} color={COLORS.primary} />
+    </View>
+    <View style={styles.contentCopy}>
+      <Text style={styles.contentTitle}>{item.titulo}</Text>
+      <Text style={styles.contentMeta}>
+        {item.kind === "actividad" ? `Fecha de entrega: ${formatDate(item.fechaEntrega)}` : item.tipo}
+      </Text>
+    </View>
+    <MaterialIcons name="chevron-right" size={22} color="#94A3B8" />
+  </TouchableOpacity>
+);
+
+const PeopleTab: React.FC<{
+  alumnos: Alumno[];
+  grupoId: number;
+  grupoNombre: string;
+  navigation: Navigation;
+  onRemoveAlumno: (alumno: Alumno) => void;
+}> = ({ alumnos, grupoId, grupoNombre, navigation, onRemoveAlumno }) => (
+  <View style={styles.peopleWrap}>
+    <View style={styles.peopleSection}>
+      <Text style={styles.peopleHeading}>Profesores</Text>
+      <View style={styles.personRow}>
+        <View style={styles.personAvatar}>
+          <Text style={styles.personAvatarText}>P</Text>
+        </View>
+        <View style={styles.personCopy}>
+          <Text style={styles.personName}>Profesor principal</Text>
+          <Text style={styles.personMeta}>Docente de la clase</Text>
         </View>
       </View>
+    </View>
 
-      <View style={styles.activityProgressTrack}>
-        <View style={[styles.activityProgressFill, { width: `${summary.progress}%` }]} />
+    <View style={styles.peopleSection}>
+      <View style={styles.peopleHeader}>
+        <Text style={styles.peopleHeading}>Companeros de clase</Text>
+        <Text style={styles.feedCount}>{alumnos.length} alumnos</Text>
       </View>
-
-      <View style={styles.activityFooter}>
-        <Text style={styles.activitySummaryText}>
-          {summary.entregadas}/{summary.total} entregadas - {summary.pendientes} pendientes -{" "}
-          {summary.calificadas} calificadas
-        </Text>
+      <View style={styles.inlineActions}>
+        <TouchableOpacity style={styles.secondaryAction} onPress={() => navigation.navigate("CrearAlumno", { grupoId })}>
+          <MaterialIcons name="person-add" size={18} color={COLORS.primary} />
+          <Text style={styles.secondaryActionText}>Agregar</Text>
+        </TouchableOpacity>
         <TouchableOpacity
-          style={styles.rowActionButton}
-          onPress={(event) => {
-            event.stopPropagation();
-            onGrade();
-          }}
+          style={styles.secondaryAction}
+          onPress={() => navigation.navigate("ImportarAlumnos", { grupoId, grupoNombre })}
         >
-          <MaterialIcons name="grading" size={16} color={COLORS.primary} />
-          <Text style={styles.rowActionText}>Calificar</Text>
+          <MaterialIcons name="upload-file" size={18} color={COLORS.primary} />
+          <Text style={styles.secondaryActionText}>Importar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.secondaryAction}
+          onPress={() => navigation.navigate("ExportarAlumnos", { grupoId, grupoNombre })}
+        >
+          <MaterialIcons name="download" size={18} color={COLORS.primary} />
+          <Text style={styles.secondaryActionText}>Exportar</Text>
         </TouchableOpacity>
       </View>
 
-      {previewAlumnos.length > 0 ? (
-        <View style={styles.activityStudentPreview}>
-          {previewAlumnos.map((alumno) => {
-            const status = getAlumnoEntregaStatus(alumno, actividad, entregas);
-            return (
-              <View key={alumno.id} style={styles.activityStudentChip}>
-                <Text style={styles.activityStudentText}>
-                  {alumno.nombre}: {status}
-                </Text>
-              </View>
-            );
-          })}
-        </View>
-      ) : null}
-    </TouchableOpacity>
-  );
-};
-
-const MaterialRow: React.FC<{ recurso: Recurso; onPress: () => void }> = ({ recurso, onPress }) => (
-  <TouchableOpacity style={styles.studentRow} onPress={onPress}>
-    <View style={styles.materialAvatar}>
-      <MaterialIcons
-        name={isPlaneacionResource(recurso) ? "article" : "folder"}
-        size={20}
-        color={COLORS.primary}
-      />
+      {alumnos.length === 0 ? (
+        <Text style={styles.emptyTextLeft}>Aun no hay alumnos inscritos.</Text>
+      ) : (
+        alumnos.map((alumno) => (
+          <View key={alumno.id} style={styles.personRow}>
+            <View style={styles.personAvatar}>
+              <Text style={styles.personAvatarText}>{(alumno.nombre?.[0] ?? "A").toUpperCase()}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.personCopy}
+              onPress={() => navigation.navigate("DetalleAlumno", { alumnoId: alumno.id })}
+            >
+              <Text style={styles.personName}>{`${alumno.nombre} ${alumno.apellidos}`.trim()}</Text>
+              <Text style={styles.personMeta}>{alumno.numeroControl} - {alumno.estado}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton} onPress={() => onRemoveAlumno(alumno)}>
+              <MaterialIcons name="person-remove" size={20} color="#B91C1C" />
+            </TouchableOpacity>
+          </View>
+        ))
+      )}
     </View>
-    <View style={styles.studentCopy}>
-      <Text style={styles.studentName}>{recurso.titulo}</Text>
-      <Text style={styles.studentMeta}>
-        {isPlaneacionResource(recurso) ? "planeacion" : recurso.tipo} - {recurso.origen} - v
-        {recurso.versionActual}
-      </Text>
-    </View>
-    <MaterialIcons name="chevron-right" size={22} color="#94A3B8" />
-  </TouchableOpacity>
-);
-
-const SummaryMetric: React.FC<{ label: string; value: number | string }> = ({ label, value }) => (
-  <View style={styles.summaryMetric}>
-    <Text style={styles.summaryMetricValue}>{value}</Text>
-    <Text style={styles.summaryMetricLabel}>{label}</Text>
-  </View>
-);
-
-const FollowUpRow: React.FC<{
-  alumno: Alumno;
-  reasons: string[];
-  onPress: () => void;
-}> = ({ alumno, onPress, reasons }) => (
-  <TouchableOpacity style={styles.followUpRow} onPress={onPress}>
-    <View style={styles.followUpIcon}>
-      <MaterialIcons name="priority-high" size={18} color="#B45309" />
-    </View>
-    <View style={styles.studentCopy}>
-      <Text style={styles.studentName}>{`${alumno.nombre} ${alumno.apellidos}`.trim()}</Text>
-      <Text style={styles.studentMeta}>{reasons.join(" - ")}</Text>
-    </View>
-    <MaterialIcons name="chevron-right" size={22} color="#94A3B8" />
-  </TouchableOpacity>
-);
-
-const FeedItem: React.FC<{ icon: keyof typeof MaterialIcons.glyphMap; title: string; meta: string }> = ({
-  icon,
-  meta,
-  title,
-}) => (
-  <View style={styles.feedItem}>
-    <View style={styles.feedIcon}>
-      <MaterialIcons name={icon} size={19} color={COLORS.primary} />
-    </View>
-    <View style={styles.feedCopy}>
-      <Text style={styles.feedTitle}>{title}</Text>
-      <Text style={styles.feedMeta}>{meta}</Text>
-    </View>
-  </View>
-);
-
-const EmptyFeedLine: React.FC<{ icon: keyof typeof MaterialIcons.glyphMap; text: string }> = ({ icon, text }) => (
-  <View style={styles.emptyLine}>
-    <MaterialIcons name={icon} size={20} color="#64748B" />
-    <Text style={styles.emptyLineText}>{text}</Text>
   </View>
 );
 
@@ -1378,7 +733,7 @@ const webScrollStyle =
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#EEF3F8",
+    backgroundColor: "#F5F7FA",
   },
   scroller: {
     flex: 1,
@@ -1386,143 +741,129 @@ const styles = StyleSheet.create({
   },
   content: {
     alignSelf: "center",
-    maxWidth: 1180,
+    maxWidth: 1220,
     padding: 18,
-    paddingBottom: Platform.OS === "web" ? 190 : 120,
+    paddingBottom: Platform.OS === "web" ? 170 : 120,
     width: "100%",
   },
   contentCompact: {
-    padding: 14,
-    paddingBottom: 140,
+    padding: 12,
   },
   banner: {
     backgroundColor: "#1E7D4F",
-    borderRadius: 28,
-    minHeight: 190,
+    borderRadius: 24,
+    minHeight: 168,
     overflow: "hidden",
-    padding: 24,
+    padding: 22,
   },
   bannerCompact: {
-    borderRadius: 24,
     minHeight: 150,
-    padding: 20,
-  },
-  bannerPatternOne: {
-    backgroundColor: "rgba(255,255,255,0.14)",
-    borderRadius: 999,
-    height: 210,
-    position: "absolute",
-    right: -42,
-    top: -56,
-    width: 210,
-  },
-  bannerPatternTwo: {
-    backgroundColor: "rgba(255,255,255,0.10)",
-    borderRadius: 999,
-    bottom: -82,
-    height: 240,
-    position: "absolute",
-    right: 116,
-    width: 240,
   },
   backButton: {
     alignItems: "center",
     backgroundColor: "rgba(255,255,255,0.92)",
     borderRadius: 16,
-    height: 46,
+    height: 44,
     justifyContent: "center",
-    width: 46,
+    width: 44,
   },
   bannerCopy: {
-    marginTop: 24,
-    maxWidth: 720,
-  },
-  bannerCopyCompact: {
-    marginTop: 18,
+    marginTop: 20,
+    maxWidth: 760,
   },
   eyebrow: {
     color: "#D7FBE8",
     fontSize: 12,
     fontWeight: "900",
-    letterSpacing: 1.1,
+    letterSpacing: 1,
     textTransform: "uppercase",
   },
   title: {
     color: "#FFFFFF",
     fontSize: 34,
     fontWeight: "900",
-    letterSpacing: -0.6,
-    lineHeight: 39,
+    letterSpacing: -0.5,
     marginTop: 8,
   },
   titleCompact: {
-    fontSize: 30,
-    lineHeight: 35,
+    fontSize: 28,
   },
   subtitle: {
     color: "#E4F8EC",
     fontSize: 15,
     fontWeight: "700",
-    marginTop: 8,
+    marginTop: 6,
   },
-  subtitleCompact: {
-    fontSize: 14,
-    lineHeight: 20,
+  headerActions: {
+    bottom: 18,
+    flexDirection: "row",
+    gap: 8,
+    position: "absolute",
+    right: 18,
+  },
+  headerActionsCompact: {
+    bottom: undefined,
+    marginTop: 16,
+    position: "relative",
+    right: undefined,
+  },
+  headerAction: {
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 999,
+    flexDirection: "row",
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+  },
+  headerActionText: {
+    color: "#1E7D4F",
+    fontSize: 12,
+    fontWeight: "900",
   },
   tabsBar: {
     alignItems: "center",
     backgroundColor: "#FFFFFF",
-    borderColor: "#DDE8F5",
-    borderRadius: 999,
-    borderWidth: 1,
+    borderBottomColor: "#CBD5E1",
+    borderBottomWidth: 1,
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginTop: 14,
-    padding: 8,
-  },
-  tabsBarCompact: {
-    alignItems: "stretch",
-    borderRadius: 24,
+    gap: 6,
+    marginTop: 12,
+    paddingHorizontal: 12,
   },
   tabPill: {
-    borderRadius: 999,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    borderBottomColor: "transparent",
+    borderBottomWidth: 3,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
   },
   tabPillActive: {
-    backgroundColor: "#E8F3EC",
+    borderBottomColor: "#2563EB",
   },
   tabText: {
-    color: "#64748B",
-    fontSize: 13,
-    fontWeight: "900",
+    color: "#475569",
+    fontSize: 14,
+    fontWeight: "800",
   },
   tabTextActive: {
-    color: "#1E7D4F",
+    color: "#2563EB",
   },
   warningCard: {
     alignItems: "center",
     backgroundColor: "#FFF7ED",
     borderColor: "#FED7AA",
-    borderRadius: 18,
+    borderRadius: 16,
     borderWidth: 1,
     flexDirection: "row",
-    gap: 12,
+    gap: 10,
     marginTop: 14,
-    padding: 16,
-  },
-  warningCopy: {
-    flex: 1,
-  },
-  warningTitle: {
-    color: "#9A3412",
-    fontSize: 16,
-    fontWeight: "900",
+    padding: 14,
   },
   warningText: {
     color: "#9A3412",
+    flex: 1,
     fontSize: 14,
+    fontWeight: "700",
   },
   loadingBox: {
     alignItems: "center",
@@ -1537,15 +878,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderColor: "#DDE8F5",
-    borderRadius: 24,
+    borderRadius: 20,
     borderWidth: 1,
-    gap: 10,
-    marginTop: 18,
-    padding: 22,
+    gap: 8,
+    marginTop: 16,
+    padding: 20,
   },
   emptyTitle: {
     color: "#122033",
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "900",
   },
   emptyText: {
@@ -1553,219 +894,81 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
   },
-  primaryButton: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 15,
-    paddingHorizontal: 18,
-    paddingVertical: 13,
+  emptyTextLeft: {
+    color: "#64748B",
+    fontSize: 14,
+    fontWeight: "700",
+    paddingVertical: 10,
   },
-  primaryButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "900",
-  },
-  classroomLayout: {
+  streamLayout: {
     alignItems: "flex-start",
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 18,
+    gap: 16,
     marginTop: 18,
   },
-  sideRail: {
-    flexGrow: 1,
-    gap: 12,
-    maxWidth: 320,
-    minWidth: 260,
+  streamLayoutCompact: {
+    flexDirection: "column",
   },
-  sideRailCompact: {
-    maxWidth: undefined,
-    minWidth: 0,
-    width: "100%",
-  },
-  mainRail: {
-    flex: 1,
-    gap: 14,
-    minWidth: 320,
-  },
-  mainRailCompact: {
-    minWidth: 0,
-    width: "100%",
-  },
-  classCodeCard: {
+  upcomingCard: {
     backgroundColor: "#FFFFFF",
     borderColor: "#DDE8F5",
-    borderRadius: 22,
+    borderRadius: 18,
     borderWidth: 1,
-    padding: 18,
+    gap: 10,
+    padding: 16,
+    width: 260,
+  },
+  upcomingCardCompact: {
+    width: "100%",
   },
   cardLabel: {
-    color: "#64748B",
-    fontSize: 12,
+    color: "#1F2937",
+    fontSize: 15,
     fontWeight: "900",
-    textTransform: "uppercase",
   },
-  classCode: {
-    color: "#0F172A",
-    fontSize: 30,
-    fontWeight: "900",
-    marginTop: 6,
+  upcomingItem: {
+    borderTopColor: "#E2E8F0",
+    borderTopWidth: 1,
+    paddingTop: 10,
   },
-  classCodeHelp: {
-    color: "#64748B",
-    fontSize: 13,
-    marginTop: 2,
-  },
-  metricsStack: {
-    gap: 10,
-  },
-  metricsStackCompact: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  kpiCard: {
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderColor: "#DDE8F5",
-    borderRadius: 18,
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: 14,
-    padding: 15,
-  },
-  kpiValue: {
+  upcomingTitle: {
     color: "#122033",
-    fontSize: 22,
-    fontWeight: "900",
-  },
-  kpiLabel: {
-    color: "#64748B",
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "800",
   },
-  legacyButton: {
-    alignItems: "center",
-    backgroundColor: "#EAF2FF",
-    borderColor: "#CFE0F7",
-    borderRadius: 18,
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: 10,
-    justifyContent: "center",
-    padding: 15,
+  upcomingDate: {
+    color: "#64748B",
+    fontSize: 12,
+    marginTop: 2,
   },
-  legacyButtonText: {
-    color: COLORS.primary,
-    fontSize: 14,
-    fontWeight: "900",
+  streamMain: {
+    flex: 1,
+    gap: 12,
+    minWidth: 0,
   },
-  announcementCard: {
+  announceCard: {
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderColor: "#DDE8F5",
-    borderRadius: 22,
+    borderRadius: 18,
     borderWidth: 1,
     flexDirection: "row",
-    gap: 14,
-    padding: 16,
+    gap: 12,
+    padding: 14,
   },
   teacherAvatar: {
     alignItems: "center",
     backgroundColor: "#1E7D4F",
     borderRadius: 999,
-    height: 46,
-    justifyContent: "center",
-    width: 46,
-  },
-  announcementCopy: {
-    flex: 1,
-  },
-  announcementTitle: {
-    color: "#122033",
-    fontSize: 16,
-    fontWeight: "900",
-  },
-  announcementText: {
-    color: "#64748B",
-    fontSize: 13,
-    lineHeight: 18,
-    marginTop: 3,
-  },
-  actionsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-  },
-  actionCard: {
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderColor: "#DDE8F5",
-    borderRadius: 20,
-    borderWidth: 1,
-    flexBasis: 250,
-    flexDirection: "row",
-    flexGrow: 1,
-    gap: 12,
-    minHeight: 92,
-    padding: 14,
-  },
-  actionIcon: {
-    alignItems: "center",
-    backgroundColor: "#EAF2FF",
-    borderRadius: 14,
     height: 42,
     justifyContent: "center",
     width: 42,
   },
-  actionCopy: {
+  announceText: {
+    color: "#64748B",
     flex: 1,
-  },
-  actionTitle: {
-    color: "#122033",
-    fontSize: 15,
-    fontWeight: "900",
-  },
-  actionDescription: {
-    color: "#64748B",
-    fontSize: 12,
-    lineHeight: 17,
-    marginTop: 3,
-  },
-  feedCard: {
-    backgroundColor: "#FFFFFF",
-    borderColor: "#DDE8F5",
-    borderRadius: 22,
-    borderWidth: 1,
-    gap: 10,
-    padding: 16,
-  },
-  sectionHint: {
-    color: "#64748B",
-    fontSize: 12,
-    fontWeight: "700",
-    marginTop: 2,
-  },
-  inlineActions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  inlineActionButton: {
-    alignItems: "center",
-    backgroundColor: "#EAF2FF",
-    borderColor: "#CFE0F7",
-    borderRadius: 14,
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: 7,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  inlineActionText: {
-    color: COLORS.primary,
-    fontSize: 12,
-    fontWeight: "900",
-  },
-  disabledActionButton: {
-    opacity: 0.6,
+    fontSize: 14,
+    fontWeight: "800",
   },
   aiWarningBox: {
     alignItems: "center",
@@ -1782,171 +985,208 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 12,
     fontWeight: "800",
-    lineHeight: 17,
   },
-  filterPills: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  filterPill: {
+  streamPost: {
+    alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderColor: "#DDE8F5",
-    borderRadius: 999,
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  filterPillActive: {
-    backgroundColor: "#1E7D4F",
-    borderColor: "#1E7D4F",
-  },
-  filterPillText: {
-    color: "#64748B",
-    fontSize: 12,
-    fontWeight: "900",
-  },
-  filterPillTextActive: {
-    color: "#FFFFFF",
-  },
-  studentRow: {
-    alignItems: "center",
-    backgroundColor: "#F8FAFC",
-    borderRadius: 16,
-    flexDirection: "row",
-    gap: 12,
-    padding: 12,
-  },
-  activityRow: {
-    backgroundColor: "#F8FAFC",
-    borderColor: "#E2E8F0",
     borderRadius: 18,
     borderWidth: 1,
-    gap: 10,
-    padding: 12,
-  },
-  activityTopLine: {
-    alignItems: "center",
     flexDirection: "row",
     gap: 12,
+    padding: 14,
   },
-  activityStatusBadge: {
-    backgroundColor: "#E8F3EC",
+  postAvatar: {
+    alignItems: "center",
+    backgroundColor: "#EAF2FF",
     borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    height: 44,
+    justifyContent: "center",
+    width: 44,
   },
-  activityStatusText: {
-    color: "#1E7D4F",
-    fontSize: 11,
+  postCopy: {
+    flex: 1,
+  },
+  postMeta: {
+    color: "#64748B",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  postTitle: {
+    color: "#122033",
+    fontSize: 15,
+    fontWeight: "900",
+    marginTop: 3,
+  },
+  postDescription: {
+    color: "#64748B",
+    fontSize: 13,
+    marginTop: 3,
+  },
+  postDate: {
+    color: "#94A3B8",
+    fontSize: 12,
+    marginTop: 5,
+  },
+  coursework: {
+    gap: 14,
+    marginTop: 18,
+  },
+  courseworkToolbar: {
+    alignItems: "center",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  primaryAction: {
+    alignItems: "center",
+    backgroundColor: COLORS.primary,
+    borderRadius: 999,
+    flexDirection: "row",
+    gap: 7,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  primaryActionText: {
+    color: "#FFFFFF",
+    fontSize: 13,
     fontWeight: "900",
   },
-  activityProgressTrack: {
-    backgroundColor: "#E2E8F0",
-    borderRadius: 999,
-    height: 8,
-    overflow: "hidden",
-  },
-  activityProgressFill: {
-    backgroundColor: "#1E7D4F",
-    borderRadius: 999,
-    height: "100%",
-  },
-  activityFooter: {
+  secondaryAction: {
     alignItems: "center",
+    backgroundColor: "#EAF2FF",
+    borderColor: "#CFE0F7",
+    borderRadius: 999,
+    borderWidth: 1,
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    justifyContent: "space-between",
+    gap: 7,
+    paddingHorizontal: 13,
+    paddingVertical: 10,
   },
-  activitySummaryText: {
-    color: "#475569",
-    flex: 1,
+  secondaryActionText: {
+    color: COLORS.primary,
+    fontSize: 12,
+    fontWeight: "900",
+  },
+  ghostAction: {
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  ghostActionText: {
+    color: "#64748B",
     fontSize: 12,
     fontWeight: "800",
-    minWidth: 190,
   },
-  activityStudentPreview: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-  },
-  activityStudentChip: {
+  sectionCard: {
     backgroundColor: "#FFFFFF",
     borderColor: "#DDE8F5",
-    borderRadius: 999,
+    borderRadius: 18,
     borderWidth: 1,
-    paddingHorizontal: 9,
-    paddingVertical: 6,
+    overflow: "hidden",
   },
-  activityStudentText: {
-    color: "#64748B",
-    fontSize: 11,
-    fontWeight: "800",
-    textTransform: "capitalize",
-  },
-  rubricHint: {
+  sectionHeader: {
     alignItems: "center",
-    backgroundColor: "#F0FDF4",
-    borderColor: "#BBF7D0",
-    borderRadius: 14,
-    borderWidth: 1,
+    backgroundColor: "#F8FAFC",
     flexDirection: "row",
-    gap: 8,
-    padding: 11,
+    justifyContent: "space-between",
+    padding: 14,
   },
-  rubricHintText: {
-    color: "#166534",
+  sectionTitleWrap: {
+    alignItems: "center",
     flex: 1,
-    fontSize: 12,
-    fontWeight: "800",
-    lineHeight: 17,
-  },
-  summaryGrid: {
     flexDirection: "row",
-    flexWrap: "wrap",
     gap: 10,
   },
-  summaryMetric: {
-    backgroundColor: "#F8FAFC",
-    borderColor: "#E2E8F0",
-    borderRadius: 16,
-    borderWidth: 1,
-    flexBasis: 128,
-    flexGrow: 1,
-    padding: 12,
-  },
-  summaryMetricValue: {
-    color: "#122033",
+  unitTitle: {
+    color: "#1F2937",
     fontSize: 18,
     fontWeight: "900",
   },
-  summaryMetricLabel: {
+  unitMeta: {
     color: "#64748B",
-    fontSize: 11,
-    fontWeight: "800",
-    marginTop: 3,
-    textTransform: "uppercase",
+    fontSize: 12,
+    marginTop: 2,
   },
-  followUpRow: {
-    alignItems: "center",
-    backgroundColor: "#FFFBEB",
-    borderColor: "#FDE68A",
-    borderRadius: 16,
-    borderWidth: 1,
+  sectionActions: {
     flexDirection: "row",
-    gap: 12,
-    padding: 12,
+    gap: 6,
   },
-  followUpIcon: {
+  iconButton: {
     alignItems: "center",
-    backgroundColor: "#FEF3C7",
+    borderRadius: 999,
+    height: 38,
+    justifyContent: "center",
+    width: 38,
+  },
+  sectionItems: {
+    paddingHorizontal: 16,
+  },
+  contentRow: {
+    alignItems: "center",
+    borderTopColor: "#E2E8F0",
+    borderTopWidth: 1,
+    flexDirection: "row",
+    gap: 14,
+    paddingVertical: 13,
+  },
+  contentIcon: {
+    alignItems: "center",
+    backgroundColor: "#F1F5F9",
     borderRadius: 999,
     height: 42,
     justifyContent: "center",
     width: 42,
   },
-  studentAvatar: {
+  contentCopy: {
+    flex: 1,
+  },
+  contentTitle: {
+    color: "#1F2937",
+    fontSize: 15,
+    fontWeight: "900",
+  },
+  contentMeta: {
+    color: "#64748B",
+    fontSize: 12,
+    marginTop: 2,
+  },
+  peopleWrap: {
+    gap: 18,
+    marginTop: 18,
+  },
+  peopleSection: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#DDE8F5",
+    borderRadius: 18,
+    borderWidth: 1,
+    gap: 10,
+    padding: 16,
+  },
+  peopleHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  peopleHeading: {
+    color: "#1F2937",
+    fontSize: 20,
+    fontWeight: "900",
+  },
+  inlineActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  personRow: {
+    alignItems: "center",
+    borderTopColor: "#E2E8F0",
+    borderTopWidth: 1,
+    flexDirection: "row",
+    gap: 12,
+    paddingVertical: 12,
+  },
+  personAvatar: {
     alignItems: "center",
     backgroundColor: "#DFF3E8",
     borderRadius: 999,
@@ -1954,72 +1194,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 42,
   },
-  studentAvatarText: {
+  personAvatarText: {
     color: "#1E7D4F",
     fontSize: 15,
     fontWeight: "900",
   },
-  materialAvatar: {
-    alignItems: "center",
-    backgroundColor: "#EAF2FF",
-    borderRadius: 999,
-    height: 42,
-    justifyContent: "center",
-    width: 42,
-  },
-  studentCopy: {
+  personCopy: {
     flex: 1,
   },
-  studentName: {
+  personName: {
     color: "#122033",
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "900",
   },
-  studentMeta: {
+  personMeta: {
     color: "#64748B",
     fontSize: 12,
     marginTop: 2,
-    textTransform: "capitalize",
-  },
-  rowActions: {
-    alignItems: "center",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-    justifyContent: "flex-end",
-  },
-  rowActionButton: {
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderColor: "#CFE0F7",
-    borderRadius: 999,
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: 5,
-    paddingHorizontal: 9,
-    paddingVertical: 7,
-  },
-  rowActionDanger: {
-    backgroundColor: "#FFF1F2",
-    borderColor: "#FECACA",
-  },
-  rowActionText: {
-    color: COLORS.primary,
-    fontSize: 11,
-    fontWeight: "900",
-  },
-  rowActionDangerText: {
-    color: "#B91C1C",
-  },
-  feedHeader: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  sectionTitle: {
-    color: "#122033",
-    fontSize: 18,
-    fontWeight: "900",
   },
   feedCount: {
     backgroundColor: "#E8F3EC",
@@ -2030,50 +1221,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
   },
-  feedItem: {
-    alignItems: "center",
-    backgroundColor: "#F8FAFC",
-    borderRadius: 16,
-    flexDirection: "row",
-    gap: 12,
-    padding: 12,
-  },
-  feedIcon: {
-    alignItems: "center",
-    backgroundColor: "#EAF2FF",
-    borderRadius: 12,
-    height: 38,
-    justifyContent: "center",
-    width: 38,
-  },
-  feedCopy: {
-    flex: 1,
-  },
-  feedTitle: {
-    color: "#122033",
-    fontSize: 14,
-    fontWeight: "900",
-  },
-  feedMeta: {
-    color: "#64748B",
-    fontSize: 12,
-    marginTop: 2,
-  },
-  emptyLine: {
-    alignItems: "center",
-    backgroundColor: "#F8FAFC",
-    borderRadius: 16,
-    flexDirection: "row",
-    gap: 10,
-    padding: 12,
-  },
-  emptyLineText: {
-    color: "#64748B",
-    flex: 1,
-    fontSize: 14,
-    fontWeight: "700",
-  },
 });
 
 export default ClassroomGroupScreen;
-

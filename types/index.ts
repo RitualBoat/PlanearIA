@@ -180,6 +180,7 @@ export interface Tarea extends BaseEntity {
   descripcion: string;
   tipo: "tarea" | "examen" | "proyecto" | "investigacion";
   grupoId: ID; // ⭐ Cambio: ahora relacionado con grupo específico
+  unidadId?: string; // Seccion/tema dentro de Classroom V2
   recursoId?: ID; // ⭐ Opcional: si la tarea está basada en un recurso (ej: examen)
   fechaAsignacion: Date;
   fechaEntrega: Date;
@@ -227,6 +228,7 @@ export interface Recurso extends BaseEntity {
     | "audio"
     | "enlace"
     | "otro";
+  unidadId?: string; // Seccion/tema dentro de Classroom V2
   descripcion: string;
   archivo?: string; // Ruta del archivo
   url?: string; // Para enlaces externos
@@ -564,6 +566,7 @@ export interface TareaFormData {
   descripcion: string;
   tipo: "tarea" | "examen" | "proyecto" | "investigacion";
   grupoId: ID; // ⭐ Específico del grupo
+  unidadId?: string;
   recursoId?: ID; // ⭐ Opcional: si se basa en un recurso
   fechaAsignacion: string;
   fechaEntrega: string;
@@ -614,6 +617,7 @@ export interface RecursoFormData {
     | "enlace"
     | "otro";
   descripcion: string;
+  unidadId?: string;
   archivo?: File; // Para subida de archivos
   url?: string;
   tags: string[];

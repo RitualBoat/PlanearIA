@@ -32,7 +32,7 @@ try {
 const CrearTareaGrupoScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, "CrearTareaGrupo">>();
   const navigation = useNavigation();
-  const vm = useCrearTareaGrupoViewModel(route.params.grupoId, route.params.entregableId);
+  const vm = useCrearTareaGrupoViewModel(route.params.grupoId, route.params.entregableId, route.params.unidadId);
 
   const isExamen = vm.tipo === "examen";
 

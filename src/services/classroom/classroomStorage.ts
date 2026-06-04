@@ -7,6 +7,7 @@ export interface ClassroomStoragePort {
 
 export const CLASSROOM_STORAGE_KEYS = {
   grupos: "@planearia:grupos",
+  unidades: "@planearia:unidades_classroom",
   alumnos: "@planearia:alumnos",
   tareas: "@planearia:entregables",
   tareasLegacy: "@planearia:tareas",
@@ -47,4 +48,3 @@ export class MemoryClassroomStorage implements ClassroomStoragePort {
 }
 
 export const classroomStorage = new AsyncStorageClassroomStorage();
-

@@ -30,6 +30,7 @@ import DetalleGrupoScreen from "../screens/grupos/DetalleGrupoScreen";
 import ReportesGrupoScreen from "../screens/grupos/ReportesGrupoScreen";
 import ImportarGruposScreen from "../screens/grupos/ImportarGruposScreen";
 import ClassroomGroupScreen from "../screens/classroom/ClassroomGroupScreen";
+import DetalleActividadClassroomScreen from "../screens/classroom/DetalleActividadClassroomScreen";
 
 // Pantallas de Tareas dentro de Grupos
 import CrearTareaGrupoScreen from "../screens/grupos/tareas/CrearTareaGrupoScreen";
@@ -154,10 +155,11 @@ export type RootStackParamList = {
   ImportarGrupos: undefined;
 
   // Tareas dentro de Grupos (v3.0)
-  CrearTareaGrupo: { grupoId: number; entregableId?: number };
+  CrearTareaGrupo: { grupoId: number; entregableId?: number; unidadId?: string };
   AsignarRecurso: { grupoId: number };
   DetalleTarea: { tareaId: number; grupoId: number };
   CalificarEntregas: { tareaId: number; grupoId: number };
+  DetalleActividadClassroom: { tareaId: number; grupoId: number };
 
   // Entregables
   ListaEntregables: undefined;
@@ -194,7 +196,7 @@ export type RootStackParamList = {
   // NUEVA ARQUITECTURA: Recursos DidÃƒÂ¡cticos (reemplaza Recursos)
   RecursosDidacticos: undefined;
   ListaRecursos: { filtroTipo?: string } | undefined;
-  CrearRecurso: { recursoId?: number; grupoId?: number } | undefined;
+  CrearRecurso: { recursoId?: number; grupoId?: number; unidadId?: string } | undefined;
 
   // Plantillas
   BibliotecaPlantillas: undefined;
@@ -494,6 +496,14 @@ const StackNavigator: React.FC = () => {
         component={CalificarEntregasScreen}
         options={{
           title: "Calificar Entregas",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="DetalleActividadClassroom"
+        component={DetalleActividadClassroomScreen}
+        options={{
+          title: "Actividad",
           headerShown: false,
         }}
       />

@@ -154,4 +154,32 @@ describe("classroomFacade", () => {
     expect(resumenes).toHaveLength(1);
     expect(resumenes[0].resumen.totalActividades).toBe(1);
   });
+
+  it("gestiona secciones de trabajo de clase sin acoplarlas a pantallas legacy", async () => {
+    const storage = new MemoryClassroomStorage({
+      [CLASSROOM_STORAGE_KEYS.grupos]: [grupo],
+      [CLASSROOM_STORAGE_KEYS.tareas]: [tarea],
+      [CLASSROOM_STORAGE_KEYS.recursos]: [recurso],
+    });
+    const facade = createClassroomFacade(storage);
+
+    const unidad = await facade.createUnidad(1, "Unidad 1 - Introduccion");
+    const unidades = await facade.getUnidadesByGrupoId(1);
+    const dataset = await facade.getDatasetByGrupoId(1);
+
+    expect(unidades).toHaveLength(1);
+    expect(dataset?.unidades?.[0]).toMatchObject({
+      id: unidad.id,
+      nombre: "Unidad 1 - Introduccion",
+      colapsada: false,
+    });
+
+    await facade.updateUnidad(unidad.id, { nombre: "Unidad 1", colapsada: true });
+    await expect(facade.getUnidadesByGrupoId(1)).resolves.toEqual(
+      expect.arrayContaining([expect.objectContaining({ nombre: "Unidad 1", colapsada: true })]),
+    );
+
+    await facade.deleteUnidad(unidad.id);
+    await expect(facade.getUnidadesByGrupoId(1)).resolves.toHaveLength(0);
+  });
 });

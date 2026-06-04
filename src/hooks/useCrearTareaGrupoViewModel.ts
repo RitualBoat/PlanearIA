@@ -73,7 +73,8 @@ const parseDate = (str: string): Date | null => {
 
 export const useCrearTareaGrupoViewModel = (
   grupoId: number,
-  entregableId?: number
+  entregableId?: number,
+  unidadId?: string
 ): CrearTareaGrupoViewModel => {
   const navigation = useNavigation<Nav>();
   const { crearEntregable, actualizarEntregable, eliminarEntregable, obtenerEntregablePorId } =
@@ -163,6 +164,7 @@ export const useCrearTareaGrupoViewModel = (
         descripcion: descripcion.trim(),
         tipo,
         grupoId,
+        unidadId,
         fechaAsignacion: parseDate(fechaAsignacion) ?? now,
         fechaEntrega: parseDate(fechaEntrega) ?? now,
         valor: Number(valor),
@@ -206,6 +208,7 @@ export const useCrearTareaGrupoViewModel = (
     descripcion,
     tipo,
     grupoId,
+    unidadId,
     valor,
     fechaAsignacion,
     fechaEntrega,

@@ -9,6 +9,7 @@ import type {
   Tarea,
 } from "../../../types";
 import type { ClassroomDataset } from "../../../types/classroom";
+import type { UnidadClassroom } from "../../../types/unidadClassroom";
 import {
   buildClassroomActividadReciente,
   buildClassroomGrupo,
@@ -28,6 +29,10 @@ export interface ClassroomFacade {
   listGruposResumen(): Promise<BuildClassroomModelResult[]>;
   getDatasetByGrupoId(grupoId: ID): Promise<ClassroomDataset | null>;
   getClassroomModel(grupoId: ID): Promise<BuildClassroomModelResult | null>;
+  getUnidadesByGrupoId(grupoId: ID): Promise<UnidadClassroom[]>;
+  createUnidad(grupoId: ID, nombre: string): Promise<UnidadClassroom>;
+  updateUnidad(id: string, cambios: Partial<UnidadClassroom>): Promise<UnidadClassroom | null>;
+  deleteUnidad(id: string): Promise<void>;
   getAlumnosByGrupoId(grupoId: ID): Promise<Alumno[]>;
   getActividadesByGrupoId(grupoId: ID): Promise<Tarea[]>;
   getMaterialesByGrupoId(grupoId: ID): Promise<Recurso[]>;
@@ -44,6 +49,7 @@ export function createClassroomFacade(
   }> => {
     const [
       grupos,
+      unidades,
       alumnos,
       tareas,
       tareasLegacy,
@@ -54,6 +60,7 @@ export function createClassroomFacade(
       entregasLegacy,
     ] = await Promise.all([
       storage.readArray<Partial<Grupo>>(CLASSROOM_STORAGE_KEYS.grupos),
+      storage.readArray<UnidadClassroom>(CLASSROOM_STORAGE_KEYS.unidades),
       storage.readArray<Alumno>(CLASSROOM_STORAGE_KEYS.alumnos),
       storage.readArray<Tarea>(CLASSROOM_STORAGE_KEYS.tareas),
       storage.readArray<Tarea>(CLASSROOM_STORAGE_KEYS.tareasLegacy),
@@ -66,6 +73,7 @@ export function createClassroomFacade(
 
     return {
       grupos,
+      unidades,
       alumnos,
       actividades: mergeById(tareas, tareasLegacy).filter(isTarea),
       materiales: recursos,
@@ -88,6 +96,7 @@ export function createClassroomFacade(
 
     return {
       grupo: grupo as Pick<Grupo, "id"> & Partial<Grupo>,
+      unidades: data.unidades.filter((item) => item.grupoId === grupoId).sort((a, b) => a.posicion - b.posicion),
       alumnos: data.alumnos.filter((item) => item.grupoId === grupoId),
       actividades,
       materiales: data.materiales.filter((item) => item.grupoId === grupoId),
@@ -125,6 +134,55 @@ export function createClassroomFacade(
     async getClassroomModel(grupoId) {
       const dataset = await buildDatasetByGrupoId(grupoId);
       return dataset ? buildClassroomModel(dataset) : null;
+    },
+
+    async getUnidadesByGrupoId(grupoId) {
+      const data = await readDataset();
+      return data.unidades.filter((item) => item.grupoId === grupoId).sort((a, b) => a.posicion - b.posicion);
+    },
+
+    async createUnidad(grupoId, nombre) {
+      const unidades = await storage.readArray<UnidadClassroom>(CLASSROOM_STORAGE_KEYS.unidades);
+      const now = new Date().toISOString();
+      const nextPosition = unidades.filter((item) => item.grupoId === grupoId).length;
+      const unidad: UnidadClassroom = {
+        id: `unidad_${grupoId}_${Date.now()}`,
+        grupoId,
+        nombre,
+        posicion: nextPosition,
+        colapsada: false,
+        fechaCreacion: now,
+        fechaModificacion: now,
+        syncStatus: "pending",
+      };
+      await storage.writeArray(CLASSROOM_STORAGE_KEYS.unidades, [...unidades, unidad]);
+      return unidad;
+    },
+
+    async updateUnidad(id, cambios) {
+      const unidades = await storage.readArray<UnidadClassroom>(CLASSROOM_STORAGE_KEYS.unidades);
+      let updated: UnidadClassroom | null = null;
+      const next = unidades.map((unidad) => {
+        if (unidad.id !== id) return unidad;
+        updated = {
+          ...unidad,
+          ...cambios,
+          id: unidad.id,
+          fechaModificacion: new Date().toISOString(),
+          syncStatus: cambios.syncStatus ?? "pending",
+        };
+        return updated;
+      });
+      await storage.writeArray(CLASSROOM_STORAGE_KEYS.unidades, next);
+      return updated;
+    },
+
+    async deleteUnidad(id) {
+      const unidades = await storage.readArray<UnidadClassroom>(CLASSROOM_STORAGE_KEYS.unidades);
+      await storage.writeArray(
+        CLASSROOM_STORAGE_KEYS.unidades,
+        unidades.filter((unidad) => unidad.id !== id),
+      );
     },
 
     async getAlumnosByGrupoId(grupoId) {
@@ -196,4 +254,3 @@ function isEntregaTarea(value: EntregaTarea | unknown): value is EntregaTarea {
     "calificada" in value
   );
 }
-

@@ -8,6 +8,7 @@ import type {
   Recurso,
   Tarea,
 } from "./index";
+import type { UnidadClassroom } from "./unidadClassroom";
 
 export type ClassroomSectionId =
   | "inicio"
@@ -116,6 +117,7 @@ export type ClassroomGrupoInput = Pick<Grupo, "id"> & Partial<Grupo>;
 export interface ClassroomDataset {
   grupo: ClassroomGrupoInput;
   alumnos?: Alumno[];
+  unidades?: UnidadClassroom[];
   actividades?: Tarea[];
   materiales?: Recurso[];
   asistencias?: Asistencia[];
@@ -134,4 +136,3 @@ export interface ClassroomRouteMap {
   actividades: "CrearTareaGrupo" | "DetalleTarea" | "ListaEntregables";
   materiales: "ListaRecursos" | "RecursosDidacticos";
 }
-

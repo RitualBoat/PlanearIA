@@ -2,7 +2,7 @@
 
 > **Version:** 1.0  
 > **Fecha:** 2026-06-03  
-> **Estado:** [~] Plan maestro en ejecucion. Fases 0-9 completadas; Fase 10 en progreso con validacion manual pendiente.
+> **Estado:** [~] Plan maestro en ejecucion. Fases 0-9 completadas; Fase 10 en validacion manual.
 > **Alcance:** fusionar grupos, alumnos, tareas, entregables, recursos, asistencia, calificaciones y reportes operativos en una experiencia central tipo Google Classroom, manteniendo arquitectura MVVM, offline-first y bajo costo.  
 > **Stack:** React Native 0.81.5, Expo 54, TypeScript 5.9, React Navigation 7, AsyncStorage actual con posible migracion futura a SQLite/Expo SQLite, backend Node en `backend/api`, MongoDB Atlas/free tier, Jest + Testing Library.
 > **Modulo:** Classroom / Gestion academica diaria.  
@@ -162,14 +162,14 @@ Classroom debe sentirse como una herramienta diaria de aula, no como un panel ad
 GruposTab
   -> Classroom Home
     -> Grupo / Clase
-      -> Inicio
-      -> Alumnos
-      -> Actividades
-      -> Materiales
-      -> Asistencia
-      -> Calificaciones
-      -> Reportes
-      -> Configuracion
+      -> Tablon
+      -> Trabajo de clase
+        -> Seccion / Unidad
+          -> Material
+          -> Actividad
+            -> Entregas
+            -> Calificacion contextual
+      -> Personas
 ```
 
 ### Acciones principales
@@ -177,14 +177,15 @@ GruposTab
 - Crear grupo/clase.
 - Importar alumnos.
 - Agregar alumno individual.
-- Crear material.
-- Asignar planeacion como material.
-- Crear actividad/tarea.
-- Calificar entregas.
-- Registrar asistencia.
-- Capturar calificaciones.
+- Crear seccion/unidad de curso.
+- Crear material dentro de una seccion.
+- Asignar planeacion como material dentro de una seccion.
+- Crear actividad/tarea dentro de una seccion.
+- Abrir actividad y ver entregas por alumno.
+- Calificar entrega desde el detalle de la actividad, solo si el alumno entrego.
 - Ver alumno en contexto.
-- Exportar lista, asistencia, calificaciones o reporte.
+- Importar/exportar lista de alumnos desde `Personas`.
+- Mantener asistencia, reportes y analitica como herramientas secundarias hasta que tengan ubicacion natural.
 
 ### Principio UX
 
@@ -192,7 +193,7 @@ Cada accion debe empezar desde el grupo cuando tenga contexto de grupo.
 
 Ejemplo:
 
-- Bien: `Grupo -> Actividades -> Crear actividad`.
+- Bien: `Grupo -> Trabajo de clase -> Unidad 1 -> Crear actividad`.
 - Evitar: `Contenido -> Crear entregable -> elegir grupo -> volver a buscar grupo`.
 
 ---
@@ -216,7 +217,7 @@ No romper tipos actuales sin necesidad. La primera fase debe crear una capa conc
 | `Asistencia` | existente | conectar por fecha y grupo. |
 | `PlaneacionV2` | existente | permitir asignar como material o guia de clase. |
 | `Rubrica` | futura | evaluar si vive en recursos evaluables o Classroom. |
-| `UnidadClassroom` | nueva opcional | solo si se necesita organizar por semana, tema o periodo. |
+| `UnidadClassroom` | nueva implementada | organiza `Trabajo de clase` por secciones/unidades colapsables. |
 
 ### 5.3 Campos Obligatorios Para Entidades Sincronizables
 
@@ -317,14 +318,11 @@ La experiencia debe funcionar aunque el backend este apagado:
 | --- | --- |
 | `ClassroomHomeScreen` | reemplazo gradual de dashboard de grupos como vista tipo Classroom. |
 | `ClassroomGroupScreen` | detalle madre de un grupo/clase. |
-| `ClassroomInicioSection` | resumen, pendientes, actividad reciente y proximas acciones. |
-| `ClassroomAlumnosSection` | lista, importacion, asistencia rapida y perfiles. |
-| `ClassroomActividadesSection` | tareas, entregables, rubricas y estado de entrega. |
-| `ClassroomMaterialesSection` | recursos, planeaciones asignadas, PDFs, links y archivos. |
-| `ClassroomAsistenciaSection` | registrar e historial por fecha. |
-| `ClassroomCalificacionesSection` | captura, promedios y relacion con tareas. |
-| `ClassroomReportesSection` | reportes accionables por grupo/alumno. |
-| `ClassroomConfiguracionSection` | nombre, ciclo, materia, exportar y archivo. |
+| `Tablon` | feed de publicaciones, proximas entregas y actividad reciente del curso. |
+| `Trabajo de clase` | secciones/unidades colapsables con materiales y actividades. |
+| `DetalleActividadClassroomScreen` | instrucciones, entregas por alumno y calificacion contextual. |
+| `Personas` | profesores, alumnos inscritos, importacion/exportacion y perfil de alumno. |
+| Herramientas secundarias | asistencia, reportes, IA y analitica fuera del primer plano hasta ubicacion natural. |
 
 ### 7.2 Navegacion
 
@@ -336,12 +334,13 @@ Mapa minimo:
 - Entrada principal: `GruposTab`.
 - Entradas secundarias: `ContenidoScreen`, acciones contextuales de recursos/planeaciones, perfil de alumno y notificaciones.
 - Crear grupo: `GruposTab` -> `ClassroomHome` -> `CrearGrupo` -> `ClassroomGroup`.
-- Editar grupo: `ClassroomGroup` -> `Configuracion` -> `EditarGrupo` -> `ClassroomGroup`.
-- Crear alumno: `ClassroomGroup` -> `Alumnos` -> `Agregar alumno`.
-- Crear actividad: `ClassroomGroup` -> `Actividades` -> `Crear actividad`.
-- Crear material: `ClassroomGroup` -> `Materiales` -> `Crear material`.
-- Registrar asistencia: `ClassroomGroup` -> `Asistencia` -> `Registro del dia`.
-- Calificar: `ClassroomGroup` -> `Actividades` o `Calificaciones` -> `Calificar`.
+- Crear alumno: `ClassroomGroup` -> `Personas` -> `Agregar alumno`.
+- Crear seccion: `ClassroomGroup` -> `Trabajo de clase` -> `Crear seccion`.
+- Crear actividad: `ClassroomGroup` -> `Trabajo de clase` -> `Seccion` -> `Actividad`.
+- Crear material: `ClassroomGroup` -> `Trabajo de clase` -> `Seccion` -> `Material`.
+- Adjuntar planeacion: `ClassroomGroup` -> `Trabajo de clase` -> `Seccion` -> `Adjuntar planeacion`.
+- Calificar: `ClassroomGroup` -> `Trabajo de clase` -> `Actividad` -> `Entrega entregada` -> `Guardar calificacion`.
+- Asistencia/reportes: rutas secundarias, no tabs principales.
 - Salidas seguras: guardar, cancelar, volver a grupo, volver a home.
 - Rutas legacy: ocultar o redirigir despues de validar equivalencia.
 ```
@@ -806,7 +805,7 @@ Modo sugerido: `NORMAL` para auditoria IHC con heuristicas de Nielsen y severida
 - [x] **10.1 Auditar Classroom con reglas de navegacion de `meta_guia_planes.md`.**
 - [x] **10.2 Verificar entradas desde tabs, `ContenidoScreen`, cards, FABs y acciones contextuales.**
 - [x] **10.3 Ocultar o redirigir rutas legacy que ya tengan reemplazo.**
-- [x] **10.4 Eliminar pantallas duplicadas solo despues de validacion manual.**
+- [~] **10.4 Mantener legacy fuera del flujo principal y eliminar duplicados solo despues de validacion manual.**
 - [x] **10.5 Revisar botones activos legibles, contrastes, labels y tamanos tactiles.**
 - [~] **10.6 Validar web, tablet y movil.**
 - [x] **10.7 Actualizar onboarding/ayuda si el flujo cambia.**
@@ -819,17 +818,20 @@ Criterio de cierre:
 
 Resultado parcial:
 
-- Las pestañas internas de `ClassroomGroupScreen` dejaron de ser decorativas y ahora filtran secciones reales: Novedades, Trabajo de clase, Personas y Calificaciones.
-- Novedades centraliza acciones rapidas, IA, pendientes y actividad reciente.
-- Trabajo de clase centraliza actividades y materiales.
-- Personas centraliza alumnos y asistencia.
-- Calificaciones centraliza calificaciones, reportes y seguimiento.
-- Se oculto el CTA visible a `DetalleGrupo` legacy desde la clase moderna; la ruta antigua sigue existiendo como respaldo hasta validacion manual completa.
-- Se mantuvieron pantallas duplicadas sin borrar, respetando el criterio de no eliminar legacy antes de validacion manual.
-- Se revisaron botones activos para mantener texto visible en estados seleccionados/deshabilitados.
+- `ClassroomGroupScreen` fue reorientado a una experiencia tipo Google Classroom/Classroomio con tres pestañas principales: `Tablon`, `Trabajo de clase` y `Personas`.
+- `Tablon` queda como feed de publicaciones del curso, con proximas entregas y sin tarjetas administrativas sueltas.
+- `Trabajo de clase` organiza contenidos por `UnidadClassroom`/seccion colapsable, con soporte para `Sin seccion`.
+- Las actividades y materiales ahora guardan `unidadId`, de modo que `CrearTareaGrupo` y `CrearRecurso` regresan al contexto correcto del curso.
+- Al abrir una actividad desde `Trabajo de clase`, el flujo entra a `DetalleActividadClassroom`, donde se ve la consigna, entregas por alumno y calificacion integrada.
+- La calificacion ya no se presenta como modulo suelto: solo se habilita si existe `EntregaTarea` marcada como `entregada`, `tarde` o `calificada`.
+- `Personas` queda para ver/agregar/importar/exportar alumnos; asistencia, reportes y calificaciones quedan fuera del primer plano hasta una fase posterior donde tengan ubicacion natural.
+- Se ocultaron CTAs visibles a pantallas legacy administrativas desde la clase moderna; las rutas antiguas siguen existiendo como respaldo hasta validacion manual completa.
+- Se agrego `UnidadClassroom` y CRUD de secciones en `classroomFacade`, manteniendo MVVM/offline-first y evitando acoplar la pantalla a claves directas.
+- Se revisaron botones activos para mantener texto visible en estados seleccionados/deshabilitados y se ajusto layout responsive en web/movil.
 - No se actualizo onboarding porque no existe flujo de ayuda/onboarding especifico de Classroom que haya cambiado en esta fase.
-- Validaciones tecnicas ejecutadas: `npx tsc --noEmit`, `npx jest src/__tests__/classroom --runInBand` y lint focalizado de `ClassroomGroupScreen`.
-- Pendiente para cerrar Fase 10: validar manualmente web, tablet y movil; confirmar que las pestañas no cortan scroll, que cada CTA regresa al grupo y que no hay rutas clave aisladas.
+- Validaciones tecnicas ejecutadas: `npx tsc --noEmit`, `npx jest src/__tests__/classroom --runInBand` y lint focalizado de archivos tocados.
+- Pruebas Classroom actualizadas: 12 tests pasan, incluyendo CRUD de secciones/unidades en `classroomFacade`.
+- Pendiente para cerrar Fase 10: validar manualmente web, tablet y movil; confirmar que `Trabajo de clase` no corta scroll, que crear/guardar vuelve al contexto correcto y que no hay rutas clave aisladas.
 
 ### FASE FINAL: Validacion, Documentacion y Cierre
 
@@ -860,16 +862,18 @@ Modo sugerido: `CAVEMAN` para correr validaciones, marcar checkboxes, actualizar
 - [ ] Agregar alumno desde grupo.
 - [ ] Importar alumnos desde grupo.
 - [ ] Abrir detalle de alumno y volver al grupo.
-- [ ] Crear material desde grupo.
-- [ ] Asignar recurso existente a grupo.
-- [ ] Asignar planeacion existente como material.
-- [ ] Crear actividad/tarea desde grupo.
-- [ ] Ver estado de entregas por alumno.
-- [ ] Calificar entrega.
-- [ ] Registrar asistencia.
-- [ ] Ver historial de asistencia.
-- [ ] Capturar calificaciones.
-- [ ] Ver reporte de grupo.
+- [ ] Confirmar que la clase activa muestra solo `Tablon`, `Trabajo de clase` y `Personas`.
+- [ ] Crear seccion/unidad desde `Trabajo de clase`.
+- [ ] Colapsar y expandir seccion/unidad.
+- [ ] Crear material dentro de una seccion y confirmar que aparece en esa seccion.
+- [ ] Crear actividad/tarea dentro de una seccion y confirmar que aparece en esa seccion.
+- [ ] Adjuntar planeacion existente como material dentro de una seccion.
+- [ ] Ver contenidos sin unidad dentro de `Sin seccion`.
+- [ ] Abrir actividad desde `Trabajo de clase`.
+- [ ] Ver estado de entregas por alumno dentro del detalle de actividad.
+- [ ] Confirmar que una entrega pendiente no permite calificar.
+- [ ] Calificar entrega solo cuando exista entrega marcada como `entregada`, `tarde` o `calificada`.
+- [ ] Confirmar que asistencia, reportes y calificaciones no aparecen como modulos sueltos en el primer plano.
 - [ ] Usar app sin internet y crear datos pendientes.
 - [ ] Reconectar y confirmar sync.
 - [ ] Validar web sin scroll roto.
@@ -902,7 +906,7 @@ Modo sugerido: `CAVEMAN` para correr validaciones, marcar checkboxes, actualizar
 
 - [ ] Confirmar si el tab visible seguira llamandose `Grupos` o se renombrara a `Classroom`.
 - [ ] Confirmar si `ContenidoScreen` debe mantenerse como tab principal o degradarse a hub interno mas adelante.
-- [ ] Confirmar si las unidades/semanas se implementan en primera version o se posponen.
+- [x] Confirmar si las unidades/semanas se implementan en primera version o se posponen. Decision: implementadas como `UnidadClassroom`.
 - [ ] Confirmar si los alumnos pueden existir fuera de grupos o siempre deben vincularse a uno.
 - [ ] Confirmar si se requiere rol `Alumno` visible en la app durante esta fase o solo preparacion tecnica.
 - [ ] Confirmar si Classroom debe tener modo demo con datos precargados para presentacion escolar.

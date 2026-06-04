@@ -24,7 +24,6 @@ export interface ClassroomContentSection {
   id: string;
   nombre: string;
   colapsada: boolean;
-  isUnassigned?: boolean;
   actividadesCount: number;
   materialesCount: number;
   items: ClassroomContentItem[];
@@ -173,27 +172,23 @@ export function useClassroomGroupViewModel(
   );
 
   const contentSections = useMemo<ClassroomContentSection[]>(() => {
-    const unidadIds = new Set(unidades.map((unidad) => unidad.id));
     const sections = unidades.map((unidad) => {
       const items = contentItems
         .filter((item) => item.unidadId === unidad.id)
         .sort(sortContentItems);
       return buildSection(unidad.id, unidad.nombre, unidad.colapsada, items);
     });
-    const unassignedItems = contentItems
-      .filter((item) => !item.unidadId || !unidadIds.has(item.unidadId))
-      .sort(sortContentItems);
-
-    if (unassignedItems.length > 0 || sections.length === 0) {
-      sections.push(buildSection("sin-unidad", "Sin seccion", false, unassignedItems, true));
-    }
 
     return sections;
   }, [contentItems, unidades]);
 
   const feedItems = useMemo(
-    () => [...contentItems].sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()).slice(0, 10),
-    [contentItems],
+    () =>
+      contentSections
+        .flatMap((section) => section.items)
+        .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
+        .slice(0, 10),
+    [contentSections],
   );
 
   useEffect(() => {
@@ -226,13 +221,11 @@ function buildSection(
   nombre: string,
   colapsada: boolean,
   items: ClassroomContentItem[],
-  isUnassigned = false,
 ): ClassroomContentSection {
   return {
     id,
     nombre,
     colapsada,
-    isUnassigned,
     actividadesCount: items.filter((item) => item.kind === "actividad").length,
     materialesCount: items.filter((item) => item.kind === "material").length,
     items,

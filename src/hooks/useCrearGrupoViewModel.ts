@@ -36,6 +36,7 @@ export const useCrearGrupoViewModel = (): CrearGrupoViewModel => {
 
   const modo = route.params?.modo === "editar" ? "editar" : "crear";
   const grupoId = route.params?.grupoId;
+  const returnToClassroom = route.params?.returnToClassroom === true;
   const [nombre, setNombre] = useState("");
   const [materia, setMateria] = useState("");
   const [carrera, setCarrera] = useState<Carrera>("ISC");
@@ -115,7 +116,11 @@ export const useCrearGrupoViewModel = (): CrearGrupoViewModel => {
         });
       }
 
-      navigation.navigate("ListaGrupos");
+      if (returnToClassroom) {
+        navigation.navigate("MainTabs", { screen: "GruposTab" });
+      } else {
+        navigation.navigate("ListaGrupos");
+      }
     } catch {
       setValidationError("No se pudo guardar el grupo. Intenta nuevamente.");
     } finally {
@@ -131,6 +136,7 @@ export const useCrearGrupoViewModel = (): CrearGrupoViewModel => {
     horario,
     modo,
     grupoId,
+    returnToClassroom,
     actualizarGrupo,
     agregarGrupo,
     navigation,

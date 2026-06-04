@@ -31,6 +31,8 @@ import ReportesGrupoScreen from "../screens/grupos/ReportesGrupoScreen";
 import ImportarGruposScreen from "../screens/grupos/ImportarGruposScreen";
 import ClassroomGroupScreen from "../screens/classroom/ClassroomGroupScreen";
 import DetalleActividadClassroomScreen from "../screens/classroom/DetalleActividadClassroomScreen";
+import AgregarContenidoClassroomScreen from "../screens/classroom/AgregarContenidoClassroomScreen";
+import DetalleRecursoClassroomScreen from "../screens/classroom/DetalleRecursoClassroomScreen";
 
 // Pantallas de Tareas dentro de Grupos
 import CrearTareaGrupoScreen from "../screens/grupos/tareas/CrearTareaGrupoScreen";
@@ -139,6 +141,7 @@ export type RootStackParamList = {
     | {
         modo?: "crear" | "editar";
         grupoId?: number;
+        returnToClassroom?: boolean;
       };
   DetalleGrupo: {
     grupoId: number;
@@ -155,11 +158,21 @@ export type RootStackParamList = {
   ImportarGrupos: undefined;
 
   // Tareas dentro de Grupos (v3.0)
-  CrearTareaGrupo: { grupoId: number; entregableId?: number; unidadId?: string };
+  CrearTareaGrupo: { grupoId: number; entregableId?: number; unidadId?: string; returnToClassroom?: boolean };
   AsignarRecurso: { grupoId: number };
   DetalleTarea: { tareaId: number; grupoId: number };
   CalificarEntregas: { tareaId: number; grupoId: number };
   DetalleActividadClassroom: { tareaId: number; grupoId: number };
+  AgregarContenidoClassroom: {
+    grupoId: number;
+    kind?: "material" | "actividad";
+    modo?: "crear" | "editar";
+    recursoId?: number;
+    tareaId?: number;
+    unidadId?: string;
+    unidadNombre?: string;
+  };
+  DetalleRecursoClassroom: { recursoId: number; grupoId?: number };
 
   // Entregables
   ListaEntregables: undefined;
@@ -196,7 +209,7 @@ export type RootStackParamList = {
   // NUEVA ARQUITECTURA: Recursos DidÃƒÂ¡cticos (reemplaza Recursos)
   RecursosDidacticos: undefined;
   ListaRecursos: { filtroTipo?: string } | undefined;
-  CrearRecurso: { recursoId?: number; grupoId?: number; unidadId?: string } | undefined;
+  CrearRecurso: { recursoId?: number; grupoId?: number; unidadId?: string; returnToClassroom?: boolean } | undefined;
 
   // Plantillas
   BibliotecaPlantillas: undefined;
@@ -504,6 +517,22 @@ const StackNavigator: React.FC = () => {
         component={DetalleActividadClassroomScreen}
         options={{
           title: "Actividad",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="AgregarContenidoClassroom"
+        component={AgregarContenidoClassroomScreen}
+        options={{
+          title: "Agregar contenido",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="DetalleRecursoClassroom"
+        component={DetalleRecursoClassroomScreen}
+        options={{
+          title: "Recurso",
           headerShown: false,
         }}
       />

@@ -178,9 +178,9 @@ GruposTab
 - Importar alumnos.
 - Agregar alumno individual.
 - Crear seccion/unidad de curso.
-- Crear material dentro de una seccion.
-- Asignar planeacion como material dentro de una seccion.
-- Crear actividad/tarea dentro de una seccion.
+- Subir archivo o pegar enlace dentro de una seccion.
+- Preparar importacion futura desde Canva/Genially.
+- Asignar contenido a una seccion sin usar formularios legacy de recursos/actividades.
 - Abrir actividad y ver entregas por alumno.
 - Calificar entrega desde el detalle de la actividad, solo si el alumno entrego.
 - Ver alumno en contexto.
@@ -193,7 +193,7 @@ Cada accion debe empezar desde el grupo cuando tenga contexto de grupo.
 
 Ejemplo:
 
-- Bien: `Grupo -> Trabajo de clase -> Unidad 1 -> Crear actividad`.
+- Bien: `Grupo -> Trabajo de clase -> Unidad 1 -> Agregar contenido -> subir/enlazar`.
 - Evitar: `Contenido -> Crear entregable -> elegir grupo -> volver a buscar grupo`.
 
 ---
@@ -336,9 +336,9 @@ Mapa minimo:
 - Crear grupo: `GruposTab` -> `ClassroomHome` -> `CrearGrupo` -> `ClassroomGroup`.
 - Crear alumno: `ClassroomGroup` -> `Personas` -> `Agregar alumno`.
 - Crear seccion: `ClassroomGroup` -> `Trabajo de clase` -> `Crear seccion`.
-- Crear actividad: `ClassroomGroup` -> `Trabajo de clase` -> `Seccion` -> `Actividad`.
-- Crear material: `ClassroomGroup` -> `Trabajo de clase` -> `Seccion` -> `Material`.
-- Adjuntar planeacion: `ClassroomGroup` -> `Trabajo de clase` -> `Seccion` -> `Adjuntar planeacion`.
+- Agregar contenido: `ClassroomGroup` -> `Trabajo de clase` -> `Seccion` -> `Agregar contenido`.
+- Subir/enlazar: `Agregar contenido` -> `Material` o `Actividad evaluable` -> archivo/enlace -> `ClassroomGroup`.
+- Importar Canva/Genially: placeholder deshabilitado hasta crear modulo visual.
 - Calificar: `ClassroomGroup` -> `Trabajo de clase` -> `Actividad` -> `Entrega entregada` -> `Guardar calificacion`.
 - Asistencia/reportes: rutas secundarias, no tabs principales.
 - Salidas seguras: guardar, cancelar, volver a grupo, volver a home.
@@ -412,7 +412,7 @@ Reglas:
 ### Planeaciones
 
 - Permitir asignar una planeacion a un grupo como guia/material.
-- Permitir crear actividades desde una planeacion en fase posterior.
+- Permitir asignar actividades derivadas de una planeacion en fase posterior, sin convertir Classroom en editor/creador principal.
 - No modificar el editor Word/Docs durante la fase inicial de Classroom.
 
 ### Contenido
@@ -699,7 +699,7 @@ Criterio de cierre:
 
 Resultado:
 
-- `ClassroomGroupScreen` ahora tiene seccion `Actividades y entregas` antes de materiales, con filtros por estado, CTA para crear actividad, acceso a entregables y calificacion por tarea.
+- `ClassroomGroupScreen` integro el flujo de actividades y entregas dentro de `Trabajo de clase`, con filtros por estado, acceso a entregables y calificacion contextual por tarea.
 - Los estados visibles se mapean sobre el modelo actual: `asignada` como publicada, `en_progreso` como en curso, `finalizada` como cerrada y `calificada` derivada de entregas calificadas por alumno.
 - Cada actividad muestra progreso de entregas, pendientes, calificadas y preview de estado por alumno: pendiente, entregado, revisado o calificado.
 - `useClassroomGroupViewModel` consume actividades y entregas desde `classroomFacade`, manteniendo MVVM y el camino futuro hacia SQLite.
@@ -820,14 +820,24 @@ Resultado parcial:
 
 - `ClassroomGroupScreen` fue reorientado a una experiencia tipo Google Classroom/Classroomio con tres pestañas principales: `Tablon`, `Trabajo de clase` y `Personas`.
 - `Tablon` queda como feed de publicaciones del curso, con proximas entregas y sin tarjetas administrativas sueltas.
-- `Trabajo de clase` organiza contenidos por `UnidadClassroom`/seccion colapsable, con soporte para `Sin seccion`.
-- Las actividades y materiales ahora guardan `unidadId`, de modo que `CrearTareaGrupo` y `CrearRecurso` regresan al contexto correcto del curso.
+- `Trabajo de clase` organiza contenidos solo por `UnidadClassroom`/seccion colapsable; se elimino `Sin seccion` del flujo visible.
+- Las actividades y materiales visibles deben guardar `unidadId`; los contenidos sin unidad quedan fuera de la vista Classroom hasta reasignarse.
 - Al abrir una actividad desde `Trabajo de clase`, el flujo entra a `DetalleActividadClassroom`, donde se ve la consigna, entregas por alumno y calificacion integrada.
 - La calificacion ya no se presenta como modulo suelto: solo se habilita si existe `EntregaTarea` marcada como `entregada`, `tarde` o `calificada`.
 - `Personas` queda para ver/agregar/importar/exportar alumnos; asistencia, reportes y calificaciones quedan fuera del primer plano hasta una fase posterior donde tengan ubicacion natural.
 - Se ocultaron CTAs visibles a pantallas legacy administrativas desde la clase moderna; las rutas antiguas siguen existiendo como respaldo hasta validacion manual completa.
 - Se agrego `UnidadClassroom` y CRUD de secciones en `classroomFacade`, manteniendo MVVM/offline-first y evitando acoplar la pantalla a claves directas.
 - Se revisaron botones activos para mantener texto visible en estados seleccionados/deshabilitados y se ajusto layout responsive en web/movil.
+- Correccion post-validacion: el boton `+` de una seccion abre `AgregarContenidoClassroom`, no un formulario directo.
+- Correccion post-validacion 2: `AgregarContenidoClassroom` ya no lista recursos existentes ni planeaciones; ahora permite material/actividad evaluable mediante multiples archivos y enlaces, y deja Canva/Genially como integracion futura.
+- Correccion post-validacion 3: `DetalleRecursoClassroom` muestra los adjuntos publicados en Classroom como lista visible, ocultando metadatos tecnicos internos.
+- Correccion post-validacion 4: `ClassroomHomeScreen` reemplazo el header anterior por `AnimatedTopPill` preservado.
+- Correccion post-validacion 5: `CrearGrupo` puede regresar al dashboard Classroom cuando se invoca desde `ClassroomHomeScreen`, evitando `ListaGrupos` legacy.
+- Correccion post-validacion 6: editar material o actividad desde Classroom abre `AgregarContenidoClassroom` en modo edicion, no pantallas legacy; actividades incorporan fecha de asignacion, entrega, entrega tardia y notas.
+- Correccion post-validacion: los materiales existentes abren `DetalleRecursoClassroom`, con visor, metadatos y acciones secundarias para editar/quitar/eliminar.
+- Correccion post-validacion: `CrearRecurso` queda como respaldo legacy/secundario, no como flujo principal de Classroom.
+- Correccion post-validacion: `ClassroomHomeScreen` se alineo al patron Classroom con cursos, calendario y pendientes; se quito el CTA visible `Ver legacy`.
+- Regla de producto reforzada: Classroom organiza/asigna contenido; la creacion compleja debe vivir en modulos especializados tipo Word/Docs, Canva/Genially o Excel/Listas.
 - No se actualizo onboarding porque no existe flujo de ayuda/onboarding especifico de Classroom que haya cambiado en esta fase.
 - Validaciones tecnicas ejecutadas: `npx tsc --noEmit`, `npx jest src/__tests__/classroom --runInBand` y lint focalizado de archivos tocados.
 - Pruebas Classroom actualizadas: 12 tests pasan, incluyendo CRUD de secciones/unidades en `classroomFacade`.
@@ -863,13 +873,22 @@ Modo sugerido: `CAVEMAN` para correr validaciones, marcar checkboxes, actualizar
 - [ ] Importar alumnos desde grupo.
 - [ ] Abrir detalle de alumno y volver al grupo.
 - [ ] Confirmar que la clase activa muestra solo `Tablon`, `Trabajo de clase` y `Personas`.
+- [ ] Confirmar que el dashboard Classroom usa la pildora hero preservada.
+- [ ] Crear clase desde Classroom y confirmar regreso al dashboard Classroom, no a `ListaGrupos`.
 - [ ] Crear seccion/unidad desde `Trabajo de clase`.
 - [ ] Colapsar y expandir seccion/unidad.
-- [ ] Crear material dentro de una seccion y confirmar que aparece en esa seccion.
-- [ ] Crear actividad/tarea dentro de una seccion y confirmar que aparece en esa seccion.
-- [ ] Adjuntar planeacion existente como material dentro de una seccion.
-- [ ] Ver contenidos sin unidad dentro de `Sin seccion`.
+- [ ] Confirmar que el boton `+` de una seccion abre `Agregar contenido`, no un formulario directo.
+- [ ] Confirmar que no aparece `Sin seccion` en `Trabajo de clase`.
+- [ ] Subir archivo desde `Agregar contenido` y confirmar regreso a Classroom.
+- [ ] Pegar enlace desde `Agregar contenido` y confirmar regreso a Classroom.
+- [ ] Asignar material con varios archivos/enlaces y confirmar que `DetalleRecursoClassroom` muestra todos los adjuntos.
+- [ ] Confirmar que `Importar desde Canva/Genially` aparece como futura integracion deshabilitada.
+- [ ] Abrir material existente y confirmar que entra a `DetalleRecursoClassroom`.
+- [ ] Editar material desde `DetalleRecursoClassroom` y confirmar que abre `AgregarContenidoClassroom`.
+- [ ] Asignar actividad evaluable ligera con ponderacion 0-100 desde `Agregar contenido`, sin abrir formularios legacy de creacion profunda.
+- [ ] Confirmar que la actividad permite fecha de asignacion, fecha de entrega, entrega tardia y notas adicionales.
 - [ ] Abrir actividad desde `Trabajo de clase`.
+- [ ] Editar actividad desde `DetalleActividadClassroom` y confirmar que abre `AgregarContenidoClassroom`.
 - [ ] Ver estado de entregas por alumno dentro del detalle de actividad.
 - [ ] Confirmar que una entrega pendiente no permite calificar.
 - [ ] Calificar entrega solo cuando exista entrega marcada como `entregada`, `tarde` o `calificada`.
@@ -981,6 +1000,9 @@ Estado operativo:
 - [x] Issue creado para Fase 5: `https://github.com/RitualBoat/PlanearIA/issues/6`.
 - [x] Issue de Fase 5 agregado a `PlanearIA Product OS`.
 - [x] Fase 5 ejecutada: materiales contextuales, filtros internos, planeaciones como material y apertura en `DocEditor`.
+- [x] Issue creado para Fase 10: `https://github.com/RitualBoat/PlanearIA/issues/7`.
+- [x] Issue de Fase 10 agregado a `PlanearIA Product OS`.
+- [~] Fase 10 en validacion manual: UX/UI Classroom-like, contenido por secciones, detalle de recurso y limpieza legacy visible.
 
 Regla de actualizacion:
 

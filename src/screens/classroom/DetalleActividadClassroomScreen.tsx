@@ -138,7 +138,7 @@ const DetalleActividadClassroomScreen: React.FC = () => {
 
       const draft = drafts[String(alumno.id)] ?? { calificacion: "", retroalimentacion: "" };
       const calificacion = Number(draft.calificacion.replace(",", "."));
-      const max = tarea.calificacionMaxima || tarea.valor || 100;
+      const max = tarea.calificacionMaxima ?? tarea.valor ?? 100;
 
       if (!Number.isFinite(calificacion) || calificacion < 0 || calificacion > max) {
         showMessage("Calificacion invalida", `Ingresa una calificacion entre 0 y ${max}.`);
@@ -219,12 +219,20 @@ const DetalleActividadClassroomScreen: React.FC = () => {
             <Text style={styles.eyebrow}>Trabajo de clase</Text>
             <Text style={styles.title}>{tarea.titulo}</Text>
             <Text style={styles.subtitle}>
-              {tarea.tipo} - Entrega: {formatDate(tarea.fechaEntrega)} - Valor: {tarea.calificacionMaxima || tarea.valor}
+              {tarea.tipo} - Entrega: {formatDate(tarea.fechaEntrega)} - Valor: {tarea.calificacionMaxima ?? tarea.valor ?? 100}
             </Text>
           </View>
           <TouchableOpacity
             style={styles.secondaryButton}
-            onPress={() => navigation.navigate("CrearTareaGrupo", { grupoId, entregableId: tarea.id, unidadId: tarea.unidadId })}
+            onPress={() =>
+              navigation.navigate("AgregarContenidoClassroom", {
+                grupoId,
+                kind: "actividad",
+                modo: "editar",
+                tareaId: tarea.id,
+                unidadId: tarea.unidadId,
+              })
+            }
           >
             <MaterialIcons name="edit" size={18} color={COLORS.primary} />
             <Text style={styles.secondaryButtonText}>Editar</Text>
@@ -298,7 +306,7 @@ const DetalleActividadClassroomScreen: React.FC = () => {
                           <TextInput
                             style={styles.input}
                             keyboardType="decimal-pad"
-                            placeholder={`0-${tarea.calificacionMaxima || tarea.valor || 100}`}
+                            placeholder={`0-${tarea.calificacionMaxima ?? tarea.valor ?? 100}`}
                             placeholderTextColor="#94A3B8"
                             value={draft.calificacion}
                             onChangeText={(value) => updateDraft(alumno.id, "calificacion", value)}

@@ -74,7 +74,8 @@ const parseDate = (str: string): Date | null => {
 export const useCrearTareaGrupoViewModel = (
   grupoId: number,
   entregableId?: number,
-  unidadId?: string
+  unidadId?: string,
+  returnToClassroom = false,
 ): CrearTareaGrupoViewModel => {
   const navigation = useNavigation<Nav>();
   const { crearEntregable, actualizarEntregable, eliminarEntregable, obtenerEntregablePorId } =
@@ -196,7 +197,11 @@ export const useCrearTareaGrupoViewModel = (
           "El entregable se guardó localmente. Se sincronizará cuando haya conexión."
         );
       }
-      navigation.goBack();
+      if (returnToClassroom) {
+        navigation.navigate("ClassroomGroup", { grupoId });
+      } else {
+        navigation.goBack();
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "No se pudo guardar el entregable";
       Alert.alert("Error", msg);
@@ -209,6 +214,7 @@ export const useCrearTareaGrupoViewModel = (
     tipo,
     grupoId,
     unidadId,
+    returnToClassroom,
     valor,
     fechaAsignacion,
     fechaEntrega,

@@ -18,11 +18,8 @@ import type { StackNavigationProp } from "@react-navigation/stack";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../../types";
 import type { Alumno, Recurso, Tarea } from "../../../types";
-import type { PlaneacionDocumento } from "../../../types/planeacionV2";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
 import { useAlumnos } from "../../context/AlumnosContext";
-import { usePlaneaciones } from "../../context/PlaneacionesContext";
-import { useRecursos } from "../../context/RecursosContext";
 import {
   type ClassroomContentItem,
   type ClassroomContentSection,
@@ -30,10 +27,8 @@ import {
 } from "../../hooks/classroom/useClassroomGroupViewModel";
 import {
   resumirProgresoClassroom,
-  sugerirActividadClassroom,
   type ClassroomAiResponse,
   type ResumirProgresoResultado,
-  type SugerirActividadResultado,
 } from "../../services/classroom/classroomAiService";
 
 type Navigation = StackNavigationProp<RootStackParamList>;
@@ -46,37 +41,11 @@ const CLASSROOM_TABS: { key: ClassroomTab; label: string }[] = [
   { key: "personas", label: "Personas" },
 ];
 
-const isPlaneacionResource = (recurso: Recurso): boolean =>
-  recurso.url?.startsWith("planeacion://") === true ||
-  Boolean(recurso.tags?.some((tag) => tag.toLowerCase() === "planeacion"));
-
-const getPlaneacionTitle = (doc: PlaneacionDocumento): string => {
-  const asignatura = doc.datosGenerales.asignatura || doc.elementosCurriculares.contenido || "Planeacion";
-  const grado = doc.datosGenerales.grado ? ` - ${doc.datosGenerales.grado}` : "";
-  const grupo = doc.datosGenerales.grupos?.[0] ? ` ${doc.datosGenerales.grupos[0]}` : "";
-  return `${asignatura}${grado}${grupo}`.trim();
-};
-
 const formatDate = (value?: Date | string): string => {
   if (!value) return "Sin fecha";
   const date = new Date(value);
   if (!Number.isFinite(date.getTime())) return "Sin fecha";
   return date.toLocaleDateString();
-};
-
-const formatAiActivity = (response: ClassroomAiResponse<SugerirActividadResultado>): string => {
-  const { actividad, mensaje } = response.resultado;
-  return [
-    mensaje,
-    "",
-    `Titulo: ${actividad.titulo}`,
-    `Tipo: ${actividad.tipo}`,
-    `Descripcion: ${actividad.descripcion}`,
-    "",
-    `Instrucciones: ${actividad.instrucciones}`,
-    "",
-    `Criterios: ${actividad.criterios.join(" - ")}`,
-  ].join("\n");
 };
 
 const formatAiProgress = (response: ClassroomAiResponse<ResumirProgresoResultado>): string => {
@@ -106,8 +75,6 @@ const ClassroomGroupScreen: React.FC = () => {
     reload,
   } = useClassroomGroupViewModel(grupoId);
   const { actualizarAlumno } = useAlumnos();
-  const { documentos } = usePlaneaciones();
-  const { crearRecurso } = useRecursos();
   const [activeTab, setActiveTab] = React.useState<ClassroomTab>("tablon");
   const [aiLoading, setAiLoading] = React.useState(false);
   const [aiWarning, setAiWarning] = React.useState<string | null>(null);
@@ -206,7 +173,6 @@ const ClassroomGroupScreen: React.FC = () => {
 
   const handleRenameUnidad = React.useCallback(
     (section: ClassroomContentSection) => {
-      if (section.isUnassigned) return;
       askText("Renombrar seccion", "Escribe el nuevo nombre de la seccion.", section.nombre, (value) => {
         void renombrarUnidad(section.id, value);
       });
@@ -216,9 +182,8 @@ const ClassroomGroupScreen: React.FC = () => {
 
   const handleDeleteUnidad = React.useCallback(
     (section: ClassroomContentSection) => {
-      if (section.isUnassigned) return;
       const message =
-        "La seccion se quitara del curso. Sus materiales y actividades no se eliminan; apareceran en Sin seccion.";
+        "La seccion se quitara del curso. Sus materiales y actividades no se eliminan, pero dejaran de mostrarse hasta reasignarlos.";
       if (Platform.OS === "web") {
         if (window.confirm(`Eliminar seccion\n\n${message}`)) void eliminarUnidad(section.id);
         return;
@@ -231,93 +196,15 @@ const ClassroomGroupScreen: React.FC = () => {
     [eliminarUnidad],
   );
 
-  const attachPlaneacion = React.useCallback(
-    async (doc: PlaneacionDocumento, unidadId?: string) => {
-      const now = new Date();
-      await crearRecurso({
-        titulo: getPlaneacionTitle(doc),
-        tipo: "documento",
-        descripcion: `Planeacion adjunta a ${nombre}.`,
-        url: `planeacion://${doc.id}`,
-        grupoId,
-        unidadId,
-        asignadoComoTarea: false,
-        tags: ["planeacion", doc.nivelAcademico, doc.datosGenerales.asignatura].filter(Boolean),
-        fechaCreacion: now,
-        fechaModificacion: now,
-        formato: "planeacion",
-        formatosExportacion: ["pdf", "docx"],
-        acceso: "privado",
-        origen: "manual",
-        profesorId: 1,
-        versionActual: 1,
-      });
-      await reload();
-      showMessage("Planeacion adjunta", unidadId ? "Aparece dentro de la seccion elegida." : "Aparece en Sin seccion.");
-    },
-    [crearRecurso, grupoId, nombre, reload, showMessage],
-  );
-
-  const handleAttachPlaneacion = React.useCallback(
-    (unidadId?: string) => {
-      if (documentos.length === 0) {
-        showMessage("Sin planeaciones", "Crea una planeacion para adjuntarla como material.");
-        return;
-      }
-      const opciones = documentos.slice(0, 8);
-      if (Platform.OS === "web") {
-        const promptText = opciones.map((doc, index) => `${index + 1}. ${getPlaneacionTitle(doc)}`).join("\n");
-        const selected = window.prompt(`Elige una planeacion:\n\n${promptText}`);
-        const doc = opciones[Number(selected) - 1];
-        if (doc) void attachPlaneacion(doc, unidadId);
-        return;
-      }
-      Alert.alert("Adjuntar planeacion", "Selecciona una planeacion.", [
-        ...opciones.slice(0, 6).map((doc) => ({
-          text: getPlaneacionTitle(doc),
-          onPress: () => void attachPlaneacion(doc, unidadId),
-        })),
-        { text: "Cancelar", style: "cancel" },
-      ]);
-    },
-    [attachPlaneacion, documentos, showMessage],
-  );
-
   const handleCreateForSection = React.useCallback(
     (section: ClassroomContentSection) => {
-      const unidadId = section.isUnassigned ? undefined : section.id;
-      const options = [
-        {
-          text: "Actividad",
-          onPress: () => navigation.navigate("CrearTareaGrupo", { grupoId, unidadId }),
-        },
-        {
-          text: "Material",
-          onPress: () => navigation.navigate("CrearRecurso", { grupoId, unidadId }),
-        },
-        {
-          text: "Adjuntar planeacion",
-          onPress: () => handleAttachPlaneacion(unidadId),
-        },
-      ];
-
-      if (Platform.OS === "web") {
-        const selected = window.prompt(
-          `Agregar a ${section.nombre}\n\n1. Actividad\n2. Material\n3. Adjuntar planeacion`,
-          "1",
-        );
-        if (selected === "1") options[0].onPress();
-        if (selected === "2") options[1].onPress();
-        if (selected === "3") options[2].onPress();
-        return;
-      }
-
-      Alert.alert(`Agregar a ${section.nombre}`, "Elige el tipo de contenido.", [
-        ...options,
-        { text: "Cancelar", style: "cancel" },
-      ]);
+      navigation.navigate("AgregarContenidoClassroom", {
+        grupoId,
+        unidadId: section.id,
+        unidadNombre: section.nombre,
+      });
     },
-    [grupoId, handleAttachPlaneacion, navigation],
+    [grupoId, navigation],
   );
 
   const handleOpenContentItem = React.useCallback(
@@ -327,11 +214,7 @@ const ClassroomGroupScreen: React.FC = () => {
         return;
       }
       const recurso = item.raw as Recurso;
-      if (isPlaneacionResource(recurso) && recurso.url) {
-        navigation.navigate("DocEditor", { modo: "editar", planeacionId: recurso.url.replace("planeacion://", "") });
-        return;
-      }
-      navigation.navigate("CrearRecurso", { recursoId: recurso.id, grupoId, unidadId: recurso.unidadId });
+      navigation.navigate("DetalleRecursoClassroom", { recursoId: recurso.id, grupoId });
     },
     [grupoId, navigation],
   );
@@ -365,18 +248,6 @@ const ClassroomGroupScreen: React.FC = () => {
       const response = await resumirProgresoClassroom(aiContext);
       setAiWarning(response.usage?.warning ?? null);
       showMessage("Resumen IA", `${formatAiProgress(response)}\n\nEsto no sustituye la revision docente.`);
-    } finally {
-      setAiLoading(false);
-    }
-  }, [aiContext, aiLoading, showMessage]);
-
-  const runAiActivity = React.useCallback(async () => {
-    if (aiLoading) return;
-    setAiLoading(true);
-    try {
-      const response = await sugerirActividadClassroom(aiContext);
-      setAiWarning(response.usage?.warning ?? null);
-      showMessage("Sugerencia IA", `${formatAiActivity(response)}\n\nRevisala antes de crear una actividad real.`);
     } finally {
       setAiLoading(false);
     }
@@ -460,7 +331,6 @@ const ClassroomGroupScreen: React.FC = () => {
             onDeleteUnidad={handleDeleteUnidad}
             onOpenItem={handleOpenContentItem}
             onRenameUnidad={handleRenameUnidad}
-            onSuggestActivity={runAiActivity}
             onToggleUnidad={(id) => void toggleUnidad(id)}
           />
         ) : null}
@@ -502,12 +372,12 @@ const ClassStream: React.FC<{
       )}
     </View>
 
-    <View style={styles.streamMain}>
+    <View style={[styles.streamMain, isCompact ? styles.streamMainCompact : null]}>
       <TouchableOpacity style={styles.announceCard} onPress={onCreateActivity}>
         <View style={styles.teacherAvatar}>
           <MaterialIcons name="person" size={20} color="#FFFFFF" />
         </View>
-        <Text style={styles.announceText}>Publica una actividad o material para tu clase</Text>
+        <Text style={styles.announceText}>Publica un archivo, enlace o actividad evaluable en Trabajo de clase</Text>
       </TouchableOpacity>
 
       {aiWarning ? (
@@ -521,7 +391,7 @@ const ClassStream: React.FC<{
         <View style={styles.emptyCard}>
           <MaterialIcons name="dynamic-feed" size={30} color={COLORS.primary} />
           <Text style={styles.emptyTitle}>Aun no hay publicaciones</Text>
-          <Text style={styles.emptyText}>Crea contenido desde Trabajo de clase para llenar el tablon.</Text>
+          <Text style={styles.emptyText}>Agrega contenido desde Trabajo de clase para llenar el tablon.</Text>
         </View>
       ) : (
         feedItems.map((item) => <StreamPost key={item.id} item={item} onPress={() => onOpenItem(item)} />)
@@ -552,7 +422,6 @@ const CourseworkTab: React.FC<{
   onDeleteUnidad: (section: ClassroomContentSection) => void;
   onOpenItem: (item: ClassroomContentItem) => void;
   onRenameUnidad: (section: ClassroomContentSection) => void;
-  onSuggestActivity: () => void;
   onToggleUnidad: (id: string) => void;
 }> = ({
   sections,
@@ -561,7 +430,6 @@ const CourseworkTab: React.FC<{
   onDeleteUnidad,
   onOpenItem,
   onRenameUnidad,
-  onSuggestActivity,
   onToggleUnidad,
 }) => (
   <View style={styles.coursework}>
@@ -570,11 +438,15 @@ const CourseworkTab: React.FC<{
         <MaterialIcons name="topic" size={18} color="#FFFFFF" />
         <Text style={styles.primaryActionText}>Crear seccion</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.secondaryAction} onPress={onSuggestActivity}>
-        <MaterialIcons name="auto-awesome" size={18} color={COLORS.primary} />
-        <Text style={styles.secondaryActionText}>Sugerir actividad</Text>
-      </TouchableOpacity>
     </View>
+
+    {sections.length === 0 ? (
+      <View style={styles.emptyCard}>
+        <MaterialIcons name="topic" size={30} color={COLORS.primary} />
+        <Text style={styles.emptyTitle}>Aun no hay secciones</Text>
+        <Text style={styles.emptyText}>Crea una unidad para empezar a asignar materiales o actividades.</Text>
+      </View>
+    ) : null}
 
     {sections.map((section) => (
       <CourseSection
@@ -613,16 +485,12 @@ const CourseSection: React.FC<{
         <TouchableOpacity style={styles.iconButton} onPress={onAddContent}>
           <MaterialIcons name="add" size={22} color={COLORS.primary} />
         </TouchableOpacity>
-        {!section.isUnassigned ? (
-          <>
-            <TouchableOpacity style={styles.iconButton} onPress={onRename}>
-              <MaterialIcons name="edit" size={20} color="#64748B" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton} onPress={onDelete}>
-              <MaterialIcons name="delete-outline" size={20} color="#B91C1C" />
-            </TouchableOpacity>
-          </>
-        ) : null}
+        <TouchableOpacity style={styles.iconButton} onPress={onRename}>
+          <MaterialIcons name="edit" size={20} color="#64748B" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconButton} onPress={onDelete}>
+          <MaterialIcons name="delete-outline" size={20} color="#B91C1C" />
+        </TouchableOpacity>
       </View>
     </View>
 
@@ -945,6 +813,9 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 12,
     minWidth: 0,
+  },
+  streamMainCompact: {
+    width: "100%",
   },
   announceCard: {
     alignItems: "center",

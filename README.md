@@ -22,7 +22,7 @@ PlanearIA nace como una app para planeaciones educativas, pero su objetivo es cr
 La vision actual organiza el producto por experiencias:
 
 - **Planeaciones = Word/Docs:** crear, importar, editar y exportar planeaciones como documentos reales, con IA pedagogica y plantillas.
-- **Grupos y recursos = Classroom:** clases, unidades, alumnos, actividades, materiales, entregas, asistencia y calificaciones en un flujo unico.
+- **Grupos y recursos = Classroom:** clases, unidades, alumnos, materiales/enlaces/archivos asignados, actividades evaluables ligeras, entregas y calificacion contextual en un flujo unico.
 - **Diseno didactico = Canva/Genially:** crear presentaciones, examenes visuales, actividades y materiales desde un editor visual opcional.
 - **Listas y registros = Excel:** hojas/listas libres para asistencia, calificaciones, notas y registros sincronizables con Classroom.
 - **Mensajeria docente = WhatsApp profesional:** contactos, chat y envio de recursos entre docentes.
@@ -51,7 +51,7 @@ Estado del trabajo principal:
 
 - Planeaciones cerro Fase 9 como primera gran refactorizacion terminada.
 - Pasos Iniciales quedo cerrado como cimiento de GitHub Product OS, CI inicial y entorno local.
-- Classroom es el plan activo: Fases 0 a 5 completadas, Fase 6 pendiente.
+- Classroom es el plan activo: Fases 0 a 9 completadas y Fase 10 en validacion manual UX/UI.
 - `Documentacion/01-planes-maestros/meta_guia_planes.md` define el estandar para futuros planes.
 
 ---
@@ -62,7 +62,7 @@ Estado del trabajo principal:
 | ------ | ------------- | ------ |
 | Planeaciones | Fase 9 completada. Hay modelo V2, editor tipo Word/Docs, escaner, exportacion, plantilla default robusta, copiloto IA y flujo moderno. | Mantener como experiencia Word/Docs e integrarla con Classroom y plantillas/diseno. |
 | Contenido / Hub de Recursos | Hub transversal para planeaciones, recursos, entregables y plantillas. | Centro claro, sin flujos duplicados ni rutas legacy escondidas. |
-| Classroom / Grupos | Plan activo; Fases 0-5 completadas. | Fusionar grupos, alumnos, materiales, actividades, entregas, asistencia, calificaciones y reportes operativos. |
+| Classroom / Grupos | Plan activo; Fase 10 en validacion manual. | Experiencia tipo Classroom con cursos, tablon, trabajo por secciones, personas, materiales asignados y actividades con calificacion contextual. |
 | Recursos Didacticos / Biblioteca | Existen lista, creacion, contexto y ViewModels. | Gestionar diapositivas, PDFs, videos, notas, mapas mentales y lineas de tiempo. |
 | Recursos Evaluables / Tareas / Entregables | Hay tareas dentro de grupos, entregables, calificacion y asignacion de recursos. | Examenes, trabajos, rubricas, proyectos, revision, asignacion y calificacion conectada con alumnos. |
 | Alumnos | CRUD, detalle, notas, importacion, exportacion y reportes. | Perfil academico completo conectado a Classroom y Excel/Listas. |
@@ -144,7 +144,7 @@ Planes actuales:
 
 | Plan | Archivo | Estado |
 | ---- | ------- | ------ |
-| Classroom / Grupos y Recursos | [`Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`](./Documentacion/01-planes-maestros/PLAN_CLASSROOM.md) | Activo. Fases 0-5 completadas; Fase 6 pendiente. |
+| Classroom / Grupos y Recursos | [`Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`](./Documentacion/01-planes-maestros/PLAN_CLASSROOM.md) | Activo. Fase 10 en validacion manual. |
 | Planeaciones | [`Documentacion/01-planes-maestros/plan_planeaciones.md`](./Documentacion/01-planes-maestros/plan_planeaciones.md) | Cerrado. Fase 9 aprobada. |
 | Pasos iniciales | [`Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md`](./Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md) | Cerrado como cimiento organizativo. |
 | Meta guia de planes | [`Documentacion/01-planes-maestros/meta_guia_planes.md`](./Documentacion/01-planes-maestros/meta_guia_planes.md) | Vigente, define reglas para futuros planes. |
@@ -156,13 +156,13 @@ Planes actuales:
 
 ### Corto plazo
 
-- Continuar `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md` desde Fase 6.
+- Continuar `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md` con validacion manual de Fase 10.
 - Mantener GitHub Product OS alineado con fases activas.
 - Validar web/movil en cada fase de Classroom.
 
 ### Mediano plazo
 
-- Fusionar actividades, entregas, asistencia y calificaciones en Classroom.
+- Consolidar Classroom como organizador/asignador: subir archivos simples o enlaces desde `Trabajo de clase`, y crear contenido complejo en modulos especializados como Word/Docs, Canva/Genially o Excel/Listas.
 - Crear plan UX/UI y Navegacion Global cuando el flujo funcional principal este estable.
 - Preparar plan de infraestructura local/CI/deploy basico.
 - Endurecer Auth y Seguridad antes de beta con usuarios reales.

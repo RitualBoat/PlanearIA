@@ -32,7 +32,7 @@ Si eres una IA o agente nuevo, lee en este orden:
 
 - Planeaciones: cerrado como experiencia Word/Docs. Fase 9 aprobada.
 - Pasos Iniciales: cerrado como organizacion de GitHub, CI inicial y entorno.
-- Classroom: plan activo. Fases 0 a 5 completadas; siguiente paso es Fase 6.
+- Classroom: plan activo. Fases 0 a 9 completadas; Fase 10 en validacion manual y limpieza UX/UI.
 - UX/UI Global: pendiente, se hara cuando existan mas flujos funcionales.
 - Infraestructura/Auth/Excel/Canva/WhatsApp/Reportes: pendientes de planes futuros.
 
@@ -54,7 +54,7 @@ Si eres una IA o agente nuevo, lee en este orden:
 | Documento | Estado |
 | --- | --- |
 | `01-planes-maestros/meta_guia_planes.md` | Vigente; instructivo obligatorio para crear planes. |
-| `01-planes-maestros/PLAN_CLASSROOM.md` | Activo; continuar desde Fase 6. |
+| `01-planes-maestros/PLAN_CLASSROOM.md` | Activo; Fase 10 en validacion manual. |
 | `01-planes-maestros/PLAN_PASOS_INICIALES.md` | Cerrado. |
 | `01-planes-maestros/plan_planeaciones.md` | Cerrado; referencia de calidad. |
 | `01-planes-maestros/PLANEACIONES_IA_EDITOR_FASE9.md` | Soporte de cierre IA/editor de Planeaciones. |

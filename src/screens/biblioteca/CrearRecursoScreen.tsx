@@ -7,6 +7,7 @@ import {
   TextInput,
   StatusBar,
   ScrollView,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -30,6 +31,7 @@ const CrearRecursoScreen: React.FC = () => {
   const recursoId = route.params?.recursoId;
   const grupoId = route.params?.grupoId;
   const unidadId = route.params?.unidadId;
+  const returnToClassroom = route.params?.returnToClassroom;
   const vm = useCrearRecursoViewModel(recursoId, grupoId, unidadId);
 
   const [tagInput, setTagInput] = useState("");
@@ -39,6 +41,18 @@ const CrearRecursoScreen: React.FC = () => {
       vm.addTag(tagInput.trim());
       setTagInput("");
     }
+  };
+
+  const handleSaved = async () => {
+    const saved = await vm.handleGuardar();
+    if (!saved) return;
+
+    if (returnToClassroom && grupoId) {
+      navigation.navigate("ClassroomGroup", { grupoId });
+      return;
+    }
+
+    navigation.goBack();
   };
 
   const getFileIcon = (fileName?: string): string => {
@@ -117,14 +131,11 @@ const CrearRecursoScreen: React.FC = () => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <MaterialIcons name="arrow-back" size={24} color={COLORS.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Crear Recurso</Text>
-          <TouchableOpacity
-            onPress={() => {
-              void vm.handleGuardar().then(() => {
-                if (!vm.isSaving) navigation.goBack();
-              });
-            }}
-          >
+          <View style={styles.headerTitleWrap}>
+            <Text style={styles.headerTitle}>{vm.isEditMode ? "Editar material" : "Nuevo material"}</Text>
+            {grupoId ? <Text style={styles.headerSubtitle}>Se guardara en Classroom</Text> : null}
+          </View>
+          <TouchableOpacity onPress={() => void handleSaved()}>
             <MaterialIcons name="save" size={24} color={COLORS.primary} />
           </TouchableOpacity>
         </View>
@@ -133,6 +144,7 @@ const CrearRecursoScreen: React.FC = () => {
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={Platform.OS === "web"}
         >
           {/* Type pills */}
           <ScrollView
@@ -300,9 +312,7 @@ const CrearRecursoScreen: React.FC = () => {
               style={[styles.saveButton, vm.isSaving && styles.saveButtonDisabled]}
               disabled={vm.isSaving}
               onPress={() => {
-                void vm.handleGuardar().then(() => {
-                  if (!vm.isSaving) navigation.goBack();
-                });
+                void handleSaved();
               }}
             >
               <Text style={styles.saveButtonText}>
@@ -347,11 +357,31 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: COLORS.text,
   },
+  headerTitleWrap: {
+    flex: 1,
+    marginHorizontal: 12,
+  },
+  headerSubtitle: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    fontWeight: "600",
+    marginTop: 2,
+  },
   scrollView: {
     flex: 1,
+    ...(Platform.OS === "web"
+      ? ({
+          height: "100vh",
+          maxHeight: "100vh",
+          overflowY: "auto",
+        } as object)
+      : null),
   },
   scrollContent: {
-    paddingBottom: 40,
+    alignSelf: "center",
+    maxWidth: 960,
+    paddingBottom: Platform.OS === "web" ? 150 : 90,
+    width: "100%",
   },
   // Type pills
   tipoPillsScroll: {

@@ -1,6 +1,7 @@
-﻿import React from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -14,46 +15,78 @@ import type { StackNavigationProp } from "@react-navigation/stack";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../../types";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
+import AnimatedTopPill from "../../components/AnimatedTopPill";
 import { useClassroomHomeViewModel } from "../../hooks/classroom/useClassroomHomeViewModel";
 
 type Navigation = StackNavigationProp<RootStackParamList>;
+type HomeTab = "cursos" | "calendario" | "pendientes";
+
+const HOME_TABS: { key: HomeTab; label: string; icon: keyof typeof MaterialIcons.glyphMap }[] = [
+  { key: "cursos", label: "Cursos", icon: "school" },
+  { key: "calendario", label: "Calendario", icon: "event" },
+  { key: "pendientes", label: "Pendientes", icon: "assignment-late" },
+];
+
+const COVER_COLORS = ["#1E7D4F", "#2563EB", "#0F766E", "#B45309", "#4338CA"];
 
 const ClassroomHomeScreen: React.FC = () => {
   const navigation = useNavigation<Navigation>();
   const { classrooms, isLoading, error, isEmpty, totalAlumnos, totalGrupos, totalPendientes, reload } =
     useClassroomHomeViewModel();
+  const [activeTab, setActiveTab] = useState<HomeTab>("cursos");
+  const allPendientes = classrooms.flatMap((item) =>
+    item.pendientes.map((pendiente) => ({
+      ...pendiente,
+      grupoNombre: item.grupo.nombre,
+      materia: item.grupo.materia,
+    })),
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
+        style={styles.scroller}
         contentContainerStyle={styles.content}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => void reload()} />}
+        showsVerticalScrollIndicator={Platform.OS === "web"}
       >
-        <View style={styles.hero}>
-          <View style={styles.heroCopy}>
-            <Text style={styles.eyebrow}>Classroom</Text>
-            <Text style={styles.title}>Tus clases, actividades y alumnos en un solo lugar</Text>
-            <Text style={styles.subtitle}>
-              Abre un grupo para trabajar materiales, tareas, asistencia, calificaciones y reportes
-              sin saltar entre modulos.
-            </Text>
-          </View>
+        <AnimatedTopPill icon="school" title="Tus clases" size="large" subtitleNumberOfLines={3}>
+          <Text style={styles.pillSubtitle}>
+            Organiza cursos, unidades, materiales y actividades desde una experiencia tipo Classroom.
+          </Text>
           <View style={styles.heroActions}>
-            <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("CrearGrupo")}>
+            <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("CrearGrupo", { returnToClassroom: true })}>
               <MaterialIcons name="add" size={20} color="#FFFFFF" />
-              <Text style={styles.primaryButtonText}>Crear grupo</Text>
+              <Text style={styles.primaryButtonText}>Crear clase</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate("ListaGrupos")}>
-              <MaterialIcons name="list-alt" size={20} color={COLORS.primary} />
-              <Text style={styles.secondaryButtonText}>Ver legacy</Text>
+            <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate("ImportarGrupos")}>
+              <MaterialIcons name="upload-file" size={20} color={COLORS.primary} />
+              <Text style={styles.secondaryButtonText}>Importar</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </AnimatedTopPill>
 
         <View style={styles.kpiGrid}>
-          <KpiCard label="Grupos" value={String(totalGrupos)} icon="groups" />
+          <KpiCard label="Cursos" value={String(totalGrupos)} icon="groups" />
           <KpiCard label="Alumnos" value={String(totalAlumnos)} icon="school" />
           <KpiCard label="Pendientes" value={String(totalPendientes)} icon="assignment-late" />
+        </View>
+
+        <View style={styles.tabsBar}>
+          {HOME_TABS.map((tab) => (
+            <TouchableOpacity
+              key={tab.key}
+              style={[styles.tabButton, activeTab === tab.key ? styles.tabButtonActive : null]}
+              onPress={() => setActiveTab(tab.key)}
+            >
+              <MaterialIcons
+                name={tab.icon}
+                size={18}
+                color={activeTab === tab.key ? COLORS.primary : "#64748B"}
+              />
+              <Text style={[styles.tabText, activeTab === tab.key ? styles.tabTextActive : null]}>{tab.label}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         {error ? (
@@ -83,7 +116,7 @@ const ClassroomHomeScreen: React.FC = () => {
               el flujo actual.
             </Text>
             <View style={styles.emptyActions}>
-              <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("CrearGrupo")}>
+              <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("CrearGrupo", { returnToClassroom: true })}>
                 <Text style={styles.primaryButtonText}>Crear grupo</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -96,41 +129,72 @@ const ClassroomHomeScreen: React.FC = () => {
           </View>
         ) : null}
 
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Clases activas</Text>
-          <Text style={styles.sectionCaption}>Entrada moderna; las rutas legacy siguen disponibles.</Text>
-        </View>
+        {activeTab === "cursos" ? (
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Clases activas</Text>
+              <Text style={styles.sectionCaption}>Abre una clase para ver tablon, trabajo de clase y personas.</Text>
+            </View>
 
-        <View style={styles.classGrid}>
-          {classrooms.map((item) => (
-            <TouchableOpacity
-              key={item.grupo.id}
-              style={styles.classCard}
-              onPress={() =>
-                navigation.navigate("ClassroomGroup", {
-                  grupoId: item.grupo.id,
-                  grupoNombre: item.grupo.nombre,
-                })
-              }
-            >
-              <View style={styles.cardTopRow}>
-                <View style={styles.iconBadge}>
-                  <MaterialIcons name="menu-book" size={22} color={COLORS.primary} />
-                </View>
-                <Text style={styles.statusPill}>{item.grupo.estado}</Text>
-              </View>
-              <Text style={styles.classTitle}>{item.grupo.nombre}</Text>
-              <Text style={styles.classSubtitle}>
-                {item.grupo.materia} - {item.grupo.periodo}
-              </Text>
-              <View style={styles.cardMetrics}>
-                <MiniMetric label="Alumnos" value={item.resumen.totalAlumnos} />
-                <MiniMetric label="Actividades" value={item.resumen.totalActividades} />
-                <MiniMetric label="Materiales" value={item.resumen.totalMateriales} />
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
+            <View style={styles.classGrid}>
+              {classrooms.map((item, index) => (
+                <TouchableOpacity
+                  key={item.grupo.id}
+                  style={styles.classCard}
+                  onPress={() =>
+                    navigation.navigate("ClassroomGroup", {
+                      grupoId: item.grupo.id,
+                      grupoNombre: item.grupo.nombre,
+                    })
+                  }
+                >
+                  <View style={[styles.classCover, { backgroundColor: getCoverColor(index) }]}>
+                    <Text style={styles.classCoverTitle} numberOfLines={2}>{item.grupo.nombre}</Text>
+                    <Text style={styles.classCoverSubtitle}>{item.grupo.materia}</Text>
+                    <View style={styles.avatarBubble}>
+                      <Text style={styles.avatarBubbleText}>{item.grupo.nombre.slice(0, 1).toUpperCase()}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.classBody}>
+                    <Text style={styles.classSubtitle}>{item.grupo.periodo}</Text>
+                    <View style={styles.cardMetrics}>
+                      <MiniMetric label="Alumnos" value={item.resumen.totalAlumnos} />
+                      <MiniMetric label="Actividades" value={item.resumen.totalActividades} />
+                      <MiniMetric label="Materiales" value={item.resumen.totalMateriales} />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
+        ) : null}
+
+        {activeTab === "calendario" ? (
+          <TimelineList
+            emptyText="No hay fechas proximas."
+            items={allPendientes
+              .filter((item) => item.fechaLimite)
+              .sort((a, b) => new Date(a.fechaLimite ?? "").getTime() - new Date(b.fechaLimite ?? "").getTime())
+              .map((item) => ({
+                id: item.id,
+                title: item.titulo,
+                subtitle: `${item.grupoNombre} - ${formatDate(item.fechaLimite)}`,
+                icon: "event",
+              }))}
+          />
+        ) : null}
+
+        {activeTab === "pendientes" ? (
+          <TimelineList
+            emptyText="No tienes pendientes generales."
+            items={allPendientes.map((item) => ({
+              id: item.id,
+              title: item.titulo,
+              subtitle: `${item.grupoNombre} - prioridad ${item.prioridad}`,
+              icon: "assignment-late",
+            }))}
+          />
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -155,14 +219,65 @@ const MiniMetric: React.FC<{ label: string; value: number }> = ({ label, value }
   </View>
 );
 
+const TimelineList: React.FC<{
+  emptyText: string;
+  items: Array<{
+    icon: keyof typeof MaterialIcons.glyphMap;
+    id: string;
+    subtitle: string;
+    title: string;
+  }>;
+}> = ({ emptyText, items }) => (
+  <View style={styles.timelineCard}>
+    {items.length === 0 ? (
+      <View style={styles.timelineEmpty}>
+        <MaterialIcons name="event-available" size={30} color={COLORS.primary} />
+        <Text style={styles.emptyText}>{emptyText}</Text>
+      </View>
+    ) : (
+      items.map((item) => (
+        <View key={item.id} style={styles.timelineRow}>
+          <View style={styles.timelineIcon}>
+            <MaterialIcons name={item.icon} size={20} color={COLORS.primary} />
+          </View>
+          <View style={styles.timelineCopy}>
+            <Text style={styles.timelineTitle}>{item.title}</Text>
+            <Text style={styles.timelineSubtitle}>{item.subtitle}</Text>
+          </View>
+        </View>
+      ))
+    )}
+  </View>
+);
+
+function getCoverColor(index: number): string {
+  return COVER_COLORS[index % COVER_COLORS.length];
+}
+
+function formatDate(value?: string): string {
+  if (!value) return "Sin fecha";
+  const date = new Date(value);
+  return Number.isFinite(date.getTime()) ? date.toLocaleDateString() : "Sin fecha";
+}
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#F3F7FB",
   },
+  scroller: {
+    flex: 1,
+    ...(Platform.OS === "web"
+      ? ({
+          height: "100vh",
+          maxHeight: "100vh",
+          overflowY: "auto",
+        } as object)
+      : null),
+  },
   content: {
     padding: 18,
-    paddingBottom: 110,
+    paddingBottom: Platform.OS === "web" ? 160 : 110,
   },
   hero: {
     backgroundColor: "#FFFFFF",
@@ -197,6 +312,11 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 10,
     marginTop: 18,
+  },
+  pillSubtitle: {
+    color: "#64758E",
+    fontSize: 15,
+    lineHeight: 21,
   },
   primaryButton: {
     alignItems: "center",
@@ -235,6 +355,36 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 12,
     marginTop: 14,
+  },
+  tabsBar: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#DDE8F5",
+    borderRadius: 18,
+    borderWidth: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 14,
+    padding: 8,
+  },
+  tabButton: {
+    alignItems: "center",
+    borderRadius: 14,
+    flexDirection: "row",
+    gap: 7,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  tabButtonActive: {
+    backgroundColor: "#EAF2FF",
+  },
+  tabText: {
+    color: "#64748B",
+    fontSize: 13,
+    fontWeight: "900",
+  },
+  tabTextActive: {
+    color: COLORS.primary,
   },
   kpiCard: {
     backgroundColor: "#FFFFFF",
@@ -343,7 +493,45 @@ const styles = StyleSheet.create({
     borderColor: "#DDE8F5",
     borderRadius: 22,
     borderWidth: 1,
+    overflow: "hidden",
+  },
+  classCover: {
+    minHeight: 142,
     padding: 18,
+  },
+  classCoverTitle: {
+    color: "#FFFFFF",
+    fontSize: 23,
+    fontWeight: "900",
+    maxWidth: 280,
+  },
+  classCoverSubtitle: {
+    color: "rgba(255,255,255,0.88)",
+    fontSize: 14,
+    fontWeight: "800",
+    marginTop: 5,
+  },
+  avatarBubble: {
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderColor: "rgba(255,255,255,0.5)",
+    borderRadius: 999,
+    borderWidth: 3,
+    bottom: -24,
+    height: 58,
+    justifyContent: "center",
+    position: "absolute",
+    right: 18,
+    width: 58,
+  },
+  avatarBubbleText: {
+    color: COLORS.primary,
+    fontSize: 22,
+    fontWeight: "900",
+  },
+  classBody: {
+    padding: 18,
+    paddingTop: 30,
   },
   cardTopRow: {
     alignItems: "center",
@@ -400,6 +588,48 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "700",
     marginTop: 2,
+  },
+  timelineCard: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#DDE8F5",
+    borderRadius: 20,
+    borderWidth: 1,
+    marginTop: 16,
+    overflow: "hidden",
+  },
+  timelineRow: {
+    alignItems: "center",
+    borderBottomColor: "#E2E8F0",
+    borderBottomWidth: 1,
+    flexDirection: "row",
+    gap: 12,
+    padding: 15,
+  },
+  timelineIcon: {
+    alignItems: "center",
+    backgroundColor: "#EAF2FF",
+    borderRadius: 999,
+    height: 42,
+    justifyContent: "center",
+    width: 42,
+  },
+  timelineCopy: {
+    flex: 1,
+  },
+  timelineTitle: {
+    color: "#122033",
+    fontSize: 15,
+    fontWeight: "900",
+  },
+  timelineSubtitle: {
+    color: "#64748B",
+    fontSize: 12,
+    marginTop: 2,
+  },
+  timelineEmpty: {
+    alignItems: "center",
+    gap: 8,
+    padding: 24,
   },
 });
 

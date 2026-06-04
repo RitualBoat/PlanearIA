@@ -70,7 +70,7 @@ export interface CrearRecursoViewModel {
   handleSelectFile: () => Promise<void>;
   isSaving: boolean;
   isEditMode: boolean;
-  handleGuardar: () => Promise<void>;
+  handleGuardar: () => Promise<boolean>;
   handleEliminar: () => void;
   tipoOptions: { key: RecursoTipo; label: string; icon: string }[];
 }
@@ -187,10 +187,10 @@ export const useCrearRecursoViewModel = (
     }
   }, [tipo, titulo]);
 
-  const handleGuardar = useCallback(async () => {
+  const handleGuardar = useCallback(async (): Promise<boolean> => {
     if (!titulo.trim()) {
       Alert.alert("Error", "El título del recurso es obligatorio");
-      return;
+      return false;
     }
 
     setIsSaving(true);
@@ -227,8 +227,10 @@ export const useCrearRecursoViewModel = (
         await crearRecurso(recursoData);
         Alert.alert("Listo", "Recurso guardado correctamente");
       }
+      return true;
     } catch {
       Alert.alert("Error", "No se pudo guardar el recurso");
+      return false;
     } finally {
       setIsSaving(false);
     }

@@ -123,6 +123,7 @@ Estado:
 - Existe modulo `biblioteca` con lista y creacion de recursos.
 - Hay `RecursosContext`, `useCrearRecursoViewModel`, `useListaRecursosViewModel`.
 - Los recursos se conectan con contenido, grupos y asignaciones.
+- Regla vigente: Classroom debe organizar, asignar, subir archivos simples o enlazar contenido; la creacion profunda de documentos, presentaciones, examenes visuales, hojas o piezas tipo Canva/Word/Excel debe vivir en sus modulos especializados.
 
 Archivos principales:
 
@@ -141,6 +142,7 @@ Estado:
 - Hay `ListaEntregablesScreen`.
 - Hay `EntregablesContext`.
 - Existen flujos de calificar entregas y asignar recursos.
+- Regla vigente: la calificacion debe nacer desde una actividad asignada y una entrega real; evitar pantallas de calificacion sueltas sin contexto de actividad/alumno.
 
 Archivos principales:
 
@@ -158,6 +160,7 @@ Estado:
 
 - Modulo amplio con dashboard, lista, detalle, reportes, importacion y tareas.
 - Es el centro operativo para alumnos, asistencia, calificaciones y entregables.
+- Decision actual: dentro de una clase activa, la estructura principal debe parecerse a Classroom: `Tablon`, `Trabajo de clase` por secciones/unidades y `Personas`. No debe existir `Sin seccion` como apartado visible.
 
 Archivos principales:
 

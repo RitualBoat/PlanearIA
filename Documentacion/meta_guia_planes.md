@@ -53,7 +53,8 @@ Todo plan futuro debe asumir este punto de partida, salvo que el codigo demuestr
 - Navegacion: React Navigation 7.
 - Estado: React Context + hooks ViewModel.
 - Arquitectura objetivo: MVVM.
-- Persistencia local: AsyncStorage.
+- Persistencia local actual: AsyncStorage.
+- Persistencia local objetivo para datos relacionales/pesados: SQLite/Expo SQLite o una capa equivalente evaluada en el plan de infraestructura.
 - Sync: offline-first con cola de operaciones.
 - Backend actual: funciones serverless Node en `backend/api`.
 - Base remota actual: MongoDB Atlas.
@@ -397,8 +398,10 @@ Antes de redactar cualquier plan futuro, la IA debe:
 - Verificar si la documentacion esta desfasada contra el codigo.
 - Identificar que otros modulos dependen del modulo objetivo.
 - Identificar restricciones de costo, despliegue y tiempo de entrega.
+- Leer `Documentacion/GITHUB_PRODUCT_OS.md` si el plan tendra ejecucion inmediata.
+- Revisar el estado del GitHub Project si `gh` esta disponible y el usuario permite tocar work items.
 
-- Consultar el directorio `referencias-opensource/README.md`. Si el módulo a planificar tiene una arquitectura de referencia asignada en ese documento (ej. `kalvi` para el módulo de Classroom), la IA DEBE analizar los archivos de base de datos o lógica guardados en esa subcarpeta. La IA utilizará estas referencias estrictamente como inspiración arquitectónica, absteniéndose de copiar código literal y encargándose de traducir los conceptos lógicos a nuestro stack local (React Native, TypeScript, MongoDB).
+- Consultar el directorio `context/referencias-opensource/README.md`. Si el modulo a planificar tiene una arquitectura de referencia asignada en ese documento, la IA debe analizar los archivos curados de esa subcarpeta. La IA usara estas referencias estrictamente como inspiracion arquitectonica, sin copiar codigo literal y traduciendo los conceptos logicos a nuestro stack local.
 
 ---
 
@@ -469,7 +472,7 @@ Debe incluir:
 - Compatibilidad o reemplazo legacy.
 - Entidades relacionadas.
 - Indices locales/remotos.
-- Claves AsyncStorage.
+- Claves locales actuales o futuras: AsyncStorage actual, tablas SQLite futuras o repositorio local equivalente.
 - Forma de sync.
 - Forma de exportacion/importacion.
 - Campos de auditoria: `userId`, `fechaCreacion`, `fechaModificacion`, `syncStatus` o equivalente.
@@ -520,6 +523,7 @@ Debe incluir:
 - Eliminacion logica.
 - Recuperacion de borradores.
 - Validacion offline/reconexion.
+- Estrategia de migracion si el modulo debe pasar de AsyncStorage a SQLite o a otra base local.
 
 ### 6.9 Limpieza Legacy
 
@@ -584,7 +588,10 @@ Todo plan futuro debe cumplir:
 - Servicios para I/O, storage, import/export, IA y API.
 - Tipos centralizados y versionados.
 - Offline-first desde el diseno.
-- AsyncStorage como cache/fuente local.
+- Persistencia local mediante una capa desacoplada.
+- AsyncStorage es la implementacion actual para cache/datos simples.
+- SQLite/Expo SQLite debe evaluarse como destino preferente para modulos con relaciones, busquedas, volumen o sync complejo.
+- Ningun modulo nuevo debe acoplarse directamente a AsyncStorage si eso bloquea una migracion futura a SQLite.
 - MongoDB/API como respaldo remoto cuando aplique.
 - `userId` en toda entidad sincronizable.
 - No duplicar fuente de verdad.
@@ -1076,6 +1083,36 @@ Cada avance debe registrar:
 - Validacion ejecutada.
 - Riesgos pendientes.
 
+### 13.1 Markdown + GitHub Projects
+
+Los planes maestros no deben quedarse solo en markdown cuando entren a ejecucion. La regla operativa es:
+
+- El archivo markdown es la fuente de verdad arquitectonica, historica y de decisiones.
+- GitHub Projects es la fuente de verdad operativa diaria: Kanban, prioridad, estado, bloqueo y seguimiento.
+- GitHub Actions no debe usarse para guardar tareas; Actions solo valida automatizaciones como typecheck, lint, tests y deploy.
+
+Modelo recomendado para un desarrollador solo:
+
+- Crear un issue o draft item tipo `epic` por cada plan maestro.
+- Crear work items por fase cuando el plan este por ejecutarse.
+- No crear desde el primer dia un issue por cada checkbox interno si eso genera demasiado ruido.
+- Convertir a issues las tareas de la fase activa y de la siguiente fase inmediata.
+- Mantener las tareas futuras como checklist dentro del markdown hasta que esten cerca de ejecutarse.
+- Usar milestones como ciclos/sprints/release goals, no como epicas permanentes.
+- Usar labels para clasificar trabajo: `fase`, `legacy`, `ux-ui`, `offline-first`, `ai`, `infra`, `testing`, `docs`, `needs-input`, `low-cost`.
+- Al completar una fase, actualizar tanto el markdown como el Project.
+
+Mapping recomendado:
+
+| Elemento | Donde vive | Uso |
+| --- | --- | --- |
+| Plan maestro | Markdown + issue/draft `epic` | Vision, alcance y seguimiento macro. |
+| Fase | Issue o Project item | Trabajo accionable en Kanban. |
+| Tarea pequena | Checklist del issue activo | Detalle diario sin llenar el Project de ruido. |
+| Milestone | GitHub Milestone | Ciclo de trabajo o release parcial. |
+| Label | GitHub Label | Clasificacion tecnica/producto. |
+| Validacion CI | GitHub Actions | Evidencia automatica de calidad. |
+
 ---
 
 ## 14. Reglas para IAs Durante Ejecucion
@@ -1086,6 +1123,7 @@ Cuando una IA implemente una fase:
 - Debe revisar `git status`.
 - Debe no revertir cambios ajenos.
 - Debe actualizar el plan al completar avances.
+- Debe actualizar GitHub Project si el plan ya esta en ejecucion y hay work items creados.
 - Debe actualizar documentacion si cambia arquitectura.
 - Debe validar que las rutas nuevas queden enlazadas desde tabs, hubs, CTAs, menus o cards reales.
 - Debe correr validaciones proporcionales.
@@ -1103,7 +1141,7 @@ Cuando una IA implemente una fase:
 > **Version:** 1.0
 > **Fecha:** YYYY-MM-DD
 > **Alcance:** [descripcion]
-> **Stack:** React Native - Expo - TypeScript - MongoDB Atlas - AsyncStorage - MVVM
+> **Stack:** React Native - Expo - TypeScript - MongoDB Atlas - AsyncStorage actual / SQLite futuro - MVVM
 > **Modulo:** [nombre]
 > **Estado actual:** [resumen basado en codigo]
 

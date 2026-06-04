@@ -4,7 +4,7 @@
 > **Fecha:** 2026-06-03  
 > **Estado:** [ ] Plan maestro pendiente de ejecucion  
 > **Alcance:** fusionar grupos, alumnos, tareas, entregables, recursos, asistencia, calificaciones y reportes operativos en una experiencia central tipo Google Classroom, manteniendo arquitectura MVVM, offline-first y bajo costo.  
-> **Stack:** React Native 0.81.5, Expo 54, TypeScript 5.9, React Navigation 7, AsyncStorage, backend Node en `backend/api`, MongoDB Atlas/free tier, Jest + Testing Library.  
+> **Stack:** React Native 0.81.5, Expo 54, TypeScript 5.9, React Navigation 7, AsyncStorage actual con posible migracion futura a SQLite/Expo SQLite, backend Node en `backend/api`, MongoDB Atlas/free tier, Jest + Testing Library.
 > **Modulo:** Classroom / Gestion academica diaria.  
 > **Relacion con otros modulos:** Planeaciones, Contenido, Recursos Didacticos, Recursos Evaluables, Alumnos, Asistencia, Calificaciones, Plantillas, Chat, Notificaciones, Reportes, Auth/Seguridad y UX/UI Global.
 
@@ -230,9 +230,16 @@ Cada entidad nueva o modificada debe incluir, o mapear a equivalente:
 - `syncStatus` o equivalente.
 - `deletedAt` o eliminacion logica si aplica.
 
-### 5.4 Claves Locales
+### 5.4 Persistencia Local
 
-No crear claves AsyncStorage nuevas sin revisar las actuales. La fase de datos debe inventariar:
+Decision corregida antes de implementar:
+
+- AsyncStorage es la implementacion local actual.
+- SQLite/Expo SQLite es mejor candidato para el destino futuro de datos relacionales, volumen alto, busquedas, filtros, historial, asistencia, calificaciones y sync complejo.
+- Classroom no debe crear una nueva dependencia directa fuerte a AsyncStorage si eso dificulta la migracion.
+- La primera implementacion debe favorecer una capa de repositorio/facade que pueda leer desde AsyncStorage hoy y migrar a SQLite despues.
+
+La fase de datos debe inventariar:
 
 - Claves de grupos.
 - Claves de alumnos.
@@ -254,7 +261,7 @@ ClassroomScreen
     -> ClassroomContext o facade
       -> contexts existentes
       -> services existentes
-      -> AsyncStorage/API/sync
+      -> storage local desacoplado (AsyncStorage actual / SQLite futura) + API/sync
 ```
 
 ### 6.2 Capa Recomendable
@@ -298,6 +305,7 @@ La experiencia debe funcionar aunque el backend este apagado:
 - Reintentar sync.
 - Evitar spinners infinitos.
 - Mostrar conflictos de forma entendible.
+- Evitar acoplar pantallas nuevas a una API directa de AsyncStorage.
 
 ---
 
@@ -514,12 +522,14 @@ Objetivo: crear un punto de lectura/escritura para la experiencia Classroom sin 
 - [ ] **2.3 Agregar selectores para alumnos, actividades, materiales, asistencia y calificaciones por grupo.**
 - [ ] **2.4 Reutilizar servicios actuales de import/export/reportes.**
 - [ ] **2.5 Garantizar fallback local si backend falla.**
-- [ ] **2.6 Agregar tests unitarios de selectors/facade.**
+- [ ] **2.6 Definir interfaz de storage local que no bloquee migracion futura a SQLite.**
+- [ ] **2.7 Agregar tests unitarios de selectors/facade/storage.**
 
 Criterio de cierre:
 
 - [ ] Classroom puede renderizar datos locales.
 - [ ] No se rompe ningun contexto existente.
+- [ ] La capa local no queda acoplada irreversiblemente a AsyncStorage.
 - [ ] Typecheck, lint y tests pasan.
 
 ### FASE 3: Shell Classroom y Navegacion Principal
@@ -754,3 +764,41 @@ Este plan se considera completado cuando:
 No empieces a programar Classroom sin leer este plan completo, `Documentacion/meta_guia_planes.md` y `Documentacion/MAPA_MODULOS_ACTUALES.md`.
 
 La meta no es "hacer otro dashboard". La meta es que el docente abra una clase y pueda trabajar ahi sin preguntarse en que modulo vive cada cosa.
+
+---
+
+## 18. Tracking Operativo en GitHub Projects
+
+Decision antes de iniciar implementacion:
+
+- No convertir cada checkbox del plan en issue desde el inicio.
+- Usar este markdown como fuente arquitectonica y de trazabilidad completa.
+- Usar GitHub Projects como tablero operativo.
+- Mantener el item/issue padre `Plan Maestro: Classroom / Grupos y Recursos` como epic.
+- Crear issue por fase al iniciar esa fase o cuando sea la siguiente inmediata.
+- Meter las tareas internas de la fase activa como checklist dentro del issue de fase.
+- Usar milestone `Ciclo 2 - Fundacion Classroom` para las primeras fases de implementacion.
+- Usar labels segun corresponda: `fase`, `plan-maestro`, `offline-first`, `legacy`, `ux-ui`, `testing`, `docs`, `low-cost`, `needs-input`.
+
+Mapping sugerido inicial:
+
+| Work item | Tipo | Milestone | Estado inicial |
+| --- | --- | --- | --- |
+| `Plan Maestro: Classroom / Grupos y Recursos` | Epic | `Ciclo 2 - Fundacion Classroom` | Ready |
+| `Classroom Fase 0 - Auditoria profunda y preparacion` | Fase | `Ciclo 2 - Fundacion Classroom` | Ready |
+| `Classroom Fase 1 - Modelo academico unificado` | Fase | `Ciclo 2 - Fundacion Classroom` | Backlog |
+| `Classroom Fase 2 - Capa de datos y facade` | Fase | `Ciclo 2 - Fundacion Classroom` | Backlog |
+| `Classroom Fase 3 - Shell Classroom y navegacion principal` | Fase | `Ciclo 2 - Fundacion Classroom` | Backlog |
+
+Estado operativo:
+
+- [x] Issue creado para Fase 0: `https://github.com/RitualBoat/PlanearIA/issues/1`.
+- [x] Issue agregado a `PlanearIA Product OS`.
+- [x] Status inicial: `Ready`.
+- [x] Priority inicial: `P0`.
+
+Regla de actualizacion:
+
+- Cuando una fase pase de `[ ]` a `[~]`, mover su item a `In Progress`.
+- Cuando una fase pase a `[x]`, mover su item a `Review Manual` o `Done` segun si requiere validacion manual.
+- Si hay bloqueo por decision de producto, API key, costo o input del usuario, mover a `Blocked` y etiquetar `needs-input`.

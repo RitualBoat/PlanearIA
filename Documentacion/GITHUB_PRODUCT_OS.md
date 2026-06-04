@@ -62,15 +62,39 @@ Columnas/estados:
 - `Ciclo 2 - Fundacion Classroom`.
 - `Ciclo 3 - UX/Navegacion Global`.
 
-## Automatizacion local pendiente de GitHub CLI
+## Modelo de Work Items
 
-`gh` no esta instalado actualmente en la laptop. Cuando este instalado y autenticado, ejecutar:
+La documentacion markdown y GitHub Projects cumplen roles distintos:
+
+- Markdown: arquitectura, decisiones, fases completas, criterios de cierre e historial.
+- GitHub Projects: seguimiento diario, Kanban, prioridad, bloqueos y avance visible.
+- GitHub Actions: validacion automatica; no es un tablero de tareas.
+
+Regla practica para no llenar el tablero de ruido:
+
+- Crear un item/issue `epic` por plan maestro.
+- Crear un item/issue por fase cuando esa fase se vaya a ejecutar.
+- Crear issues de tareas pequenas solo para la fase activa o la siguiente fase inmediata.
+- Mantener checkboxes futuros dentro del plan markdown hasta que sea momento de ejecutarlos.
+- Usar milestones como ciclos/sprints/release goals, no como epicas.
+- Usar labels para clasificar: `fase`, `ux-ui`, `legacy`, `offline-first`, `ai`, `infra`, `testing`, `docs`, `needs-input`, `low-cost`.
+
+Ejemplo recomendado para Classroom:
+
+- Epic: `Plan Maestro: Classroom / Grupos y Recursos`.
+- Milestone: `Ciclo 2 - Fundacion Classroom`.
+- Issue fase activa: `Classroom Fase 0 - Auditoria profunda y preparacion`.
+- Checklist dentro del issue: tareas `0.1` a `0.7`.
+
+## Automatizacion local con GitHub CLI
+
+`gh` ya esta instalado y autenticado en la laptop. Si se necesita reconstruir labels/milestones, ejecutar:
 
 ```powershell
 .\scripts\github-bootstrap.ps1
 ```
 
-Ese script crea labels y milestones. El Project v2 puede requerir permisos extra (`project` scope), por lo que si falla, crearlo manualmente desde GitHub con el nombre y vistas indicadas arriba.
+Ese script crea/verifica labels y milestones. El Project v2 ya existe como `PlanearIA Product OS`; si falla por permisos, revisar que `gh auth status` tenga scope `project`.
 
 ## Templates creados
 

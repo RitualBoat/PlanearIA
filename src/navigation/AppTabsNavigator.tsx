@@ -7,7 +7,7 @@ import { COLORS, PostAttachment } from "../../types";
 
 import FeedScreen from "../screens/feed/FeedScreen";
 import ContenidoScreen from "../screens/contenido/ContenidoScreen";
-import GruposDashboardScreen from "../screens/grupos/GruposDashboardScreen";
+import ClassroomHomeScreen from "../screens/classroom/ClassroomHomeScreen";
 import SocialScreen from "../screens/social/SocialScreen";
 import CuentaScreen from "../screens/cuenta/CuentaScreen";
 import FloatingActionIcons from "../components/FloatingActionIcons";
@@ -124,7 +124,7 @@ const AppTabsNavigator: React.FC = () => {
         />
         <Tab.Screen
           name="GruposTab"
-          component={GruposDashboardScreen}
+          component={ClassroomHomeScreen}
           options={{
             title: labels.GruposTab,
             tabBarAccessibilityLabel: "Grupos",

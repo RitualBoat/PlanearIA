@@ -29,6 +29,7 @@ import CrearGrupoScreen from "../screens/grupos/CrearGrupoScreen";
 import DetalleGrupoScreen from "../screens/grupos/DetalleGrupoScreen";
 import ReportesGrupoScreen from "../screens/grupos/ReportesGrupoScreen";
 import ImportarGruposScreen from "../screens/grupos/ImportarGruposScreen";
+import ClassroomGroupScreen from "../screens/classroom/ClassroomGroupScreen";
 
 // Pantallas de Tareas dentro de Grupos
 import CrearTareaGrupoScreen from "../screens/grupos/tareas/CrearTareaGrupoScreen";
@@ -141,6 +142,10 @@ export type RootStackParamList = {
   DetalleGrupo: {
     grupoId: number;
     grupoNombre: string;
+  };
+  ClassroomGroup: {
+    grupoId: number;
+    grupoNombre?: string;
   };
   ReportesGrupo: {
     grupoId: number;
@@ -431,6 +436,14 @@ const StackNavigator: React.FC = () => {
         component={DetalleGrupoScreen}
         options={{
           title: "Detalle del Grupo",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="ClassroomGroup"
+        component={ClassroomGroupScreen}
+        options={{
+          title: "Classroom",
           headerShown: false,
         }}
       />

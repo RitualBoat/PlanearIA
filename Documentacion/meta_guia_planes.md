@@ -1120,6 +1120,7 @@ Mapping recomendado:
 Cuando una IA implemente una fase:
 
 - Debe leer la fase completa.
+- Debe leer `.agents/skills/token-efficiency/SKILL.md` y decidir modo `NORMAL` o `CAVEMAN` antes de actuar.
 - Debe revisar `git status`.
 - Debe no revertir cambios ajenos.
 - Debe actualizar el plan al completar avances.
@@ -1130,6 +1131,32 @@ Cuando una IA implemente una fase:
 - Debe hacer commit solo si el usuario lo pide.
 - Debe pedir confirmacion antes de saltar a otra fase grande si el usuario lo solicito.
 - Debe detenerse si una decision de producto cambia el rumbo.
+
+### 14.1 Uso Obligatorio de `token-efficiency` / Modo Caveman
+
+Cada plan maestro debe indicar en que fases conviene usar la skill:
+
+- Skill fuente: `.agents/skills/token-efficiency/SKILL.md`.
+- Modo `NORMAL`: usar para auditoria, planeacion, arquitectura, decisiones UX/UI, decisiones de producto, investigacion, prompts de IA, dudas, checkpoints y entregables documentales.
+- Modo `CAVEMAN`: usar para ejecutar tareas ya aprobadas y mecanicas: crear archivos desde una especificacion, mover/renombrar, actualizar imports, implementar helpers/facades, escribir tests definidos, corregir lint/typecheck, correr validaciones, marcar checkboxes y sincronizar GitHub Project.
+- No usar `CAVEMAN` cuando todavia haya ambiguedad, riesgo de arquitectura, decision de navegacion, decision de costo, seguridad o UX/IHC.
+- Si una fase mezcla pensamiento y ejecucion, la IA debe trabajar primero en `NORMAL`, cerrar decision, y despues cambiar a `CAVEMAN` para la implementacion mecanica.
+- Al final de una fase, volver a `NORMAL` para resumir evidencia, riesgos y pedir confirmacion si aplica.
+
+Regla de trazabilidad:
+
+- En cada plan nuevo debe existir una seccion breve llamada `Modo de Trabajo Recomendado` o notas por fase indicando si se espera `NORMAL`, `CAVEMAN` o mixto.
+- Las issues de GitHub pueden incluir una linea `Modo sugerido: NORMAL/CAVEMAN/Mixto` para orientar a futuras IAs.
+
+### 14.2 Guia Opcional de Modelos y Razonamiento
+
+Esta guia es orientativa y no debe bloquear el trabajo si los modelos disponibles cambian:
+
+- Planeacion estrategica, arquitectura, auditorias profundas, seguridad, UX/IHC con Nielsen: usar modelos fuertes con razonamiento `high` o `xhigh` como Codex 5.5, Claude Opus thinking o Gemini 3.1 Pro.
+- Implementacion extensa con contexto de repo, refactors, tests y fixes: usar Codex 5.4 o 5.5 en `medium/high`; subir a `xhigh` si hay bugs dificiles o migraciones delicadas.
+- Cambios mecanicos, documentacion menor, checkboxes, labels, issues y validaciones repetitivas: usar Codex 5.4 mini o modelo rapido en `low/medium`, siempre con modo `CAVEMAN`.
+- Revisiones cruzadas de producto, copy UX o alternativas de diseno: usar un segundo modelo fuerte en `high` como contraste, sin copiar codigo externo.
+- IA/costos/infraestructura: preferir razonamiento alto para decidir, pero implementacion en modo eficiente una vez aprobada la ruta.
 
 ---
 
@@ -1166,6 +1193,12 @@ Cuando una IA implemente una fase:
 ## Costos e Infraestructura
 
 ## Limpieza Legacy
+
+## Modo de Trabajo Recomendado
+
+- NORMAL: auditoria, decisiones, arquitectura, UX/UI, seguridad, IA, costos y checkpoints.
+- CAVEMAN: implementacion mecanica aprobada, tests, validaciones, updates de plan y GitHub Project.
+- Modelo sugerido: [opcional, segun complejidad y disponibilidad].
 
 ## Fases de Ejecucion
 

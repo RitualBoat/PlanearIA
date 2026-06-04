@@ -478,9 +478,27 @@ Si en una fase aparece necesidad de almacenamiento pesado, emails, push o IA pag
 
 ## 12. Fases de Ejecucion
 
+### Modo de Trabajo Recomendado
+
+Antes de ejecutar cualquier fase, la IA debe leer `.agents/skills/token-efficiency/SKILL.md`.
+
+- `NORMAL`: usar para auditorias, decisiones de arquitectura, dudas de producto, diseno UX/UI, seguridad, IA, costos, checkpoints y explicaciones al usuario.
+- `CAVEMAN`: usar para implementacion mecanica ya aprobada, creacion de archivos, helpers, facades, ViewModels, tests, correcciones de lint/typecheck, updates de checklist y sincronizacion con GitHub Project.
+- Mixto: usar `NORMAL` al inicio para confirmar criterio tecnico y `CAVEMAN` durante la ejecucion mecanica.
+- Volver a `NORMAL` al cerrar una fase para reportar evidencia, riesgos y pedir confirmacion si aplica.
+
+Guia opcional de modelos:
+
+- Planeacion/auditoria/arquitectura: Codex 5.5 `high/xhigh`, Gemini 3.1 Pro, Claude Opus thinking o Claude Sonnet thinking.
+- Implementacion de fases Classroom: Codex 5.4 o 5.5 `medium/high`.
+- Cambios mecanicos, checkboxes, issues, validaciones: Codex 5.4 mini o modelo rapido `low/medium` con modo `CAVEMAN`.
+- Bugs dificiles de sync/navegacion o migraciones delicadas: subir a razonamiento `high/xhigh`.
+
 ### FASE 0: Auditoria Profunda y Preparacion
 
 Objetivo: confirmar rutas, datos y dependencias antes de tocar codigo.
+
+Modo sugerido: `NORMAL`. Esta fase requiere lectura, criterio y registro de riesgos.
 
 - [x] **0.1 Auditar rutas actuales de grupos/alumnos/tareas/asistencia/calificaciones.**
 - [x] **0.2 Auditar contexts y servicios usados por cada pantalla.**
@@ -510,6 +528,8 @@ Resultado de ejecucion:
 
 Objetivo: definir contratos para que `Grupo` funcione como clase madre sin romper datos actuales.
 
+Modo sugerido: mixto. `NORMAL` para decidir contratos; `CAVEMAN` para crear tipos, helpers y tests una vez aprobados.
+
 - [x] **1.1 Revisar `types/index.ts` para `Grupo`, `Alumno`, `Tarea`, `EntregaTarea`, `Recurso`, `Asistencia` y `Calificacion`.**
 - [x] **1.2 Crear `types/classroom.ts` solo si aporta tipos derivados o ViewModels.**
 - [x] **1.3 Definir `ClassroomResumen`, `ClassroomActividadReciente` y `ClassroomPendiente` si hacen falta.**
@@ -534,42 +554,70 @@ Resultado de ejecucion:
 
 Objetivo: crear un punto de lectura/escritura para la experiencia Classroom sin reescribir contexts existentes.
 
-- [ ] **2.1 Crear `src/services/classroom/classroomFacade.ts` o equivalente.**
-- [ ] **2.2 Agregar selectores para resumen de grupo.**
-- [ ] **2.3 Agregar selectores para alumnos, actividades, materiales, asistencia y calificaciones por grupo.**
-- [ ] **2.4 Reutilizar servicios actuales de import/export/reportes.**
-- [ ] **2.5 Garantizar fallback local si backend falla.**
-- [ ] **2.6 Definir interfaz de storage local que no bloquee migracion futura a SQLite.**
-- [ ] **2.7 Agregar tests unitarios de selectors/facade/storage.**
+Modo sugerido: `CAVEMAN` para implementar `classroomFacade`, selectores, storage abstraction y tests, porque la decision arquitectonica ya esta definida. Volver a `NORMAL` si aparece una decision real sobre AsyncStorage vs SQLite o cambio de sync.
+
+- [x] **2.1 Crear `src/services/classroom/classroomFacade.ts` o equivalente.**
+- [x] **2.2 Agregar selectores para resumen de grupo.**
+- [x] **2.3 Agregar selectores para alumnos, actividades, materiales, asistencia y calificaciones por grupo.**
+- [x] **2.4 Reutilizar servicios actuales de import/export/reportes.**
+- [x] **2.5 Garantizar fallback local si backend falla.**
+- [x] **2.6 Definir interfaz de storage local que no bloquee migracion futura a SQLite.**
+- [x] **2.7 Agregar tests unitarios de selectors/facade/storage.**
 
 Criterio de cierre:
 
-- [ ] Classroom puede renderizar datos locales.
-- [ ] No se rompe ningun contexto existente.
-- [ ] La capa local no queda acoplada irreversiblemente a AsyncStorage.
-- [ ] Typecheck, lint y tests pasan.
+- [x] Classroom puede renderizar datos locales.
+- [x] No se rompe ningun contexto existente.
+- [x] La capa local no queda acoplada irreversiblemente a AsyncStorage.
+- [x] Typecheck, lint y tests pasan.
+
+Resultado de ejecucion:
+
+- Se creo `src/services/classroom/classroomStorage.ts` con `ClassroomStoragePort`, `AsyncStorageClassroomStorage`, `MemoryClassroomStorage` y claves academicas centralizadas.
+- Se creo `src/services/classroom/classroomFacade.ts` como punto unico para leer grupos, alumnos, actividades, materiales, asistencia, calificaciones y entregas por `grupoId`.
+- La facade consume el modelo de Fase 1 y expone `getClassroomModel`, `listGruposResumen` y selectores por seccion.
+- Se agrego fallback para la deuda historica `@planearia:entregables` / `@planearia:tareas`, filtrando por forma de dato para evitar mezclar `Tarea` con `EntregaTarea`.
+- Se agregaron pruebas en `src/__tests__/classroom/classroomFacade.test.ts`.
+- Validaciones ejecutadas: `npx tsc --noEmit`, `npx jest src/__tests__/classroom --runInBand` y lint focalizado.
 
 ### FASE 3: Shell Classroom y Navegacion Principal
 
 Objetivo: convertir `GruposTab` en entrada real a Classroom sin romper rutas viejas.
 
-- [ ] **3.1 Crear `src/screens/classroom/ClassroomHomeScreen.tsx`.**
-- [ ] **3.2 Crear `src/screens/classroom/ClassroomGroupScreen.tsx`.**
-- [ ] **3.3 Integrar entrada desde `AppTabsNavigator` o ruta actual de grupos.**
-- [ ] **3.4 Mantener redireccion segura a pantallas legacy mientras se migran secciones.**
-- [ ] **3.5 Crear header/acciones rapidas coherentes web/movil.**
-- [ ] **3.6 Agregar estados vacios y offline.**
-- [ ] **3.7 Validar que volver/cancelar no pierda contexto.**
+Modo sugerido: mixto. `NORMAL` para revisar UX/navegacion antes de tocar rutas; `CAVEMAN` para crear pantallas, conectar navigation y agregar tests.
+
+- [x] **3.1 Crear `src/screens/classroom/ClassroomHomeScreen.tsx`.**
+- [x] **3.2 Crear `src/screens/classroom/ClassroomGroupScreen.tsx`.**
+- [x] **3.3 Integrar entrada desde `AppTabsNavigator` o ruta actual de grupos.**
+- [x] **3.4 Mantener redireccion segura a pantallas legacy mientras se migran secciones.**
+- [x] **3.5 Crear header/acciones rapidas coherentes web/movil.**
+- [x] **3.6 Agregar estados vacios y offline.**
+- [x] **3.7 Validar que volver/cancelar no pierda contexto.**
+- [x] **3.8 Ajuste post-validacion manual: corregir scroll web cortado dentro de clase activa.**
+- [x] **3.9 Ajuste post-validacion manual: acercar la clase activa a un patron visual Google Classroom/Classroomio.**
 
 Criterio de cierre:
 
-- [ ] `GruposTab` abre la experiencia Classroom.
-- [ ] Abrir un grupo lleva a `ClassroomGroupScreen`.
-- [ ] Las rutas legacy siguen accesibles solo donde sean necesarias.
+- [x] `GruposTab` abre la experiencia Classroom.
+- [x] Abrir un grupo lleva a `ClassroomGroupScreen`.
+- [x] Las rutas legacy siguen accesibles solo donde sean necesarias.
+
+Resultado de ejecucion:
+
+- Se creo `src/screens/classroom/ClassroomHomeScreen.tsx` como nueva entrada de `GruposTab`.
+- Se creo `src/screens/classroom/ClassroomGroupScreen.tsx` como shell madre por grupo, con KPIs, acciones contextuales, pendientes, actividad reciente y salida a detalle legacy.
+- Se agregaron ViewModels `useClassroomHomeViewModel` y `useClassroomGroupViewModel`.
+- `AppTabsNavigator` ahora apunta `GruposTab` a `ClassroomHomeScreen`.
+- `StackNavigator` incluye la ruta `ClassroomGroup` y conserva `DetalleGrupo`, `ListaGrupos`, `CrearGrupo`, `ImportarGrupos`, tareas, asistencia, calificaciones y reportes legacy.
+- Validaciones ejecutadas: `npx tsc --noEmit`, `npx jest src/__tests__/classroom --runInBand` y lint focalizado de rutas/pantallas/hooks nuevos.
+- Tras revision manual en `context/classroom-ground-truth/01-errores-actuales`, se corrigio el scroll web de `ClassroomGroupScreen` y se cambio la composicion visual a banner de clase, pestañas tipo Classroom, columna lateral de resumen y stream principal.
+- El rediseño visual base pertenece a Classroom porque afecta el flujo del modulo. La auditoria final de consistencia, Nielsen, accesibilidad y tokens visuales queda para Fase 10 / UX-UI Global.
 
 ### FASE 4: Seccion Alumnos y Lista del Grupo
 
 Objetivo: que el docente administre participantes desde la clase.
+
+Modo sugerido: `CAVEMAN` si se reutilizan pantallas/contextos existentes; cambiar a `NORMAL` si hay que decidir nuevo flujo de importacion, mover alumnos o acciones masivas.
 
 - [ ] **4.1 Crear seccion `Alumnos` dentro de `ClassroomGroupScreen`.**
 - [ ] **4.2 Reutilizar creacion/importacion/exportacion de alumnos.**
@@ -588,6 +636,8 @@ Criterio de cierre:
 
 Objetivo: llevar recursos didacticos al contexto de grupo.
 
+Modo sugerido: mixto. `NORMAL` para evitar duplicidad con `ContenidoScreen`; `CAVEMAN` para implementar filtros, rutas y tests ya definidos.
+
 - [ ] **5.1 Crear seccion `Materiales`.**
 - [ ] **5.2 Mostrar recursos asignados al grupo.**
 - [ ] **5.3 Permitir crear recurso desde grupo.**
@@ -604,6 +654,8 @@ Criterio de cierre:
 ### FASE 6: Actividades, Tareas y Entregables
 
 Objetivo: unificar recursos evaluables dentro de la clase.
+
+Modo sugerido: mixto. `NORMAL` para resolver vocabulario `Tarea`/`Entregable`/`EntregaTarea` y rubricas; `CAVEMAN` para integrar servicios, estados y pruebas.
 
 - [ ] **6.1 Crear seccion `Actividades`.**
 - [ ] **6.2 Mostrar tareas por estado: borrador, publicada, en curso, cerrada, calificada.**
@@ -623,6 +675,8 @@ Criterio de cierre:
 
 Objetivo: mover controles academicos diarios al mismo espacio.
 
+Modo sugerido: `CAVEMAN` para integrar secciones y reutilizar servicios actuales. Usar `NORMAL` solo si se redefine modelo de calificaciones o reglas academicas.
+
 - [ ] **7.1 Crear seccion `Asistencia`.**
 - [ ] **7.2 Registrar asistencia desde grupo con fecha clara.**
 - [ ] **7.3 Ver historial de asistencia por grupo.**
@@ -640,6 +694,8 @@ Criterio de cierre:
 
 Objetivo: dar al docente informacion accionable sin convertir Classroom en un dashboard saturado.
 
+Modo sugerido: mixto. `NORMAL` para decidir indicadores utiles y carga cognitiva; `CAVEMAN` para conectar reportes existentes y tests.
+
 - [ ] **8.1 Crear seccion `Reportes` dentro del grupo.**
 - [ ] **8.2 Reutilizar reportes de grupo y alumno.**
 - [ ] **8.3 Mostrar indicadores simples: asistencia baja, tareas pendientes, promedio bajo.**
@@ -655,6 +711,8 @@ Criterio de cierre:
 ### FASE 9: IA Classroom y Automatizaciones Pedagogicas
 
 Objetivo: agregar IA solo cuando el flujo base sea estable.
+
+Modo sugerido: `NORMAL` al inicio, porque hay decisiones de costo, prompts, limites, privacidad y revision humana. Cambiar a `CAVEMAN` solo al implementar endpoints/tests ya especificados.
 
 - [ ] **9.1 Definir casos IA reales para Classroom.**
 - [ ] **9.2 Reutilizar `aiGateway` y limites por accion.**
@@ -674,6 +732,8 @@ Criterio de cierre:
 
 Objetivo: dejar Classroom usable, profesional y sin rutas duplicadas.
 
+Modo sugerido: `NORMAL` para auditoria IHC con heuristicas de Nielsen y severidad 0-4. Usar `CAVEMAN` solo para aplicar fixes mecanicos ya priorizados.
+
 - [ ] **10.1 Auditar Classroom con reglas de navegacion de `meta_guia_planes.md`.**
 - [ ] **10.2 Verificar entradas desde tabs, `ContenidoScreen`, cards, FABs y acciones contextuales.**
 - [ ] **10.3 Ocultar o redirigir rutas legacy que ya tengan reemplazo.**
@@ -691,6 +751,8 @@ Criterio de cierre:
 ### FASE FINAL: Validacion, Documentacion y Cierre
 
 Objetivo: cerrar el plan con evidencia tecnica y manual.
+
+Modo sugerido: `CAVEMAN` para correr validaciones, marcar checkboxes, actualizar Project y preparar commit. Usar `NORMAL` para el resumen final y confirmacion del usuario.
 
 - [ ] **F.1 Ejecutar `npx tsc --noEmit`.**
 - [ ] **F.2 Ejecutar `npm run lint -- --quiet`.**
@@ -822,6 +884,12 @@ Estado operativo:
 - [x] Issue de Fase 1 agregado a `PlanearIA Product OS`.
 - [x] Fase 1 movida a `In Progress` al iniciar ejecucion.
 - [x] Fase 1 ejecutada y lista para `Done`.
+- [x] Issue creado para Fase 2: `https://github.com/RitualBoat/PlanearIA/issues/3`.
+- [x] Issue de Fase 2 agregado a `PlanearIA Product OS`.
+- [x] Fase 2 ejecutada y marcada como `Done`.
+- [x] Issue creado para Fase 3: `https://github.com/RitualBoat/PlanearIA/issues/4`.
+- [x] Issue de Fase 3 agregado a `PlanearIA Product OS`.
+- [x] Fase 3 ejecutada y marcada como `Done`.
 
 Regla de actualizacion:
 

@@ -62,6 +62,18 @@ La propuesta original de Gemini era util, pero habia que endurecerla por licenci
 
 ## Que Leer Segun Modulo
 
+### Regla Obligatoria Para Planes Maestros
+
+Todo plan maestro debe consultar esta seccion antes de definir fases. Si el modulo busca paridad alta con una experiencia madre y no hay referencia curada, la IA debe pedir al desarrollador URLs de GitHub y ground truth visual antes de implementar pantallas.
+
+Cada fase o tarea que toque UX/UI debe citar las referencias concretas que usara:
+
+- `context/<modulo>-ground-truth/03-referencias-reales/...` para capturas reales.
+- `context/referencias-opensource/<repo>/FUENTE.md` para repos curados.
+- `context/referencias-opensource/<repo>/ARCHITECTURE_PATHS.md` para rutas importantes.
+
+No basta escribir "tipo Word", "tipo Classroom", "tipo Excel" o "tipo Canva". La fase debe decir exactamente que capturas y repos guian la implementacion.
+
 ### Planeaciones / Word
 
 Leer:
@@ -105,6 +117,56 @@ Leer:
 - `jaaz-ai-local/ARCHITECTURE_PATHS.md`
 
 Uso: inspirar herramientas IA con contexto visual, no copiar implementacion.
+
+### Listas / Excel / Google Sheets
+
+Estado: referencia open source pendiente.
+
+Se necesita que el desarrollador proporcione URLs de repos GitHub para curar una o mas referencias de:
+
+- Grid tipo Excel/Sheets.
+- Edicion de celdas.
+- Formulas basicas.
+- Filtros y ordenamiento.
+- Import/export CSV/XLSX.
+- Manejo offline/local.
+
+Carpeta futura sugerida para repos curados:
+
+- `context/referencias-opensource/excel-sheets-grid/`
+
+Ground truth local ya preparado:
+
+- `context/excel-ground-truth/01-errores-actuales/README.md`
+- `context/excel-ground-truth/02-capturas-actuales-de-la-app/`
+- `context/excel-ground-truth/03-referencias-reales/`
+
+Uso: futuros planes de listas/registros deben pedir estas referencias antes de implementar la experiencia tipo Excel.
+
+### Chat / WhatsApp Profesional
+
+Estado: referencia open source pendiente.
+
+Se necesita que el desarrollador proporcione URLs de repos GitHub para curar una o mas referencias de:
+
+- Lista de conversaciones tipo WhatsApp.
+- Pantalla de conversacion.
+- Adjuntos.
+- Estados de envio/pendiente/error.
+- Busqueda.
+- Mensajes offline y reintentos.
+
+Carpeta futura sugerida para repos curados:
+
+- `context/referencias-opensource/whatsapp-chat/`
+
+Ground truth local ya preparado:
+
+- `context/chat-ground-truth/01-errores-actuales/README.md`
+- `context/chat-ground-truth/02-capturas-actuales-de-la-app/`
+- `context/chat-ground-truth/03-referencias-reales/`
+
+Uso: futuros planes de mensajeria deben pedir estas referencias antes de implementar la experiencia tipo WhatsApp.
 
 ### Funciones Remotas / Extras Futuras
 

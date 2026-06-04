@@ -406,6 +406,60 @@ Antes de redactar cualquier plan futuro, la IA debe:
 
 - Consultar el directorio `context/referencias-opensource/README.md`. Si el modulo a planificar tiene una arquitectura de referencia asignada en ese documento, la IA debe analizar los archivos curados de esa subcarpeta. La IA usara estas referencias estrictamente como inspiracion arquitectonica, sin copiar codigo literal y traduciendo los conceptos logicos a nuestro stack local.
 
+### 5.1 Contrato de Experiencia Madre y Ground Truth por Fase
+
+Antes de escribir o ejecutar un plan, la IA debe clasificar el modulo por nivel de paridad esperado:
+
+- `Clon/paridad alta`: debe sentirse casi como una experiencia conocida. Aplica a Word/Docs, Classroom/Classroomio, Excel/Sheets, Canva/Genially y WhatsApp profesional.
+- `Inspirado/paridad media`: toma patrones de una app conocida, pero puede adaptar la experiencia. Aplica a social, chat docente si no se busca clon exacto, reportes y notificaciones.
+- `Funcional/administrativo`: prioriza robustez, seguridad, costo y mantenibilidad. Aplica a infraestructura, auth/seguridad, sync y configuracion interna.
+
+Si el modulo es `Clon/paridad alta`, el plan no puede quedarse en frases como "tipo Classroom" o "tipo Canva". Debe convertir las referencias en contrato verificable:
+
+- Rutas exactas de capturas en `context/<modulo>-ground-truth/`.
+- Rutas exactas de referencias reales dentro de `context/<modulo>-ground-truth/03-referencias-reales/`.
+- Repos open source relevantes segun `context/referencias-opensource/README.md`.
+- Pantallas/flujos que se desean clonar.
+- Pantallas/flujos que se prohibe introducir porque rompen la experiencia madre.
+- Rutas legacy que no deben aparecer en el flujo principal.
+- Checklist visual y de navegacion por fase.
+
+Antes de implementar cualquier fase de un modulo de paridad alta, la IA debe generar un `Brief de Implementacion de Fase` dentro del plan o del issue activo. Ese brief debe incluir:
+
+```markdown
+### Brief Ground Truth - Fase X
+
+- Nivel de paridad: Clon/paridad alta.
+- Referencias reales obligatorias:
+  - `context/<modulo>-ground-truth/03-referencias-reales/...`
+- Capturas actuales a comparar:
+  - `context/<modulo>-ground-truth/02-capturas-actuales-de-la-app/...`
+- Referencias open source obligatorias:
+  - `context/referencias-opensource/<repo>/FUENTE.md`
+  - `context/referencias-opensource/<repo>/ARCHITECTURE_PATHS.md`
+- Pantallas/flujo a imitar:
+  - ...
+- Flujos legacy prohibidos:
+  - ...
+- Criterio de cierre UX:
+  - El usuario confirma que se siente como [Word/Classroom/Excel/Canva/WhatsApp], no como modulos sueltos.
+```
+
+Si no existe carpeta de ground truth para el modulo, la IA debe crear o pedir al desarrollador esta estructura antes de cerrar el plan:
+
+```text
+context/<modulo>-ground-truth/
+  01-errores-actuales/README.md
+  02-capturas-actuales-de-la-app/
+  03-referencias-reales/
+  04-flujos-deseados/
+  05-notas-del-desarrollador/README.md
+```
+
+Si faltan referencias open source para el modulo objetivo, la IA debe pedir URLs de repositorios GitHub y registrar la necesidad en `context/referencias-opensource/README.md`. No debe inventar que tiene referencia open source si no existe.
+
+Regla de cierre: en modulos de paridad alta, TypeScript, lint y tests no bastan. La fase solo puede cerrarse como `[x]` cuando tambien exista validacion manual o checklist visual contra ground truth.
+
 ---
 
 ## 6. Estructura Obligatoria de Todo Plan Maestro
@@ -434,8 +488,11 @@ Debe incluir:
 - Tabla de brechas.
 - Hallazgos clave.
 - Implicaciones en datos, UX, IA, backend y offline-first.
+- Nivel de paridad esperado: `Clon/paridad alta`, `Inspirado/paridad media` o `Funcional/administrativo`.
+- Tabla de referencias obligatorias con rutas concretas a `context/<modulo>-ground-truth/` y `context/referencias-opensource/`.
+- Lista de capturas o repositorios faltantes que el desarrollador debe proporcionar antes de ejecutar fases UI.
 
-Si no hay ground truth, la IA debe pedirlo o crear una investigacion local basada en pantallas existentes, tipos y casos docentes realistas.
+Si no hay ground truth suficiente, la IA debe pedirlo o crear una investigacion local basada en pantallas existentes, tipos y casos docentes realistas. Para modulos de `Clon/paridad alta`, pedir ground truth no es opcional: se debe indicar exactamente que carpetas crear y que capturas/URLs entregar antes de implementar pantallas.
 
 ### 6.3 Inventario del Codigo Actual
 
@@ -550,6 +607,30 @@ Cada plan debe tener fases numeradas con checkboxes:
 
 No usar otros estados.
 
+Cada fase que toque UX, navegacion, pantallas, modales, flujos de creacion/edicion o integracion con otros modulos debe incluir un bloque `Brief Ground Truth - Fase X`. Ese bloque debe citar referencias concretas y no solo una descripcion general.
+
+Formato obligatorio para fases de paridad alta:
+
+```markdown
+### FASE X: [Nombre]
+
+Brief Ground Truth - Fase X:
+
+- Experiencia madre a imitar: [Word/Docs | Classroom/Classroomio | Excel/Sheets | Canva/Genially | WhatsApp].
+- Referencias reales:
+  - `context/<modulo>-ground-truth/03-referencias-reales/...`
+- Capturas actuales:
+  - `context/<modulo>-ground-truth/02-capturas-actuales-de-la-app/...`
+- Referencias open source:
+  - `context/referencias-opensource/<repo>/FUENTE.md`
+- Flujos prohibidos:
+  - [rutas legacy, modales antiguos, CTAs administrativos sueltos].
+- Validacion visual:
+  - [comparacion manual requerida antes de cerrar].
+
+- [ ] **X.1 ...**
+```
+
 Estructura recomendada:
 
 - Fase 0: Auditoria y preparacion.
@@ -577,6 +658,8 @@ Debe incluir:
 - Validacion de costo/configuracion cuando aplique.
 - Validacion de navegacion: entrar al modulo desde todos los puntos esperados, ejecutar acciones principales y volver sin perder contexto.
 - Validacion UX/UI: revisar redundancia, claridad de CTAs, contraste, jerarquia visual, estados vacios y accesibilidad basica.
+- Validacion de paridad para experiencias madre: comparar pantalla/flujo contra las rutas de ground truth citadas en la fase.
+- Confirmacion del desarrollador cuando el objetivo sea un clon/paridad alta: no cerrar como `[x]` solo por pasar validaciones automaticas.
 
 ---
 
@@ -873,6 +956,20 @@ Todo plan con IA debe exigir:
 ---
 
 ## 12. Directrices por Modulo Futuro
+
+### 12.0 Experiencias Madre Declaradas
+
+Cuando un plan toque estos dominios, debe tratarlos como `Clon/paridad alta` salvo que el desarrollador diga lo contrario:
+
+| Dominio | Experiencia madre | Ground truth esperado |
+| --- | --- | --- |
+| Planeaciones | Word/Google Docs | Documento paginado, toolbar, plantillas, import/export. |
+| Classroom/Grupos | Google Classroom/Classroomio | Cursos, tablon, trabajo por unidades, personas, detalle de actividad/material. |
+| Recursos visuales | Canva/Genially | Canvas, templates, panel lateral, capas, paginas, exportacion. |
+| Listas/registros | Excel/Google Sheets | Grid editable, columnas, formulas, filtros, import/export. |
+| Chat/mensajeria | WhatsApp profesional | Lista de chats, conversacion, adjuntos, estados de envio, busqueda. |
+
+Si falta una carpeta `context/<modulo>-ground-truth/` o una referencia open source para cualquiera de estas experiencias, la IA debe pedirla antes de implementar fases visuales.
 
 ### 12.1 Planeaciones
 
@@ -1234,6 +1331,8 @@ Mapping recomendado:
 Cuando una IA implemente una fase:
 
 - Debe leer la fase completa.
+- Debe leer el `Brief Ground Truth - Fase X` de esa fase si existe.
+- Si la fase no tiene brief y toca UX/UI o flujo de un modulo de paridad alta, debe detenerse y crear/pedir ese brief antes de programar.
 - Debe leer `.agents/skills/token-efficiency/SKILL.md` y decidir modo `NORMAL` o `CAVEMAN` antes de actuar.
 - Debe revisar `git status`.
 - Debe no revertir cambios ajenos.
@@ -1241,6 +1340,7 @@ Cuando una IA implemente una fase:
 - Debe actualizar GitHub Project si el plan ya esta en ejecucion y hay work items creados.
 - Debe actualizar documentacion si cambia arquitectura.
 - Debe validar que las rutas nuevas queden enlazadas desde tabs, hubs, CTAs, menus o cards reales.
+- Debe comparar los flujos implementados contra capturas/referencias reales citadas en la fase.
 - Debe correr validaciones proporcionales.
 - Debe hacer commit solo si el usuario lo pide.
 - Debe pedir confirmacion antes de saltar a otra fase grande si el usuario lo solicito.
@@ -1290,6 +1390,18 @@ Esta guia es orientativa y no debe bloquear el trabajo si los modelos disponible
 
 ## Analisis del Ground Truth
 
+## Contrato de Experiencia Madre
+
+- Nivel de paridad: [Clon/paridad alta | Inspirado/paridad media | Funcional/administrativo]
+- Ground truth local:
+  - `context/[modulo]-ground-truth/01-errores-actuales/README.md`
+  - `context/[modulo]-ground-truth/02-capturas-actuales-de-la-app/`
+  - `context/[modulo]-ground-truth/03-referencias-reales/`
+- Referencias open source:
+  - `context/referencias-opensource/[repo]/FUENTE.md`
+- Referencias faltantes a pedir:
+  - ...
+
 ## Inventario del Codigo Actual
 
 ## Decisiones Tecnicas
@@ -1317,6 +1429,17 @@ Esta guia es orientativa y no debe bloquear el trabajo si los modelos disponible
 ## Fases de Ejecucion
 
 ### FASE 0: Auditoria y Preparacion
+
+Brief Ground Truth - Fase 0:
+
+- Referencias reales:
+  - ...
+- Capturas actuales:
+  - ...
+- Referencias open source:
+  - ...
+- Flujos prohibidos:
+  - ...
 
 - [ ] ...
 
@@ -1373,6 +1496,9 @@ Un plan es aceptable solo si:
 - Garantiza que el modulo no queda aislado y que sus flujos de entrada/salida son claros.
 - Detecta redundancias de UX/UI y propone eliminarlas o consolidarlas.
 - Define criterio de cierre en lenguaje de usuario.
+- Define nivel de paridad y ground truth por fase cuando el modulo imita una experiencia madre.
+- Pide capturas, URLs o repos open source faltantes antes de implementar pantallas si no existen referencias suficientes.
+- No permite cerrar fases visuales de paridad alta solo con tests automaticos.
 
 ---
 

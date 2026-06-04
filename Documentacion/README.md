@@ -58,6 +58,7 @@ Si eres una IA o agente nuevo, lee en este orden:
 | `01-planes-maestros/PLAN_PASOS_INICIALES.md` | Cerrado. |
 | `01-planes-maestros/plan_planeaciones.md` | Cerrado; referencia de calidad. |
 | `01-planes-maestros/PLANEACIONES_IA_EDITOR_FASE9.md` | Soporte de cierre IA/editor de Planeaciones. |
+| `01-planes-maestros/PLANES MAESTROS AUDITADOS.md` | Auditoria de Classroom y regla de ground truth por fase para futuros planes. |
 
 ### Operacion y Validacion
 
@@ -74,6 +75,8 @@ Si eres una IA o agente nuevo, lee en este orden:
 | --- | --- |
 | `04-referencia/MAPA_NAVEGACION_ACTUAL.md` | Navegacion vigente resumida. |
 | `04-referencia/COMPONENTES_PRESERVADOS.md` | Componentes visuales a preservar como referencia. |
+| `../context/README.md` | Protocolo para ground truth, capturas y referencias por modulo. |
+| `../context/referencias-opensource/README.md` | Repos open source curados y referencias pendientes. |
 
 ## Documentacion Archivada
 
@@ -89,6 +92,10 @@ Archivados principales:
 ## Reglas para Futuras IAs
 
 - Leer `01-planes-maestros/meta_guia_planes.md` antes de crear cualquier plan.
+- Leer `01-planes-maestros/PLANES MAESTROS AUDITADOS.md` como retrospectiva de lo que fallo en Classroom.
+- Si el modulo busca paridad alta con Word, Classroom, Excel, Canva o WhatsApp, crear/citar ground truth por fase en `context/<modulo>-ground-truth/`.
+- Consultar `context/referencias-opensource/README.md` y pedir URLs de repos si faltan referencias open source para el modulo.
+- No cerrar fases visuales de paridad alta solo por pasar TypeScript/lint/tests; exigir validacion manual contra capturas/referencias.
 - No crear rutas/pantallas aisladas sin mapa de navegacion.
 - No duplicar flujos entre Contenido, Classroom y pantallas legacy.
 - Mantener tracking markdown `[ ]`, `[~]`, `[x]` en planes.

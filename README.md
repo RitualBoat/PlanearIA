@@ -140,6 +140,13 @@ El backend ya cuenta con un gateway IA multi-provider para Planeaciones (`backen
 
 Cada modulo importante debe tener su propio plan maestro, siguiendo `Documentacion/01-planes-maestros/meta_guia_planes.md`.
 
+Regla nueva despues de la auditoria Classroom: los planes de experiencias madre no pueden quedarse en "tipo Word", "tipo Classroom", "tipo Excel" o "tipo Canva". Deben declarar nivel de paridad y citar ground truth por fase:
+
+- `Clon/paridad alta`: Word/Docs, Classroom/Classroomio, Excel/Sheets, Canva/Genially y WhatsApp profesional.
+- Cada fase UX debe citar capturas en `context/<modulo>-ground-truth/` y referencias en `context/referencias-opensource/`.
+- Si faltan capturas o repos open source, el plan debe pedirlos antes de implementar pantallas.
+- Una fase visual de paridad alta no se cierra solo con TypeScript/tests; requiere validacion manual contra referencias.
+
 Planes actuales:
 
 | Plan | Archivo | Estado |
@@ -148,6 +155,7 @@ Planes actuales:
 | Planeaciones | [`Documentacion/01-planes-maestros/plan_planeaciones.md`](./Documentacion/01-planes-maestros/plan_planeaciones.md) | Cerrado. Fase 9 aprobada. |
 | Pasos iniciales | [`Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md`](./Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md) | Cerrado como cimiento organizativo. |
 | Meta guia de planes | [`Documentacion/01-planes-maestros/meta_guia_planes.md`](./Documentacion/01-planes-maestros/meta_guia_planes.md) | Vigente, define reglas para futuros planes. |
+| Planes auditados | [`Documentacion/01-planes-maestros/PLANES MAESTROS AUDITADOS.md`](./Documentacion/01-planes-maestros/PLANES%20MAESTROS%20AUDITADOS.md) | Retrospectiva de Classroom; origen del contrato de ground truth por fase. |
 | Roadmap de planes | [`Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md`](./Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md) | Indice de planes futuros. |
 
 ---
@@ -270,6 +278,8 @@ La documentacion tecnica esta en [`Documentacion/`](./Documentacion/):
 | [`Documentacion/00-fundamentos/ARQUITECTURA.md`](./Documentacion/00-fundamentos/ARQUITECTURA.md) | Arquitectura del sistema y decisiones tecnicas. |
 | [`Documentacion/01-planes-maestros/meta_guia_planes.md`](./Documentacion/01-planes-maestros/meta_guia_planes.md) | Guia maestra para planes futuros. |
 | [`Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`](./Documentacion/01-planes-maestros/PLAN_CLASSROOM.md) | Plan activo de Classroom. |
+| [`context/README.md`](./context/README.md) | Protocolo de ground truth, capturas y referencias por modulo. |
+| [`context/referencias-opensource/README.md`](./context/referencias-opensource/README.md) | Repos open source curados y referencias faltantes. |
 | [`Documentacion/02-operacion/ENTORNO_LOCAL.md`](./Documentacion/02-operacion/ENTORNO_LOCAL.md) | Guia para levantar frontend/backend local. |
 | [`Documentacion/02-operacion/GUIA_PRUEBAS.md`](./Documentacion/02-operacion/GUIA_PRUEBAS.md) | Guia vigente de pruebas. |
 | [`Documentacion/04-referencia/MAPA_NAVEGACION_ACTUAL.md`](./Documentacion/04-referencia/MAPA_NAVEGACION_ACTUAL.md) | Mapa vigente de navegacion. |

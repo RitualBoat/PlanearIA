@@ -2,7 +2,7 @@
 
 > **Version:** 1.0  
 > **Fecha:** 2026-06-03  
-> **Estado:** [ ] Plan maestro pendiente de ejecucion  
+> **Estado:** [~] Plan maestro en ejecucion  
 > **Alcance:** fusionar grupos, alumnos, tareas, entregables, recursos, asistencia, calificaciones y reportes operativos en una experiencia central tipo Google Classroom, manteniendo arquitectura MVVM, offline-first y bajo costo.  
 > **Stack:** React Native 0.81.5, Expo 54, TypeScript 5.9, React Navigation 7, AsyncStorage actual con posible migracion futura a SQLite/Expo SQLite, backend Node en `backend/api`, MongoDB Atlas/free tier, Jest + Testing Library.
 > **Modulo:** Classroom / Gestion academica diaria.  
@@ -482,36 +482,53 @@ Si en una fase aparece necesidad de almacenamiento pesado, emails, push o IA pag
 
 Objetivo: confirmar rutas, datos y dependencias antes de tocar codigo.
 
-- [ ] **0.1 Auditar rutas actuales de grupos/alumnos/tareas/asistencia/calificaciones.**
-- [ ] **0.2 Auditar contexts y servicios usados por cada pantalla.**
-- [ ] **0.3 Auditar tests existentes y brechas por modulo.**
-- [ ] **0.4 Identificar pantallas legacy que se conservaran temporalmente.**
-- [ ] **0.5 Definir equivalencias entre flujo actual y flujo Classroom.**
-- [ ] **0.6 Crear checklist manual especifico de Classroom.**
-- [ ] **0.7 Registrar riesgos de navegacion antes de implementar.**
+- [x] **0.1 Auditar rutas actuales de grupos/alumnos/tareas/asistencia/calificaciones.**
+- [x] **0.2 Auditar contexts y servicios usados por cada pantalla.**
+- [x] **0.3 Auditar tests existentes y brechas por modulo.**
+- [x] **0.4 Identificar pantallas legacy que se conservaran temporalmente.**
+- [x] **0.5 Definir equivalencias entre flujo actual y flujo Classroom.**
+- [x] **0.6 Crear checklist manual especifico de Classroom.**
+- [x] **0.7 Registrar riesgos de navegacion antes de implementar.**
 
 Criterio de cierre:
 
-- [ ] Inventario validado.
-- [ ] Lista de rutas legacy documentada.
-- [ ] Checklist manual creado.
-- [ ] No hay dudas sobre primera pantalla a construir.
+- [x] Inventario validado.
+- [x] Lista de rutas legacy documentada.
+- [x] Checklist manual creado.
+- [x] No hay dudas sobre primera pantalla a construir.
+
+Resultado de ejecucion:
+
+- Entrada principal actual confirmada: `GruposTab` apunta a `GruposDashboardScreen` y debe evolucionar hacia Classroom sin romper rutas existentes.
+- Rutas academicas actuales confirmadas en `StackNavigator`: grupos, alumnos, asistencia, calificaciones, tareas/entregables y recursos.
+- Contextos auditados: `GruposContext`, `AlumnosContext`, `AsistenciaContext`, `CalificacionesContext`, `EntregablesContext` y `RecursosContext`.
+- Servicios auditados: import/export/reportes de grupos y alumnos, asignaciones de grupo, promedios, backend por entidad y sync.
+- Brechas registradas: storage local disperso por claves AsyncStorage, endpoints academicos con aislamiento `userId` incompleto, `ContenidoScreen` como hub transversal que puede competir con Classroom y pantallas de calificacion/entregas con datos mock o integracion parcial.
+- Checklist manual especifico queda en la seccion 13 de este documento.
 
 ### FASE 1: Modelo Academico Unificado
 
 Objetivo: definir contratos para que `Grupo` funcione como clase madre sin romper datos actuales.
 
-- [ ] **1.1 Revisar `types/index.ts` para `Grupo`, `Alumno`, `Tarea`, `EntregaTarea`, `Recurso`, `Asistencia` y `Calificacion`.**
-- [ ] **1.2 Crear `types/classroom.ts` solo si aporta tipos derivados o ViewModels.**
-- [ ] **1.3 Definir `ClassroomResumen`, `ClassroomActividadReciente` y `ClassroomPendiente` si hacen falta.**
-- [ ] **1.4 Asegurar `userId`, `grupoId`, fechas y sync status en entidades nuevas o derivadas.**
-- [ ] **1.5 Agregar tests de mapeo si se crea facade.**
+- [x] **1.1 Revisar `types/index.ts` para `Grupo`, `Alumno`, `Tarea`, `EntregaTarea`, `Recurso`, `Asistencia` y `Calificacion`.**
+- [x] **1.2 Crear `types/classroom.ts` solo si aporta tipos derivados o ViewModels.**
+- [x] **1.3 Definir `ClassroomResumen`, `ClassroomActividadReciente` y `ClassroomPendiente` si hacen falta.**
+- [x] **1.4 Asegurar `userId`, `grupoId`, fechas y sync status en entidades nuevas o derivadas.**
+- [x] **1.5 Agregar tests de mapeo si se crea facade.**
 
 Criterio de cierre:
 
-- [ ] Tipos compilan.
-- [ ] No se duplican entidades existentes.
-- [ ] `Grupo` queda definido como raiz de Classroom.
+- [x] Tipos compilan.
+- [x] No se duplican entidades existentes.
+- [x] `Grupo` queda definido como raiz de Classroom.
+
+Resultado de ejecucion:
+
+- Se creo `types/classroom.ts` con tipos derivados para `ClassroomGrupo`, `ClassroomResumen`, `ClassroomActividadReciente`, `ClassroomPendiente`, `ClassroomDataset` y `ClassroomRouteMap`.
+- Se creo `src/services/classroom/classroomModel.ts` como primer agregador puro de dominio. Todavia no reemplaza contexts ni storage; solo normaliza lectura para futuros ViewModels.
+- Se agregaron pruebas en `src/__tests__/classroom/classroomModel.test.ts` para validar conteos por grupo, actividad reciente, pendientes y composicion del modelo.
+- `Grupo` queda confirmado como raiz de Classroom; `Alumno`, `Tarea`, `EntregaTarea`, `Recurso`, `Asistencia` y `Calificacion` se consumen por `grupoId`.
+- `userId`, `fechaModificacion`, `syncStatus` y eliminacion logica quedan modelados como auditoria derivada cuando existan, pero siguen siendo deuda en varias entidades actuales. La fase 2 debe resolverlo desde una capa de repositorio/storage, sin mutar todo de golpe.
 
 ### FASE 2: Capa de Datos y Facade Classroom
 
@@ -729,6 +746,10 @@ Objetivo: cerrar el plan con evidencia tecnica y manual.
 | Introducir costos | Medio | Reusar backend y gateway actual; sin servicios nuevos. |
 | Copiar referencias AGPL | Alto | Solo inspiracion conceptual, no codigo. |
 | Dejar `ContenidoScreen` compitiendo | Alto | Redirecciones claras y criterio por contexto. |
+| Storage academico disperso en varias claves AsyncStorage | Alto | Fase 2 debe crear facade/repositorio y no acoplar pantallas nuevas a claves directas. |
+| Endpoints academicos sin aislamiento `userId` consistente | Alto | Documentar como deuda de seguridad y resolver antes de beta multiusuario. |
+| Calificacion de entregas con datos mock/integracion parcial | Alto | Fase 6 debe conectar entregas reales, calificaciones y tests antes de cerrar flujo evaluable. |
+| Nombres `Tarea`, `EntregaTarea` y `Entregable` mezclados | Medio | Fase 2 debe definir vocabulario interno y mapping sin duplicar entidades. |
 
 ---
 
@@ -794,8 +815,13 @@ Estado operativo:
 
 - [x] Issue creado para Fase 0: `https://github.com/RitualBoat/PlanearIA/issues/1`.
 - [x] Issue agregado a `PlanearIA Product OS`.
-- [x] Status inicial: `Ready`.
+- [x] Fase 0 movida a `In Progress` al iniciar ejecucion.
+- [x] Fase 0 ejecutada y lista para `Done`.
 - [x] Priority inicial: `P0`.
+- [x] Issue creado para Fase 1: `https://github.com/RitualBoat/PlanearIA/issues/2`.
+- [x] Issue de Fase 1 agregado a `PlanearIA Product OS`.
+- [x] Fase 1 movida a `In Progress` al iniciar ejecucion.
+- [x] Fase 1 ejecutada y lista para `Done`.
 
 Regla de actualizacion:
 

@@ -1,8 +1,8 @@
-# Plan Maestro: Classroom / Grupos y Recursos - PlanearIA
+﻿# Plan Maestro: Classroom / Grupos y Recursos - PlanearIA
 
 > **Version:** 1.0  
 > **Fecha:** 2026-06-03  
-> **Estado:** [~] Plan maestro en ejecucion  
+> **Estado:** [~] Plan maestro en ejecucion. Fases 0-5 completadas; siguiente bloque tecnico: Fase 6.  
 > **Alcance:** fusionar grupos, alumnos, tareas, entregables, recursos, asistencia, calificaciones y reportes operativos en una experiencia central tipo Google Classroom, manteniendo arquitectura MVVM, offline-first y bajo costo.  
 > **Stack:** React Native 0.81.5, Expo 54, TypeScript 5.9, React Navigation 7, AsyncStorage actual con posible migracion futura a SQLite/Expo SQLite, backend Node en `backend/api`, MongoDB Atlas/free tier, Jest + Testing Library.
 > **Modulo:** Classroom / Gestion academica diaria.  
@@ -32,14 +32,14 @@ Documentacion interna:
 
 - `README.md`.
 - `Documentacion/README.md`.
-- `Documentacion/meta_guia_planes.md`.
-- `Documentacion/VISION_ACTUAL.md`.
-- `Documentacion/INFRAESTRUCTURA_SUGERIDA.md`.
-- `Documentacion/MAPA_MODULOS_ACTUALES.md`.
-- `Documentacion/PLAN_PASOS_INICIALES.md`.
-- `Documentacion/plan_planeaciones.md`.
-- `Documentacion/GITHUB_PRODUCT_OS.md`.
-- `Documentacion/ENTORNO_LOCAL.md`.
+- `Documentacion/01-planes-maestros/meta_guia_planes.md`.
+- `Documentacion/00-fundamentos/VISION_ACTUAL.md`.
+- `Documentacion/05-analisis-ia/INFRAESTRUCTURA_SUGERIDA.md`.
+- `Documentacion/00-fundamentos/MAPA_MODULOS_ACTUALES.md`.
+- `Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md`.
+- `Documentacion/01-planes-maestros/plan_planeaciones.md`.
+- `Documentacion/02-operacion/GITHUB_PRODUCT_OS.md`.
+- `Documentacion/02-operacion/ENTORNO_LOCAL.md`.
 
 Codigo actual auditado a nivel de estructura:
 
@@ -621,8 +621,8 @@ Resultado de ejecucion:
 - `AppTabsNavigator` ahora apunta `GruposTab` a `ClassroomHomeScreen`.
 - `StackNavigator` incluye la ruta `ClassroomGroup` y conserva `DetalleGrupo`, `ListaGrupos`, `CrearGrupo`, `ImportarGrupos`, tareas, asistencia, calificaciones y reportes legacy.
 - Validaciones ejecutadas: `npx tsc --noEmit`, `npx jest src/__tests__/classroom --runInBand` y lint focalizado de rutas/pantallas/hooks nuevos.
-- Tras revision manual en `context/classroom-ground-truth/01-errores-actuales`, se corrigio el scroll web de `ClassroomGroupScreen` y se cambio la composicion visual a banner de clase, pestañas tipo Classroom, columna lateral de resumen y stream principal.
-- El rediseño visual base pertenece a Classroom porque afecta el flujo del modulo. La auditoria final de consistencia, Nielsen, accesibilidad y tokens visuales queda para Fase 10 / UX-UI Global.
+- Tras revision manual en `context/classroom-ground-truth/01-errores-actuales`, se corrigio el scroll web de `ClassroomGroupScreen` y se cambio la composicion visual a banner de clase, pestaÃ±as tipo Classroom, columna lateral de resumen y stream principal.
+- El rediseÃ±o visual base pertenece a Classroom porque afecta el flujo del modulo. La auditoria final de consistencia, Nielsen, accesibilidad y tokens visuales queda para Fase 10 / UX-UI Global.
 
 ### FASE 4: Seccion Alumnos y Lista del Grupo
 
@@ -634,21 +634,22 @@ Modo sugerido: `CAVEMAN` si se reutilizan pantallas/contextos existentes; cambia
 - [x] **4.2 Reutilizar creacion/importacion/exportacion de alumnos.**
 - [x] **4.3 Mostrar estado academico basico por alumno.**
 - [x] **4.4 Permitir abrir detalle de alumno con retorno al grupo.**
-- [~] **4.5 Definir acciones masivas: importar, exportar, mover, quitar de grupo.**
+- [x] **4.5 Definir acciones masivas: importar, exportar, mover, quitar de grupo.**
 - [x] **4.6 Validar offline y sync pendiente.**
 
 Criterio de cierre:
 
-- [~] El flujo de alumnos dentro del grupo reemplaza el salto aislado a lista general.
+- [x] El flujo de alumnos dentro del grupo reemplaza el salto aislado a lista general.
 - [x] Import/export siguen funcionando.
 - [x] No se duplica captura de alumno.
 
-Resultado parcial:
+Resultado:
 
 - `ClassroomGroupScreen` ahora muestra alumnos filtrados por `grupoId`, con preview, contador y acceso a detalle.
 - `CrearAlumno` acepta `grupoId` y el ViewModel guarda alumnos nuevos vinculados al grupo.
-- Se reutilizan rutas existentes: `CrearAlumno`, `ImportarAlumnos`, `ExportarAlumnos` y `DetalleAlumno`.
-- Queda pendiente completar acciones masivas de mover/quitar alumno de grupo y decidir si import/export deben prefiltrar por grupo o mantenerse globales en esta etapa.
+- `ImportarAlumnos` y `ExportarAlumnos` aceptan `grupoId`/`grupoNombre`; desde Classroom importan/exportan solo la clase actual y desde la lista general conservan el modo global.
+- Se agregaron acciones contextuales para abrir detalle, mover alumno a otro grupo y quitar alumno del grupo sin eliminar su perfil.
+- Se reutilizan rutas existentes: `CrearAlumno`, `ImportarAlumnos`, `ExportarAlumnos` y `DetalleAlumno`, evitando duplicar capturas.
 
 ### FASE 5: Materiales y Recursos de Clase
 
@@ -659,22 +660,23 @@ Modo sugerido: mixto. `NORMAL` para evitar duplicidad con `ContenidoScreen`; `CA
 - [x] **5.1 Crear seccion `Materiales`.**
 - [x] **5.2 Mostrar recursos asignados al grupo.**
 - [x] **5.3 Permitir crear recurso desde grupo.**
-- [ ] **5.4 Permitir adjuntar planeacion como material.**
-- [~] **5.5 Permitir filtrar por tipo: PDF, enlace, video, planeacion, imagen, archivo.**
+- [x] **5.4 Permitir adjuntar planeacion como material.**
+- [x] **5.5 Permitir filtrar por tipo: PDF, enlace, video, planeacion, imagen, archivo.**
 - [x] **5.6 Mantener biblioteca general como origen transversal.**
-- [~] **5.7 Evitar duplicidad con `ContenidoScreen`.**
+- [x] **5.7 Evitar duplicidad con `ContenidoScreen`.**
 
 Criterio de cierre:
 
 - [x] Un docente puede agregar/ver materiales desde el grupo.
-- [~] `ContenidoScreen` no compite con Classroom para acciones de grupo.
+- [x] `ContenidoScreen` no compite con Classroom para acciones de grupo.
 
-Resultado parcial:
+Resultado:
 
 - `ClassroomGroupScreen` muestra materiales asignados por `grupoId`, con preview y contador.
 - `CrearRecurso` acepta `grupoId` y el ViewModel guarda recursos nuevos vinculados al grupo.
-- Se mantienen rutas de biblioteca/asignacion existentes para no duplicar captura.
-- Quedan pendientes: adjuntar planeaciones como material, filtros por tipo dentro de la seccion y resolver la competencia fina con `ContenidoScreen`.
+- Se agregaron filtros internos por tipo: todos, planeaciones, PDF, video, enlaces, imagenes, archivo y otros.
+- Se puede adjuntar una planeacion existente como material del grupo usando `planeacion://<id>` y abrirla directamente en `DocEditor`.
+- Se mantienen rutas de biblioteca/asignacion existentes como origen transversal; Classroom queda como vista contextual de clase y `ContenidoScreen` no compite con acciones de grupo.
 
 ### FASE 6: Actividades, Tareas y Entregables
 
@@ -869,7 +871,7 @@ Este plan se considera completado cuando:
 
 ## 17. Nota Para Futuras IAs
 
-No empieces a programar Classroom sin leer este plan completo, `Documentacion/meta_guia_planes.md` y `Documentacion/MAPA_MODULOS_ACTUALES.md`.
+No empieces a programar Classroom sin leer este plan completo, `Documentacion/01-planes-maestros/meta_guia_planes.md` y `Documentacion/00-fundamentos/MAPA_MODULOS_ACTUALES.md`.
 
 La meta no es "hacer otro dashboard". La meta es que el docente abra una clase y pueda trabajar ahi sin preguntarse en que modulo vive cada cosa.
 
@@ -888,15 +890,12 @@ Decision antes de iniciar implementacion:
 - Usar milestone `Ciclo 2 - Fundacion Classroom` para las primeras fases de implementacion.
 - Usar labels segun corresponda: `fase`, `plan-maestro`, `offline-first`, `legacy`, `ux-ui`, `testing`, `docs`, `low-cost`, `needs-input`.
 
-Mapping sugerido inicial:
+Mapping operativo:
 
-| Work item | Tipo | Milestone | Estado inicial |
-| --- | --- | --- | --- |
-| `Plan Maestro: Classroom / Grupos y Recursos` | Epic | `Ciclo 2 - Fundacion Classroom` | Ready |
-| `Classroom Fase 0 - Auditoria profunda y preparacion` | Fase | `Ciclo 2 - Fundacion Classroom` | Ready |
-| `Classroom Fase 1 - Modelo academico unificado` | Fase | `Ciclo 2 - Fundacion Classroom` | Backlog |
-| `Classroom Fase 2 - Capa de datos y facade` | Fase | `Ciclo 2 - Fundacion Classroom` | Backlog |
-| `Classroom Fase 3 - Shell Classroom y navegacion principal` | Fase | `Ciclo 2 - Fundacion Classroom` | Backlog |
+- Epic: `Plan Maestro: Classroom / Grupos y Recursos`.
+- Milestone: `Ciclo 2 - Fundacion Classroom`.
+- Fases cerradas: 0, 1, 2, 3, 4 y 5.
+- Siguiente issue recomendado: `Classroom Fase 6 - Actividades, tareas y entregables`.
 
 Estado operativo:
 
@@ -917,13 +916,14 @@ Estado operativo:
 - [x] Fase 3 ejecutada y marcada como `Done`.
 - [x] Issue creado para Fase 4: `https://github.com/RitualBoat/PlanearIA/issues/5`.
 - [x] Issue de Fase 4 agregado a `PlanearIA Product OS`.
-- [~] Fase 4 en progreso: alumnos contextuales implementados; faltan acciones masivas mover/quitar y filtros import/export por grupo.
+- [x] Fase 4 ejecutada: alumnos contextuales, import/export por grupo, mover/quitar alumno y detalle desde Classroom.
 - [x] Issue creado para Fase 5: `https://github.com/RitualBoat/PlanearIA/issues/6`.
 - [x] Issue de Fase 5 agregado a `PlanearIA Product OS`.
-- [~] Fase 5 en progreso: materiales contextuales implementados; faltan planeaciones como material, filtros internos y consolidacion con `ContenidoScreen`.
+- [x] Fase 5 ejecutada: materiales contextuales, filtros internos, planeaciones como material y apertura en `DocEditor`.
 
 Regla de actualizacion:
 
 - Cuando una fase pase de `[ ]` a `[~]`, mover su item a `In Progress`.
 - Cuando una fase pase a `[x]`, mover su item a `Review Manual` o `Done` segun si requiere validacion manual.
 - Si hay bloqueo por decision de producto, API key, costo o input del usuario, mover a `Blocked` y etiquetar `needs-input`.
+

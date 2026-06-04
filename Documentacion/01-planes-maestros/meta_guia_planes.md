@@ -1,4 +1,4 @@
-# Meta Guia de Planes Arquitectonicos - PlanearIA
+﻿# Meta Guia de Planes Arquitectonicos - PlanearIA
 
 > **Proposito:** esta guia define el estandar obligatorio para crear futuros planes maestros de refactorizacion o construccion de modulos en PlanearIA.  
 > **Uso previsto:** entregar este archivo a futuras IAs antes de pedirles un plan de modulo.  
@@ -72,7 +72,7 @@ Regla: la documentacion puede estar desfasada. La fuente de verdad para planear 
 - `src/screens/`.
 - `backend/api/`.
 - `types/`.
-- `plan_planeaciones.md`.
+- `Documentacion/01-planes-maestros/plan_planeaciones.md`.
 
 ---
 
@@ -84,9 +84,9 @@ Esta seccion no es un plan de refactorizacion. Es un mapa de referencia para que
 
 Estado:
 
-- Tiene plan maestro activo en `plan_planeaciones.md`.
+- Tiene plan maestro cerrado en `Documentacion/01-planes-maestros/plan_planeaciones.md`.
 - Ya existe modelo V2, contexto nuevo, editor, escaner, exportacion y copiloto IA.
-- Sigue en Fase 9 con hotfixes y evolucion de DocEditor.
+- Fase 9 quedo aprobada; no reabrir salvo bug nuevo o decision explicita del usuario.
 
 Archivos principales:
 
@@ -99,7 +99,7 @@ Archivos principales:
 - `backend/api/planeaciones.js`.
 - `backend/api/planeaciones/*`.
 
-Regla: no crear otro plan de planeaciones sin leer completo `plan_planeaciones.md`.
+Regla: no crear otro plan de planeaciones sin leer completo `Documentacion/01-planes-maestros/plan_planeaciones.md`.
 
 ### 3.2 Contenido / Hub de Recursos
 
@@ -385,10 +385,10 @@ Antes de redactar cualquier plan futuro, la IA debe:
 
 - Leer `README.md`.
 - Leer `Documentacion/README.md`.
-- Leer `Documentacion/ARQUITECTURA.md`.
-- Leer `Documentacion/FLUJO_SINCRONIZACION.md`.
-- Leer `Documentacion/meta_guia_planes.md`.
-- Leer `plan_planeaciones.md` como ejemplo de calidad y tracking.
+- Leer `Documentacion/00-fundamentos/ARQUITECTURA.md`.
+- Leer `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`.
+- Leer `Documentacion/01-planes-maestros/meta_guia_planes.md`.
+- Leer `Documentacion/01-planes-maestros/plan_planeaciones.md` como ejemplo de calidad y tracking.
 - Revisar `src/navigation/StackNavigator.tsx`.
 - Revisar `src/navigation/AppTabsNavigator.tsx`.
 - Revisar carpetas del modulo objetivo en `src/screens`, `src/hooks`, `src/context`, `src/services`, `types` y `backend/api`.
@@ -398,7 +398,7 @@ Antes de redactar cualquier plan futuro, la IA debe:
 - Verificar si la documentacion esta desfasada contra el codigo.
 - Identificar que otros modulos dependen del modulo objetivo.
 - Identificar restricciones de costo, despliegue y tiempo de entrega.
-- Leer `Documentacion/GITHUB_PRODUCT_OS.md` si el plan tendra ejecucion inmediata.
+- Leer `Documentacion/02-operacion/GITHUB_PRODUCT_OS.md` si el plan tendra ejecucion inmediata.
 - Revisar el estado del GitHub Project si `gh` esta disponible y el usuario permite tocar work items.
 
 - Consultar el directorio `context/referencias-opensource/README.md`. Si el modulo a planificar tiene una arquitectura de referencia asignada en ese documento, la IA debe analizar los archivos curados de esa subcarpeta. La IA usara estas referencias estrictamente como inspiracion arquitectonica, sin copiar codigo literal y traduciendo los conceptos logicos a nuestro stack local.
@@ -740,7 +740,7 @@ Regla de trazabilidad:
 
 ### 9.4 Respaldo de Componentes Visuales
 
-El archivo `Documentacion/COMPONENTES_PRESERVADOS.md` contiene el codigo fuente de componentes visuales que el desarrollador quiere tener respaldados como referencia. Este archivo es solo un respaldo documental; no obliga a futuras IAs a mantener esos componentes en la app. Si un plan de modulo o de UX/UI Global decide reemplazar o eliminar un componente documentado ahi, puede hacerlo sin restriccion.
+El archivo `Documentacion/04-referencia/COMPONENTES_PRESERVADOS.md` contiene el codigo fuente de componentes visuales que el desarrollador quiere tener respaldados como referencia. Este archivo es solo un respaldo documental; no obliga a futuras IAs a mantener esos componentes en la app. Si un plan de modulo o de UX/UI Global decide reemplazar o eliminar un componente documentado ahi, puede hacerlo sin restriccion.
 
 ### 9.5 Navegacion Global: Estructura de Tabs y Modulos
 
@@ -873,7 +873,7 @@ Todo plan con IA debe exigir:
 
 ### 12.1 Planeaciones
 
-No generar un plan nuevo sin leer `plan_planeaciones.md`.
+No generar un plan nuevo sin leer `Documentacion/01-planes-maestros/plan_planeaciones.md`.
 
 Si se retoma:
 
@@ -1378,3 +1378,5 @@ Un plan es aceptable solo si:
 PlanearIA debe crecer como una app profesional, pero con una estrategia realista para un estudiante que trabaja solo. Cada plan futuro debe ayudar a construir algo que pueda demostrarse, mantenerse y eventualmente lanzarse sin quedar atrapado en complejidad innecesaria.
 
 La meta no es impresionar con tecnologia. La meta es que la app funcione bien para docentes reales, cueste lo minimo razonable, sea mantenible, aproveche IA con responsabilidad y pueda evolucionar modulo por modulo.
+
+

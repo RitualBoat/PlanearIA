@@ -85,7 +85,7 @@ PlanearIA implementa una arquitectura **offline-first** que permite a los docent
 │ PASO 1: INTERACCIÓN DEL USUARIO │
 └─────────────────────────────────────────────────────────────────────────┘
 
-Usuario llena formulario en EditorPlaneacionScreen.tsx
+Usuario edita/guarda en DocEditorScreen.tsx o pantalla equivalente del modulo
  │
  │ (1) Usuario presiona "Guardar"
  │
@@ -316,32 +316,32 @@ UI muestra indicador "Sincronizado"
 
 | Componente | Responsabilidad | Archivo |
 | --------------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **EditorPlaneacionScreen** | Formulario de creación/edición | [`src/screens/planeaciones/EditorPlaneacionScreen.tsx`](../src/screens/planeaciones/EditorPlaneacionScreen.tsx) |
-| **ListaPlaneacionesScreen** | Visualización de planeaciones | [`src/screens/planeaciones/ListaPlaneacionesScreen.tsx`](../src/screens/planeaciones/ListaPlaneacionesScreen.tsx) |
-| **SyncIndicator** | Indicador visual de estado de sync | [`src/components/SyncIndicator.tsx`](../src/components/SyncIndicator.tsx) |
+| **DocEditorScreen** | Editor moderno de planeaciones | [`src/screens/planeaciones/DocEditorScreen.tsx`](../../src/screens/planeaciones/DocEditorScreen.tsx) |
+| **ListaPlaneacionesScreen** | Visualización de planeaciones | [`src/screens/planeaciones/ListaPlaneacionesScreen.tsx`](../../src/screens/planeaciones/ListaPlaneacionesScreen.tsx) |
+| **SyncIndicator** | Indicador visual de estado de sync | [`src/components/SyncIndicator.tsx`](../../src/components/SyncIndicator.tsx) |
 
 ### 2. Capa de Lógica
 
 | Componente | Responsabilidad | Archivo |
 | ----------------------- | ----------------------------- | ------------------------------------------------------------------------------- |
-| **PlaneacionesContext** | Estado global de planeaciones | [`src/context/PlaneacionesContext.tsx`](../src/context/PlaneacionesContext.tsx) |
-| **SyncProvider** | Contexto de sincronización | [`src/sync/providers/SyncProvider.tsx`](../src/sync/providers/SyncProvider.tsx) |
-| **useSync** | Hook de conectividad y sync | [`src/sync/hooks/useSync.ts`](../src/sync/hooks/useSync.ts) |
+| **PlaneacionesContext** | Estado global de planeaciones | [`src/context/PlaneacionesContext.tsx`](../../src/context/PlaneacionesContext.tsx) |
+| **SyncProvider** | Contexto de sincronización | [`src/sync/providers/SyncProvider.tsx`](../../src/sync/providers/SyncProvider.tsx) |
+| **Sync hooks/context** | Conectividad y sync | Revisar `src/sync/` y contexts del modulo activo. |
 
 ### 3. Capa de Servicios
 
 | Componente | Responsabilidad | Archivo |
 | --------------- | -------------------------- | ------------------------------------------------------------------------- |
-| **syncService** | Lógica de sincronización | [`src/sync/services/syncService.ts`](../src/sync/services/syncService.ts) |
-| **apiConfig** | Configuración de endpoints | [`src/sync/config/apiConfig.ts`](../src/sync/config/apiConfig.ts) |
+| **syncEngine** | Motor de sincronización | [`src/sync/services/syncEngine.ts`](../../src/sync/services/syncEngine.ts) |
+| **apiConfig** | Configuración de endpoints | [`src/sync/config/apiConfig.ts`](../../src/sync/config/apiConfig.ts) |
 
 ### 4. Backend
 
 | Endpoint | Método | Responsabilidad | Archivo |
 | ------------------- | ------------------- | -------------------- | --------------------------------------------------------------- |
-| `/api/health` | GET | Health check | [`backend/api/health.js`](../backend/api/health.js) |
-| `/api/planeaciones` | GET/POST/PUT/DELETE | CRUD individual | [`backend/api/planeaciones.js`](../backend/api/planeaciones.js) |
-| `/api/sync` | POST | Sincronización batch | [`backend/api/sync.js`](../backend/api/sync.js) |
+| `/api/health` | GET | Health check | [`backend/api/health.js`](../../backend/api/health.js) |
+| `/api/planeaciones` | GET/POST/PUT/DELETE | CRUD individual | [`backend/api/planeaciones.js`](../../backend/api/planeaciones.js) |
+| `/api/sync` | POST | Sincronización batch | [`backend/api/sync.js`](../../backend/api/sync.js) |
 
 ---
 
@@ -500,3 +500,4 @@ El backend permite peticiones desde cualquier origen (configurado para desarroll
 
 **Última actualización**: Diciembre 16, 2025
 **Versión del proyecto**: 3.0
+

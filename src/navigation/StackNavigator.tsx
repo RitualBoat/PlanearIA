@@ -179,8 +179,8 @@ export type RootStackParamList = {
         grupoId?: number;
       };
   ListaAlumnos: undefined;
-  ImportarAlumnos: undefined;
-  ExportarAlumnos: undefined;
+  ImportarAlumnos: { grupoId?: number; grupoNombre?: string } | undefined;
+  ExportarAlumnos: { grupoId?: number; grupoNombre?: string } | undefined;
   DetalleAlumno: { alumnoId: number };
   NotasAlumno: {
     alumnoId: number;

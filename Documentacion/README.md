@@ -1,200 +1,112 @@
-# Documentacion PlanearIA v4.0
+﻿# Documentacion PlanearIA v4.1
 
-Esta carpeta contiene la documentacion tecnica y estrategica de PlanearIA.
+Esta carpeta contiene la documentacion tecnica, estrategica y operativa de PlanearIA.
 
-PlanearIA esta evolucionando de una app de planeaciones a una plataforma integral para docentes. La documentacion debe explicar no solo que se va a hacer, sino tambien que existe hoy, como se conecta cada modulo y que reglas deben seguir futuras refactorizaciones.
+PlanearIA esta evolucionando de app de planeaciones a plataforma integral para docentes. La regla vigente es cero friccion: experiencias familiares tipo Word/Docs, Classroom, Canva, Excel, WhatsApp docente y reportes.
 
----
+## Lectura Rapida
 
-## Documentos Vigentes
+Si eres una IA o agente nuevo, lee en este orden:
 
-### Vision, Arquitectura y Planes
+1. `00-fundamentos/RESUMEN_EJECUTIVO.md`
+2. `00-fundamentos/VISION_ACTUAL.md`
+3. `00-fundamentos/ARQUITECTURA.md`
+4. `01-planes-maestros/meta_guia_planes.md`
+5. `01-planes-maestros/PLAN_CLASSROOM.md` si vas a continuar Classroom
+6. `02-operacion/ENTORNO_LOCAL.md`
+7. `02-operacion/GUIA_PRUEBAS.md`
+
+## Estructura
+
+| Carpeta | Uso |
+| --- | --- |
+| `00-fundamentos/` | Vision vigente, arquitectura, resumen ejecutivo, roadmap de planes y mapa de modulos. |
+| `01-planes-maestros/` | Planes ejecutables y meta guia obligatoria. |
+| `02-operacion/` | GitHub Product OS, entorno local y pruebas vigentes. |
+| `03-validacion/` | Checklists manuales de cierre. |
+| `04-referencia/` | Mapas actuales y componentes preservados. |
+| `05-analisis-ia/` | Opiniones/revisiones de IA conservadas como contexto, no como fuente unica. |
+| `99-archivo/` | Documentacion legacy 2025 archivada; no usar para implementar. |
+
+## Estado Actual
+
+- Planeaciones: cerrado como experiencia Word/Docs. Fase 9 aprobada.
+- Pasos Iniciales: cerrado como organizacion de GitHub, CI inicial y entorno.
+- Classroom: plan activo. Fases 0 a 5 completadas; siguiente paso es Fase 6.
+- UX/UI Global: pendiente, se hara cuando existan mas flujos funcionales.
+- Infraestructura/Auth/Excel/Canva/WhatsApp/Reportes: pendientes de planes futuros.
+
+## Documentos Principales
+
+### Fundamentos
 
 | Documento | Descripcion |
-| --------- | ----------- |
-| [VISION_ACTUAL.md](./VISION_ACTUAL.md) | Manifiesto vigente de cero friccion: experiencias Word, Classroom, Canva, Excel, WhatsApp y reportes. |
-| [PLAN_PASOS_INICIALES.md](./PLAN_PASOS_INICIALES.md) | Plan rector activo para organizacion del proyecto, GitHub/GitHub Projects, entorno local, CI y secuencia de futuros planes maestros. |
-| [PLAN_CLASSROOM.md](./PLAN_CLASSROOM.md) | Plan maestro listo para ejecutar: fusionar grupos, alumnos, materiales, actividades, entregables, asistencia, calificaciones y reportes operativos en una experiencia tipo Classroom. |
-| [GITHUB_PRODUCT_OS.md](./GITHUB_PRODUCT_OS.md) | Guia operativa de ramas, Project, labels, milestones, templates y criterio de merge. |
-| [ENTORNO_LOCAL.md](./ENTORNO_LOCAL.md) | Guia de desarrollo local para frontend/backend, IP LAN en celular fisico, env vars e IA local temporal. |
-| [MAPA_MODULOS_ACTUALES.md](./MAPA_MODULOS_ACTUALES.md) | Fotografia inicial de pantallas, tabs, rutas y experiencias madre para preparar Classroom. |
-| [meta_guia_planes.md](./meta_guia_planes.md) | Guia maestra para crear futuros planes de refactorizacion o construccion de modulos. Define estructura, tracking, reglas de IA, offline-first, bajo costo, navegacion y UX/UI global. |
-| [INFRAESTRUCTURA_SUGERIDA.md](./INFRAESTRUCTURA_SUGERIDA.md) | Estrategia de infraestructura realista para un estudiante: monolito modular, desarrollo local, bajo costo y despliegue gradual. |
-| [OPINION_DE_IA_TRAS_LEER_META_GUIA_PLANEACIONES.md](./OPINION_DE_IA_TRAS_LEER_META_GUIA_PLANEACIONES.md) | Analisis estrategico posterior a la meta guia y nueva vision del producto. |
-| [REVISION-GPT-TRAS-LEER-ARCHIVOS-DOCUMENTACION.md](./REVISION-GPT-TRAS-LEER-ARCHIVOS-DOCUMENTACION.md) | Revision adicional de documentacion fundacional y alineacion estrategica. |
-| [PLANEACIONES_IA_EDITOR_FASE9.md](./PLANEACIONES_IA_EDITOR_FASE9.md) | Auditoria real de IA en Planeaciones y criterio de aceptacion del editor tipo Word/Docs para cierre de Fase 9. |
-| [CHECKLIST_VALIDACION_MANUAL_FASE9.md](./CHECKLIST_VALIDACION_MANUAL_FASE9.md) | Checklist manual E2E para cerrar formalmente la Fase 9 del modulo de Planeaciones. |
-| [COMPONENTES_PRESERVADOS.md](./COMPONENTES_PRESERVADOS.md) | Codigo fuente y documentacion de componentes visuales que el desarrollador quiere conservar ante futuros redisenos. |
-| [ARQUITECTURA.md](./ARQUITECTURA.md) | Arquitectura del sistema, stack tecnologico, capas MVVM y decisiones tecnicas. |
-| [FLUJO_SINCRONIZACION.md](./FLUJO_SINCRONIZACION.md) | Flujo de datos offline-first y sincronizacion con MongoDB Atlas. |
-| [DIAGRAMA_NAVEGACION.md](./DIAGRAMA_NAVEGACION.md) | Diagrama visual del flujo de navegacion. |
-| [MAPA_NAVEGACION.md](./MAPA_NAVEGACION.md) | Mapa de rutas y relaciones entre modulos. |
-| [RESUMEN.md](./RESUMEN.md) | Resumen general del proyecto. |
+| --- | --- |
+| `00-fundamentos/RESUMEN_EJECUTIVO.md` | Estado vigente y reglas de direccion. |
+| `00-fundamentos/VISION_ACTUAL.md` | Manifiesto de producto: Word, Classroom, Canva, Excel, WhatsApp y reportes. |
+| `00-fundamentos/ARQUITECTURA.md` | Stack, MVVM, offline-first, backend y convenciones. |
+| `00-fundamentos/MAPA_MODULOS_ACTUALES.md` | Inventario de modulos y experiencias madre. |
+| `00-fundamentos/ROADMAP_PLANES_MAESTROS.md` | Orden y estado de planes maestros. |
+| `00-fundamentos/FLUJO_SINCRONIZACION.md` | Sync offline-first y relacion AsyncStorage/MongoDB. |
 
-### Testing
+### Planes Maestros
+
+| Documento | Estado |
+| --- | --- |
+| `01-planes-maestros/meta_guia_planes.md` | Vigente; instructivo obligatorio para crear planes. |
+| `01-planes-maestros/PLAN_CLASSROOM.md` | Activo; continuar desde Fase 6. |
+| `01-planes-maestros/PLAN_PASOS_INICIALES.md` | Cerrado. |
+| `01-planes-maestros/plan_planeaciones.md` | Cerrado; referencia de calidad. |
+| `01-planes-maestros/PLANEACIONES_IA_EDITOR_FASE9.md` | Soporte de cierre IA/editor de Planeaciones. |
+
+### Operacion y Validacion
 
 | Documento | Descripcion |
-| --------- | ----------- |
-| [GUIA_PRUEBAS.md](./GUIA_PRUEBAS.md) | Guia de testing funcional e integracion. |
+| --- | --- |
+| `02-operacion/GITHUB_PRODUCT_OS.md` | Ramas, Project, labels, milestones, issues y criterio de merge. |
+| `02-operacion/ENTORNO_LOCAL.md` | Levantar frontend/backend local y configurar env vars. |
+| `02-operacion/GUIA_PRUEBAS.md` | Guia vigente de validacion tecnica/manual. |
+| `03-validacion/CHECKLIST_VALIDACION_MANUAL_FASE9.md` | Cierre manual de Planeaciones Fase 9. |
 
----
+### Referencia
 
-## Estado General de la App
+| Documento | Descripcion |
+| --- | --- |
+| `04-referencia/MAPA_NAVEGACION_ACTUAL.md` | Navegacion vigente resumida. |
+| `04-referencia/COMPONENTES_PRESERVADOS.md` | Componentes visuales a preservar como referencia. |
 
-PlanearIA ya cuenta con una base funcional y varios modulos implementados o parcialmente implementados. La vision vigente reorganiza esos modulos en experiencias docentes familiares: Planeaciones como Word/Docs, Grupos/Recursos como Classroom, Diseno Didactico como Canva, Listas como Excel, Mensajeria como WhatsApp profesional y Reportes como hub separado.
+## Documentacion Archivada
 
-- Auth: login, registro y recuperacion de contrasena.
-- Navegacion: tabs principales y stack navigator.
-- Planeaciones: modelo V2, contexto, editor tipo Word/Docs, escaner, exportacion, copiloto IA y Fase 9 cerrada como primera gran refactorizacion.
-- Contenido: hub transversal para planeaciones, recursos, entregables y plantillas.
-- Recursos didacticos: biblioteca, lista y creacion de recursos.
-- Recursos evaluables: tareas, entregables, calificacion y asignacion de recursos desde grupos.
-- Grupos: dashboard, lista, detalle, reportes, importacion, exportacion y tareas.
-- Alumnos: CRUD, detalle, notas, importacion, exportacion y reportes.
-- Asistencia: registro e historial.
-- Calificaciones: captura y promedios.
-- Plantillas: biblioteca, lista, detalle y editor.
-- Feed/red social: posts, detalle, retos, preguntas y resultados.
-- Social/contactos: buscador de perfiles, contactos e invitaciones.
-- Chat: lista de conversaciones y pantalla de conversacion.
-- Notificaciones: contexto, pantalla y servicio push.
-- Cuenta/perfil/accesibilidad: perfil, roles, terminos, tema, fuente y daltonismo.
-- Onboarding y ayuda.
-- Infraestructura: backend serverless, MongoDB Atlas, AsyncStorage y sync local/remoto.
+`99-archivo/` contiene documentos legacy de noviembre 2025. Se conservan por historia, pero no deben guiar implementaciones nuevas.
 
-La app no esta en produccion y no tiene usuarios reales, por lo que los planes pueden proponer cambios fuertes si reducen legacy y mejoran la experiencia.
+Archivados principales:
 
----
+- `RESUMEN_LEGACY_2025.md`
+- `DIAGRAMA_NAVEGACION_LEGACY_2025.md`
+- `MAPA_NAVEGACION_LEGACY_2025.md`
+- `GUIA_PRUEBAS_LEGACY_2025.md`
 
-## Planes Activos y Cerrados
+## Reglas para Futuras IAs
 
-El plan rector inicial actual es:
+- Leer `01-planes-maestros/meta_guia_planes.md` antes de crear cualquier plan.
+- No crear rutas/pantallas aisladas sin mapa de navegacion.
+- No duplicar flujos entre Contenido, Classroom y pantallas legacy.
+- Mantener tracking markdown `[ ]`, `[~]`, `[x]` en planes.
+- Crear issues de GitHub solo para epicas/fases activas, no para todo el backlog futuro.
+- Documentar costos y free tiers antes de proponer infraestructura o IA nueva.
+- Preservar contexto importante antes de borrar o archivar documentos.
 
-**[PLAN_PASOS_INICIALES.md](./PLAN_PASOS_INICIALES.md)**
-
-El siguiente plan maestro listo para ejecucion es:
-
-**[PLAN_CLASSROOM.md](./PLAN_CLASSROOM.md)**
-
-El plan cerrado de Planeaciones queda como referencia de calidad:
-
-**[plan_planeaciones.md](./plan_planeaciones.md)**
-
-Estado actual:
-
-- Fase 0 completada: limpieza legacy.
-- Fase 1 completada: tipos V2 y migracion base.
-- Fase 2 completada: capa de datos y sync con `PlaneacionesContext`.
-- Fase 3 completada: editor base con Tentap/toolbars/modo responsive.
-- Fase 4 completada: DocEditor, secciones modulares y wizard/lista V2.
-- Fase 5 completada: escaner de plantillas PDF/DOCX y flujo desde plantilla V2.
-- Fase 6 completada: endpoint copiloto, servicio/hook y AIToolbar integrada.
-- Fase 7 completada: exportacion PDF/DOCX V2, navegacion DocEditor/EscanerPlantilla y Mi Contenido conectado.
-- Fase 8 completada: limpieza y validaciones tecnicas.
-- Fase 9 completada/cerrada el 2026-05-30: auditoria y correccion funcional del flujo real, editor tipo Word/Docs, web/movil, IA, plantillas default y navegacion sin legacy.
-- Nueva prioridad: cerrar `PLAN_PASOS_INICIALES.md` con CI remoto y ejecutar despues `PLAN_CLASSROOM.md` cuando el usuario confirme el inicio del siguiente ciclo.
-
----
-
-## Modulos que Deben Considerarse en Planes Futuros
-
-La `meta_guia_planes.md` registra el estado y directrices para estos modulos:
-
-1. Planeaciones.
-2. Contenido / Hub de Recursos.
-3. Recursos Didacticos / Biblioteca.
-4. Recursos Evaluables / Tareas / Entregables.
-5. Grupos.
-6. Alumnos.
-7. Asistencia.
-8. Calificaciones.
-9. Plantillas.
-10. Feed / Red Social Educativa.
-11. Social / Contactos.
-12. Chat / Mensajeria.
-13. Notificaciones.
-14. Cuenta, Perfil, Configuracion y Accesibilidad.
-15. Auth / Seguridad.
-16. Onboarding y Ayuda.
-17. Infraestructura, Sync y Backend.
-18. UX/UI y Navegacion Global.
-
----
-
-## Reglas para Futuros Planes
-
-Toda IA o persona que cree un nuevo plan debe leer primero:
-
-- [README.md](../README.md).
-- [Documentacion/README.md](./README.md).
-- [ARQUITECTURA.md](./ARQUITECTURA.md).
-- [FLUJO_SINCRONIZACION.md](./FLUJO_SINCRONIZACION.md).
-- [meta_guia_planes.md](./meta_guia_planes.md).
-- [plan_planeaciones.md](./plan_planeaciones.md) como ejemplo de calidad.
-- [PLAN_PASOS_INICIALES.md](./PLAN_PASOS_INICIALES.md) como plan rector actual.
-
-Cada plan debe incluir:
-
-- Analisis del estado real del codigo.
-- Inventario de archivos afectados.
-- Modelo de datos objetivo.
-- Arquitectura MVVM y offline-first.
-- Limpieza de legacy.
-- UX/UI objetivo y mapa de navegacion.
-- Reglas de IA, prompts, API keys, fallbacks y costos.
-- Consideraciones de bajo presupuesto.
-- Fases numeradas con tracking `[ ]`, `[~]`, `[x]`.
-- Validacion tecnica, manual y de navegacion.
-
----
-
-## Consideraciones Especiales
-
-### Bajo costo
-
-El proyecto lo construye un estudiante trabajando solo. Antes de proponer infraestructura, IA, hosting, email, storage, push o monitoreo, se deben evaluar costos, free tiers y alternativas simples.
-
-### Vision de cero friccion
-
-La vision vigente esta en `VISION_ACTUAL.md`: PlanearIA debe sentirse como Word/Docs para planeaciones, Classroom para grupos/recursos, Canva para diseno didactico, Excel para listas y WhatsApp profesional para comunicacion docente. Los planes futuros deben fusionar modulos en esas experiencias madre y evitar pantallas aisladas.
-
-### Navegacion y UX/UI global
-
-Cada modulo debe quedar accesible desde rutas claras. Ningun plan debe crear pantallas aisladas, flujos duplicados o botones sin destino. Si la navegacion global empieza a romperse, debe crearse un plan dedicado: `Plan Maestro: UX/UI y Navegacion Global - PlanearIA`.
-
-El plan global de UX/UI debe usar las 10 heuristicas de Jakob Nielsen, clasificar hallazgos con severidad `0` a `4` y priorizar cero friccion, carga cognitiva baja, accesibilidad, consistencia visual y tokens centralizados en `ThemeContext` o equivalente.
-
-### Seguridad pragmatica y low-cost
-
-El plan de Auth/Seguridad debe asumir presupuesto cero o bajo costo. Debe contemplar RBAC con roles `Dev/Desarrollador`, `Admin`, `Docente` y `Alumno`; validacion real en backend/APIs/queries; rate limiting en endpoints criticos; `bcrypt`, JWT, secretos en variables de entorno, CORS/cabeceras seguras y compatibilidad con local/free tiers como Render, Vercel, EAS y MongoDB Atlas M0.
-
-### Offline-first
-
-AsyncStorage es la fuente local inmediata; MongoDB Atlas es persistencia remota. Cada modulo debe definir claves locales, sync, conflictos, borradores, reintentos y estados offline.
-
-### IA
-
-La IA debe tener uso pedagogico claro, fallback si no hay API key, validacion humana y documentacion de costos. Para Planeaciones ya existe un gateway multi-provider en backend (`backend/lib/aiGateway.js`) con limite por accion (`AI_MAX_REQUESTS_PER_ACTION`, default 10); futuros modulos deben reutilizarlo o justificar por que necesitan otro flujo. El modo dev puede ampliar el limite con `AI_DEV_MODE=true`, pero debe mostrar advertencia y nunca sustituir los limites de invitados/usuarios registrados.
-
----
-
-## Stack Tecnologico
+## Stack Vigente
 
 - React Native 0.81.5 + Expo 54.
-- TypeScript 5.9.2.
-- React Navigation 7.x.
-- AsyncStorage.
-- MongoDB Atlas M0.
-- Vercel serverless.
-- Monolito modular y desarrollo local primero.
-- JWT auth con `userId` isolation.
+- TypeScript 5.9.
+- React Navigation 7.
+- Context + hooks ViewModel.
+- AsyncStorage actual; SQLite/Expo SQLite como destino futuro para datos relacionales.
+- Backend Node en `backend/api`.
+- MongoDB Atlas/free tier.
+- IA gateway multi-provider en backend.
 - Jest + Testing Library.
-- Tentap/TipTap/WebView para editor enriquecido.
-
----
 
 **Ultima actualizacion:** Junio 2026
-
-**Version:** 4.0
-
-**Branch:** development
+**Version documental:** 4.1

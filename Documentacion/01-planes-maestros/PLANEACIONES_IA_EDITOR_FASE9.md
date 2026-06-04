@@ -1,6 +1,6 @@
 ﻿# Planeaciones Fase 9: IA Gateway y Criterio de Aceptacion del Editor
 
-> **Estado:** documento de soporte cerrado el 2026-05-30 junto con la Fase 9 de `Documentacion/plan_planeaciones.md`.
+> **Estado:** documento de soporte cerrado el 2026-05-30 junto con la Fase 9 de `Documentacion/01-planes-maestros/plan_planeaciones.md`.
 
 ## 1) IA usada realmente en Planeaciones
 
@@ -85,5 +85,6 @@ El editor se considera aceptado si cumple todo:
 - Soporte de configuracion publica para backend agregado con `EXPO_PUBLIC_API_URL` y `EXPO_PUBLIC_API_SECRET`.
 - Gateway IA multi-provider agregado en backend.
 - Escaner de plantillas endurecido con fallback local para que no bloquee C4 cuando falte backend/proveedor.
-- Checklist manual Fase 9 ejecutado y documentado en `Documentacion/CHECKLIST_VALIDACION_MANUAL_FASE9.md`.
+- Checklist manual Fase 9 ejecutado y documentado en `Documentacion/03-validacion/CHECKLIST_VALIDACION_MANUAL_FASE9.md`.
 - Fase 9 queda cerrada como base estable para continuar con la reorientacion global de PlanearIA.
+

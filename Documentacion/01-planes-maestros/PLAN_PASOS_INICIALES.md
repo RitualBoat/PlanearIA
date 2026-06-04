@@ -32,12 +32,12 @@ Este plan se basa en los documentos y estado actual siguientes:
 
 - `README.md`.
 - `Documentacion/README.md`.
-- `Documentacion/meta_guia_planes.md`.
-- `Documentacion/VISION_ACTUAL.md`.
-- `Documentacion/INFRAESTRUCTURA_SUGERIDA.md`.
-- `Documentacion/OPINION_DE_IA_TRAS_LEER_META_GUIA_PLANEACIONES.md`.
-- `Documentacion/REVISION-GPT-TRAS-LEER-ARCHIVOS-DOCUMENTACION.md`.
-- `Documentacion/plan_planeaciones.md`.
+- `Documentacion/01-planes-maestros/meta_guia_planes.md`.
+- `Documentacion/00-fundamentos/VISION_ACTUAL.md`.
+- `Documentacion/05-analisis-ia/INFRAESTRUCTURA_SUGERIDA.md`.
+- `Documentacion/05-analisis-ia/OPINION_DE_IA_TRAS_LEER_META_GUIA_PLANEACIONES.md`.
+- `Documentacion/05-analisis-ia/REVISION-GPT-TRAS-LEER-ARCHIVOS-DOCUMENTACION.md`.
+- `Documentacion/01-planes-maestros/plan_planeaciones.md`.
 - `context/referencias-opensource/README.md`.
 - Estructura actual de `src/screens`, `src/context`, `src/hooks`, `src/services`, `src/navigation`, `backend/api` y `types`.
 
@@ -104,7 +104,7 @@ Convertir GitHub en el centro de control del desarrollo, sin burocracia de empre
   - `fix/*`: bugs puntuales.
 
 - [x] **0.2 Crear GitHub Project principal:**
-  - **Avance:** guia operativa creada en `Documentacion/GITHUB_PRODUCT_OS.md`.
+  - **Avance:** guia operativa creada en `Documentacion/02-operacion/GITHUB_PRODUCT_OS.md`.
   - **Cierre 2026-06-03:** Project v2 verificado en GitHub (`PlanearIA Product OS`) y vinculado al repo.
   - Nombre recomendado: `PlanearIA Product OS`.
   - Vista 1: Kanban operativo.
@@ -112,7 +112,7 @@ Convertir GitHub en el centro de control del desarrollo, sin burocracia de empre
   - Vista 3: Bugs y validacion manual.
 
 - [x] **0.3 Definir columnas del tablero:**
-  - **Avance:** columnas definidas en `Documentacion/GITHUB_PRODUCT_OS.md`.
+  - **Avance:** columnas definidas en `Documentacion/02-operacion/GITHUB_PRODUCT_OS.md`.
   - **Cierre 2026-06-03:** campo `Status` verificado con columnas Inbox, Backlog, Ready, In progress, Review Manual, Blocked, Done y Parked.
   - `Inbox`.
   - `Backlog`.
@@ -371,17 +371,17 @@ Duracion sugerida: 2 a 4 dias para planear, no programar.
 - [x] Crear plan maestro Classroom con fases y tracking.
 - [x] Decidir que se fusiona, que se oculta y que se elimina.
 
-**Cierre 2026-06-03:** se creo `Documentacion/PLAN_CLASSROOM.md` como siguiente plan maestro. Classroom queda definido como experiencia madre para grupos, alumnos, materiales, actividades, entregables, asistencia, calificaciones y reportes operativos.
+**Cierre 2026-06-03:** se creo `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md` como siguiente plan maestro. Classroom queda definido como experiencia madre para grupos, alumnos, materiales, actividades, entregables, asistencia, calificaciones y reportes operativos.
 
 ### Ciclo 2 - Fundacion Classroom
 
 Duracion sugerida: 1 a 2 semanas.
 
-Estado: transferido a `Documentacion/PLAN_CLASSROOM.md`. Este ciclo ya no se ejecuta dentro del plan inicial; se retomara cuando el usuario confirme empezar el Plan Maestro Classroom.
+Estado: transferido a `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`. Este ciclo ya no se ejecuta dentro del plan inicial. Classroom ya inicio y Fases 0-5 quedaron completadas dentro de su propio plan.
 
-- [ ] Implementar solo la primera fase del plan Classroom.
-- [ ] Crear flujo central: grupo -> unidades -> materiales/actividades -> alumnos.
-- [ ] No construir gamificacion ni IA avanzada todavia.
+- [x] Implementar fases iniciales del plan Classroom.
+- [~] Crear flujo central: grupo -> unidades -> materiales/actividades -> alumnos. Avance: alumnos y materiales ya funcionan; actividades/tareas siguen en Fase 6.
+- [x] No construir gamificacion ni IA avanzada todavia.
 
 ---
 
@@ -396,14 +396,14 @@ Este plan se puede cerrar cuando:
 - [x] El entorno local esta documentado para web y celular fisico.
 - [x] Existe un orden aceptado de planes maestros futuros.
 - [x] El siguiente plan maestro elegido es Classroom.
-- [x] Existe `Documentacion/PLAN_CLASSROOM.md` como plan maestro listo para ejecutar.
+- [x] Existe `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md` como plan maestro listo para ejecutar.
 - [x] No quedan dudas sobre que Planeaciones Fase 9 esta cerrada y el proyecto entra a reorientacion.
 
 ---
 
 ## Notas Para Futuras IAs
 
-- No generar planes nuevos sin leer `Documentacion/meta_guia_planes.md`.
+- No generar planes nuevos sin leer `Documentacion/01-planes-maestros/meta_guia_planes.md`.
 - No proponer microservicios.
 - No proponer gastos recurrentes antes de justificar valor.
 - No copiar codigo de referencias AGPL/GPL/custom/no-license.
@@ -419,6 +419,7 @@ Este plan se puede cerrar cuando:
 - [x] **T.2 Registrar nueva prioridad: organizacion + Classroom como siguiente gran plan.**
 - [x] **T.3 Vincular este plan con README y documentacion principal.**
 - [x] **T.4 Ejecutar Ciclo 0.** Project, labels, milestones, templates, docs, commit/push y CI remoto observados en verde.
-- [x] **T.5 Crear Plan Maestro Classroom.** Creado en `Documentacion/PLAN_CLASSROOM.md`.
+- [x] **T.5 Crear Plan Maestro Classroom.** Creado en `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`.
 
 **Cierre del plan inicial 2026-06-03:** PlanearIA queda organizado para la nueva vision: Planeaciones Fase 9 cerrada, GitHub Product OS creado, CI inicial operativo, entorno local documentado y `PLAN_CLASSROOM.md` listo como siguiente ciclo de trabajo.
+

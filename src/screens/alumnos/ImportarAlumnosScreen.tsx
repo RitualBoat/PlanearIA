@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as DocumentPicker from "expo-document-picker";
+import { useRoute, type RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -24,6 +25,7 @@ import {
 } from "../../services/alumnoImportService";
 
 type Nav = StackNavigationProp<RootStackParamList, "ImportarAlumnos">;
+type Route = RouteProp<RootStackParamList, "ImportarAlumnos">;
 
 interface ImportarAlumnosScreenProps {
   navigation: Nav;
@@ -32,7 +34,10 @@ interface ImportarAlumnosScreenProps {
 type UiState = "idle" | "processing" | "preview" | "success" | "error";
 
 const ImportarAlumnosScreen: React.FC<ImportarAlumnosScreenProps> = ({ navigation }) => {
+  const route = useRoute<Route>();
   const { alumnos, agregarAlumno } = useAlumnos();
+  const grupoId = route.params?.grupoId;
+  const grupoNombre = route.params?.grupoNombre;
   const [uiState, setUiState] = useState<UiState>("idle");
   const [result, setResult] = useState<AlumnoImportResult | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
@@ -103,7 +108,7 @@ const ImportarAlumnosScreen: React.FC<ImportarAlumnosScreenProps> = ({ navigatio
       const baseId = Math.max(0, ...alumnos.map((item) => item.id || 0)) + 1;
 
       for (let i = 0; i < result.validRows.length; i += 1) {
-        const alumno = buildAlumnoFromDraft(result.validRows[i], baseId + i);
+        const alumno = buildAlumnoFromDraft(result.validRows[i], baseId + i, grupoId);
         await agregarAlumno(alumno);
       }
 
@@ -130,7 +135,9 @@ const ImportarAlumnosScreen: React.FC<ImportarAlumnosScreenProps> = ({ navigatio
       </View>
       <Text style={styles.cardTitle}>Subir listado de alumnos</Text>
       <Text style={styles.cardText}>
-        Aún no has seleccionado archivo. Sube CSV o Excel para importar alumnos.
+        {grupoId
+          ? `Sube CSV o Excel para importar alumnos directamente a ${grupoNombre ?? "este grupo"}.`
+          : "Aun no has seleccionado archivo. Sube CSV o Excel para importar alumnos."}
       </Text>
 
       <TouchableOpacity style={styles.primaryButton} onPress={() => void handleSelectFile()}>
@@ -237,14 +244,22 @@ const ImportarAlumnosScreen: React.FC<ImportarAlumnosScreenProps> = ({ navigatio
       </View>
       <Text style={styles.successTitle}>Importación completada</Text>
       <Text style={styles.cardText}>
-        Se han importado {validCount} alumnos nuevos correctamente.
+        Se han importado {validCount} alumnos nuevos correctamente
+        {grupoId ? ` en ${grupoNombre ?? "este grupo"}` : ""}.
       </Text>
 
       <TouchableOpacity
         style={styles.primaryButton}
-        onPress={() => navigation.navigate("ListaAlumnos")}
+        onPress={() => {
+          if (grupoId) {
+            navigation.navigate("ClassroomGroup", { grupoId, grupoNombre });
+            return;
+          }
+
+          navigation.navigate("ListaAlumnos");
+        }}
       >
-        <Text style={styles.primaryButtonText}>Ir a mis alumnos</Text>
+        <Text style={styles.primaryButtonText}>{grupoId ? "Volver a la clase" : "Ir a mis alumnos"}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.secondaryButton} onPress={resetFlow}>

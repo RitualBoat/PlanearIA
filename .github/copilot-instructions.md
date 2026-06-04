@@ -10,16 +10,17 @@ Auth: JWT con userId isolation.
 
 ## Plan de Trabajo Activo
 
-- El plan rector actual es `Documentacion/PLAN_PASOS_INICIALES.md`.
-- El plan de Planeaciones quedo cerrado como referencia en `Documentacion/plan_planeaciones.md`.
-- La guia obligatoria para nuevos planes maestros es `Documentacion/meta_guia_planes.md`.
-- Cada modulo importante tendra su propio plan maestro dentro de `Documentacion/`, siguiendo tracking `[ ]`, `[~]`, `[x]`.
+- El plan activo actual es `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`.
+- El plan de Planeaciones quedo cerrado como referencia en `Documentacion/01-planes-maestros/plan_planeaciones.md`.
+- El plan de Pasos Iniciales quedo cerrado como cimiento organizativo en `Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md`.
+- La guia obligatoria para nuevos planes maestros es `Documentacion/01-planes-maestros/meta_guia_planes.md`.
+- Cada modulo importante tendra su propio plan maestro dentro de `Documentacion/01-planes-maestros/`, siguiendo tracking `[ ]`, `[~]`, `[x]`.
 - Las tareas se marcan con: `[ ]` pendiente, `[~]` en progreso, `[x]` completado.
 - Al completar una tarea, actualizar su estado en el plan.
 
 ### Cuando el usuario pida "trabajar en la proxima tarea"
 
-1. Leer `Documentacion/PLAN_PASOS_INICIALES.md` y el plan maestro del modulo activo para encontrar la siguiente tarea pendiente `[ ]`
+1. Leer `Documentacion/README.md`, `Documentacion/00-fundamentos/RESUMEN_EJECUTIVO.md` y el plan maestro del modulo activo para encontrar la siguiente tarea pendiente `[ ]`
 2. Implementar la tarea en el codigo
 3. **Ejecutar tests** relacionados (`npm test -- --testPathPattern="<patron>"`)
 4. Cambiar su estado en el plan a `[x]`

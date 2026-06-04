@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Alert, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRoute, type RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -13,20 +14,29 @@ import {
 } from "../../services/alumnoExportService";
 
 type Nav = StackNavigationProp<RootStackParamList, "ExportarAlumnos">;
+type Route = RouteProp<RootStackParamList, "ExportarAlumnos">;
 
 interface ExportarAlumnosScreenProps {
   navigation: Nav;
 }
 
 const ExportarAlumnosScreen: React.FC<ExportarAlumnosScreenProps> = ({ navigation }) => {
+  const route = useRoute<Route>();
   const { alumnos } = useAlumnos();
+  const grupoId = route.params?.grupoId;
+  const grupoNombre = route.params?.grupoNombre;
+  const alumnosExportables = grupoId
+    ? alumnos.filter((alumno) => alumno.grupoId === grupoId)
+    : alumnos;
   const [selectedFormat, setSelectedFormat] = useState<AlumnoExportFormat>("excel");
   const [isExporting, setIsExporting] = useState(false);
   const [exported, setExported] = useState(false);
 
   const handleExport = async () => {
-    if (alumnos.length === 0) {
-      const msg = "No hay alumnos registrados para exportar.";
+    if (alumnosExportables.length === 0) {
+      const msg = grupoId
+        ? "No hay alumnos vinculados a este grupo para exportar."
+        : "No hay alumnos registrados para exportar.";
       if (Platform.OS === "web") {
         window.alert(msg);
       } else {
@@ -37,7 +47,7 @@ const ExportarAlumnosScreen: React.FC<ExportarAlumnosScreenProps> = ({ navigatio
 
     try {
       setIsExporting(true);
-      await exportarAlumnosArchivo({ alumnos, formato: selectedFormat });
+      await exportarAlumnosArchivo({ alumnos: alumnosExportables, formato: selectedFormat });
       setExported(true);
     } catch {
       const msg = "No se pudo generar el archivo. Intenta de nuevo.";
@@ -85,7 +95,7 @@ const ExportarAlumnosScreen: React.FC<ExportarAlumnosScreenProps> = ({ navigatio
               </View>
               <Text style={styles.successTitle}>Exportación lista</Text>
               <Text style={styles.cardText}>
-                Se exportaron {alumnos.length} alumnos en formato{" "}
+                Se exportaron {alumnosExportables.length} alumnos en formato{" "}
                 {selectedFormat === "excel" ? "Excel" : "PDF"}.
               </Text>
 
@@ -122,13 +132,17 @@ const ExportarAlumnosScreen: React.FC<ExportarAlumnosScreenProps> = ({ navigatio
 
           <Text style={styles.pageTitle}>Exportar Datos</Text>
           <Text style={styles.pageSubtitle}>
-            Genera un archivo con la lista completa de tus alumnos registrados.
+            {grupoId
+              ? `Genera un archivo solo con los alumnos de ${grupoNombre ?? "este grupo"}.`
+              : "Genera un archivo con la lista completa de tus alumnos registrados."}
           </Text>
 
           <View style={styles.statsCard}>
             <MaterialIcons name="people" size={24} color={COLORS.primary} />
             <Text style={styles.statsText}>
-              {alumnos.length} {alumnos.length === 1 ? "alumno" : "alumnos"} registrados
+              {alumnosExportables.length}{" "}
+              {alumnosExportables.length === 1 ? "alumno" : "alumnos"}{" "}
+              {grupoId ? "en esta clase" : "registrados"}
             </Text>
           </View>
 

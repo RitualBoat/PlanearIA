@@ -1,4 +1,4 @@
-# Arquitectura de PlanearIA
+﻿# Arquitectura de PlanearIA
 
 ## Indice
 
@@ -99,74 +99,41 @@ PlanearIA es una aplicacion movil para docentes mexicanos. Permite gestionar pla
 
 ## Estructura del Proyecto
 
-```
+```text
 PlanearIA/
-├── App.tsx                      # Entry point principal
-├── Documentacion/
-│   ├── plan_planeaciones.md     # Plan de Planeaciones cerrado como referencia
-│   ├── PLAN_PASOS_INICIALES.md  # Plan rector activo actual
-├── .agents/skills/              # Skills para agentes IA
-│   ├── token-efficiency/        # Control de verbosidad adaptativo
-│   ├── writing-style/           # Convenciones de escritura
-│   ├── accessibility/           # Accesibilidad VoiceOver/TalkBack
-│   ├── best-practices/          # Best practices RN/Expo
-│   ├── performance/             # Optimizacion de rendimiento
-│   ├── core-web-vitals/         # Metricas de performance
-│   ├── seo/                     # ASO y deep linking
-│   └── web-quality-audit/       # Auditoria de calidad
-│
-├── backend/
-│   ├── api/                     # Endpoints serverless (Vercel)
-│   │   ├── auth.js              # Login, registro
-│   │   ├── health.js            # Health check
-│   │   ├── planeaciones.js      # CRUD con userId isolation
-│   │   └── sync.js              # Sincronizacion batch
-│   └── lib/
-│       ├── auth.js              # getUserFromToken, verifyApiKey
-│       ├── mongodb.js           # Conexion a Atlas
-│       └── databaseIndexes.js   # Indices de MongoDB
-│
-├── src/
-│   ├── components/              # Componentes reutilizables
-│   │   ├── BottomNavBar.tsx
-│   │   └── SyncIndicator.tsx
-│   ├── context/
-│   │   ├── AuthContext.tsx       # Autenticacion y sesion
-│   │   ├── PlaneacionesContext.tsx # Estado de planeaciones
-│   │   └── NotificacionesContext.tsx
-│   ├── hooks/                   # ViewModels (custom hooks)
-│   ├── navigation/
-│   │   └── StackNavigator.tsx   # Todas las rutas
-│   ├── screens/
-│   │   ├── auth/                # LoginScreen
-│   │   ├── planeaciones/        # Editor, Lista, Crear
-│   │   ├── grupos/              # Grupos, Detalle, Crear
-│   │   ├── biblioteca/          # Recursos didacticos
-│   │   ├── cuenta/              # Perfil
-│   │   ├── notificaciones/
-│   │   └── ayuda/
-│   ├── services/
-│   │   └── pushNotificationService.ts
-│   ├── sync/
-│   │   └── services/
-│   │       ├── syncEngine.ts    # Motor de sincronizacion
-│   │       └── syncService.ts   # Servicio de sync
-│   ├── themes/
-│   │   └── colors.ts            # Paleta de colores
-│   └── utils/
-│       ├── apiClient.ts         # Cliente HTTP centralizado
-│       └── migrateV1toV2.ts     # Migracion de tipos V1 a V2
-│
-├── types/
-│   ├── index.ts                 # Tipos generales (Grupo, Alumno, etc.)
-│   ├── planeacion.ts            # V1 types (legacy, en deprecacion)
-│   ├── planeacionV2.ts          # V2 types (NEM-aligned, estandar nuevo)
-│   └── plantillaDocumento.ts    # Tipos de plantillas
-│
-├── context/
-│   └── planeaciones-reales/     # Ejemplos de planeaciones reales
-│
-└── Documentacion/               # Docs tecnicos
++-- App.tsx
++-- README.md
++-- Documentacion/
+|   +-- README.md
+|   +-- 00-fundamentos/
+|   +-- 01-planes-maestros/
+|   +-- 02-operacion/
+|   +-- 03-validacion/
+|   +-- 04-referencia/
+|   +-- 05-analisis-ia/
+|   +-- 99-archivo/
++-- backend/
+|   +-- api/
+|   +-- lib/
++-- context/
+|   +-- planeaciones-ground-truth/
+|   +-- classroom-ground-truth/
+|   +-- referencias-opensource/
++-- src/
+|   +-- components/
+|   +-- context/
+|   +-- hooks/
+|   +-- navigation/
+|   +-- screens/
+|   +-- services/
+|   +-- sync/
+|   +-- themes/
+|   +-- utils/
+|   +-- __tests__/
++-- types/
+```
+
+La documentacion vigente se organiza por carpetas. Los documentos legacy de 2025 viven en `Documentacion/99-archivo/` y no deben guiar implementaciones nuevas.
 ```
 
 ---
@@ -215,17 +182,17 @@ Definidas en `types/plantillaDocumento.ts`. Representan la estructura NEM escane
 ### Escritura (optimistic update)
 
 ```
-Usuario edita → setState (UI inmediata)
-             → AsyncStorage.setItem (persistencia local)
-             → Cola de sync (operacion pendiente)
-             → [Cuando hay red] POST /api/sync → MongoDB Atlas
+Usuario edita â†’ setState (UI inmediata)
+             â†’ AsyncStorage.setItem (persistencia local)
+             â†’ Cola de sync (operacion pendiente)
+             â†’ [Cuando hay red] POST /api/sync â†’ MongoDB Atlas
 ```
 
 ### Lectura
 
 ```
-App inicia → AsyncStorage.getItem → setState (datos locales)
-          → [Si hay red] GET /api/sync → merge con datos remotos
+App inicia â†’ AsyncStorage.getItem â†’ setState (datos locales)
+          â†’ [Si hay red] GET /api/sync â†’ merge con datos remotos
 ```
 
 ### Conflictos
@@ -296,7 +263,7 @@ Transformar cada modulo de formularios nativos simples a experiencias docentes f
 
 ### Estado actual
 
-El modulo de **Planeaciones** cerro Fase 9 como primera gran refactorizacion. La prioridad actual es ejecutar `Documentacion/PLAN_PASOS_INICIALES.md` y preparar el siguiente plan maestro: Classroom / Grupos y Recursos.
+El modulo de **Planeaciones** cerro Fase 9 como primera gran refactorizacion. `PLAN_PASOS_INICIALES.md` quedo cerrado como cimiento organizativo. La prioridad actual es continuar `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md` desde la Fase 6.
 
 ---
 
@@ -335,5 +302,6 @@ COLORS = {
 
 ---
 
-**Ultima actualizacion**: Mayo 2026
-**Version de Arquitectura**: 4.0
+**Ultima actualizacion**: Junio 2026
+**Version de Arquitectura**: 4.1
+

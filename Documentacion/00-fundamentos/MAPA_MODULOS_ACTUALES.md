@@ -1,12 +1,12 @@
 ﻿# Mapa de Modulos Actuales - PlanearIA
 
-> Estado: fotografia inicial para preparar el Plan Maestro Classroom y la poda de legacy.
+> Estado: fotografia vigente para orientar Classroom, UX global y futuros planes. Classroom ya esta en ejecucion.
 
 ## Tabs principales actuales
 
 - `FeedTab` -> `FeedScreen`.
 - `ContenidoTab` -> `ContenidoScreen`.
-- `GruposTab` -> `GruposDashboardScreen`.
+- `GruposTab` -> `ClassroomHomeScreen`.
 - `SocialTab` -> `SocialScreen`.
 - `ConfiguracionTab` -> `CuentaScreen`.
 
@@ -15,7 +15,7 @@
 | Experiencia madre | Modulos actuales relacionados | Decision inicial |
 | --- | --- | --- |
 | Word/Docs | `planeaciones`, `plantillas` | Planeaciones queda cerrada Fase 9; plantillas se retomara en Canva/UX. |
-| Classroom | `grupos`, `alumnos`, `tareas`, `biblioteca`, `asistencia`, `calificaciones`, `contenido` | Siguiente plan maestro. Fusionar flujos academicos en una experiencia central. |
+| Classroom | `grupos`, `alumnos`, `tareas`, `biblioteca`, `asistencia`, `calificaciones`, `contenido` | Plan activo. Fases 0-5 completadas; Fase 6 debe integrar actividades, tareas y entregables. |
 | Canva/Genially | `biblioteca`, `plantillas`, recursos visuales futuros | Congelar hasta tener Classroom base, salvo demo visual. |
 | Excel | `alumnos`, `asistencia`, `calificaciones`, import/export | Plan posterior a Classroom base. |
 | WhatsApp docente | `chat`, `social`, `feed`, `notificaciones` | Reorientar red social pesada hacia comunicacion directa. |
@@ -28,7 +28,8 @@
 | --- | --- | --- |
 | `planeaciones` | Crear, DocEditor, Escaner, Importar, Exportar, Lista | Mantener como modulo referencia Word/Docs. |
 | `contenido` | Hub de contenido | Mantener como entrada transversal; revisar en UX global. |
-| `grupos` | Dashboard, lista, crear, detalle, importar, reportes, tareas | Fusionar en Classroom. |
+| `classroom` | Home y pantalla de clase | Nueva capa principal para experiencia Classroom. |
+| `grupos` | Dashboard, lista, crear, detalle, importar, reportes, tareas | Reutilizar y fusionar progresivamente en Classroom; mantener legacy solo como puente. |
 | `alumnos` | Lista, crear, detalle, notas, importar/exportar, reportes | Fusionar en Classroom/Excel. |
 | `tareas` y `grupos/tareas` | Entregables, crear/asignar/detalle/calificar | Fusionar en Classroom. |
 | `biblioteca` | Recursos didacticos, lista, crear | Fusionar en Classroom y despues Canva. |
@@ -45,7 +46,7 @@
 
 ## Decision record inicial
 
-- Primero se planifica Classroom porque concentra mayor valor diario y conecta grupos, alumnos, recursos, tareas, asistencia y calificaciones.
+- Classroom es el plan activo porque concentra mayor valor diario y conecta grupos, alumnos, recursos, tareas, asistencia y calificaciones.
 - UX/UI Global queda como plan transversal, pero su pulido fuerte debe esperar a que los modulos funcionales principales existan.
 - Infraestructura/Auth se endurecen antes de beta con usuarios reales, no antes de tener una demo local consistente.
 - Feed/social no se elimina ahora; se congela hasta decidir WhatsApp docente/comunidad.

@@ -1,6 +1,6 @@
 ﻿# GitHub Product OS - PlanearIA
 
-> Estado: guia operativa para ejecutar la Fase 0 de `Documentacion/PLAN_PASOS_INICIALES.md`.
+> Estado: guia operativa vigente. `PLAN_PASOS_INICIALES.md` ya quedo cerrado; esta guia se usa para mantener GitHub Project alineado con planes activos como Classroom.
 
 ## Ramas oficiales
 
@@ -83,8 +83,8 @@ Ejemplo recomendado para Classroom:
 
 - Epic: `Plan Maestro: Classroom / Grupos y Recursos`.
 - Milestone: `Ciclo 2 - Fundacion Classroom`.
-- Issue fase activa: `Classroom Fase 0 - Auditoria profunda y preparacion`.
-- Checklist dentro del issue: tareas `0.1` a `0.7`.
+- Issue fase activa: crear solo la fase actual o la siguiente inmediata.
+- Checklist dentro del issue: tareas internas de esa fase.
 
 ## Automatizacion local con GitHub CLI
 
@@ -111,3 +111,4 @@ Ese script crea/verifica labels y milestones. El Project v2 ya existe como `Plan
 - No cerrar fase UX/UI sin validacion manual cuando aplique.
 - No cerrar plan maestro sin actualizar su tracking `[ ]`, `[~]`, `[x]`.
 - No mergear cambios con secrets reales.
+

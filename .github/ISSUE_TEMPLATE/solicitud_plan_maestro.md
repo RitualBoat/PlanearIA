@@ -12,8 +12,9 @@ Ejemplo: Classroom, UX/UI Global, Auth/Seguridad, Excel/Listas.
 
 ## Documentos obligatorios a leer
 
-- [ ] `Documentacion/meta_guia_planes.md`
-- [ ] `Documentacion/PLAN_PASOS_INICIALES.md`
+- [ ] `Documentacion/01-planes-maestros/meta_guia_planes.md`
+- [ ] `Documentacion/00-fundamentos/RESUMEN_EJECUTIVO.md`
+- [ ] `Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md`
 - [ ] `README.md`
 - [ ] Documentacion/contexto especifico del modulo
 

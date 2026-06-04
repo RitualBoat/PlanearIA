@@ -1,6 +1,6 @@
 ﻿# Entorno Local - PlanearIA
 
-> Estado: guia base creada desde `Documentacion/PLAN_PASOS_INICIALES.md`.
+> Estado: guia base creada desde `Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md`.
 
 ## Objetivo
 
@@ -117,3 +117,4 @@ npm test -- --runInBand
 ```
 
 Para trabajar mas rapido, ejecutar tests focalizados del modulo tocado.
+

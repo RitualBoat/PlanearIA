@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import {
   ActivityIndicator,
+  Alert,
   Platform,
   RefreshControl,
   ScrollView,
@@ -17,7 +18,12 @@ import type { StackNavigationProp } from "@react-navigation/stack";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../../types";
 import type { Alumno, Recurso } from "../../../types";
+import type { PlaneacionDocumento } from "../../../types/planeacionV2";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
+import { useAlumnos } from "../../context/AlumnosContext";
+import { useGruposContext } from "../../context/GruposContext";
+import { usePlaneaciones } from "../../context/PlaneacionesContext";
+import { useRecursos } from "../../context/RecursosContext";
 import { useClassroomGroupViewModel } from "../../hooks/classroom/useClassroomGroupViewModel";
 
 type Navigation = StackNavigationProp<RootStackParamList>;
@@ -25,18 +31,252 @@ type Route = RouteProp<RootStackParamList, "ClassroomGroup">;
 
 const TAB_LABELS = ["Novedades", "Trabajo de clase", "Personas", "Calificaciones"];
 
+type MaterialFilter =
+  | "todos"
+  | "planeaciones"
+  | "pdf"
+  | "video"
+  | "enlaces"
+  | "imagenes"
+  | "archivos"
+  | "otros";
+
+const MATERIAL_FILTERS: { key: MaterialFilter; label: string }[] = [
+  { key: "todos", label: "Todos" },
+  { key: "planeaciones", label: "Planeaciones" },
+  { key: "pdf", label: "PDF" },
+  { key: "video", label: "Video" },
+  { key: "enlaces", label: "Enlaces" },
+  { key: "imagenes", label: "Imagenes" },
+  { key: "archivos", label: "Archivo" },
+  { key: "otros", label: "Otros" },
+];
+
+const isPlaneacionResource = (recurso: Recurso): boolean => {
+  const tags = recurso.tags ?? [];
+  return (
+    recurso.url?.startsWith("planeacion://") === true ||
+    tags.some((tag) => tag.toLowerCase() === "planeacion")
+  );
+};
+
+const resolveMaterialFilter = (recurso: Recurso): MaterialFilter => {
+  const formato = recurso.formato?.toLowerCase() ?? "";
+  const archivo = recurso.archivo?.toLowerCase() ?? "";
+
+  if (isPlaneacionResource(recurso)) return "planeaciones";
+  if (formato === "pdf" || archivo.endsWith(".pdf")) return "pdf";
+  if (recurso.tipo === "video") return "video";
+  if (recurso.tipo === "enlace" || recurso.url?.startsWith("http") === true) return "enlaces";
+  if (recurso.tipo === "imagen") return "imagenes";
+  if (recurso.archivo || ["documento", "presentacion", "audio", "examen"].includes(recurso.tipo)) {
+    return "archivos";
+  }
+  return "otros";
+};
+
+const getPlaneacionTitle = (doc: PlaneacionDocumento): string => {
+  const asignatura = doc.datosGenerales.asignatura || doc.elementosCurriculares.contenido || "Planeacion";
+  const grado = doc.datosGenerales.grado ? ` - ${doc.datosGenerales.grado}` : "";
+  const grupo = doc.datosGenerales.grupos?.[0] ? ` ${doc.datosGenerales.grupos[0]}` : "";
+  return `${asignatura}${grado}${grupo}`.trim();
+};
+
 const ClassroomGroupScreen: React.FC = () => {
   const navigation = useNavigation<Navigation>();
   const route = useRoute<Route>();
   const { width } = useWindowDimensions();
   const { grupoId, grupoNombre } = route.params;
   const { model, alumnos, materiales, isLoading, error, reload } = useClassroomGroupViewModel(grupoId);
+  const { actualizarAlumno } = useAlumnos();
+  const { grupos } = useGruposContext();
+  const { documentos } = usePlaneaciones();
+  const { crearRecurso } = useRecursos();
+  const [materialFilter, setMaterialFilter] = React.useState<MaterialFilter>("todos");
   const nombre = model?.grupo.nombre ?? grupoNombre ?? "Grupo";
   const materia = model?.grupo.materia ?? "Materia sin definir";
   const periodo = model?.grupo.periodo ?? "Periodo sin definir";
   const isCompact = width < 760;
   const alumnosPreview = alumnos.slice(0, 4);
-  const materialesPreview = materiales.slice(0, 4);
+  const materialesFiltrados = materiales.filter((recurso) => {
+    if (materialFilter === "todos") return true;
+    return resolveMaterialFilter(recurso) === materialFilter;
+  });
+  const materialesPreview = materialesFiltrados.slice(0, 6);
+  const gruposDestino = grupos.filter((grupo) => typeof grupo.id === "number" && grupo.id !== grupoId);
+
+  const showMessage = React.useCallback((title: string, message: string) => {
+    if (Platform.OS === "web") {
+      window.alert(`${title}\n\n${message}`);
+      return;
+    }
+
+    Alert.alert(title, message);
+  }, []);
+
+  const removeAlumnoFromGroup = React.useCallback(
+    async (alumno: Alumno) => {
+      await actualizarAlumno(alumno.id, { grupoId: undefined });
+      await reload();
+    },
+    [actualizarAlumno, reload]
+  );
+
+  const moveAlumnoToGroup = React.useCallback(
+    async (alumno: Alumno, targetGrupoId: number) => {
+      await actualizarAlumno(alumno.id, { grupoId: targetGrupoId });
+      await reload();
+    },
+    [actualizarAlumno, reload]
+  );
+
+  const handleRemoveAlumno = React.useCallback(
+    (alumno: Alumno) => {
+      const fullName = `${alumno.nombre} ${alumno.apellidos}`.trim();
+      const message = `Esto quitara a ${fullName} de ${nombre}, pero no eliminara su perfil.`;
+
+      if (Platform.OS === "web") {
+        if (window.confirm(`Quitar alumno\n\n${message}`)) {
+          void removeAlumnoFromGroup(alumno);
+        }
+        return;
+      }
+
+      Alert.alert("Quitar alumno", message, [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Quitar",
+          style: "destructive",
+          onPress: () => void removeAlumnoFromGroup(alumno),
+        },
+      ]);
+    },
+    [nombre, removeAlumnoFromGroup]
+  );
+
+  const handleMoveAlumno = React.useCallback(
+    (alumno: Alumno) => {
+      if (gruposDestino.length === 0) {
+        showMessage("Sin grupos destino", "Crea otro grupo para poder mover este alumno.");
+        return;
+      }
+
+      if (Platform.OS === "web") {
+        const promptText = gruposDestino
+          .map((grupo) => `${grupo.id} - ${grupo.nombre ?? "Grupo sin nombre"}`)
+          .join("\n");
+        const selected = window.prompt(`Escribe el ID del grupo destino:\n\n${promptText}`);
+        if (!selected) return;
+
+        const targetId = Number(selected);
+        const exists = gruposDestino.some((grupo) => grupo.id === targetId);
+        if (!Number.isFinite(targetId) || !exists) {
+          showMessage("Grupo invalido", "El ID seleccionado no coincide con un grupo disponible.");
+          return;
+        }
+
+        void moveAlumnoToGroup(alumno, targetId);
+        return;
+      }
+
+      Alert.alert(
+        "Mover alumno",
+        `Selecciona el grupo destino para ${alumno.nombre}.`,
+        [
+          ...gruposDestino.slice(0, 6).map((grupo) => ({
+            text: grupo.nombre ?? `Grupo ${grupo.id}`,
+            onPress: () => {
+              if (typeof grupo.id === "number") {
+                void moveAlumnoToGroup(alumno, grupo.id);
+              }
+            },
+          })),
+          { text: "Cancelar", style: "cancel" as const },
+        ]
+      );
+    },
+    [gruposDestino, moveAlumnoToGroup, showMessage]
+  );
+
+  const attachPlaneacion = React.useCallback(
+    async (doc: PlaneacionDocumento) => {
+      const now = new Date();
+      await crearRecurso({
+        titulo: getPlaneacionTitle(doc),
+        tipo: "documento",
+        descripcion: `Planeacion adjunta a la clase ${nombre}.`,
+        url: `planeacion://${doc.id}`,
+        grupoId,
+        asignadoComoTarea: false,
+        tags: ["planeacion", doc.nivelAcademico, doc.datosGenerales.asignatura].filter(Boolean),
+        fechaCreacion: now,
+        fechaModificacion: now,
+        formato: "planeacion",
+        formatosExportacion: ["pdf", "docx"],
+        acceso: "privado",
+        origen: "manual",
+        profesorId: 1,
+        versionActual: 1,
+      });
+      await reload();
+      showMessage("Planeacion adjunta", "La planeacion ya aparece como material de esta clase.");
+    },
+    [crearRecurso, grupoId, nombre, reload, showMessage]
+  );
+
+  const handleAttachPlaneacion = React.useCallback(() => {
+    if (documentos.length === 0) {
+      showMessage("Sin planeaciones", "Crea una planeacion para poder adjuntarla como material.");
+      return;
+    }
+
+    const opciones = documentos.slice(0, 8);
+
+    if (Platform.OS === "web") {
+      const promptText = opciones
+        .map((doc, index) => `${index + 1}. ${getPlaneacionTitle(doc)}`)
+        .join("\n");
+      const selected = window.prompt(`Elige una planeacion para adjuntar:\n\n${promptText}`);
+      if (!selected) return;
+
+      const index = Number(selected) - 1;
+      const doc = opciones[index];
+      if (!doc) {
+        showMessage("Seleccion invalida", "El numero seleccionado no coincide con una planeacion.");
+        return;
+      }
+
+      void attachPlaneacion(doc);
+      return;
+    }
+
+    Alert.alert(
+      "Adjuntar planeacion",
+      "Selecciona una planeacion para convertirla en material de clase.",
+      [
+        ...opciones.slice(0, 6).map((doc) => ({
+          text: getPlaneacionTitle(doc),
+          onPress: () => void attachPlaneacion(doc),
+        })),
+        { text: "Cancelar", style: "cancel" as const },
+      ]
+    );
+  }, [attachPlaneacion, documentos, showMessage]);
+
+  const handleOpenMaterial = React.useCallback(
+    (recurso: Recurso) => {
+      if (isPlaneacionResource(recurso) && recurso.url) {
+        const planeacionId = recurso.url.replace("planeacion://", "");
+        if (planeacionId) {
+          navigation.navigate("DocEditor", { modo: "editar", planeacionId });
+          return;
+        }
+      }
+
+      navigation.navigate("CrearRecurso", { recursoId: recurso.id, grupoId });
+    },
+    [grupoId, navigation]
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -158,7 +398,9 @@ const ClassroomGroupScreen: React.FC = () => {
                     <Text style={styles.sectionTitle}>Materiales de clase</Text>
                     <Text style={styles.sectionHint}>Recursos asignados al grupo.</Text>
                   </View>
-                  <Text style={styles.feedCount}>{materiales.length}</Text>
+                  <Text style={styles.feedCount}>
+                    {materialesFiltrados.length}/{materiales.length}
+                  </Text>
                 </View>
 
                 <View style={styles.inlineActions}>
@@ -178,6 +420,13 @@ const ClassroomGroupScreen: React.FC = () => {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.inlineActionButton}
+                    onPress={handleAttachPlaneacion}
+                  >
+                    <MaterialIcons name="article" size={18} color={COLORS.primary} />
+                    <Text style={styles.inlineActionText}>Adjuntar planeacion</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.inlineActionButton}
                     onPress={() => navigation.navigate("ListaRecursos", { filtroTipo: undefined })}
                   >
                     <MaterialIcons name="folder-open" size={18} color={COLORS.primary} />
@@ -185,10 +434,38 @@ const ClassroomGroupScreen: React.FC = () => {
                   </TouchableOpacity>
                 </View>
 
+                <View style={styles.filterPills}>
+                  {MATERIAL_FILTERS.map((filter) => (
+                    <TouchableOpacity
+                      key={filter.key}
+                      style={[
+                        styles.filterPill,
+                        materialFilter === filter.key ? styles.filterPillActive : null,
+                      ]}
+                      onPress={() => setMaterialFilter(filter.key)}
+                    >
+                      <Text
+                        style={[
+                          styles.filterPillText,
+                          materialFilter === filter.key ? styles.filterPillTextActive : null,
+                        ]}
+                      >
+                        {filter.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
                 {materialesPreview.length === 0 ? (
-                  <EmptyFeedLine icon="folder-open" text="Aun no hay materiales asignados a esta clase." />
+                  <EmptyFeedLine icon="folder-open" text="No hay materiales para este filtro." />
                 ) : (
-                  materialesPreview.map((recurso) => <MaterialRow key={recurso.id} recurso={recurso} />)
+                  materialesPreview.map((recurso) => (
+                    <MaterialRow
+                      key={recurso.id}
+                      recurso={recurso}
+                      onPress={() => handleOpenMaterial(recurso)}
+                    />
+                  ))
                 )}
               </View>
 
@@ -211,14 +488,14 @@ const ClassroomGroupScreen: React.FC = () => {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.inlineActionButton}
-                    onPress={() => navigation.navigate("ImportarAlumnos")}
+                    onPress={() => navigation.navigate("ImportarAlumnos", { grupoId, grupoNombre: nombre })}
                   >
                     <MaterialIcons name="upload-file" size={18} color={COLORS.primary} />
                     <Text style={styles.inlineActionText}>Importar</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.inlineActionButton}
-                    onPress={() => navigation.navigate("ExportarAlumnos")}
+                    onPress={() => navigation.navigate("ExportarAlumnos", { grupoId, grupoNombre: nombre })}
                   >
                     <MaterialIcons name="download" size={18} color={COLORS.primary} />
                     <Text style={styles.inlineActionText}>Exportar</Text>
@@ -233,6 +510,8 @@ const ClassroomGroupScreen: React.FC = () => {
                       key={alumno.id}
                       alumno={alumno}
                       onPress={() => navigation.navigate("DetalleAlumno", { alumnoId: alumno.id })}
+                      onMove={() => handleMoveAlumno(alumno)}
+                      onRemove={() => handleRemoveAlumno(alumno)}
                     />
                   ))
                 )}
@@ -333,7 +612,12 @@ const ActionCard: React.FC<{
   </TouchableOpacity>
 );
 
-const StudentRow: React.FC<{ alumno: Alumno; onPress: () => void }> = ({ alumno, onPress }) => (
+const StudentRow: React.FC<{
+  alumno: Alumno;
+  onPress: () => void;
+  onMove: () => void;
+  onRemove: () => void;
+}> = ({ alumno, onMove, onPress, onRemove }) => (
   <TouchableOpacity style={styles.studentRow} onPress={onPress}>
     <View style={styles.studentAvatar}>
       <Text style={styles.studentAvatarText}>
@@ -346,22 +630,50 @@ const StudentRow: React.FC<{ alumno: Alumno; onPress: () => void }> = ({ alumno,
         {alumno.numeroControl} - {alumno.carrera} - {alumno.estado}
       </Text>
     </View>
+    <View style={styles.rowActions}>
+      <TouchableOpacity
+        style={styles.rowActionButton}
+        onPress={(event) => {
+          event.stopPropagation();
+          onMove();
+        }}
+      >
+        <MaterialIcons name="drive-file-move" size={16} color={COLORS.primary} />
+        <Text style={styles.rowActionText}>Mover</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.rowActionButton, styles.rowActionDanger]}
+        onPress={(event) => {
+          event.stopPropagation();
+          onRemove();
+        }}
+      >
+        <MaterialIcons name="person-remove" size={16} color="#B91C1C" />
+        <Text style={[styles.rowActionText, styles.rowActionDangerText]}>Quitar</Text>
+      </TouchableOpacity>
+    </View>
     <MaterialIcons name="chevron-right" size={22} color="#94A3B8" />
   </TouchableOpacity>
 );
 
-const MaterialRow: React.FC<{ recurso: Recurso }> = ({ recurso }) => (
-  <View style={styles.studentRow}>
+const MaterialRow: React.FC<{ recurso: Recurso; onPress: () => void }> = ({ recurso, onPress }) => (
+  <TouchableOpacity style={styles.studentRow} onPress={onPress}>
     <View style={styles.materialAvatar}>
-      <MaterialIcons name="folder" size={20} color={COLORS.primary} />
+      <MaterialIcons
+        name={isPlaneacionResource(recurso) ? "article" : "folder"}
+        size={20}
+        color={COLORS.primary}
+      />
     </View>
     <View style={styles.studentCopy}>
       <Text style={styles.studentName}>{recurso.titulo}</Text>
       <Text style={styles.studentMeta}>
-        {recurso.tipo} - {recurso.origen} - v{recurso.versionActual}
+        {isPlaneacionResource(recurso) ? "planeacion" : recurso.tipo} - {recurso.origen} - v
+        {recurso.versionActual}
       </Text>
     </View>
-  </View>
+    <MaterialIcons name="chevron-right" size={22} color="#94A3B8" />
+  </TouchableOpacity>
 );
 
 const FeedItem: React.FC<{ icon: keyof typeof MaterialIcons.glyphMap; title: string; meta: string }> = ({
@@ -781,6 +1093,31 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "900",
   },
+  filterPills: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  filterPill: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#DDE8F5",
+    borderRadius: 999,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  filterPillActive: {
+    backgroundColor: "#1E7D4F",
+    borderColor: "#1E7D4F",
+  },
+  filterPillText: {
+    color: "#64748B",
+    fontSize: 12,
+    fontWeight: "900",
+  },
+  filterPillTextActive: {
+    color: "#FFFFFF",
+  },
   studentRow: {
     alignItems: "center",
     backgroundColor: "#F8FAFC",
@@ -823,6 +1160,36 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 2,
     textTransform: "capitalize",
+  },
+  rowActions: {
+    alignItems: "center",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    justifyContent: "flex-end",
+  },
+  rowActionButton: {
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderColor: "#CFE0F7",
+    borderRadius: 999,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 7,
+  },
+  rowActionDanger: {
+    backgroundColor: "#FFF1F2",
+    borderColor: "#FECACA",
+  },
+  rowActionText: {
+    color: COLORS.primary,
+    fontSize: 11,
+    fontWeight: "900",
+  },
+  rowActionDangerText: {
+    color: "#B91C1C",
   },
   feedHeader: {
     alignItems: "center",

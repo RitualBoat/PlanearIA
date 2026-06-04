@@ -1,25 +1,26 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, StatusBar } from "react-native";
+import { StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import { COLORS, FONT_SIZES } from "../../../../types";
 import WebScrollView from "../../../components/WebScrollView";
-import { useCalificarEntregasViewModel } from "../../../hooks/useCalificarEntregasViewModel";
-import { useRoute, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../../navigation/StackNavigator";
+import { useCalificarEntregasViewModel } from "../../../hooks/useCalificarEntregasViewModel";
 
-/**
- * Pantalla para calificar las entregas de una tarea (View)
- * Solo JSX y StyleSheet - la logica vive en useCalificarEntregasViewModel
- */
 const CalificarEntregasScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, "CalificarEntregas">>();
   const {
     tareaId,
     grupoId,
+    tituloTarea,
+    calificacionMaxima,
     entregas,
     calificaciones,
+    isSaving,
+    isSuggestingFeedback,
     updateCalificacion,
+    handleSugerirRetroalimentacion,
     handleGuardarCalificaciones,
     handleCancelar,
   } = useCalificarEntregasViewModel(route.params.tareaId, route.params.grupoId);
@@ -31,78 +32,95 @@ const CalificarEntregasScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         <WebScrollView style={styles.content}>
           <View style={styles.header}>
-            <Text style={styles.pageTitle}>Calificar Entregas</Text>
+            <Text style={styles.pageTitle}>Calificar entregas</Text>
             <Text style={styles.pageSubtitle}>
-              Tarea ID: {tareaId} • Grupo ID: {grupoId}
+              {tituloTarea} - Tarea ID: {tareaId} - Grupo ID: {grupoId}
             </Text>
           </View>
 
           <View style={styles.calificacionesContainer}>
+            {entregas.length === 0 ? (
+              <View style={styles.emptyCard}>
+                <MaterialIcons name="groups" size={32} color={COLORS.primary} />
+                <Text style={styles.emptyTitle}>No hay alumnos en este grupo</Text>
+                <Text style={styles.emptyText}>
+                  Agrega o importa alumnos desde Classroom para poder calificar esta actividad.
+                </Text>
+              </View>
+            ) : null}
+
             {entregas.map((entrega) => (
               <View key={entrega.id} style={styles.entregaCard}>
                 <View style={styles.alumnoHeader}>
                   <MaterialIcons name="account-circle" size={40} color={COLORS.primary} />
                   <View style={styles.alumnoInfo}>
                     <Text style={styles.alumnoNombre}>{entrega.nombre}</Text>
-                    <Text style={styles.entregaInfo}>Entrega revisable</Text>
+                    <Text style={styles.entregaInfo}>
+                      Estado: {entrega.estado} {entrega.calificada ? "- calificada" : ""}
+                    </Text>
                   </View>
                 </View>
 
-                {/* Calificación */}
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Calificación (0-10) *</Text>
+                  <Text style={styles.label}>Calificacion (0-{calificacionMaxima}) *</Text>
                   <TextInput
                     style={styles.input}
                     placeholder="Ej: 9.5"
                     keyboardType="decimal-pad"
                     value={calificaciones[entrega.alumnoId]?.calificacion || ""}
-                    onChangeText={(value) =>
-                      updateCalificacion(entrega.alumnoId, "calificacion", value)
-                    }
+                    onChangeText={(value) => updateCalificacion(entrega.alumnoId, "calificacion", value)}
                     placeholderTextColor={COLORS.textSecondary}
                   />
                 </View>
 
-                {/* Retroalimentación */}
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Retroalimentación</Text>
+                  <Text style={styles.label}>Retroalimentacion</Text>
                   <TextInput
                     style={[styles.input, styles.textArea]}
                     placeholder="Comentarios para el alumno..."
                     multiline
                     numberOfLines={3}
                     value={calificaciones[entrega.alumnoId]?.retroalimentacion || ""}
-                    onChangeText={(value) =>
-                      updateCalificacion(entrega.alumnoId, "retroalimentacion", value)
-                    }
+                    onChangeText={(value) => updateCalificacion(entrega.alumnoId, "retroalimentacion", value)}
                     placeholderTextColor={COLORS.textSecondary}
                   />
                 </View>
 
-                {/* Ver archivo */}
-                <TouchableOpacity style={styles.verArchivoButton}>
+                <TouchableOpacity
+                  style={[styles.aiFeedbackButton, isSuggestingFeedback ? styles.buttonDisabled : null]}
+                  disabled={Boolean(isSuggestingFeedback)}
+                  onPress={() => handleSugerirRetroalimentacion(entrega.alumnoId)}
+                >
+                  <MaterialIcons name="auto-awesome" size={18} color={COLORS.primary} />
+                  <Text style={styles.aiFeedbackText}>
+                    {isSuggestingFeedback === entrega.alumnoId
+                      ? "Sugiriendo..."
+                      : "Sugerir retroalimentacion IA"}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.verArchivoButton} disabled={!entrega.archivo}>
                   <MaterialIcons name="attachment" size={20} color={COLORS.primaryLight} />
-                  <Text style={styles.verArchivoText}>Ver archivo entregado</Text>
+                  <Text style={styles.verArchivoText}>
+                    {entrega.archivo ? "Ver archivo entregado" : "Sin archivo entregado"}
+                  </Text>
                 </TouchableOpacity>
               </View>
             ))}
           </View>
 
-          {/* Botones de acción */}
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[styles.button, styles.buttonSecondary]}
-              onPress={handleCancelar}
-            >
+            <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={handleCancelar}>
               <Text style={styles.buttonTextSecondary}>Cancelar</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.button, styles.buttonPrimary]}
+              style={[styles.button, styles.buttonPrimary, isSaving ? styles.buttonDisabled : null]}
               onPress={handleGuardarCalificaciones}
+              disabled={isSaving}
             >
               <MaterialIcons name="save" size={20} color="white" />
-              <Text style={styles.buttonText}>Guardar</Text>
+              <Text style={styles.buttonText}>{isSaving ? "Guardando..." : "Guardar"}</Text>
             </TouchableOpacity>
           </View>
         </WebScrollView>
@@ -123,45 +141,65 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    width: "100%",
-    maxWidth: 980,
     alignSelf: "center",
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 10,
     backgroundColor: "transparent",
     marginBottom: 15,
+    maxWidth: 980,
+    paddingBottom: 10,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    width: "100%",
   },
   pageTitle: {
+    color: COLORS.text,
     fontSize: FONT_SIZES.xxlarge,
     fontWeight: "bold",
-    color: COLORS.text,
     marginBottom: 8,
   },
   pageSubtitle: {
-    fontSize: FONT_SIZES.medium,
     color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.medium,
   },
   calificacionesContainer: {
-    width: "100%",
-    maxWidth: 980,
     alignSelf: "center",
+    maxWidth: 980,
+    paddingBottom: 110,
     paddingHorizontal: 16,
     paddingTop: 0,
-    paddingBottom: 110,
+    width: "100%",
+  },
+  emptyCard: {
+    alignItems: "center",
+    backgroundColor: COLORS.surface,
+    borderColor: COLORS.border,
+    borderRadius: 14,
+    borderWidth: 1,
+    gap: 8,
+    marginBottom: 15,
+    padding: 20,
+  },
+  emptyTitle: {
+    color: COLORS.text,
+    fontSize: FONT_SIZES.large,
+    fontWeight: "700",
+  },
+  emptyText: {
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.medium,
+    textAlign: "center",
   },
   entregaCard: {
     backgroundColor: COLORS.surface,
-    borderWidth: 1,
     borderColor: COLORS.border,
-    padding: 20,
     borderRadius: 12,
-    marginBottom: 15,
+    borderWidth: 1,
     boxShadow: "0px 8px 18px rgba(18, 44, 86, 0.08)",
+    marginBottom: 15,
+    padding: 20,
   },
   alumnoHeader: {
-    flexDirection: "row",
     alignItems: "center",
+    flexDirection: "row",
     marginBottom: 15,
   },
   alumnoInfo: {
@@ -169,74 +207,95 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   alumnoNombre: {
+    color: COLORS.text,
     fontSize: FONT_SIZES.large,
     fontWeight: "600",
-    color: COLORS.text,
     marginBottom: 4,
   },
   entregaInfo: {
-    fontSize: FONT_SIZES.small,
     color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.small,
+    textTransform: "capitalize",
   },
   inputGroup: {
     marginBottom: 15,
   },
   label: {
+    color: COLORS.text,
     fontSize: FONT_SIZES.medium,
     fontWeight: "600",
-    color: COLORS.text,
     marginBottom: 8,
   },
   input: {
     backgroundColor: COLORS.backgroundSoft,
-    borderWidth: 1,
     borderColor: COLORS.borderLight,
     borderRadius: 8,
-    padding: 12,
-    fontSize: FONT_SIZES.medium,
+    borderWidth: 1,
     color: COLORS.text,
+    fontSize: FONT_SIZES.medium,
+    padding: 12,
   },
   textArea: {
     minHeight: 80,
     textAlignVertical: "top",
   },
-  verArchivoButton: {
-    flexDirection: "row",
+  aiFeedbackButton: {
     alignItems: "center",
-    paddingVertical: 10,
+    backgroundColor: "#EAF2FF",
+    borderColor: "#CFE0F7",
+    borderRadius: 12,
+    borderWidth: 1,
+    flexDirection: "row",
     gap: 8,
+    marginBottom: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 11,
+  },
+  aiFeedbackText: {
+    color: COLORS.primary,
+    fontSize: FONT_SIZES.small,
+    fontWeight: "700",
+  },
+  verArchivoButton: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+    paddingVertical: 10,
   },
   verArchivoText: {
-    fontSize: FONT_SIZES.medium,
     color: COLORS.primaryLight,
+    fontSize: FONT_SIZES.medium,
     fontWeight: "500",
   },
   buttonContainer: {
+    alignSelf: "center",
     flexDirection: "row",
     gap: 10,
-    width: "100%",
     maxWidth: 980,
-    alignSelf: "center",
+    paddingBottom: 20,
     paddingHorizontal: 16,
     paddingTop: 6,
-    paddingBottom: 20,
+    width: "100%",
   },
   button: {
+    alignItems: "center",
+    borderRadius: 10,
     flex: 1,
     flexDirection: "row",
-    alignItems: "center",
+    gap: 8,
     justifyContent: "center",
     paddingVertical: 15,
-    borderRadius: 10,
-    gap: 8,
   },
   buttonPrimary: {
     backgroundColor: COLORS.primary,
   },
   buttonSecondary: {
     backgroundColor: COLORS.surface,
-    borderWidth: 1,
     borderColor: COLORS.primary,
+    borderWidth: 1,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   buttonText: {
     color: "white",

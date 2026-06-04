@@ -17,7 +17,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../../types";
-import type { Alumno, Recurso } from "../../../types";
+import type { Alumno, Asistencia, Calificacion, EntregaTarea, Recurso, Tarea } from "../../../types";
 import type { PlaneacionDocumento } from "../../../types/planeacionV2";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
 import { useAlumnos } from "../../context/AlumnosContext";
@@ -25,11 +25,28 @@ import { useGruposContext } from "../../context/GruposContext";
 import { usePlaneaciones } from "../../context/PlaneacionesContext";
 import { useRecursos } from "../../context/RecursosContext";
 import { useClassroomGroupViewModel } from "../../hooks/classroom/useClassroomGroupViewModel";
+import {
+  generarRubricaClassroom,
+  resumirProgresoClassroom,
+  sugerirActividadClassroom,
+  type ClassroomAiAccion,
+  type ClassroomAiResponse,
+  type GenerarRubricaResultado,
+  type ResumirProgresoResultado,
+  type SugerirActividadResultado,
+} from "../../services/classroom/classroomAiService";
 
 type Navigation = StackNavigationProp<RootStackParamList>;
 type Route = RouteProp<RootStackParamList, "ClassroomGroup">;
 
-const TAB_LABELS = ["Novedades", "Trabajo de clase", "Personas", "Calificaciones"];
+type ClassroomTab = "novedades" | "trabajo" | "personas" | "calificaciones";
+
+const CLASSROOM_TABS: { key: ClassroomTab; label: string }[] = [
+  { key: "novedades", label: "Novedades" },
+  { key: "trabajo", label: "Trabajo de clase" },
+  { key: "personas", label: "Personas" },
+  { key: "calificaciones", label: "Calificaciones" },
+];
 
 type MaterialFilter =
   | "todos"
@@ -41,6 +58,8 @@ type MaterialFilter =
   | "archivos"
   | "otros";
 
+type ActivityFilter = "todas" | "borrador" | "publicada" | "en_curso" | "cerrada" | "calificada";
+
 const MATERIAL_FILTERS: { key: MaterialFilter; label: string }[] = [
   { key: "todos", label: "Todos" },
   { key: "planeaciones", label: "Planeaciones" },
@@ -50,6 +69,15 @@ const MATERIAL_FILTERS: { key: MaterialFilter; label: string }[] = [
   { key: "imagenes", label: "Imagenes" },
   { key: "archivos", label: "Archivo" },
   { key: "otros", label: "Otros" },
+];
+
+const ACTIVITY_FILTERS: { key: ActivityFilter; label: string }[] = [
+  { key: "todas", label: "Todas" },
+  { key: "borrador", label: "Borrador" },
+  { key: "publicada", label: "Publicada" },
+  { key: "en_curso", label: "En curso" },
+  { key: "cerrada", label: "Cerrada" },
+  { key: "calificada", label: "Calificada" },
 ];
 
 const isPlaneacionResource = (recurso: Recurso): boolean => {
@@ -82,17 +110,181 @@ const getPlaneacionTitle = (doc: PlaneacionDocumento): string => {
   return `${asignatura}${grado}${grupo}`.trim();
 };
 
+const getEntregasForTarea = (tarea: Tarea, entregas: EntregaTarea[]): EntregaTarea[] =>
+  entregas.filter((entrega) => entrega.tareaId === tarea.id);
+
+const isEntregaRealizada = (entrega: EntregaTarea): boolean =>
+  entrega.estado === "entregada" || entrega.estado === "tarde" || entrega.estado === "calificada";
+
+const isActividadCalificada = (tarea: Tarea, entregas: EntregaTarea[], totalAlumnos: number): boolean => {
+  if (totalAlumnos === 0) return false;
+  const entregasTarea = getEntregasForTarea(tarea, entregas);
+  const calificadas = entregasTarea.filter((entrega) => entrega.calificada || entrega.estado === "calificada");
+  return calificadas.length >= totalAlumnos;
+};
+
+const resolveActivityFilter = (
+  tarea: Tarea,
+  entregas: EntregaTarea[],
+  totalAlumnos: number,
+): Exclude<ActivityFilter, "todas" | "borrador"> => {
+  if (isActividadCalificada(tarea, entregas, totalAlumnos)) return "calificada";
+  if (tarea.estado === "en_progreso") return "en_curso";
+  if (tarea.estado === "finalizada") return "cerrada";
+  return "publicada";
+};
+
+const getActivityLabel = (filter: ActivityFilter): string => {
+  const item = ACTIVITY_FILTERS.find((candidate) => candidate.key === filter);
+  return item?.label ?? "Publicada";
+};
+
+const getActivitySummary = (tarea: Tarea, entregas: EntregaTarea[], alumnos: Alumno[]) => {
+  const entregasTarea = getEntregasForTarea(tarea, entregas);
+  const entregadas = entregasTarea.filter(isEntregaRealizada).length;
+  const calificadas = entregasTarea.filter((entrega) => entrega.calificada || entrega.estado === "calificada").length;
+  const pendientes = Math.max(alumnos.length - entregadas, 0);
+  const progress = alumnos.length > 0 ? Math.min(100, Math.round((entregadas / alumnos.length) * 100)) : 0;
+  const estado = resolveActivityFilter(tarea, entregas, alumnos.length);
+
+  return { calificadas, entregadas, estado, pendientes, progress, total: alumnos.length };
+};
+
+const formatActivityDate = (value: Date | string): string => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Sin fecha";
+  return date.toLocaleDateString();
+};
+
+const getAlumnoEntregaStatus = (
+  alumno: Alumno,
+  tarea: Tarea,
+  entregas: EntregaTarea[],
+): "pendiente" | "entregado" | "revisado" | "calificado" => {
+  const entrega = entregas.find((item) => item.tareaId === tarea.id && item.alumnoId === alumno.id);
+  if (!entrega) return "pendiente";
+  if (entrega.calificada || entrega.estado === "calificada") return "calificado";
+  if (entrega.retroalimentacion) return "revisado";
+  if (isEntregaRealizada(entrega)) return "entregado";
+  return "pendiente";
+};
+
+const normalizeDateKey = (value: Date | string): string => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 10);
+};
+
+const getLatestAttendanceDate = (asistencias: Asistencia[]): string | null => {
+  const dates = asistencias.map((asistencia) => normalizeDateKey(asistencia.fecha)).filter(Boolean).sort();
+  return dates.at(-1) ?? null;
+};
+
+const getAttendanceSummary = (asistencias: Asistencia[], totalAlumnos: number) => {
+  const latestDate = getLatestAttendanceDate(asistencias);
+  const latestRecords = latestDate
+    ? asistencias.filter((asistencia) => normalizeDateKey(asistencia.fecha) === latestDate)
+    : [];
+  const presentes = latestRecords.filter((asistencia) => asistencia.estado === "presente").length;
+  const retardos = latestRecords.filter((asistencia) => asistencia.estado === "retardo").length;
+  const ausentes = latestRecords.filter((asistencia) => asistencia.estado === "ausente").length;
+  const justificadas = latestRecords.filter((asistencia) => asistencia.estado === "justificada").length;
+  const pendientes = Math.max(totalAlumnos - latestRecords.length, 0);
+
+  return { ausentes, justificadas, latestDate, pendientes, presentes, registros: latestRecords.length, retardos };
+};
+
+const getGradesSummary = (calificaciones: Calificacion[], totalAlumnos: number) => {
+  const values = calificaciones.map((calificacion) => Number(calificacion.promedio)).filter(Number.isFinite);
+  const promedio = values.length > 0 ? Math.round((values.reduce((sum, value) => sum + value, 0) / values.length) * 10) / 10 : 0;
+  const aprobados = calificaciones.filter((calificacion) => calificacion.estado === "aprobado").length;
+  const reprobados = calificaciones.filter((calificacion) => calificacion.estado === "reprobado").length;
+  const pendientes = Math.max(totalAlumnos - calificaciones.length, 0);
+
+  return { aprobados, pendientes, promedio, registrados: calificaciones.length, reprobados };
+};
+
+const getStudentFollowUp = (
+  alumnos: Alumno[],
+  asistencias: Asistencia[],
+  calificaciones: Calificacion[],
+  actividades: Tarea[],
+  entregas: EntregaTarea[],
+) =>
+  alumnos
+    .map((alumno) => {
+      const asistenciasAlumno = asistencias.filter((asistencia) => asistencia.alumnoId === alumno.id);
+      const presentes = asistenciasAlumno.filter((asistencia) => asistencia.estado === "presente").length;
+      const asistenciaPct =
+        asistenciasAlumno.length > 0 ? Math.round((presentes / asistenciasAlumno.length) * 100) : null;
+      const calificacion = calificaciones.find((item) => item.alumnoId === alumno.id);
+      const entregasAlumno = entregas.filter((entrega) => entrega.alumnoId === alumno.id && isEntregaRealizada(entrega));
+      const pendientes = Math.max(actividades.length - entregasAlumno.length, 0);
+      const reasons = [
+        asistenciaPct !== null && asistenciaPct < 80 ? `asistencia ${asistenciaPct}%` : null,
+        calificacion?.estado === "reprobado" ? `promedio ${calificacion.promedio}` : null,
+        pendientes > 0 ? `${pendientes} actividades pendientes` : null,
+      ].filter(Boolean) as string[];
+
+      return {
+        alumno,
+        asistenciaPct,
+        promedio: calificacion?.promedio,
+        pendientes,
+        reasons,
+      };
+    })
+    .filter((item) => item.reasons.length > 0)
+    .sort((a, b) => b.reasons.length - a.reasons.length);
+
+const formatAiActivity = (response: ClassroomAiResponse<SugerirActividadResultado>): string => {
+  const { actividad, mensaje } = response.resultado;
+  return [
+    mensaje,
+    "",
+    `Titulo: ${actividad.titulo}`,
+    `Tipo: ${actividad.tipo}`,
+    `Descripcion: ${actividad.descripcion}`,
+    "",
+    `Instrucciones: ${actividad.instrucciones}`,
+    "",
+    `Criterios: ${actividad.criterios.join(" - ")}`,
+  ].join("\n");
+};
+
+const formatAiRubric = (response: ClassroomAiResponse<GenerarRubricaResultado>): string => {
+  const { rubrica, mensaje } = response.resultado;
+  const criterios = rubrica.criterios
+    .map(
+      (item, index) =>
+        `${index + 1}. ${item.criterio}\nExcelente: ${item.excelente}\nSatisfactorio: ${item.satisfactorio}\nEn proceso: ${item.enProceso}`,
+    )
+    .join("\n\n");
+  return [mensaje, "", rubrica.titulo, "", criterios].join("\n");
+};
+
+const formatAiProgress = (response: ClassroomAiResponse<ResumirProgresoResultado>): string => {
+  const { hallazgos, mensaje, resumen } = response.resultado;
+  const lines = hallazgos.map((item) => `- ${item.prioridad}/${item.tipo}: ${item.descripcion}`);
+  return [mensaje, "", resumen, "", ...lines].join("\n");
+};
+
 const ClassroomGroupScreen: React.FC = () => {
   const navigation = useNavigation<Navigation>();
   const route = useRoute<Route>();
   const { width } = useWindowDimensions();
   const { grupoId, grupoNombre } = route.params;
-  const { model, alumnos, materiales, isLoading, error, reload } = useClassroomGroupViewModel(grupoId);
+  const { model, alumnos, actividades, entregas, asistencias, calificaciones, materiales, isLoading, error, reload } =
+    useClassroomGroupViewModel(grupoId);
   const { actualizarAlumno } = useAlumnos();
   const { grupos } = useGruposContext();
   const { documentos } = usePlaneaciones();
   const { crearRecurso } = useRecursos();
   const [materialFilter, setMaterialFilter] = React.useState<MaterialFilter>("todos");
+  const [activityFilter, setActivityFilter] = React.useState<ActivityFilter>("todas");
+  const [activeTab, setActiveTab] = React.useState<ClassroomTab>("novedades");
+  const [aiLoadingAction, setAiLoadingAction] = React.useState<ClassroomAiAccion | null>(null);
+  const [aiWarning, setAiWarning] = React.useState<string | null>(null);
   const nombre = model?.grupo.nombre ?? grupoNombre ?? "Grupo";
   const materia = model?.grupo.materia ?? "Materia sin definir";
   const periodo = model?.grupo.periodo ?? "Periodo sin definir";
@@ -103,7 +295,70 @@ const ClassroomGroupScreen: React.FC = () => {
     return resolveMaterialFilter(recurso) === materialFilter;
   });
   const materialesPreview = materialesFiltrados.slice(0, 6);
+  const actividadesFiltradas = actividades.filter((actividad) => {
+    if (activityFilter === "todas") return true;
+    if (activityFilter === "borrador") return false;
+    return resolveActivityFilter(actividad, entregas, alumnos.length) === activityFilter;
+  });
+  const actividadesPreview = actividadesFiltradas.slice(0, 6);
+  const asistenciaSummary = getAttendanceSummary(asistencias, alumnos.length);
+  const calificacionesSummary = getGradesSummary(calificaciones, alumnos.length);
+  const seguimientoAlumnos = getStudentFollowUp(alumnos, asistencias, calificaciones, actividades, entregas);
+  const seguimientoPreview = seguimientoAlumnos.slice(0, 4);
   const gruposDestino = grupos.filter((grupo) => typeof grupo.id === "number" && grupo.id !== grupoId);
+  const showNovedades = activeTab === "novedades";
+  const showTrabajo = activeTab === "trabajo";
+  const showPersonas = activeTab === "personas";
+  const showCalificaciones = activeTab === "calificaciones";
+  const classroomAiContext = React.useMemo(
+    () => ({
+      grupo: {
+        id: grupoId,
+        nombre,
+        materia,
+        periodo,
+      },
+      resumen: model?.resumen,
+      alumnos: alumnos.map((alumno) => ({
+        id: alumno.id,
+        nombre: alumno.nombre,
+        apellidos: alumno.apellidos,
+        estado: alumno.estado,
+      })),
+      actividades: actividades.map((actividad) => ({
+        id: actividad.id,
+        titulo: actividad.titulo,
+        descripcion: actividad.descripcion,
+        tipo: actividad.tipo,
+        estado: actividad.estado,
+        fechaEntrega: actividad.fechaEntrega,
+        valor: actividad.valor,
+      })),
+      materiales: materiales.map((material) => ({
+        id: material.id,
+        titulo: material.titulo,
+        tipo: material.tipo,
+      })),
+      asistencias: asistencias.map((asistencia) => ({
+        alumnoId: asistencia.alumnoId,
+        fecha: asistencia.fecha,
+        estado: asistencia.estado,
+      })),
+      calificaciones: calificaciones.map((calificacion) => ({
+        alumnoId: calificacion.alumnoId,
+        promedio: calificacion.promedio,
+        estado: calificacion.estado,
+      })),
+      entregas: entregas.map((entrega) => ({
+        tareaId: entrega.tareaId,
+        alumnoId: entrega.alumnoId,
+        estado: entrega.estado,
+        calificacion: entrega.calificacion,
+        calificada: entrega.calificada,
+      })),
+    }),
+    [actividades, alumnos, asistencias, calificaciones, entregas, grupoId, materiales, materia, model?.resumen, nombre, periodo],
+  );
 
   const showMessage = React.useCallback((title: string, message: string) => {
     if (Platform.OS === "web") {
@@ -113,6 +368,87 @@ const ClassroomGroupScreen: React.FC = () => {
 
     Alert.alert(title, message);
   }, []);
+
+  const applyAiUsageMeta = React.useCallback((response: ClassroomAiResponse) => {
+    setAiWarning(response.usage?.warning ?? null);
+  }, []);
+
+  const reviewAiActivity = React.useCallback(
+    (response: ClassroomAiResponse<SugerirActividadResultado>) => {
+      applyAiUsageMeta(response);
+      const body = formatAiActivity(response);
+
+      if (Platform.OS === "web") {
+        const shouldCreate = window.confirm(
+          `Sugerencia IA: actividad\n\n${body}\n\nRevisala antes de guardar. ¿Quieres abrir el creador de actividad?`,
+        );
+        if (shouldCreate) {
+          navigation.navigate("CrearTareaGrupo", { grupoId });
+        }
+        return;
+      }
+
+      Alert.alert("Sugerencia IA: actividad", body, [
+        { text: "Cerrar", style: "cancel" },
+        {
+          text: "Crear actividad",
+          onPress: () => navigation.navigate("CrearTareaGrupo", { grupoId }),
+        },
+      ]);
+    },
+    [applyAiUsageMeta, grupoId, navigation],
+  );
+
+  const reviewAiRubric = React.useCallback(
+    (response: ClassroomAiResponse<GenerarRubricaResultado>) => {
+      applyAiUsageMeta(response);
+      showMessage("Sugerencia IA: rubrica", `${formatAiRubric(response)}\n\nRevisa antes de copiarla a una actividad.`);
+    },
+    [applyAiUsageMeta, showMessage],
+  );
+
+  const reviewAiProgress = React.useCallback(
+    (response: ClassroomAiResponse<ResumirProgresoResultado>) => {
+      applyAiUsageMeta(response);
+      showMessage("Resumen IA de progreso", `${formatAiProgress(response)}\n\nEsto no sustituye la revision docente.`);
+    },
+    [applyAiUsageMeta, showMessage],
+  );
+
+  const runClassroomAi = React.useCallback(
+    async (accion: ClassroomAiAccion) => {
+      if (aiLoadingAction) return;
+
+      setAiLoadingAction(accion);
+      try {
+        if (accion === "sugerir_actividad") {
+          const response = await sugerirActividadClassroom(classroomAiContext);
+          reviewAiActivity(response);
+        } else if (accion === "generar_rubrica") {
+          const response = await generarRubricaClassroom(classroomAiContext);
+          reviewAiRubric(response);
+        } else if (accion === "resumir_progreso") {
+          const response = await resumirProgresoClassroom(classroomAiContext);
+          reviewAiProgress(response);
+        }
+      } catch (error) {
+        showMessage(
+          "IA Classroom no disponible",
+          error instanceof Error ? error.message : "No se pudo ejecutar la accion IA.",
+        );
+      } finally {
+        setAiLoadingAction(null);
+      }
+    },
+    [
+      aiLoadingAction,
+      classroomAiContext,
+      reviewAiActivity,
+      reviewAiProgress,
+      reviewAiRubric,
+      showMessage,
+    ],
+  );
 
   const removeAlumnoFromGroup = React.useCallback(
     async (alumno: Alumno) => {
@@ -302,10 +638,14 @@ const ClassroomGroupScreen: React.FC = () => {
         </View>
 
         <View style={[styles.tabsBar, isCompact ? styles.tabsBarCompact : null]}>
-          {TAB_LABELS.map((label, index) => (
-            <View key={label} style={[styles.tabPill, index === 0 ? styles.tabPillActive : null]}>
-              <Text style={[styles.tabText, index === 0 ? styles.tabTextActive : null]}>{label}</Text>
-            </View>
+          {CLASSROOM_TABS.map((tab) => (
+            <TouchableOpacity
+              key={tab.key}
+              style={[styles.tabPill, activeTab === tab.key ? styles.tabPillActive : null]}
+              onPress={() => setActiveTab(tab.key)}
+            >
+              <Text style={[styles.tabText, activeTab === tab.key ? styles.tabTextActive : null]}>{tab.label}</Text>
+            </TouchableOpacity>
           ))}
         </View>
 
@@ -341,216 +681,464 @@ const ClassroomGroupScreen: React.FC = () => {
           <View style={styles.classroomLayout}>
 
             <View style={[styles.mainRail, isCompact ? styles.mainRailCompact : null]}>
-              <View style={styles.announcementCard}>
-                <View style={styles.teacherAvatar}>
-                  <MaterialIcons name="person" size={22} color="#FFFFFF" />
-                </View>
-                <View style={styles.announcementCopy}>
-                  <Text style={styles.announcementTitle}>Publica o prepara algo para tu clase</Text>
-                  <Text style={styles.announcementText}>
-                    Accesos rapidos para crear trabajo, asignar recursos y registrar el avance diario.
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.actionsGrid}>
-                <ActionCard
-                  title="Alumnos"
-                  description="Lista del grupo, perfiles e importacion."
-                  icon="groups"
-                  onPress={() => navigation.navigate("CrearAlumno", { grupoId })}
-                />
-                <ActionCard
-                  title="Actividades"
-                  description="Crear tarea o revisar entregas."
-                  icon="assignment-add"
-                  onPress={() => navigation.navigate("CrearTareaGrupo", { grupoId })}
-                />
-                <ActionCard
-                  title="Materiales"
-                  description="Recursos y planeaciones asignadas."
-                  icon="folder-special"
-                  onPress={() => navigation.navigate("CrearRecurso", { grupoId })}
-                />
-                <ActionCard
-                  title="Asistencia"
-                  description="Registro del dia e historial."
-                  icon="event-available"
-                  onPress={() => navigation.navigate("RegistrarAsistencia", { grupoId })}
-                />
-                <ActionCard
-                  title="Calificaciones"
-                  description="Captura y promedios."
-                  icon="grading"
-                  onPress={() => navigation.navigate("CapturarCalificaciones", { grupoId })}
-                />
-                <ActionCard
-                  title="Reportes"
-                  description="Seguimiento accionable."
-                  icon="insights"
-                  onPress={() => navigation.navigate("ReportesGrupo", { grupoId, grupoNombre: nombre })}
-                />
-              </View>
-
-              <View style={styles.feedCard}>
-                <View style={styles.feedHeader}>
-                  <View>
-                    <Text style={styles.sectionTitle}>Materiales de clase</Text>
-                    <Text style={styles.sectionHint}>Recursos asignados al grupo.</Text>
-                  </View>
-                  <Text style={styles.feedCount}>
-                    {materialesFiltrados.length}/{materiales.length}
-                  </Text>
-                </View>
-
-                <View style={styles.inlineActions}>
-                  <TouchableOpacity
-                    style={styles.inlineActionButton}
-                    onPress={() => navigation.navigate("CrearRecurso", { grupoId })}
-                  >
-                    <MaterialIcons name="add-to-drive" size={18} color={COLORS.primary} />
-                    <Text style={styles.inlineActionText}>Crear material</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.inlineActionButton}
-                    onPress={() => navigation.navigate("AsignarRecurso", { grupoId })}
-                  >
-                    <MaterialIcons name="library-add" size={18} color={COLORS.primary} />
-                    <Text style={styles.inlineActionText}>Asignar existente</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.inlineActionButton}
-                    onPress={handleAttachPlaneacion}
-                  >
-                    <MaterialIcons name="article" size={18} color={COLORS.primary} />
-                    <Text style={styles.inlineActionText}>Adjuntar planeacion</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.inlineActionButton}
-                    onPress={() => navigation.navigate("ListaRecursos", { filtroTipo: undefined })}
-                  >
-                    <MaterialIcons name="folder-open" size={18} color={COLORS.primary} />
-                    <Text style={styles.inlineActionText}>Biblioteca</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.filterPills}>
-                  {MATERIAL_FILTERS.map((filter) => (
-                    <TouchableOpacity
-                      key={filter.key}
-                      style={[
-                        styles.filterPill,
-                        materialFilter === filter.key ? styles.filterPillActive : null,
-                      ]}
-                      onPress={() => setMaterialFilter(filter.key)}
-                    >
-                      <Text
-                        style={[
-                          styles.filterPillText,
-                          materialFilter === filter.key ? styles.filterPillTextActive : null,
-                        ]}
-                      >
-                        {filter.label}
+              {showNovedades ? (
+                <>
+                  <View style={styles.announcementCard}>
+                    <View style={styles.teacherAvatar}>
+                      <MaterialIcons name="person" size={22} color="#FFFFFF" />
+                    </View>
+                    <View style={styles.announcementCopy}>
+                      <Text style={styles.announcementTitle}>Publica o prepara algo para tu clase</Text>
+                      <Text style={styles.announcementText}>
+                        Accesos rapidos para crear trabajo, asignar recursos y registrar el avance diario.
                       </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-                {materialesPreview.length === 0 ? (
-                  <EmptyFeedLine icon="folder-open" text="No hay materiales para este filtro." />
-                ) : (
-                  materialesPreview.map((recurso) => (
-                    <MaterialRow
-                      key={recurso.id}
-                      recurso={recurso}
-                      onPress={() => handleOpenMaterial(recurso)}
-                    />
-                  ))
-                )}
-              </View>
-
-              <View style={styles.feedCard}>
-                <View style={styles.feedHeader}>
-                  <View>
-                    <Text style={styles.sectionTitle}>Alumnos del grupo</Text>
-                    <Text style={styles.sectionHint}>Participantes vinculados a esta clase.</Text>
+                    </View>
                   </View>
-                  <Text style={styles.feedCount}>{alumnos.length}</Text>
-                </View>
 
-                <View style={styles.inlineActions}>
-                  <TouchableOpacity
-                    style={styles.inlineActionButton}
-                    onPress={() => navigation.navigate("CrearAlumno", { grupoId })}
-                  >
-                    <MaterialIcons name="person-add" size={18} color={COLORS.primary} />
-                    <Text style={styles.inlineActionText}>Agregar</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.inlineActionButton}
-                    onPress={() => navigation.navigate("ImportarAlumnos", { grupoId, grupoNombre: nombre })}
-                  >
-                    <MaterialIcons name="upload-file" size={18} color={COLORS.primary} />
-                    <Text style={styles.inlineActionText}>Importar</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.inlineActionButton}
-                    onPress={() => navigation.navigate("ExportarAlumnos", { grupoId, grupoNombre: nombre })}
-                  >
-                    <MaterialIcons name="download" size={18} color={COLORS.primary} />
-                    <Text style={styles.inlineActionText}>Exportar</Text>
-                  </TouchableOpacity>
-                </View>
-
-                {alumnosPreview.length === 0 ? (
-                  <EmptyFeedLine icon="person-add" text="Aun no hay alumnos vinculados a este grupo." />
-                ) : (
-                  alumnosPreview.map((alumno) => (
-                    <StudentRow
-                      key={alumno.id}
-                      alumno={alumno}
-                      onPress={() => navigation.navigate("DetalleAlumno", { alumnoId: alumno.id })}
-                      onMove={() => handleMoveAlumno(alumno)}
-                      onRemove={() => handleRemoveAlumno(alumno)}
+                  <View style={styles.actionsGrid}>
+                    <ActionCard
+                      title="Alumnos"
+                      description="Lista del grupo, perfiles e importacion."
+                      icon="groups"
+                      onPress={() => navigation.navigate("CrearAlumno", { grupoId })}
                     />
-                  ))
-                )}
-              </View>
-
-              <View style={styles.feedCard}>
-                <View style={styles.feedHeader}>
-                  <Text style={styles.sectionTitle}>Pendientes</Text>
-                  <Text style={styles.feedCount}>{model.pendientes.length}</Text>
-                </View>
-                {model.pendientes.length === 0 ? (
-                  <EmptyFeedLine icon="check-circle" text="Sin pendientes academicos detectados." />
-                ) : (
-                  model.pendientes.slice(0, 5).map((pendiente) => (
-                    <FeedItem key={pendiente.id} icon="flag" title={pendiente.titulo} meta={pendiente.tipo} />
-                  ))
-                )}
-              </View>
-
-              <View style={styles.feedCard}>
-                <View style={styles.feedHeader}>
-                  <Text style={styles.sectionTitle}>Actividad reciente</Text>
-                  <Text style={styles.feedCount}>{model.actividadReciente.length}</Text>
-                </View>
-                {model.actividadReciente.length === 0 ? (
-                  <EmptyFeedLine icon="history" text="Aun no hay actividad reciente." />
-                ) : (
-                  model.actividadReciente.slice(0, 5).map((actividad) => (
-                    <FeedItem
-                      key={actividad.id}
-                      icon="history"
-                      title={actividad.titulo}
-                      meta={`${actividad.entidadOrigen} - ${new Date(actividad.fecha).toLocaleDateString()}`}
+                    <ActionCard
+                      title="Actividades"
+                      description="Crear tarea o revisar entregas."
+                      icon="assignment-add"
+                      onPress={() => navigation.navigate("CrearTareaGrupo", { grupoId })}
                     />
-                  ))
-                )}
-              </View>
+                    <ActionCard
+                      title="Materiales"
+                      description="Recursos y planeaciones asignadas."
+                      icon="folder-special"
+                      onPress={() => navigation.navigate("CrearRecurso", { grupoId })}
+                    />
+                    <ActionCard
+                      title="Asistencia"
+                      description="Registro del dia e historial."
+                      icon="event-available"
+                      onPress={() => navigation.navigate("RegistrarAsistencia", { grupoId })}
+                    />
+                    <ActionCard
+                      title="Calificaciones"
+                      description="Captura y promedios."
+                      icon="grading"
+                      onPress={() => navigation.navigate("CapturarCalificaciones", { grupoId })}
+                    />
+                    <ActionCard
+                      title="Reportes"
+                      description="Seguimiento accionable."
+                      icon="insights"
+                      onPress={() => navigation.navigate("ReportesGrupo", { grupoId, grupoNombre: nombre })}
+                    />
+                  </View>
+
+                  <View style={styles.feedCard}>
+                    <View style={styles.feedHeader}>
+                      <View>
+                        <Text style={styles.sectionTitle}>Copiloto IA Classroom</Text>
+                        <Text style={styles.sectionHint}>Sugerencias revisables; nada se guarda sin aprobacion docente.</Text>
+                      </View>
+                      <Text style={styles.feedCount}>Beta</Text>
+                    </View>
+
+                    {aiWarning ? (
+                      <View style={styles.aiWarningBox}>
+                        <MaterialIcons name="warning" size={18} color="#B45309" />
+                        <Text style={styles.aiWarningText}>{aiWarning}</Text>
+                      </View>
+                    ) : null}
+
+                    <View style={styles.inlineActions}>
+                      <TouchableOpacity
+                        style={[styles.inlineActionButton, aiLoadingAction ? styles.disabledActionButton : null]}
+                        disabled={Boolean(aiLoadingAction)}
+                        onPress={() => void runClassroomAi("resumir_progreso")}
+                      >
+                        <MaterialIcons name="psychology" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>
+                          {aiLoadingAction === "resumir_progreso" ? "Analizando..." : "Resumir progreso"}
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.inlineActionButton, aiLoadingAction ? styles.disabledActionButton : null]}
+                        disabled={Boolean(aiLoadingAction)}
+                        onPress={() => void runClassroomAi("sugerir_actividad")}
+                      >
+                        <MaterialIcons name="auto-awesome" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>
+                          {aiLoadingAction === "sugerir_actividad" ? "Generando..." : "Sugerir actividad"}
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.inlineActionButton, aiLoadingAction ? styles.disabledActionButton : null]}
+                        disabled={Boolean(aiLoadingAction)}
+                        onPress={() => void runClassroomAi("generar_rubrica")}
+                      >
+                        <MaterialIcons name="rule" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>
+                          {aiLoadingAction === "generar_rubrica" ? "Generando..." : "Sugerir rubrica"}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  <View style={styles.feedCard}>
+                    <View style={styles.feedHeader}>
+                      <Text style={styles.sectionTitle}>Pendientes</Text>
+                      <Text style={styles.feedCount}>{model.pendientes.length}</Text>
+                    </View>
+                    {model.pendientes.length === 0 ? (
+                      <EmptyFeedLine icon="check-circle" text="Sin pendientes academicos detectados." />
+                    ) : (
+                      model.pendientes.slice(0, 5).map((pendiente) => (
+                        <FeedItem key={pendiente.id} icon="flag" title={pendiente.titulo} meta={pendiente.tipo} />
+                      ))
+                    )}
+                  </View>
+
+                  <View style={styles.feedCard}>
+                    <View style={styles.feedHeader}>
+                      <Text style={styles.sectionTitle}>Actividad reciente</Text>
+                      <Text style={styles.feedCount}>{model.actividadReciente.length}</Text>
+                    </View>
+                    {model.actividadReciente.length === 0 ? (
+                      <EmptyFeedLine icon="history" text="Aun no hay actividad reciente." />
+                    ) : (
+                      model.actividadReciente.slice(0, 5).map((actividad) => (
+                        <FeedItem
+                          key={actividad.id}
+                          icon="history"
+                          title={actividad.titulo}
+                          meta={`${actividad.entidadOrigen} - ${new Date(actividad.fecha).toLocaleDateString()}`}
+                        />
+                      ))
+                    )}
+                  </View>
+                </>
+              ) : null}
+
+              {showTrabajo ? (
+                <>
+                  <View style={styles.feedCard}>
+                    <View style={styles.feedHeader}>
+                      <View>
+                        <Text style={styles.sectionTitle}>Actividades y entregas</Text>
+                        <Text style={styles.sectionHint}>Tareas evaluables dentro de esta clase.</Text>
+                      </View>
+                      <Text style={styles.feedCount}>
+                        {actividadesFiltradas.length}/{actividades.length}
+                      </Text>
+                    </View>
+
+                    <View style={styles.inlineActions}>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={() => navigation.navigate("CrearTareaGrupo", { grupoId })}
+                      >
+                        <MaterialIcons name="assignment-add" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Crear actividad</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={() => navigation.navigate("ListaEntregables")}
+                      >
+                        <MaterialIcons name="fact-check" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Entregables</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.filterPills}>
+                      {ACTIVITY_FILTERS.map((filter) => (
+                        <TouchableOpacity
+                          key={filter.key}
+                          style={[
+                            styles.filterPill,
+                            activityFilter === filter.key ? styles.filterPillActive : null,
+                          ]}
+                          onPress={() => setActivityFilter(filter.key)}
+                        >
+                          <Text
+                            style={[
+                              styles.filterPillText,
+                              activityFilter === filter.key ? styles.filterPillTextActive : null,
+                            ]}
+                          >
+                            {filter.label}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+
+                    <View style={styles.rubricHint}>
+                      <MaterialIcons name="rule" size={18} color="#1E7D4F" />
+                      <Text style={styles.rubricHintText}>
+                        Rubricas preparadas como extension futura: visibles en el flujo, sin calificacion automatica por IA.
+                      </Text>
+                    </View>
+
+                    {actividadesPreview.length === 0 ? (
+                      <EmptyFeedLine icon="assignment" text="No hay actividades para este filtro." />
+                    ) : (
+                      actividadesPreview.map((actividad) => (
+                        <ActivityRow
+                          key={actividad.id}
+                          actividad={actividad}
+                          alumnos={alumnos}
+                          entregas={entregas}
+                          onPress={() => navigation.navigate("DetalleTarea", { tareaId: actividad.id, grupoId })}
+                          onGrade={() => navigation.navigate("CalificarEntregas", { tareaId: actividad.id, grupoId })}
+                        />
+                      ))
+                    )}
+                  </View>
+
+                  <View style={styles.feedCard}>
+                    <View style={styles.feedHeader}>
+                      <View>
+                        <Text style={styles.sectionTitle}>Materiales de clase</Text>
+                        <Text style={styles.sectionHint}>Recursos asignados al grupo.</Text>
+                      </View>
+                      <Text style={styles.feedCount}>
+                        {materialesFiltrados.length}/{materiales.length}
+                      </Text>
+                    </View>
+
+                    <View style={styles.inlineActions}>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={() => navigation.navigate("CrearRecurso", { grupoId })}
+                      >
+                        <MaterialIcons name="add-to-drive" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Crear material</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={() => navigation.navigate("AsignarRecurso", { grupoId })}
+                      >
+                        <MaterialIcons name="library-add" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Asignar existente</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={handleAttachPlaneacion}
+                      >
+                        <MaterialIcons name="article" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Adjuntar planeacion</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={() => navigation.navigate("ListaRecursos", { filtroTipo: undefined })}
+                      >
+                        <MaterialIcons name="folder-open" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Biblioteca</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.filterPills}>
+                      {MATERIAL_FILTERS.map((filter) => (
+                        <TouchableOpacity
+                          key={filter.key}
+                          style={[
+                            styles.filterPill,
+                            materialFilter === filter.key ? styles.filterPillActive : null,
+                          ]}
+                          onPress={() => setMaterialFilter(filter.key)}
+                        >
+                          <Text
+                            style={[
+                              styles.filterPillText,
+                              materialFilter === filter.key ? styles.filterPillTextActive : null,
+                            ]}
+                          >
+                            {filter.label}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+
+                    {materialesPreview.length === 0 ? (
+                      <EmptyFeedLine icon="folder-open" text="No hay materiales para este filtro." />
+                    ) : (
+                      materialesPreview.map((recurso) => (
+                        <MaterialRow
+                          key={recurso.id}
+                          recurso={recurso}
+                          onPress={() => handleOpenMaterial(recurso)}
+                        />
+                      ))
+                    )}
+                  </View>
+                </>
+              ) : null}
+
+              {showPersonas ? (
+                <>
+                  <View style={styles.feedCard}>
+                    <View style={styles.feedHeader}>
+                      <View>
+                        <Text style={styles.sectionTitle}>Alumnos del grupo</Text>
+                        <Text style={styles.sectionHint}>Participantes vinculados a esta clase.</Text>
+                      </View>
+                      <Text style={styles.feedCount}>{alumnos.length}</Text>
+                    </View>
+
+                    <View style={styles.inlineActions}>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={() => navigation.navigate("CrearAlumno", { grupoId })}
+                      >
+                        <MaterialIcons name="person-add" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Agregar</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={() => navigation.navigate("ImportarAlumnos", { grupoId, grupoNombre: nombre })}
+                      >
+                        <MaterialIcons name="upload-file" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Importar</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={() => navigation.navigate("ExportarAlumnos", { grupoId, grupoNombre: nombre })}
+                      >
+                        <MaterialIcons name="download" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Exportar</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    {alumnosPreview.length === 0 ? (
+                      <EmptyFeedLine icon="person-add" text="Aun no hay alumnos vinculados a este grupo." />
+                    ) : (
+                      alumnosPreview.map((alumno) => (
+                        <StudentRow
+                          key={alumno.id}
+                          alumno={alumno}
+                          onPress={() => navigation.navigate("DetalleAlumno", { alumnoId: alumno.id })}
+                          onMove={() => handleMoveAlumno(alumno)}
+                          onRemove={() => handleRemoveAlumno(alumno)}
+                        />
+                      ))
+                    )}
+                  </View>
+
+                  <View style={styles.feedCard}>
+                    <View style={styles.feedHeader}>
+                      <View>
+                        <Text style={styles.sectionTitle}>Asistencia</Text>
+                        <Text style={styles.sectionHint}>Registro diario e historial de la clase.</Text>
+                      </View>
+                      <Text style={styles.feedCount}>{model.resumen.porcentajeAsistencia}%</Text>
+                    </View>
+
+                    <View style={styles.inlineActions}>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={() => navigation.navigate("RegistrarAsistencia", { grupoId })}
+                      >
+                        <MaterialIcons name="event-available" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Registrar hoy</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={() => navigation.navigate("HistorialAsistencia", { grupoId })}
+                      >
+                        <MaterialIcons name="history" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Historial</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.summaryGrid}>
+                      <SummaryMetric label="Ultimo registro" value={asistenciaSummary.latestDate ?? "Sin datos"} />
+                      <SummaryMetric label="Presentes" value={asistenciaSummary.presentes} />
+                      <SummaryMetric label="Retardos" value={asistenciaSummary.retardos} />
+                      <SummaryMetric label="Ausentes" value={asistenciaSummary.ausentes} />
+                      <SummaryMetric label="Justificadas" value={asistenciaSummary.justificadas} />
+                      <SummaryMetric label="Pendientes" value={asistenciaSummary.pendientes} />
+                    </View>
+                  </View>
+                </>
+              ) : null}
+
+              {showCalificaciones ? (
+                <>
+                  <View style={styles.feedCard}>
+                    <View style={styles.feedHeader}>
+                      <View>
+                        <Text style={styles.sectionTitle}>Calificaciones</Text>
+                        <Text style={styles.sectionHint}>Promedios conectados con registros existentes.</Text>
+                      </View>
+                      <Text style={styles.feedCount}>{calificacionesSummary.promedio || "N/A"}</Text>
+                    </View>
+
+                    <View style={styles.inlineActions}>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={() => navigation.navigate("CapturarCalificaciones", { grupoId })}
+                      >
+                        <MaterialIcons name="grading" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Capturar</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={() => navigation.navigate("PromediosCalificaciones", { grupoId })}
+                      >
+                        <MaterialIcons name="leaderboard" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Promedios</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={() => navigation.navigate("ReportesGrupo", { grupoId, grupoNombre: nombre })}
+                      >
+                        <MaterialIcons name="download" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Exportar/reporte</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.summaryGrid}>
+                      <SummaryMetric label="Registrados" value={calificacionesSummary.registrados} />
+                      <SummaryMetric label="Pendientes" value={calificacionesSummary.pendientes} />
+                      <SummaryMetric label="Aprobados" value={calificacionesSummary.aprobados} />
+                      <SummaryMetric label="Reprobados" value={calificacionesSummary.reprobados} />
+                    </View>
+                  </View>
+
+                  <View style={styles.feedCard}>
+                    <View style={styles.feedHeader}>
+                      <View>
+                        <Text style={styles.sectionTitle}>Reportes y seguimiento</Text>
+                        <Text style={styles.sectionHint}>Alertas simples para detectar alumnos que requieren atencion.</Text>
+                      </View>
+                      <Text style={styles.feedCount}>{seguimientoAlumnos.length}</Text>
+                    </View>
+
+                    <View style={styles.inlineActions}>
+                      <TouchableOpacity
+                        style={styles.inlineActionButton}
+                        onPress={() => navigation.navigate("ReportesGrupo", { grupoId, grupoNombre: nombre })}
+                      >
+                        <MaterialIcons name="insights" size={18} color={COLORS.primary} />
+                        <Text style={styles.inlineActionText}>Abrir reporte</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    {seguimientoPreview.length === 0 ? (
+                      <EmptyFeedLine icon="verified" text="Sin alertas academicas con los datos actuales." />
+                    ) : (
+                      seguimientoPreview.map((item) => (
+                        <FollowUpRow
+                          key={item.alumno.id}
+                          alumno={item.alumno}
+                          reasons={item.reasons}
+                          onPress={() => navigation.navigate("DetalleAlumno", { alumnoId: item.alumno.id })}
+                        />
+                      ))
+                    )}
+                  </View>
+                </>
+              ) : null}
             </View>
-
             <View style={[styles.sideRail, isCompact ? styles.sideRailCompact : null]}>
               <View style={styles.classCodeCard}>
                 <Text style={styles.cardLabel}>Resumen de clase</Text>
@@ -565,13 +1153,6 @@ const ClassroomGroupScreen: React.FC = () => {
                 <KpiCard label="Asistencia" value={`${model.resumen.porcentajeAsistencia}%`} icon="how-to-reg" />
               </View>
 
-              <TouchableOpacity
-                style={styles.legacyButton}
-                onPress={() => navigation.navigate("DetalleGrupo", { grupoId, grupoNombre: nombre })}
-              >
-                <MaterialIcons name="open-in-new" size={20} color={COLORS.primary} />
-                <Text style={styles.legacyButtonText}>Abrir detalle legacy</Text>
-              </TouchableOpacity>
             </View>
           </View>
         ) : null}
@@ -656,6 +1237,72 @@ const StudentRow: React.FC<{
   </TouchableOpacity>
 );
 
+const ActivityRow: React.FC<{
+  actividad: Tarea;
+  alumnos: Alumno[];
+  entregas: EntregaTarea[];
+  onPress: () => void;
+  onGrade: () => void;
+}> = ({ actividad, alumnos, entregas, onGrade, onPress }) => {
+  const summary = getActivitySummary(actividad, entregas, alumnos);
+  const previewAlumnos = alumnos.slice(0, 3);
+
+  return (
+    <TouchableOpacity style={styles.activityRow} onPress={onPress}>
+      <View style={styles.activityTopLine}>
+        <View style={styles.materialAvatar}>
+          <MaterialIcons name="assignment" size={20} color={COLORS.primary} />
+        </View>
+        <View style={styles.studentCopy}>
+          <Text style={styles.studentName}>{actividad.titulo}</Text>
+          <Text style={styles.studentMeta}>
+            {actividad.tipo} - entrega {formatActivityDate(actividad.fechaEntrega)} - {actividad.valor} pts
+          </Text>
+        </View>
+        <View style={styles.activityStatusBadge}>
+          <Text style={styles.activityStatusText}>{getActivityLabel(summary.estado)}</Text>
+        </View>
+      </View>
+
+      <View style={styles.activityProgressTrack}>
+        <View style={[styles.activityProgressFill, { width: `${summary.progress}%` }]} />
+      </View>
+
+      <View style={styles.activityFooter}>
+        <Text style={styles.activitySummaryText}>
+          {summary.entregadas}/{summary.total} entregadas - {summary.pendientes} pendientes -{" "}
+          {summary.calificadas} calificadas
+        </Text>
+        <TouchableOpacity
+          style={styles.rowActionButton}
+          onPress={(event) => {
+            event.stopPropagation();
+            onGrade();
+          }}
+        >
+          <MaterialIcons name="grading" size={16} color={COLORS.primary} />
+          <Text style={styles.rowActionText}>Calificar</Text>
+        </TouchableOpacity>
+      </View>
+
+      {previewAlumnos.length > 0 ? (
+        <View style={styles.activityStudentPreview}>
+          {previewAlumnos.map((alumno) => {
+            const status = getAlumnoEntregaStatus(alumno, actividad, entregas);
+            return (
+              <View key={alumno.id} style={styles.activityStudentChip}>
+                <Text style={styles.activityStudentText}>
+                  {alumno.nombre}: {status}
+                </Text>
+              </View>
+            );
+          })}
+        </View>
+      ) : null}
+    </TouchableOpacity>
+  );
+};
+
 const MaterialRow: React.FC<{ recurso: Recurso; onPress: () => void }> = ({ recurso, onPress }) => (
   <TouchableOpacity style={styles.studentRow} onPress={onPress}>
     <View style={styles.materialAvatar}>
@@ -671,6 +1318,30 @@ const MaterialRow: React.FC<{ recurso: Recurso; onPress: () => void }> = ({ recu
         {isPlaneacionResource(recurso) ? "planeacion" : recurso.tipo} - {recurso.origen} - v
         {recurso.versionActual}
       </Text>
+    </View>
+    <MaterialIcons name="chevron-right" size={22} color="#94A3B8" />
+  </TouchableOpacity>
+);
+
+const SummaryMetric: React.FC<{ label: string; value: number | string }> = ({ label, value }) => (
+  <View style={styles.summaryMetric}>
+    <Text style={styles.summaryMetricValue}>{value}</Text>
+    <Text style={styles.summaryMetricLabel}>{label}</Text>
+  </View>
+);
+
+const FollowUpRow: React.FC<{
+  alumno: Alumno;
+  reasons: string[];
+  onPress: () => void;
+}> = ({ alumno, onPress, reasons }) => (
+  <TouchableOpacity style={styles.followUpRow} onPress={onPress}>
+    <View style={styles.followUpIcon}>
+      <MaterialIcons name="priority-high" size={18} color="#B45309" />
+    </View>
+    <View style={styles.studentCopy}>
+      <Text style={styles.studentName}>{`${alumno.nombre} ${alumno.apellidos}`.trim()}</Text>
+      <Text style={styles.studentMeta}>{reasons.join(" - ")}</Text>
     </View>
     <MaterialIcons name="chevron-right" size={22} color="#94A3B8" />
   </TouchableOpacity>
@@ -1093,6 +1764,26 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "900",
   },
+  disabledActionButton: {
+    opacity: 0.6,
+  },
+  aiWarningBox: {
+    alignItems: "center",
+    backgroundColor: "#FFFBEB",
+    borderColor: "#FDE68A",
+    borderRadius: 14,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 8,
+    padding: 11,
+  },
+  aiWarningText: {
+    color: "#92400E",
+    flex: 1,
+    fontSize: 12,
+    fontWeight: "800",
+    lineHeight: 17,
+  },
   filterPills: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -1125,6 +1816,135 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     padding: 12,
+  },
+  activityRow: {
+    backgroundColor: "#F8FAFC",
+    borderColor: "#E2E8F0",
+    borderRadius: 18,
+    borderWidth: 1,
+    gap: 10,
+    padding: 12,
+  },
+  activityTopLine: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 12,
+  },
+  activityStatusBadge: {
+    backgroundColor: "#E8F3EC",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  activityStatusText: {
+    color: "#1E7D4F",
+    fontSize: 11,
+    fontWeight: "900",
+  },
+  activityProgressTrack: {
+    backgroundColor: "#E2E8F0",
+    borderRadius: 999,
+    height: 8,
+    overflow: "hidden",
+  },
+  activityProgressFill: {
+    backgroundColor: "#1E7D4F",
+    borderRadius: 999,
+    height: "100%",
+  },
+  activityFooter: {
+    alignItems: "center",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    justifyContent: "space-between",
+  },
+  activitySummaryText: {
+    color: "#475569",
+    flex: 1,
+    fontSize: 12,
+    fontWeight: "800",
+    minWidth: 190,
+  },
+  activityStudentPreview: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  activityStudentChip: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#DDE8F5",
+    borderRadius: 999,
+    borderWidth: 1,
+    paddingHorizontal: 9,
+    paddingVertical: 6,
+  },
+  activityStudentText: {
+    color: "#64748B",
+    fontSize: 11,
+    fontWeight: "800",
+    textTransform: "capitalize",
+  },
+  rubricHint: {
+    alignItems: "center",
+    backgroundColor: "#F0FDF4",
+    borderColor: "#BBF7D0",
+    borderRadius: 14,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 8,
+    padding: 11,
+  },
+  rubricHintText: {
+    color: "#166534",
+    flex: 1,
+    fontSize: 12,
+    fontWeight: "800",
+    lineHeight: 17,
+  },
+  summaryGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  summaryMetric: {
+    backgroundColor: "#F8FAFC",
+    borderColor: "#E2E8F0",
+    borderRadius: 16,
+    borderWidth: 1,
+    flexBasis: 128,
+    flexGrow: 1,
+    padding: 12,
+  },
+  summaryMetricValue: {
+    color: "#122033",
+    fontSize: 18,
+    fontWeight: "900",
+  },
+  summaryMetricLabel: {
+    color: "#64748B",
+    fontSize: 11,
+    fontWeight: "800",
+    marginTop: 3,
+    textTransform: "uppercase",
+  },
+  followUpRow: {
+    alignItems: "center",
+    backgroundColor: "#FFFBEB",
+    borderColor: "#FDE68A",
+    borderRadius: 16,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 12,
+    padding: 12,
+  },
+  followUpIcon: {
+    alignItems: "center",
+    backgroundColor: "#FEF3C7",
+    borderRadius: 999,
+    height: 42,
+    justifyContent: "center",
+    width: 42,
   },
   studentAvatar: {
     alignItems: "center",

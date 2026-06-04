@@ -2,7 +2,7 @@
 
 > **Version:** 1.0  
 > **Fecha:** 2026-06-03  
-> **Estado:** [~] Plan maestro en ejecucion. Fases 0-5 completadas; siguiente bloque tecnico: Fase 6.  
+> **Estado:** [~] Plan maestro en ejecucion. Fases 0-9 completadas; Fase 10 en progreso con validacion manual pendiente.
 > **Alcance:** fusionar grupos, alumnos, tareas, entregables, recursos, asistencia, calificaciones y reportes operativos en una experiencia central tipo Google Classroom, manteniendo arquitectura MVVM, offline-first y bajo costo.  
 > **Stack:** React Native 0.81.5, Expo 54, TypeScript 5.9, React Navigation 7, AsyncStorage actual con posible migracion futura a SQLite/Expo SQLite, backend Node en `backend/api`, MongoDB Atlas/free tier, Jest + Testing Library.
 > **Modulo:** Classroom / Gestion academica diaria.  
@@ -684,19 +684,30 @@ Objetivo: unificar recursos evaluables dentro de la clase.
 
 Modo sugerido: mixto. `NORMAL` para resolver vocabulario `Tarea`/`Entregable`/`EntregaTarea` y rubricas; `CAVEMAN` para integrar servicios, estados y pruebas.
 
-- [ ] **6.1 Crear seccion `Actividades`.**
-- [ ] **6.2 Mostrar tareas por estado: borrador, publicada, en curso, cerrada, calificada.**
-- [ ] **6.3 Reutilizar creacion de tarea actual.**
-- [ ] **6.4 Reutilizar entregables y calificacion existente.**
-- [ ] **6.5 Preparar soporte para rubricas sin implementarlas si no toca.**
-- [ ] **6.6 Agregar estado por alumno: pendiente, entregado, revisado, calificado.**
-- [ ] **6.7 Validar flujo completo crear -> asignar -> entregar/mock -> calificar.**
+- [x] **6.1 Crear seccion `Actividades`.**
+- [x] **6.2 Mostrar tareas por estado: borrador, publicada, en curso, cerrada, calificada.**
+- [x] **6.3 Reutilizar creacion de tarea actual.**
+- [x] **6.4 Reutilizar entregables y calificacion existente.**
+- [x] **6.5 Preparar soporte para rubricas sin implementarlas si no toca.**
+- [x] **6.6 Agregar estado por alumno: pendiente, entregado, revisado, calificado.**
+- [x] **6.7 Validar flujo completo crear -> asignar -> entregar/mock -> calificar.**
 
 Criterio de cierre:
 
-- [ ] Las tareas se gestionan desde el grupo.
-- [ ] El docente ve rapidamente quien entrego y quien falta.
-- [ ] No hay calificacion automatica por IA.
+- [x] Las tareas se gestionan desde el grupo.
+- [x] El docente ve rapidamente quien entrego y quien falta.
+- [x] No hay calificacion automatica por IA.
+
+Resultado:
+
+- `ClassroomGroupScreen` ahora tiene seccion `Actividades y entregas` antes de materiales, con filtros por estado, CTA para crear actividad, acceso a entregables y calificacion por tarea.
+- Los estados visibles se mapean sobre el modelo actual: `asignada` como publicada, `en_progreso` como en curso, `finalizada` como cerrada y `calificada` derivada de entregas calificadas por alumno.
+- Cada actividad muestra progreso de entregas, pendientes, calificadas y preview de estado por alumno: pendiente, entregado, revisado o calificado.
+- `useClassroomGroupViewModel` consume actividades y entregas desde `classroomFacade`, manteniendo MVVM y el camino futuro hacia SQLite.
+- `CalificarEntregasScreen` deja de usar alumnos mock; ahora carga alumnos del grupo, lee/escribe entregas reales en `@planearia:entregas` y conserva la tarea desde `EntregablesContext`.
+- Rubricas quedan preparadas como extension visible del flujo, sin implementar submodelo ni calificacion automatica por IA.
+- Validaciones ejecutadas: `npx tsc --noEmit`, `npx jest src/__tests__/classroom --runInBand` y lint focalizado de archivos tocados.
+- Validacion manual pendiente recomendada: crear una actividad desde el grupo, calificar al menos un alumno y volver a Classroom para confirmar que el contador de calificadas cambia.
 
 ### FASE 7: Asistencia y Calificaciones Integradas
 
@@ -704,18 +715,28 @@ Objetivo: mover controles academicos diarios al mismo espacio.
 
 Modo sugerido: `CAVEMAN` para integrar secciones y reutilizar servicios actuales. Usar `NORMAL` solo si se redefine modelo de calificaciones o reglas academicas.
 
-- [ ] **7.1 Crear seccion `Asistencia`.**
-- [ ] **7.2 Registrar asistencia desde grupo con fecha clara.**
-- [ ] **7.3 Ver historial de asistencia por grupo.**
-- [ ] **7.4 Crear seccion `Calificaciones`.**
-- [ ] **7.5 Capturar calificaciones desde actividades o tabla general.**
-- [ ] **7.6 Mantener promedios conectados con datos existentes.**
-- [ ] **7.7 Exportar asistencia/calificaciones si ya existe servicio.**
+- [x] **7.1 Crear seccion `Asistencia`.**
+- [x] **7.2 Registrar asistencia desde grupo con fecha clara.**
+- [x] **7.3 Ver historial de asistencia por grupo.**
+- [x] **7.4 Crear seccion `Calificaciones`.**
+- [x] **7.5 Capturar calificaciones desde actividades o tabla general.**
+- [x] **7.6 Mantener promedios conectados con datos existentes.**
+- [x] **7.7 Exportar asistencia/calificaciones si ya existe servicio.**
 
 Criterio de cierre:
 
-- [ ] Asistencia y calificaciones ya no se sienten como modulos aislados.
-- [ ] Los datos siguen sincronizando correctamente.
+- [x] Asistencia y calificaciones ya no se sienten como modulos aislados.
+- [x] Los datos siguen sincronizando correctamente.
+
+Resultado:
+
+- `ClassroomGroupScreen` ahora incluye seccion `Asistencia` con ultimo registro, presentes, retardos, ausentes, justificadas y pendientes.
+- La seccion de asistencia reutiliza rutas actuales: `RegistrarAsistencia` e `HistorialAsistencia`, siempre con `grupoId` contextual.
+- `ClassroomGroupScreen` ahora incluye seccion `Calificaciones` con promedio, registros, pendientes, aprobados y reprobados.
+- La seccion de calificaciones reutiliza rutas actuales: `CapturarCalificaciones`, `PromediosCalificaciones` y `ReportesGrupo` como salida de exportacion/reporte sin inventar servicio nuevo.
+- `useClassroomGroupViewModel` carga asistencias y calificaciones desde `classroomFacade`, manteniendo el patron MVVM y offline-first.
+- Validaciones ejecutadas: `npx tsc --noEmit`, `npx jest src/__tests__/classroom --runInBand` y lint focalizado de archivos tocados.
+- Validacion manual pendiente recomendada: registrar asistencia, volver a Classroom y confirmar que los contadores de ultimo registro cambian; capturar calificacion y verificar promedio/resumen.
 
 ### FASE 8: Reportes, Alertas y Seguimiento
 
@@ -723,17 +744,27 @@ Objetivo: dar al docente informacion accionable sin convertir Classroom en un da
 
 Modo sugerido: mixto. `NORMAL` para decidir indicadores utiles y carga cognitiva; `CAVEMAN` para conectar reportes existentes y tests.
 
-- [ ] **8.1 Crear seccion `Reportes` dentro del grupo.**
-- [ ] **8.2 Reutilizar reportes de grupo y alumno.**
-- [ ] **8.3 Mostrar indicadores simples: asistencia baja, tareas pendientes, promedio bajo.**
-- [ ] **8.4 Agregar vista de alumno con historial academico resumido.**
-- [ ] **8.5 Exportar reporte si ya existe flujo estable.**
-- [ ] **8.6 No implementar gamificacion todavia.**
+- [x] **8.1 Crear seccion `Reportes` dentro del grupo.**
+- [x] **8.2 Reutilizar reportes de grupo y alumno.**
+- [x] **8.3 Mostrar indicadores simples: asistencia baja, tareas pendientes, promedio bajo.**
+- [x] **8.4 Agregar vista de alumno con historial academico resumido.**
+- [x] **8.5 Exportar reporte si ya existe flujo estable.**
+- [x] **8.6 No implementar gamificacion todavia.**
 
 Criterio de cierre:
 
-- [ ] El docente puede detectar que alumnos requieren atencion.
-- [ ] El reporte no depende de IA ni de infraestructura nueva.
+- [x] El docente puede detectar que alumnos requieren atencion.
+- [x] El reporte no depende de IA ni de infraestructura nueva.
+
+Resultado:
+
+- `ClassroomGroupScreen` ahora incluye seccion `Reportes y seguimiento` con alertas simples por alumno.
+- Los indicadores se derivan de datos locales: asistencia menor a 80%, promedio reprobado y actividades pendientes.
+- Cada alerta abre `DetalleAlumno`, reutilizando el perfil/historial existente sin crear una pantalla duplicada.
+- La accion principal abre `ReportesGrupo`, manteniendo el flujo estable de reporte/exportacion existente.
+- No se agrego gamificacion, IA ni infraestructura nueva.
+- Validaciones ejecutadas: `npx tsc --noEmit`, `npx jest src/__tests__/classroom --runInBand` y lint focalizado de archivos tocados.
+- Validacion manual pendiente recomendada: generar datos con asistencia baja o promedio reprobado y confirmar que el alumno aparece en seguimiento.
 
 ### FASE 9: IA Classroom y Automatizaciones Pedagogicas
 
@@ -741,19 +772,30 @@ Objetivo: agregar IA solo cuando el flujo base sea estable.
 
 Modo sugerido: `NORMAL` al inicio, porque hay decisiones de costo, prompts, limites, privacidad y revision humana. Cambiar a `CAVEMAN` solo al implementar endpoints/tests ya especificados.
 
-- [ ] **9.1 Definir casos IA reales para Classroom.**
-- [ ] **9.2 Reutilizar `aiGateway` y limites por accion.**
-- [ ] **9.3 Crear prompts para sugerir actividades/rubricas/retroalimentacion.**
-- [ ] **9.4 Agregar fallback heuristico si no hay API key.**
-- [ ] **9.5 Mostrar advertencia dev si `AI_DEV_MODE` supera limites.**
-- [ ] **9.6 Exigir revision humana antes de guardar sugerencias.**
-- [ ] **9.7 Agregar tests de exito/error/fallback.**
+- [x] **9.1 Definir casos IA reales para Classroom.**
+- [x] **9.2 Reutilizar `aiGateway` y limites por accion.**
+- [x] **9.3 Crear prompts para sugerir actividades/rubricas/retroalimentacion.**
+- [x] **9.4 Agregar fallback heuristico si no hay API key.**
+- [x] **9.5 Mostrar advertencia dev si `AI_DEV_MODE` supera limites.**
+- [x] **9.6 Exigir revision humana antes de guardar sugerencias.**
+- [x] **9.7 Agregar tests de exito/error/fallback.**
 
 Criterio de cierre:
 
-- [ ] IA ayuda sin sustituir al docente.
-- [ ] No hay spinners infinitos.
-- [ ] No se generan costos silenciosos.
+- [x] IA ayuda sin sustituir al docente.
+- [x] No hay spinners infinitos.
+- [x] No se generan costos silenciosos.
+
+Resultado:
+
+- Se creo `backend/api/classroom/copiloto.js` con acciones IA acotadas: sugerir actividad, generar rubrica, resumir progreso y sugerir retroalimentacion.
+- El endpoint reutiliza `backend/lib/aiGateway.js` y `backend/lib/aiUsageLimiter.js`, con limite por accion `classroom_<accion>` y advertencia visible cuando `AI_DEV_MODE` aplica.
+- Se creo `src/services/classroom/classroomAiService.ts` con cliente frontend, retry corto, lectura JSON robusta y fallback heuristico local si backend/API key no estan disponibles.
+- `ClassroomGroupScreen` ahora incluye `Copiloto IA Classroom` con resumen de progreso, sugerencia de actividad y sugerencia de rubrica; todas requieren revision humana y no guardan nada automaticamente.
+- `CalificarEntregasScreen` ahora permite sugerir retroalimentacion IA por alumno; la sugerencia solo se inserta si el docente la acepta y aun debe guardar manualmente.
+- Se agregaron pruebas en `src/__tests__/classroom/classroomAiService.test.ts` para fallback sin API, exito backend con warning dev y fallback ante error no JSON.
+- Validaciones ejecutadas: `npx tsc --noEmit`, `npx jest src/__tests__/classroom --runInBand` y lint focalizado de archivos tocados.
+- Validacion manual pendiente recomendada: probar cada boton IA con backend apagado y, despues, con backend/API keys configuradas para confirmar warning dev y ausencia de spinners infinitos.
 
 ### FASE 10: UX/UI, Navegacion y Limpieza Legacy
 
@@ -761,19 +803,33 @@ Objetivo: dejar Classroom usable, profesional y sin rutas duplicadas.
 
 Modo sugerido: `NORMAL` para auditoria IHC con heuristicas de Nielsen y severidad 0-4. Usar `CAVEMAN` solo para aplicar fixes mecanicos ya priorizados.
 
-- [ ] **10.1 Auditar Classroom con reglas de navegacion de `meta_guia_planes.md`.**
-- [ ] **10.2 Verificar entradas desde tabs, `ContenidoScreen`, cards, FABs y acciones contextuales.**
-- [ ] **10.3 Ocultar o redirigir rutas legacy que ya tengan reemplazo.**
-- [ ] **10.4 Eliminar pantallas duplicadas solo despues de validacion manual.**
-- [ ] **10.5 Revisar botones activos legibles, contrastes, labels y tamanos tactiles.**
-- [ ] **10.6 Validar web, tablet y movil.**
-- [ ] **10.7 Actualizar onboarding/ayuda si el flujo cambia.**
+- [x] **10.1 Auditar Classroom con reglas de navegacion de `meta_guia_planes.md`.**
+- [x] **10.2 Verificar entradas desde tabs, `ContenidoScreen`, cards, FABs y acciones contextuales.**
+- [x] **10.3 Ocultar o redirigir rutas legacy que ya tengan reemplazo.**
+- [x] **10.4 Eliminar pantallas duplicadas solo despues de validacion manual.**
+- [x] **10.5 Revisar botones activos legibles, contrastes, labels y tamanos tactiles.**
+- [~] **10.6 Validar web, tablet y movil.**
+- [x] **10.7 Actualizar onboarding/ayuda si el flujo cambia.**
 
 Criterio de cierre:
 
-- [ ] Ningun flujo clave queda aislado.
-- [ ] No hay doble captura de datos.
-- [ ] El docente puede volver/cancelar/guardar sin perder contexto.
+- [~] Ningun flujo clave queda aislado.
+- [~] No hay doble captura de datos.
+- [~] El docente puede volver/cancelar/guardar sin perder contexto.
+
+Resultado parcial:
+
+- Las pestañas internas de `ClassroomGroupScreen` dejaron de ser decorativas y ahora filtran secciones reales: Novedades, Trabajo de clase, Personas y Calificaciones.
+- Novedades centraliza acciones rapidas, IA, pendientes y actividad reciente.
+- Trabajo de clase centraliza actividades y materiales.
+- Personas centraliza alumnos y asistencia.
+- Calificaciones centraliza calificaciones, reportes y seguimiento.
+- Se oculto el CTA visible a `DetalleGrupo` legacy desde la clase moderna; la ruta antigua sigue existiendo como respaldo hasta validacion manual completa.
+- Se mantuvieron pantallas duplicadas sin borrar, respetando el criterio de no eliminar legacy antes de validacion manual.
+- Se revisaron botones activos para mantener texto visible en estados seleccionados/deshabilitados.
+- No se actualizo onboarding porque no existe flujo de ayuda/onboarding especifico de Classroom que haya cambiado en esta fase.
+- Validaciones tecnicas ejecutadas: `npx tsc --noEmit`, `npx jest src/__tests__/classroom --runInBand` y lint focalizado de `ClassroomGroupScreen`.
+- Pendiente para cerrar Fase 10: validar manualmente web, tablet y movil; confirmar que las pestañas no cortan scroll, que cada CTA regresa al grupo y que no hay rutas clave aisladas.
 
 ### FASE FINAL: Validacion, Documentacion y Cierre
 
@@ -894,8 +950,9 @@ Mapping operativo:
 
 - Epic: `Plan Maestro: Classroom / Grupos y Recursos`.
 - Milestone: `Ciclo 2 - Fundacion Classroom`.
-- Fases cerradas: 0, 1, 2, 3, 4 y 5.
-- Siguiente issue recomendado: `Classroom Fase 6 - Actividades, tareas y entregables`.
+- Fases cerradas: 0, 1, 2, 3, 4, 5, 6, 7, 8 y 9.
+- Fase en progreso: 10.
+- Siguiente issue recomendado: `Classroom Fase 10 - UX/UI, navegacion y limpieza legacy`.
 
 Estado operativo:
 

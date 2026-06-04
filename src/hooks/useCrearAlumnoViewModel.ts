@@ -42,6 +42,7 @@ export interface CrearAlumnoViewModel {
   guardarAlumno: (options?: {
     modo?: "crear" | "editar";
     alumnoId?: number;
+    grupoId?: number;
     originalAlumno?: Alumno;
   }) => Promise<{ ok: boolean; syncOk: boolean | null; alumnoId?: number }>;
   resetForm: () => void;
@@ -108,6 +109,7 @@ export const useCrearAlumnoViewModel = (): CrearAlumnoViewModel => {
   const guardarAlumno = async (options?: {
     modo?: "crear" | "editar";
     alumnoId?: number;
+    grupoId?: number;
     originalAlumno?: Alumno;
   }): Promise<{ ok: boolean; syncOk: boolean | null; alumnoId?: number }> => {
     if (!validate()) {
@@ -127,6 +129,7 @@ export const useCrearAlumnoViewModel = (): CrearAlumnoViewModel => {
           especialidad: especialidad.trim() || undefined,
           email: email.trim() || undefined,
           telefono: telefono.trim() || undefined,
+          grupoId: options.originalAlumno?.grupoId ?? options.grupoId,
           fechaIngreso: options.originalAlumno?.fechaIngreso || new Date(),
           estado: options.originalAlumno?.estado || "activo",
         });
@@ -142,6 +145,7 @@ export const useCrearAlumnoViewModel = (): CrearAlumnoViewModel => {
           especialidad: especialidad.trim() || undefined,
           email: email.trim() || undefined,
           telefono: telefono.trim() || undefined,
+          grupoId: options?.grupoId,
           fechaIngreso: new Date(),
           estado: "activo",
         });

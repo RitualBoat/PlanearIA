@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import type { RouteProp } from "@react-navigation/native";
@@ -15,6 +16,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../../types";
+import type { Alumno, Recurso } from "../../../types";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
 import { useClassroomGroupViewModel } from "../../hooks/classroom/useClassroomGroupViewModel";
 
@@ -26,36 +28,40 @@ const TAB_LABELS = ["Novedades", "Trabajo de clase", "Personas", "Calificaciones
 const ClassroomGroupScreen: React.FC = () => {
   const navigation = useNavigation<Navigation>();
   const route = useRoute<Route>();
+  const { width } = useWindowDimensions();
   const { grupoId, grupoNombre } = route.params;
-  const { model, isLoading, error, reload } = useClassroomGroupViewModel(grupoId);
+  const { model, alumnos, materiales, isLoading, error, reload } = useClassroomGroupViewModel(grupoId);
   const nombre = model?.grupo.nombre ?? grupoNombre ?? "Grupo";
   const materia = model?.grupo.materia ?? "Materia sin definir";
   const periodo = model?.grupo.periodo ?? "Periodo sin definir";
+  const isCompact = width < 760;
+  const alumnosPreview = alumnos.slice(0, 4);
+  const materialesPreview = materiales.slice(0, 4);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
         style={styles.scroller}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, isCompact ? styles.contentCompact : null]}
         showsVerticalScrollIndicator={Platform.OS === "web"}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => void reload()} />}
       >
-        <View style={styles.banner}>
+        <View style={[styles.banner, isCompact ? styles.bannerCompact : null]}>
           <View style={styles.bannerPatternOne} />
           <View style={styles.bannerPatternTwo} />
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <MaterialIcons name="arrow-back" size={22} color="#0F172A" />
           </TouchableOpacity>
-          <View style={styles.bannerCopy}>
+          <View style={[styles.bannerCopy, isCompact ? styles.bannerCopyCompact : null]}>
             <Text style={styles.eyebrow}>Classroom</Text>
-            <Text style={styles.title}>{nombre}</Text>
-            <Text style={styles.subtitle}>
+            <Text style={[styles.title, isCompact ? styles.titleCompact : null]}>{nombre}</Text>
+            <Text style={[styles.subtitle, isCompact ? styles.subtitleCompact : null]}>
               {materia} - {periodo}
             </Text>
           </View>
         </View>
 
-        <View style={styles.tabsBar}>
+        <View style={[styles.tabsBar, isCompact ? styles.tabsBarCompact : null]}>
           {TAB_LABELS.map((label, index) => (
             <View key={label} style={[styles.tabPill, index === 0 ? styles.tabPillActive : null]}>
               <Text style={[styles.tabText, index === 0 ? styles.tabTextActive : null]}>{label}</Text>
@@ -93,30 +99,8 @@ const ClassroomGroupScreen: React.FC = () => {
 
         {model ? (
           <View style={styles.classroomLayout}>
-            <View style={styles.sideRail}>
-              <View style={styles.classCodeCard}>
-                <Text style={styles.cardLabel}>Resumen de clase</Text>
-                <Text style={styles.classCode}>{String(grupoId).padStart(3, "0")}</Text>
-                <Text style={styles.classCodeHelp}>Codigo local del grupo</Text>
-              </View>
 
-              <View style={styles.metricsStack}>
-                <KpiCard label="Alumnos" value={model.resumen.totalAlumnos} icon="school" />
-                <KpiCard label="Actividades" value={model.resumen.totalActividades} icon="assignment" />
-                <KpiCard label="Materiales" value={model.resumen.totalMateriales} icon="folder" />
-                <KpiCard label="Asistencia" value={`${model.resumen.porcentajeAsistencia}%`} icon="how-to-reg" />
-              </View>
-
-              <TouchableOpacity
-                style={styles.legacyButton}
-                onPress={() => navigation.navigate("DetalleGrupo", { grupoId, grupoNombre: nombre })}
-              >
-                <MaterialIcons name="open-in-new" size={20} color={COLORS.primary} />
-                <Text style={styles.legacyButtonText}>Abrir detalle legacy</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.mainRail}>
+            <View style={[styles.mainRail, isCompact ? styles.mainRailCompact : null]}>
               <View style={styles.announcementCard}>
                 <View style={styles.teacherAvatar}>
                   <MaterialIcons name="person" size={22} color="#FFFFFF" />
@@ -132,9 +116,9 @@ const ClassroomGroupScreen: React.FC = () => {
               <View style={styles.actionsGrid}>
                 <ActionCard
                   title="Alumnos"
-                  description="Lista, perfiles e importacion."
+                  description="Lista del grupo, perfiles e importacion."
                   icon="groups"
-                  onPress={() => navigation.navigate("ListaAlumnos")}
+                  onPress={() => navigation.navigate("CrearAlumno", { grupoId })}
                 />
                 <ActionCard
                   title="Actividades"
@@ -146,7 +130,7 @@ const ClassroomGroupScreen: React.FC = () => {
                   title="Materiales"
                   description="Recursos y planeaciones asignadas."
                   icon="folder-special"
-                  onPress={() => navigation.navigate("AsignarRecurso", { grupoId })}
+                  onPress={() => navigation.navigate("CrearRecurso", { grupoId })}
                 />
                 <ActionCard
                   title="Asistencia"
@@ -166,6 +150,92 @@ const ClassroomGroupScreen: React.FC = () => {
                   icon="insights"
                   onPress={() => navigation.navigate("ReportesGrupo", { grupoId, grupoNombre: nombre })}
                 />
+              </View>
+
+              <View style={styles.feedCard}>
+                <View style={styles.feedHeader}>
+                  <View>
+                    <Text style={styles.sectionTitle}>Materiales de clase</Text>
+                    <Text style={styles.sectionHint}>Recursos asignados al grupo.</Text>
+                  </View>
+                  <Text style={styles.feedCount}>{materiales.length}</Text>
+                </View>
+
+                <View style={styles.inlineActions}>
+                  <TouchableOpacity
+                    style={styles.inlineActionButton}
+                    onPress={() => navigation.navigate("CrearRecurso", { grupoId })}
+                  >
+                    <MaterialIcons name="add-to-drive" size={18} color={COLORS.primary} />
+                    <Text style={styles.inlineActionText}>Crear material</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.inlineActionButton}
+                    onPress={() => navigation.navigate("AsignarRecurso", { grupoId })}
+                  >
+                    <MaterialIcons name="library-add" size={18} color={COLORS.primary} />
+                    <Text style={styles.inlineActionText}>Asignar existente</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.inlineActionButton}
+                    onPress={() => navigation.navigate("ListaRecursos", { filtroTipo: undefined })}
+                  >
+                    <MaterialIcons name="folder-open" size={18} color={COLORS.primary} />
+                    <Text style={styles.inlineActionText}>Biblioteca</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {materialesPreview.length === 0 ? (
+                  <EmptyFeedLine icon="folder-open" text="Aun no hay materiales asignados a esta clase." />
+                ) : (
+                  materialesPreview.map((recurso) => <MaterialRow key={recurso.id} recurso={recurso} />)
+                )}
+              </View>
+
+              <View style={styles.feedCard}>
+                <View style={styles.feedHeader}>
+                  <View>
+                    <Text style={styles.sectionTitle}>Alumnos del grupo</Text>
+                    <Text style={styles.sectionHint}>Participantes vinculados a esta clase.</Text>
+                  </View>
+                  <Text style={styles.feedCount}>{alumnos.length}</Text>
+                </View>
+
+                <View style={styles.inlineActions}>
+                  <TouchableOpacity
+                    style={styles.inlineActionButton}
+                    onPress={() => navigation.navigate("CrearAlumno", { grupoId })}
+                  >
+                    <MaterialIcons name="person-add" size={18} color={COLORS.primary} />
+                    <Text style={styles.inlineActionText}>Agregar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.inlineActionButton}
+                    onPress={() => navigation.navigate("ImportarAlumnos")}
+                  >
+                    <MaterialIcons name="upload-file" size={18} color={COLORS.primary} />
+                    <Text style={styles.inlineActionText}>Importar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.inlineActionButton}
+                    onPress={() => navigation.navigate("ExportarAlumnos")}
+                  >
+                    <MaterialIcons name="download" size={18} color={COLORS.primary} />
+                    <Text style={styles.inlineActionText}>Exportar</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {alumnosPreview.length === 0 ? (
+                  <EmptyFeedLine icon="person-add" text="Aun no hay alumnos vinculados a este grupo." />
+                ) : (
+                  alumnosPreview.map((alumno) => (
+                    <StudentRow
+                      key={alumno.id}
+                      alumno={alumno}
+                      onPress={() => navigation.navigate("DetalleAlumno", { alumnoId: alumno.id })}
+                    />
+                  ))
+                )}
               </View>
 
               <View style={styles.feedCard}>
@@ -200,6 +270,29 @@ const ClassroomGroupScreen: React.FC = () => {
                   ))
                 )}
               </View>
+            </View>
+
+            <View style={[styles.sideRail, isCompact ? styles.sideRailCompact : null]}>
+              <View style={styles.classCodeCard}>
+                <Text style={styles.cardLabel}>Resumen de clase</Text>
+                <Text style={styles.classCode}>{String(grupoId).padStart(3, "0")}</Text>
+                <Text style={styles.classCodeHelp}>Codigo local del grupo</Text>
+              </View>
+
+              <View style={[styles.metricsStack, isCompact ? styles.metricsStackCompact : null]}>
+                <KpiCard label="Alumnos" value={model.resumen.totalAlumnos} icon="school" />
+                <KpiCard label="Actividades" value={model.resumen.totalActividades} icon="assignment" />
+                <KpiCard label="Materiales" value={model.resumen.totalMateriales} icon="folder" />
+                <KpiCard label="Asistencia" value={`${model.resumen.porcentajeAsistencia}%`} icon="how-to-reg" />
+              </View>
+
+              <TouchableOpacity
+                style={styles.legacyButton}
+                onPress={() => navigation.navigate("DetalleGrupo", { grupoId, grupoNombre: nombre })}
+              >
+                <MaterialIcons name="open-in-new" size={20} color={COLORS.primary} />
+                <Text style={styles.legacyButtonText}>Abrir detalle legacy</Text>
+              </TouchableOpacity>
             </View>
           </View>
         ) : null}
@@ -238,6 +331,37 @@ const ActionCard: React.FC<{
     </View>
     <MaterialIcons name="chevron-right" size={22} color="#94A3B8" />
   </TouchableOpacity>
+);
+
+const StudentRow: React.FC<{ alumno: Alumno; onPress: () => void }> = ({ alumno, onPress }) => (
+  <TouchableOpacity style={styles.studentRow} onPress={onPress}>
+    <View style={styles.studentAvatar}>
+      <Text style={styles.studentAvatarText}>
+        {(alumno.nombre?.[0] ?? "A").toUpperCase()}
+      </Text>
+    </View>
+    <View style={styles.studentCopy}>
+      <Text style={styles.studentName}>{`${alumno.nombre} ${alumno.apellidos}`.trim()}</Text>
+      <Text style={styles.studentMeta}>
+        {alumno.numeroControl} - {alumno.carrera} - {alumno.estado}
+      </Text>
+    </View>
+    <MaterialIcons name="chevron-right" size={22} color="#94A3B8" />
+  </TouchableOpacity>
+);
+
+const MaterialRow: React.FC<{ recurso: Recurso }> = ({ recurso }) => (
+  <View style={styles.studentRow}>
+    <View style={styles.materialAvatar}>
+      <MaterialIcons name="folder" size={20} color={COLORS.primary} />
+    </View>
+    <View style={styles.studentCopy}>
+      <Text style={styles.studentName}>{recurso.titulo}</Text>
+      <Text style={styles.studentMeta}>
+        {recurso.tipo} - {recurso.origen} - v{recurso.versionActual}
+      </Text>
+    </View>
+  </View>
 );
 
 const FeedItem: React.FC<{ icon: keyof typeof MaterialIcons.glyphMap; title: string; meta: string }> = ({
@@ -284,12 +408,21 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === "web" ? 190 : 120,
     width: "100%",
   },
+  contentCompact: {
+    padding: 14,
+    paddingBottom: 140,
+  },
   banner: {
     backgroundColor: "#1E7D4F",
     borderRadius: 28,
     minHeight: 190,
     overflow: "hidden",
     padding: 24,
+  },
+  bannerCompact: {
+    borderRadius: 24,
+    minHeight: 150,
+    padding: 20,
   },
   bannerPatternOne: {
     backgroundColor: "rgba(255,255,255,0.14)",
@@ -321,6 +454,9 @@ const styles = StyleSheet.create({
     marginTop: 24,
     maxWidth: 720,
   },
+  bannerCopyCompact: {
+    marginTop: 18,
+  },
   eyebrow: {
     color: "#D7FBE8",
     fontSize: 12,
@@ -336,11 +472,19 @@ const styles = StyleSheet.create({
     lineHeight: 39,
     marginTop: 8,
   },
+  titleCompact: {
+    fontSize: 30,
+    lineHeight: 35,
+  },
   subtitle: {
     color: "#E4F8EC",
     fontSize: 15,
     fontWeight: "700",
     marginTop: 8,
+  },
+  subtitleCompact: {
+    fontSize: 14,
+    lineHeight: 20,
   },
   tabsBar: {
     alignItems: "center",
@@ -353,6 +497,10 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 14,
     padding: 8,
+  },
+  tabsBarCompact: {
+    alignItems: "stretch",
+    borderRadius: 24,
   },
   tabPill: {
     borderRadius: 999,
@@ -445,10 +593,19 @@ const styles = StyleSheet.create({
     maxWidth: 320,
     minWidth: 260,
   },
+  sideRailCompact: {
+    maxWidth: undefined,
+    minWidth: 0,
+    width: "100%",
+  },
   mainRail: {
     flex: 1,
     gap: 14,
     minWidth: 320,
+  },
+  mainRailCompact: {
+    minWidth: 0,
+    width: "100%",
   },
   classCodeCard: {
     backgroundColor: "#FFFFFF",
@@ -476,6 +633,10 @@ const styles = StyleSheet.create({
   },
   metricsStack: {
     gap: 10,
+  },
+  metricsStackCompact: {
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
   kpiCard: {
     alignItems: "center",
@@ -593,6 +754,76 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 16,
   },
+  sectionHint: {
+    color: "#64748B",
+    fontSize: 12,
+    fontWeight: "700",
+    marginTop: 2,
+  },
+  inlineActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  inlineActionButton: {
+    alignItems: "center",
+    backgroundColor: "#EAF2FF",
+    borderColor: "#CFE0F7",
+    borderRadius: 14,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 7,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  inlineActionText: {
+    color: COLORS.primary,
+    fontSize: 12,
+    fontWeight: "900",
+  },
+  studentRow: {
+    alignItems: "center",
+    backgroundColor: "#F8FAFC",
+    borderRadius: 16,
+    flexDirection: "row",
+    gap: 12,
+    padding: 12,
+  },
+  studentAvatar: {
+    alignItems: "center",
+    backgroundColor: "#DFF3E8",
+    borderRadius: 999,
+    height: 42,
+    justifyContent: "center",
+    width: 42,
+  },
+  studentAvatarText: {
+    color: "#1E7D4F",
+    fontSize: 15,
+    fontWeight: "900",
+  },
+  materialAvatar: {
+    alignItems: "center",
+    backgroundColor: "#EAF2FF",
+    borderRadius: 999,
+    height: 42,
+    justifyContent: "center",
+    width: 42,
+  },
+  studentCopy: {
+    flex: 1,
+  },
+  studentName: {
+    color: "#122033",
+    fontSize: 14,
+    fontWeight: "900",
+  },
+  studentMeta: {
+    color: "#64748B",
+    fontSize: 12,
+    marginTop: 2,
+    textTransform: "capitalize",
+  },
   feedHeader: {
     alignItems: "center",
     flexDirection: "row",
@@ -658,3 +889,4 @@ const styles = StyleSheet.create({
 });
 
 export default ClassroomGroupScreen;
+

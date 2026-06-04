@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { NavigatorScreenParams } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -9,12 +9,12 @@ import AppTabsNavigator, { MainTabParamList } from "./AppTabsNavigator";
 import { useAuth } from "../context/AuthContext";
 import { useDeepLinkHandler } from "../hooks/useDeepLinkHandler";
 
-// ImportaciÃ³n de pantallas de autenticaciÃ³n
+// ImportaciÃƒÂ³n de pantallas de autenticaciÃƒÂ³n
 import LoginScreen from "../screens/auth/LoginScreen";
 import RegistroScreen from "../screens/auth/RegistroScreen";
 import RecuperarContrasenaScreen from "../screens/auth/RecuperarContrasenaScreen";
 
-// ImportaciÃ³n de pantallas de Planeaciones
+// ImportaciÃƒÂ³n de pantallas de Planeaciones
 import CrearPlaneacionScreen from "../screens/planeaciones/CrearPlaneacionScreen";
 import ImportarPlaneacionScreen from "../screens/planeaciones/ImportarPlaneacionScreen";
 import ExportarPlaneacionScreen from "../screens/planeaciones/ExportarPlaneacionScreen";
@@ -22,7 +22,7 @@ import ListaPlaneacionesScreen from "../screens/planeaciones/ListaPlaneacionesSc
 import DocEditorScreen from "../screens/planeaciones/DocEditorScreen";
 import EscanerPlantillaScreen from "../screens/planeaciones/EscanerPlantillaScreen";
 
-// ImportaciÃ³n de pantallas de Grupos (NUEVA ARQUITECTURA)
+// ImportaciÃƒÂ³n de pantallas de Grupos (NUEVA ARQUITECTURA)
 import GruposScreen from "../screens/grupos/GruposScreen";
 import ListaGruposScreen from "../screens/grupos/ListaGruposScreen";
 import CrearGrupoScreen from "../screens/grupos/CrearGrupoScreen";
@@ -57,51 +57,51 @@ import NotasAlumnoScreen from "../screens/alumnos/NotasAlumnoScreen";
 import ImportarAlumnosScreen from "../screens/alumnos/ImportarAlumnosScreen";
 import ExportarAlumnosScreen from "../screens/alumnos/ExportarAlumnosScreen";
 
-// ImportaciÃ³n de pantallas de Biblioteca de Recursos
+// ImportaciÃƒÂ³n de pantallas de Biblioteca de Recursos
 import RecursosDidacticosScreen from "../screens/biblioteca/RecursosDidacticosScreen";
 import ListaRecursosScreen from "../screens/biblioteca/ListaRecursosScreen";
 import CrearRecursoScreen from "../screens/biblioteca/CrearRecursoScreen";
 
-// ImportaciÃ³n de pantallas de Cuenta
+// ImportaciÃƒÂ³n de pantallas de Cuenta
 import CuentaScreen from "../screens/cuenta/CuentaScreen";
 import EditarPerfilScreen from "../screens/cuenta/EditarPerfilScreen";
 import AdminRolesScreen from "../screens/cuenta/AdminRolesScreen";
 import TerminosScreen from "../screens/cuenta/TerminosScreen";
 
-// ImportaciÃ³n de pantallas de Plantillas
+// ImportaciÃƒÂ³n de pantallas de Plantillas
 import BibliotecaPlantillasScreen from "../screens/plantillas/BibliotecaPlantillasScreen";
 import ListaPlantillasScreen from "../screens/plantillas/ListaPlantillasScreen";
 import DetallePlantillaScreen from "../screens/plantillas/DetallePlantillaScreen";
 import EditorPlantillaScreen from "../screens/plantillas/EditorPlantillaScreen";
 
-// ImportaciÃ³n de pantalla de Perfil
+// ImportaciÃƒÂ³n de pantalla de Perfil
 import PerfilScreen from "../screens/perfil/PerfilScreen";
 
-// ImportaciÃ³n de pantallas de Reto
+// ImportaciÃƒÂ³n de pantallas de Reto
 import RetoResolucionScreen from "../screens/feed/RetoResolucionScreen";
 import RetoResultadoScreen from "../screens/feed/RetoResultadoScreen";
 import QuestionEditorScreen from "../screens/feed/QuestionEditorScreen";
 
-// ImportaciÃ³n de pantalla de Detalle de Post
+// ImportaciÃƒÂ³n de pantalla de Detalle de Post
 import PostDetailScreen from "../screens/feed/PostDetailScreen";
 
-// ImportaciÃ³n de pantalla de Buscador de Perfiles
+// ImportaciÃƒÂ³n de pantalla de Buscador de Perfiles
 import BuscadorPerfilesScreen from "../screens/social/BuscadorPerfilesScreen";
 
-// ImportaciÃ³n de pantallas de Chat/MensajerÃ­a
+// ImportaciÃƒÂ³n de pantallas de Chat/MensajerÃƒÂ­a
 import ChatScreen from "../screens/chat/ChatScreen";
 import ConversacionScreen from "../screens/chat/ConversacionScreen";
 
-// ImportaciÃ³n de pantalla de Onboarding
+// ImportaciÃƒÂ³n de pantalla de Onboarding
 import OnboardingScreen from "../screens/onboarding/OnboardingScreen";
 
-// ImportaciÃ³n de pantallas de Notificaciones y Ayuda
+// ImportaciÃƒÂ³n de pantallas de Notificaciones y Ayuda
 import { NotificacionesScreen } from "../screens/notificaciones/NotificacionesScreen";
 import { AyudaScreen } from "../screens/ayuda/AyudaScreen";
 
 /**
- * DefiniciÃ³n de los tipos para los parÃ¡metros de navegaciÃ³n
- * Esto ayuda a TypeScript a entender quÃ© parÃ¡metros espera cada pantalla
+ * DefiniciÃƒÂ³n de los tipos para los parÃƒÂ¡metros de navegaciÃƒÂ³n
+ * Esto ayuda a TypeScript a entender quÃƒÂ© parÃƒÂ¡metros espera cada pantalla
  */
 const ONBOARDING_KEY = "HAS_SEEN_ONBOARDING";
 
@@ -109,7 +109,7 @@ export type RootStackParamList = {
   // Onboarding
   Onboarding: undefined;
 
-  // AutenticaciÃ³n
+  // AutenticaciÃƒÂ³n
   Login: undefined;
   Registro: undefined;
   RecuperarContrasena: undefined;
@@ -176,6 +176,7 @@ export type RootStackParamList = {
     | {
         modo?: "crear" | "editar";
         alumnoId?: number;
+        grupoId?: number;
       };
   ListaAlumnos: undefined;
   ImportarAlumnos: undefined;
@@ -190,10 +191,10 @@ export type RootStackParamList = {
     alumnoNombre?: string;
   };
 
-  // NUEVA ARQUITECTURA: Recursos DidÃ¡cticos (reemplaza Recursos)
+  // NUEVA ARQUITECTURA: Recursos DidÃƒÂ¡cticos (reemplaza Recursos)
   RecursosDidacticos: undefined;
   ListaRecursos: { filtroTipo?: string } | undefined;
-  CrearRecurso: { recursoId?: number } | undefined;
+  CrearRecurso: { recursoId?: number; grupoId?: number } | undefined;
 
   // Plantillas
   BibliotecaPlantillas: undefined;
@@ -238,7 +239,7 @@ export type RootStackParamList = {
   // Social / Buscador de Perfiles
   BuscadorPerfiles: undefined;
 
-  // Chat / MensajerÃ­a
+  // Chat / MensajerÃƒÂ­a
   Chat: undefined;
   Conversacion: { conversacionId: number };
 
@@ -251,8 +252,8 @@ export type RootStackParamList = {
  */
 const Stack = createStackNavigator<RootStackParamList>();
 /**
- * Componente principal de navegaciÃ³n
- * Gestiona todas las rutas de la aplicaciÃ³n
+ * Componente principal de navegaciÃƒÂ³n
+ * Gestiona todas las rutas de la aplicaciÃƒÂ³n
  */
 const StackNavigator: React.FC = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -308,12 +309,12 @@ const StackNavigator: React.FC = () => {
           headerShown: false,
         }}
       />
-      {/* ========== AUTENTICACIÃ“N ========== */}
+      {/* ========== AUTENTICACIÃƒâ€œN ========== */}
       <Stack.Screen
         name="Login"
         component={LoginScreen}
         options={{
-          title: "Iniciar SesiÃ³n",
+          title: "Iniciar SesiÃƒÂ³n",
           headerShown: false,
         }}
       />
@@ -329,7 +330,7 @@ const StackNavigator: React.FC = () => {
         name="RecuperarContrasena"
         component={RecuperarContrasenaScreen}
         options={{
-          title: "Recuperar contraseÃ±a",
+          title: "Recuperar contraseÃƒÂ±a",
           headerShown: false,
         }}
       />
@@ -354,7 +355,7 @@ const StackNavigator: React.FC = () => {
         name="CrearPlaneacion"
         component={CrearPlaneacionScreen}
         options={{
-          title: "Crear PlaneaciÃ³n",
+          title: "Crear PlaneaciÃƒÂ³n",
           headerShown: false,
         }}
       />
@@ -362,7 +363,7 @@ const StackNavigator: React.FC = () => {
         name="GenerarPlaneacionIA"
         component={CrearPlaneacionScreen}
         options={{
-          title: "Generar PlaneaciÃ³n IA",
+          title: "Generar PlaneaciÃƒÂ³n IA",
           headerShown: false,
         }}
       />
@@ -370,7 +371,7 @@ const StackNavigator: React.FC = () => {
         name="ImportarPlaneacion"
         component={ImportarPlaneacionScreen}
         options={{
-          title: "Importar PlaneaciÃ³n",
+          title: "Importar PlaneaciÃƒÂ³n",
           headerShown: false,
         }}
       />
@@ -386,7 +387,7 @@ const StackNavigator: React.FC = () => {
         name="ExportarPlaneacion"
         component={ExportarPlaneacionScreen}
         options={{
-          title: "Exportar PlaneaciÃ³n",
+          title: "Exportar PlaneaciÃƒÂ³n",
           headerShown: false,
         }}
       />
@@ -595,12 +596,12 @@ const StackNavigator: React.FC = () => {
           headerShown: false,
         }}
       />
-      {/* ========== RECURSOS DIDÃCTICOS (NUEVA ARQUITECTURA) ========== */}
+      {/* ========== RECURSOS DIDÃƒÂCTICOS (NUEVA ARQUITECTURA) ========== */}
       <Stack.Screen
         name="RecursosDidacticos"
         component={RecursosDidacticosScreen}
         options={{
-          title: "Recursos DidÃ¡cticos",
+          title: "Recursos DidÃƒÂ¡cticos",
           headerShown: false,
         }}
       />
@@ -738,7 +739,7 @@ const StackNavigator: React.FC = () => {
           headerShown: false,
         }}
       />
-      {/* ========== CHAT / MENSAJERÃA ========== */}
+      {/* ========== CHAT / MENSAJERÃƒÂA ========== */}
       <Stack.Screen
         name="Chat"
         component={ChatScreen}
@@ -751,7 +752,7 @@ const StackNavigator: React.FC = () => {
         name="Conversacion"
         component={ConversacionScreen}
         options={{
-          title: "ConversaciÃ³n",
+          title: "ConversaciÃƒÂ³n",
           headerShown: false,
         }}
       />
@@ -777,3 +778,5 @@ const StackNavigator: React.FC = () => {
   );
 };
 export default StackNavigator;
+
+

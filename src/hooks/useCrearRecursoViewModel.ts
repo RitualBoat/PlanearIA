@@ -85,7 +85,7 @@ const TIPO_OPTIONS: { key: RecursoTipo; label: string; icon: string }[] = [
   { key: "video", label: "Video", icon: "videocam" },
 ];
 
-export const useCrearRecursoViewModel = (recursoId?: number): CrearRecursoViewModel => {
+export const useCrearRecursoViewModel = (recursoId?: number, grupoId?: number): CrearRecursoViewModel => {
   const { crearRecurso, actualizarRecurso, eliminarRecurso, obtenerRecursoPorId } = useRecursos();
 
   const [titulo, setTitulo] = useState("");
@@ -202,6 +202,7 @@ export const useCrearRecursoViewModel = (recursoId?: number): CrearRecursoViewMo
         archivo: uploadedFile?.name,
         url: uploadedFile?.uri,
         acceso: "privado",
+        grupoId,
         asignadoComoTarea: false,
         profesorId: 1,
         versionActual: 1,
@@ -235,6 +236,7 @@ export const useCrearRecursoViewModel = (recursoId?: number): CrearRecursoViewMo
     uploadedFile,
     isEditMode,
     recursoId,
+    grupoId,
     crearRecurso,
     actualizarRecurso,
   ]);

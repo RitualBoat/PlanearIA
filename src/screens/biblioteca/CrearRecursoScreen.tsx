@@ -28,7 +28,8 @@ const CrearRecursoScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const recursoId = route.params?.recursoId;
-  const vm = useCrearRecursoViewModel(recursoId);
+  const grupoId = route.params?.grupoId;
+  const vm = useCrearRecursoViewModel(recursoId, grupoId);
 
   const [tagInput, setTagInput] = useState("");
 

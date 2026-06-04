@@ -643,6 +643,19 @@ Todo plan debe exigir:
 
 Cuando un modulo tenga edicion compleja, se debe preferir una experiencia tipo herramienta real, no solo un formulario.
 
+### 9.0 Estrategia UX/UI Hibrida por Modulo
+
+Cada modulo debe tener una UX base profesional dentro de su propio plan, pero el redisenio final de toda la app debe reservarse para `Plan Maestro: UX/UI y Navegacion Global`.
+
+Reglas:
+
+- En el plan del modulo se corrigen problemas propios del flujo: scroll roto, pantallas cortadas, botones inaccesibles, jerarquia confusa, estados vacios pobres y responsive movil/web.
+- En el plan del modulo se implementa una plantilla visual base alineada con referencias reales y ground truth local.
+- No convertir cada modulo en un mega redisenio final si eso bloquea funcionalidad.
+- Antes de tocar UI, revisar `context/<modulo>-ground-truth/` si existe.
+- Si el desarrollador entrega pantallas de Stitch/Figma, HTML, MD, tokens o capturas, ese material tiene prioridad como ground truth visual.
+- El plan UX/UI Global debe consolidar: prompts para Stitch/Figma, sistema visual, tokens, navegacion global, Nielsen, accesibilidad y severidad 0-4.
+
 ### 9.1 Metodologia IHC obligatoria para el Plan Maestro UX/UI
 
 El `Plan Maestro: UX/UI y Navegacion Global - PlanearIA` sera una fase de pulido posterior a los modulos funcionales principales. Cuando se genere, no debe basarse en gustos subjetivos. Debe usar rigor de Interaccion Humano-Computadora:

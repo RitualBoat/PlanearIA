@@ -371,6 +371,17 @@ Movil:
 - Estado error recuperable.
 - Estado loading con timeout o fallback local.
 
+### 7.5 Estrategia UX/UI Hibrida
+
+Decision post-revision manual:
+
+- Cada modulo debe implementar una UX base profesional, responsive y usable dentro de su propio plan.
+- El plan del modulo debe corregir bugs visuales propios del flujo: scroll roto, pantallas cortadas, jerarquia confusa, acciones ocultas o layout movil/web desfasado.
+- El plan del modulo debe consultar su ground truth local antes de tocar UI. Para Classroom, usar `context/classroom-ground-truth/` y referencias reales de Google Classroom/Classroomio como inspiracion conceptual.
+- No inflar cada plan con redisenos finales exhaustivos. El refinamiento visual profundo debe vivir en `Plan Maestro: UX/UI y Navegacion Global`.
+- Si el desarrollador crea pantallas en Stitch/Figma y entrega HTML/MD/capturas, ese material se considera ground truth superior para una fase de redisenio dedicada.
+- UX/UI Global hara la auditoria final con Nielsen, severidad 0-4, accesibilidad, tokens visuales y consistencia entre modulos.
+
 ---
 
 ## 8. IA y Automatizacion
@@ -619,18 +630,25 @@ Objetivo: que el docente administre participantes desde la clase.
 
 Modo sugerido: `CAVEMAN` si se reutilizan pantallas/contextos existentes; cambiar a `NORMAL` si hay que decidir nuevo flujo de importacion, mover alumnos o acciones masivas.
 
-- [ ] **4.1 Crear seccion `Alumnos` dentro de `ClassroomGroupScreen`.**
-- [ ] **4.2 Reutilizar creacion/importacion/exportacion de alumnos.**
-- [ ] **4.3 Mostrar estado academico basico por alumno.**
-- [ ] **4.4 Permitir abrir detalle de alumno con retorno al grupo.**
-- [ ] **4.5 Definir acciones masivas: importar, exportar, mover, quitar de grupo.**
-- [ ] **4.6 Validar offline y sync pendiente.**
+- [x] **4.1 Crear seccion `Alumnos` dentro de `ClassroomGroupScreen`.**
+- [x] **4.2 Reutilizar creacion/importacion/exportacion de alumnos.**
+- [x] **4.3 Mostrar estado academico basico por alumno.**
+- [x] **4.4 Permitir abrir detalle de alumno con retorno al grupo.**
+- [~] **4.5 Definir acciones masivas: importar, exportar, mover, quitar de grupo.**
+- [x] **4.6 Validar offline y sync pendiente.**
 
 Criterio de cierre:
 
-- [ ] El flujo de alumnos dentro del grupo reemplaza el salto aislado a lista general.
-- [ ] Import/export siguen funcionando.
-- [ ] No se duplica captura de alumno.
+- [~] El flujo de alumnos dentro del grupo reemplaza el salto aislado a lista general.
+- [x] Import/export siguen funcionando.
+- [x] No se duplica captura de alumno.
+
+Resultado parcial:
+
+- `ClassroomGroupScreen` ahora muestra alumnos filtrados por `grupoId`, con preview, contador y acceso a detalle.
+- `CrearAlumno` acepta `grupoId` y el ViewModel guarda alumnos nuevos vinculados al grupo.
+- Se reutilizan rutas existentes: `CrearAlumno`, `ImportarAlumnos`, `ExportarAlumnos` y `DetalleAlumno`.
+- Queda pendiente completar acciones masivas de mover/quitar alumno de grupo y decidir si import/export deben prefiltrar por grupo o mantenerse globales en esta etapa.
 
 ### FASE 5: Materiales y Recursos de Clase
 
@@ -638,18 +656,25 @@ Objetivo: llevar recursos didacticos al contexto de grupo.
 
 Modo sugerido: mixto. `NORMAL` para evitar duplicidad con `ContenidoScreen`; `CAVEMAN` para implementar filtros, rutas y tests ya definidos.
 
-- [ ] **5.1 Crear seccion `Materiales`.**
-- [ ] **5.2 Mostrar recursos asignados al grupo.**
-- [ ] **5.3 Permitir crear recurso desde grupo.**
+- [x] **5.1 Crear seccion `Materiales`.**
+- [x] **5.2 Mostrar recursos asignados al grupo.**
+- [x] **5.3 Permitir crear recurso desde grupo.**
 - [ ] **5.4 Permitir adjuntar planeacion como material.**
-- [ ] **5.5 Permitir filtrar por tipo: PDF, enlace, video, planeacion, imagen, archivo.**
-- [ ] **5.6 Mantener biblioteca general como origen transversal.**
-- [ ] **5.7 Evitar duplicidad con `ContenidoScreen`.**
+- [~] **5.5 Permitir filtrar por tipo: PDF, enlace, video, planeacion, imagen, archivo.**
+- [x] **5.6 Mantener biblioteca general como origen transversal.**
+- [~] **5.7 Evitar duplicidad con `ContenidoScreen`.**
 
 Criterio de cierre:
 
-- [ ] Un docente puede agregar/ver materiales desde el grupo.
-- [ ] `ContenidoScreen` no compite con Classroom para acciones de grupo.
+- [x] Un docente puede agregar/ver materiales desde el grupo.
+- [~] `ContenidoScreen` no compite con Classroom para acciones de grupo.
+
+Resultado parcial:
+
+- `ClassroomGroupScreen` muestra materiales asignados por `grupoId`, con preview y contador.
+- `CrearRecurso` acepta `grupoId` y el ViewModel guarda recursos nuevos vinculados al grupo.
+- Se mantienen rutas de biblioteca/asignacion existentes para no duplicar captura.
+- Quedan pendientes: adjuntar planeaciones como material, filtros por tipo dentro de la seccion y resolver la competencia fina con `ContenidoScreen`.
 
 ### FASE 6: Actividades, Tareas y Entregables
 
@@ -890,6 +915,12 @@ Estado operativo:
 - [x] Issue creado para Fase 3: `https://github.com/RitualBoat/PlanearIA/issues/4`.
 - [x] Issue de Fase 3 agregado a `PlanearIA Product OS`.
 - [x] Fase 3 ejecutada y marcada como `Done`.
+- [x] Issue creado para Fase 4: `https://github.com/RitualBoat/PlanearIA/issues/5`.
+- [x] Issue de Fase 4 agregado a `PlanearIA Product OS`.
+- [~] Fase 4 en progreso: alumnos contextuales implementados; faltan acciones masivas mover/quitar y filtros import/export por grupo.
+- [x] Issue creado para Fase 5: `https://github.com/RitualBoat/PlanearIA/issues/6`.
+- [x] Issue de Fase 5 agregado a `PlanearIA Product OS`.
+- [~] Fase 5 en progreso: materiales contextuales implementados; faltan planeaciones como material, filtros internos y consolidacion con `ContenidoScreen`.
 
 Regla de actualizacion:
 

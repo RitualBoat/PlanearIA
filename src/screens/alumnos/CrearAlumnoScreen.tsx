@@ -36,6 +36,7 @@ const CrearAlumnoScreen: React.FC = () => {
   const { obtenerAlumno } = useAlumnos();
   const modo = route.params?.modo || "crear";
   const alumnoId = route.params?.alumnoId;
+  const grupoId = route.params?.grupoId;
   const alumnoEdicion = alumnoId ? obtenerAlumno(alumnoId) : undefined;
   const isDesktopWeb = Platform.OS === "web" && width >= 1080;
   const isCreateMode = modo === "crear";
@@ -118,6 +119,7 @@ const CrearAlumnoScreen: React.FC = () => {
     const result = await guardarAlumno({
       modo,
       alumnoId,
+      grupoId,
       originalAlumno: alumnoEdicion,
     });
 

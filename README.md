@@ -323,6 +323,7 @@ La documentacion tecnica esta en [`Documentacion/`](./Documentacion/):
 | [`Documentacion/DIAGRAMA_NAVEGACION.md`](./Documentacion/DIAGRAMA_NAVEGACION.md) | Diagrama de navegacion. |
 | [`Documentacion/MAPA_NAVEGACION.md`](./Documentacion/MAPA_NAVEGACION.md) | Mapa de rutas entre modulos. |
 | [`Documentacion/GUIA_PRUEBAS.md`](./Documentacion/GUIA_PRUEBAS.md) | Guia de pruebas. |
+| [`Documentacion/COMPONENTES_PRESERVADOS.md`](./Documentacion/COMPONENTES_PRESERVADOS.md) | Componentes visuales preservados con codigo fuente completo (hero pills, etc.). |
 
 ---
 

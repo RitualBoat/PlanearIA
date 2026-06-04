@@ -669,6 +669,104 @@ El `Plan Maestro: UX/UI y Navegacion Global - PlanearIA` sera una fase de pulido
 - Centralizar tokens visuales en `ThemeContext` o capa equivalente para evitar interfaces Frankenstein entre modulos.
 - Convertir recomendaciones en cambios accionables, con criterio de aceptacion verificable en web, tablet y movil.
 
+### 9.2 Estado Actual del Diseno Visual
+
+PlanearIA no tiene un diseno maestro definido todavia. No existe un sistema de tokens visual final, no hay Figma/Stitch aprobado como fuente de verdad global y no hay una guia de estilo cerrada.
+
+Reglas mientras no exista un diseno maestro:
+
+- Las pantallas nuevas o modificadas deben ser lo mas homogeneas posible con el estado actual de la app.
+- No inventar paletas, tipografias o estilos nuevos que contradigan lo que ya existe.
+- Si un modulo necesita pantallas nuevas, basarse en los patrones visuales existentes: spacing, colores de `ThemeContext`, cards, botones y tab bars internas.
+- La app no esta en produccion y todo puede cambiar. Ningun plan debe asumir que el diseno actual es definitivo.
+- El diseno final se definira cuando se cree el `Plan Maestro: UX/UI y Navegacion Global`.
+
+### 9.3 Workflow de Diseno con Google Stitch
+
+Este workflow aplica exclusivamente al futuro `Plan Maestro: UX/UI y Navegacion Global`. Los planes de modulos individuales no deben incluir fases de Stitch ni bloquear su avance por diseno visual. Los modulos deben implementar una UX base funcional y profesional; el pulido visual global se hace despues.
+
+Cuando se cree el plan de UX/UI Global, la IA debe seguir este flujo iterativo con el desarrollador:
+
+#### Paso 1: Generar prompts para Stitch
+
+La IA debe proponer entre 2 y 4 prompts alternativos para Google Stitch por cada pantalla o flujo pequeno. Cada prompt debe:
+
+- Describir la pantalla, el contenido, la jerarquia visual y las acciones principales.
+- Basarse en las reglas de UX/UI de esta guia, las heuristicas de Nielsen y el ground truth del modulo.
+- Consultar las carpetas `context/referencias-opensource/` y `context/<modulo>-ground-truth/` para inspirar flujos coherentes con experiencias reales.
+- Tener en cuenta como funciona la app actualmente para no proponer flujos desconectados del estado real.
+- Variar entre si: una opcion puede priorizar compacidad, otra puede priorizar jerarquia visual, otra puede explorar un layout alternativo.
+
+Ejemplo de formato:
+
+```markdown
+## Prompts para Stitch: Classroom Home
+
+**Prompt 1:** Pantalla Classroom con clases activas como cards grandes, acceso rapido a materiales
+recientes y barra de busqueda superior. Estilo inspirado en Google Classroom.
+
+**Prompt 2:** Pantalla Classroom con tres secciones: Mis Cursos, Actividad Reciente y Pendientes.
+Cada seccion es colapsable. Navegacion por pestanas internas.
+
+**Prompt 3:** Pantalla Classroom minimalista: lista vertical de grupos/clases con KPIs inline
+(alumnos, tareas, asistencia). FAB para crear grupo. Sin secciones separadas.
+```
+
+#### Paso 2: El desarrollador elige
+
+El desarrollador usa los prompts en Google Stitch, genera los disenos, descarga los resultados y los coloca en `context/stitch-results/<tarea>/` como HTML, preview y JSON/MD.
+
+#### Paso 3: Implementar e iterar
+
+La IA lee el resultado de Stitch, implementa la pantalla y permite iteracion hasta que el desarrollador este satisfecho. Solo cuando el desarrollador apruebe el diseno se pasa al siguiente flujo.
+
+#### Paso 4: Avanzar al siguiente flujo
+
+Al iniciar el siguiente flujo de UX/UI, la IA debe tener en cuenta los disenos ya aprobados para mantener homogeneidad visual.
+
+#### Paso 5: Diseno global opcional
+
+La IA tambien puede proponer prompts para Stitch sobre el diseno global de la app: paleta de colores, tipografia, tokens, navegacion y estilo general. Esto permite que todos los flujos posteriores se basen en un sistema visual coherente desde el principio.
+
+#### Paso 6: Auditoria final
+
+Al cerrar el ciclo de diseno, se debe hacer una auditoria estricta de UX/UI y homogeneidad visual. Se daran varias repasadas hasta que quede pulido.
+
+Regla de trazabilidad:
+
+- Los resultados de Stitch se guardan en `context/stitch-results/` siguiendo la estructura documentada en `context/stitch-results/README.md`.
+- Los prompts generados por la IA se incluyen en el plan maestro de UX/UI Global.
+- Las imagenes aprobadas se conservan como ground truth dentro de la carpeta del modulo correspondiente en `context/<modulo>-ground-truth/`.
+
+### 9.4 Respaldo de Componentes Visuales
+
+El archivo `Documentacion/COMPONENTES_PRESERVADOS.md` contiene el codigo fuente de componentes visuales que el desarrollador quiere tener respaldados como referencia. Este archivo es solo un respaldo documental; no obliga a futuras IAs a mantener esos componentes en la app. Si un plan de modulo o de UX/UI Global decide reemplazar o eliminar un componente documentado ahi, puede hacerlo sin restriccion.
+
+### 9.5 Navegacion Global: Estructura de Tabs y Modulos
+
+La estructura de tabs actual es provisional y puede cambiar radicalmente. Las 5 tabs actuales de la barra inferior son:
+
+1. Feed.
+2. Recursos.
+3. Classroom (antes Grupos).
+4. Social.
+5. Configuracion.
+
+Esta estructura no es definitiva. El desarrollador ha planteado varias alternativas posibles:
+
+- **Modelo actual:** tabs globales fijas en la barra inferior, cada tab es un modulo.
+- **Home supremo:** sin tab bar global, una pantalla home con accesos a modulos. Al entrar a un modulo, ese modulo tiene sus propias pestanas internas.
+- **Tabs por modulo con swipe:** cada modulo tiene tabs propias en la barra inferior. Para cambiar de modulo se desliza horizontalmente o se usa un boton flotante/selector de modulo siempre visible.
+- **Hibrido:** una tab bar global reducida con los modulos principales y tabs internas dentro de cada modulo para sus secciones.
+
+Regla para futuras IAs:
+
+- No asumir que la estructura de tabs actual es permanente.
+- Si un plan de modulo necesita tabs internas, implementarlas de forma que puedan convivir con cualquier estructura global.
+- La decision final sobre la estructura de navegacion debe tomarse en el `Plan Maestro: UX/UI y Navegacion Global` o cuando el desarrollador lo decida.
+- Cualquier plan que toque tabs principales debe documentar el impacto si la estructura cambia.
+- No bloquear funcionalidad por esperar la decision de tabs. Construir modulos con entradas claras que funcionen con cualquier modelo de navegacion.
+
 ---
 
 ## 10. Reglas de Navegacion y UX/UI Global

@@ -24,6 +24,7 @@ PlanearIA esta evolucionando de una app de planeaciones a una plataforma integra
 | [REVISION-GPT-TRAS-LEER-ARCHIVOS-DOCUMENTACION.md](./REVISION-GPT-TRAS-LEER-ARCHIVOS-DOCUMENTACION.md) | Revision adicional de documentacion fundacional y alineacion estrategica. |
 | [PLANEACIONES_IA_EDITOR_FASE9.md](./PLANEACIONES_IA_EDITOR_FASE9.md) | Auditoria real de IA en Planeaciones y criterio de aceptacion del editor tipo Word/Docs para cierre de Fase 9. |
 | [CHECKLIST_VALIDACION_MANUAL_FASE9.md](./CHECKLIST_VALIDACION_MANUAL_FASE9.md) | Checklist manual E2E para cerrar formalmente la Fase 9 del modulo de Planeaciones. |
+| [COMPONENTES_PRESERVADOS.md](./COMPONENTES_PRESERVADOS.md) | Codigo fuente y documentacion de componentes visuales que el desarrollador quiere conservar ante futuros redisenos. |
 | [ARQUITECTURA.md](./ARQUITECTURA.md) | Arquitectura del sistema, stack tecnologico, capas MVVM y decisiones tecnicas. |
 | [FLUJO_SINCRONIZACION.md](./FLUJO_SINCRONIZACION.md) | Flujo de datos offline-first y sincronizacion con MongoDB Atlas. |
 | [DIAGRAMA_NAVEGACION.md](./DIAGRAMA_NAVEGACION.md) | Diagrama visual del flujo de navegacion. |
@@ -192,7 +193,7 @@ La IA debe tener uso pedagogico claro, fallback si no hay API key, validacion hu
 
 ---
 
-**Ultima actualizacion:** Mayo 2026
+**Ultima actualizacion:** Junio 2026
 
 **Version:** 4.0
 

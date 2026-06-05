@@ -1,7 +1,7 @@
-﻿# Meta Guia de Planes Arquitectonicos - PlanearIA
+# Meta Guia de Planes Arquitectonicos - PlanearIA
 
-> **Proposito:** esta guia define el estandar obligatorio para crear futuros planes maestros de refactorizacion o construccion de modulos en PlanearIA.  
-> **Uso previsto:** entregar este archivo a futuras IAs antes de pedirles un plan de modulo.  
+> **Proposito:** esta guia define el estandar obligatorio para crear futuros planes maestros de refactorizacion o construccion de modulos en PlanearIA.
+> **Uso previsto:** entregar este archivo a futuras IAs antes de pedirles un plan de modulo.
 > **Regla central:** no generar planes superficiales. Cada plan debe partir del estado real del repo, del flujo docente real, del presupuesto disponible y de la arquitectura objetivo de PlanearIA.
 
 ---
@@ -54,12 +54,12 @@ Todo plan futuro debe asumir este punto de partida, salvo que el codigo demuestr
 - Estado: React Context + hooks ViewModel.
 - Arquitectura objetivo: MVVM.
 - Persistencia local actual: AsyncStorage.
-- Persistencia local objetivo para datos relacionales/pesados: SQLite/Expo SQLite o una capa equivalente evaluada en el plan de infraestructura.
+- Persistencia local objetivo para datos relacionales/pesados: SQLite/Expo SQLite o una capa equivalente evaluada en el plan de infraestructura/storage.
 - Sync: offline-first con cola de operaciones.
-- Backend actual: funciones serverless Node en `backend/api`.
+- Backend actual: funciones Node/serverless en `backend/api`.
 - Base remota actual: MongoDB Atlas.
 - Auth actual: `AuthContext`, backend `auth.js`, JWT/API secret en evolucion.
-- IA actual: endpoints en `backend/api/planeaciones/*`, proveedor OpenAI cuando hay `OPENAI_API_KEY`.
+- IA actual: gateway multi-provider en `backend/lib/aiGateway.js`, limiter en `backend/lib/aiUsageLimiter.js`, endpoints en `backend/api/planeaciones/*` y `backend/api/classroom/copiloto.js`.
 - Testing: Jest + Testing Library React Native.
 
 Regla: la documentacion puede estar desfasada. La fuente de verdad para planear es el codigo actual, especialmente:
@@ -73,296 +73,117 @@ Regla: la documentacion puede estar desfasada. La fuente de verdad para planear 
 - `backend/api/`.
 - `types/`.
 - `Documentacion/01-planes-maestros/plan_planeaciones.md`.
+- `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`.
+- `Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`.
 
 ---
 
 ## 3. Estado Actual Detectado de Modulos
 
-Esta seccion no es un plan de refactorizacion. Es un mapa de referencia para que futuras IAs sepan que existe hoy.
+Esta seccion es un **snapshot operativo**, no un plan de refactorizacion. Su objetivo es que una IA nueva entienda rapidamente que existe, que ya quedo cerrado, que esta activo y que debe revisarse antes de proponer cambios.
 
-### 3.1 Planeaciones
+Regla de lectura: si este snapshot contradice el codigo, gana el codigo. Antes de planear o ejecutar, verificar con `rg`, `git status`, tests y los archivos reales del modulo.
 
-Estado:
+### 3.1 Resumen Ejecutivo de Estado
 
-- Tiene plan maestro cerrado en `Documentacion/01-planes-maestros/plan_planeaciones.md`.
-- Ya existe modelo V2, contexto nuevo, editor, escaner, exportacion y copiloto IA.
-- Fase 9 quedo aprobada; no reabrir salvo bug nuevo o decision explicita del usuario.
+| Dominio | Estado vigente | Plan/decision relacionada | Lectura minima antes de tocar |
+| --- | --- | --- | --- |
+| Planeaciones / Word-Docs | Cerrado como gran refactor. Modelo V2, editor, plantillas, escaner, exportacion e IA ya existen. | No reabrir salvo bug nuevo o decision explicita. | `Documentacion/01-planes-maestros/plan_planeaciones.md`, `src/screens/planeaciones/`, `types/planeacionV2.ts`. |
+| Classroom / Grupos | Cerrado como experiencia tipo Classroom/Classroomio. | Issue #8 cerrado; usar como base para Excel, reportes y calificacion avanzada. | `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`, `src/screens/classroom/`, `context/classroom-ground-truth/`. |
+| Infraestructura / CI / Deploy | Plan activo. Fase 0 completada; Fase 1 pendiente. | Continuar `PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`. | `.github/workflows/ci.yml`, `package.json`, `backend/package.json`, `Documentacion/02-operacion/ENTORNO_LOCAL.md`. |
+| Contenido / Hub de Recursos | Hub transversal para planeaciones, recursos, entregables y plantillas. | No debe competir con Classroom ni duplicar flujos contextuales. | `src/screens/contenido/ContenidoScreen.tsx`, `src/hooks/useContenidoViewModel.ts`. |
+| Recursos Didacticos / Biblioteca | CRUD/lista de recursos existe y se conecta con contenido/grupos. | Futuro plan Canva/Genially o Recursos Didacticos. | `src/screens/biblioteca/`, `src/context/RecursosContext.tsx`, `backend/api/recursos.js`. |
+| Recursos Evaluables / Tareas / Entregables | Existen tareas, entregas y calificacion. | Futuro plan de evaluables/calificacion avanzada. | `src/screens/grupos/tareas/`, `src/screens/tareas/`, `src/context/EntregablesContext.tsx`. |
+| Alumnos | CRUD, detalle, notas, import/export y reportes. | Debe seguir conectado a Classroom y futuro Excel/Listas. | `src/screens/alumnos/`, `src/context/AlumnosContext.tsx`. |
+| Asistencia y Calificaciones | Existen flujos basicos por grupo/alumno. | Reubicar con cuidado; no crear modulos sueltos sin contexto. | `src/screens/asistencia/`, `src/screens/calificaciones/`, contexts respectivos. |
+| Plantillas | Hay plantillas legacy/generales y `PlantillaDocumento` para planeaciones. | Futuro plan debe decidir integrar, migrar o separar. | `src/screens/plantillas/`, `src/context/PlantillasContext.tsx`, `types/plantillaDocumento.ts`. |
+| Feed / Social / Chat | Existen feed, contactos y mensajeria. | Futuro enfoque: WhatsApp docente/comunidad con bajo ruido. | `src/screens/feed/`, `src/screens/social/`, `src/screens/chat/`. |
+| Notificaciones | Contexto, pantalla y servicio push existen. | Expo Go limita push; dev build puede ser necesario. | `src/context/NotificacionesContext.tsx`, `src/services/pushNotificationService.ts`. |
+| Cuenta / Perfil / Accesibilidad | Perfil, roles, terminos, tema, fuente y daltonismo existen. | UX/UI global y Auth deben respetar estos providers. | `src/screens/cuenta/`, `src/screens/perfil/`, `src/context/ThemeContext.tsx`. |
+| Auth / Seguridad | Login, registro, recuperar contrasena, JWT/API secret en evolucion. | Futuro plan obligatorio antes de beta real. | `src/screens/auth/`, `src/context/AuthContext.tsx`, `backend/api/auth.js`, `backend/lib/auth.js`. |
+| Onboarding / Ayuda | Existen pantallas base. | Actualizar cuando cambien flujos principales. | `src/screens/onboarding/`, `src/screens/ayuda/`. |
 
-Archivos principales:
+### 3.2 Reglas Transversales Vigentes
 
-- `src/screens/planeaciones/`.
-- `src/hooks/useCrearPlaneacionViewModel.ts`.
-- `src/hooks/useDocEditorViewModel.ts`.
-- `src/context/PlaneacionesContext.tsx`.
-- `types/planeacionV2.ts`.
-- `types/plantillaDocumento.ts`.
-- `backend/api/planeaciones.js`.
-- `backend/api/planeaciones/*`.
+- **Classroom organiza y asigna; no crea todo.** La clase puede subir archivos simples, enlaces y actividades ligeras. La creacion profunda debe vivir en modulos especializados: Word/Docs, Canva/Genially, Excel/Listas o Evaluables.
+- **Calificar requiere contexto.** No crear pantallas de calificacion sueltas si no existe actividad asignada, entrega real y alumno asociado.
+- **Contenido es hub, no competidor.** Si una accion depende de una clase, debe vivir en Classroom. Si es biblioteca/global, puede vivir en Contenido.
+- **Legacy no debe ser entrada principal.** Si existe pantalla moderna equivalente, las rutas viejas quedan como respaldo temporal, redireccion o deuda explicitamente documentada.
+- **Offline-first desde el diseno.** AsyncStorage es la implementacion actual; SQLite/Expo SQLite es destino preferente para datos relacionales/pesados cuando se ejecute el plan de storage.
+- **GitHub Project acompana la ejecucion.** Plan markdown = arquitectura y decisiones; Project = estado operativo; Actions = evidencia automatica.
+- **Ground truth manda en experiencias madre.** Para Word, Classroom, Excel, Canva o WhatsApp, no basta escribir "tipo X"; cada fase debe citar capturas/referencias concretas.
 
-Regla: no crear otro plan de planeaciones sin leer completo `Documentacion/01-planes-maestros/plan_planeaciones.md`.
+### 3.3 Fichas Rapidas por Dominio
 
-### 3.2 Contenido / Hub de Recursos
+#### Planeaciones
 
-Estado:
+- Estado: cerrado; no tocar sin bug o decision explicita.
+- Clave: `PlaneacionV2`, `PlantillaDocumento`, `DocEditor`, escaner/import/export e IA.
+- Archivos: `src/screens/planeaciones/`, `src/hooks/useCrearPlaneacionViewModel.ts`, `src/hooks/useDocEditorViewModel.ts`, `src/context/PlaneacionesContext.tsx`, `backend/api/planeaciones*`, `types/planeacionV2.ts`.
 
-- `ContenidoScreen` funciona como hub para planeaciones, recursos, entregables y plantillas.
-- Es una pantalla transversal y puede bloquear o duplicar flujos si no se audita.
+#### Classroom / Grupos / Alumnos
 
-Archivos principales:
+- Estado: cerrado como flujo principal de clases.
+- Clave: `Tablon`, `Trabajo de clase`, `Personas`, unidades/secciones, materiales, actividades y detalle contextual.
+- Archivos: `src/screens/classroom/`, `src/screens/grupos/`, `src/screens/alumnos/`, `src/services/classroom/`, `src/context/GruposContext.tsx`, `src/context/AlumnosContext.tsx`.
 
-- `src/screens/contenido/ContenidoScreen.tsx`.
-- `src/hooks/useContenidoViewModel.ts`.
-- `src/components/CrearNuevoModal.tsx`.
+#### Recursos Didacticos y Evaluables
 
-Regla: cualquier plan de recursos, plantillas, entregables o planeaciones debe auditar este hub.
+- Estado: funcional parcial; requiere planes propios si se profesionaliza.
+- Clave: biblioteca global, recursos asignados, tareas, entregables, calificacion y futuras rubricas/proyectos/examenes.
+- Archivos: `src/screens/biblioteca/`, `src/screens/grupos/tareas/`, `src/screens/tareas/`, `src/context/RecursosContext.tsx`, `src/context/EntregablesContext.tsx`, `backend/api/recursos.js`, `backend/api/entregables.js`.
 
-### 3.3 Recursos Didacticos / Biblioteca
+#### Asistencia, Calificaciones y Reportes
 
-Estado:
+- Estado: existen flujos basicos, pero deben integrarse con actividades, alumnos y grupos sin sentirse aislados.
+- Clave: no duplicar calificacion fuera de entregas; reportes deben esperar datos reales suficientes.
+- Archivos: `src/screens/asistencia/`, `src/screens/calificaciones/`, `src/services/promediosService.ts`, reportes de grupo/alumno.
 
-- Existe modulo `biblioteca` con lista y creacion de recursos.
-- Hay `RecursosContext`, `useCrearRecursoViewModel`, `useListaRecursosViewModel`.
-- Los recursos se conectan con contenido, grupos y asignaciones.
-- Regla vigente: Classroom debe organizar, asignar, subir archivos simples o enlazar contenido; la creacion profunda de documentos, presentaciones, examenes visuales, hojas o piezas tipo Canva/Word/Excel debe vivir en sus modulos especializados.
+#### Plantillas
 
-Archivos principales:
+- Estado: hay plantillas legacy/generales y plantillas documento de planeaciones.
+- Clave: futuro plan debe decidir si se integran, migran, separan o reemplazan.
+- Archivos: `src/screens/plantillas/`, `src/context/PlantillasContext.tsx`, `backend/api/plantillas.js`, `types/plantillaDocumento.ts`.
 
-- `src/screens/biblioteca/`.
-- `src/context/RecursosContext.tsx`.
-- `src/hooks/useCrearRecursoViewModel.ts`.
-- `src/hooks/useListaRecursosViewModel.ts`.
-- `backend/api/recursos.js`.
-- Tipos `Recurso` en `types/index.ts`.
+#### Feed, Social, Contactos y Chat
 
-### 3.4 Recursos Evaluables / Tareas / Entregables
+- Estado: existen feed, posts, contactos, invitaciones, lista de chats y conversacion.
+- Clave: futuro rumbo recomendado es mensajeria docente tipo WhatsApp profesional, no red social pesada sin proposito claro.
+- Archivos: `src/screens/feed/`, `src/screens/social/`, `src/screens/chat/`, `src/context/PostsContext.tsx`, `src/context/ContactosContext.tsx`, `src/context/MensajesContext.tsx`, `backend/api/posts.js`, `backend/api/contactos.js`, `backend/api/mensajes.js`.
 
-Estado:
+#### Notificaciones
 
-- Hay rutas de tareas dentro de grupos.
-- Hay `ListaEntregablesScreen`.
-- Hay `EntregablesContext`.
-- Existen flujos de calificar entregas y asignar recursos.
-- Regla vigente: la calificacion debe nacer desde una actividad asignada y una entrega real; evitar pantallas de calificacion sueltas sin contexto de actividad/alumno.
+- Estado: contexto, pantalla y push service existen.
+- Clave: Expo Go ya no cubre todos los casos de push; planes futuros deben contemplar dev build/EAS si se requiere push real.
+- Archivos: `src/screens/notificaciones/`, `src/context/NotificacionesContext.tsx`, `src/services/pushNotificationService.ts`, `backend/api/notificaciones.js`.
 
-Archivos principales:
+#### Cuenta, Perfil, Configuracion y Accesibilidad
 
-- `src/screens/grupos/tareas/`.
-- `src/screens/tareas/ListaEntregablesScreen.tsx`.
-- `src/context/EntregablesContext.tsx`.
-- `src/hooks/useCrearTareaGrupoViewModel.ts`.
-- `src/hooks/useCalificarEntregasViewModel.ts`.
-- `backend/api/entregables.js`.
-- Tipos `Tarea` y `EntregaTarea` en `types/index.ts`.
+- Estado: perfil/cuenta/roles/terminos y providers visuales existen.
+- Clave: cualquier rediseño global debe preservar `ThemeContext`, `FontSizeContext` y `DaltonismoContext`.
+- Archivos: `src/screens/cuenta/`, `src/screens/perfil/`, `src/context/ThemeContext.tsx`, `src/context/FontSizeContext.tsx`, `src/context/DaltonismoContext.tsx`.
 
-### 3.5 Grupos
+#### Auth / Seguridad
 
-Estado:
+- Estado: existe auth funcional basica; seguridad robusta pendiente.
+- Clave: futuro plan debe cubrir RBAC `Dev/Admin/Docente/Alumno`, JWT, bcrypt, rate limiting, CORS/Helmet, secretos y aislamiento por `userId`.
+- Archivos: `src/screens/auth/`, `src/context/AuthContext.tsx`, `backend/api/auth.js`, `backend/lib/auth.js`.
 
-- Modulo amplio con dashboard, lista, detalle, reportes, importacion y tareas.
-- Es el centro operativo para alumnos, asistencia, calificaciones y entregables.
-- Decision actual: dentro de una clase activa, la estructura principal debe parecerse a Classroom: `Tablon`, `Trabajo de clase` por secciones/unidades y `Personas`. No debe existir `Sin seccion` como apartado visible.
+#### Infraestructura, Sync y Backend
 
-Archivos principales:
+- Estado: plan activo; Fase 0 completada.
+- Clave: no microservicios; mantener monolito modular, CI barato, env vars seguras, backend local/cloud low-cost y preparacion SQLite.
+- Archivos: `.github/workflows/ci.yml`, `backend/api/`, `backend/lib/`, `src/sync/`, `src/sync/config/apiConfig.ts`, `Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`.
 
-- `src/screens/grupos/`.
-- `src/context/GruposContext.tsx`.
-- `src/hooks/useGruposDashboardViewModel.ts`.
-- `src/hooks/useDetalleGrupoViewModel.ts`.
-- `src/hooks/useCrearGrupoViewModel.ts`.
-- `src/services/gruposService.ts`.
-- `src/services/grupoImportService.ts`.
-- `src/services/grupoExportService.ts`.
-- `src/services/grupoReportesService.ts`.
-- `backend/api/grupos.js`.
+### 3.4 Cuando Activar un Plan Nuevo
 
-### 3.6 Alumnos
-
-Estado:
-
-- Tiene pantallas CRUD, detalle, notas, importacion, exportacion y reportes.
-- Debe integrarse con grupos, asistencia, calificaciones, entregables y reportes.
-
-Archivos principales:
-
-- `src/screens/alumnos/`.
-- `src/context/AlumnosContext.tsx`.
-- `src/hooks/useCrearAlumnoViewModel.ts`.
-- `src/hooks/useNotasAlumnoViewModel.ts`.
-- `src/hooks/useReportesAlumnoViewModel.ts`.
-- `src/services/alumnoImportService.ts`.
-- `src/services/alumnoExportService.ts`.
-- `src/services/alumnoReportesService.ts`.
-- `backend/api/alumnos.js`.
-
-### 3.7 Asistencia
-
-Estado:
-
-- Tiene registro e historial.
-- Depende de grupos y alumnos.
-
-Archivos principales:
-
-- `src/screens/asistencia/`.
-- `src/context/AsistenciaContext.tsx`.
-- `backend/api/asistencias.js`.
-- Tipo `Asistencia` en `types/index.ts`.
-
-### 3.8 Calificaciones
-
-Estado:
-
-- Tiene captura y promedios.
-- Depende de grupos, alumnos, tareas y entregables.
-
-Archivos principales:
-
-- `src/screens/calificaciones/`.
-- `src/context/CalificacionesContext.tsx`.
-- `src/services/promediosService.ts`.
-- `backend/api/calificaciones.js`.
-- Tipo `Calificacion` en `types/index.ts`.
-
-### 3.9 Plantillas
-
-Estado:
-
-- Existen plantillas legacy/generales separadas de `PlantillaDocumento` de planeaciones.
-- Hay biblioteca, lista, detalle y editor.
-
-Archivos principales:
-
-- `src/screens/plantillas/`.
-- `src/context/PlantillasContext.tsx`.
-- `src/hooks/useEditorPlantillaViewModel.ts`.
-- `src/hooks/useListaPlantillasViewModel.ts`.
-- `backend/api/plantillas.js`.
-- Tipo `Plantilla` en `types/index.ts`.
-
-Regla: futuros planes deben decidir si se integran, migran o reemplazan, no mezclar sin criterio.
-
-### 3.10 Feed / Red Social Educativa
-
-Estado:
-
-- Existe feed, detalle de post, retos, editor de preguntas y resultados.
-- Se conecta con recursos y planeaciones compartidas.
-
-Archivos principales:
-
-- `src/screens/feed/`.
-- `src/context/PostsContext.tsx`.
-- `src/hooks/useFeedViewModel.ts`.
-- `backend/api/posts.js`.
-- Tipos `Post`, `PostComment`, `PostAttachment` en `types/index.ts`.
-
-### 3.11 Social / Contactos
-
-Estado:
-
-- Existe pantalla social y buscador de perfiles.
-- Hay contexto de contactos y servicio de invitacion.
-
-Archivos principales:
-
-- `src/screens/social/`.
-- `src/context/ContactosContext.tsx`.
-- `src/hooks/useSocialViewModel.ts`.
-- `src/hooks/useBuscadorPerfilesViewModel.ts`.
-- `src/services/inviteLinkService.ts`.
-- `backend/api/contactos.js`.
-
-### 3.12 Chat / Mensajeria
-
-Estado:
-
-- Existe lista de chat y pantalla de conversacion.
-- Puede enviar texto, planeaciones y recursos.
-
-Archivos principales:
-
-- `src/screens/chat/`.
-- `src/context/MensajesContext.tsx`.
-- `src/hooks/useChatViewModel.ts`.
-- `src/hooks/useConversacionViewModel.ts`.
-- `backend/api/mensajes.js`.
-- Tipos `Mensaje` y `Conversacion` en `types/index.ts`.
-
-### 3.13 Notificaciones
-
-Estado:
-
-- Existe contexto, pantalla y servicio push.
-- Expo Go tiene limitaciones para push en SDK moderno; planes futuros deben considerar dev build.
-
-Archivos principales:
-
-- `src/screens/notificaciones/`.
-- `src/context/NotificacionesContext.tsx`.
-- `src/services/pushNotificationService.ts`.
-- `backend/api/notificaciones.js`.
-
-### 3.14 Cuenta, Perfil, Configuracion y Accesibilidad
-
-Estado:
-
-- Cuenta tiene perfil, roles, terminos.
-- Perfil tambien existe como modulo/pantalla.
-- Hay providers de tema, fuente y daltonismo.
-
-Archivos principales:
-
-- `src/screens/cuenta/`.
-- `src/screens/perfil/`.
-- `src/context/ThemeContext.tsx`.
-- `src/context/FontSizeContext.tsx`.
-- `src/context/DaltonismoContext.tsx`.
-- `src/hooks/useCuentaViewModel.ts`.
-- `src/hooks/useEditarPerfilViewModel.ts`.
-- `src/hooks/useAdminRolesViewModel.ts`.
-
-### 3.15 Auth / Seguridad
-
-Estado:
-
-- Existe login, registro y recuperar contrasena.
-- Hay `AuthContext`.
-- Backend tiene `auth.js`.
-- Seguridad real todavia debe endurecerse.
-
-Archivos principales:
-
-- `src/screens/auth/`.
-- `src/context/AuthContext.tsx`.
-- `src/hooks/useLoginViewModel.ts`.
-- `src/hooks/useRegistroViewModel.ts`.
-- `src/hooks/useRecuperarContrasenaViewModel.ts`.
-- `backend/api/auth.js`.
-- `backend/lib/auth.js`.
-
-### 3.16 Onboarding y Ayuda
-
-Estado:
-
-- Existe onboarding.
-- Existe centro de ayuda.
-- Deben actualizarse cuando cambien flujos principales.
-
-Archivos principales:
-
-- `src/screens/onboarding/`.
-- `src/screens/ayuda/`.
-
-### 3.17 Infraestructura, Sync y Backend
-
-Estado:
-
-- Backend serverless en `backend/api`.
-- Sync engine en `src/sync`.
-- API config en `src/sync/config/apiConfig.ts`.
-- Hay endpoints para alumnos, asistencias, auth, calificaciones, contactos, entregables, grupos, mensajes, notificaciones, planeaciones, plantillas, posts, recursos y sync.
-
-Regla: cualquier plan grande debe auditar costos, free tiers y posibilidad de correr localmente.
+- Activar **Infraestructura** si se van a cambiar scripts, CI, backend, variables, deploy, demo o SQLite.
+- Activar **Auth/Seguridad** antes de beta, usuarios reales, datos sensibles o roles reales.
+- Activar **UX/UI Global** cuando los flujos principales existan y el problema sea navegacion, consistencia, accesibilidad o pulido final.
+- Activar **Excel/Listas** cuando se necesiten registros tabulares conectados a Classroom, asistencia o calificaciones.
+- Activar **Canva/Genially** cuando se requiera creacion visual compleja de recursos didacticos.
+- Activar **WhatsApp Docente** cuando chat/contactos deban reemplazar la red social pesada.
+- Activar **Reportes/Gamificacion** cuando haya datos suficientes de Classroom, evaluables, asistencia y calificaciones.
 
 ---
 
@@ -992,9 +813,10 @@ No generar un plan nuevo sin leer `Documentacion/01-planes-maestros/plan_planeac
 
 Si se retoma:
 
-- Continuar desde la fase activa.
-- Priorizar Fase 9 hasta cerrar web, movil, editor tipo Docs/Word e IA.
-- Actualizar README/documentacion si cambia arquitectura.
+- Tratar Planeaciones como modulo cerrado y estable salvo bug nuevo, deuda puntual o decision explicita del usuario.
+- Leer primero `Documentacion/01-planes-maestros/plan_planeaciones.md` y `Documentacion/01-planes-maestros/PLANEACIONES_IA_EDITOR_FASE9.md`.
+- No volver al flujo legacy ni a formularios como experiencia principal.
+- Actualizar README/documentacion si cambia arquitectura, IA, editor, plantillas o exportacion.
 
 ### 12.2 Recursos Evaluables
 
@@ -1182,6 +1004,8 @@ Reglas obligatorias de seguridad pragmatica y low-cost:
 - Debe funcionar en local, Render/Vercel/EAS/MongoDB Atlas free tier o alternativas gratuitas razonables.
 
 ### 12.9 Infraestructura y DevOps
+
+Plan activo actual: `Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`. No crear otro plan de infraestructura sin cerrar, extender o reemplazar explicitamente ese archivo.
 
 Debe cubrir:
 
@@ -1526,5 +1350,3 @@ Un plan es aceptable solo si:
 PlanearIA debe crecer como una app profesional, pero con una estrategia realista para un estudiante que trabaja solo. Cada plan futuro debe ayudar a construir algo que pueda demostrarse, mantenerse y eventualmente lanzarse sin quedar atrapado en complejidad innecesaria.
 
 La meta no es impresionar con tecnologia. La meta es que la app funcione bien para docentes reales, cueste lo minimo razonable, sea mantenible, aproveche IA con responsabilidad y pueda evolucionar modulo por modulo.
-
-

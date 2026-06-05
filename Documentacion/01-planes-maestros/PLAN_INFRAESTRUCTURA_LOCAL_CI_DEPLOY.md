@@ -1,10 +1,11 @@
 # Plan Maestro: Infraestructura Local, CI y Deploy Basico - PlanearIA
 
-> **Version:** 1.0  
-> **Fecha:** 2026-06-04  
-> **Estado:** [~] Plan maestro activo. Fase 0 completada; Fase 1 pendiente.  
-> **Prioridad:** siguiente cimiento despues de cerrar Classroom.  
-> **Alcance:** estabilizar entorno local, scripts, CI, backend local/serverless, variables de entorno, evidencia de despliegue low-cost y preparacion futura para migracion SQLite.  
+> **Version:** 1.0
+> **Fecha:** 2026-06-04
+> **Ultima actualizacion:** 2026-06-05
+> **Estado:** [~] Plan maestro activo. Fase 0 completada; Fase 1 pendiente.
+> **Prioridad:** siguiente cimiento despues de cerrar Classroom.
+> **Alcance:** estabilizar entorno local, scripts, CI, backend local/serverless, variables de entorno, evidencia de despliegue low-cost y preparacion futura para migracion SQLite.
 > **Restriccion central:** estudiante/desarrollador solo, presupuesto cero o muy bajo, laptop potente como entorno principal, sin microservicios ni servicios empresariales.
 
 ---
@@ -142,6 +143,27 @@ Regla: no guardar secretos, URLs privadas con tokens, screenshots con API keys n
 - No introducir Docker en la primera pasada salvo que resuelva una demo o backend local con menos friccion.
 - No migrar a SQLite dentro de esta fase sin plan especifico de storage.
 - Preparar SQLite como proximo gran cambio de persistencia local, con evidencia antes/despues y entregables academicos.
+- No ejecutar deploys, tuneles publicos, Docker o cambios de proveedor cloud sin decision explicita del usuario.
+- No instalar dependencias nuevas para infraestructura si un script/documentacion resuelve el problema.
+
+### 5.1 Alcance de la Siguiente Fase
+
+La Fase 1 debe enfocarse solo en **reproducibilidad local**:
+
+- Scripts de `package.json`.
+- Scripts o wrappers para backend si reducen friccion.
+- Comandos focalizados de tests.
+- Documentacion clara en README/ENTORNO_LOCAL.
+- Evidencia de validacion.
+
+No pertenece a Fase 1:
+
+- Migrar a SQLite.
+- Cambiar Vercel/Render/Railway.
+- Activar deploy automatico.
+- Instalar Docker.
+- Crear dev builds/EAS.
+- Tocar secretos reales.
 
 ---
 

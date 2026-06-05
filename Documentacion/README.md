@@ -12,7 +12,7 @@ Si eres una IA o agente nuevo, lee en este orden:
 2. `00-fundamentos/VISION_ACTUAL.md`
 3. `00-fundamentos/ARQUITECTURA.md`
 4. `01-planes-maestros/meta_guia_planes.md`
-5. `01-planes-maestros/PLAN_CLASSROOM.md` si vas a continuar Classroom
+5. `01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` si vas a continuar el plan activo
 6. `02-operacion/ENTORNO_LOCAL.md`
 7. `02-operacion/GUIA_PRUEBAS.md`
 
@@ -32,9 +32,10 @@ Si eres una IA o agente nuevo, lee en este orden:
 
 - Planeaciones: cerrado como experiencia Word/Docs. Fase 9 aprobada.
 - Pasos Iniciales: cerrado como organizacion de GitHub, CI inicial y entorno.
-- Classroom: plan activo. Fases 0 a 9 completadas; Fase 10 en validacion manual y limpieza UX/UI.
+- Classroom: cerrado. Fases 0 a 10, validacion final e issue #8 completados.
+- Infraestructura Local/CI/Deploy Basico: plan activo; Fase 0 completada, Fase 1 pendiente.
 - UX/UI Global: pendiente, se hara cuando existan mas flujos funcionales.
-- Infraestructura/Auth/Excel/Canva/WhatsApp/Reportes: pendientes de planes futuros.
+- Auth/Excel/Canva/WhatsApp/Reportes: pendientes de planes futuros.
 
 ## Documentos Principales
 
@@ -54,7 +55,8 @@ Si eres una IA o agente nuevo, lee en este orden:
 | Documento | Estado |
 | --- | --- |
 | `01-planes-maestros/meta_guia_planes.md` | Vigente; instructivo obligatorio para crear planes. |
-| `01-planes-maestros/PLAN_CLASSROOM.md` | Activo; Fase 10 en validacion manual. |
+| `01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` | Activo; Fase 0 completada, Fase 1 pendiente. |
+| `01-planes-maestros/PLAN_CLASSROOM.md` | Cerrado; #8 completado. |
 | `01-planes-maestros/PLAN_PASOS_INICIALES.md` | Cerrado. |
 | `01-planes-maestros/plan_planeaciones.md` | Cerrado; referencia de calidad. |
 | `01-planes-maestros/PLANEACIONES_IA_EDITOR_FASE9.md` | Soporte de cierre IA/editor de Planeaciones. |
@@ -100,6 +102,7 @@ Archivados principales:
 - No duplicar flujos entre Contenido, Classroom y pantallas legacy.
 - Mantener tracking markdown `[ ]`, `[~]`, `[x]` en planes.
 - Crear issues de GitHub solo para epicas/fases activas, no para todo el backlog futuro.
+- Cada fase ejecutable debe registrar su bloque `GitHub/CI - Fase X` con issue/Project item, milestone, labels, scripts y estado del tablero.
 - Documentar costos y free tiers antes de proponer infraestructura o IA nueva.
 - Preservar contexto importante antes de borrar o archivar documentos.
 

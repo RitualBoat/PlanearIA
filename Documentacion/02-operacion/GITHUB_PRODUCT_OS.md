@@ -78,6 +78,9 @@ Regla practica para no llenar el tablero de ruido:
 - Mantener checkboxes futuros dentro del plan markdown hasta que sea momento de ejecutarlos.
 - Usar milestones como ciclos/sprints/release goals, no como epicas.
 - Usar labels para clasificar: `fase`, `ux-ui`, `legacy`, `offline-first`, `ai`, `infra`, `testing`, `docs`, `needs-input`, `low-cost`.
+- Cada fase activa debe tener un bloque `GitHub/CI - Fase X` en el plan o en el issue, con issue/Project item, milestone, labels, estado inicial/final y scripts de validacion.
+- Al cerrar una fase, dejar evidencia de comandos: `npx tsc --noEmit`, `npm run lint -- --quiet`, `npm test -- --runInBand`, tests focalizados y GitHub Actions si aplica.
+- Si varias fases se resolvieron juntas durante un refactor, crear un issue consolidado que documente fases cubiertas, evidencia tecnica y pendientes manuales.
 
 Ejemplo recomendado para Classroom:
 

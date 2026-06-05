@@ -49,20 +49,23 @@ Smoke test recomendado:
 
 ## Classroom
 
-Estado: plan activo. Fases 0-5 completadas.
+Estado: cerrado. Fases 0-10, cierre final e issue #8 completados.
 
 Smoke test actual:
 
 - Entrar a tab Classroom/Grupos.
 - Abrir una clase.
-- Validar banner, tabs, resumen y stream.
-- Agregar alumno desde clase.
-- Importar/exportar alumnos desde clase y verificar filtro por grupo.
-- Mover/quitar alumno sin eliminar perfil.
-- Crear material desde clase.
-- Adjuntar planeacion como material.
-- Filtrar materiales por tipo.
-- Abrir una planeacion adjunta en `DocEditor`.
+- Confirmar tabs `Tablon`, `Trabajo de clase` y `Personas`.
+- Confirmar pildora hero en dashboard Classroom.
+- Crear clase desde Classroom y confirmar regreso a dashboard Classroom.
+- Crear seccion/unidad desde `Trabajo de clase`.
+- Confirmar que el boton `+` de una seccion abre `AgregarContenidoClassroom`.
+- Crear material con varios archivos/enlaces y confirmar detalle en `DetalleRecursoClassroom`.
+- Crear actividad con fecha de asignacion, fecha de entrega, entrega tardia y notas.
+- Editar material/actividad desde sus detalles y confirmar que no abre formulario legacy.
+- Confirmar flujo contextual de entregas/calificacion.
+- Validar offline/reconexion si se toca storage/sync.
+- Confirmar web sin scroll roto y movil sin pantallas cortadas.
 
 ## Backend e IA
 
@@ -76,4 +79,5 @@ Smoke test actual:
 - Actualizar plan maestro.
 - Actualizar issue/fase en GitHub Product OS.
 - Registrar comandos ejecutados.
+- Registrar bloque `GitHub/CI - Fase X` en planes nuevos o issues activos.
 - Si hubo validacion manual, crear o actualizar checklist en `Documentacion/03-validacion/`.

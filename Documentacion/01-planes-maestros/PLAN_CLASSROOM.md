@@ -2,7 +2,7 @@
 
 > **Version:** 1.0  
 > **Fecha:** 2026-06-03  
-> **Estado:** [~] Plan maestro en ejecucion. Fases 0-9 completadas; Fase 10 en validacion manual.
+> **Estado:** [x] Plan maestro cerrado. Fases 0-10, fase final y validacion manual completadas; issue consolidado #8 cerrado en `Done`.
 > **Alcance:** fusionar grupos, alumnos, tareas, entregables, recursos, asistencia, calificaciones y reportes operativos en una experiencia central tipo Google Classroom, manteniendo arquitectura MVVM, offline-first y bajo costo.  
 > **Stack:** React Native 0.81.5, Expo 54, TypeScript 5.9, React Navigation 7, AsyncStorage actual con posible migracion futura a SQLite/Expo SQLite, backend Node en `backend/api`, MongoDB Atlas/free tier, Jest + Testing Library.
 > **Modulo:** Classroom / Gestion academica diaria.  
@@ -136,19 +136,19 @@ El `Grupo` actual debe convertirse en la raiz practica de Classroom. No crear un
 
 Traduccion de conceptos:
 
-| Concepto Classroom | Entidad actual o destino |
-| --- | --- |
-| Clase / Curso | `Grupo` |
-| Participantes | `Alumno` + miembros de grupo |
-| Stream / Inicio | nuevo resumen de actividad por grupo |
-| Trabajo de clase | tareas, recursos, planeaciones asignadas y actividades |
-| Material | `Recurso` |
-| Actividad / Tarea | `Tarea` / entregables |
-| Entrega | `EntregaTarea` |
-| Calificacion | `Calificacion` + rubrica futura |
-| Asistencia | `Asistencia` |
-| Reportes | reportes de grupo/alumno existentes |
-| Invitaciones | contacto/invitacion futura, no prioridad inmediata |
+| Concepto Classroom | Entidad actual o destino                               |
+| ------------------ | ------------------------------------------------------ |
+| Clase / Curso      | `Grupo`                                                |
+| Participantes      | `Alumno` + miembros de grupo                           |
+| Stream / Inicio    | nuevo resumen de actividad por grupo                   |
+| Trabajo de clase   | tareas, recursos, planeaciones asignadas y actividades |
+| Material           | `Recurso`                                              |
+| Actividad / Tarea  | `Tarea` / entregables                                  |
+| Entrega            | `EntregaTarea`                                         |
+| Calificacion       | `Calificacion` + rubrica futura                        |
+| Asistencia         | `Asistencia`                                           |
+| Reportes           | reportes de grupo/alumno existentes                    |
+| Invitaciones       | contacto/invitacion futura, no prioridad inmediata     |
 
 ---
 
@@ -206,17 +206,17 @@ No romper tipos actuales sin necesidad. La primera fase debe crear una capa conc
 
 ### 5.2 Entidades Base
 
-| Entidad | Estado | Decision |
-| --- | --- | --- |
-| `Grupo` | existente | usar como raiz de clase. |
-| `Alumno` | existente | vincular con grupo, historial y estado academico. |
-| `Recurso` | existente | usar como material de clase. |
-| `Tarea` | existente | usar como actividad evaluable. |
-| `EntregaTarea` | existente | mantener como entrega por alumno. |
-| `Calificacion` | existente | conectar con actividad/rubrica/alumno. |
-| `Asistencia` | existente | conectar por fecha y grupo. |
-| `PlaneacionV2` | existente | permitir asignar como material o guia de clase. |
-| `Rubrica` | futura | evaluar si vive en recursos evaluables o Classroom. |
+| Entidad           | Estado             | Decision                                                        |
+| ----------------- | ------------------ | --------------------------------------------------------------- |
+| `Grupo`           | existente          | usar como raiz de clase.                                        |
+| `Alumno`          | existente          | vincular con grupo, historial y estado academico.               |
+| `Recurso`         | existente          | usar como material de clase.                                    |
+| `Tarea`           | existente          | usar como actividad evaluable.                                  |
+| `EntregaTarea`    | existente          | mantener como entrega por alumno.                               |
+| `Calificacion`    | existente          | conectar con actividad/rubrica/alumno.                          |
+| `Asistencia`      | existente          | conectar por fecha y grupo.                                     |
+| `PlaneacionV2`    | existente          | permitir asignar como material o guia de clase.                 |
+| `Rubrica`         | futura             | evaluar si vive en recursos evaluables o Classroom.             |
 | `UnidadClassroom` | nueva implementada | organiza `Trabajo de clase` por secciones/unidades colapsables. |
 
 ### 5.3 Campos Obligatorios Para Entidades Sincronizables
@@ -314,15 +314,15 @@ La experiencia debe funcionar aunque el backend este apagado:
 
 ### 7.1 Pantallas Objetivo
 
-| Pantalla | Funcion |
-| --- | --- |
-| `ClassroomHomeScreen` | reemplazo gradual de dashboard de grupos como vista tipo Classroom. |
-| `ClassroomGroupScreen` | detalle madre de un grupo/clase. |
-| `Tablon` | feed de publicaciones, proximas entregas y actividad reciente del curso. |
-| `Trabajo de clase` | secciones/unidades colapsables con materiales y actividades. |
-| `DetalleActividadClassroomScreen` | instrucciones, entregas por alumno y calificacion contextual. |
-| `Personas` | profesores, alumnos inscritos, importacion/exportacion y perfil de alumno. |
-| Herramientas secundarias | asistencia, reportes, IA y analitica fuera del primer plano hasta ubicacion natural. |
+| Pantalla                          | Funcion                                                                              |
+| --------------------------------- | ------------------------------------------------------------------------------------ |
+| `ClassroomHomeScreen`             | reemplazo gradual de dashboard de grupos como vista tipo Classroom.                  |
+| `ClassroomGroupScreen`            | detalle madre de un grupo/clase.                                                     |
+| `Tablon`                          | feed de publicaciones, proximas entregas y actividad reciente del curso.             |
+| `Trabajo de clase`                | secciones/unidades colapsables con materiales y actividades.                         |
+| `DetalleActividadClassroomScreen` | instrucciones, entregas por alumno y calificacion contextual.                        |
+| `Personas`                        | profesores, alumnos inscritos, importacion/exportacion y perfil de alumno.           |
+| Herramientas secundarias          | asistencia, reportes, IA y analitica fuera del primer plano hasta ubicacion natural. |
 
 ### 7.2 Navegacion
 
@@ -805,18 +805,18 @@ Modo sugerido: `NORMAL` para auditoria IHC con heuristicas de Nielsen y severida
 - [x] **10.1 Auditar Classroom con reglas de navegacion de `meta_guia_planes.md`.**
 - [x] **10.2 Verificar entradas desde tabs, `ContenidoScreen`, cards, FABs y acciones contextuales.**
 - [x] **10.3 Ocultar o redirigir rutas legacy que ya tengan reemplazo.**
-- [~] **10.4 Mantener legacy fuera del flujo principal y eliminar duplicados solo despues de validacion manual.**
+- [x] **10.4 Mantener legacy fuera del flujo principal y eliminar duplicados solo despues de validacion manual.**
 - [x] **10.5 Revisar botones activos legibles, contrastes, labels y tamanos tactiles.**
-- [~] **10.6 Validar web, tablet y movil.**
+- [x] **10.6 Validar web, tablet y movil.**
 - [x] **10.7 Actualizar onboarding/ayuda si el flujo cambia.**
 
 Criterio de cierre:
 
-- [~] Ningun flujo clave queda aislado.
-- [~] No hay doble captura de datos.
-- [~] El docente puede volver/cancelar/guardar sin perder contexto.
+- [x] Ningun flujo clave queda aislado.
+- [x] No hay doble captura de datos.
+- [x] El docente puede volver/cancelar/guardar sin perder contexto.
 
-Resultado parcial:
+Resultado final:
 
 - `ClassroomGroupScreen` fue reorientado a una experiencia tipo Google Classroom/Classroomio con tres pestañas principales: `Tablon`, `Trabajo de clase` y `Personas`.
 - `Tablon` queda como feed de publicaciones del curso, con proximas entregas y sin tarjetas administrativas sueltas.
@@ -839,9 +839,11 @@ Resultado parcial:
 - Correccion post-validacion: `ClassroomHomeScreen` se alineo al patron Classroom con cursos, calendario y pendientes; se quito el CTA visible `Ver legacy`.
 - Regla de producto reforzada: Classroom organiza/asigna contenido; la creacion compleja debe vivir en modulos especializados tipo Word/Docs, Canva/Genially o Excel/Listas.
 - No se actualizo onboarding porque no existe flujo de ayuda/onboarding especifico de Classroom que haya cambiado en esta fase.
-- Validaciones tecnicas ejecutadas: `npx tsc --noEmit`, `npx jest src/__tests__/classroom --runInBand` y lint focalizado de archivos tocados.
-- Pruebas Classroom actualizadas: 12 tests pasan, incluyendo CRUD de secciones/unidades en `classroomFacade`.
-- Pendiente para cerrar Fase 10: validar manualmente web, tablet y movil; confirmar que `Trabajo de clase` no corta scroll, que crear/guardar vuelve al contexto correcto y que no hay rutas clave aisladas.
+- Validaciones tecnicas ejecutadas: `npx tsc --noEmit`, `npx jest src/__tests__/classroom --runInBand`, lint focalizado de archivos Classroom, `npm run lint -- --quiet` y `npm test -- --runInBand`.
+- Pruebas Classroom actualizadas: 12 tests focalizados pasan, incluyendo CRUD de secciones/unidades en `classroomFacade`.
+- Suite global validada: 73 suites y 549 tests pasan.
+- GitHub Product OS actualizado: #7 cerrado como reemplazado, #8 creado como issue consolidado Fases 6-10 y #8 cerrado/movido a `Done` tras validacion manual del usuario.
+- Cierre confirmado: el usuario valido manualmente #8 y confirmo que la experiencia ya se siente como Classroom/Classroomio.
 
 ### FASE FINAL: Validacion, Documentacion y Cierre
 
@@ -849,86 +851,90 @@ Objetivo: cerrar el plan con evidencia tecnica y manual.
 
 Modo sugerido: `CAVEMAN` para correr validaciones, marcar checkboxes, actualizar Project y preparar commit. Usar `NORMAL` para el resumen final y confirmacion del usuario.
 
-- [ ] **F.1 Ejecutar `npx tsc --noEmit`.**
-- [ ] **F.2 Ejecutar `npm run lint -- --quiet`.**
-- [ ] **F.3 Ejecutar `npm test -- --runInBand`.**
-- [ ] **F.4 Ejecutar tests focalizados de grupos/alumnos/tareas/asistencia/calificaciones.**
-- [ ] **F.5 Validar manualmente web.**
-- [ ] **F.6 Validar manualmente movil fisico.**
-- [ ] **F.7 Validar offline/reconexion.**
-- [ ] **F.8 Actualizar `README.md`.**
-- [ ] **F.9 Actualizar `Documentacion/README.md`.**
-- [ ] **F.10 Actualizar mapa de navegacion si cambia.**
-- [ ] **F.11 Hacer commit solo cuando el usuario lo pida o lo confirme.**
+- [x] **F.1 Ejecutar `npx tsc --noEmit`.**
+- [x] **F.2 Ejecutar `npm run lint -- --quiet`.**
+- [x] **F.3 Ejecutar `npm test -- --runInBand`.**
+- [x] **F.4 Ejecutar tests focalizados de grupos/alumnos/tareas/asistencia/calificaciones.**
+- [x] **F.5 Validar manualmente web.**
+- [x] **F.6 Validar manualmente movil fisico.**
+- [x] **F.7 Validar offline/reconexion.**
+- [x] **F.8 Actualizar `README.md`.**
+- [x] **F.9 Actualizar `Documentacion/README.md`.**
+- [x] **F.10 Actualizar mapa de navegacion si cambia.**
+- [x] **F.11 Hacer commit solo cuando el usuario lo pida o lo confirme.** Regla cumplida: no se hace commit en este turno porque no fue pedido explicitamente.
 
 ---
 
 ## 13. Checklist de Validacion Manual
 
-- [ ] Entrar desde `GruposTab`.
-- [ ] Crear grupo nuevo.
-- [ ] Abrir grupo existente.
-- [ ] Volver de grupo a home.
-- [ ] Agregar alumno desde grupo.
-- [ ] Importar alumnos desde grupo.
-- [ ] Abrir detalle de alumno y volver al grupo.
-- [ ] Confirmar que la clase activa muestra solo `Tablon`, `Trabajo de clase` y `Personas`.
-- [ ] Confirmar que el dashboard Classroom usa la pildora hero preservada.
-- [ ] Crear clase desde Classroom y confirmar regreso al dashboard Classroom, no a `ListaGrupos`.
-- [ ] Crear seccion/unidad desde `Trabajo de clase`.
-- [ ] Colapsar y expandir seccion/unidad.
-- [ ] Confirmar que el boton `+` de una seccion abre `Agregar contenido`, no un formulario directo.
-- [ ] Confirmar que no aparece `Sin seccion` en `Trabajo de clase`.
-- [ ] Subir archivo desde `Agregar contenido` y confirmar regreso a Classroom.
-- [ ] Pegar enlace desde `Agregar contenido` y confirmar regreso a Classroom.
-- [ ] Asignar material con varios archivos/enlaces y confirmar que `DetalleRecursoClassroom` muestra todos los adjuntos.
-- [ ] Confirmar que `Importar desde Canva/Genially` aparece como futura integracion deshabilitada.
-- [ ] Abrir material existente y confirmar que entra a `DetalleRecursoClassroom`.
-- [ ] Editar material desde `DetalleRecursoClassroom` y confirmar que abre `AgregarContenidoClassroom`.
-- [ ] Asignar actividad evaluable ligera con ponderacion 0-100 desde `Agregar contenido`, sin abrir formularios legacy de creacion profunda.
-- [ ] Confirmar que la actividad permite fecha de asignacion, fecha de entrega, entrega tardia y notas adicionales.
-- [ ] Abrir actividad desde `Trabajo de clase`.
-- [ ] Editar actividad desde `DetalleActividadClassroom` y confirmar que abre `AgregarContenidoClassroom`.
-- [ ] Ver estado de entregas por alumno dentro del detalle de actividad.
-- [ ] Confirmar que una entrega pendiente no permite calificar.
-- [ ] Calificar entrega solo cuando exista entrega marcada como `entregada`, `tarde` o `calificada`.
-- [ ] Confirmar que asistencia, reportes y calificaciones no aparecen como modulos sueltos en el primer plano.
-- [ ] Usar app sin internet y crear datos pendientes.
-- [ ] Reconectar y confirmar sync.
-- [ ] Validar web sin scroll roto.
-- [ ] Validar movil sin pantallas cortadas.
-- [ ] Validar que no haya botones sin destino.
-- [ ] Validar que no haya texto ilegible al seleccionar botones.
+- [x] Entrar desde `GruposTab`.
+- [x] Crear grupo nuevo.
+- [x] Abrir grupo existente.
+- [x] Volver de grupo a home.
+- [x] Agregar alumno desde grupo.
+- [x] Importar alumnos desde grupo.
+- [x] Abrir detalle de alumno y volver al grupo.
+- [x] Confirmar que la clase activa muestra solo `Tablon`, `Trabajo de clase` y `Personas`.
+- [x] Confirmar que el dashboard Classroom usa la pildora hero preservada.
+- [x] Crear clase desde Classroom y confirmar regreso al dashboard Classroom, no a `ListaGrupos`.
+- [x] Crear seccion/unidad desde `Trabajo de clase`.
+- [x] Colapsar y expandir seccion/unidad.
+- [x] Confirmar que el boton `+` de una seccion abre `Agregar contenido`, no un formulario directo.
+- [x] Confirmar que no aparece `Sin seccion` en `Trabajo de clase`.
+- [x] Subir archivo desde `Agregar contenido` y confirmar regreso a Classroom.
+- [x] Pegar enlace desde `Agregar contenido` y confirmar regreso a Classroom.
+- [x] Asignar material con varios archivos/enlaces y confirmar que `DetalleRecursoClassroom` muestra todos los adjuntos.
+- [x] Confirmar que `Importar desde Canva/Genially` aparece como futura integracion deshabilitada.
+- [x] Abrir material existente y confirmar que entra a `DetalleRecursoClassroom`.
+- [x] Editar material desde `DetalleRecursoClassroom` y confirmar que abre `AgregarContenidoClassroom`.
+- [x] Asignar actividad evaluable ligera con ponderacion 0-100 desde `Agregar contenido`, sin abrir formularios legacy de creacion profunda.
+- [x] Confirmar que la actividad permite fecha de asignacion, fecha de entrega, entrega tardia y notas adicionales.
+- [x] Abrir actividad desde `Trabajo de clase`.
+- [x] Editar actividad desde `DetalleActividadClassroom` y confirmar que abre `AgregarContenidoClassroom`.
+- [x] Ver estado de entregas por alumno dentro del detalle de actividad.
+- [x] Confirmar que una entrega pendiente no permite calificar.
+- [x] Calificar entrega solo cuando exista entrega marcada como `entregada`, `tarde` o `calificada`.
+- [x] Confirmar que asistencia, reportes y calificaciones no aparecen como modulos sueltos en el primer plano.
+- [x] Usar app sin internet y crear datos pendientes.
+- [x] Reconectar y confirmar sync.
+- [x] Validar web sin scroll roto.
+- [x] Validar movil sin pantallas cortadas.
+- [x] Validar que no haya botones sin destino.
+- [x] Validar que no haya texto ilegible al seleccionar botones.
 
 ---
 
 ## 14. Riesgos y Mitigaciones
 
-| Riesgo | Impacto | Mitigacion |
-| --- | --- | --- |
-| Intentar reescribir todo de golpe | Alto | Fusion progresiva por secciones. |
-| Romper datos existentes | Alto | Usar facade y tipos derivados antes de migrar. |
-| Duplicar rutas | Alto | Auditar navegacion en cada fase. |
-| Sobrecargar UI movil | Medio | Secciones compactas y acciones contextuales. |
-| Crear IA antes de flujo base | Medio | Dejar IA para fase posterior. |
-| Introducir costos | Medio | Reusar backend y gateway actual; sin servicios nuevos. |
-| Copiar referencias AGPL | Alto | Solo inspiracion conceptual, no codigo. |
-| Dejar `ContenidoScreen` compitiendo | Alto | Redirecciones claras y criterio por contexto. |
-| Storage academico disperso en varias claves AsyncStorage | Alto | Fase 2 debe crear facade/repositorio y no acoplar pantallas nuevas a claves directas. |
-| Endpoints academicos sin aislamiento `userId` consistente | Alto | Documentar como deuda de seguridad y resolver antes de beta multiusuario. |
-| Calificacion de entregas con datos mock/integracion parcial | Alto | Fase 6 debe conectar entregas reales, calificaciones y tests antes de cerrar flujo evaluable. |
-| Nombres `Tarea`, `EntregaTarea` y `Entregable` mezclados | Medio | Fase 2 debe definir vocabulario interno y mapping sin duplicar entidades. |
+| Riesgo                                                      | Impacto | Mitigacion                                                                                    |
+| ----------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------- |
+| Intentar reescribir todo de golpe                           | Alto    | Fusion progresiva por secciones.                                                              |
+| Romper datos existentes                                     | Alto    | Usar facade y tipos derivados antes de migrar.                                                |
+| Duplicar rutas                                              | Alto    | Auditar navegacion en cada fase.                                                              |
+| Sobrecargar UI movil                                        | Medio   | Secciones compactas y acciones contextuales.                                                  |
+| Crear IA antes de flujo base                                | Medio   | Dejar IA para fase posterior.                                                                 |
+| Introducir costos                                           | Medio   | Reusar backend y gateway actual; sin servicios nuevos.                                        |
+| Copiar referencias AGPL                                     | Alto    | Solo inspiracion conceptual, no codigo.                                                       |
+| Dejar `ContenidoScreen` compitiendo                         | Alto    | Redirecciones claras y criterio por contexto.                                                 |
+| Storage academico disperso en varias claves AsyncStorage    | Alto    | Fase 2 debe crear facade/repositorio y no acoplar pantallas nuevas a claves directas.         |
+| Endpoints academicos sin aislamiento `userId` consistente   | Alto    | Documentar como deuda de seguridad y resolver antes de beta multiusuario.                     |
+| Calificacion de entregas con datos mock/integracion parcial | Alto    | Fase 6 debe conectar entregas reales, calificaciones y tests antes de cerrar flujo evaluable. |
+| Nombres `Tarea`, `EntregaTarea` y `Entregable` mezclados    | Medio   | Fase 2 debe definir vocabulario interno y mapping sin duplicar entidades.                     |
 
 ---
 
 ## 15. Open Questions Antes de Implementar
 
 - [ ] Confirmar si el tab visible seguira llamandose `Grupos` o se renombrara a `Classroom`.
+      dev: se debe llamar ClassPlanner
 - [ ] Confirmar si `ContenidoScreen` debe mantenerse como tab principal o degradarse a hub interno mas adelante.
 - [x] Confirmar si las unidades/semanas se implementan en primera version o se posponen. Decision: implementadas como `UnidadClassroom`.
-- [ ] Confirmar si los alumnos pueden existir fuera de grupos o siempre deben vincularse a uno.
-- [ ] Confirmar si se requiere rol `Alumno` visible en la app durante esta fase o solo preparacion tecnica.
-- [ ] Confirmar si Classroom debe tener modo demo con datos precargados para presentacion escolar.
+- [x] Confirmar si los alumnos pueden existir fuera de grupos o siempre deben vincularse a uno.
+      dev: de momento solo pueden existir vinculados a un grupo pero en el futuro si se ve la manera de implementarse, tal vez se pudiesen agregar en el whatsapp empresarial, invitarlos a clases o puede que tengan su propio modulo en el apartado excel o en otro
+- [x] Confirmar si se requiere rol `Alumno` visible en la app durante esta fase o solo preparacion tecnica.
+      dev: solo cuando la app ya vaya a despegar y tenga la validacion de roles y todo ya contemplada.
+- [x] Confirmar si Classroom debe tener modo demo con datos precargados para presentacion escolar.
+      dev: no, no debe de tener nada hardcodeado.
 
 ---
 
@@ -936,15 +942,16 @@ Modo sugerido: `CAVEMAN` para correr validaciones, marcar checkboxes, actualizar
 
 Este plan se considera completado cuando:
 
-- [ ] `GruposTab` funciona como experiencia Classroom.
-- [ ] Un grupo/clase centraliza alumnos, materiales, actividades, asistencia, calificaciones y reportes.
-- [ ] Las rutas legacy duplicadas estan ocultas, redirigidas o eliminadas.
-- [ ] `ContenidoScreen` no duplica flujos de grupo.
-- [ ] Los datos funcionan offline-first.
-- [ ] TypeScript, lint y tests pasan.
-- [ ] Hay validacion manual web y movil.
-- [ ] README/documentacion reflejan el nuevo flujo.
-- [ ] El usuario confirma que la experiencia se siente como Classroom y no como pantallas sueltas.
+- [x] `GruposTab` funciona como experiencia Classroom.
+- [x] Un grupo/clase centraliza alumnos, materiales, actividades, asistencia, calificaciones y reportes.
+- [x] Las rutas legacy duplicadas estan ocultas, redirigidas o eliminadas.
+- [x] `ContenidoScreen` no duplica flujos de grupo.
+- [x] Los datos funcionan offline-first.
+- [x] TypeScript, lint y tests pasan.
+- [x] Hay validacion manual web y movil.
+- [x] README/documentacion reflejan el nuevo flujo.
+- [x] El usuario confirma que la experiencia se siente como Classroom y no como pantallas sueltas.
+      dev: confirmado, se logro el objetivo
 
 ---
 
@@ -1002,11 +1009,14 @@ Estado operativo:
 - [x] Fase 5 ejecutada: materiales contextuales, filtros internos, planeaciones como material y apertura en `DocEditor`.
 - [x] Issue creado para Fase 10: `https://github.com/RitualBoat/PlanearIA/issues/7`.
 - [x] Issue de Fase 10 agregado a `PlanearIA Product OS`.
-- [~] Fase 10 en validacion manual: UX/UI Classroom-like, contenido por secciones, detalle de recurso y limpieza legacy visible.
+- [x] Issue de Fase 10 #7 cerrado como reemplazado por consolidado #8.
+- [x] Issue consolidado creado para Fases 6-10: `https://github.com/RitualBoat/PlanearIA/issues/8`.
+- [x] Issue #8 agregado a `PlanearIA Product OS` con prioridad `P0`, size `L` y label `needs-input`.
+- [x] Issue #8 cerrado y movido a `Done` tras validacion manual del usuario.
+- [x] Fase 10/fase final cerrada: adjuntos multiples, edicion contextual, fechas/entrega tardia/notas, entregas/calificacion, offline/reconexion y confirmacion de experiencia Classroom-like.
 
 Regla de actualizacion:
 
 - Cuando una fase pase de `[ ]` a `[~]`, mover su item a `In Progress`.
 - Cuando una fase pase a `[x]`, mover su item a `Review Manual` o `Done` segun si requiere validacion manual.
 - Si hay bloqueo por decision de producto, API key, costo o input del usuario, mover a `Blocked` y etiquetar `needs-input`.
-

@@ -16,15 +16,16 @@ Este archivo lista los planes maestros actuales y futuros. No reemplaza los plan
 | --- | --- | --- |
 | Planeaciones | `Documentacion/01-planes-maestros/plan_planeaciones.md` | Cerrado. Fase 9 aprobada. |
 | Pasos Iniciales | `Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md` | Cerrado como cimiento organizativo. |
-| Classroom / Grupos y Recursos | `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md` | Activo. Fases 0-5 completadas; Fase 6 pendiente. |
+| Classroom / Grupos y Recursos | `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md` | Cerrado. Fases 0-10, cierre final e issue #8 completados. |
+| Infraestructura Local, CI y Deploy Basico | `Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` | Activo. Fase 0 completada; Fase 1 pendiente. |
 | Meta Guia de Planes | `Documentacion/01-planes-maestros/meta_guia_planes.md` | Vigente como instructivo obligatorio. |
 
 ## Orden recomendado de planes futuros
 
-1. `Plan Maestro: UX/UI y Navegacion Global`
-2. `Plan Maestro: Infraestructura Local, CI y Deploy Basico`
-3. `Plan Maestro: Auth, Seguridad y Sesion Real`
-4. `Plan Maestro: Excel / Listas y Sync Bidireccional`
+1. `Plan Maestro: Auth, Seguridad y Sesion Real`
+2. `Plan Maestro: UX/UI y Navegacion Global`
+3. `Plan Maestro: Excel / Listas y Sync Bidireccional`
+4. `Plan Maestro: Storage Local SQLite y Migracion Offline`
 5. `Plan Maestro: Calificacion y Revision de Tareas`
 6. `Plan Maestro: Calendario y Seguimiento Personal`
 7. `Plan Maestro: WhatsApp Docente / Chat y Contactos`
@@ -35,10 +36,11 @@ Este archivo lista los planes maestros actuales y futuros. No reemplaza los plan
 
 ## Criterio para activar un plan
 
-- UX/UI Global: cuando los modulos principales funcionen pero la navegacion empiece a sentirse fragmentada.
-- Infraestructura: antes de demo externa o si el backend local/free tier empieza a bloquear pruebas.
-- Auth/Seguridad: antes de usuarios reales o beta cerrada.
+- Infraestructura: plan activo; estabiliza entorno local, CI, scripts, backend, variables y demo low-cost antes de mas refactors grandes.
+- Auth/Seguridad: antes de usuarios reales, beta cerrada o pruebas con datos reales.
+- UX/UI Global: cuando los modulos principales funcionen pero la navegacion empiece a sentirse fragmentada; no debe bloquear funcionalidad base de los modulos.
 - Excel/Listas: despues de tener Classroom con datos reales de grupos/alumnos/tareas.
+- Storage Local SQLite: cuando se decida migrar persistencia local o cuando la actividad academica requiera evidencia antes/despues.
 - Calificacion: cuando actividades/entregas de Classroom tengan flujo base.
 - Calendario: cuando planeaciones y tareas ya tengan fechas confiables.
 - WhatsApp docente: cuando contactos/chat tengan valor claro sin competir con Classroom.
@@ -47,6 +49,9 @@ Este archivo lista los planes maestros actuales y futuros. No reemplaza los plan
 
 ## Estado de GitHub Product OS
 
-- Epic actual: `Plan Maestro: Classroom / Grupos y Recursos`.
-- Fases de Classroom 0-5: cerradas.
-- Siguiente issue recomendado: `Classroom Fase 6 - Actividades, tareas y entregables`.
+- Epic Classroom: cerrado en `Done`.
+- Issues de Classroom #1-#7: cerrados; #7 quedo reemplazado por #8.
+- Issue de cierre `Classroom Fases 6-10 - cierre tecnico consolidado y validacion manual` (#8): cerrado y en `Done`.
+- Epic activo: `Plan Maestro: Infraestructura Local, CI y Deploy Basico`.
+- Issue #9 `Infraestructura Fase 0 - Auditoria operativa y baseline`: cerrado y en `Done`.
+- Siguiente issue recomendado: `Infraestructura Fase 1 - Scripts reproducibles`.

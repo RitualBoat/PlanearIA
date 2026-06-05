@@ -42,10 +42,12 @@ Entrada principal:
 
 Dentro de una clase:
 
-- Alumnos: crear, importar, exportar, mover, quitar, abrir detalle.
-- Materiales: crear, asignar existente, adjuntar planeacion, filtrar y abrir.
-- Actividades/tareas: pendiente Fase 6.
-- Asistencia/calificaciones/reportes: rutas existentes se reutilizan hasta migracion completa.
+- `Tablon`: feed/resumen contextual del curso, proximas entregas y actividad reciente.
+- `Trabajo de clase`: secciones/unidades colapsables con materiales y actividades.
+- `Personas`: docentes/alumnos inscritos, importacion/exportacion y detalle de alumno.
+- Materiales: se crean/asignan desde `AgregarContenidoClassroom`, admiten enlaces/archivos multiples y se abren en `DetalleRecursoClassroom`.
+- Actividades: se crean/asignan desde `AgregarContenidoClassroom`, admiten fechas, entrega tardia, notas y calificacion contextual por entregas.
+- Asistencia, reportes y calificaciones: no deben aparecer como modulos sueltos de primer plano; se ubican de forma contextual o quedan para planes especializados.
 
 ### Contenido
 
@@ -60,7 +62,8 @@ Auth actual existe, pero seguridad real se endurecera en el plan de Auth/Segurid
 
 ## Rutas legacy conocidas
 
-- Detalle legacy de grupo puede seguir accesible como puente mientras Classroom absorbe funciones.
+- Detalle legacy de grupo no debe ser flujo principal si existe equivalente Classroom.
+- Crear/editar materiales o actividades desde una clase no debe mandar a formularios legacy si existe pantalla contextual.
 - Pantallas viejas de navegacion 2025 no deben usarse como referencia. Ver `Documentacion/99-archivo/`.
 
 ## Checklist de navegacion para cualquier fase

@@ -609,6 +609,8 @@ No usar otros estados.
 
 Cada fase que toque UX, navegacion, pantallas, modales, flujos de creacion/edicion o integracion con otros modulos debe incluir un bloque `Brief Ground Truth - Fase X`. Ese bloque debe citar referencias concretas y no solo una descripcion general.
 
+Cada fase ejecutable tambien debe incluir un bloque `GitHub/CI - Fase X`. Ese bloque evita que el avance quede solo en markdown y obliga a declarar issue/Project item, milestone, labels, estado inicial/final del tablero, scripts de validacion y si GitHub Actions/CI remoto debe revisarse.
+
 Formato obligatorio para fases de paridad alta:
 
 ```markdown
@@ -627,6 +629,19 @@ Brief Ground Truth - Fase X:
   - [rutas legacy, modales antiguos, CTAs administrativos sueltos].
 - Validacion visual:
   - [comparacion manual requerida antes de cerrar].
+
+GitHub/CI - Fase X:
+
+- Issue/Project item: [crear/usar #...].
+- Milestone: [ciclo].
+- Labels: `fase`, ...
+- Estado al iniciar: `In progress`.
+- Estado al cerrar: `Done` si no requiere revision manual; `Review Manual` si toca UX/UI, navegacion o paridad alta.
+- Scripts obligatorios:
+  - `npx tsc --noEmit`
+  - `npm run lint -- --quiet` o lint focalizado justificado.
+  - `npm test -- --runInBand` o tests focalizados justificados.
+- GitHub Actions: revisar CI remoto si existe workflow activo o si el cambio se sube a rama/PR.
 
 - [ ] **X.1 ...**
 ```
@@ -1312,6 +1327,8 @@ Modelo recomendado para un desarrollador solo:
 - Usar milestones como ciclos/sprints/release goals, no como epicas permanentes.
 - Usar labels para clasificar trabajo: `fase`, `legacy`, `ux-ui`, `offline-first`, `ai`, `infra`, `testing`, `docs`, `needs-input`, `low-cost`.
 - Al completar una fase, actualizar tanto el markdown como el Project.
+- Cada fase ejecutada debe dejar evidencia de comandos: TypeScript, lint, tests, validacion focalizada y/o GitHub Actions. Si se decide no correr un script global por costo/tiempo, el plan debe justificarlo y dejar comando focalizado equivalente.
+- Si varias fases se ejecutan juntas por refactor, crear un unico issue consolidado que explique alcance, fases cubiertas, evidencia tecnica y validacion manual pendiente.
 
 Mapping recomendado:
 
@@ -1342,6 +1359,8 @@ Cuando una IA implemente una fase:
 - Debe validar que las rutas nuevas queden enlazadas desde tabs, hubs, CTAs, menus o cards reales.
 - Debe comparar los flujos implementados contra capturas/referencias reales citadas en la fase.
 - Debe correr validaciones proporcionales.
+- Debe registrar en el plan y/o issue activo los scripts ejecutados y el resultado: `npx tsc --noEmit`, `npm run lint -- --quiet`, `npm test -- --runInBand`, tests focalizados y GitHub Actions si aplica.
+- No debe saltarse la sincronizacion de GitHub Project: si una fase queda en `[x]`, el item debe moverse a `Done` o `Review Manual`; si queda en `[~]`, debe moverse a `In progress` o `Review Manual`; si requiere input, debe llevar `needs-input`.
 - Debe hacer commit solo si el usuario lo pide.
 - Debe pedir confirmacion antes de saltar a otra fase grande si el usuario lo solicito.
 - Debe detenerse si una decision de producto cambia el rumbo.

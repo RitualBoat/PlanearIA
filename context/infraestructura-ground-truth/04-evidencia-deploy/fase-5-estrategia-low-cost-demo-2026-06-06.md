@@ -76,25 +76,32 @@ Ruta default para demo sin costo:
 - Confirmar URL final de backend con `npm run backend:health -- https://URL`.
 - Registrar evidencia sin tokens, secrets ni URI de MongoDB.
 
-## Review manual pendiente
+## Review manual completada
 
 Fase 4:
 
-- Hacer commit/push o abrir PR contra `development`.
-- Esperar el run remoto de GitHub Actions.
-- Confirmar que pasan los jobs TypeScript, ESLint, Jest y Backend smoke.
-- Guardar link o captura del run sin secretos en `context/infraestructura-ground-truth/03-evidencia-ci/`.
-- Si pasa, mover issue #13 a `Done`; si falla, reproducir localmente el comando del job fallido.
+- Completada por el usuario el 2026-06-06 con capturas en `context/infraestructura-ground-truth/03-evidencia-ci/`.
+- GitHub Actions remoto paso correctamente.
 
 Fase 5:
 
 - Ruta decidida para entrega/demo actual: demo externa temporal con ngrok si se necesita URL publica.
 - Mantener Vercel como primera opcion futura para backend cloud real; Cloudflare Tunnel/Docker quedan para evolucion posterior.
-- Antes de cualquier opcion publica, revisar `.env.local` y `backend/.env.local` sin imprimir valores.
-- Probar `npm run check` y `npm run backend:check`.
-- Si se expone una URL, validar `npm run backend:health -- https://URL` y registrar evidencia sin secrets.
-- Si se descarta deploy real, cerrar Fase 5 como decision pospuesta y mover issue #14 a `Done`.
+- `npm run check`: OK segun captura adjunta.
+- `npm run backend:check`: OK segun captura adjunta y reverificacion local.
+- `npm run web`: OK.
+- `ngrok http 8082`: OK.
+- URL publica funcional de demo: `https://spouse-padded-shredder.ngrok-free.dev/`.
+- Evidencia adjunta:
+  - `npm run check.png`
+  - `npm run backend check.png`
+  - `pagina corriendo en ngrok web.png`
+  - `pagina corriendo en ngrok movil.png`
+
+## Nota sobre backend local Vercel
+
+Durante la review manual, `npm run backend:dev` fallo con Vercel CLI 50.1.0 porque el patron redundante `api/*.js` en `backend/vercel.json` fue rechazado por la CLI. Se corrigio dejando `api/**/*.js` como unico patron de funciones y se actualizo `backend:check` para validar esa configuracion.
 
 ## Estado
 
-La decision de ruta queda documentada. El deploy real queda pospuesto hasta que el usuario lo pida explicitamente.
+Fase 5 cerrada. La demo temporal con ngrok funciono para entrega. No se hizo deploy cloud permanente, no se agregaron costos y no se salto a Fase 6.

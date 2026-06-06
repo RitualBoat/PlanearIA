@@ -12,7 +12,7 @@ if (vercelConfig.version !== 2) {
   throw new Error("backend/vercel.json must keep version=2");
 }
 
-if (!vercelConfig.functions?.["api/**/*.js"] || !vercelConfig.functions?.["api/*.js"]) {
+if (!vercelConfig.functions?.["api/**/*.js"]) {
   throw new Error("backend/vercel.json must configure api function limits");
 }
 

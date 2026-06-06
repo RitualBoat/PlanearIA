@@ -3,7 +3,7 @@
 > **Version:** 1.0
 > **Fecha:** 2026-06-04
 > **Ultima actualizacion:** 2026-06-05
-> **Estado:** [~] Plan maestro activo. Fases 0, 1, 2 y 3 completadas; Fases 4 y 5 en Review Manual por validacion externa pendiente.
+> **Estado:** [~] Plan maestro activo. Fases 0 a 5 completadas; Fase 6 pendiente, no iniciada.
 > **Prioridad:** siguiente cimiento despues de cerrar Classroom.
 > **Alcance:** estabilizar entorno local, scripts, CI, backend local/serverless, variables de entorno, evidencia de despliegue low-cost y preparacion futura para migracion SQLite.
 > **Restriccion central:** estudiante/desarrollador solo, presupuesto cero o muy bajo, laptop potente como entorno principal, sin microservicios ni servicios empresariales.
@@ -244,7 +244,7 @@ Tareas:
 - [x] **1.4 Documentar comandos en `ENTORNO_LOCAL.md` y README.**
   - **Completado 2026-06-06:** se actualizaron `README.md`, `ENTORNO_LOCAL.md` y `GUIA_PRUEBAS.md`.
 - [x] **1.5 Evitar scripts que dependan de herramientas globales no documentadas.**
-  - **Completado 2026-06-06:** `backend:dev` usa la dependencia local del backend via `npm --prefix backend run dev`, no `vercel` global.
+  - **Completado 2026-06-06:** `backend:dev` usa el script local del backend via `npm --prefix backend start`, no `vercel` global.
 
 Criterio de cierre:
 
@@ -343,7 +343,7 @@ Evidencia:
 
 ---
 
-### FASE 4: CI Robusto Pero Barato [~]
+### FASE 4: CI Robusto Pero Barato [x]
 
 Objetivo: mejorar GitHub Actions sin gastar minutos innecesarios ni bloquear el desarrollo solo.
 
@@ -353,7 +353,7 @@ GitHub/CI - Fase 4:
 - Milestone: `Ciclo 3 - Infraestructura Local y CI`.
 - Labels: `fase`, `infra`, `testing`, `docs`.
 - Estado al iniciar: `In progress`.
-- Estado al cerrar: `Review Manual` hasta que el run remoto de GitHub Actions pase en branch/PR.
+- Estado al cerrar: `Done`; run remoto de GitHub Actions validado manualmente el 2026-06-06.
 - Scripts obligatorios:
   - CI remoto en branch/PR.
   - `npx tsc --noEmit`
@@ -373,14 +373,14 @@ Tareas:
 - [x] **4.5 Documentar como leer runs de GitHub Actions.**
   - **Completado 2026-06-06:** `GUIA_PRUEBAS.md` y `GITHUB_PRODUCT_OS.md` documentan jobs, lectura de fallos y relacion Actions/Project.
 - [x] **4.6 Registrar evidencia en `context/infraestructura-ground-truth/03-evidencia-ci/`.**
-  - **Completado 2026-06-06:** evidencia local equivalente a CI registrada; run remoto queda pendiente hasta push/PR.
+  - **Completado 2026-06-06:** evidencia local equivalente a CI registrada; review manual remota completada con capturas adjuntas.
 
 Criterio de cierre:
 
 - [x] CI valida lo importante sin volverse lento.
 - [x] Un fallo de CI indica accion clara.
 - [x] El plan documenta que Actions valida, Project gestiona trabajo.
-- [ ] Run remoto de GitHub Actions para estos cambios pendiente hasta commit/push/PR.
+- [x] Run remoto de GitHub Actions validado manualmente con evidencia.
 
 Evidencia:
 
@@ -388,7 +388,7 @@ Evidencia:
 
 ---
 
-### FASE 5: Estrategia Low-Cost de Deploy y Demo [~ Review Manual]
+### FASE 5: Estrategia Low-Cost de Deploy y Demo [x]
 
 Objetivo: elegir una ruta realista para mostrar PlanearIA fuera de la laptop cuando sea necesario.
 
@@ -398,7 +398,7 @@ GitHub/CI - Fase 5:
 - Milestone: `Ciclo 3 - Infraestructura Local y CI`.
 - Labels: `fase`, `infra`, `low-cost`, `docs`.
 - Estado al iniciar: `In progress`.
-- Estado al cerrar: `Review Manual` hasta que el usuario autorice o descarte deploy real.
+- Estado al cerrar: `Done`; demo temporal ngrok validada manualmente el 2026-06-06.
 - Scripts obligatorios:
   - Validaciones locales antes de cualquier deploy.
   - Si se hace deploy, registrar URL y health check sin secretos.
@@ -425,7 +425,7 @@ Criterio de cierre:
 - [x] Hay decision de deploy para demos.
 - [x] Hay opcion de fallback local si el free tier falla.
 - [x] No se agregan costos recurrentes sin decision explicita del usuario.
-- [ ] Deploy real queda pendiente hasta decision explicita del usuario.
+- [x] Demo temporal externa con ngrok validada para entrega; deploy cloud permanente queda pospuesto.
 
 Evidencia:
 
@@ -572,8 +572,8 @@ Estado inicial recomendado:
 - [x] Issue #10 de Fase 1 cerrado y movido a `Done` con evidencia local.
 - [x] Issue #11 de Fase 2 cerrado y movido a `Done` con evidencia local.
 - [x] Issue #12 de Fase 3 cerrado y movido a `Done` con evidencia local.
-- [~] Issue #13 de Fase 4 movido a `Review Manual`; pendiente run remoto de GitHub Actions tras push/PR.
-- [~] Issue #14 de Fase 5 movido a `Review Manual`; deploy real pendiente de decision explicita.
+- [x] Issue #13 de Fase 4 listo para `Done`; run remoto de GitHub Actions validado manualmente con evidencia.
+- [x] Issue #14 de Fase 5 listo para `Done`; demo temporal ngrok validada y deploy cloud permanente pospuesto.
 - [ ] Crear issues de fases posteriores solo cuando esten cercanas.
 - [ ] Mantener tareas internas como checkboxes del issue activo.
 

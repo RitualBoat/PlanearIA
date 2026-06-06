@@ -43,4 +43,14 @@ No se agrego deploy automatico, EAS, Docker, tuneles ni servicios de pago.
 
 ## CI remoto
 
-No se ejecuto un run remoto nuevo para estos cambios porque no se hizo commit, push ni PR. Pendiente natural: al subir la rama, GitHub Actions debe ejecutar `CI` y mostrar los cuatro jobs.
+Review manual completada por el usuario el 2026-06-06.
+
+- GitHub Actions remoto: OK segun capturas adjuntas en esta carpeta.
+- Jobs esperados: TypeScript, ESLint, Jest y Backend smoke.
+- Evidencia adjunta:
+  - `revision manual pasada.png`
+  - `revision manual pasada 2.png`
+
+## Estado
+
+Fase 4 cerrada. CI remoto validado manualmente con evidencia.

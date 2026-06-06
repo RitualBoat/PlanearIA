@@ -22,8 +22,10 @@ context/infraestructura-ground-truth/
 
 Checklist de evidencia minima:
 
-- [ ] Captura o log de comandos locales pasando.
-- [ ] Captura o enlace de GitHub Actions exitoso.
+- [x] Captura o log de comandos locales pasando.
+- [x] Captura o enlace de GitHub Actions exitoso.
 - [ ] Evidencia de backend local `/api/health`.
-- [ ] Evidencia de app web/celular apuntando al backend correcto.
-- [ ] Matriz de alternativas si se decide deploy o storage.
+- [x] Evidencia de app web/celular apuntando al backend correcto.
+- [x] Matriz de alternativas si se decide deploy o storage.
+
+URL Publica en ngrok: https://spouse-padded-shredder.ngrok-free.dev/

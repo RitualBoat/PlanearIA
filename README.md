@@ -21,9 +21,9 @@ PlanearIA es una plataforma educativa offline-first para ayudar a docentes a cre
 PlanearIA nace como una app para planeaciones educativas, pero su objetivo es crecer hasta convertirse en una plataforma integral para docentes con una regla central: **cero friccion**. Un profesor no deberia sentir que aprende software nuevo, sino que abre herramientas familiares dentro de un solo ecosistema.
 
 La vision actual organiza el producto por experiencias:
-<img width="2554" height="1600" alt="image" src="https://github.com/user-attachments/assets/f871a0d9-087e-4f52-b0af-ec48f862d029" />
-
 <img width="2550" height="1600" alt="image" src="https://github.com/user-attachments/assets/708a296b-cfb4-4b8e-9200-c11a9b066a8a" />
+
+<img width="2554" height="1600" alt="image" src="https://github.com/user-attachments/assets/f871a0d9-087e-4f52-b0af-ec48f862d029" />
 
 - **Planeaciones = Word/Docs:** crear, importar, editar y exportar planeaciones como documentos reales, con IA pedagogica y plantillas.
 - **Grupos y recursos = Classroom:** clases, unidades, alumnos, materiales/enlaces/archivos asignados, actividades evaluables ligeras, entregas y calificacion contextual en un flujo unico.
@@ -37,7 +37,6 @@ La arquitectura objetivo es monolito modular, desarrollo local primero, bajo cos
 ---
 
 ## Estado Actual
-<img width="2554" height="1600" alt="image" src="https://github.com/user-attachments/assets/b7dc9704-65bf-4b98-8ab6-8d995365b219" />
 
 PlanearIA esta en desarrollo activo. No esta en produccion y no tiene usuarios reales, asi que el proyecto permite refactors grandes cuando ayuden a limpiar legacy, simplificar flujos o mejorar la experiencia.
 

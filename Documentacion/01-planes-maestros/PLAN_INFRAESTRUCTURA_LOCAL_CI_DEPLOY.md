@@ -3,7 +3,7 @@
 > **Version:** 1.0
 > **Fecha:** 2026-06-04
 > **Ultima actualizacion:** 2026-06-05
-> **Estado:** [~] Plan maestro activo. Fases 0, 1, 2 y 3 completadas; Fase 4 pendiente.
+> **Estado:** [~] Plan maestro activo. Fases 0, 1, 2 y 3 completadas; Fase 4 en Review Manual por CI remoto pendiente.
 > **Prioridad:** siguiente cimiento despues de cerrar Classroom.
 > **Alcance:** estabilizar entorno local, scripts, CI, backend local/serverless, variables de entorno, evidencia de despliegue low-cost y preparacion futura para migracion SQLite.
 > **Restriccion central:** estudiante/desarrollador solo, presupuesto cero o muy bajo, laptop potente como entorno principal, sin microservicios ni servicios empresariales.
@@ -343,17 +343,17 @@ Evidencia:
 
 ---
 
-### FASE 4: CI Robusto Pero Barato
+### FASE 4: CI Robusto Pero Barato [~]
 
 Objetivo: mejorar GitHub Actions sin gastar minutos innecesarios ni bloquear el desarrollo solo.
 
 GitHub/CI - Fase 4:
 
-- Issue/Project item: `Infraestructura Fase 4 - CI barato y confiable`.
+- Issue/Project item: `https://github.com/RitualBoat/PlanearIA/issues/13`.
 - Milestone: `Ciclo 3 - Infraestructura Local y CI`.
 - Labels: `fase`, `infra`, `testing`, `docs`.
 - Estado al iniciar: `In progress`.
-- Estado al cerrar: `Done`.
+- Estado al cerrar: `Review Manual` hasta que el run remoto de GitHub Actions pase en branch/PR.
 - Scripts obligatorios:
   - CI remoto en branch/PR.
   - `npx tsc --noEmit`
@@ -362,18 +362,29 @@ GitHub/CI - Fase 4:
 
 Tareas:
 
-- [ ] **4.1 Revisar si CI debe instalar tambien `backend/` con `npm ci`.**
-- [ ] **4.2 Evaluar agregar job de smoke/static check para backend.**
-- [ ] **4.3 Mantener cache npm y concurrency actual.**
-- [ ] **4.4 Evitar EAS/deploy automatico hasta tener decision de release.**
-- [ ] **4.5 Documentar como leer runs de GitHub Actions.**
-- [ ] **4.6 Registrar evidencia en `context/infraestructura-ground-truth/03-evidencia-ci/`.**
+- [x] **4.1 Revisar si CI debe instalar tambien `backend/` con `npm ci`.**
+  - **Completado 2026-06-06:** se agrego job `Backend smoke` con `npm ci --prefix backend` y cache por `backend/package-lock.json`.
+- [x] **4.2 Evaluar agregar job de smoke/static check para backend.**
+  - **Completado 2026-06-06:** se agrego `backend:check` con `scripts/checkBackendApiStatic.mjs` para validar `vercel.json`, `GET /api/health` y `OPTIONS /api/health`.
+- [x] **4.3 Mantener cache npm y concurrency actual.**
+  - **Completado 2026-06-06:** se conserva `concurrency`; los jobs frontend mantienen cache npm raiz y backend usa cache con `backend/package-lock.json`.
+- [x] **4.4 Evitar EAS/deploy automatico hasta tener decision de release.**
+  - **Completado 2026-06-06:** no se agrego deploy, EAS, Docker ni tuneles.
+- [x] **4.5 Documentar como leer runs de GitHub Actions.**
+  - **Completado 2026-06-06:** `GUIA_PRUEBAS.md` y `GITHUB_PRODUCT_OS.md` documentan jobs, lectura de fallos y relacion Actions/Project.
+- [x] **4.6 Registrar evidencia en `context/infraestructura-ground-truth/03-evidencia-ci/`.**
+  - **Completado 2026-06-06:** evidencia local equivalente a CI registrada; run remoto queda pendiente hasta push/PR.
 
 Criterio de cierre:
 
-- [ ] CI valida lo importante sin volverse lento.
-- [ ] Un fallo de CI indica accion clara.
-- [ ] El plan documenta que Actions valida, Project gestiona trabajo.
+- [x] CI valida lo importante sin volverse lento.
+- [x] Un fallo de CI indica accion clara.
+- [x] El plan documenta que Actions valida, Project gestiona trabajo.
+- [ ] Run remoto de GitHub Actions para estos cambios pendiente hasta commit/push/PR.
+
+Evidencia:
+
+- `context/infraestructura-ground-truth/03-evidencia-ci/fase-4-ci-backend-smoke-2026-06-06.md`
 
 ---
 
@@ -548,6 +559,7 @@ Estado inicial recomendado:
 - [x] Issue #10 de Fase 1 cerrado y movido a `Done` con evidencia local.
 - [x] Issue #11 de Fase 2 cerrado y movido a `Done` con evidencia local.
 - [x] Issue #12 de Fase 3 cerrado y movido a `Done` con evidencia local.
+- [~] Issue #13 de Fase 4 movido a `Review Manual`; pendiente run remoto de GitHub Actions tras push/PR.
 - [ ] Crear issues de fases posteriores solo cuando esten cercanas.
 - [ ] Mantener tareas internas como checkboxes del issue activo.
 

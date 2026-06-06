@@ -170,6 +170,7 @@ Para trabajar mas rapido, ejecutar tests focalizados del modulo tocado:
 npm run test:classroom
 npm run test:planeaciones
 npm run test:sync
+npm run backend:check
 ```
 
 ## Scripts reproducibles desde raiz
@@ -187,5 +188,6 @@ npm run test:sync
 | `npm run backend:dev` | Levanta el backend local con Vercel dev desde `backend/`. |
 | `npm run backend:dev:local` | Levanta un servidor local minimo para smoke de `/api/health` sin login de Vercel. |
 | `npm run backend:health` | Valida `GET /api/health` contra `http://localhost:3000` o una URL indicada. |
+| `npm run backend:check` | Smoke estatico de backend para CI: valida `vercel.json` y carga `/api/health` sin levantar servidor. |
 | `npm run backend:deploy` | Ejecuta deploy del backend; usar solo con decision explicita. |
 

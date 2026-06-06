@@ -65,3 +65,20 @@ jobs:
         run: npm ci
       - name: Run tests
         run: npm test -- --runInBand
+
+  backend:
+    name: Backend smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install backend dependencies
+        run: npm ci --prefix backend
+      - name: Run backend static smoke
+        run: npm run backend:check

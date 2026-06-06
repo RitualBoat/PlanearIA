@@ -115,3 +115,21 @@ Ese script crea/verifica labels y milestones. El Project v2 ya existe como `Plan
 - No cerrar plan maestro sin actualizar su tracking `[ ]`, `[~]`, `[x]`.
 - No mergear cambios con secrets reales.
 
+## Lectura Rapida de GitHub Actions
+
+GitHub Actions es evidencia automatica, no tablero operativo. Para infraestructura actual, el workflow `CI` debe leerse asi:
+
+| Job | Senal esperada |
+| --- | --- |
+| `TypeScript` | El proyecto compila con `npm run typecheck`. |
+| `ESLint` | No hay errores de lint relevantes con `npm run lint -- --quiet`. |
+| `Jest` | La suite completa pasa con `npm test -- --runInBand`. |
+| `Backend smoke` | El backend instala dependencias propias y `GET /api/health` carga sin romper. |
+
+Si un job falla:
+
+- Abrir el run, entrar al job rojo y leer el primer error real.
+- Reproducir localmente el comando del job antes de cambiar codigo.
+- Registrar el comando corregido en el issue/fase activa.
+- Mantener el Project como fuente de estado: `In progress`, `Review Manual`, `Blocked` o `Done`.
+

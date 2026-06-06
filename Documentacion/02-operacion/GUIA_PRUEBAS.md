@@ -21,7 +21,27 @@ Para ahorrar tiempo, usar pruebas focalizadas del modulo tocado:
 npm run test:classroom
 npm run test:planeaciones
 npm run test:sync
+npm run backend:check
 ```
+
+## CI y GitHub Actions
+
+El workflow `.github/workflows/ci.yml` valida en cada push/PR a `main` y `development`:
+
+| Job | Que valida | Comando principal |
+| --- | --- | --- |
+| `TypeScript` | Tipado del frontend/app | `npm run typecheck` |
+| `ESLint` | Lint sin ruido informativo | `npm run lint -- --quiet` |
+| `Jest` | Suite automatizada completa | `npm test -- --runInBand` |
+| `Backend smoke` | Instalacion del backend y smoke estatico de `/api/health` | `npm ci --prefix backend` + `npm run backend:check` |
+
+Como leer un fallo:
+
+- Si falla `TypeScript`, corregir tipos antes de revisar UI.
+- Si falla `ESLint`, resolver errores reportados; warnings no deben bloquear en modo `--quiet`.
+- Si falla `Jest`, revisar el primer test fallido y confirmar si es regresion o fixture desactualizado.
+- Si falla `Backend smoke`, revisar `backend/package-lock.json`, `backend/vercel.json` y `backend/api/health.js`.
+- No usar GitHub Actions como tablero de tareas; el estado operativo vive en GitHub Project.
 
 ## Validacion manual base
 
@@ -73,6 +93,8 @@ Smoke test actual:
 
 - Confirmar `.env.local` y `backend/.env.local` sin comments en valores.
 - Probar health/API local si se toca backend.
+- Smoke estatico backend: `npm run backend:check`.
+- Smoke local con servidor: `npm run backend:dev:local` en una terminal y `npm run backend:health` en otra.
 - IA debe usar gateway backend, no keys en frontend.
 - Si no hay proveedor IA, debe existir fallback usable donde aplique.
 

@@ -152,7 +152,8 @@ Planes actuales:
 
 | Plan | Archivo | Estado |
 | ---- | ------- | ------ |
-| Infraestructura Local, CI y Deploy Basico | [`Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`](./Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md) | Activo; Fase 0 completada, Fase 1 pendiente. |
+| Infraestructura Local, CI y Deploy Basico | [`Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`](./Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md) | Activo; Fases 0 a 5 completadas; Fase 6 en Review Manual. |
+| Storage Local SQLite y Migracion Offline | [`Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`](./Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md) | Futuro preparado; no iniciar sin decision explicita. |
 | Classroom / Grupos y Recursos | [`Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`](./Documentacion/01-planes-maestros/PLAN_CLASSROOM.md) | Cerrado; #8 completado. |
 | Planeaciones | [`Documentacion/01-planes-maestros/plan_planeaciones.md`](./Documentacion/01-planes-maestros/plan_planeaciones.md) | Cerrado. Fase 9 aprobada. |
 | Pasos iniciales | [`Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md`](./Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md) | Cerrado como cimiento organizativo. |
@@ -168,7 +169,7 @@ Planes actuales:
 
 - Crear el `Plan Maestro: Infraestructura Local, CI y Deploy Basico` como siguiente cimiento.
 - Mantener GitHub Product OS alineado con fases activas.
-- Ejecutar Fase 1 de infraestructura: scripts reproducibles para desarrollador solo.
+- Cerrar Fase 6 de infraestructura tras review manual de preparacion SQLite.
 
 ### Mediano plazo
 

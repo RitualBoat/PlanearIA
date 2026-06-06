@@ -27,5 +27,10 @@ Checklist de evidencia minima:
 - [ ] Evidencia de backend local `/api/health`.
 - [x] Evidencia de app web/celular apuntando al backend correcto.
 - [x] Matriz de alternativas si se decide deploy o storage.
+- [x] Preparacion SQLite con inventario, matriz y checklist academico.
 
 URL Publica en ngrok: https://spouse-padded-shredder.ngrok-free.dev/
+
+Evidencia SQLite:
+
+- `05-sqlite-actividad-academica/fase-6-preparacion-sqlite-2026-06-06.md`

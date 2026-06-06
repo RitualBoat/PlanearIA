@@ -17,7 +17,8 @@ Este archivo lista los planes maestros actuales y futuros. No reemplaza los plan
 | Planeaciones | `Documentacion/01-planes-maestros/plan_planeaciones.md` | Cerrado. Fase 9 aprobada. |
 | Pasos Iniciales | `Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md` | Cerrado como cimiento organizativo. |
 | Classroom / Grupos y Recursos | `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md` | Cerrado. Fases 0-10, cierre final e issue #8 completados. |
-| Infraestructura Local, CI y Deploy Basico | `Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` | Activo. Fase 0 completada; Fase 1 pendiente. |
+| Infraestructura Local, CI y Deploy Basico | `Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` | Activo. Fases 0 a 5 completadas; Fase 6 en Review Manual. |
+| Storage Local SQLite y Migracion Offline | `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md` | Futuro preparado; no iniciar sin decision explicita. |
 | Meta Guia de Planes | `Documentacion/01-planes-maestros/meta_guia_planes.md` | Vigente como instructivo obligatorio. |
 
 ## Orden recomendado de planes futuros
@@ -53,5 +54,6 @@ Este archivo lista los planes maestros actuales y futuros. No reemplaza los plan
 - Issues de Classroom #1-#7: cerrados; #7 quedo reemplazado por #8.
 - Issue de cierre `Classroom Fases 6-10 - cierre tecnico consolidado y validacion manual` (#8): cerrado y en `Done`.
 - Epic activo: `Plan Maestro: Infraestructura Local, CI y Deploy Basico`.
-- Issue #9 `Infraestructura Fase 0 - Auditoria operativa y baseline`: cerrado y en `Done`.
-- Siguiente issue recomendado: `Infraestructura Fase 1 - Scripts reproducibles`.
+- Issues #9 a #14 de Infraestructura: cerrados y en `Done`.
+- Issue #16 `Infraestructura Fase 6 - Preparacion SQLite y evidencia academica`: en `Review Manual`.
+- Siguiente issue recomendado: Fase 7 solo cuando el usuario pida cerrar documentacion/runbooks.

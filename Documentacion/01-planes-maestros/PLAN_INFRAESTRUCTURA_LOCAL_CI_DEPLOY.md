@@ -3,7 +3,7 @@
 > **Version:** 1.0
 > **Fecha:** 2026-06-04
 > **Ultima actualizacion:** 2026-06-05
-> **Estado:** [~] Plan maestro activo. Fases 0 a 5 completadas; Fase 6 pendiente, no iniciada.
+> **Estado:** [~] Plan maestro activo. Fases 0 a 5 completadas; Fase 6 en Review Manual con preparacion SQLite lista.
 > **Prioridad:** siguiente cimiento despues de cerrar Classroom.
 > **Alcance:** estabilizar entorno local, scripts, CI, backend local/serverless, variables de entorno, evidencia de despliegue low-cost y preparacion futura para migracion SQLite.
 > **Restriccion central:** estudiante/desarrollador solo, presupuesto cero o muy bajo, laptop potente como entorno principal, sin microservicios ni servicios empresariales.
@@ -433,7 +433,7 @@ Evidencia:
 
 ---
 
-### FASE 6: Preparacion SQLite y Evidencia Academica
+### FASE 6: Preparacion SQLite y Evidencia Academica [~ Review Manual]
 
 Objetivo: preparar la futura migracion AsyncStorage -> SQLite sin mezclarla todavia con deploy.
 
@@ -444,7 +444,7 @@ Esta fase existe por dos razones:
 
 GitHub/CI - Fase 6:
 
-- Issue/Project item: `Infraestructura Fase 6 - Preparacion SQLite y evidencia academica`.
+- Issue/Project item: `https://github.com/RitualBoat/PlanearIA/issues/16`.
 - Milestone: `Ciclo 3 - Infraestructura Local y CI` o futuro `Ciclo Storage SQLite`.
 - Labels: `fase`, `infra`, `offline-first`, `docs`, `testing`, `needs-input`.
 - Estado al iniciar: `In progress`.
@@ -456,13 +456,20 @@ GitHub/CI - Fase 6:
 
 Tareas:
 
-- [ ] **6.1 Inventariar claves AsyncStorage actuales por modulo.**
-- [ ] **6.2 Identificar datos relacionales que sufren en AsyncStorage: grupos, alumnos, unidades, actividades, entregas, calificaciones, asistencia.**
-- [ ] **6.3 Comparar alternativas: AsyncStorage, Expo SQLite, WatermelonDB, Realm, Mongo local.**
-- [ ] **6.4 Definir decision preliminar: Expo SQLite como primera opcion low-cost si no aparece bloqueo.**
-- [ ] **6.5 Crear plan futuro especifico `Plan Maestro: Storage Local SQLite y Migracion Offline`.**
-- [ ] **6.6 Preparar checklist de capturas antes/despues para la tarea academica.**
-- [ ] **6.7 Pedir o leer el PDF de la actividad cuando toque ejecutar la migracion.**
+- [x] **6.1 Inventariar claves AsyncStorage actuales por modulo.**
+  - **Completado 2026-06-06:** inventario registrado en evidencia de Fase 6.
+- [x] **6.2 Identificar datos relacionales que sufren en AsyncStorage: grupos, alumnos, unidades, actividades, entregas, calificaciones, asistencia.**
+  - **Completado 2026-06-06:** se priorizo Classroom academico como primera ola futura.
+- [x] **6.3 Comparar alternativas: AsyncStorage, Expo SQLite, WatermelonDB, Realm, Mongo local.**
+  - **Completado 2026-06-06:** matriz registrada con costo, offline, relaciones, complejidad y encaje.
+- [x] **6.4 Definir decision preliminar: Expo SQLite como primera opcion low-cost si no aparece bloqueo.**
+  - **Completado 2026-06-06:** Expo SQLite queda como primera opcion; AsyncStorage sigue para datos simples/caches.
+- [x] **6.5 Crear plan futuro especifico `Plan Maestro: Storage Local SQLite y Migracion Offline`.**
+  - **Completado 2026-06-06:** creado `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`.
+- [x] **6.6 Preparar checklist de capturas antes/despues para la tarea academica.**
+  - **Completado 2026-06-06:** checklist antes/despues registrado en evidencia.
+- [x] **6.7 Pedir o leer el PDF de la actividad cuando toque ejecutar la migracion.**
+  - **Completado 2026-06-06:** queda como condicion de inicio del plan futuro; no se lee ahora porque no se ejecuta migracion real.
 
 Evidencia academica sugerida para `Actividad 8 - Fase 2 - Exploracion de alternativas`:
 
@@ -493,9 +500,14 @@ Entregables probables:
 
 Criterio de cierre:
 
-- [ ] No se migra a SQLite todavia salvo decision explicita.
-- [ ] La tarea academica queda preparada con lista de evidencias.
-- [ ] Existe plan futuro recomendado para storage.
+- [x] No se migra a SQLite todavia salvo decision explicita.
+- [x] La tarea academica queda preparada con lista de evidencias.
+- [x] Existe plan futuro recomendado para storage.
+
+Evidencia:
+
+- `context/infraestructura-ground-truth/05-sqlite-actividad-academica/fase-6-preparacion-sqlite-2026-06-06.md`
+- `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`
 
 ---
 
@@ -554,10 +566,14 @@ Criterio de cierre:
 
 ## 9. Open Questions
 
-- [ ] Confirmar si el backend debe seguir en Vercel o evaluar Render como default para demo.
-- [ ] Confirmar si se permitira instalar Vercel CLI globalmente o se prefiere `npx vercel`.
-- [ ] Confirmar si se desea tunnel temporal para demos externas desde laptop.
-- [ ] Confirmar si Expo EAS se usara solo cuando haya build movil real o antes para previews.
+- [x] Confirmar si el backend debe seguir en Vercel o evaluar Render como default para demo.
+  - Decision 2026-06-06: Vercel sigue como primera opcion; Render queda fallback.
+- [x] Confirmar si se permitira instalar Vercel CLI globalmente o se prefiere `npx vercel`.
+  - Decision 2026-06-06: usar dependencia local del backend; no exigir instalacion global.
+- [x] Confirmar si se desea tunnel temporal para demos externas desde laptop.
+  - Decision 2026-06-06: ngrok temporal para entrega/demo rapida.
+- [x] Confirmar si Expo EAS se usara solo cuando haya build movil real o antes para previews.
+  - Decision 2026-06-06: posponer EAS hasta requerir build movil real.
 - [ ] Confirmar cuando leer/extraer formalmente requisitos del PDF de la actividad de SQLite.
 
 ---
@@ -574,6 +590,7 @@ Estado inicial recomendado:
 - [x] Issue #12 de Fase 3 cerrado y movido a `Done` con evidencia local.
 - [x] Issue #13 de Fase 4 listo para `Done`; run remoto de GitHub Actions validado manualmente con evidencia.
 - [x] Issue #14 de Fase 5 listo para `Done`; demo temporal ngrok validada y deploy cloud permanente pospuesto.
+- [~] Issue #16 de Fase 6 movido a `Review Manual`; preparacion SQLite lista y migracion real pendiente de decision/PDF.
 - [ ] Crear issues de fases posteriores solo cuando esten cercanas.
 - [ ] Mantener tareas internas como checkboxes del issue activo.
 
@@ -589,11 +606,12 @@ Regla:
 
 Este plan se considera completado cuando:
 
-- [ ] Entorno local documentado y probado.
-- [ ] Scripts reproducibles existen o estan justificados.
-- [ ] CI local/remoto pasa.
-- [ ] Backend local/cloud tiene ruta de demo clara.
-- [ ] Variables de entorno estan documentadas sin secretos.
-- [ ] Se decidio mantener o cambiar Vercel/Render/Railway/self-host.
-- [ ] SQLite queda preparado como plan futuro con evidencia academica.
+- [x] Entorno local documentado y probado.
+- [x] Scripts reproducibles existen o estan justificados.
+- [x] CI local/remoto pasa.
+- [x] Backend local/cloud tiene ruta de demo clara.
+- [x] Variables de entorno estan documentadas sin secretos.
+- [x] Se decidio mantener o cambiar Vercel/Render/Railway/self-host.
+- [x] SQLite queda preparado como plan futuro con evidencia academica.
 - [ ] GitHub Project y README quedan actualizados.
+  - **Parcial 2026-06-06:** README/indices actualizados hasta Fase 6; cierre global queda para Fase 7.

@@ -63,7 +63,7 @@ Ruta default para demo sin costo:
 2. Backend cloud para demo externa: mantener Vercel como primera opcion porque el repo ya esta adaptado a funciones serverless.
 3. Base remota: mantener MongoDB Atlas Free mientras los datos sean de demo y caben en limites.
 4. Movil: usar Expo Go/local primero; posponer EAS hasta que una fase requiera dev build o distribucion.
-5. Demo externa temporal: ngrok si urge una URL rapida; Cloudflare Tunnel si se quiere algo mas serio y se acepta configuracion adicional.
+5. Demo externa temporal para entrega actual: ngrok es la opcion elegida por menor friccion si se necesita una URL publica rapida; Cloudflare Tunnel queda como alternativa mas seria para despues.
 6. Fallback: evaluar Render si Vercel deja de encajar; Railway no es default por costo mensual posterior al trial/free.
 7. Docker queda como fase futura de reproducibilidad local/CI; No-IP y Floci no son default para el alcance actual.
 
@@ -88,7 +88,8 @@ Fase 4:
 
 Fase 5:
 
-- Decidir explicitamente una de estas rutas: sin deploy real por ahora, demo externa temporal con ngrok/Cloudflare Tunnel, backend cloud en Vercel, o ruta academica Azure/PostgreSQL/APK si el profesor la pide.
+- Ruta decidida para entrega/demo actual: demo externa temporal con ngrok si se necesita URL publica.
+- Mantener Vercel como primera opcion futura para backend cloud real; Cloudflare Tunnel/Docker quedan para evolucion posterior.
 - Antes de cualquier opcion publica, revisar `.env.local` y `backend/.env.local` sin imprimir valores.
 - Probar `npm run check` y `npm run backend:check`.
 - Si se expone una URL, validar `npm run backend:health -- https://URL` y registrar evidencia sin secrets.

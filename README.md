@@ -62,8 +62,7 @@ Estado del trabajo principal:
 ---
 
 ## Modulos de la App
-<img width="589" height="1280" alt="image" src="https://github.com/user-attachments/assets/766bf439-9a3c-4c6e-b8ae-76187497333b" />
-
+<img width="589" height="1280" alt="image" src="https://github.com/user-attachments/assets/29ebf8b9-3519-4f8a-ac6c-62c5cd4493a2" />
 
 | Modulo | Estado actual | Vision |
 | ------ | ------------- | ------ |

@@ -3,7 +3,7 @@
 > **Version:** 1.0
 > **Fecha:** 2026-06-04
 > **Ultima actualizacion:** 2026-06-05
-> **Estado:** [~] Plan maestro activo. Fase 0 completada; Fase 1 pendiente.
+> **Estado:** [~] Plan maestro activo. Fase 0 y Fase 1 completadas; Fase 2 pendiente.
 > **Prioridad:** siguiente cimiento despues de cerrar Classroom.
 > **Alcance:** estabilizar entorno local, scripts, CI, backend local/serverless, variables de entorno, evidencia de despliegue low-cost y preparacion futura para migracion SQLite.
 > **Restriccion central:** estudiante/desarrollador solo, presupuesto cero o muy bajo, laptop potente como entorno principal, sin microservicios ni servicios empresariales.
@@ -217,13 +217,13 @@ Criterio de cierre:
 
 ---
 
-### FASE 1: Scripts Reproducibles Para Desarrollador Solo
+### FASE 1: Scripts Reproducibles Para Desarrollador Solo [x]
 
 Objetivo: que levantar y validar PlanearIA sea obvio desde la raiz del repo.
 
 GitHub/CI - Fase 1:
 
-- Issue/Project item: `Infraestructura Fase 1 - Scripts reproducibles`.
+- Issue/Project item: `https://github.com/RitualBoat/PlanearIA/issues/10`.
 - Milestone: `Ciclo 3 - Infraestructura Local y CI`.
 - Labels: `fase`, `infra`, `testing`, `docs`, `low-cost`.
 - Estado al iniciar: `In progress`.
@@ -235,16 +235,25 @@ GitHub/CI - Fase 1:
 
 Tareas:
 
-- [ ] **1.1 Evaluar si agregar script raiz `check` que corra typecheck, lint y tests.**
-- [ ] **1.2 Evaluar scripts raiz para backend: `backend:install`, `backend:dev`, `backend:deploy`.**
-- [ ] **1.3 Crear scripts focalizados utiles: `test:classroom`, `test:planeaciones`, `test:sync`.**
-- [ ] **1.4 Documentar comandos en `ENTORNO_LOCAL.md` y README.**
-- [ ] **1.5 Evitar scripts que dependan de herramientas globales no documentadas.**
+- [x] **1.1 Evaluar si agregar script raiz `check` que corra typecheck, lint y tests.**
+  - **Completado 2026-06-06:** se agrego `typecheck` y `check`; `check` corre TypeScript, ESLint quiet y Jest completo desde la raiz.
+- [x] **1.2 Evaluar scripts raiz para backend: `backend:install`, `backend:dev`, `backend:deploy`.**
+  - **Completado 2026-06-06:** se agregaron wrappers raiz con `npm --prefix backend`; el backend tambien tiene alias `dev`.
+- [x] **1.3 Crear scripts focalizados utiles: `test:classroom`, `test:planeaciones`, `test:sync`.**
+  - **Completado 2026-06-06:** los scripts focalizados se agregaron y pasaron contra sus carpetas de tests.
+- [x] **1.4 Documentar comandos en `ENTORNO_LOCAL.md` y README.**
+  - **Completado 2026-06-06:** se actualizaron `README.md`, `ENTORNO_LOCAL.md` y `GUIA_PRUEBAS.md`.
+- [x] **1.5 Evitar scripts que dependan de herramientas globales no documentadas.**
+  - **Completado 2026-06-06:** `backend:dev` usa la dependencia local del backend via `npm --prefix backend run dev`, no `vercel` global.
 
 Criterio de cierre:
 
-- [ ] Un agente nuevo puede saber que comando correr para validar todo.
-- [ ] Un estudiante puede levantar frontend/backend local sin buscar en cinco documentos.
+- [x] Un agente nuevo puede saber que comando correr para validar todo.
+- [x] Un estudiante puede levantar frontend/backend local sin buscar en cinco documentos.
+
+Evidencia:
+
+- `context/infraestructura-ground-truth/02-evidencia-local/fase-1-scripts-reproducibles-2026-06-06.md`
 
 ---
 
@@ -515,6 +524,7 @@ Estado inicial recomendado:
 - [x] Epic `Plan Maestro: Infraestructura Local, CI y Deploy Basico` movida a `In progress`.
 - [x] Crear issue de Fase 0 al iniciar ejecucion: `https://github.com/RitualBoat/PlanearIA/issues/9`.
 - [x] Issue #9 cerrado y movido a `Done` con evidencia baseline.
+- [x] Issue #10 de Fase 1 cerrado y movido a `Done` con evidencia local.
 - [ ] Crear issues de fases posteriores solo cuando esten cercanas.
 - [ ] Mantener tareas internas como checkboxes del issue activo.
 

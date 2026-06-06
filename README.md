@@ -201,25 +201,24 @@ npm --version
 git clone https://github.com/RitualBoat/PlanearIA.git
 cd PlanearIA
 npm install
-
-cd backend
-npm install
-cd ..
+npm run backend:install
 ```
 
 ### Ejecutar
 
 ```bash
-npx expo start
+npm start
 npm run start:dev
 npm run android
 npm run ios
 npm run web
+npm run backend:dev
 ```
 
 Notas:
 
 - `npm run start:dev` es recomendado para funciones nativas avanzadas.
+- `npm run backend:dev` levanta el backend serverless local desde `backend/` usando la dependencia local de Vercel.
 - iOS requiere Mac + Xcode.
 - Algunas funciones push o nativas pueden requerir dev build, no solo Expo Go.
 
@@ -294,9 +293,18 @@ La documentacion tecnica esta en [`Documentacion/`](./Documentacion/):
 Comandos habituales:
 
 ```bash
-npx tsc --noEmit
+npm run typecheck
 npm run lint -- --quiet
 npm test -- --runInBand
+npm run check
+```
+
+Pruebas focalizadas utiles:
+
+```bash
+npm run test:classroom
+npm run test:planeaciones
+npm run test:sync
 ```
 
 Para cambios de UX/UI tambien se debe validar manualmente en web, Android y, si es posible, iOS.

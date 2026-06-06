@@ -11,7 +11,7 @@ Levantar PlanearIA de forma repetible en web y celular fisico, usando desarrollo
 - Node.js 20 LTS recomendado.
 - npm incluido con Node.
 - Expo CLI via `npx expo`.
-- Vercel CLI solo si se usa el backend serverless local: `npm install -g vercel`.
+- Vercel CLI via dependencia local del backend. No hace falta instalarlo globalmente para `npm run backend:dev`.
 - Android Studio o dispositivo Android fisico para pruebas moviles.
 - Git.
 
@@ -21,6 +21,7 @@ Desde la raiz del repo:
 
 ```bash
 npm install
+npm run backend:install
 npm run web
 ```
 
@@ -31,6 +32,7 @@ npm start
 npm run start:dev
 npm run android
 npm run ios
+npm run backend:dev
 ```
 
 Notas:
@@ -41,12 +43,11 @@ Notas:
 
 ## Backend local
 
-Desde `backend/`:
+Desde la raiz del repo:
 
 ```bash
-cd backend
-npm install
-vercel dev
+npm run backend:install
+npm run backend:dev
 ```
 
 La API local esperada queda en:
@@ -111,10 +112,32 @@ El modo dev debe mostrar advertencia visible y no cambia el limite conservador d
 ## Verificacion rapida
 
 ```bash
-npx tsc --noEmit
+npm run typecheck
 npm run lint -- --quiet
 npm test -- --runInBand
+npm run check
 ```
 
-Para trabajar mas rapido, ejecutar tests focalizados del modulo tocado.
+Para trabajar mas rapido, ejecutar tests focalizados del modulo tocado:
+
+```bash
+npm run test:classroom
+npm run test:planeaciones
+npm run test:sync
+```
+
+## Scripts reproducibles desde raiz
+
+| Comando | Uso |
+| --- | --- |
+| `npm run typecheck` | Valida TypeScript sin emitir archivos. |
+| `npm run lint -- --quiet` | Ejecuta ESLint mostrando solo problemas relevantes. |
+| `npm test -- --runInBand` | Ejecuta toda la suite Jest de forma serial. |
+| `npm run check` | Corre typecheck, lint quiet y tests completos. |
+| `npm run test:classroom` | Ejecuta pruebas focalizadas de Classroom. |
+| `npm run test:planeaciones` | Ejecuta pruebas focalizadas de Planeaciones. |
+| `npm run test:sync` | Ejecuta pruebas focalizadas de sincronizacion/offline. |
+| `npm run backend:install` | Instala dependencias del backend. |
+| `npm run backend:dev` | Levanta el backend local con Vercel dev desde `backend/`. |
+| `npm run backend:deploy` | Ejecuta deploy del backend; usar solo con decision explicita. |
 

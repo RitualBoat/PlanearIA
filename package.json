@@ -10,9 +10,17 @@
     "web": "expo start --web",
     "prebuild": "expo prebuild",
     "prebuild:clean": "expo prebuild --clean",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run lint -- --quiet && npm test -- --runInBand",
     "test": "jest",
+    "test:classroom": "jest src/__tests__/classroom --runInBand",
+    "test:planeaciones": "jest src/__tests__/planeaciones --runInBand",
+    "test:sync": "jest src/__tests__/sync --runInBand",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
-    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx}\" \"types/**/*.{ts,json}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx}\" \"types/**/*.{ts,json}\"",
+    "backend:install": "npm --prefix backend install",
+    "backend:dev": "npm --prefix backend run dev",
+    "backend:deploy": "npm --prefix backend run deploy"
   },
   "dependencies": {
     "@10play/tentap-editor": "^1.0.1",

@@ -9,16 +9,18 @@ Validar cambios sin depender de documentacion legacy. Esta guia reemplaza la gui
 Ejecutar desde la raiz:
 
 ```bash
-npx tsc --noEmit
+npm run typecheck
 npm run lint -- --quiet
 npm test -- --runInBand
+npm run check
 ```
 
 Para ahorrar tiempo, usar pruebas focalizadas del modulo tocado:
 
 ```bash
-npx jest src/__tests__/classroom --runInBand
-npx jest src/__tests__/planeaciones --runInBand
+npm run test:classroom
+npm run test:planeaciones
+npm run test:sync
 ```
 
 ## Validacion manual base

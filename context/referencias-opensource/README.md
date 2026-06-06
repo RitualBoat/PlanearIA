@@ -189,3 +189,11 @@ Cuando se agregue un nuevo repo:
 5. Para repos con licencia restrictiva o sin licencia, guardar solo `ARCHITECTURE_PATHS.md` y notas propias.
 6. No guardar assets pesados, builds, lockfiles gigantes, node_modules, dist ni imagenes innecesarias.
 7. Registrar en este README para que futuros agentes sepan como usarlo.
+
+# Repos para ux/ui y documentacion real, usar para el plan maestro ux/ui y navegacion global, para que los prompts de figma definan pantallas y diseños teniendo cosas profesionales y modernas en la industria.
+añadir estos repos y pagina a la carpeta:
+1. https://github.com/crisbusquets/aprende-diseno-uxui.git
+2. https://github.com/hendurhance/ui-ux.git
+3. https://www.awwwards.com/ (pagina que da premios y menciona la mejores paginas web diseñadas)
+4. https://mockflow.com/blog/UX-documentation-for-mobile-app-design (pagina que enseña a crear ux-ui para apps)
+

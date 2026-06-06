@@ -33,6 +33,8 @@ npm run start:dev
 npm run android
 npm run ios
 npm run backend:dev
+npm run backend:dev:local
+npm run backend:health
 ```
 
 Notas:
@@ -54,6 +56,25 @@ La API local esperada queda en:
 
 ```text
 http://localhost:3000
+```
+
+En otra terminal, confirma health:
+
+```bash
+npm run backend:health
+```
+
+Decision vigente:
+
+- `npm run backend:dev` usa `vercel dev` y sigue siendo la ruta principal porque se parece mas al backend serverless real.
+- `npm run backend:dev:local` es fallback minimo sin login de Vercel para validar `/api/health`.
+- El fallback local no reemplaza pruebas de endpoints complejos, MongoDB, auth real ni IA.
+
+Tambien puedes validar otra URL sin cambiar `.env.local`:
+
+```bash
+npm run backend:health -- http://IP_DE_TU_LAPTOP:3000
+npm run backend:health -- https://tu-backend.vercel.app
 ```
 
 ## Variables de entorno
@@ -164,5 +185,7 @@ npm run test:sync
 | `npm run test:sync` | Ejecuta pruebas focalizadas de sincronizacion/offline. |
 | `npm run backend:install` | Instala dependencias del backend. |
 | `npm run backend:dev` | Levanta el backend local con Vercel dev desde `backend/`. |
+| `npm run backend:dev:local` | Levanta un servidor local minimo para smoke de `/api/health` sin login de Vercel. |
+| `npm run backend:health` | Valida `GET /api/health` contra `http://localhost:3000` o una URL indicada. |
 | `npm run backend:deploy` | Ejecuta deploy del backend; usar solo con decision explicita. |
 

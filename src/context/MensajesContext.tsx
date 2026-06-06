@@ -109,16 +109,21 @@ export const MensajesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
    */
   const fetchRemoteConversaciones = async () => {
     if (!isAPIConfigured()) return;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
+
     try {
       const response = await fetch(
         `${API_CONFIG.baseUrl}/api/mensajes?tipo=conversaciones`,
         {
+          signal: controller.signal,
           headers: {
             "Content-Type": "application/json",
             "X-API-Key": API_CONFIG.apiSecret,
           },
         }
       );
+      clearTimeout(timeoutId);
       if (!response.ok) return;
       const json = await response.json();
       const remoteConvs: Conversacion[] = json.data?.conversaciones ?? [];
@@ -131,6 +136,7 @@ export const MensajesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         return merged;
       });
     } catch (err) {
+      clearTimeout(timeoutId);
       if (!__DEV__) return;
       if (isNetworkRequestError(err)) {
         logger.debug("[MensajesContext] Backend no disponible, polling omitido.");

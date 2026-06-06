@@ -19,7 +19,9 @@
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx}\" \"types/**/*.{ts,json}\"",
     "backend:install": "npm --prefix backend install",
-    "backend:dev": "npm --prefix backend run dev",
+    "backend:dev": "npm --prefix backend start",
+    "backend:dev:local": "node scripts/localBackendServer.mjs",
+    "backend:health": "node scripts/checkBackendHealth.mjs",
     "backend:deploy": "npm --prefix backend run deploy"
   },
   "dependencies": {

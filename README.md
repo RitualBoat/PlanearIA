@@ -219,6 +219,8 @@ Notas:
 
 - `npm run start:dev` es recomendado para funciones nativas avanzadas.
 - `npm run backend:dev` levanta el backend serverless local desde `backend/` usando la dependencia local de Vercel.
+- `npm run backend:dev:local` levanta solo un fallback minimo para smoke de `/api/health` si falta login de Vercel.
+- Con el backend levantado, `npm run backend:health` valida `GET /api/health`.
 - iOS requiere Mac + Xcode.
 - Algunas funciones push o nativas pueden requerir dev build, no solo Expo Go.
 
@@ -313,6 +315,7 @@ Pruebas focalizadas utiles:
 npm run test:classroom
 npm run test:planeaciones
 npm run test:sync
+npm run backend:health
 ```
 
 Para cambios de UX/UI tambien se debe validar manualmente en web, Android y, si es posible, iOS.

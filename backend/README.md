@@ -145,9 +145,9 @@ export const API_CONFIG = {
 ## 🔧 Desarrollo Local
 
 ```bash
-cd backend
-npm install
-vercel dev
+npm run backend:install
+npm run backend:dev
+npm run backend:dev:local
 ```
 
 La API estará en `http://localhost:3000`
@@ -155,6 +155,12 @@ La API estará en `http://localhost:3000`
 ---
 
 ## 📡 Endpoints
+
+Smoke test desde otra terminal:
+
+```bash
+npm run backend:health
+```
 
 ### Health Check
 

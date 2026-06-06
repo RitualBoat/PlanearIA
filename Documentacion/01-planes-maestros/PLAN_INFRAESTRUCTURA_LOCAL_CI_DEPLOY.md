@@ -3,7 +3,7 @@
 > **Version:** 1.0
 > **Fecha:** 2026-06-04
 > **Ultima actualizacion:** 2026-06-05
-> **Estado:** [~] Plan maestro activo. Fases 0, 1 y 2 completadas; Fase 3 pendiente.
+> **Estado:** [~] Plan maestro activo. Fases 0, 1, 2 y 3 completadas; Fase 4 pendiente.
 > **Prioridad:** siguiente cimiento despues de cerrar Classroom.
 > **Alcance:** estabilizar entorno local, scripts, CI, backend local/serverless, variables de entorno, evidencia de despliegue low-cost y preparacion futura para migracion SQLite.
 > **Restriccion central:** estudiante/desarrollador solo, presupuesto cero o muy bajo, laptop potente como entorno principal, sin microservicios ni servicios empresariales.
@@ -238,7 +238,7 @@ Tareas:
 - [x] **1.1 Evaluar si agregar script raiz `check` que corra typecheck, lint y tests.**
   - **Completado 2026-06-06:** se agrego `typecheck` y `check`; `check` corre TypeScript, ESLint quiet y Jest completo desde la raiz.
 - [x] **1.2 Evaluar scripts raiz para backend: `backend:install`, `backend:dev`, `backend:deploy`.**
-  - **Completado 2026-06-06:** se agregaron wrappers raiz con `npm --prefix backend`; el backend tambien tiene alias `dev`.
+  - **Completado 2026-06-06:** se agregaron wrappers raiz con `npm --prefix backend`; en Fase 3 se corrigio `backend:dev` para usar `backend` `start` y evitar recursividad de `vercel dev`.
 - [x] **1.3 Crear scripts focalizados utiles: `test:classroom`, `test:planeaciones`, `test:sync`.**
   - **Completado 2026-06-06:** los scripts focalizados se agregaron y pasaron contra sus carpetas de tests.
 - [x] **1.4 Documentar comandos en `ENTORNO_LOCAL.md` y README.**
@@ -301,13 +301,13 @@ Evidencia:
 
 ---
 
-### FASE 3: Backend Local y Smoke Tests
+### FASE 3: Backend Local y Smoke Tests [x]
 
 Objetivo: comprobar backend sin depender de intuicion o clicks manuales.
 
 GitHub/CI - Fase 3:
 
-- Issue/Project item: `Infraestructura Fase 3 - Backend local y health smoke`.
+- Issue/Project item: `https://github.com/RitualBoat/PlanearIA/issues/12`.
 - Milestone: `Ciclo 3 - Infraestructura Local y CI`.
 - Labels: `fase`, `infra`, `testing`, `low-cost`.
 - Estado al iniciar: `In progress`.
@@ -318,18 +318,28 @@ GitHub/CI - Fase 3:
 
 Tareas:
 
-- [ ] **3.1 Decidir si `vercel dev` sigue siendo backend local principal.**
-- [ ] **3.2 Evaluar wrapper local simple si `vercel dev` genera friccion.**
-- [ ] **3.3 Crear/documentar smoke test para `/api/health`.**
-- [ ] **3.4 Documentar prueba de `EXPO_PUBLIC_API_URL` desde web y celular.**
-- [ ] **3.5 Verificar timeouts y errores de red para contextos que hacen polling.**
-- [ ] **3.6 Registrar capturas/logs sin secretos en `context/infraestructura-ground-truth/02-evidencia-local/`.**
+- [x] **3.1 Decidir si `vercel dev` sigue siendo backend local principal.**
+  - **Completado 2026-06-06:** `vercel dev` sigue como ruta principal por paridad serverless, pero requiere login local de Vercel.
+- [x] **3.2 Evaluar wrapper local simple si `vercel dev` genera friccion.**
+  - **Completado 2026-06-06:** se agrego `backend:dev:local` como fallback minimo para `/api/health` sin credenciales externas.
+- [x] **3.3 Crear/documentar smoke test para `/api/health`.**
+  - **Completado 2026-06-06:** se agrego `backend:health` con `scripts/checkBackendHealth.mjs` y se documento en README/ENTORNO_LOCAL/backend README.
+- [x] **3.4 Documentar prueba de `EXPO_PUBLIC_API_URL` desde web y celular.**
+  - **Completado 2026-06-06:** `ENTORNO_LOCAL.md` documenta URLs para web, emulador, celular fisico, cloud/demo y health smoke con URL alternativa.
+- [x] **3.5 Verificar timeouts y errores de red para contextos que hacen polling.**
+  - **Completado 2026-06-06:** se verifico `API_CONFIG.timeout`, `networkErrors.ts`, contextos CRUD y polling; `MensajesContext` ahora usa `AbortController` en polling.
+- [x] **3.6 Registrar capturas/logs sin secretos en `context/infraestructura-ground-truth/02-evidencia-local/`.**
+  - **Completado 2026-06-06:** evidencia registrada sin secretos ni URLs privadas.
 
 Criterio de cierre:
 
-- [ ] Backend local responde health check.
-- [ ] Web y celular pueden apuntar al backend correcto.
-- [ ] Los errores de red quedan como estados manejados, no LogBox ruidoso.
+- [x] Backend local responde health check.
+- [x] Web y celular pueden apuntar al backend correcto.
+- [x] Los errores de red quedan como estados manejados, no LogBox ruidoso.
+
+Evidencia:
+
+- `context/infraestructura-ground-truth/02-evidencia-local/fase-3-backend-local-health-smoke-2026-06-06.md`
 
 ---
 
@@ -537,6 +547,7 @@ Estado inicial recomendado:
 - [x] Issue #9 cerrado y movido a `Done` con evidencia baseline.
 - [x] Issue #10 de Fase 1 cerrado y movido a `Done` con evidencia local.
 - [x] Issue #11 de Fase 2 cerrado y movido a `Done` con evidencia local.
+- [x] Issue #12 de Fase 3 cerrado y movido a `Done` con evidencia local.
 - [ ] Crear issues de fases posteriores solo cuando esten cercanas.
 - [ ] Mantener tareas internas como checkboxes del issue activo.
 

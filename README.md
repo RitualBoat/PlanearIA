@@ -52,7 +52,7 @@ Estado del trabajo principal:
 - Planeaciones cerro Fase 9 como primera gran refactorizacion terminada.
 - Pasos Iniciales quedo cerrado como cimiento de GitHub Product OS, CI inicial y entorno local.
 - Classroom quedo cerrado: Fases 0 a 10, validacion final y issue consolidado #8 completados.
-- Infraestructura Local/CI/Deploy Basico es el plan activo nuevo.
+- Infraestructura Local/CI/Deploy Basico quedo cerrado como cimiento operativo.
 - `Documentacion/01-planes-maestros/meta_guia_planes.md` define el estandar para futuros planes.
 
 ---
@@ -74,7 +74,7 @@ Estado del trabajo principal:
 | Social / Contactos | Buscador de perfiles e invitaciones. | Base para WhatsApp docente. |
 | Chat / Mensajeria | Lista de chats y conversacion. | Mensajeria docente con adjuntos educativos y sync estable. |
 | Cuenta/Auth/Seguridad | Auth y cuenta existen, pero seguridad real esta pendiente. | JWT, RBAC Dev/Admin/Docente/Alumno, rate limiting, bcrypt y secrets seguros. |
-| Infraestructura | Local-first, backend Node, MongoDB Atlas/free tier, CI inicial. | Bajo costo, deploy gradual y opcion futura de self-hosting local/Docker. |
+| Infraestructura | Local-first, backend Node, MongoDB Atlas/free tier, CI barato y demo ngrok/Vercel. | Cimiento operativo cerrado; deploy cloud permanente solo bajo decision explicita. |
 | UX/UI Global | Reglas en meta guia, pulido final pendiente. | Nielsen, severidad 0-4, accesibilidad, tokens y navegacion sin friccion. |
 
 ---
@@ -152,7 +152,7 @@ Planes actuales:
 
 | Plan | Archivo | Estado |
 | ---- | ------- | ------ |
-| Infraestructura Local, CI y Deploy Basico | [`Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`](./Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md) | Activo; Fases 0 a 5 completadas; Fase 6 en Review Manual. |
+| Infraestructura Local, CI y Deploy Basico | [`Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`](./Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md) | Cerrado; Fases 0 a 7 completadas. |
 | Storage Local SQLite y Migracion Offline | [`Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`](./Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md) | Futuro preparado; no iniciar sin decision explicita. |
 | Classroom / Grupos y Recursos | [`Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`](./Documentacion/01-planes-maestros/PLAN_CLASSROOM.md) | Cerrado; #8 completado. |
 | Planeaciones | [`Documentacion/01-planes-maestros/plan_planeaciones.md`](./Documentacion/01-planes-maestros/plan_planeaciones.md) | Cerrado. Fase 9 aprobada. |
@@ -167,20 +167,19 @@ Planes actuales:
 
 ### Corto plazo
 
-- Crear el `Plan Maestro: Infraestructura Local, CI y Deploy Basico` como siguiente cimiento.
-- Mantener GitHub Product OS alineado con fases activas.
-- Cerrar Fase 6 de infraestructura tras review manual de preparacion SQLite.
+- Mantener GitHub Product OS alineado con el siguiente plan activo.
+- Elegir el siguiente frente: Auth/Seguridad, UX/UI Global, Excel/Listas o Storage SQLite si la actividad academica lo exige.
+- No iniciar migracion SQLite real sin revisar el plan futuro y confirmar requisitos/PDF.
 
 ### Mediano plazo
 
 - Consolidar Classroom como organizador/asignador y usarlo como fuente real para futuros planes de Excel/Listas, calificacion avanzada, reportes y UX/UI global.
 - Crear plan UX/UI y Navegacion Global cuando el flujo funcional principal este estable.
-- Preparar plan de infraestructura local/CI/deploy basico.
 - Endurecer Auth y Seguridad antes de beta con usuarios reales.
 
 ### Largo plazo
 
-- Evaluar infraestructura final: free tier cloud, servidor local/self-hosted, VPS economico, Vercel/Render/Railway, Docker o hibrido segun costo y facilidad de entrega.
+- Evaluar infraestructura final: Vercel/Render, servidor local/self-hosted, VPS economico, Docker o hibrido segun costo y facilidad de entrega.
 - Preparar despliegue web y distribucion en app stores.
 - Crear landing page y documentacion de lanzamiento.
 - Agregar analitica, crash reporting y monitoreo basico.

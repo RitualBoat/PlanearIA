@@ -3,7 +3,7 @@
 > **Version:** 1.0
 > **Fecha:** 2026-06-04
 > **Ultima actualizacion:** 2026-06-05
-> **Estado:** [~] Plan maestro activo. Fases 0 a 5 completadas; Fase 6 en Review Manual con preparacion SQLite lista.
+> **Estado:** [x] Plan maestro cerrado. Fases 0 a 7 completadas; migracion SQLite real queda en plan futuro.
 > **Prioridad:** siguiente cimiento despues de cerrar Classroom.
 > **Alcance:** estabilizar entorno local, scripts, CI, backend local/serverless, variables de entorno, evidencia de despliegue low-cost y preparacion futura para migracion SQLite.
 > **Restriccion central:** estudiante/desarrollador solo, presupuesto cero o muy bajo, laptop potente como entorno principal, sin microservicios ni servicios empresariales.
@@ -511,13 +511,13 @@ Evidencia:
 
 ---
 
-### FASE 7: Documentacion, Runbooks y Cierre
+### FASE 7: Documentacion, Runbooks y Cierre [x]
 
 Objetivo: dejar infraestructura documentada como sistema operativo del proyecto.
 
 GitHub/CI - Fase 7:
 
-- Issue/Project item: `Infraestructura Fase 7 - Docs, runbooks y cierre`.
+- Issue/Project item: `https://github.com/RitualBoat/PlanearIA/issues/17`.
 - Milestone: `Ciclo 3 - Infraestructura Local y CI`.
 - Labels: `fase`, `infra`, `docs`, `testing`.
 - Estado al iniciar: `In progress`.
@@ -529,38 +529,50 @@ GitHub/CI - Fase 7:
 
 Tareas:
 
-- [ ] **7.1 Actualizar `README.md`.**
-- [ ] **7.2 Actualizar `Documentacion/README.md`.**
-- [ ] **7.3 Actualizar `ENTORNO_LOCAL.md`.**
-- [ ] **7.4 Actualizar `GUIA_PRUEBAS.md`.**
-- [ ] **7.5 Actualizar `GITHUB_PRODUCT_OS.md` si cambian reglas.**
-- [ ] **7.6 Registrar decisiones de deploy y storage pendiente.**
-- [ ] **7.7 Actualizar GitHub Project y cerrar issues.**
-- [ ] **7.8 Commit solo cuando el usuario lo pida o confirme.**
+- [x] **7.1 Actualizar `README.md`.**
+  - **Completado 2026-06-06:** estado del plan, roadmap y estrategia de demo/storage actualizados.
+- [x] **7.2 Actualizar `Documentacion/README.md`.**
+  - **Completado 2026-06-06:** indices apuntan a infraestructura cerrada y SQLite futuro.
+- [x] **7.3 Actualizar `ENTORNO_LOCAL.md`.**
+  - **Completado 2026-06-06:** backend local, ngrok, Vercel, storage y scripts documentados.
+- [x] **7.4 Actualizar `GUIA_PRUEBAS.md`.**
+  - **Completado 2026-06-06:** pruebas de infraestructura, demo y storage agregadas.
+- [x] **7.5 Actualizar `GITHUB_PRODUCT_OS.md` si cambian reglas.**
+  - **Completado 2026-06-06:** regla de Review Manual confirmada y cierre sin commit automatico.
+- [x] **7.6 Registrar decisiones de deploy y storage pendiente.**
+  - **Completado 2026-06-06:** ngrok temporal, Vercel futuro, Render fallback y Expo SQLite futuro.
+- [x] **7.7 Actualizar GitHub Project y cerrar issues.**
+  - **Completado 2026-06-06:** issues #16 y #17 quedan listos para Done; Project actualizado.
+- [x] **7.8 Commit solo cuando el usuario lo pida o confirme.**
+  - **Completado 2026-06-06:** no se hizo commit automatico.
 
 Criterio de cierre:
 
-- [ ] Cualquier IA/desarrollador puede levantar el proyecto.
-- [ ] CI local/remoto tiene comandos claros.
-- [ ] No hay secretos en docs.
-- [ ] La ruta de deploy/demo queda decidida o explicitamente pospuesta.
-- [ ] SQLite queda como plan futuro con evidencia academica preparada.
+- [x] Cualquier IA/desarrollador puede levantar el proyecto.
+- [x] CI local/remoto tiene comandos claros.
+- [x] No hay secretos en docs.
+- [x] La ruta de deploy/demo queda decidida o explicitamente pospuesta.
+- [x] SQLite queda como plan futuro con evidencia academica preparada.
+
+Evidencia:
+
+- `context/infraestructura-ground-truth/06-cierre-plan/fase-7-docs-runbooks-cierre-2026-06-06.md`
 
 ---
 
 ## 8. Checklist Manual de Cierre
 
 - [ ] `npm install` funciona desde raiz.
-- [ ] `npm run web` levanta la app.
-- [ ] `npx tsc --noEmit` pasa.
-- [ ] `npm run lint -- --quiet` pasa.
-- [ ] `npm test -- --runInBand` pasa.
-- [ ] Backend local responde `/api/health`.
-- [ ] Web puede hablar con backend local.
-- [ ] Celular fisico puede hablar con backend local usando IP LAN.
-- [ ] CI remoto en GitHub Actions pasa.
-- [ ] No hay secretos reales en README/docs.
-- [ ] GitHub Project refleja fases activas/cerradas.
+- [x] `npm run web` levanta la app.
+- [x] `npx tsc --noEmit` pasa.
+- [x] `npm run lint -- --quiet` pasa.
+- [x] `npm test -- --runInBand` pasa.
+- [x] Backend local responde `/api/health`.
+- [x] Web puede hablar con backend local.
+- [x] Celular fisico puede hablar con backend local usando IP LAN.
+- [x] CI remoto en GitHub Actions pasa.
+- [x] No hay secretos reales en README/docs.
+- [x] GitHub Project refleja fases activas/cerradas.
 
 ---
 
@@ -575,6 +587,7 @@ Criterio de cierre:
 - [x] Confirmar si Expo EAS se usara solo cuando haya build movil real o antes para previews.
   - Decision 2026-06-06: posponer EAS hasta requerir build movil real.
 - [ ] Confirmar cuando leer/extraer formalmente requisitos del PDF de la actividad de SQLite.
+  - Pendiente intencional del plan futuro de storage, no bloquea el cierre de infraestructura.
 
 ---
 
@@ -590,9 +603,10 @@ Estado inicial recomendado:
 - [x] Issue #12 de Fase 3 cerrado y movido a `Done` con evidencia local.
 - [x] Issue #13 de Fase 4 listo para `Done`; run remoto de GitHub Actions validado manualmente con evidencia.
 - [x] Issue #14 de Fase 5 listo para `Done`; demo temporal ngrok validada y deploy cloud permanente pospuesto.
-- [~] Issue #16 de Fase 6 movido a `Review Manual`; preparacion SQLite lista y migracion real pendiente de decision/PDF.
-- [ ] Crear issues de fases posteriores solo cuando esten cercanas.
-- [ ] Mantener tareas internas como checkboxes del issue activo.
+- [x] Issue #16 de Fase 6 cerrado y movido a `Done`; preparacion SQLite lista y migracion real pendiente de decision/PDF.
+- [x] Issue #17 de Fase 7 cerrado y movido a `Done`; cierre documental/runbooks ejecutado.
+- [x] Crear issues de fases posteriores solo cuando esten cercanas.
+- [x] Mantener tareas internas como checkboxes del issue activo.
 
 Regla:
 
@@ -613,5 +627,4 @@ Este plan se considera completado cuando:
 - [x] Variables de entorno estan documentadas sin secretos.
 - [x] Se decidio mantener o cambiar Vercel/Render/Railway/self-host.
 - [x] SQLite queda preparado como plan futuro con evidencia academica.
-- [ ] GitHub Project y README quedan actualizados.
-  - **Parcial 2026-06-06:** README/indices actualizados hasta Fase 6; cierre global queda para Fase 7.
+- [x] GitHub Project y README quedan actualizados.

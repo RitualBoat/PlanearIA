@@ -26,7 +26,7 @@ Experiencias madre:
 - Planeaciones esta cerrada como primera gran refactorizacion. Fase 9 aprobada con editor tipo Word/Docs, selector de plantillas, IA gateway, fallback local, exportacion y flujo moderno.
 - Pasos Iniciales esta cerrado como plan de organizacion: GitHub Product OS, CI inicial, entorno local y secuencia de planes.
 - Classroom esta cerrado como experiencia base.
-- Infraestructura Local/CI/Deploy Basico es el plan activo; Fases 0 a 5 estan completadas y Fase 6 dejo preparada la ruta SQLite en Review Manual.
+- Infraestructura Local/CI/Deploy Basico quedo cerrado; Fases 0 a 7 completadas con scripts, CI, backend smoke, demo low-cost y preparacion SQLite.
 - UX/UI Global, Auth/Seguridad, Excel/Listas, Canva, WhatsApp docente, Reportes y migracion SQLite real quedan como planes posteriores.
 
 ## Stack actual

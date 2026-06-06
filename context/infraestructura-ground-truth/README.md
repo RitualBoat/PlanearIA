@@ -18,6 +18,7 @@ context/infraestructura-ground-truth/
 +-- 03-evidencia-ci/
 +-- 04-evidencia-deploy/
 +-- 05-sqlite-actividad-academica/
++-- 06-cierre-plan/
 ```
 
 Checklist de evidencia minima:
@@ -34,3 +35,7 @@ URL Publica en ngrok: https://spouse-padded-shredder.ngrok-free.dev/
 Evidencia SQLite:
 
 - `05-sqlite-actividad-academica/fase-6-preparacion-sqlite-2026-06-06.md`
+
+Evidencia de cierre:
+
+- `06-cierre-plan/fase-7-docs-runbooks-cierre-2026-06-06.md`

@@ -1,6 +1,6 @@
 ﻿# GitHub Product OS - PlanearIA
 
-> Estado: guia operativa vigente. `PLAN_PASOS_INICIALES.md` ya quedo cerrado; esta guia se usa para mantener GitHub Project alineado con planes activos como Classroom.
+> Estado: guia operativa vigente. `PLAN_PASOS_INICIALES.md`, Classroom e Infraestructura quedaron cerrados como cimientos; esta guia mantiene GitHub Project alineado con planes activos/futuros.
 
 ## Ramas oficiales
 
@@ -60,6 +60,7 @@ Columnas/estados:
 - `Ciclo 0 - Reorientacion y GitHub`.
 - `Ciclo 1 - Plan Classroom`.
 - `Ciclo 2 - Fundacion Classroom`.
+- `Ciclo 3 - Infraestructura Local y CI`.
 - `Ciclo 3 - UX/Navegacion Global`.
 
 ## Modelo de Work Items
@@ -80,6 +81,7 @@ Regla practica para no llenar el tablero de ruido:
 - Usar labels para clasificar: `fase`, `ux-ui`, `legacy`, `offline-first`, `ai`, `infra`, `testing`, `docs`, `needs-input`, `low-cost`.
 - Cada fase activa debe tener un bloque `GitHub/CI - Fase X` en el plan o en el issue, con issue/Project item, milestone, labels, estado inicial/final y scripts de validacion.
 - Al cerrar una fase, dejar evidencia de comandos: `npx tsc --noEmit`, `npm run lint -- --quiet`, `npm test -- --runInBand`, tests focalizados y GitHub Actions si aplica.
+- Si el usuario confirma una Review Manual y pide continuar, mover la fase a `Done` y registrar el comentario de cierre en GitHub.
 - Si varias fases se resolvieron juntas durante un refactor, crear un issue consolidado que documente fases cubiertas, evidencia tecnica y pendientes manuales.
 
 Ejemplo recomendado para Classroom:
@@ -108,12 +110,13 @@ Ese script crea/verifica labels y milestones. El Project v2 ya existe como `Plan
 - Decision arquitectonica.
 - Pull request template.
 
-## Criterio de merge
+## Criterio de cierre y merge
 
 - No mergear a `main` si CI falla.
 - No cerrar fase UX/UI sin validacion manual cuando aplique.
 - No cerrar plan maestro sin actualizar su tracking `[ ]`, `[~]`, `[x]`.
 - No mergear cambios con secrets reales.
+- No hacer commit automatico salvo que el usuario lo pida o confirme.
 
 ## Lectura Rapida de GitHub Actions
 

@@ -17,7 +17,7 @@ Esta carpeta contiene los planes ejecutables y la guia que deben seguir futuras 
 - Planeaciones: cerrado.
 - Pasos Iniciales: cerrado.
 - Classroom: cerrado; issue #8 completado.
-- Infraestructura Local/CI/Deploy Basico: activo; Fases 0 a 5 completadas; Fase 6 en Review Manual.
+- Infraestructura Local/CI/Deploy Basico: cerrado; Fases 0 a 7 completadas.
 - Storage Local SQLite y Migracion Offline: futuro preparado; no iniciar sin decision explicita.
 
 ## Regla de mantenimiento

@@ -48,7 +48,8 @@
 
 - Classroom concentra mayor valor diario y conecta grupos, alumnos, recursos, tareas, asistencia y calificaciones; queda cerrado como base funcional para futuros planes.
 - UX/UI Global queda como plan transversal, pero su pulido fuerte debe esperar a que los modulos funcionales principales existan.
-- Infraestructura Local/CI/Deploy Basico es el siguiente plan recomendado tras cerrar manualmente Classroom.
+- Infraestructura Local/CI/Deploy Basico quedo cerrado como cimiento operativo: scripts reproducibles, CI, backend smoke, demo ngrok/Vercel y preparacion SQLite.
+- Storage Local SQLite y Migracion Offline queda preparado como plan futuro; no iniciar sin decision explicita/PDF de actividad.
 - Auth/Seguridad se endurece antes de beta con usuarios reales.
 - Feed/social no se elimina ahora; se congela hasta decidir WhatsApp docente/comunidad.
 - Ningun modulo nuevo debe quedar aislado: debe tener entrada, salida, CTA principal y estado offline/error.

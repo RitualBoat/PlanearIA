@@ -1,6 +1,6 @@
 ﻿# Entorno Local - PlanearIA
 
-> Estado: guia base creada desde `Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md`.
+> Estado: runbook vigente tras cerrar `Plan Maestro: Infraestructura Local, CI y Deploy Basico`.
 
 ## Objetivo
 
@@ -35,6 +35,7 @@ npm run ios
 npm run backend:dev
 npm run backend:dev:local
 npm run backend:health
+npm run backend:check
 ```
 
 Notas:
@@ -68,6 +69,7 @@ Decision vigente:
 
 - `npm run backend:dev` usa `vercel dev` y sigue siendo la ruta principal porque se parece mas al backend serverless real.
 - `npm run backend:dev:local` es fallback minimo sin login de Vercel para validar `/api/health`.
+- `backend/vercel.json` usa el patron `api/**/*.js`; no reintroducir `api/*.js` porque Vercel CLI 50 lo rechazo durante Fase 5.
 - El fallback local no reemplaza pruebas de endpoints complejos, MongoDB, auth real ni IA.
 
 Tambien puedes validar otra URL sin cambiar `.env.local`:
@@ -198,9 +200,25 @@ Ruta recomendada mientras no haya usuarios reales:
 1. Demo local principal: laptop como host, `npm run web`, backend local y celular fisico por IP LAN.
 2. Backend local con paridad serverless: `npm run backend:dev` si Vercel CLI tiene sesion.
 3. Backend local minimo: `npm run backend:dev:local` solo para smoke de `/api/health` sin login de Vercel.
-4. Backend cloud para demo externa: mantener Vercel como primera opcion cuando el usuario pida deploy real.
-5. Base remota: mantener MongoDB Atlas Free para datos de demo.
-6. Movil: usar Expo Go/local primero; posponer EAS/dev builds hasta que hagan falta capacidades nativas o distribucion.
+4. URL publica temporal para entrega/demo: `ngrok http PUERTO_EXPO` o `ngrok http PUERTO_BACKEND` segun lo que se vaya a mostrar.
+5. Backend cloud para demo externa real: mantener Vercel como primera opcion cuando el usuario pida deploy permanente.
+6. Base remota: mantener MongoDB Atlas Free para datos de demo.
+7. Movil: usar Expo Go/local primero; posponer EAS/dev builds hasta que hagan falta capacidades nativas o distribucion.
 
-No activar tuneles publicos, deploy automatico, EAS, Docker ni cambio de proveedor cloud sin decision explicita.
+No activar deploy automatico, EAS, Docker ni cambio de proveedor cloud sin decision explicita.
+
+## Storage local y SQLite
+
+Estado vigente:
+
+- AsyncStorage sigue siendo la persistencia local actual.
+- Expo SQLite queda como primera opcion futura para datos academicos relacionales.
+- No instalar `expo-sqlite` ni migrar datos sin decision explicita.
+- Plan futuro: `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`.
+- Evidencia academica: `context/infraestructura-ground-truth/05-sqlite-actividad-academica/`.
+
+Regla practica:
+
+- Preferencias, flags, caches pequenos y drafts simples pueden seguir en AsyncStorage.
+- Grupos, alumnos, unidades, tareas, recursos, asistencias, calificaciones, entregas y cola de sync son candidatos a SQLite.
 

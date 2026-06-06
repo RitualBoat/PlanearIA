@@ -34,7 +34,7 @@ Si eres una IA o agente nuevo, lee en este orden:
 - Planeaciones: cerrado como experiencia Word/Docs. Fase 9 aprobada.
 - Pasos Iniciales: cerrado como organizacion de GitHub, CI inicial y entorno.
 - Classroom: cerrado. Fases 0 a 10, validacion final e issue #8 completados.
-- Infraestructura Local/CI/Deploy Basico: plan activo; Fases 0 a 5 completadas; Fase 6 en Review Manual con preparacion SQLite lista.
+- Infraestructura Local/CI/Deploy Basico: cerrado; Fases 0 a 7 completadas.
 - UX/UI Global: pendiente, se hara cuando existan mas flujos funcionales.
 - Auth/Excel/Canva/WhatsApp/Reportes: pendientes de planes futuros.
 
@@ -56,7 +56,7 @@ Si eres una IA o agente nuevo, lee en este orden:
 | Documento | Estado |
 | --- | --- |
 | `01-planes-maestros/meta_guia_planes.md` | Vigente; instructivo obligatorio para crear planes. |
-| `01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` | Activo; Fases 0 a 5 completadas; Fase 6 en Review Manual. |
+| `01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` | Cerrado; Fases 0 a 7 completadas. |
 | `01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md` | Futuro; no iniciar sin decision explicita. |
 | `01-planes-maestros/PLAN_CLASSROOM.md` | Cerrado; #8 completado. |
 | `01-planes-maestros/PLAN_PASOS_INICIALES.md` | Cerrado. |

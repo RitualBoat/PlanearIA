@@ -98,6 +98,30 @@ Smoke test actual:
 - IA debe usar gateway backend, no keys en frontend.
 - Si no hay proveedor IA, debe existir fallback usable donde aplique.
 
+## Infraestructura, Demo y Storage
+
+Estado: `Plan Maestro: Infraestructura Local, CI y Deploy Basico` cerrado hasta Fase 7.
+
+Validacion recomendada para cambios de infraestructura:
+
+- `npm run typecheck`
+- `npm run lint -- --quiet`
+- `npm test -- --runInBand`
+- `npm run backend:check`
+- `git diff --check`
+
+Demo:
+
+- Local primero con `npm run web`.
+- ngrok solo para demo temporal cuando haga falta URL publica.
+- Vercel queda como primera opcion de backend cloud real; Render fallback.
+
+Storage:
+
+- Si se toca AsyncStorage/sync, ejecutar `npm run test:sync -- --runInBand`.
+- Si se toca Classroom/storage academico, ejecutar `npm run test:classroom -- --runInBand`.
+- No instalar ni activar SQLite sin seguir `PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`.
+
 ## Antes de cerrar una fase
 
 - Actualizar plan maestro.
@@ -105,3 +129,4 @@ Smoke test actual:
 - Registrar comandos ejecutados.
 - Registrar bloque `GitHub/CI - Fase X` en planes nuevos o issues activos.
 - Si hubo validacion manual, crear o actualizar checklist en `Documentacion/03-validacion/`.
+- Si la fase queda en Review Manual, dejar claro que falta validar y no marcarla como Done hasta recibir confirmacion del usuario.

@@ -16,6 +16,7 @@ PlanearIA es una plataforma educativa offline-first para ayudar a docentes a cre
 ---
 
 ## Vision del Producto
+<img width="1600" height="1001" alt="image" src="https://github.com/user-attachments/assets/eff04917-b31b-46ec-b9a6-ca34622a374b" />
 
 PlanearIA nace como una app para planeaciones educativas, pero su objetivo es crecer hasta convertirse en una plataforma integral para docentes con una regla central: **cero friccion**. Un profesor no deberia sentir que aprende software nuevo, sino que abre herramientas familiares dentro de un solo ecosistema.
 

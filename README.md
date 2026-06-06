@@ -63,7 +63,7 @@ Estado del trabajo principal:
 
 ## Modulos de la App
 <img width="589" height="1280" alt="image" src="https://github.com/user-attachments/assets/29ebf8b9-3519-4f8a-ac6c-62c5cd4493a2" />
-
+<br>
 | Modulo | Estado actual | Vision |
 | ------ | ------------- | ------ |
 | Planeaciones | Fase 9 completada. Hay modelo V2, editor tipo Word/Docs, escaner, exportacion, plantilla default robusta, copiloto IA y flujo moderno. | Mantener como experiencia Word/Docs e integrarla con Classroom y plantillas/diseno. |

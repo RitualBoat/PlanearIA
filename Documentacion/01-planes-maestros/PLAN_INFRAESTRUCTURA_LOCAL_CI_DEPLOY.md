@@ -3,7 +3,7 @@
 > **Version:** 1.0
 > **Fecha:** 2026-06-04
 > **Ultima actualizacion:** 2026-06-05
-> **Estado:** [~] Plan maestro activo. Fases 0, 1, 2 y 3 completadas; Fase 4 en Review Manual por CI remoto pendiente.
+> **Estado:** [~] Plan maestro activo. Fases 0, 1, 2 y 3 completadas; Fases 4 y 5 en Review Manual por validacion externa pendiente.
 > **Prioridad:** siguiente cimiento despues de cerrar Classroom.
 > **Alcance:** estabilizar entorno local, scripts, CI, backend local/serverless, variables de entorno, evidencia de despliegue low-cost y preparacion futura para migracion SQLite.
 > **Restriccion central:** estudiante/desarrollador solo, presupuesto cero o muy bajo, laptop potente como entorno principal, sin microservicios ni servicios empresariales.
@@ -388,35 +388,48 @@ Evidencia:
 
 ---
 
-### FASE 5: Estrategia Low-Cost de Deploy y Demo
+### FASE 5: Estrategia Low-Cost de Deploy y Demo [~ Review Manual]
 
 Objetivo: elegir una ruta realista para mostrar PlanearIA fuera de la laptop cuando sea necesario.
 
 GitHub/CI - Fase 5:
 
-- Issue/Project item: `Infraestructura Fase 5 - Deploy low-cost y demo`.
+- Issue/Project item: `https://github.com/RitualBoat/PlanearIA/issues/14`.
 - Milestone: `Ciclo 3 - Infraestructura Local y CI`.
 - Labels: `fase`, `infra`, `low-cost`, `docs`.
 - Estado al iniciar: `In progress`.
-- Estado al cerrar: `Review Manual`.
+- Estado al cerrar: `Review Manual` hasta que el usuario autorice o descarte deploy real.
 - Scripts obligatorios:
   - Validaciones locales antes de cualquier deploy.
   - Si se hace deploy, registrar URL y health check sin secretos.
 
 Tareas:
 
-- [ ] **5.1 Comparar Vercel, Render, Railway, self-host laptop y MongoDB Atlas M0.**
-- [ ] **5.2 Decidir si se mantiene Vercel actual para backend o se migra a Render.**
-- [ ] **5.3 Definir demo web: local, tunnel temporal, Vercel/Render o Expo.**
-- [ ] **5.4 Definir demo movil: Expo Go/dev build/EAS segun necesidades nativas.**
-- [ ] **5.5 Documentar costos, limites free tier, cold starts y riesgos.**
-- [ ] **5.6 Registrar evidencia en `context/infraestructura-ground-truth/04-evidencia-deploy/`.**
+- [x] **5.1 Comparar Vercel, Render, Railway, self-host laptop y MongoDB Atlas M0.**
+  - **Completado 2026-06-06:** comparacion registrada con fuentes oficiales en evidencia de deploy.
+- [x] **5.2 Decidir si se mantiene Vercel actual para backend o se migra a Render.**
+  - **Completado 2026-06-06:** se mantiene Vercel como primera opcion para backend cloud por compatibilidad actual; Render queda como fallback si se requiere servidor Node persistente.
+- [x] **5.3 Definir demo web: local, tunnel temporal, Vercel/Render o Expo.**
+  - **Completado 2026-06-06:** demo web default local desde laptop; backend cloud solo bajo pedido; tuneles publicos no se activan sin decision explicita.
+- [x] **5.4 Definir demo movil: Expo Go/dev build/EAS segun necesidades nativas.**
+  - **Completado 2026-06-06:** usar Expo Go/local primero; posponer EAS/dev build hasta requerir capacidades nativas o distribucion.
+- [x] **5.5 Documentar costos, limites free tier, cold starts y riesgos.**
+  - **Completado 2026-06-06:** evidencia documenta Vercel, Render, Railway, MongoDB Atlas Free y Expo EAS con riesgos principales.
+- [x] **5.6 Registrar evidencia en `context/infraestructura-ground-truth/04-evidencia-deploy/`.**
+  - **Completado 2026-06-06:** evidencia registrada sin secretos.
+- [x] **5.7 Contrastar opciones de clase: ngrok, Cloudflare, Floci AWS, Docker y No-IP.**
+  - **Completado 2026-06-06:** evidencia actualizada; ngrok/Cloudflare quedan como tunnels de demo, Docker como fase futura de reproducibilidad, Floci como emulacion AWS academica y No-IP como self-hosting no recomendado para default.
 
 Criterio de cierre:
 
-- [ ] Hay decision de deploy para demos.
-- [ ] Hay opcion de fallback local si el free tier falla.
-- [ ] No se agregan costos recurrentes sin decision explicita del usuario.
+- [x] Hay decision de deploy para demos.
+- [x] Hay opcion de fallback local si el free tier falla.
+- [x] No se agregan costos recurrentes sin decision explicita del usuario.
+- [ ] Deploy real queda pendiente hasta decision explicita del usuario.
+
+Evidencia:
+
+- `context/infraestructura-ground-truth/04-evidencia-deploy/fase-5-estrategia-low-cost-demo-2026-06-06.md`
 
 ---
 
@@ -560,6 +573,7 @@ Estado inicial recomendado:
 - [x] Issue #11 de Fase 2 cerrado y movido a `Done` con evidencia local.
 - [x] Issue #12 de Fase 3 cerrado y movido a `Done` con evidencia local.
 - [~] Issue #13 de Fase 4 movido a `Review Manual`; pendiente run remoto de GitHub Actions tras push/PR.
+- [~] Issue #14 de Fase 5 movido a `Review Manual`; deploy real pendiente de decision explicita.
 - [ ] Crear issues de fases posteriores solo cuando esten cercanas.
 - [ ] Mantener tareas internas como checkboxes del issue activo.
 

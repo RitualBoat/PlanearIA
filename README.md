@@ -334,6 +334,13 @@ Prioridades:
 - Evaluar self-hosting local/Docker/backend propio cuando llegue el modulo de infraestructura.
 - Documentar costos antes de agregar IA, storage, correo, push o hosting permanente.
 
+Estrategia vigente de demo:
+
+- Local primero: laptop + Expo web/movil + backend local.
+- Backend cloud solo cuando se pida demo externa; primera opcion actual: Vercel, porque el backend ya usa funciones serverless.
+- MongoDB Atlas Free mientras los datos sean de desarrollo/demo.
+- Expo Go/local antes de EAS; dev builds solo cuando una capacidad nativa lo requiera.
+
 ---
 
 ## Licencia

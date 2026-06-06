@@ -191,3 +191,16 @@ npm run backend:check
 | `npm run backend:check` | Smoke estatico de backend para CI: valida `vercel.json` y carga `/api/health` sin levantar servidor. |
 | `npm run backend:deploy` | Ejecuta deploy del backend; usar solo con decision explicita. |
 
+## Estrategia de demo low-cost vigente
+
+Ruta recomendada mientras no haya usuarios reales:
+
+1. Demo local principal: laptop como host, `npm run web`, backend local y celular fisico por IP LAN.
+2. Backend local con paridad serverless: `npm run backend:dev` si Vercel CLI tiene sesion.
+3. Backend local minimo: `npm run backend:dev:local` solo para smoke de `/api/health` sin login de Vercel.
+4. Backend cloud para demo externa: mantener Vercel como primera opcion cuando el usuario pida deploy real.
+5. Base remota: mantener MongoDB Atlas Free para datos de demo.
+6. Movil: usar Expo Go/local primero; posponer EAS/dev builds hasta que hagan falta capacidades nativas o distribucion.
+
+No activar tuneles publicos, deploy automatico, EAS, Docker ni cambio de proveedor cloud sin decision explicita.
+

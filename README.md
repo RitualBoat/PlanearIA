@@ -226,9 +226,17 @@ Notas:
 
 ```bash
 cp .env.example .env
+npm run backend:install
+copy backend\.env.example backend\.env.local
 ```
 
-Configurar credenciales de MongoDB Atlas, endpoints y claves de IA cuando el modulo las requiera.
+Configurar endpoints y secretos solo en archivos locales ignorados por Git:
+
+- App: `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_API_SECRET`, `EXPO_PUBLIC_ALLOW_NATIVE_LOCALHOST`.
+- Backend: `API_SECRET`, `JWT_SECRET`, `MONGODB_URI`, proveedores IA y limites.
+- Las API keys privadas de IA nunca deben ir en variables `EXPO_PUBLIC_*`.
+
+Para celular fisico, usar la IP LAN de la laptop en `EXPO_PUBLIC_API_URL`; `localhost` apunta al telefono, no al backend de la laptop.
 
 ---
 

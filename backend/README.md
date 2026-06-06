@@ -75,14 +75,15 @@ cd backend
 # Configurar MongoDB URI
 vercel env add MONGODB_URI
 
-# Cuando pregunte el valor, pega:
-# mongodb+srv://planearia_user:ignacio11@planearia.thhgsor.mongodb.net/planeariaDB?retryWrites=true&w=majority
+# Cuando pregunte el valor, pega tu URI real desde un gestor seguro.
+# Ejemplo placeholder:
+# mongodb+srv://replace_user:replace_password@replace_cluster.mongodb.net/planeariaDB?retryWrites=true&w=majority
 
 # Configurar API Secret
 vercel env add API_SECRET
 
-# Cuando pregunte el valor, usa:
-# planearia-dev-secret-2025
+# Cuando pregunte el valor, usa una cadena aleatoria segura.
+# Debe coincidir con EXPO_PUBLIC_API_SECRET en la app para desarrollo/demo.
 
 # Configurar al menos un proveedor IA del gateway
 vercel env add OPENROUTER_API_KEY
@@ -240,7 +241,7 @@ Body: {
 Todas las requests requieren el header:
 
 ```
-X-API-Key: planearia-dev-secret-2025
+X-API-Key: replace_with_same_value_as_backend_API_SECRET
 ```
 
 ---

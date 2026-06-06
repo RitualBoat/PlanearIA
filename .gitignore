@@ -39,6 +39,7 @@ expo-env.d.ts
 !backend/.env.example
 *.pem
 devops_config.json
+.vercel/
 
 
 # =============================================================================

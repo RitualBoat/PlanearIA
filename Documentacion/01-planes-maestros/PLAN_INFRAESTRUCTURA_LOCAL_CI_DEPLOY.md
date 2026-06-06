@@ -3,7 +3,7 @@
 > **Version:** 1.0
 > **Fecha:** 2026-06-04
 > **Ultima actualizacion:** 2026-06-05
-> **Estado:** [~] Plan maestro activo. Fase 0 y Fase 1 completadas; Fase 2 pendiente.
+> **Estado:** [~] Plan maestro activo. Fases 0, 1 y 2 completadas; Fase 3 pendiente.
 > **Prioridad:** siguiente cimiento despues de cerrar Classroom.
 > **Alcance:** estabilizar entorno local, scripts, CI, backend local/serverless, variables de entorno, evidencia de despliegue low-cost y preparacion futura para migracion SQLite.
 > **Restriccion central:** estudiante/desarrollador solo, presupuesto cero o muy bajo, laptop potente como entorno principal, sin microservicios ni servicios empresariales.
@@ -257,13 +257,13 @@ Evidencia:
 
 ---
 
-### FASE 2: Variables de Entorno, Secrets y Perfiles Local/Web/Movil
+### FASE 2: Variables de Entorno, Secrets y Perfiles Local/Web/Movil [x]
 
 Objetivo: evitar errores de red, secrets expuestos y configuraciones ambiguas entre web, celular y backend.
 
 GitHub/CI - Fase 2:
 
-- Issue/Project item: `Infraestructura Fase 2 - Env vars y perfiles locales`.
+- Issue/Project item: `https://github.com/RitualBoat/PlanearIA/issues/11`.
 - Milestone: `Ciclo 3 - Infraestructura Local y CI`.
 - Labels: `fase`, `infra`, `docs`, `low-cost`, `needs-input` si requiere decision.
 - Estado al iniciar: `In progress`.
@@ -274,19 +274,30 @@ GitHub/CI - Fase 2:
 
 Tareas:
 
-- [ ] **2.1 Revisar `.env.example` y `backend/.env.example`.**
-- [ ] **2.2 Eliminar cualquier ejemplo que parezca secreto real en docs backend.**
-- [ ] **2.3 Documentar matriz de URLs: web localhost, celular LAN, backend local, backend cloud.**
-- [ ] **2.4 Validar que API keys IA solo vivan en backend.**
-- [ ] **2.5 Documentar `AI_DEV_MODE` con warning y limite dev.**
-- [ ] **2.6 Confirmar `.gitignore` para `.env`, `.env.local`, produccion local y archivos sensibles.**
-- [ ] **2.7 Preparar checklist de prueba de red para celular fisico.**
+- [x] **2.1 Revisar `.env.example` y `backend/.env.example`.**
+  - **Completado 2026-06-06:** ambos ejemplos quedan con placeholders seguros; `.env.example` incluye `EXPO_PUBLIC_ALLOW_NATIVE_LOCALHOST=false`.
+- [x] **2.2 Eliminar cualquier ejemplo que parezca secreto real en docs backend.**
+  - **Completado 2026-06-06:** `backend/README.md` reemplaza URI/API secret concretos por placeholders.
+- [x] **2.3 Documentar matriz de URLs: web localhost, celular LAN, backend local, backend cloud.**
+  - **Completado 2026-06-06:** `ENTORNO_LOCAL.md` documenta web, Android emulator, celular fisico, cloud/demo y modo local-only.
+- [x] **2.4 Validar que API keys IA solo vivan en backend.**
+  - **Completado 2026-06-06:** docs actualizadas para prohibir keys IA privadas en `EXPO_PUBLIC_*`; busqueda de patrones sensibles sin coincidencias.
+- [x] **2.5 Documentar `AI_DEV_MODE` con warning y limite dev.**
+  - **Completado 2026-06-06:** `ENTORNO_LOCAL.md` mantiene `AI_DEV_MODE=true` como solo desarrollo, con warning y sin cambiar limite conservador normal.
+- [x] **2.6 Confirmar `.gitignore` para `.env`, `.env.local`, produccion local y archivos sensibles.**
+  - **Completado 2026-06-06:** `.gitignore` ya cubria env locales; se agrego `.vercel/`.
+- [x] **2.7 Preparar checklist de prueba de red para celular fisico.**
+  - **Completado 2026-06-06:** `ENTORNO_LOCAL.md` incluye checklist de red para celular fisico.
 
 Criterio de cierre:
 
-- [ ] Ningun secreto real queda en README/docs.
-- [ ] Hay guia clara para web y celular fisico.
-- [ ] Backend y frontend comparten `API_SECRET` solo como configuracion local segura.
+- [x] Ningun secreto real queda en README/docs.
+- [x] Hay guia clara para web y celular fisico.
+- [x] Backend y frontend comparten `API_SECRET` solo como configuracion local segura.
+
+Evidencia:
+
+- `context/infraestructura-ground-truth/02-evidencia-local/fase-2-env-secrets-perfiles-2026-06-06.md`
 
 ---
 
@@ -525,6 +536,7 @@ Estado inicial recomendado:
 - [x] Crear issue de Fase 0 al iniciar ejecucion: `https://github.com/RitualBoat/PlanearIA/issues/9`.
 - [x] Issue #9 cerrado y movido a `Done` con evidencia baseline.
 - [x] Issue #10 de Fase 1 cerrado y movido a `Done` con evidencia local.
+- [x] Issue #11 de Fase 2 cerrado y movido a `Done` con evidencia local.
 - [ ] Crear issues de fases posteriores solo cuando esten cercanas.
 - [ ] Mantener tareas internas como checkboxes del issue activo.
 

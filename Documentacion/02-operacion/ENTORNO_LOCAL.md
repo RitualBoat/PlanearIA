@@ -70,17 +70,24 @@ Valores minimos para desarrollo:
 ```text
 EXPO_PUBLIC_API_URL=http://localhost:3000
 EXPO_PUBLIC_API_SECRET=el_mismo_valor_que_API_SECRET
+EXPO_PUBLIC_ALLOW_NATIVE_LOCALHOST=false
 API_SECRET=el_mismo_valor_que_EXPO_PUBLIC_API_SECRET
 MONGODB_URI=tu_uri_de_mongodb
 ```
 
 No guardar keys reales en Git. `.env`, `.env.local`, `backend/.env.local` y variantes locales deben permanecer ignoradas.
 
-## Web vs celular fisico
+## Matriz de URLs local/web/movil/backend
 
-- Web en la laptop: `EXPO_PUBLIC_API_URL=http://localhost:3000`.
-- Celular fisico: `localhost` apunta al telefono, no a la laptop.
-- Para celular usa la IP LAN de la laptop:
+| Escenario | `EXPO_PUBLIC_API_URL` | Notas |
+| --- | --- | --- |
+| Web en la misma laptop | `http://localhost:3000` | Requiere `npm run backend:dev`. |
+| Android emulator | `http://10.0.2.2:3000` | Alias habitual del host en Android emulator. |
+| Celular fisico en Wi-Fi | `http://IP_DE_TU_LAPTOP:3000` | Laptop y celular deben estar en la misma red. |
+| Backend cloud/demo | `https://tu-backend.vercel.app` | Solo usar URL sin tokens ni query secrets. |
+| Modo offline/local-only | dejar API URL vacia o backend apagado | La app debe degradar sin pantalla roja. |
+
+Celular fisico: `localhost` apunta al telefono, no a la laptop. Para celular usa la IP LAN de la laptop:
 
 ```text
 EXPO_PUBLIC_API_URL=http://IP_DE_TU_LAPTOP:3000
@@ -93,6 +100,8 @@ EXPO_PUBLIC_API_URL=http://192.168.1.100:3000
 ```
 
 Ambos dispositivos deben estar en la misma red Wi-Fi y el firewall debe permitir el puerto local.
+
+`EXPO_PUBLIC_ALLOW_NATIVE_LOCALHOST=true` solo debe usarse para pruebas puntuales en emuladores o escenarios controlados. En celular fisico real, prefiere IP LAN.
 
 ## IA durante desarrollo
 
@@ -108,6 +117,22 @@ AI_DEV_MAX_REQUESTS_PER_ACTION=100
 ```
 
 El modo dev debe mostrar advertencia visible y no cambia el limite conservador de invitados/usuarios registrados.
+
+Reglas:
+
+- Las API keys de IA viven solo en `backend/.env.local` o en variables del proveedor cloud.
+- Nunca agregar `OPENAI_API_KEY`, `GROQ_API_KEY`, `OPENROUTER_API_KEY` ni similares como `EXPO_PUBLIC_*`.
+- `AI_DEV_MODE=true` aumenta limites solo para desarrollo y debe seguir mostrando warning en UI/respuesta.
+
+## Checklist de red para celular fisico
+
+- Confirmar que laptop y celular estan en la misma red Wi-Fi.
+- Ejecutar `npm run backend:dev` desde la raiz.
+- Confirmar que `http://localhost:3000/api/health` responde en la laptop.
+- Configurar `EXPO_PUBLIC_API_URL=http://IP_DE_TU_LAPTOP:3000`.
+- Confirmar que el firewall permite conexiones entrantes al puerto del backend local.
+- Reiniciar Expo si se cambian variables `EXPO_PUBLIC_*`.
+- No usar screenshots que muestren API secrets, URIs de MongoDB ni tokens IA.
 
 ## Verificacion rapida
 

@@ -62,10 +62,7 @@ Estado del trabajo principal:
 ---
 
 ## Modulos de la App
-<img width="589" height="1280" alt="image" src="https://github.com/user-attachments/assets/0149fc5d-22d7-42db-ad07-570597c7a9f6" /> <img width="589" height="1280" alt="image" src="https://github.com/user-attachments/assets/7a9f4fbf-b2fb-40d7-8f71-fe67b3a4b565" />
-
-
-<img width="589" height="1280" alt="image" src="https://github.com/user-attachments/assets/293fbc6f-62fa-4792-b4ed-7f62392e5edb" /> <img width="589" height="1280" alt="image" src="https://github.com/user-attachments/assets/766bf439-9a3c-4c6e-b8ae-76187497333b" />
+<img width="589" height="1280" alt="image" src="https://github.com/user-attachments/assets/766bf439-9a3c-4c6e-b8ae-76187497333b" />
 
 
 | Modulo | Estado actual | Vision |

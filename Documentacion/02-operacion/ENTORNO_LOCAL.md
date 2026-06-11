@@ -212,13 +212,13 @@ No activar deploy automatico, EAS, Docker ni cambio de proveedor cloud sin decis
 Estado vigente:
 
 - AsyncStorage sigue siendo la persistencia local actual.
-- Expo SQLite queda como primera opcion futura para datos academicos relacionales.
-- No instalar `expo-sqlite` ni migrar datos sin decision explicita.
-- Plan futuro: `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`.
+- Expo SQLite ya esta instalado como infraestructura opt-in para datos academicos relacionales.
+- No activar SQLite como default ni borrar claves legacy sin decision explicita.
+- Plan cerrado: `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`.
 - Evidencia academica: `context/infraestructura-ground-truth/05-sqlite-actividad-academica/`.
 
 Regla practica:
 
 - Preferencias, flags, caches pequenos y drafts simples pueden seguir en AsyncStorage.
-- Grupos, alumnos, unidades, tareas, recursos, asistencias, calificaciones, entregas y cola de sync son candidatos a SQLite.
+- Grupos, alumnos, unidades, tareas, recursos, asistencias, calificaciones, entregas y cola de sync ya tienen infraestructura SQLite opt-in; cualquier plan nuevo debe usar ports/repositories y evitar lecturas directas a AsyncStorage.
 

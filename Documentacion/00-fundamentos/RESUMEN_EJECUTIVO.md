@@ -27,7 +27,8 @@ Experiencias madre:
 - Pasos Iniciales esta cerrado como plan de organizacion: GitHub Product OS, CI inicial, entorno local y secuencia de planes.
 - Classroom esta cerrado como experiencia base.
 - Infraestructura Local/CI/Deploy Basico quedo cerrado; Fases 0 a 7 completadas con scripts, CI, backend smoke, demo low-cost y preparacion SQLite.
-- UX/UI Global, Auth/Seguridad, Excel/Listas, Canva, WhatsApp docente, Reportes y migracion SQLite real quedan como planes posteriores.
+- Storage Local SQLite y Migracion Offline quedo cerrado para entrega academica: SQLite esta instalado como infraestructura opt-in con schema, adapter, migracion, sync queue y rollback; AsyncStorage sigue como default.
+- UX/UI Global, Auth/Seguridad, Excel/Listas, Canva, WhatsApp docente, Reportes y activacion SQLite como default quedan como decisiones posteriores.
 
 ## Stack actual
 
@@ -35,8 +36,8 @@ Experiencias madre:
 - TypeScript 5.9.
 - React Navigation 7.
 - Context + hooks ViewModel.
-- AsyncStorage como persistencia local actual.
-- SQLite/Expo SQLite como destino recomendado para datos relacionales futuros.
+- AsyncStorage como persistencia local default y rollback.
+- SQLite/Expo SQLite como infraestructura opt-in disponible para datos academicos relacionales y sync queue.
 - Backend Node en `backend/api`.
 - MongoDB Atlas/free tier.
 - IA gateway multi-provider en backend.
@@ -46,7 +47,7 @@ Experiencias madre:
 
 - No crear pantallas aisladas sin entrada, salida y CTA claro.
 - No duplicar flujos entre hubs legacy y modulos nuevos.
-- No acoplar pantallas nuevas directamente a AsyncStorage si eso bloquea SQLite.
+- No acoplar pantallas nuevas directamente a AsyncStorage; usar ports/repositories compatibles con SQLite.
 - No gastar en servicios hasta que exista demo/piloto que lo justifique.
 - Todo plan maestro debe seguir `Documentacion/01-planes-maestros/meta_guia_planes.md`.
 

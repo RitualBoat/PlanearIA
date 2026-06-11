@@ -49,15 +49,15 @@ export interface EngineResult {
 // ─── Constantes ──────────────────────────────────────────────────────────────
 
 const MAX_RETRIES = 5;
-const STORAGE_PREFIX = "@planearia:pending_ops_v2_";
-const FAILED_OPS_KEY = "@planearia:failed_ops_v2";
+export const SYNC_PENDING_OPS_STORAGE_PREFIX = "@planearia:pending_ops_v2_";
+export const SYNC_FAILED_OPS_STORAGE_KEY = "@planearia:failed_ops_v2";
 
 // ─── Utilidades internas ─────────────────────────────────────────────────────
 
 const generateOpId = (): string =>
   `op_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 const getStorageKey = (entity: string): string =>
-  `${STORAGE_PREFIX}${entity}`;
+  `${SYNC_PENDING_OPS_STORAGE_PREFIX}${entity}`;
 
 // ─── API pública del motor ────────────────────────────────────────────────────
 
@@ -126,7 +126,7 @@ export const getPendingOps = async <T = unknown>(
  */
 export const getFailedOps = async (): Promise<GenericPendingOp[]> => {
   try {
-    const raw = await AsyncStorage.getItem(FAILED_OPS_KEY);
+    const raw = await AsyncStorage.getItem(SYNC_FAILED_OPS_STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -137,7 +137,7 @@ export const getFailedOps = async (): Promise<GenericPendingOp[]> => {
  * Limpia las operaciones fallidas (después de que el usuario las confirmó).
  */
 export const clearFailedOps = async (): Promise<void> => {
-  await AsyncStorage.removeItem(FAILED_OPS_KEY);
+  await AsyncStorage.removeItem(SYNC_FAILED_OPS_STORAGE_KEY);
 };
 
 /**
@@ -250,7 +250,7 @@ export const flushQueue = async (
   if (newFailed.length > 0) {
     const existingFailed = await getFailedOps();
     await AsyncStorage.setItem(
-      FAILED_OPS_KEY,
+      SYNC_FAILED_OPS_STORAGE_KEY,
       JSON.stringify([...existingFailed, ...newFailed])
     );
     result.success = false;

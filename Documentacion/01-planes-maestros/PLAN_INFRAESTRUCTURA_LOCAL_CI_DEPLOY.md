@@ -3,9 +3,9 @@
 > **Version:** 1.0
 > **Fecha:** 2026-06-04
 > **Ultima actualizacion:** 2026-06-05
-> **Estado:** [x] Plan maestro cerrado. Fases 0 a 7 completadas; migracion SQLite real queda en plan futuro.
+> **Estado:** [x] Plan maestro cerrado. Fases 0 a 7 completadas; el plan SQLite posterior tambien quedo cerrado como infraestructura opt-in.
 > **Prioridad:** siguiente cimiento despues de cerrar Classroom.
-> **Alcance:** estabilizar entorno local, scripts, CI, backend local/serverless, variables de entorno, evidencia de despliegue low-cost y preparacion futura para migracion SQLite.
+> **Alcance:** estabilizar entorno local, scripts, CI, backend local/serverless, variables de entorno, evidencia de despliegue low-cost y preparar la decision de storage SQLite que luego se cerro en plan separado.
 > **Restriccion central:** estudiante/desarrollador solo, presupuesto cero o muy bajo, laptop potente como entorno principal, sin microservicios ni servicios empresariales.
 
 ---
@@ -22,7 +22,7 @@ Este plan no busca "infra enterprise". Busca que el proyecto tenga:
 - Variables de entorno seguras y documentadas.
 - Backend local/cloud low-cost listo para demos.
 - Criterios claros para decidir Vercel, Render, Railway, Expo EAS o self-host local.
-- Preparacion formal para migrar storage local de AsyncStorage a SQLite cuando toque.
+- Preparacion formal para decidir storage local SQLite; la implementacion opt-in se cerro despues en `PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`.
 
 ---
 
@@ -532,7 +532,7 @@ Tareas:
 - [x] **7.1 Actualizar `README.md`.**
   - **Completado 2026-06-06:** estado del plan, roadmap y estrategia de demo/storage actualizados.
 - [x] **7.2 Actualizar `Documentacion/README.md`.**
-  - **Completado 2026-06-06:** indices apuntan a infraestructura cerrada y SQLite futuro.
+  - **Actualizado 2026-06-11:** indices apuntan a infraestructura cerrada y a SQLite cerrado como infraestructura opt-in en plan separado.
 - [x] **7.3 Actualizar `ENTORNO_LOCAL.md`.**
   - **Completado 2026-06-06:** backend local, ngrok, Vercel, storage y scripts documentados.
 - [x] **7.4 Actualizar `GUIA_PRUEBAS.md`.**
@@ -540,7 +540,7 @@ Tareas:
 - [x] **7.5 Actualizar `GITHUB_PRODUCT_OS.md` si cambian reglas.**
   - **Completado 2026-06-06:** regla de Review Manual confirmada y cierre sin commit automatico.
 - [x] **7.6 Registrar decisiones de deploy y storage pendiente.**
-  - **Completado 2026-06-06:** ngrok temporal, Vercel futuro, Render fallback y Expo SQLite futuro.
+  - **Actualizado 2026-06-11:** ngrok temporal, Vercel futuro, Render fallback y Expo SQLite opt-in ya documentado en el plan de storage.
 - [x] **7.7 Actualizar GitHub Project y cerrar issues.**
   - **Completado 2026-06-06:** issues #16 y #17 quedan listos para Done; Project actualizado.
 - [x] **7.8 Commit solo cuando el usuario lo pida o confirme.**
@@ -626,5 +626,5 @@ Este plan se considera completado cuando:
 - [x] Backend local/cloud tiene ruta de demo clara.
 - [x] Variables de entorno estan documentadas sin secretos.
 - [x] Se decidio mantener o cambiar Vercel/Render/Railway/self-host.
-- [x] SQLite queda preparado como plan futuro con evidencia academica.
+- [x] SQLite quedo preparado en este plan y cerrado despues como infraestructura opt-in con evidencia academica.
 - [x] GitHub Project y README quedan actualizados.

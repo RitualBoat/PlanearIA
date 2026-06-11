@@ -1,0 +1,94 @@
+{
+  "version": "sqlite-fase-0-fixture-minimo-2026-06-10",
+  "descripcion": "Fixture academico pequeno para probar migracion futura AsyncStorage -> SQLite sin datos personales reales.",
+  "asyncStorage": {
+    "@planearia:grupos": [
+      {
+        "id": "grupo-demo-1",
+        "nombre": "Matematicas 1A",
+        "grado": "1",
+        "grupo": "A",
+        "materia": "Matematicas",
+        "color": "#2563eb"
+      }
+    ],
+    "@planearia:alumnos": [
+      {
+        "id": "alumno-demo-1",
+        "grupoId": "grupo-demo-1",
+        "nombre": "Ana Demo",
+        "numeroLista": 1,
+        "estado": "activo"
+      },
+      {
+        "id": "alumno-demo-2",
+        "grupoId": "grupo-demo-1",
+        "nombre": "Luis Demo",
+        "numeroLista": 2,
+        "estado": "activo"
+      }
+    ],
+    "@planearia:unidades_classroom": [
+      {
+        "id": "unidad-demo-1",
+        "grupoId": "grupo-demo-1",
+        "titulo": "Unidad 1",
+        "descripcion": "Numeros y operaciones",
+        "position": 1
+      }
+    ],
+    "@planearia:tareas": [
+      {
+        "id": "tarea-demo-1",
+        "grupoId": "grupo-demo-1",
+        "titulo": "Ejercicios diagnosticos",
+        "descripcion": "Resolver ejercicios de repaso",
+        "fechaEntrega": "2026-06-12",
+        "puntajeMaximo": 100
+      }
+    ],
+    "@planearia:recursos": [
+      {
+        "id": "recurso-demo-1",
+        "grupoId": "grupo-demo-1",
+        "titulo": "Guia de repaso",
+        "tipo": "documento"
+      }
+    ],
+    "@planearia:asistencias": [
+      {
+        "id": "asistencia-demo-1",
+        "grupoId": "grupo-demo-1",
+        "alumnoId": "alumno-demo-1",
+        "fecha": "2026-06-10",
+        "estado": "presente"
+      },
+      {
+        "id": "asistencia-demo-2",
+        "grupoId": "grupo-demo-1",
+        "alumnoId": "alumno-demo-2",
+        "fecha": "2026-06-10",
+        "estado": "retardo"
+      }
+    ],
+    "@planearia:calificaciones": [
+      {
+        "id": "calificacion-demo-1",
+        "grupoId": "grupo-demo-1",
+        "alumnoId": "alumno-demo-1",
+        "tareaId": "tarea-demo-1",
+        "valor": 95
+      }
+    ],
+    "@planearia:entregas": [
+      {
+        "id": "entrega-demo-1",
+        "grupoId": "grupo-demo-1",
+        "alumnoId": "alumno-demo-1",
+        "tareaId": "tarea-demo-1",
+        "estado": "entregado",
+        "fechaEntrega": "2026-06-10"
+      }
+    ]
+  }
+}

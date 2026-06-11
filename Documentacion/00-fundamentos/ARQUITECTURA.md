@@ -263,7 +263,7 @@ Transformar cada modulo de formularios nativos simples a experiencias docentes f
 
 ### Estado actual
 
-El modulo de **Planeaciones** cerro Fase 9 como primera gran refactorizacion. `PLAN_PASOS_INICIALES.md` y **Classroom** quedaron cerrados como cimientos funcionales. `PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` quedo cerrado hasta Fase 7 con entorno local, CI, backend smoke, demo low-cost y preparacion SQLite. La migracion real a SQLite vive como plan futuro en `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`.
+El modulo de **Planeaciones** cerro Fase 9 como primera gran refactorizacion. `PLAN_PASOS_INICIALES.md` y **Classroom** quedaron cerrados como cimientos funcionales. `PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` quedo cerrado hasta Fase 7 con entorno local, CI, backend smoke y demo low-cost. `PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md` tambien quedo cerrado para entrega academica: SQLite existe como infraestructura opt-in para datos academicos relacionales y sync queue, mientras AsyncStorage sigue como default productivo y rollback.
 
 ---
 

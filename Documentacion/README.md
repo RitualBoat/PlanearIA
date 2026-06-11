@@ -12,8 +12,7 @@ Si eres una IA o agente nuevo, lee en este orden:
 2. `00-fundamentos/VISION_ACTUAL.md`
 3. `00-fundamentos/ARQUITECTURA.md`
 4. `01-planes-maestros/meta_guia_planes.md`
-5. `01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` si vas a continuar el plan activo
-6. `01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md` si vas a tocar storage local o SQLite
+5. `01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md` si vas a tocar storage local, offline-first o datos academicos relacionales
 6. `02-operacion/ENTORNO_LOCAL.md`
 7. `02-operacion/GUIA_PRUEBAS.md`
 
@@ -35,6 +34,7 @@ Si eres una IA o agente nuevo, lee en este orden:
 - Pasos Iniciales: cerrado como organizacion de GitHub, CI inicial y entorno.
 - Classroom: cerrado. Fases 0 a 10, validacion final e issue #8 completados.
 - Infraestructura Local/CI/Deploy Basico: cerrado; Fases 0 a 7 completadas.
+- Storage Local SQLite y Migracion Offline: cerrado para entrega academica; SQLite quedo como infraestructura opt-in con rollback, AsyncStorage sigue default.
 - UX/UI Global: pendiente, se hara cuando existan mas flujos funcionales.
 - Auth/Excel/Canva/WhatsApp/Reportes: pendientes de planes futuros.
 
@@ -57,7 +57,7 @@ Si eres una IA o agente nuevo, lee en este orden:
 | --- | --- |
 | `01-planes-maestros/meta_guia_planes.md` | Vigente; instructivo obligatorio para crear planes. |
 | `01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` | Cerrado; Fases 0 a 7 completadas. |
-| `01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md` | Futuro; no iniciar sin decision explicita. |
+| `01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md` | Cerrado para entrega academica; SQLite opt-in con rollback. |
 | `01-planes-maestros/PLAN_CLASSROOM.md` | Cerrado; #8 completado. |
 | `01-planes-maestros/PLAN_PASOS_INICIALES.md` | Cerrado. |
 | `01-planes-maestros/plan_planeaciones.md` | Cerrado; referencia de calidad. |
@@ -102,6 +102,7 @@ Archivados principales:
 - No cerrar fases visuales de paridad alta solo por pasar TypeScript/lint/tests; exigir validacion manual contra capturas/referencias.
 - No crear rutas/pantallas aisladas sin mapa de navegacion.
 - No duplicar flujos entre Contenido, Classroom y pantallas legacy.
+- Todo plan nuevo que toque datos academicos debe asumir SQLite como infraestructura disponible opt-in y evitar nuevas lecturas directas a AsyncStorage; usar ports/repositories.
 - Mantener tracking markdown `[ ]`, `[~]`, `[x]` en planes.
 - Crear issues de GitHub solo para epicas/fases activas, no para todo el backlog futuro.
 - Cada fase ejecutable debe registrar su bloque `GitHub/CI - Fase X` con issue/Project item, milestone, labels, scripts y estado del tablero.
@@ -114,7 +115,7 @@ Archivados principales:
 - TypeScript 5.9.
 - React Navigation 7.
 - Context + hooks ViewModel.
-- AsyncStorage actual; SQLite/Expo SQLite como destino futuro para datos relacionales.
+- AsyncStorage sigue como default productivo; SQLite/Expo SQLite ya existe como infraestructura opt-in para datos relacionales academicos y sync queue.
 - Backend Node en `backend/api`.
 - MongoDB Atlas/free tier.
 - IA gateway multi-provider en backend.

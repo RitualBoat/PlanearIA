@@ -57,6 +57,7 @@ Estado del trabajo principal:
 - Pasos Iniciales quedo cerrado como cimiento de GitHub Product OS, CI inicial y entorno local.
 - Classroom quedo cerrado: Fases 0 a 10, validacion final y issue consolidado #8 completados.
 - Infraestructura Local/CI/Deploy Basico quedo cerrado como cimiento operativo.
+- Storage Local SQLite y Migracion Offline quedo cerrado para entrega academica: SQLite existe como infraestructura opt-in con schema, adapter, migracion, sync queue y rollback; AsyncStorage sigue como default productivo.
 - `Documentacion/01-planes-maestros/meta_guia_planes.md` define el estandar para futuros planes.
 
 ---
@@ -108,8 +109,8 @@ Estado del trabajo principal:
 | Lenguaje | TypeScript 5.9.2 | Tipado estatico y modelos compartidos. |
 | Navegacion | React Navigation 7.x | Stack navigator y bottom tabs. |
 | Estado | React Context + hooks | MVVM: screens delgadas, hooks como ViewModels. |
-| Storage local | AsyncStorage | Fuente local actual para offline-first. |
-| Storage futuro | SQLite/Expo SQLite | Recomendado para datos relacionales/pesados. |
+| Storage local default | AsyncStorage | Fuente local productiva actual para offline-first y rollback. |
+| Storage relacional opt-in | SQLite/Expo SQLite | Infraestructura instalada para datos academicos relacionales, migracion y sync queue. |
 | Backend | Node en `backend/api` | Endpoints por modulo. |
 | Base de datos | MongoDB Atlas/free tier | Persistencia remota de bajo costo. |
 | Auth | JWT | Aislamiento por `userId` en endpoints. |
@@ -159,7 +160,7 @@ Planes actuales:
 | Plan | Archivo | Estado |
 | ---- | ------- | ------ |
 | Infraestructura Local, CI y Deploy Basico | [`Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`](./Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md) | Cerrado; Fases 0 a 7 completadas. |
-| Storage Local SQLite y Migracion Offline | [`Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`](./Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md) | Futuro preparado; no iniciar sin decision explicita. |
+| Storage Local SQLite y Migracion Offline | [`Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`](./Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md) | Cerrado para entrega academica; SQLite opt-in con rollback. |
 | Classroom / Grupos y Recursos | [`Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`](./Documentacion/01-planes-maestros/PLAN_CLASSROOM.md) | Cerrado; #8 completado. |
 | Planeaciones | [`Documentacion/01-planes-maestros/plan_planeaciones.md`](./Documentacion/01-planes-maestros/plan_planeaciones.md) | Cerrado. Fase 9 aprobada. |
 | Pasos iniciales | [`Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md`](./Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md) | Cerrado como cimiento organizativo. |
@@ -174,8 +175,8 @@ Planes actuales:
 ### Corto plazo
 
 - Mantener GitHub Product OS alineado con el siguiente plan activo.
-- Elegir el siguiente frente: Auth/Seguridad, UX/UI Global, Excel/Listas o Storage SQLite si la actividad academica lo exige.
-- No iniciar migracion SQLite real sin revisar el plan futuro y confirmar requisitos/PDF.
+- Elegir el siguiente frente: Auth/Seguridad, UX/UI Global, Excel/Listas, Calificacion/Revision o Reportes.
+- No activar SQLite como default ni borrar AsyncStorage legacy sin nueva aprobacion manual; nuevos planes deben disenar datos academicos mediante ports/repositories compatibles con SQLite.
 
 ### Mediano plazo
 

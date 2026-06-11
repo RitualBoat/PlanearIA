@@ -120,7 +120,8 @@ Storage:
 
 - Si se toca AsyncStorage/sync, ejecutar `npm run test:sync -- --runInBand`.
 - Si se toca Classroom/storage academico, ejecutar `npm run test:classroom -- --runInBand`.
-- No instalar ni activar SQLite sin seguir `PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`.
+- SQLite ya esta instalado como infraestructura opt-in; no activarlo como default ni borrar claves legacy sin nuevo plan/validacion manual.
+- Si se toca SQLite adapter, migracion o sync queue, ejecutar `npm run typecheck`, `npm run test:classroom -- --runInBand`, `npm run test:sync -- --runInBand` y `npm run lint -- --quiet`.
 
 ## Antes de cerrar una fase
 

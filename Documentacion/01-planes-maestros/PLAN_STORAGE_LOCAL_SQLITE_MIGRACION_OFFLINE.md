@@ -2,7 +2,7 @@
 
 > **Version:** 0.1
 > **Fecha:** 2026-06-06
-> **Estado:** [ ] Plan futuro preparado. No iniciar sin decision explicita.
+> **Estado:** [x] Cerrado para entrega academica. SQLite implementado como infraestructura opt-in con rollback.
 > **Origen:** Fase 6 del plan `PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`.
 > **Alcance:** migrar datos academicos relacionales desde AsyncStorage a Expo SQLite sin romper offline-first, sync ni demos.
 
@@ -225,4 +225,16 @@ No iniciar este plan hasta que el usuario confirme:
 
 ## 10. Estado
 
-Plan preparado. Siguiente accion recomendada cuando toque: ejecutar Fase 0 de baseline y leer el PDF/instrucciones especificas de la actividad academica.
+Plan cerrado para entrega academica. Fase 0 baseline completada, Fase 1 ports/repositories implementada, Fase 2 SQLite adapter creado, Fase 3 migracion con snapshot implementada, Fase 4 sync queue implementada como flujo opt-in, Fase 5 validada manualmente y Fase 6 cerrada sin borrar claves legacy. SQLite queda listo como infraestructura demostrable y reversible; AsyncStorage permanece como storage default hasta una aprobacion futura.
+
+## 11. GitHub Product OS
+
+- Issue consolidado: #18 `Storage SQLite Fases 0-6 - cierre academico con rollback`.
+- Fase 0: #19 `SQLite Fase 0 - Baseline y evidencia`.
+- Fase 1: #20 `SQLite Fase 1 - Ports y repositories`.
+- Fase 2: #21 `SQLite Fase 2 - Adapter SQLite inicial`.
+- Fase 3: #22 `SQLite Fase 3 - Migracion con snapshot JSON`.
+- Fase 4: #23 `SQLite Fase 4 - Sync queue SQLite`.
+- Fase 5: #24 `SQLite Fase 5 - Validacion manual final`.
+- Fase 6: #25 `SQLite Fase 6 - Limpieza controlada y cierre`.
+- Todos quedaron cerrados y en `Done` dentro de `PlanearIA Product OS`.

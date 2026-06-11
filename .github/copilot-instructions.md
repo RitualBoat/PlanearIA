@@ -5,14 +5,15 @@
 PlanearIA es una app React Native + Expo SDK 54 + TypeScript para docentes mexicanos.
 Arquitectura MVVM con hooks como ViewModels.
 Backend: Vercel serverless + MongoDB Atlas.
-Storage local: AsyncStorage (offline-first).
+Storage local default: AsyncStorage (offline-first). SQLite/Expo SQLite existe como infraestructura opt-in para datos academicos relacionales y sync queue.
 Auth: JWT con userId isolation.
 
 ## Plan de Trabajo Activo
 
-- El plan activo actual es `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`.
+- No hay plan activo nuevo elegido en este momento; el siguiente plan debe crearse solo cuando el usuario lo pida.
 - El plan de Planeaciones quedo cerrado como referencia en `Documentacion/01-planes-maestros/plan_planeaciones.md`.
 - El plan de Pasos Iniciales quedo cerrado como cimiento organizativo en `Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md`.
+- El plan SQLite quedo cerrado en `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`; nuevos datos academicos deben disenarse con ports/repositories compatibles con SQLite, sin nuevas lecturas directas a AsyncStorage.
 - La guia obligatoria para nuevos planes maestros es `Documentacion/01-planes-maestros/meta_guia_planes.md`.
 - Cada modulo importante tendra su propio plan maestro dentro de `Documentacion/01-planes-maestros/`, siguiendo tracking `[ ]`, `[~]`, `[x]`.
 - Las tareas se marcan con: `[ ]` pendiente, `[~]` en progreso, `[x]` completado.
@@ -55,7 +56,7 @@ La app tiene pantallas/modulos que existen como esqueleto visual pero **no tiene
 
 ### MongoDB -- Base de Datos y Endpoints Backend
 
-La base de datos MongoDB Atlas (`planeariaDB`) esta conectada. La app es offline-first: AsyncStorage es la fuente primaria. MongoDB es el respaldo via sincronizacion.
+La base de datos MongoDB Atlas (`planeariaDB`) esta conectada. La app es offline-first: AsyncStorage sigue como default productivo y rollback; SQLite queda como infraestructura opt-in para datos academicos relacionales. MongoDB es el respaldo via sincronizacion.
 
 #### Regla obligatoria: Indices al crear endpoints
 

@@ -1225,7 +1225,7 @@ Esta guia es orientativa y no debe bloquear el trabajo si los modelos disponible
 > **Version:** 1.0
 > **Fecha:** YYYY-MM-DD
 > **Alcance:** [descripcion]
-> **Stack:** React Native - Expo - TypeScript - MongoDB Atlas - AsyncStorage actual / SQLite futuro - MVVM
+> **Stack:** React Native - Expo - TypeScript - MongoDB Atlas - AsyncStorage default / SQLite opt-in - MVVM
 > **Modulo:** [nombre]
 > **Estado actual:** [resumen basado en codigo]
 

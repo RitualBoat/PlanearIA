@@ -18,21 +18,21 @@ Este archivo lista los planes maestros actuales y futuros. No reemplaza los plan
 | Pasos Iniciales | `Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md` | Cerrado como cimiento organizativo. |
 | Classroom / Grupos y Recursos | `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md` | Cerrado. Fases 0-10, cierre final e issue #8 completados. |
 | Infraestructura Local, CI y Deploy Basico | `Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` | Cerrado. Fases 0 a 7 completadas. |
-| Storage Local SQLite y Migracion Offline | `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md` | Futuro preparado; no iniciar sin decision explicita. |
+| Storage Local SQLite y Migracion Offline | `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md` | Cerrado para entrega academica; SQLite opt-in con rollback. |
 | Meta Guia de Planes | `Documentacion/01-planes-maestros/meta_guia_planes.md` | Vigente como instructivo obligatorio. |
 
 ## Orden recomendado de planes futuros
 
 1. `Plan Maestro: Auth, Seguridad y Sesion Real`
 2. `Plan Maestro: UX/UI y Navegacion Global`
-3. `Plan Maestro: Excel / Listas y Sync Bidireccional`
-4. `Plan Maestro: Storage Local SQLite y Migracion Offline`
-5. `Plan Maestro: Calificacion y Revision de Tareas`
-6. `Plan Maestro: Calendario y Seguimiento Personal`
-7. `Plan Maestro: WhatsApp Docente / Chat y Contactos`
-8. `Plan Maestro: Canva / Diseno Didactico`
-9. `Plan Maestro: Reportes y Gamificacion`
-10. `Plan Maestro: Plantillas y Comunidad de Recursos`
+3. `Plan Maestro: Calificacion y Revision de Tareas`
+4. `Plan Maestro: Excel / Listas y Sync Bidireccional`
+5. `Plan Maestro: Calendario y Seguimiento Personal`
+6. `Plan Maestro: WhatsApp Docente / Chat y Contactos`
+7. `Plan Maestro: Canva / Diseno Didactico`
+8. `Plan Maestro: Reportes y Gamificacion`
+9. `Plan Maestro: Plantillas y Comunidad de Recursos`
+10. `Plan Maestro: Activacion SQLite como default` solo si una validacion futura lo justifica
 11. `Plan Maestro: Despliegue y Distribucion`
 
 ## Criterio para activar un plan
@@ -41,7 +41,8 @@ Este archivo lista los planes maestros actuales y futuros. No reemplaza los plan
 - Auth/Seguridad: antes de usuarios reales, beta cerrada o pruebas con datos reales.
 - UX/UI Global: cuando los modulos principales funcionen pero la navegacion empiece a sentirse fragmentada; no debe bloquear funcionalidad base de los modulos.
 - Excel/Listas: despues de tener Classroom con datos reales de grupos/alumnos/tareas.
-- Storage Local SQLite: cuando se decida migrar persistencia local o cuando la actividad academica requiera evidencia antes/despues.
+- Storage Local SQLite: cerrado como infraestructura opt-in; nuevos planes deben asumir ports/repositories compatibles con SQLite y no leer AsyncStorage directo.
+- Activacion SQLite como default: solo tras nueva decision explicita, snapshot real, rollback probado y validacion manual.
 - Calificacion: cuando actividades/entregas de Classroom tengan flujo base.
 - Calendario: cuando planeaciones y tareas ya tengan fechas confiables.
 - WhatsApp docente: cuando contactos/chat tengan valor claro sin competir con Classroom.
@@ -55,4 +56,6 @@ Este archivo lista los planes maestros actuales y futuros. No reemplaza los plan
 - Issue de cierre `Classroom Fases 6-10 - cierre tecnico consolidado y validacion manual` (#8): cerrado y en `Done`.
 - Epic `Plan Maestro: Infraestructura Local, CI y Deploy Basico`: listo para `Done`.
 - Issues #9 a #17 de Infraestructura: cerrados/listos para `Done`.
+- Issue consolidado Storage SQLite #18: cerrado en `Done`.
+- Issues de fases SQLite #19-#25: cerrados en `Done`.
 - Siguiente issue recomendado: crear solo cuando el usuario elija el siguiente plan activo.

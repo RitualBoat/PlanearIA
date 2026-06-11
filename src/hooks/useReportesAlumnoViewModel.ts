@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
-import type { Alumno, Asistencia, Calificacion, EntregaTarea, Tarea } from "../../types";
+import type { Calificacion } from "../../types";
 import {
   calcularEstadisticasAlumno,
   type EstadisticasAlumno,
 } from "../services/alumnoReportesService";
+import { classroomRepository } from "../services/classroom/classroomRepository";
 import { exportarReporteAlumno } from "../services/reportesExportService";
 
 type Nav = StackNavigationProp<RootStackParamList, "ReportesAlumno">;
@@ -104,28 +104,12 @@ export const useReportesAlumnoViewModel = (): UseReportesAlumnoViewModel => {
       setEstado("loading");
       setErrorCodigo("");
 
-      const [alumnosRaw, tareasRaw, asistenciasRaw, calificacionesRaw, entregasRaw] =
-        await Promise.all([
-          AsyncStorage.getItem("@planearia:alumnos"),
-          AsyncStorage.getItem("@planearia:tareas"),
-          AsyncStorage.getItem("@planearia:asistencias"),
-          AsyncStorage.getItem("@planearia:calificaciones"),
-          AsyncStorage.getItem("@planearia:entregas"),
-        ]);
-
-      const alumnos = (alumnosRaw ? JSON.parse(alumnosRaw) : []) as Alumno[];
-      const tareas = (tareasRaw ? JSON.parse(tareasRaw) : []) as Tarea[];
-      const asistencias = (asistenciasRaw ? JSON.parse(asistenciasRaw) : []) as Asistencia[];
-      const calificaciones = (
-        calificacionesRaw ? JSON.parse(calificacionesRaw) : []
-      ) as Calificacion[];
-
-      const entregasBase = (entregasRaw ? JSON.parse(entregasRaw) : []) as EntregaTarea[];
-      const entregablesFallbackRaw = await AsyncStorage.getItem("@planearia:entregables");
-      const entregas =
-        entregasBase.length > 0
-          ? entregasBase
-          : ((entregablesFallbackRaw ? JSON.parse(entregablesFallbackRaw) : []) as EntregaTarea[]);
+      const dataset = await classroomRepository.readDataset();
+      const alumnos = dataset.alumnos;
+      const tareas = dataset.actividades;
+      const asistencias = dataset.asistencias;
+      const calificaciones = dataset.calificaciones;
+      const entregas = dataset.entregas;
 
       const alumno = alumnos.find((item) => item.id === alumnoId);
       if (alumno) {
@@ -134,7 +118,8 @@ export const useReportesAlumnoViewModel = (): UseReportesAlumnoViewModel => {
           setAlumnoNombre(fullName);
         }
         if (alumno.grupoId) {
-          setGrupoNombre(`Grupo ${alumno.grupoId}`);
+          const grupo = dataset.grupos.find((item) => item.id === alumno.grupoId);
+          setGrupoNombre(grupo?.nombre ?? `Grupo ${alumno.grupoId}`);
         } else {
           setGrupoNombre("Grupo sin asignar");
         }

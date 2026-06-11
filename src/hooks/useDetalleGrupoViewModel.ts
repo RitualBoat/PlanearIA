@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RouteProp } from "@react-navigation/native";
@@ -17,6 +16,7 @@ import type {
   Tarea,
 } from "../../types";
 import { exportarGrupoArchivo, type GrupoExportFormat } from "../services/grupoExportService";
+import { classroomRepository } from "../services/classroom/classroomRepository";
 import { useAddStudentsModal } from "./useAddStudentsModal";
 import { useRemoveStudentModal } from "./useRemoveStudentModal";
 import { useGrupoNotas } from "./useGrupoNotas";
@@ -184,7 +184,7 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
   // --- Shared persistence for student management ---
   const persistAlumnosAndCount = useCallback(
     async (nextAlumnos: Alumno[]) => {
-      await AsyncStorage.setItem("@planearia:alumnos", JSON.stringify(nextAlumnos));
+      await classroomRepository.replaceAlumnos(nextAlumnos);
       setAllAlumnos(nextAlumnos);
       const alumnosDelGrupo = nextAlumnos.filter((alumno) => alumno.grupoId === grupoId);
       setAlumnos(alumnosDelGrupo);
@@ -197,32 +197,18 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
   const addStudents = useAddStudentsModal(grupoId, allAlumnos, persistAlumnosAndCount);
   const removeStudent = useRemoveStudentModal(allAlumnos, persistAlumnosAndCount);
 
-  const readArray = useCallback(async <T>(key: string): Promise<T[]> => {
-    const raw = await AsyncStorage.getItem(key);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as T[]) : [];
-  }, []);
-
   const reloadDetalleData = useCallback(async () => {
     try {
       setIsLoadingData(true);
       setLoadError("");
 
-      const [alumnosRaw, tareasRaw, recursosRaw, asistenciasRaw, calificacionesRaw, entregasRaw] =
-        await Promise.all([
-          readArray<Alumno>("@planearia:alumnos"),
-          readArray<Tarea>("@planearia:tareas"),
-          readArray<Recurso>("@planearia:recursos"),
-          readArray<Asistencia>("@planearia:asistencias"),
-          readArray<Calificacion>("@planearia:calificaciones"),
-          readArray<EntregaTarea>("@planearia:entregas"),
-        ]);
-
-      const entregablesRaw =
-        entregasRaw.length > 0
-          ? entregasRaw
-          : await readArray<EntregaTarea>("@planearia:entregables");
+      const dataset = await classroomRepository.readDataset();
+      const alumnosRaw = dataset.alumnos;
+      const tareasRaw = dataset.actividades;
+      const recursosRaw = dataset.materiales;
+      const asistenciasRaw = dataset.asistencias;
+      const calificacionesRaw = dataset.calificaciones;
+      const entregasRaw = dataset.entregas;
 
       setAllAlumnos(alumnosRaw);
       setAlumnos(alumnosRaw.filter((alumno) => alumno.grupoId === grupoId));
@@ -235,14 +221,14 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
       const tareasGrupoIds = new Set(
         tareasRaw.filter((tarea) => tarea.grupoId === grupoId).map((t) => t.id)
       );
-      setEntregas(entregablesRaw.filter((entrega) => tareasGrupoIds.has(entrega.tareaId)));
+      setEntregas(entregasRaw.filter((entrega) => tareasGrupoIds.has(entrega.tareaId)));
       setLastDataRefreshAt(new Date());
     } catch {
       setLoadError("No se pudieron cargar los datos del grupo.");
     } finally {
       setIsLoadingData(false);
     }
-  }, [grupoId, readArray]);
+  }, [grupoId]);
 
   useEffect(() => {
     void reloadDetalleData();

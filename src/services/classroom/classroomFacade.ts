@@ -18,11 +18,12 @@ import {
   buildClassroomResumen,
   type BuildClassroomModelResult,
 } from "./classroomModel";
+import type { ClassroomStoragePort } from "./classroomStorage";
 import {
-  CLASSROOM_STORAGE_KEYS,
-  classroomStorage,
-  type ClassroomStoragePort,
-} from "./classroomStorage";
+  classroomRepository,
+  createClassroomRepository,
+  type ClassroomRepository,
+} from "./classroomRepository";
 
 export interface ClassroomFacade {
   listGrupos(): Promise<Array<Partial<Grupo>>>;
@@ -42,81 +43,25 @@ export interface ClassroomFacade {
 }
 
 export function createClassroomFacade(
-  storage: ClassroomStoragePort = classroomStorage,
+  storageOrRepository?: ClassroomStoragePort | ClassroomRepository,
 ): ClassroomFacade {
-  const readDataset = async (): Promise<Required<Omit<ClassroomDataset, "grupo">> & {
-    grupos: Array<Partial<Grupo>>;
-  }> => {
-    const [
-      grupos,
-      unidades,
-      alumnos,
-      tareas,
-      tareasLegacy,
-      recursos,
-      asistencias,
-      calificaciones,
-      entregas,
-      entregasLegacy,
-    ] = await Promise.all([
-      storage.readArray<Partial<Grupo>>(CLASSROOM_STORAGE_KEYS.grupos),
-      storage.readArray<UnidadClassroom>(CLASSROOM_STORAGE_KEYS.unidades),
-      storage.readArray<Alumno>(CLASSROOM_STORAGE_KEYS.alumnos),
-      storage.readArray<Tarea>(CLASSROOM_STORAGE_KEYS.tareas),
-      storage.readArray<Tarea>(CLASSROOM_STORAGE_KEYS.tareasLegacy),
-      storage.readArray<Recurso>(CLASSROOM_STORAGE_KEYS.recursos),
-      storage.readArray<Asistencia>(CLASSROOM_STORAGE_KEYS.asistencias),
-      storage.readArray<Calificacion>(CLASSROOM_STORAGE_KEYS.calificaciones),
-      storage.readArray<EntregaTarea>(CLASSROOM_STORAGE_KEYS.entregas),
-      storage.readArray<EntregaTarea>(CLASSROOM_STORAGE_KEYS.entregasLegacy),
-    ]);
-
-    return {
-      grupos,
-      unidades,
-      alumnos,
-      actividades: mergeById(tareas, tareasLegacy).filter(isTarea),
-      materiales: recursos,
-      asistencias,
-      calificaciones,
-      entregas: mergeById(entregas, entregasLegacy).filter(isEntregaTarea),
-    };
-  };
-
-  const buildDatasetByGrupoId = async (grupoId: ID): Promise<ClassroomDataset | null> => {
-    const data = await readDataset();
-    const grupo = data.grupos.find((item) => item.id === grupoId);
-
-    if (!grupo?.id) {
-      return null;
-    }
-
-    const actividades = data.actividades.filter((item) => item.grupoId === grupoId);
-    const actividadIds = new Set(actividades.map((item) => item.id));
-
-    return {
-      grupo: grupo as Pick<Grupo, "id"> & Partial<Grupo>,
-      unidades: data.unidades.filter((item) => item.grupoId === grupoId).sort((a, b) => a.posicion - b.posicion),
-      alumnos: data.alumnos.filter((item) => item.grupoId === grupoId),
-      actividades,
-      materiales: data.materiales.filter((item) => item.grupoId === grupoId),
-      asistencias: data.asistencias.filter((item) => item.grupoId === grupoId),
-      calificaciones: data.calificaciones.filter((item) => item.grupoId === grupoId),
-      entregas: data.entregas.filter((item) => actividadIds.has(item.tareaId)),
-    };
-  };
+  const repository = isClassroomRepository(storageOrRepository)
+    ? storageOrRepository
+    : storageOrRepository
+      ? createClassroomRepository(storageOrRepository)
+      : classroomRepository;
 
   return {
     async listGrupos() {
-      return storage.readArray<Partial<Grupo>>(CLASSROOM_STORAGE_KEYS.grupos);
+      return repository.listGrupos();
     },
 
     async listGruposResumen() {
-      const grupos = await storage.readArray<Partial<Grupo>>(CLASSROOM_STORAGE_KEYS.grupos);
+      const grupos = await repository.listGrupos();
       const models = await Promise.all(
         grupos
           .filter((grupo): grupo is Pick<Grupo, "id"> & Partial<Grupo> => typeof grupo.id === "number")
-          .map((grupo) => buildDatasetByGrupoId(grupo.id)),
+          .map((grupo) => repository.getDatasetByGrupoId(grupo.id)),
       );
 
       return models.filter((dataset): dataset is ClassroomDataset => Boolean(dataset)).map((dataset) => ({
@@ -128,129 +73,58 @@ export function createClassroomFacade(
     },
 
     async getDatasetByGrupoId(grupoId) {
-      return buildDatasetByGrupoId(grupoId);
+      return repository.getDatasetByGrupoId(grupoId);
     },
 
     async getClassroomModel(grupoId) {
-      const dataset = await buildDatasetByGrupoId(grupoId);
+      const dataset = await repository.getDatasetByGrupoId(grupoId);
       return dataset ? buildClassroomModel(dataset) : null;
     },
 
     async getUnidadesByGrupoId(grupoId) {
-      const data = await readDataset();
-      return data.unidades.filter((item) => item.grupoId === grupoId).sort((a, b) => a.posicion - b.posicion);
+      return repository.getUnidadesByGrupoId(grupoId);
     },
 
     async createUnidad(grupoId, nombre) {
-      const unidades = await storage.readArray<UnidadClassroom>(CLASSROOM_STORAGE_KEYS.unidades);
-      const now = new Date().toISOString();
-      const nextPosition = unidades.filter((item) => item.grupoId === grupoId).length;
-      const unidad: UnidadClassroom = {
-        id: `unidad_${grupoId}_${Date.now()}`,
-        grupoId,
-        nombre,
-        posicion: nextPosition,
-        colapsada: false,
-        fechaCreacion: now,
-        fechaModificacion: now,
-        syncStatus: "pending",
-      };
-      await storage.writeArray(CLASSROOM_STORAGE_KEYS.unidades, [...unidades, unidad]);
-      return unidad;
+      return repository.createUnidad(grupoId, nombre);
     },
 
     async updateUnidad(id, cambios) {
-      const unidades = await storage.readArray<UnidadClassroom>(CLASSROOM_STORAGE_KEYS.unidades);
-      let updated: UnidadClassroom | null = null;
-      const next = unidades.map((unidad) => {
-        if (unidad.id !== id) return unidad;
-        updated = {
-          ...unidad,
-          ...cambios,
-          id: unidad.id,
-          fechaModificacion: new Date().toISOString(),
-          syncStatus: cambios.syncStatus ?? "pending",
-        };
-        return updated;
-      });
-      await storage.writeArray(CLASSROOM_STORAGE_KEYS.unidades, next);
-      return updated;
+      return repository.updateUnidad(id, cambios);
     },
 
     async deleteUnidad(id) {
-      const unidades = await storage.readArray<UnidadClassroom>(CLASSROOM_STORAGE_KEYS.unidades);
-      await storage.writeArray(
-        CLASSROOM_STORAGE_KEYS.unidades,
-        unidades.filter((unidad) => unidad.id !== id),
-      );
+      return repository.deleteUnidad(id);
     },
 
     async getAlumnosByGrupoId(grupoId) {
-      const dataset = await buildDatasetByGrupoId(grupoId);
-      return dataset?.alumnos ?? [];
+      return repository.getAlumnosByGrupoId(grupoId);
     },
 
     async getActividadesByGrupoId(grupoId) {
-      const dataset = await buildDatasetByGrupoId(grupoId);
-      return dataset?.actividades ?? [];
+      return repository.getActividadesByGrupoId(grupoId);
     },
 
     async getMaterialesByGrupoId(grupoId) {
-      const dataset = await buildDatasetByGrupoId(grupoId);
-      return dataset?.materiales ?? [];
+      return repository.getMaterialesByGrupoId(grupoId);
     },
 
     async getAsistenciasByGrupoId(grupoId) {
-      const dataset = await buildDatasetByGrupoId(grupoId);
-      return dataset?.asistencias ?? [];
+      return repository.getAsistenciasByGrupoId(grupoId);
     },
 
     async getCalificacionesByGrupoId(grupoId) {
-      const dataset = await buildDatasetByGrupoId(grupoId);
-      return dataset?.calificaciones ?? [];
+      return repository.getCalificacionesByGrupoId(grupoId);
     },
 
     async getEntregasByGrupoId(grupoId) {
-      const dataset = await buildDatasetByGrupoId(grupoId);
-      return dataset?.entregas ?? [];
+      return repository.getEntregasByGrupoId(grupoId);
     },
   };
 }
 
 export const classroomFacade = createClassroomFacade();
 
-function mergeById<T extends { id: ID }>(primary: T[], fallback: T[]): T[] {
-  const seen = new Set<ID>();
-  const result: T[] = [];
-
-  for (const item of [...primary, ...fallback]) {
-    if (seen.has(item.id)) {
-      continue;
-    }
-
-    seen.add(item.id);
-    result.push(item);
-  }
-
-  return result;
-}
-
-function isTarea(value: Tarea | unknown): value is Tarea {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "grupoId" in value &&
-    "fechaAsignacion" in value &&
-    "fechaEntrega" in value
-  );
-}
-
-function isEntregaTarea(value: EntregaTarea | unknown): value is EntregaTarea {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "tareaId" in value &&
-    "alumnoId" in value &&
-    "calificada" in value
-  );
+function isClassroomRepository(value?: ClassroomStoragePort | ClassroomRepository): value is ClassroomRepository {
+  return Boolean(value && "readDataset" in value && "getDatasetByGrupoId" in value);
 }

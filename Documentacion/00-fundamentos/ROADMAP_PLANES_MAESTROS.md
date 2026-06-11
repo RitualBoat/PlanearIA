@@ -19,26 +19,26 @@ Este archivo lista los planes maestros actuales y futuros. No reemplaza los plan
 | Classroom / Grupos y Recursos | `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md` | Cerrado. Fases 0-10, cierre final e issue #8 completados. |
 | Infraestructura Local, CI y Deploy Basico | `Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` | Cerrado. Fases 0 a 7 completadas. |
 | Storage Local SQLite y Migracion Offline | `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md` | Cerrado para entrega academica; SQLite opt-in con rollback. |
+| Auth, Seguridad y Sesion Real | `Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md` | Creado; pendiente de ejecucion. |
 | Meta Guia de Planes | `Documentacion/01-planes-maestros/meta_guia_planes.md` | Vigente como instructivo obligatorio. |
 
 ## Orden recomendado de planes futuros
 
-1. `Plan Maestro: Auth, Seguridad y Sesion Real`
-2. `Plan Maestro: UX/UI y Navegacion Global`
-3. `Plan Maestro: Calificacion y Revision de Tareas`
-4. `Plan Maestro: Excel / Listas y Sync Bidireccional`
-5. `Plan Maestro: Calendario y Seguimiento Personal`
-6. `Plan Maestro: WhatsApp Docente / Chat y Contactos`
-7. `Plan Maestro: Canva / Diseno Didactico`
-8. `Plan Maestro: Reportes y Gamificacion`
-9. `Plan Maestro: Plantillas y Comunidad de Recursos`
-10. `Plan Maestro: Activacion SQLite como default` solo si una validacion futura lo justifica
-11. `Plan Maestro: Despliegue y Distribucion`
+1. `Plan Maestro: UX/UI y Navegacion Global`
+2. `Plan Maestro: Calificacion y Revision de Tareas`
+3. `Plan Maestro: Excel / Listas y Sync Bidireccional`
+4. `Plan Maestro: Calendario y Seguimiento Personal`
+5. `Plan Maestro: WhatsApp Docente / Chat y Contactos`
+6. `Plan Maestro: Canva / Diseno Didactico`
+7. `Plan Maestro: Reportes y Gamificacion`
+8. `Plan Maestro: Plantillas y Comunidad de Recursos`
+9. `Plan Maestro: Activacion SQLite como default` solo si una validacion futura lo justifica
+10. `Plan Maestro: Despliegue y Distribucion`
 
 ## Criterio para activar un plan
 
 - Infraestructura: cerrado; estabilizo entorno local, CI, scripts, backend, variables, demo low-cost y preparacion SQLite.
-- Auth/Seguridad: antes de usuarios reales, beta cerrada o pruebas con datos reales.
+- Auth/Seguridad: plan creado; ejecutar antes de usuarios reales, beta cerrada o pruebas con datos reales.
 - UX/UI Global: cuando los modulos principales funcionen pero la navegacion empiece a sentirse fragmentada; no debe bloquear funcionalidad base de los modulos.
 - Excel/Listas: despues de tener Classroom con datos reales de grupos/alumnos/tareas.
 - Storage Local SQLite: cerrado como infraestructura opt-in; nuevos planes deben asumir ports/repositories compatibles con SQLite y no leer AsyncStorage directo.
@@ -58,4 +58,4 @@ Este archivo lista los planes maestros actuales y futuros. No reemplaza los plan
 - Issues #9 a #17 de Infraestructura: cerrados/listos para `Done`.
 - Issue consolidado Storage SQLite #18: cerrado en `Done`.
 - Issues de fases SQLite #19-#25: cerrados en `Done`.
-- Siguiente issue recomendado: crear solo cuando el usuario elija el siguiente plan activo.
+- Siguiente issue recomendado: crear epic/fase de Auth solo cuando inicie ejecucion del plan `PLAN_AUTH_SEGURIDAD_SESION_REAL.md`.

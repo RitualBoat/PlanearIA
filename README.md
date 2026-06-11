@@ -161,6 +161,7 @@ Planes actuales:
 | ---- | ------- | ------ |
 | Infraestructura Local, CI y Deploy Basico | [`Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`](./Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md) | Cerrado; Fases 0 a 7 completadas. |
 | Storage Local SQLite y Migracion Offline | [`Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`](./Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md) | Cerrado para entrega academica; SQLite opt-in con rollback. |
+| Auth, Seguridad y Sesion Real | [`Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md`](./Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md) | Creado; pendiente de ejecucion. |
 | Classroom / Grupos y Recursos | [`Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`](./Documentacion/01-planes-maestros/PLAN_CLASSROOM.md) | Cerrado; #8 completado. |
 | Planeaciones | [`Documentacion/01-planes-maestros/plan_planeaciones.md`](./Documentacion/01-planes-maestros/plan_planeaciones.md) | Cerrado. Fase 9 aprobada. |
 | Pasos iniciales | [`Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md`](./Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md) | Cerrado como cimiento organizativo. |
@@ -175,7 +176,7 @@ Planes actuales:
 ### Corto plazo
 
 - Mantener GitHub Product OS alineado con el siguiente plan activo.
-- Elegir el siguiente frente: Auth/Seguridad, UX/UI Global, Excel/Listas, Calificacion/Revision o Reportes.
+- Ejecutar el plan creado de Auth/Seguridad antes de beta o datos reales; despues elegir entre UX/UI Global, Calificacion/Revision, Excel/Listas o Reportes.
 - No activar SQLite como default ni borrar AsyncStorage legacy sin nueva aprobacion manual; nuevos planes deben disenar datos academicos mediante ports/repositories compatibles con SQLite.
 
 ### Mediano plazo

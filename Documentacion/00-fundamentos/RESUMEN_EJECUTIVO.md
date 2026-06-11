@@ -28,7 +28,7 @@ Experiencias madre:
 - Classroom esta cerrado como experiencia base.
 - Infraestructura Local/CI/Deploy Basico quedo cerrado; Fases 0 a 7 completadas con scripts, CI, backend smoke, demo low-cost y preparacion SQLite.
 - Storage Local SQLite y Migracion Offline quedo cerrado para entrega academica: SQLite esta instalado como infraestructura opt-in con schema, adapter, migracion, sync queue y rollback; AsyncStorage sigue como default.
-- UX/UI Global, Auth/Seguridad, Excel/Listas, Canva, WhatsApp docente, Reportes y activacion SQLite como default quedan como decisiones posteriores.
+- Auth/Seguridad y Sesion Real ya tiene plan maestro creado y queda pendiente de ejecucion. UX/UI Global, Excel/Listas, Canva, WhatsApp docente, Reportes y activacion SQLite como default quedan como decisiones posteriores.
 
 ## Stack actual
 

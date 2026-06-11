@@ -36,7 +36,8 @@ Si eres una IA o agente nuevo, lee en este orden:
 - Infraestructura Local/CI/Deploy Basico: cerrado; Fases 0 a 7 completadas.
 - Storage Local SQLite y Migracion Offline: cerrado para entrega academica; SQLite quedo como infraestructura opt-in con rollback, AsyncStorage sigue default.
 - UX/UI Global: pendiente, se hara cuando existan mas flujos funcionales.
-- Auth/Excel/Canva/WhatsApp/Reportes: pendientes de planes futuros.
+- Auth/Seguridad y Sesion Real: plan creado; pendiente de ejecucion.
+- Excel/Canva/WhatsApp/Reportes: pendientes de planes futuros.
 
 ## Documentos Principales
 
@@ -56,6 +57,7 @@ Si eres una IA o agente nuevo, lee en este orden:
 | Documento | Estado |
 | --- | --- |
 | `01-planes-maestros/meta_guia_planes.md` | Vigente; instructivo obligatorio para crear planes. |
+| `01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md` | Creado; pendiente de ejecucion. |
 | `01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` | Cerrado; Fases 0 a 7 completadas. |
 | `01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md` | Cerrado para entrega academica; SQLite opt-in con rollback. |
 | `01-planes-maestros/PLAN_CLASSROOM.md` | Cerrado; #8 completado. |

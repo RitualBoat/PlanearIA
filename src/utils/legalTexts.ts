@@ -4,7 +4,7 @@
 
 export const AVISO_PRIVACIDAD = `AVISO DE PRIVACIDAD INTEGRAL
 
-Última actualización: 1 de abril de 2026
+Última actualización: 12 de junio de 2026
 
 PlanearIA (en adelante "la Aplicación") con domicilio en México, es responsable del tratamiento de los datos personales que nos proporcione, los cuales serán protegidos conforme a lo dispuesto por la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP), su Reglamento y los Lineamientos del Aviso de Privacidad.
 
@@ -51,8 +51,11 @@ Los datos se almacenan en servidores de MongoDB Atlas y Vercel, los cuales cuent
 PlanearIA ha implementado medidas de seguridad técnicas, administrativas y físicas para proteger sus datos personales contra daño, pérdida, alteración, destrucción o uso no autorizado, incluyendo:
 • Cifrado de contraseñas mediante algoritmo PBKDF2 con sal aleatoria
 • Comunicaciones cifradas mediante protocolo HTTPS/TLS
-• Tokens de autenticación con caducidad
-• Control de acceso basado en roles  
+• Tokens de acceso de corta duración y tokens de actualización revocables
+• Almacenamiento seguro de tokens en el dispositivo (almacén cifrado del sistema en Android/iOS)
+• Aislamiento de datos por usuario en el servidor
+• Límite de intentos en operaciones sensibles como inicio de sesión y recuperación
+• Control de acceso basado en roles
 
 5. DERECHOS ARCO
 
@@ -68,9 +71,17 @@ PlanearIA responderá en un plazo máximo de 20 días hábiles contados a partir
 
 6. REVOCACIÓN DEL CONSENTIMIENTO
 
-Si desea revocar el consentimiento otorgado para el tratamiento de sus datos personales, puede hacerlo eliminando su cuenta directamente desde la Aplicación (sección "Mi Cuenta" > "Eliminar cuenta"), lo cual eliminará permanentemente todos sus datos personales y contenido asociado.
+Si desea revocar el consentimiento otorgado para el tratamiento de sus datos personales, puede hacerlo eliminando su cuenta directamente desde la Aplicación (sección "Mi Cuenta" > "Eliminar cuenta"). Esta acción requiere confirmar su contraseña y elimina de forma permanente su usuario, sus sesiones activas y el contenido asociado a su cuenta (planeaciones, grupos, alumnos, recursos, asistencias, calificaciones, entregables y notificaciones), filtrado por su identificador de usuario.
 
 También puede enviar un correo electrónico a la dirección de contacto.
+
+6 BIS. GESTIÓN DE SESIONES
+
+Puede iniciar sesión en varios dispositivos. Desde "Mi Cuenta" > "Sesiones iniciadas" puede consultar sus sesiones activas y cerrar una sesión específica o todas las demás. El cierre de sesión revoca el token de actualización correspondiente en el servidor.
+
+6 TER. RECUPERACIÓN DE CONTRASEÑA
+
+La recuperación de contraseña se realiza mediante un código temporal de un solo uso. El código se almacena cifrado, caduca y limita el número de intentos. En entornos de desarrollo el código puede mostrarse en pantalla; en producción se entrega por correo electrónico.
 
 7. MODIFICACIONES AL AVISO DE PRIVACIDAD
 
@@ -78,14 +89,14 @@ PlanearIA se reserva el derecho de efectuar en cualquier momento modificaciones 
 
 8. COOKIES Y TECNOLOGÍAS DE RASTREO
 
-La Aplicación no utiliza cookies. Se utiliza almacenamiento local (AsyncStorage) exclusivamente para mantener la sesión del usuario y almacenar datos de la aplicación de forma local en el dispositivo.
+La Aplicación no utiliza cookies. Utiliza almacenamiento local en el dispositivo para mantener la sesión y operar sin conexión: AsyncStorage para datos de la aplicación y preferencias, el almacén cifrado del sistema para los tokens de sesión en Android/iOS, y opcionalmente una base de datos local (SQLite) para datos académicos relacionales.
 
 9. CONTACTO
 
 Si usted tiene alguna duda sobre el presente aviso de privacidad, puede dirigirse a:
 Correo electrónico: privacidad@planearia.app
 
-Fecha de última actualización: 1 de abril de 2026.`;
+Fecha de última actualización: 12 de junio de 2026.`;
 
 export const TERMINOS_CONDICIONES = `TÉRMINOS Y CONDICIONES DE USO
 

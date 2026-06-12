@@ -51,7 +51,12 @@ function makeCollection() {
     },
     find(filter) {
       const rows = docs.filter((d) => matchesFilter(d, filter));
-      return { sort: () => ({ limit: () => ({ toArray: async () => rows }) }) };
+      const cursor = {
+        sort: () => cursor,
+        limit: () => cursor,
+        toArray: async () => rows,
+      };
+      return cursor;
     },
     async insertOne(doc) {
       docs.push({ ...doc });
@@ -117,6 +122,7 @@ const grupos = require("../backend/api/grupos.js");
 const alumnos = require("../backend/api/alumnos.js");
 const calificaciones = require("../backend/api/calificaciones.js");
 const notificaciones = require("../backend/api/notificaciones.js");
+const auth = require("../backend/api/auth.js");
 
 // ---- Mock req/res ----
 
@@ -238,11 +244,37 @@ async function testNotificaciones() {
   assert(putForeign.statusCode === 403, "B cannot mark A's notification");
 }
 
+async function testSesiones() {
+  resetDb();
+  console.log("[isolation] sesiones (/api/auth)");
+
+  const future = new Date(Date.now() + 60 * 60 * 1000);
+  const sessions = currentDb.collection("auth_sessions");
+  await sessions.insertOne({ id: "sa", userId: 1, revokedAt: null, refreshTokenExpiresAt: future, createdAt: new Date(), lastUsedAt: new Date() });
+  await sessions.insertOne({ id: "sb", userId: 2, revokedAt: null, refreshTokenExpiresAt: future, createdAt: new Date(), lastUsedAt: new Date() });
+
+  const listA = await call(auth, { method: "POST", token: tokenA, body: { action: "listar_sesiones" } });
+  assert(
+    listA.body.data.sessions.length === 1 && listA.body.data.sessions[0].id === "sa" && listA.body.data.sessions[0].current === true,
+    "A lists only its own session, marked current"
+  );
+
+  const revokeForeign = await call(auth, { method: "POST", token: tokenA, body: { action: "revocar_sesion", sessionId: "sb" } });
+  assert(revokeForeign.statusCode === 404, "A cannot revoke B's session");
+
+  const revokeOwn = await call(auth, { method: "POST", token: tokenA, body: { action: "revocar_sesion", sessionId: "sa" } });
+  assert(revokeOwn.body?.data?.action === "revoked", "A can revoke its own session");
+
+  const listB = await call(auth, { method: "POST", token: tokenB, body: { action: "listar_sesiones" } });
+  assert(listB.body.data.sessions.length === 1 && listB.body.data.sessions[0].id === "sb", "B still sees only its own session");
+}
+
 async function main() {
   await testGrupos();
   await testAlumnos();
   await testCalificacionesBulk();
   await testNotificaciones();
+  await testSesiones();
 
   if (failures > 0) {
     console.error(`[isolation] ${failures} assertion(s) failed`);

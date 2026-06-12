@@ -417,3 +417,36 @@ export async function loginComoDesarrollador(): Promise<AuthSession> {
 export async function getAccessToken(): Promise<string | null> {
   return sessionStorage.getToken(SESSION_KEYS.ACCESS_TOKEN);
 }
+
+// -- Active sessions --
+
+export interface SesionActiva {
+  id: string;
+  current: boolean;
+  createdAt?: string;
+  lastUsedAt?: string;
+  expiresAt?: string;
+  userAgent?: string;
+}
+
+export async function listarSesiones(
+  token: string
+): Promise<{ success: boolean; sesiones?: SesionActiva[]; error?: string }> {
+  const res = await authFetch({ action: "listar_sesiones" }, token);
+  if (!res.success) {
+    return { success: false, error: res.error || "No se pudieron cargar las sesiones." };
+  }
+  const sesiones = (res.data as unknown as { sessions?: SesionActiva[] })?.sessions ?? [];
+  return { success: true, sesiones };
+}
+
+export async function revocarSesion(token: string, sessionId: string): Promise<AuthResult> {
+  const res = await authFetch({ action: "revocar_sesion", sessionId }, token);
+  return { success: res.success, error: res.error };
+}
+
+/** Revoke every session except the current one. */
+export async function cerrarOtrasSesiones(token: string): Promise<AuthResult> {
+  const res = await authFetch({ action: "revocar_sesion", all: true }, token);
+  return { success: res.success, error: res.error };
+}

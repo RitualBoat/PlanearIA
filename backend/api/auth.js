@@ -86,11 +86,15 @@ module.exports = async function handler(req, res) {
       case "actualizar_perfil":
         return await handleActualizarPerfil(req, res, usuarios);
       case "eliminar_cuenta":
-        return await handleEliminarCuenta(req, res, usuarios);
+        return await handleEliminarCuenta(req, res, usuarios, sessions);
       case "cambiar_rol":
         return await handleCambiarRol(req, res, usuarios);
       case "listar_usuarios":
         return await handleListarUsuarios(req, res, usuarios);
+      case "listar_sesiones":
+        return await handleListarSesiones(req, res, sessions);
+      case "revocar_sesion":
+        return await handleRevocarSesion(req, res, sessions);
       case "actualizar_preferencias":
         return await handleActualizarPreferencias(req, res, usuarios);
       default:
@@ -464,7 +468,7 @@ async function handleActualizarPerfil(req, res, usuarios) {
 
 // =========== Eliminar cuenta ===========
 
-async function handleEliminarCuenta(req, res, usuarios) {
+async function handleEliminarCuenta(req, res, usuarios, sessions) {
   const authHeader = req.headers["authorization"] || "";
   const token = authHeader.replace("Bearer ", "");
 
@@ -493,9 +497,10 @@ async function handleEliminarCuenta(req, res, usuarios) {
     return errorResponse(res, 401, "Contraseña incorrecta.");
   }
 
-  // Eliminar datos asociados del usuario en otras colecciones
+  // Eliminar datos asociados del usuario en otras colecciones, filtrando por userId
   const { db } = await connectToDatabase();
   const userId = payload.userId;
+  const usuarioIdStr = String(userId);
 
   await Promise.allSettled([
     db.collection("planeaciones").deleteMany({ userId }),
@@ -505,12 +510,87 @@ async function handleEliminarCuenta(req, res, usuarios) {
     db.collection("recursos").deleteMany({ userId }),
     db.collection("asistencias").deleteMany({ userId }),
     db.collection("calificaciones").deleteMany({ userId }),
+    db.collection("notificaciones").deleteMany({ usuarioId: usuarioIdStr }),
   ]);
+
+  // Revocar todas las sesiones del usuario antes de eliminar la cuenta
+  if (sessions) {
+    await revokeAuthSession(sessions, { userId });
+  }
 
   // Eliminar el usuario
   await usuarios.deleteOne({ id: userId });
 
   return successResponse(res, { message: "Cuenta eliminada correctamente." });
+}
+
+// =========== Sesiones activas ===========
+
+function summarizeSession(session, currentSessionId) {
+  return {
+    id: session.id,
+    current: session.id === currentSessionId,
+    createdAt: session.createdAt,
+    lastUsedAt: session.lastUsedAt,
+    expiresAt: session.refreshTokenExpiresAt,
+    userAgent: session.userAgent || undefined,
+  };
+}
+
+async function handleListarSesiones(req, res, sessions) {
+  const payload = getUserFromToken(req);
+  if (!payload?.userId) {
+    return errorResponse(res, 401, "Token inválido o expirado.");
+  }
+
+  const now = new Date();
+  const list = await sessions
+    .find({
+      userId: payload.userId,
+      revokedAt: null,
+      refreshTokenExpiresAt: { $gt: now },
+    })
+    .sort({ lastUsedAt: -1 })
+    .toArray();
+
+  return successResponse(res, {
+    sessions: list.map((s) => summarizeSession(s, payload.sessionId)),
+  });
+}
+
+async function handleRevocarSesion(req, res, sessions) {
+  const payload = getUserFromToken(req);
+  if (!payload?.userId) {
+    return errorResponse(res, 401, "Token inválido o expirado.");
+  }
+
+  const { sessionId, all } = req.body || {};
+
+  // Cerrar todas las demas sesiones (preserva la sesion actual)
+  if (all) {
+    const now = new Date();
+    const query = { userId: payload.userId, revokedAt: null };
+    if (payload.sessionId) query.id = { $ne: payload.sessionId };
+    const result = await sessions.updateMany(query, {
+      $set: { revokedAt: now, updatedAt: now },
+    });
+    return successResponse(res, {
+      action: "revoked_others",
+      modifiedCount: result.modifiedCount,
+    });
+  }
+
+  if (!sessionId) {
+    return errorResponse(res, 400, "sessionId es obligatorio.");
+  }
+
+  const session = await sessions.findOne({ id: sessionId });
+  if (!session || String(session.userId) !== String(payload.userId)) {
+    return errorResponse(res, 404, "Sesión no encontrada.");
+  }
+
+  await revokeAuthSession(sessions, { sessionId });
+  return successResponse(res, { action: "revoked", sessionId });
 }
 
 // =========== Cambiar rol (solo admin) ===========

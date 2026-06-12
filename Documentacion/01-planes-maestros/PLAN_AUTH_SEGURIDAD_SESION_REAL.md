@@ -936,16 +936,17 @@ GitHub/CI - Fase 6:
   - `npm run backend:check`
   - `git diff --check`
 
-- [ ] **6.1 Elegir proveedor email low-cost**
-  - Documentar costo, free tier, limites y variables.
-- [ ] **6.2 Implementar envio real**
-  - Timeout, errores visibles, no revelar existencia de correo.
-- [ ] **6.3 Implementar pantalla/flujo de sesiones**
-  - Listar, revocar actual/todas/una especifica.
-- [ ] **6.4 Endurecer eliminar cuenta**
-  - Password, auditoria, borrado por `userId`, rollback documental.
-- [ ] **6.5 Actualizar terminos/privacidad**
-  - Sesion, datos locales, IA, storage, eliminacion y email.
+- [x] **6.1 Elegir proveedor email low-cost**
+  - Decision de usuario 2026-06-12: modo dev por ahora. Sin proveedor externo ni costo. El codigo de recuperacion solo se muestra con `AUTH_DEV_RECOVERY_CODES=true`. Variables sugeridas (`EMAIL_PROVIDER`, `EMAIL_FROM`, `EMAIL_API_KEY`) documentadas para conectar Resend/Brevo en beta.
+- [~] **6.2 Implementar envio real**
+  - Diferido por decision (modo dev). Ya existe: no revelar existencia de correo, codigo hasheado, TTL e intentos limitados (Fase 2). Falta integrar el proveedor real cuando se vaya a beta.
+- [x] **6.3 Implementar pantalla/flujo de sesiones**
+  - Backend `listar_sesiones`/`revocar_sesion` (una o todas las demas) en `auth.js`. Frontend: `SesionesActivasScreen` + `useSesionesViewModel` + metodos en `authService`, ruta en `StackNavigator`, entrada desde CuentaScreen "Sesiones iniciadas".
+- [x] **6.4 Endurecer eliminar cuenta**
+  - Requiere password, borra por `userId` en planeaciones/grupos/alumnos/recursos/asistencias/calificaciones/entregables/notificaciones y revoca todas las sesiones antes de eliminar el usuario.
+- [x] **6.5 Actualizar terminos/privacidad**
+  - `legalTexts.ts`: medidas de seguridad (SecureStore, refresh revocable, aislamiento por usuario, rate limit), gestion de sesiones, recuperacion por codigo, eliminacion por `userId` y storage (AsyncStorage/SecureStore/SQLite).
+- **Avance 2026-06-12:** Fase 6 (sin email real) implementada. Pantalla de sesiones (listar/revocar una/todas), endurecimiento de eliminar cuenta y textos legales actualizados. Tests: `useSesionesViewModel` (frontend) y escenario de sesiones en `testBackendIsolation.mjs` (ownership de revoke/list). Validacion: `tsc` 0, ESLint 0, jest 623/623 (87 suites), `backend:check` (smoke + aislamiento incl. sesiones) en verde. Email real (6.2) diferido por decision de modo dev. Issue de Fase 6 y sincronizacion GitHub Product OS pendientes.
 
 ### FASE 7: Validacion Tecnica, Manual y Seguridad Basica
 

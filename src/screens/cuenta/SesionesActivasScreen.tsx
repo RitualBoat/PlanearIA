@@ -1,0 +1,179 @@
+import React from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { COLORS, FONT_SIZES } from "../../../types";
+import { useSesionesViewModel } from "../../hooks/useSesionesViewModel";
+import type { SesionActiva } from "../../services/auth/authService";
+
+function formatFecha(value?: string): string {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString();
+}
+
+const SesionesActivasScreen: React.FC = () => {
+  const { sesiones, isLoading, revokingId, error, refetch, revocar, cerrarOtras, goBack } =
+    useSesionesViewModel();
+
+  const otras = sesiones.filter((s) => !s.current).length;
+
+  const renderItem = ({ item }: { item: SesionActiva }) => {
+    const isRevoking = revokingId === item.id;
+    return (
+      <View style={styles.card}>
+        <View style={styles.cardRow}>
+          <View style={styles.iconWrap}>
+            <MaterialIcons name="devices" size={22} color={COLORS.primary} />
+          </View>
+          <View style={styles.info}>
+            <Text style={styles.deviceText} numberOfLines={1}>
+              {item.userAgent || "Dispositivo desconocido"}
+            </Text>
+            <Text style={styles.metaText}>Activa desde {formatFecha(item.lastUsedAt || item.createdAt)}</Text>
+            {item.current ? <Text style={styles.currentBadge}>Sesión actual</Text> : null}
+          </View>
+          {item.current ? null : (
+            <TouchableOpacity
+              style={styles.revokeBtn}
+              onPress={() => revocar(item.id)}
+              disabled={isRevoking}
+            >
+              {isRevoking ? (
+                <ActivityIndicator size="small" color={COLORS.danger} />
+              ) : (
+                <Text style={styles.revokeText}>Cerrar</Text>
+              )}
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.safe} edges={["top"]}>
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+
+      <View style={styles.header}>
+        <TouchableOpacity onPress={goBack} style={styles.backBtn}>
+          <MaterialIcons name="arrow-back" size={24} color={COLORS.text} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Sesiones iniciadas</Text>
+        <TouchableOpacity onPress={refetch} style={styles.backBtn}>
+          <MaterialIcons name="refresh" size={24} color={COLORS.primary} />
+        </TouchableOpacity>
+      </View>
+
+      {isLoading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={styles.loadingText}>Cargando sesiones...</Text>
+        </View>
+      ) : error ? (
+        <View style={styles.center}>
+          <MaterialIcons name="error-outline" size={44} color={COLORS.textTertiary} />
+          <Text style={styles.emptyText}>{error}</Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={refetch}>
+            <Text style={styles.retryText}>Reintentar</Text>
+          </TouchableOpacity>
+        </View>
+      ) : sesiones.length === 0 ? (
+        <View style={styles.center}>
+          <MaterialIcons name="devices" size={44} color={COLORS.textTertiary} />
+          <Text style={styles.emptyText}>No hay sesiones activas.</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={sesiones}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={styles.list}
+          ListFooterComponent={
+            otras > 0 ? (
+              <TouchableOpacity
+                style={styles.closeAllBtn}
+                onPress={cerrarOtras}
+                disabled={revokingId === "__all__"}
+              >
+                {revokingId === "__all__" ? (
+                  <ActivityIndicator size="small" color={COLORS.surface} />
+                ) : (
+                  <Text style={styles.closeAllText}>Cerrar las demás sesiones</Text>
+                )}
+              </TouchableOpacity>
+            ) : null
+          }
+        />
+      )}
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: COLORS.background },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    backgroundColor: COLORS.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
+  },
+  backBtn: { padding: 4 },
+  headerTitle: { fontSize: FONT_SIZES.large, fontWeight: "700", color: COLORS.text },
+  center: { flex: 1, justifyContent: "center", alignItems: "center", gap: 12, padding: 24 },
+  loadingText: { fontSize: FONT_SIZES.medium, color: COLORS.textSecondary },
+  emptyText: { fontSize: FONT_SIZES.medium, color: COLORS.textTertiary, textAlign: "center" },
+  retryBtn: { paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10, backgroundColor: COLORS.primary },
+  retryText: { color: COLORS.surface, fontWeight: "600" },
+  list: { padding: 16, gap: 10 },
+  card: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
+  },
+  cardRow: { flexDirection: "row", alignItems: "center", gap: 12 },
+  iconWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: COLORS.backgroundSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  info: { flex: 1, gap: 2 },
+  deviceText: { fontSize: FONT_SIZES.medium, fontWeight: "600", color: COLORS.text },
+  metaText: { fontSize: FONT_SIZES.small, color: COLORS.textSecondary },
+  currentBadge: { marginTop: 2, fontSize: 12, fontWeight: "700", color: COLORS.primary },
+  revokeBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: "#FFEBEE",
+  },
+  revokeText: { color: COLORS.danger, fontWeight: "600", fontSize: 13 },
+  closeAllBtn: {
+    marginTop: 8,
+    borderRadius: 12,
+    backgroundColor: COLORS.danger,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  closeAllText: { color: COLORS.surface, fontWeight: "700", fontSize: FONT_SIZES.medium },
+});
+
+export default SesionesActivasScreen;

@@ -69,6 +69,7 @@ import CrearRecursoScreen from "../screens/biblioteca/CrearRecursoScreen";
 import CuentaScreen from "../screens/cuenta/CuentaScreen";
 import EditarPerfilScreen from "../screens/cuenta/EditarPerfilScreen";
 import AdminRolesScreen from "../screens/cuenta/AdminRolesScreen";
+import SesionesActivasScreen from "../screens/cuenta/SesionesActivasScreen";
 import TerminosScreen from "../screens/cuenta/TerminosScreen";
 
 // ImportaciÃƒÂ³n de pantallas de Plantillas
@@ -221,6 +222,7 @@ export type RootStackParamList = {
   Cuenta: undefined;
   EditarPerfil: undefined;
   AdminRoles: undefined;
+  SesionesActivas: undefined;
   Terminos: { tab?: "terminos" | "privacidad" } | undefined;
 
   // Perfil
@@ -715,6 +717,14 @@ const StackNavigator: React.FC = () => {
         component={AdminRolesScreen}
         options={{
           title: "Administrar Roles",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="SesionesActivas"
+        component={SesionesActivasScreen}
+        options={{
+          title: "Sesiones iniciadas",
           headerShown: false,
         }}
       />

@@ -636,12 +636,7 @@ const CuentaScreen: React.FC = () => {
                       {!isGuest && (
                         <TouchableOpacity
                           style={styles.secondaryAction}
-                          onPress={() =>
-                            Alert.alert(
-                              "Próximamente",
-                              "Esta función se implementará en una próxima actualización."
-                            )
-                          }
+                          onPress={() => (navigation as any).navigate("SesionesActivas")}
                           activeOpacity={0.82}
                         >
                           <MaterialIcons name="devices" size={18} color={COLORS.textDark} />

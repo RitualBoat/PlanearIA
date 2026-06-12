@@ -5,7 +5,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import { Grupo, GrupoMiembro, RolGrupo } from "../../types";
-import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
+import { isAPIConfigured } from "../sync/config/apiConfig";
+import { apiRequest } from "../utils/apiClient";
 import logger from "../utils/logger";
 
 const STORAGE_KEY = "@planearia:grupos";
@@ -43,29 +44,9 @@ const checkConnectivity = async (): Promise<boolean> => {
   }
 };
 
-const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<Response> => {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    "X-API-Key": API_CONFIG.apiSecret,
-    ...options.headers,
-  };
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-
-  try {
-    const response = await fetch(`${API_CONFIG.baseUrl}${endpoint}`, {
-      ...options,
-      headers,
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
-};
+// Uses the shared apiClient so every grupos request carries the JWT
+// (Authorization header). The previous local apiRequest only sent X-API-Key,
+// which bypassed per-user isolation and left grupos un-attributed.
 
 const getPendingSyncOperations = async (): Promise<GrupoPendingOperation[]> => {
   const data = await AsyncStorage.getItem(PENDING_SYNC_KEY);
@@ -139,12 +120,8 @@ const syncSingleOperation = async (
 ): Promise<void> => {
   if (!isAPIConfigured()) return;
 
-  const isOnline = await checkConnectivity();
-  if (!isOnline) {
-    await enqueuePendingOperation(type, data);
-    return;
-  }
-
+  // Offline-first by attempt, not by pre-check: NetInfo is unreliable on web,
+  // so try the real request and only enqueue when it actually fails.
   try {
     await executeRemoteOperation(type, data);
   } catch {
@@ -206,11 +183,8 @@ export const sincronizarGruposConBackend = async (): Promise<GruposSyncResult> =
     return baseResult;
   }
 
-  const isOnline = await checkConnectivity();
-  if (!isOnline) {
-    return { ...baseResult, success: false, status: "offline" };
-  }
-
+  // Do not gate the pull/push on NetInfo (unreliable on web). Attempt the
+  // requests; genuine network failures fall through to the catch below.
   try {
     const pendingResult = await processPendingOperations();
 
@@ -261,7 +235,6 @@ export interface GruposService {
  */
 export const obtenerGrupos = async (): Promise<Partial<Grupo>[]> => {
   try {
-    // Primero intentar cargar desde AsyncStorage
     const stored = await AsyncStorage.getItem(STORAGE_KEY);
 
     if (stored) {
@@ -270,45 +243,9 @@ export const obtenerGrupos = async (): Promise<Partial<Grupo>[]> => {
       return grupos;
     }
 
-    // Si no hay datos guardados, devolver datos de ejemplo
-    // En producción, aquí se haría una llamada a la API
-    const gruposDefault: Partial<Grupo>[] = [
-      {
-        id: 1,
-        nombre: "7A - Matemáticas Avanzadas",
-        materia: "Matemáticas Avanzadas",
-        carrera: "ISC",
-        semestre: 7,
-        cantidadAlumnos: 28,
-        estado: "activo",
-        periodo: "Enero-Junio 2024",
-      },
-      {
-        id: 2,
-        nombre: "5B - Programación Web",
-        materia: "Programación Web",
-        carrera: "ITICS",
-        semestre: 5,
-        cantidadAlumnos: 32,
-        estado: "activo",
-        periodo: "Enero-Junio 2024",
-      },
-      {
-        id: 3,
-        nombre: "3A - Estructuras de Datos",
-        materia: "Estructuras de Datos",
-        carrera: "ISC",
-        semestre: 3,
-        cantidadAlumnos: 25,
-        estado: "activo",
-        periodo: "Enero-Junio 2024",
-      },
-    ];
-
-    // Guardar los datos de ejemplo en storage
-    await guardarGrupos(gruposDefault);
-
-    return gruposDefault;
+    // No seeded sample data: an empty store means no groups yet. Remote
+    // groups (if any) are pulled and merged by sincronizarGruposConBackend.
+    return [];
   } catch (error) {
     logger.error(" Error obteniendo grupos:", error);
     throw new Error("No se pudieron cargar los grupos");

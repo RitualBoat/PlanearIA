@@ -57,7 +57,9 @@ stitch-results
 .adal/
 .agent/
 .augment/
-.claude/
+# .claude/ is NOT ignored — it holds shared Claude Code config (CLAUDE.md, settings.json, rules/)
+.claude/settings.local.json
+CLAUDE.local.md
 .codebuddy/
 .commandcode/
 .continue/

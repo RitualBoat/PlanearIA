@@ -2,7 +2,7 @@
 
 > **Version:** 1.0  
 > **Fecha:** 2026-06-11  
-> **Estado:** [~] Plan en ejecucion; Fase 2 validada localmente; Review Manual remoto pendiente.
+> **Estado:** [~] Plan en ejecucion; Fase 3 implementada y validada localmente (typecheck/lint/logica); jest-expo completo y Review Manual remoto pendientes.
 > **Alcance:** endurecer autenticacion, sesion, roles, permisos, recuperacion de cuenta, aislamiento multiusuario y seguridad backend/frontend antes de beta, datos reales o pilotos.  
 > **Stack:** React Native 0.81.5 - Expo 54 - TypeScript 5.9 - React Navigation 7 - Context/hooks MVVM - Backend Node/Vercel - MongoDB Atlas Free - AsyncStorage default / SQLite opt-in.  
 > **Modulo:** Auth, Cuenta, Seguridad, Sesion, RBAC, secretos, APIs protegidas y aislamiento por usuario.  
@@ -822,18 +822,19 @@ GitHub/CI - Fase 3:
   - tests de `AuthContext`, login/registro/recuperacion
   - `git diff --check`
 
-- [ ] **3.1 Crear `SessionStoragePort`**
-  - SecureStore native, AsyncStorage web/dev fallback.
-- [ ] **3.2 Crear `authService`**
-  - Login, registro, refresh, logout, revoke, verify, reset.
-- [ ] **3.3 Refactorizar `AuthContext`**
-  - Restauracion, refresh automatico, expiracion, guest/dev, errores.
-- [ ] **3.4 Refactorizar `apiClient`**
-  - Leer token desde Auth/session service o inyector controlado.
-- [ ] **3.5 Migrar claves legacy de sesion**
-  - Leer legacy, escribir nuevo storage, no borrar hasta validacion.
-- [ ] **3.6 Tests frontend**
-  - Storage fallback, logout, expired token, guest, dev, refresh error.
+- [x] **3.1 Crear `SessionStoragePort`**
+  - SecureStore native, AsyncStorage web/dev fallback. `src/services/auth/sessionStorage.ts`.
+- [x] **3.2 Crear `authService`**
+  - Login, registro, refresh, logout, revoke, verify, reset. `src/services/auth/authService.ts`.
+- [x] **3.3 Refactorizar `AuthContext`**
+  - Delega a authService; refresh automatico (timer 1min antes de expiry); guest/dev; ya no toca storage ni hace fetch directo.
+- [x] **3.4 Refactorizar `apiClient`**
+  - Lee token via `getAccessToken()` del servicio; misma correccion en `useCrearPlaneacionViewModel`.
+- [x] **3.5 Migrar claves legacy de sesion**
+  - `legacyMigration.ts`: lee `@planearia:auth_token`, escribe a key segura, no borra legacy, flag idempotente, wired en `App.tsx`.
+- [x] **3.6 Tests frontend**
+  - 3 suites: `sessionStorage`, `authService`, `legacyMigration` en `src/__tests__/auth/`.
+- **Avance 2026-06-12:** Fase 3 implementada (SessionStoragePort, authService, refactor AuthContext/apiClient, migracion legacy, 3 suites de tests). Instalado `expo-secure-store`. Resuelta corrupcion de bytes NUL al final de archivos (package.json, package-lock.json, AuthContext.tsx) introducida por escrituras previas; era la causa real de fallos de parseo/tests. Validacion local: `tsc --noEmit` 0 errores, ESLint 0 errores en archivos Auth, logica de authService+legacyMigration verificada (21/21 casos). Pendiente: correr `npm test -- --runInBand` en Windows (la suite jest-expo completa no corre en el sandbox por limite de lectura del mount sobre node_modules). Issue de Fase 3 y sincronizacion GitHub Product OS pendientes.
 
 ### FASE 4: Proteccion de Rutas, Cuenta y RBAC UX
 

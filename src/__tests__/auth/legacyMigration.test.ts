@@ -1,0 +1,91 @@
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  getItem: jest.fn(() => Promise.resolve(null)),
+  setItem: jest.fn(() => Promise.resolve()),
+  removeItem: jest.fn(() => Promise.resolve()),
+}));
+
+const mockSessionStorage = {
+  getToken: jest.fn().mockResolvedValue(null),
+  setToken: jest.fn().mockResolvedValue(undefined),
+  removeToken: jest.fn().mockResolvedValue(undefined),
+  clearTokens: jest.fn().mockResolvedValue(undefined),
+};
+
+jest.mock("../../services/auth/sessionStorage", () => ({
+  sessionStorage: mockSessionStorage,
+  SESSION_KEYS: {
+    ACCESS_TOKEN: "@planearia:secure:access_token",
+    REFRESH_TOKEN: "@planearia:secure:refresh_token",
+    USER: "@planearia:auth_user",
+    IS_GUEST: "@planearia:is_guest",
+  },
+  LEGACY_SESSION_KEYS: {
+    TOKEN: "@planearia:auth_token",
+    USER: "@planearia:auth_user",
+    IS_GUEST: "@planearia:is_guest",
+  },
+}));
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { migrateLegacySessionKeys } from "../../services/auth/legacyMigration";
+
+const MIGRATION_FLAG = "@planearia:auth_migration_v1_done";
+
+describe("legacyMigration", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+    (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
+    mockSessionStorage.getToken.mockResolvedValue(null);
+  });
+
+  it("migrates legacy token to new secure storage", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockImplementation((key: string) => {
+      if (key === MIGRATION_FLAG) return null;
+      if (key === "@planearia:auth_token") return "legacy-jwt";
+      return null;
+    });
+    await migrateLegacySessionKeys();
+    expect(mockSessionStorage.setToken).toHaveBeenCalledWith(
+      "@planearia:secure:access_token",
+      "legacy-jwt"
+    );
+    expect(AsyncStorage.setItem).toHaveBeenCalledWith(MIGRATION_FLAG, "true");
+  });
+
+  it("skips if migration already completed", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockImplementation((key: string) => {
+      if (key === MIGRATION_FLAG) return "true";
+      return null;
+    });
+    await migrateLegacySessionKeys();
+    expect(mockSessionStorage.setToken).not.toHaveBeenCalled();
+  });
+
+  it("does not overwrite existing new token", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockImplementation((key: string) => {
+      if (key === MIGRATION_FLAG) return null;
+      if (key === "@planearia:auth_token") return "legacy-jwt";
+      return null;
+    });
+    mockSessionStorage.getToken.mockResolvedValue("existing-new-token");
+    await migrateLegacySessionKeys();
+    expect(mockSessionStorage.setToken).not.toHaveBeenCalled();
+    expect(AsyncStorage.setItem).toHaveBeenCalledWith(MIGRATION_FLAG, "true");
+  });
+
+  it("does not delete legacy keys", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockImplementation((key: string) => {
+      if (key === MIGRATION_FLAG) return null;
+      if (key === "@planearia:auth_token") return "legacy-jwt";
+      return null;
+    });
+    await migrateLegacySessionKeys();
+    expect(AsyncStorage.removeItem).not.toHaveBeenCalledWith("@planearia:auth_token");
+  });
+
+  it("handles errors gracefully without throwing", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockRejectedValue(new Error("storage error"));
+    await expect(migrateLegacySessionKeys()).resolves.toBeUndefined();
+  });
+});

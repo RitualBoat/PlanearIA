@@ -1,12 +1,12 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { API_CONFIG } from "../sync/config/apiConfig";
-import { AUTH_PERMISSIONS_VERSION } from "../../types";
-import type { RolUsuario } from "../../types";
+import { SESSION_KEYS } from "../services/auth/sessionStorage";
+import * as authService from "../services/auth/authService";
+import type { AuthUser, AuthSession, RolUsuario } from "../../types/auth";
+import type { RegistroData } from "../services/auth/authService";
 
-const AUTH_TOKEN_KEY = "@planearia:auth_token";
-const AUTH_USER_KEY = "@planearia:auth_user";
-const AUTH_GUEST_KEY = "@planearia:is_guest";
+// Re-export for consumers that imported from here
+export type { RegistroData };
 
 export interface PreferenciasUsuario {
   recibirRecomendaciones: boolean;
@@ -26,6 +26,11 @@ export const PREFERENCIAS_DEFAULT: PreferenciasUsuario = {
   notificaciones: true,
 };
 
+/**
+ * Extended user interface for backward compatibility.
+ * AuthContext consumers still see the full Usuario shape;
+ * authService works with the leaner AuthUser from types/auth.
+ */
 export interface Usuario {
   id: number;
   nombre: string;
@@ -63,41 +68,30 @@ interface AuthContextData {
   eliminarCuenta: (password: string) => Promise<{ success: boolean; error?: string }>;
 }
 
-export interface RegistroData {
-  nombre: string;
-  apellidos?: string;
-  email: string;
-  password: string;
-}
-
 const AuthContext = createContext<AuthContextData | undefined>(undefined);
 
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-async function authRequest(body: Record<string, unknown>): Promise<{
-  ok: boolean;
-  data?: { token: string; usuario: Usuario; valid?: boolean; userId?: number; email?: string };
-  error?: string;
-}> {
-  try {
-    const res = await fetch(`${API_CONFIG.baseUrl}/api/auth`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-Key": API_CONFIG.apiSecret,
-      },
-      body: JSON.stringify(body),
-    });
-    const json = await res.json();
-    if (json.success) {
-      return { ok: true, data: json.data };
-    }
-    return { ok: false, error: json.error || "Error desconocido" };
-  } catch {
-    return { ok: false, error: "No se pudo conectar al servidor." };
-  }
+/** Convert AuthUser (from service) to full Usuario (for UI) */
+function toUsuario(user: AuthUser, existing?: Usuario | null): Usuario {
+  const now = new Date().toISOString();
+  return {
+    id: typeof user.id === "number" ? user.id : Number(user.id) || 0,
+    nombre: user.nombre,
+    apellidos: user.apellidos || existing?.apellidos || "",
+    email: user.email,
+    fotoPerfil: existing?.fotoPerfil ?? null,
+    biografia: existing?.biografia || "",
+    pais: existing?.pais || "Mexico",
+    rol: user.rol,
+    permissionsVersion: user.permissionsVersion,
+    preferencias: existing?.preferencias,
+    expoPushToken: existing?.expoPushToken,
+    fechaCreacion: existing?.fechaCreacion || now,
+    fechaModificacion: now,
+  };
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -105,24 +99,55 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isGuest, setIsGuest] = useState(false);
+  const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Restaurar sesión al montar
+  // Schedule token refresh ~1 min before expiry
+  const scheduleRefresh = useCallback((expiresAt?: string) => {
+    if (refreshTimerRef.current) {
+      clearTimeout(refreshTimerRef.current);
+      refreshTimerRef.current = null;
+    }
+    if (!expiresAt) return;
+
+    const expiresMs = new Date(expiresAt).getTime();
+    const nowMs = Date.now();
+    // Refresh 60s before expiry, minimum 10s from now
+    const delayMs = Math.max(expiresMs - nowMs - 60_000, 10_000);
+
+    refreshTimerRef.current = setTimeout(async () => {
+      const refreshed = await authService.refreshAccessToken();
+      if (refreshed) {
+        applySession(refreshed);
+      } else {
+        // Refresh failed -- force re-login
+        setToken(null);
+        setUsuario(null);
+        setIsGuest(false);
+        await authService.logout();
+      }
+    }, delayMs);
+  }, []);
+
+  const applySession = useCallback(
+    (session: AuthSession) => {
+      const u = toUsuario(session.user, usuario);
+      setUsuario(u);
+      setToken(session.tokens.accessToken || null);
+      setIsGuest(session.isGuest ?? false);
+      if (!session.isGuest) {
+        scheduleRefresh(session.tokens.expiresAt);
+      }
+    },
+    [usuario, scheduleRefresh]
+  );
+
+  // Restore session on mount
   useEffect(() => {
     (async () => {
       try {
-        const [storedToken, storedUser, storedGuest] = await Promise.all([
-          AsyncStorage.getItem(AUTH_TOKEN_KEY),
-          AsyncStorage.getItem(AUTH_USER_KEY),
-          AsyncStorage.getItem(AUTH_GUEST_KEY),
-        ]);
-        if (storedToken && storedUser) {
-          // Token-based session takes full priority (dev or real user)
-          setToken(storedToken);
-          setUsuario(JSON.parse(storedUser) as Usuario);
-          setIsGuest(false);
-        } else if (storedGuest === "true" && storedUser) {
-          setUsuario(JSON.parse(storedUser) as Usuario);
-          setIsGuest(true);
+        const session = await authService.restoreSession();
+        if (session) {
+          applySession(session);
         }
       } catch {
         // no-op
@@ -130,194 +155,126 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsLoading(false);
       }
     })();
+    return () => {
+      if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
+    };
+    // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const persistSession = useCallback(async (t: string, u: Usuario) => {
-    setToken(t);
-    setUsuario(u);
-    await Promise.all([
-      AsyncStorage.setItem(AUTH_TOKEN_KEY, t),
-      AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(u)),
-    ]);
-  }, []);
-
-  const login = useCallback(
+  const loginHandler = useCallback(
     async (email: string, password: string) => {
-      const result = await authRequest({ action: "login", email, password });
-      if (result.ok && result.data) {
-        await persistSession(result.data.token, result.data.usuario);
+      const result = await authService.login(email, password);
+      if (result.success && result.session) {
+        applySession(result.session);
         return { success: true };
       }
       return { success: false, error: result.error };
     },
-    [persistSession]
+    [applySession]
   );
 
-  const registro = useCallback(
+  const registroHandler = useCallback(
     async (data: RegistroData) => {
-      const result = await authRequest({ action: "registro", ...data });
-      if (result.ok && result.data) {
-        await persistSession(result.data.token, result.data.usuario);
+      const result = await authService.registro(data);
+      if (result.success && result.session) {
+        applySession(result.session);
         return { success: true };
       }
       return { success: false, error: result.error };
     },
-    [persistSession]
+    [applySession]
   );
 
-  const logout = useCallback(async () => {
+  const logoutHandler = useCallback(async () => {
+    if (refreshTimerRef.current) {
+      clearTimeout(refreshTimerRef.current);
+      refreshTimerRef.current = null;
+    }
+    await authService.logout(token);
     setToken(null);
     setUsuario(null);
     setIsGuest(false);
-    await Promise.all([
-      AsyncStorage.removeItem(AUTH_TOKEN_KEY),
-      AsyncStorage.removeItem(AUTH_USER_KEY),
-      AsyncStorage.removeItem(AUTH_GUEST_KEY),
-    ]);
-  }, []);
+  }, [token]);
 
-  const loginComoInvitado = useCallback(async () => {
-    const guestUser: Usuario = {
-      id: -1,
-      nombre: "Invitado",
-      apellidos: "",
-      email: "",
-      fotoPerfil: null,
-      biografia: "",
-      pais: "México",
-      rol: "usuario" as RolUsuario,
-      permissionsVersion: AUTH_PERMISSIONS_VERSION,
-      fechaCreacion: new Date().toISOString(),
-      fechaModificacion: new Date().toISOString(),
-    };
-    setUsuario(guestUser);
-    setIsGuest(true);
-    setToken(null);
-    await Promise.all([
-      AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(guestUser)),
-      AsyncStorage.setItem(AUTH_GUEST_KEY, "true"),
-      AsyncStorage.removeItem(AUTH_TOKEN_KEY),
-    ]);
-  }, []);
+  const loginComoInvitadoHandler = useCallback(async () => {
+    const session = await authService.loginComoInvitado();
+    applySession(session);
+  }, [applySession]);
 
-  const loginComoDesarrollador = useCallback(async () => {
-    const devUser: Usuario = {
-      id: 9999,
-      nombre: "Dev",
-      apellidos: "Admin",
-      email: "dev@planearia.local",
-      fotoPerfil: null,
-      biografia: "Cuenta de desarrollador para pruebas",
-      pais: "México",
-      rol: "dev" as RolUsuario,
-      permissionsVersion: AUTH_PERMISSIONS_VERSION,
-      fechaCreacion: new Date().toISOString(),
-      fechaModificacion: new Date().toISOString(),
-    };
-    const devToken = "dev-token-local-testing-only";
-    setIsGuest(false);
-    await AsyncStorage.removeItem(AUTH_GUEST_KEY);
-    await persistSession(devToken, devUser);
-  }, [persistSession]);
+  const loginComoDesarrolladorHandler = useCallback(async () => {
+    const session = await authService.loginComoDesarrollador();
+    applySession(session);
+  }, [applySession]);
 
-  const verificarToken = useCallback(async (): Promise<boolean> => {
+  const verificarTokenHandler = useCallback(async (): Promise<boolean> => {
     if (!token) return false;
-    const result = await authRequest({ action: "verificar" });
-    if (!result.ok) {
-      await logout();
+    const valid = await authService.verificarToken(token);
+    if (!valid) {
+      // Try refresh before giving up
+      const refreshed = await authService.refreshAccessToken();
+      if (refreshed) {
+        applySession(refreshed);
+        return true;
+      }
+      await logoutHandler();
       return false;
     }
     return true;
-  }, [token, logout]);
+  }, [token, applySession, logoutHandler]);
 
-  const actualizarPerfil = useCallback(
+  const actualizarPerfilHandler = useCallback(
     async (data: Partial<Pick<Usuario, "nombre" | "apellidos" | "biografia" | "pais" | "expoPushToken">>) => {
-      try {
-        const res = await fetch(`${API_CONFIG.baseUrl}/api/auth`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-API-Key": API_CONFIG.apiSecret,
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ action: "actualizar_perfil", ...data }),
-        });
-        const json = await res.json();
-        if (json.success && json.data?.usuario) {
-          const updatedUser = json.data.usuario as Usuario;
-          setUsuario(updatedUser);
-          await AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(updatedUser));
-          return { success: true };
-        }
-        return { success: false, error: json.error || "Error al actualizar perfil." };
-      } catch {
-        return { success: false, error: "No se pudo conectar al servidor." };
+      if (!token) return { success: false, error: "No autenticado." };
+      const result = await authService.actualizarPerfil(token, data as Record<string, unknown>);
+      if (result.success && result.user) {
+        setUsuario((prev) => toUsuario(result.user!, prev));
       }
+      return { success: result.success, error: result.error };
     },
     [token]
   );
 
-  const eliminarCuenta = useCallback(
+  const eliminarCuentaHandler = useCallback(
     async (password: string) => {
-      try {
-        const res = await fetch(`${API_CONFIG.baseUrl}/api/auth`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-API-Key": API_CONFIG.apiSecret,
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ action: "eliminar_cuenta", password }),
-        });
-        const json = await res.json();
-        if (json.success) {
-          await logout();
-          return { success: true };
-        }
-        return { success: false, error: json.error || "Error al eliminar cuenta." };
-      } catch {
-        return { success: false, error: "No se pudo conectar al servidor." };
+      if (!token) return { success: false, error: "No autenticado." };
+      const result = await authService.eliminarCuenta(token, password);
+      if (result.success) {
+        if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
+        setToken(null);
+        setUsuario(null);
+        setIsGuest(false);
       }
+      return { success: result.success, error: result.error };
     },
-    [token, logout]
+    [token]
   );
 
-  const actualizarPreferencias = useCallback(
+  const actualizarPreferenciasHandler = useCallback(
     async (preferencias: Partial<PreferenciasUsuario>) => {
-      try {
-        const res = await fetch(`${API_CONFIG.baseUrl}/api/auth`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-API-Key": API_CONFIG.apiSecret,
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ action: "actualizar_preferencias", preferencias }),
+      if (!token) return { success: false, error: "No autenticado." };
+      const result = await authService.actualizarPreferencias(
+        token,
+        preferencias as Record<string, unknown>
+      );
+      if (result.success) {
+        setUsuario((prev) => {
+          if (!prev) return prev;
+          const updated = {
+            ...prev,
+            preferencias: {
+              ...PREFERENCIAS_DEFAULT,
+              ...prev.preferencias,
+              ...(result.preferencias as Partial<PreferenciasUsuario>),
+            },
+          };
+          AsyncStorage.setItem(SESSION_KEYS.USER, JSON.stringify(updated));
+          return updated;
         });
-        const json = await res.json();
-        if (json.success) {
-          const updatedUser = usuario
-            ? {
-                ...usuario,
-                preferencias: {
-                  ...PREFERENCIAS_DEFAULT,
-                  ...usuario.preferencias,
-                  ...json.data.preferencias,
-                },
-              }
-            : null;
-          setUsuario(updatedUser);
-          if (updatedUser) {
-            await AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(updatedUser));
-          }
-          return { success: true };
-        }
-        return { success: false, error: json.error || "Error al actualizar preferencias." };
-      } catch {
-        return { success: false, error: "No se pudo conectar al servidor." };
       }
+      return { success: result.success, error: result.error };
     },
-    [token, usuario]
+    [token]
   );
 
   const value: AuthContextData = {
@@ -326,15 +283,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     isAuthenticated: (!!token && !!usuario) || isGuest,
     isGuest,
-    login,
-    loginComoInvitado,
-    loginComoDesarrollador,
-    registro,
-    logout,
-    verificarToken,
-    actualizarPerfil,
-    actualizarPreferencias,
-    eliminarCuenta,
+    login: loginHandler,
+    loginComoInvitado: loginComoInvitadoHandler,
+    loginComoDesarrollador: loginComoDesarrolladorHandler,
+    registro: registroHandler,
+    logout: logoutHandler,
+    verificarToken: verificarTokenHandler,
+    actualizarPerfil: actualizarPerfilHandler,
+    actualizarPreferencias: actualizarPreferenciasHandler,
+    eliminarCuenta: eliminarCuentaHandler,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

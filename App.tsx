@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import StackNavigator from "./src/navigation/StackNavigator";
 import { AuthProvider } from "./src/context/AuthContext";
+import { migrateLegacySessionKeys } from "./src/services/auth";
 import { PlaneacionesProvider } from "./src/context/PlaneacionesContext";
 import { GruposProvider } from "./src/context/GruposContext";
 import { AlumnosProvider } from "./src/context/AlumnosContext";
@@ -21,6 +22,15 @@ import KeyboardDismissFab from "./src/components/KeyboardDismissFab";
 import "./src/locales/i18n";
 
 const App: React.FC = () => {
+  const [migrated, setMigrated] = useState(false);
+
+  useEffect(() => {
+    migrateLegacySessionKeys().finally(() => setMigrated(true));
+  }, []);
+
+  // Block render until migration completes (fast, single AsyncStorage read)
+  if (!migrated) return null;
+
   return (
     <ThemeProvider>
       <FontSizeProvider>

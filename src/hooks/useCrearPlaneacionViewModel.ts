@@ -8,6 +8,7 @@ import { API_CONFIG } from "../sync/config/apiConfig";
 import { useAuth } from "../context/AuthContext";
 import { usePlaneaciones } from "../context/PlaneacionesContext";
 import { mapResponseToPlaneacion } from "../utils/planeacionMapper";
+import { getAccessToken } from "../services/auth";
 import {
   buildDocumentoFromPlantilla,
   listPlantillasDocumento,
@@ -23,7 +24,6 @@ import {
 import type { PlantillaDocumento, SeccionPlantilla } from "../../types/plantillaDocumento";
 
 type Nav = StackNavigationProp<RootStackParamList, "CrearPlaneacion">;
-const AUTH_TOKEN_KEY = "@planearia:auth_token";
 
 type TemplateSource = "base" | "predeterminada" | "guardada" | "online";
 
@@ -636,7 +636,7 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
     setIsGeneratingIA(true);
 
     try {
-      const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+      const token = await getAccessToken();
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
 

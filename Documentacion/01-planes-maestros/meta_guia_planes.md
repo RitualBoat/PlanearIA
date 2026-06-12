@@ -49,6 +49,7 @@ Todo plan futuro debe asumir este punto de partida, salvo que el codigo demuestr
 
 - Frontend: React Native 0.81.5 + Expo 54.
 - Web: react-native-web.
+- UI multiplataforma: una pantalla madre responsiva/adaptativa por defecto, mobile-first, con `react-native-web` y breakpoints compartidos.
 - Lenguaje: TypeScript 5.9.
 - Navegacion: React Navigation 7.
 - Estado: React Context + hooks ViewModel.
@@ -110,6 +111,8 @@ Regla de lectura: si este snapshot contradice el codigo, gana el codigo. Antes d
 - **Contenido es hub, no competidor.** Si una accion depende de una clase, debe vivir en Classroom. Si es biblioteca/global, puede vivir en Contenido.
 - **Legacy no debe ser entrada principal.** Si existe pantalla moderna equivalente, las rutas viejas quedan como respaldo temporal, redireccion o deuda explicitamente documentada.
 - **Offline-first desde el diseno.** AsyncStorage es la implementacion actual; SQLite/Expo SQLite es destino preferente para datos relacionales/pesados cuando se ejecute el plan de storage.
+- **Web/tablet/movil se unifican por defecto.** Cada pantalla nueva o refactorizada debe partir de una sola pantalla madre React Native/Expo, con layout responsivo/adaptativo mobile-first, ViewModel/logica compartida y estilos controlados por breakpoints. Evitar duplicar pantallas en `Screen.web.tsx` y `Screen.native.tsx` salvo excepcion justificada.
+- **Excepciones por plataforma solo para interacciones realmente distintas.** Se permite separar `.web.tsx`, `.native.tsx`, `.ios.tsx` o `.android.tsx` cuando el modulo lo exige por experiencia y rendimiento, por ejemplo Canva/Genially, editor de textos avanzado/Word, grids tipo Excel o flujos con teclado, mouse, canvas, gestos o atajos imposibles de mantener limpiamente en una sola pantalla. El plan debe justificar la separacion, mantener ViewModel/tipos/contratos compartidos y definir validacion para cada variante.
 - **GitHub Project acompana la ejecucion.** Plan markdown = arquitectura y decisiones; Project = estado operativo; Actions = evidencia automatica.
 - **Ground truth manda en experiencias madre.** Para Word, Classroom, Excel, Canva o WhatsApp, no basta escribir "tipo X"; cada fase debe citar capturas/referencias concretas.
 
@@ -341,6 +344,8 @@ Debe incluir:
 - Riesgos.
 - Dependencias nuevas.
 - Impacto en Expo Go, dev client, web, Android e iOS.
+- Estrategia web/tablet/movil: pantalla madre responsiva por defecto o separacion `.web.tsx`/`.native.tsx` justificada.
+- Hook, helper o sistema de breakpoints compartido si el modulo requiere adaptacion visual; no repetir `useWindowDimensions()` sin una abstraccion clara.
 - Impacto en costo.
 - Impacto en offline-first.
 - Estrategia de migracion.
@@ -377,6 +382,18 @@ Debe incluir:
 - Pantallas legacy a eliminar o redirigir.
 - Validacion de que el modulo no queda aislado ni inaccesible desde tabs, hubs, menus, buscadores o acciones contextuales.
 - Recomendaciones de redisenio del flujo si la navegacion actual es redundante, confusa o profunda.
+
+#### 6.6.1 Estrategia Web/Tablet/Movil
+
+Todo plan que toque pantallas debe resolver explicitamente:
+
+- En movil: flujo principal mobile-first, jerarquia, scroll, estados vacios y acciones primarias.
+- En tablet/web: que elementos se convierten en columnas, panel lateral, tabla, grid, toolbar ampliada o vista de detalle.
+- Breakpoints propuestos o referencia al helper/hook compartido del proyecto.
+- Componentes que se comparten entre plataformas y componentes que solo cambian layout.
+- Componentes pesados que no deben cargarse en movil si solo existen para web.
+- Si se propone `.web.tsx`/`.native.tsx`: razon tecnica, costo de mantenimiento, contrato compartido, pruebas por plataforma y criterio para evitar que una variante quede atrasada.
+- Validacion manual minima en web, tablet y movil antes de cerrar fases visuales.
 
 ### 6.7 IA y Automatizacion
 
@@ -769,6 +786,8 @@ Checklist obligatorio para UX/UI y navegacion:
 - [ ] No hay flujos que terminen en una pantalla sin salida evidente.
 - [ ] Los empty states llevan a la accion correcta.
 - [ ] Web, tablet y movil tienen navegacion usable.
+- [ ] Las pantallas nuevas usan pantalla madre responsiva/adaptativa por defecto o documentan una excepcion `.web.tsx`/`.native.tsx` justificada.
+- [ ] Existe criterio de cierre visual en movil, tablet y web, con capturas/checklist cuando el modulo toca UX/UI.
 - [ ] Los lectores de pantalla tienen labels basicos en acciones principales.
 
 ---
@@ -1253,6 +1272,22 @@ Esta guia es orientativa y no debe bloquear el trabajo si los modelos disponible
 
 ## UX/UI Objetivo
 
+## Estrategia Web/Tablet/Movil
+
+- Default: pantalla madre responsiva/adaptativa, mobile-first, con ViewModel/logica compartida.
+- Breakpoints/helper previsto:
+  - ...
+- Cambios de layout esperados:
+  - Movil: ...
+  - Tablet: ...
+  - Web: ...
+- Excepcion por plataforma:
+  - [No aplica | `.web.tsx`/`.native.tsx` justificado por ...]
+- Validacion minima:
+  - Web: ...
+  - Tablet: ...
+  - Movil: ...
+
 ## Mapa de Navegacion y UX/UI Global
 
 ## IA y Automatizacion
@@ -1332,6 +1367,7 @@ Un plan es aceptable solo si:
 - Integra offline-first desde el inicio.
 - Considera presupuesto bajo.
 - Considera web, Android e iOS.
+- Define estrategia web/tablet/movil: pantalla madre responsiva por defecto o excepcion por plataforma justificada.
 - Define IA con fallback.
 - Incluye validacion.
 - Incluye costos cuando aplica.

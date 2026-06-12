@@ -104,6 +104,7 @@ Archivados principales:
 - No cerrar fases visuales de paridad alta solo por pasar TypeScript/lint/tests; exigir validacion manual contra capturas/referencias.
 - No crear rutas/pantallas aisladas sin mapa de navegacion.
 - No duplicar flujos entre Contenido, Classroom y pantallas legacy.
+- Todo plan que toque pantallas debe definir estrategia web/tablet/movil: pantalla madre responsiva/adaptativa por defecto, mobile-first, y excepcion `.web.tsx`/`.native.tsx` solo si el modulo lo justifica.
 - Todo plan nuevo que toque datos academicos debe asumir SQLite como infraestructura disponible opt-in y evitar nuevas lecturas directas a AsyncStorage; usar ports/repositories.
 - Mantener tracking markdown `[ ]`, `[~]`, `[x]` en planes.
 - Crear issues de GitHub solo para epicas/fases activas, no para todo el backlog futuro.

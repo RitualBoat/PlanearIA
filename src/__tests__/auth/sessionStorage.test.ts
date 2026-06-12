@@ -4,11 +4,14 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   removeItem: jest.fn(() => Promise.resolve()),
 }));
 
+// expo-secure-store is installed (Fase 3), so the mock must intercept the
+// real module. With { virtual: true } the mock was not applied on CI and the
+// real native module load failed with "Cannot find native module".
 jest.mock("expo-secure-store", () => ({
   getItemAsync: jest.fn(() => Promise.resolve(null)),
   setItemAsync: jest.fn(() => Promise.resolve()),
   deleteItemAsync: jest.fn(() => Promise.resolve()),
-}), { virtual: true });
+}));
 
 // Replace react-native with a plain, mutable Platform object. The module
 // under test only needs Platform.OS. Mutating jest-expo's own Platform via

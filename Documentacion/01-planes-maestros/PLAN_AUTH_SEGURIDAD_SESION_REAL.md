@@ -2,7 +2,7 @@
 
 > **Version:** 1.0  
 > **Fecha:** 2026-06-11  
-> **Estado:** [~] Plan en ejecucion; Fase 3 implementada y validada localmente (typecheck/lint/logica); jest-expo completo y Review Manual remoto pendientes.
+> **Estado:** [~] Plan en ejecucion; Fase 3 completada y validada en CI (typecheck, lint, jest 605/605, backend smoke en verde); Review Manual remoto pendiente.
 > **Alcance:** endurecer autenticacion, sesion, roles, permisos, recuperacion de cuenta, aislamiento multiusuario y seguridad backend/frontend antes de beta, datos reales o pilotos.  
 > **Stack:** React Native 0.81.5 - Expo 54 - TypeScript 5.9 - React Navigation 7 - Context/hooks MVVM - Backend Node/Vercel - MongoDB Atlas Free - AsyncStorage default / SQLite opt-in.  
 > **Modulo:** Auth, Cuenta, Seguridad, Sesion, RBAC, secretos, APIs protegidas y aislamiento por usuario.  
@@ -835,6 +835,7 @@ GitHub/CI - Fase 3:
 - [x] **3.6 Tests frontend**
   - 3 suites: `sessionStorage`, `authService`, `legacyMigration` en `src/__tests__/auth/`.
 - **Avance 2026-06-12:** Fase 3 implementada (SessionStoragePort, authService, refactor AuthContext/apiClient, migracion legacy, 3 suites de tests). Instalado `expo-secure-store`. Resuelta corrupcion de bytes NUL al final de archivos (package.json, package-lock.json, AuthContext.tsx) introducida por escrituras previas; era la causa real de fallos de parseo/tests. Validacion local: `tsc --noEmit` 0 errores, ESLint 0 errores en archivos Auth, logica de authService+legacyMigration verificada (21/21 casos). Pendiente: correr `npm test -- --runInBand` en Windows (la suite jest-expo completa no corre en el sandbox por limite de lectura del mount sobre node_modules). Issue de Fase 3 y sincronizacion GitHub Product OS pendientes.
+- **Cierre 2026-06-12:** CI de Fase 3 en verde (run 27412080004). Se corrigio `src/__tests__/auth/sessionStorage.test.ts`, que fallaba solo en CI (Linux) en las 3 pruebas del adaptador SecureStore nativo. Causa: (1) mutar `Platform.OS` de jest-expo via `Object.defineProperty` no se propagaba al modulo bajo prueba en Linux, asi que la rama nativa nunca corria; se reemplazo `react-native` por un mock plano `{ Platform: { OS } }` (patron de `reportesExportService.alumno.test.ts`); (2) al activarse la rama nativa, el mock de `expo-secure-store` con `{ virtual: true }` dejaba de interceptar el modulo real ya instalado y fallaba con "Cannot find native module ExpoSecureStore"; se quito `virtual`. Validacion: `tsc --noEmit`, `eslint --quiet`, `jest --runInBand` 605/605 local y los 4 jobs de CI (TypeScript, ESLint, Jest, Backend smoke) en verde.
 
 ### FASE 4: Proteccion de Rutas, Cuenta y RBAC UX
 

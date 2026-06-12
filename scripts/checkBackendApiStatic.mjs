@@ -12,11 +12,23 @@ if (vercelConfig.version !== 2) {
   throw new Error("backend/vercel.json must keep version=2");
 }
 
-if (!vercelConfig.functions?.["api/**/*.js"]) {
-  throw new Error("backend/vercel.json must configure api function limits");
+if (!vercelConfig.functions?.["api/index.js"]) {
+  throw new Error("backend/vercel.json must keep a single api/index.js function");
 }
 
-const health = require("../backend/api/health.js");
+if (Object.keys(vercelConfig.functions).length !== 1) {
+  throw new Error("backend/vercel.json must stay within Vercel Hobby limits with one function");
+}
+
+const apiRewrite = vercelConfig.rewrites?.find(
+  (rewrite) => rewrite.source === "/api/:path*" && rewrite.destination === "/api/index.js"
+);
+
+if (!apiRewrite) {
+  throw new Error("backend/vercel.json must rewrite /api/:path* to /api/index.js");
+}
+
+const apiRouter = require("../backend/api/index.js");
 
 const createMockResponse = () => {
   const headers = {};
@@ -49,6 +61,7 @@ const createMockResponse = () => {
 };
 
 const getReq = {
+  url: "/api/health",
   method: "GET",
   headers: {
     origin: "http://localhost:8081",
@@ -56,7 +69,7 @@ const getReq = {
 };
 
 const { response: getRes, headers: getHeaders } = createMockResponse();
-await health(getReq, getRes);
+await apiRouter(getReq, getRes);
 
 if (getRes.statusCode !== 200 || !getRes.body?.success || getRes.body?.data?.status !== "ok") {
   throw new Error("GET /api/health static smoke failed");
@@ -67,6 +80,7 @@ if (getHeaders["access-control-allow-origin"] !== "http://localhost:8081") {
 }
 
 const optionsReq = {
+  url: "/api/health",
   method: "OPTIONS",
   headers: {
     origin: "http://localhost:8081",
@@ -74,12 +88,29 @@ const optionsReq = {
 };
 
 const { response: optionsRes } = createMockResponse();
-await health(optionsReq, optionsRes);
+await apiRouter(optionsReq, optionsRes);
 
 if (optionsRes.statusCode !== 200 || !optionsRes.ended) {
   throw new Error("OPTIONS /api/health static smoke failed");
 }
 
+const { response: unknownRes } = createMockResponse();
+await apiRouter(
+  {
+    url: "/api/no-existe",
+    method: "GET",
+    headers: {
+      origin: "http://localhost:8081",
+    },
+  },
+  unknownRes
+);
+
+if (unknownRes.statusCode !== 404 || !unknownRes.body?.error) {
+  throw new Error("Unknown route static smoke failed");
+}
+
 console.log("[backend:check] OK backend/vercel.json");
 console.log("[backend:check] OK GET /api/health");
 console.log("[backend:check] OK OPTIONS /api/health");
+console.log("[backend:check] OK single-function router");

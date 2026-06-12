@@ -118,11 +118,11 @@ require.cache[mongoPath] = {
   exports: { connectToDatabase: async () => ({ db: currentDb }) },
 };
 
-const grupos = require("../backend/api/grupos.js");
-const alumnos = require("../backend/api/alumnos.js");
-const calificaciones = require("../backend/api/calificaciones.js");
-const notificaciones = require("../backend/api/notificaciones.js");
-const auth = require("../backend/api/auth.js");
+const grupos = require("../backend/routes/grupos.js");
+const alumnos = require("../backend/routes/alumnos.js");
+const calificaciones = require("../backend/routes/calificaciones.js");
+const notificaciones = require("../backend/routes/notificaciones.js");
+const auth = require("../backend/routes/auth.js");
 
 // ---- Mock req/res ----
 

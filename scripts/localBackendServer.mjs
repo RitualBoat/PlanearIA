@@ -8,9 +8,7 @@ const port = Number(process.env.BACKEND_LOCAL_PORT ?? 3000);
 process.env.API_SECRET ||= "local-dev-only-api-secret";
 process.env.JWT_SECRET ||= process.env.API_SECRET;
 
-const routes = new Map([
-  ["/api/health", require("../backend/api/health.js")],
-]);
+const apiRouter = require("../backend/api/index.js");
 
 const createResponseAdapter = (res) => {
   res.status = (statusCode) => {
@@ -31,9 +29,8 @@ const createResponseAdapter = (res) => {
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://${req.headers.host ?? `localhost:${port}`}`);
-  const handler = routes.get(url.pathname);
 
-  if (!handler) {
+  if (!url.pathname.startsWith("/api/")) {
     res.statusCode = 404;
     res.setHeader("Content-Type", "application/json");
     res.end(JSON.stringify({ success: false, error: "Route not available in local smoke server" }));
@@ -43,7 +40,7 @@ const server = http.createServer(async (req, res) => {
   req.query = Object.fromEntries(url.searchParams.entries());
 
   try {
-    await handler(req, createResponseAdapter(res));
+    await apiRouter(req, createResponseAdapter(res));
   } catch (error) {
     if (!res.headersSent) {
       res.statusCode = 500;
@@ -60,5 +57,5 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(port, () => {
   console.log(`[backend:dev:local] listening on http://localhost:${port}`);
-  console.log("[backend:dev:local] available routes: /api/health");
+  console.log("[backend:dev:local] requests are routed through /api/index.js");
 });

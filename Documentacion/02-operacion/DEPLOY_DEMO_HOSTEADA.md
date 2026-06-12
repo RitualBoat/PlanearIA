@@ -110,12 +110,18 @@ En `Build and Output Settings`, para backend deja casi todo simple:
 
 ```text
 Framework Preset: Other
-Build Command: vacio o default
+Build Command: vacio
 Output Directory: vacio
 Install Command: npm install
 ```
 
-Si no ves estos campos, no pasa nada. Lo importante es que `Root Directory` sea `backend`.
+Muy importante: en el proyecto `planearia-api` NO pongas `npm run build:web`.
+
+Ese comando solo existe en el `package.json` de la raiz para el frontend. El backend usa `backend/package.json`, y ahi no existe `build:web`.
+
+Si Vercel no te deja dejar `Build Command` vacio, usa la opcion `Override` apagada o elimina el texto del campo para que quede como valor por defecto.
+
+Si no ves estos campos, no pasa nada. Lo importante es que `Root Directory` sea `backend` y que el backend no tenga `Build Command: npm run build:web`.
 
 ### 2.5 Agregar variables del backend
 
@@ -370,7 +376,26 @@ Para probar como profesor:
 
 ### El frontend falla con `Missing script build:web`
 
-Vercel no recibio tu cambio de `package.json`.
+Hay dos causas posibles.
+
+Caso A: estabas desplegando `planearia-api`.
+
+Entonces el problema es que pusiste `npm run build:web` en el backend. El backend no usa ese script.
+
+Solucion:
+
+1. Entra a Vercel -> proyecto `planearia-api`.
+2. Ve a `Settings`.
+3. Entra a `Build and Deployment`.
+4. Busca `Build Command`.
+5. Borra `npm run build:web` o apaga el override.
+6. Confirma que `Root Directory` sea `backend`.
+7. Ve a `Deployments`.
+8. En el ultimo deploy fallido, tres puntos `...` -> `Redeploy`.
+
+Caso B: estabas desplegando `planearia-web`.
+
+Entonces Vercel no recibio tu cambio de `package.json` o el proyecto web esta apuntando a la carpeta incorrecta.
 
 Solucion:
 
@@ -380,7 +405,16 @@ git commit -m "Prepare hosted demo deploy"
 git push
 ```
 
-Luego redeploy frontend.
+Luego revisa en Vercel:
+
+```text
+Proyecto: planearia-web
+Root Directory: .
+Build Command: npm run build:web
+Output Directory: dist
+```
+
+Despues redeploy frontend.
 
 ### La app carga, pero no habla con backend
 
@@ -417,6 +451,39 @@ Tambien revisa MongoDB Atlas:
 2. Ve a `Network Access`.
 3. Para demo, permite acceso desde Vercel. Si no sabes la IP de salida, la opcion rapida es `Allow Access from Anywhere`, pero solo para demo y con usuario/password fuertes.
 4. Ve a `Database Access` y confirma que el usuario de la URI existe.
+
+### Error: `No more than 12 Serverless Functions`
+
+Este error aparece en el plan Hobby cuando Vercel detecta demasiados archivos dentro de `backend/api` y quiere convertir cada archivo en una funcion separada.
+
+PlanearIA ya esta preparado para evitarlo:
+
+```text
+backend/api/index.js       -> unica funcion serverless visible para Vercel
+backend/routes/*.js        -> handlers reales internos
+backend/vercel.json        -> rewrite /api/:path* hacia /api/index.js
+```
+
+Si te sale este error, significa que Vercel esta desplegando un commit viejo o que todavia no subiste el cambio del router unico.
+
+Solucion:
+
+```bash
+git status --short
+git add backend/api/index.js backend/routes backend/vercel.json scripts/checkBackendApiStatic.mjs scripts/testBackendIsolation.mjs scripts/localBackendServer.mjs Documentacion/02-operacion/DEPLOY_DEMO_HOSTEADA.md
+git commit -m "Use single Vercel API function for Hobby deploy"
+git push
+```
+
+Despues:
+
+1. Entra a Vercel -> proyecto `planearia-api`.
+2. Ve a `Deployments`.
+3. En el ultimo deploy fallido, tres puntos `...`.
+4. Presiona `Redeploy`.
+5. Asegurate de que el nuevo deployment use el commit que incluye `backend/api/index.js`.
+
+No necesitas pagar Pro solo para esta demo.
 
 ### Cambie una variable y no paso nada
 

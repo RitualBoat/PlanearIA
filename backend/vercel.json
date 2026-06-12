@@ -1,9 +1,15 @@
 {
   "version": 2,
   "functions": {
-    "api/**/*.js": {
+    "api/index.js": {
       "memory": 256,
       "maxDuration": 10
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/index.js"
+    }
+  ]
 }

@@ -3,7 +3,7 @@ import { Alert, Share } from "react-native";
 import { usePosts } from "../context/PostsContext";
 import { useAuth } from "../context/AuthContext";
 import { useRecursos } from "../context/RecursosContext";
-import { Post, PostMood, PostAttachment } from "../../types";
+import { getRoleLabel, Post, PostMood, PostAttachment } from "../../types";
 
 export function useFeedViewModel() {
   const { posts, isLoading, error, createPost, toggleLike, toggleSave, refreshPosts } = usePosts();
@@ -18,7 +18,7 @@ export function useFeedViewModel() {
   const userName = usuario
     ? `${usuario.nombre}${usuario.apellidos ? ` ${usuario.apellidos}` : ""}`
     : "Usuario";
-  const userRole = usuario?.rol === "admin" ? "Administrador" : "Docente";
+  const userRole = usuario?.rol ? getRoleLabel(usuario.rol) : "Docente";
 
   const sortedPosts = useMemo(
     () =>

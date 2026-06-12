@@ -36,7 +36,7 @@ function isDevRequest(req) {
   const tokenUser = getUserFromToken(req);
   const email = String(tokenUser?.email || "").toLowerCase();
   const role = String(tokenUser?.rol || tokenUser?.role || "").toLowerCase();
-  return role === "admin" && email.includes("dev");
+  return role === "dev" || (role === "admin" && email.includes("dev"));
 }
 
 function hash(value) {

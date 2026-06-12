@@ -2,7 +2,7 @@
  * Middleware de autenticación simple
  * Verifica el API secret en el header y valida JWT tokens.
  */
-const crypto = require("crypto");
+const { getUserFromToken, verifyToken } = require("./tokens");
 
 const API_SECRET = process.env.API_SECRET;
 
@@ -29,38 +29,9 @@ function validateAuth(req) {
   return { valid: true };
 }
 
-function getJWTSecret() {
-  return process.env.JWT_SECRET || process.env.API_SECRET;
-}
-
-function verifyToken(token) {
-  try {
-    const secret = getJWTSecret();
-    if (!secret) return null;
-    const [header, body, signature] = token.split(".");
-    const expectedSig = crypto
-      .createHmac("sha256", secret)
-      .update(`${header}.${body}`)
-      .digest("base64url");
-    if (signature !== expectedSig) return null;
-    const payload = JSON.parse(Buffer.from(body, "base64url").toString());
-    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
-    return payload;
-  } catch {
-    return null;
-  }
-}
-
 /**
  * Obtiene la información del usuario desde el JWT token en la cabecera de la petición
  */
-function getUserFromToken(req) {
-  const authHeader = req.headers["authorization"] || "";
-  const token = authHeader.replace("Bearer ", "");
-  if (!token) return null;
-  return verifyToken(token);
-}
-
 /**
  * Orígenes permitidos para CORS
  */
@@ -76,12 +47,22 @@ const ALLOWED_ORIGINS = [
  */
 function getCorsHeaders(req) {
   const origin = req?.headers?.origin || "";
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const envOrigins = String(process.env.ALLOWED_ORIGINS || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+  const allowedOrigins = envOrigins.length ? envOrigins : ALLOWED_ORIGINS;
+  const allowedOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
   return {
     "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-API-Key",
+    "Cache-Control": "no-store",
     "Content-Type": "application/json",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    "Referrer-Policy": "no-referrer",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
   };
 }
 
@@ -135,6 +116,7 @@ function successResponse(res, data, status = 200) {
 module.exports = {
   validateAuth,
   getUserFromToken,
+  verifyToken,
   getCorsHeaders,
   handleCors,
   applyCors,

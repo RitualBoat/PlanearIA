@@ -5,79 +5,32 @@
  * Usa Node.js crypto (PBKDF2) para hashing de contraseñas
  * y HMAC-SHA256 para tokens JWT firmados.
  */
-const crypto = require("crypto");
 const { connectToDatabase } = require("../lib/mongodb");
 const { handleCors, applyCors, errorResponse, successResponse } = require("../lib/auth");
-
-// =========== Password hashing con PBKDF2 ===========
-
-const SALT_LENGTH = 32;
-const KEY_LENGTH = 64;
-const ITERATIONS = 100000;
-const DIGEST = "sha512";
-
-function hashPassword(password) {
-  return new Promise((resolve, reject) => {
-    const salt = crypto.randomBytes(SALT_LENGTH).toString("hex");
-    crypto.pbkdf2(password, salt, ITERATIONS, KEY_LENGTH, DIGEST, (err, derivedKey) => {
-      if (err) return reject(err);
-      resolve(`${salt}:${derivedKey.toString("hex")}`);
-    });
-  });
-}
-
-function verifyPassword(password, stored) {
-  return new Promise((resolve, reject) => {
-    const [salt, key] = stored.split(":");
-    crypto.pbkdf2(password, salt, ITERATIONS, KEY_LENGTH, DIGEST, (err, derivedKey) => {
-      if (err) return reject(err);
-      resolve(derivedKey.toString("hex") === key);
-    });
-  });
-}
-
-// =========== JWT con HMAC-SHA256 ===========
-
-function getJWTSecret() {
-  const secret = process.env.JWT_SECRET || process.env.API_SECRET;
-  if (!secret) throw new Error("JWT_SECRET not configured");
-  return secret;
-}
-
-function base64url(str) {
-  return Buffer.from(str).toString("base64url");
-}
-
-function createToken(payload, expiresInHours = 168) {
-  const secret = getJWTSecret();
-  const header = base64url(JSON.stringify({ alg: "HS256", typ: "JWT" }));
-  const now = Math.floor(Date.now() / 1000);
-  const body = base64url(
-    JSON.stringify({ ...payload, iat: now, exp: now + expiresInHours * 3600 })
-  );
-  const signature = crypto
-    .createHmac("sha256", secret)
-    .update(`${header}.${body}`)
-    .digest("base64url");
-  return `${header}.${body}.${signature}`;
-}
-
-function verifyToken(token) {
-  try {
-    const secret = getJWTSecret();
-    const [header, body, signature] = token.split(".");
-    const expectedSig = crypto
-      .createHmac("sha256", secret)
-      .update(`${header}.${body}`)
-      .digest("base64url");
-    if (signature !== expectedSig) return null;
-    const payload = JSON.parse(Buffer.from(body, "base64url").toString());
-    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
-    return payload;
-  } catch {
-    return null;
-  }
-}
+const {
+  createAuthSession,
+  ensureAuthSessionIndexes,
+  revokeAuthSession,
+  rotateAuthSession,
+} = require("../lib/authSessions");
+const {
+  AUTH_PERMISSIONS,
+  AUTH_PERMISSIONS_VERSION,
+  ASSIGNABLE_AUTH_ROLES,
+  hasPermission,
+  normalizeRole,
+} = require("../lib/authContract");
+const { hashPassword, validatePasswordPolicy, verifyPasswordDetailed } = require("../lib/passwords");
+const { assertRateLimit } = require("../lib/rateLimit");
+const {
+  RESET_CODE_MAX_ATTEMPTS,
+  RESET_CODE_TTL_MS,
+  createResetCode,
+  hashResetCode,
+  isDevResetCodeEnabled,
+  verifyResetCode,
+} = require("../lib/resetCodes");
+const { createAccessToken, getBearerToken, getUserFromToken, verifyToken } = require("../lib/tokens");
 
 // =========== Validaciones ===========
 
@@ -86,63 +39,12 @@ function validateEmail(email) {
 }
 
 function validatePassword(password) {
-  return typeof password === "string" && password.length >= 6;
+  return validatePasswordPolicy(password).valid;
 }
 
 // =========== Roles válidos ===========
 
-const ROLES_VALIDOS = ["admin", "supervisor", "docente", "alumno", "usuario"];
-
-const PERMISOS_POR_ROL = {
-  admin: [
-    "gestionar_usuarios",
-    "cambiar_roles",
-    "ver_todos_grupos",
-    "gestionar_planeaciones",
-    "gestionar_grupos",
-    "gestionar_alumnos",
-    "gestionar_calificaciones",
-    "gestionar_entregables",
-    "gestionar_recursos",
-    "gestionar_asistencia",
-    "ver_propios_datos",
-  ],
-  supervisor: [
-    "ver_todos_grupos",
-    "gestionar_planeaciones",
-    "gestionar_grupos",
-    "gestionar_alumnos",
-    "gestionar_calificaciones",
-    "gestionar_entregables",
-    "gestionar_recursos",
-    "gestionar_asistencia",
-    "ver_propios_datos",
-  ],
-  docente: [
-    "gestionar_planeaciones",
-    "gestionar_grupos",
-    "gestionar_alumnos",
-    "gestionar_calificaciones",
-    "gestionar_entregables",
-    "gestionar_recursos",
-    "gestionar_asistencia",
-    "ver_propios_datos",
-  ],
-  alumno: ["ver_propios_datos"],
-  usuario: ["ver_propios_datos"],
-};
-
-function getUserFromToken(req) {
-  const authHeader = req.headers["authorization"] || "";
-  const token = authHeader.replace("Bearer ", "");
-  if (!token) return null;
-  return verifyToken(token);
-}
-
-function hasPermission(rol, permiso) {
-  const permisos = PERMISOS_POR_ROL[rol] || [];
-  return permisos.includes(permiso);
-}
+const ROLES_VALIDOS = ASSIGNABLE_AUTH_ROLES;
 
 // =========== Handler ===========
 
@@ -159,16 +61,22 @@ module.exports = async function handler(req, res) {
   try {
     const { db } = await connectToDatabase();
     const usuarios = db.collection("usuarios");
+    const sessions = db.collection("auth_sessions");
 
     // Crear índices (idempotente)
     await usuarios.createIndex({ id: 1 }, { unique: true });
     await usuarios.createIndex({ email: 1 }, { unique: true });
+    await ensureAuthSessionIndexes(sessions);
 
     switch (action) {
       case "registro":
-        return await handleRegistro(req, res, usuarios);
+        return await handleRegistro(req, res, usuarios, sessions);
       case "login":
-        return await handleLogin(req, res, usuarios);
+        return await handleLogin(req, res, usuarios, sessions);
+      case "refresh":
+        return await handleRefresh(req, res, usuarios, sessions);
+      case "logout":
+        return await handleLogout(req, res, sessions);
       case "verificar":
         return await handleVerificar(req, res);
       case "recuperar":
@@ -189,15 +97,61 @@ module.exports = async function handler(req, res) {
         return errorResponse(res, 400, "Acción no válida.");
     }
   } catch (err) {
+    if (err?.statusCode) {
+      return errorResponse(res, err.statusCode, err.message);
+    }
     console.error("[auth] Error:", err);
     return errorResponse(res, 500, "Error interno del servidor");
   }
 };
 
+function authRateLimit(req, action, identifier, max) {
+  return assertRateLimit(req, `auth:${action}`, {
+    identifier: identifier || req.body?.email || getBearerToken(req),
+    max,
+  });
+}
+
+function toSafeUser(usuario) {
+  const { password, _id, resetCode, resetCodeHash, resetCodeExpiry, resetCodeAttempts, ...safeUser } =
+    usuario;
+  return {
+    ...safeUser,
+    canonicalRole: normalizeRole(safeUser.rol || "docente"),
+    permissionsVersion: safeUser.permissionsVersion || AUTH_PERMISSIONS_VERSION,
+  };
+}
+
+async function buildAuthResponse(req, usuario, sessions) {
+  const { session, refreshToken, refreshTokenExpiresAt } = await createAuthSession(
+    sessions,
+    usuario,
+    req
+  );
+  const access = createAccessToken(usuario, session.id);
+  const safeUser = toSafeUser(usuario);
+
+  return {
+    token: access.token,
+    accessToken: access.token,
+    refreshToken,
+    sessionId: session.id,
+    tokens: {
+      accessToken: access.token,
+      refreshToken,
+      tokenType: "Bearer",
+      expiresAt: access.expiresAt.toISOString(),
+      refreshExpiresAt: refreshTokenExpiresAt.toISOString(),
+    },
+    usuario: safeUser,
+  };
+}
+
 // =========== Registro ===========
 
-async function handleRegistro(req, res, usuarios) {
+async function handleRegistro(req, res, usuarios, sessions) {
   const { nombre, apellidos, email, password } = req.body;
+  authRateLimit(req, "registro", email, 10);
 
   if (!nombre || !email || !password) {
     return errorResponse(res, 400, "Nombre, email y contraseña son obligatorios.");
@@ -207,7 +161,8 @@ async function handleRegistro(req, res, usuarios) {
     return errorResponse(res, 400, "Formato de email no válido.");
   }
 
-  if (!validatePassword(password)) {
+  const passwordPolicy = { valid: validatePassword(password) };
+  if (!passwordPolicy.valid) {
     return errorResponse(res, 400, "La contraseña debe tener al menos 6 caracteres.");
   }
 
@@ -231,23 +186,21 @@ async function handleRegistro(req, res, usuarios) {
     biografia: "",
     pais: "México",
     rol: "docente",
+    permissionsVersion: AUTH_PERMISSIONS_VERSION,
     fechaCreacion: now,
     fechaModificacion: now,
   };
 
   await usuarios.insertOne(usuario);
 
-  const token = createToken({ userId: id, email: usuario.email, rol: "docente" });
-
-  const { password: _, _id, ...safeUser } = usuario;
-
-  return successResponse(res, { token, usuario: safeUser }, 201);
+  return successResponse(res, await buildAuthResponse(req, usuario, sessions), 201);
 }
 
 // =========== Login ===========
 
-async function handleLogin(req, res, usuarios) {
+async function handleLogin(req, res, usuarios, sessions) {
   const { email, password } = req.body;
+  authRateLimit(req, "login", email, 10);
 
   if (!email || !password) {
     return errorResponse(res, 400, "Email y contraseña son obligatorios.");
@@ -258,30 +211,32 @@ async function handleLogin(req, res, usuarios) {
     return errorResponse(res, 401, "Credenciales incorrectas.");
   }
 
-  const valid = await verifyPassword(password, usuario.password);
-  if (!valid) {
+  const passwordResult = await verifyPasswordDetailed(password, usuario.password);
+  if (!passwordResult.valid) {
     return errorResponse(res, 401, "Credenciales incorrectas.");
   }
 
-  const token = createToken({
-    userId: usuario.id,
-    email: usuario.email,
-    rol: usuario.rol || "docente",
-  });
+  const updateFields = {
+    ultimoAcceso: new Date(),
+    permissionsVersion: usuario.permissionsVersion || AUTH_PERMISSIONS_VERSION,
+  };
+  if (passwordResult.needsRehash) {
+    updateFields.password = await hashPassword(password);
+  }
 
   // Actualizar último acceso
-  await usuarios.updateOne({ id: usuario.id }, { $set: { ultimoAcceso: new Date() } });
+  await usuarios.updateOne({ id: usuario.id }, { $set: updateFields });
 
-  const { password: _, _id, ...safeUser } = usuario;
-
-  return successResponse(res, { token, usuario: safeUser });
+  return successResponse(
+    res,
+    await buildAuthResponse(req, { ...usuario, ...updateFields }, sessions)
+  );
 }
 
 // =========== Verificar token ===========
 
 async function handleVerificar(req, res) {
-  const authHeader = req.headers["authorization"] || "";
-  const token = authHeader.replace("Bearer ", "");
+  const token = getBearerToken(req);
 
   if (!token) {
     return errorResponse(res, 401, "Token no proporcionado.");
@@ -292,13 +247,79 @@ async function handleVerificar(req, res) {
     return errorResponse(res, 401, "Token inválido o expirado.");
   }
 
-  return successResponse(res, { valid: true, userId: payload.userId, email: payload.email });
+  return successResponse(res, {
+    valid: true,
+    userId: payload.userId,
+    email: payload.email,
+    rol: payload.rol,
+    role: payload.role || normalizeRole(payload.rol),
+    permissionsVersion: payload.permissionsVersion || AUTH_PERMISSIONS_VERSION,
+  });
 }
 
 // =========== Recuperar contraseña ===========
 
+// =========== Refresh / Logout ===========
+
+async function handleRefresh(req, res, usuarios, sessions) {
+  const { refreshToken } = req.body;
+  authRateLimit(req, "refresh", refreshToken, 20);
+
+  if (!refreshToken) {
+    return errorResponse(res, 400, "refreshToken es obligatorio.");
+  }
+
+  const rotated = await rotateAuthSession(sessions, refreshToken, req);
+  if (!rotated) {
+    return errorResponse(res, 401, "Refresh token invalido o expirado.");
+  }
+
+  const usuario = await usuarios.findOne({ id: rotated.session.userId });
+  if (!usuario) {
+    await revokeAuthSession(sessions, { sessionId: rotated.session.id });
+    return errorResponse(res, 401, "Sesion invalida.");
+  }
+
+  const access = createAccessToken(usuario, rotated.session.id);
+  const safeUser = toSafeUser(usuario);
+
+  return successResponse(res, {
+    token: access.token,
+    accessToken: access.token,
+    refreshToken: rotated.refreshToken,
+    sessionId: rotated.session.id,
+    tokens: {
+      accessToken: access.token,
+      refreshToken: rotated.refreshToken,
+      tokenType: "Bearer",
+      expiresAt: access.expiresAt.toISOString(),
+      refreshExpiresAt: rotated.refreshTokenExpiresAt.toISOString(),
+    },
+    usuario: safeUser,
+  });
+}
+
+async function handleLogout(req, res, sessions) {
+  const { refreshToken, all } = req.body || {};
+  const payload = getUserFromToken(req);
+  const sessionId = payload?.sessionId;
+
+  if (!refreshToken && !sessionId && !payload?.userId) {
+    return errorResponse(res, 400, "No hay sesion para cerrar.");
+  }
+
+  await revokeAuthSession(sessions, {
+    refreshToken,
+    sessionId: all ? undefined : sessionId,
+    userId: all ? payload?.userId : undefined,
+  });
+
+  return successResponse(res, { message: "Sesion cerrada correctamente." });
+}
+
 async function handleRecuperar(req, res, usuarios) {
   const { email } = req.body;
+  authRateLimit(req, "recuperar", email, 5);
 
   if (!email) {
     return errorResponse(res, 400, "El email es obligatorio.");
@@ -317,12 +338,20 @@ async function handleRecuperar(req, res, usuarios) {
   }
 
   // Generar código de 6 dígitos
-  const code = crypto.randomInt(100000, 999999).toString();
-  const expiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
+  const code = createResetCode();
+  const expiry = new Date(Date.now() + RESET_CODE_TTL_MS);
 
   await usuarios.updateOne(
     { id: usuario.id },
-    { $set: { resetCode: code, resetCodeExpiry: expiry } }
+    {
+      $set: {
+        resetCodeHash: hashResetCode(usuario.email, code),
+        resetCodeExpiry: expiry,
+        resetCodeAttempts: 0,
+        resetCodeIssuedAt: new Date(),
+      },
+      $unset: { resetCode: "" },
+    }
   );
 
   // TODO producción: enviar email con el código usando SendGrid/Resend
@@ -330,7 +359,7 @@ async function handleRecuperar(req, res, usuarios) {
   return successResponse(res, {
     message: "Si el email existe, recibirás un código de recuperación.",
     // DEV ONLY — quitar en producción:
-    _devCode: code,
+    ...(isDevResetCodeEnabled() ? { _devCode: code } : {}),
   });
 }
 
@@ -338,21 +367,28 @@ async function handleRecuperar(req, res, usuarios) {
 
 async function handleResetear(req, res, usuarios) {
   const { email, code, newPassword } = req.body;
+  authRateLimit(req, "resetear", email, 5);
 
   if (!email || !code || !newPassword) {
     return errorResponse(res, 400, "Email, código y nueva contraseña son obligatorios.");
   }
 
-  if (!validatePassword(newPassword)) {
-    return errorResponse(res, 400, "La contraseña debe tener al menos 6 caracteres.");
+  const passwordPolicy = validatePasswordPolicy(newPassword);
+  if (!passwordPolicy.valid) {
+    return errorResponse(res, 400, passwordPolicy.error);
   }
 
   const usuario = await usuarios.findOne({ email: email.toLowerCase().trim() });
-  if (!usuario || !usuario.resetCode) {
+  if (!usuario || (!usuario.resetCodeHash && !usuario.resetCode)) {
     return errorResponse(res, 400, "Código inválido o expirado.");
   }
 
-  if (usuario.resetCode !== code) {
+  if ((usuario.resetCodeAttempts || 0) >= RESET_CODE_MAX_ATTEMPTS) {
+    return errorResponse(res, 429, "Demasiados intentos. Solicita un nuevo codigo.");
+  }
+
+  if (!verifyResetCode(usuario, code)) {
+    await usuarios.updateOne({ id: usuario.id }, { $inc: { resetCodeAttempts: 1 } });
     return errorResponse(res, 400, "Código inválido o expirado.");
   }
 
@@ -360,7 +396,15 @@ async function handleResetear(req, res, usuarios) {
     // Limpiar código expirado
     await usuarios.updateOne(
       { id: usuario.id },
-      { $unset: { resetCode: "", resetCodeExpiry: "" } }
+      {
+        $unset: {
+          resetCode: "",
+          resetCodeHash: "",
+          resetCodeExpiry: "",
+          resetCodeAttempts: "",
+          resetCodeIssuedAt: "",
+        },
+      }
     );
     return errorResponse(res, 400, "El código ha expirado. Solicita uno nuevo.");
   }
@@ -371,7 +415,13 @@ async function handleResetear(req, res, usuarios) {
     { id: usuario.id },
     {
       $set: { password: hashedPassword, fechaModificacion: new Date() },
-      $unset: { resetCode: "", resetCodeExpiry: "" },
+      $unset: {
+        resetCode: "",
+        resetCodeHash: "",
+        resetCodeExpiry: "",
+        resetCodeAttempts: "",
+        resetCodeIssuedAt: "",
+      },
     }
   );
 
@@ -409,9 +459,7 @@ async function handleActualizarPerfil(req, res, usuarios) {
     return errorResponse(res, 404, "Usuario no encontrado.");
   }
 
-  const { password: _, _id, resetCode, resetCodeExpiry, ...safeUser } = updated;
-
-  return successResponse(res, { usuario: safeUser });
+  return successResponse(res, { usuario: toSafeUser(updated) });
 }
 
 // =========== Eliminar cuenta ===========
@@ -440,8 +488,8 @@ async function handleEliminarCuenta(req, res, usuarios) {
     return errorResponse(res, 404, "Usuario no encontrado.");
   }
 
-  const valid = await verifyPassword(password, usuario.password);
-  if (!valid) {
+  const passwordResult = await verifyPasswordDetailed(password, usuario.password);
+  if (!passwordResult.valid) {
     return errorResponse(res, 401, "Contraseña incorrecta.");
   }
 
@@ -474,7 +522,7 @@ async function handleListarUsuarios(req, res, usuarios) {
   }
 
   const solicitante = await usuarios.findOne({ id: payload.userId });
-  if (!solicitante || solicitante.rol !== "admin") {
+  if (!solicitante || !hasPermission(solicitante.rol, AUTH_PERMISSIONS.GESTIONAR_USUARIOS)) {
     return errorResponse(res, 403, "Solo los administradores pueden listar usuarios.");
   }
 
@@ -529,7 +577,7 @@ async function handleCambiarRol(req, res, usuarios) {
 
   // Verificar que el solicitante es admin
   const solicitante = await usuarios.findOne({ id: payload.userId });
-  if (!solicitante || solicitante.rol !== "admin") {
+  if (!solicitante || !hasPermission(solicitante.rol, AUTH_PERMISSIONS.CAMBIAR_ROLES)) {
     return errorResponse(res, 403, "Solo los administradores pueden cambiar roles.");
   }
 
@@ -541,6 +589,10 @@ async function handleCambiarRol(req, res, usuarios) {
 
   if (!ROLES_VALIDOS.includes(nuevoRol)) {
     return errorResponse(res, 400, `Rol no válido. Roles válidos: ${ROLES_VALIDOS.join(", ")}`);
+  }
+
+  if (nuevoRol === "dev" && process.env.ALLOW_DEV_ROLE_ASSIGNMENT !== "true") {
+    return errorResponse(res, 403, "El rol dev solo puede asignarse con entorno autorizado.");
   }
 
   const target = await usuarios.findOne({ id: targetUserId });

@@ -92,6 +92,17 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
       <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
 
       <SafeAreaView style={styles.safeArea}>
+        <View style={styles.headerBar}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate("MainTabs" as any)}
+            activeOpacity={0.7}
+          >
+            <MaterialIcons name="arrow-back" size={24} color={COLORS.primary} />
+          </TouchableOpacity>
+          <Text style={styles.headerBarTitle}>Recursos</Text>
+          <View style={{ width: 40 }} />
+        </View>
         <Animated.ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -228,6 +239,29 @@ const styles = StyleSheet.create({
     maxWidth: 1220,
   },
   headerBlock: { marginBottom: 2 },
+  headerBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: COLORS.background,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2EAF4",
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#EEF3FA",
+  },
+  headerBarTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: COLORS.primary,
+  },
   heroTitle: {
     fontSize: 26,
     fontWeight: "800",

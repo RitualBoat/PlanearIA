@@ -11,20 +11,19 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { COLORS, FONT_SIZES } from "../../../types";
+import { ASSIGNABLE_ROLES, COLORS, FONT_SIZES, getRoleLabel } from "../../../types";
 import type { RolUsuario } from "../../../types";
 import { useAdminRolesViewModel } from "../../hooks/useAdminRolesViewModel";
 
-const ROLES: { value: RolUsuario; label: string }[] = [
-  { value: "admin", label: "Administrador" },
-  { value: "supervisor", label: "Supervisor" },
-  { value: "docente", label: "Docente" },
-  { value: "alumno", label: "Alumno" },
-  { value: "usuario", label: "Usuario" },
-];
+const ROLES: { value: RolUsuario; label: string }[] = ASSIGNABLE_ROLES.map((value) => ({
+  value,
+  label: getRoleLabel(value),
+}));
 
 const rolColor = (rol: RolUsuario): string => {
   switch (rol) {
+    case "dev":
+      return "#5B2A86";
     case "admin":
       return "#C62828";
     case "supervisor":

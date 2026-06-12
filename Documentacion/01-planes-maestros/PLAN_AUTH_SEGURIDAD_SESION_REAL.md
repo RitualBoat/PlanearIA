@@ -2,7 +2,7 @@
 
 > **Version:** 1.0  
 > **Fecha:** 2026-06-11  
-> **Estado:** [ ] Plan creado; ejecucion pendiente.  
+> **Estado:** [~] Plan en ejecucion; Fase 2 validada localmente; Review Manual remoto pendiente.
 > **Alcance:** endurecer autenticacion, sesion, roles, permisos, recuperacion de cuenta, aislamiento multiusuario y seguridad backend/frontend antes de beta, datos reales o pilotos.  
 > **Stack:** React Native 0.81.5 - Expo 54 - TypeScript 5.9 - React Navigation 7 - Context/hooks MVVM - Backend Node/Vercel - MongoDB Atlas Free - AsyncStorage default / SQLite opt-in.  
 > **Modulo:** Auth, Cuenta, Seguridad, Sesion, RBAC, secretos, APIs protegidas y aislamiento por usuario.  
@@ -704,10 +704,11 @@ Brief de Seguridad - Fase 0:
 
 GitHub/CI - Fase 0:
 
-- Issue/Project item: crear al iniciar ejecucion; no creado durante redaccion documental.
-- Milestone sugerido: `Ciclo 4 - Auth y Seguridad`.
+- Epic: `#26` - `Plan Maestro: Auth, Seguridad y Sesion Real`.
+- Issue/Project item: `#27` - `Auth Seguridad Fase 0 - Auditoria y baseline de seguridad`.
+- Milestone: `Ciclo 4 - Auth y Seguridad` (`#7`).
 - Labels: `plan-maestro`, `fase`, `infra`, `testing`, `low-cost`.
-- Estado al iniciar: `In Progress`.
+- Estado al iniciar: `In progress`.
 - Estado al cerrar: `Review Manual` si incluye validacion manual; si solo auditoria documental, `Done`.
 - Scripts obligatorios:
   - `npm run typecheck`
@@ -716,54 +717,58 @@ GitHub/CI - Fase 0:
   - `npm run backend:check`
   - `git diff --check`
 - GitHub Actions: revisar si hay rama/PR.
+- Evidencia Fase 0: `context/infraestructura-ground-truth/06-auth-seguridad-sesion/auth-fase-0-auditoria-baseline-2026-06-12.md`.
 
-- [ ] **0.1 Inventariar flujos Auth reales**
+- [x] **0.1 Inventariar flujos Auth reales**
   - Login, registro, invitado, dev, recuperar, resetear, perfil, preferencias, eliminar cuenta, admin roles.
-- [ ] **0.2 Crear matriz de endpoints y nivel de proteccion**
+- [x] **0.2 Crear matriz de endpoints y nivel de proteccion**
   - Clasificar cada `backend/api/*.js` por API key, JWT, `userId`, rol, permisos y rate limit.
-- [ ] **0.3 Crear baseline de storage local**
+- [x] **0.3 Crear baseline de storage local**
   - Registrar claves Auth y claves academicas que no deben borrarse.
-- [ ] **0.4 Crear baseline de rutas**
+- [x] **0.4 Crear baseline de rutas**
   - Confirmar rutas accesibles sin rol y definir guards necesarios.
-- [ ] **0.5 Registrar riesgos**
+- [x] **0.5 Registrar riesgos**
   - Token en AsyncStorage, dev token, reset code, roles legacy, endpoints sin `userId`.
+- **Avance 2026-06-12:** inventario documental de Fase 0 completado, validado y cerrado en GitHub Product OS; issue `#27` cerrado y Project item en `Done`.
 
 ### FASE 1: Modelo de Roles, Permisos y Contrato de Sesion
 
 GitHub/CI - Fase 1:
 
-- Issue/Project item: crear al iniciar fase.
-- Milestone sugerido: `Ciclo 4 - Auth y Seguridad`.
+- Issue/Project item: `#28` - `Auth Seguridad Fase 1 - Modelo de roles permisos y contrato de sesion`.
+- Milestone: `Ciclo 4 - Auth y Seguridad` (`#7`).
 - Labels: `fase`, `infra`, `docs`, `testing`.
-- Estado al iniciar: `In Progress`.
+- Estado al iniciar: `In progress`.
 - Estado al cerrar: `Review Manual` si cambia contrato de producto; `Done` si solo tipos/tests.
 - Scripts obligatorios:
   - `npm run typecheck`
   - `npm run lint -- --quiet`
   - tests de tipos/helpers Auth cuando existan
   - `git diff --check`
+- Evidencia Fase 1: `context/infraestructura-ground-truth/06-auth-seguridad-sesion/auth-fase-1-roles-permisos-contrato-2026-06-12.md`.
 
-- [ ] **1.1 Definir roles canonicos**
+- [x] **1.1 Definir roles canonicos**
   - `dev`, `admin`, `docente`, `alumno`.
-- [ ] **1.2 Definir aliases legacy**
+- [x] **1.2 Definir aliases legacy**
   - Decidir migracion de `supervisor` y `usuario`.
-- [ ] **1.3 Crear tipos compartidos de auth**
+- [x] **1.3 Crear tipos compartidos de auth**
   - `AuthUser`, `AuthSession`, `AuthTokens`, `PlaneariaRole`, `Permission`.
-- [ ] **1.4 Unificar permisos frontend/backend**
+- [x] **1.4 Unificar permisos frontend/backend**
   - Evitar tablas divergentes en `types/index.ts` y backend.
-- [ ] **1.5 Definir contrato de token**
+- [x] **1.5 Definir contrato de token**
   - Claims, expiracion, `sessionId`, `jti`, `permissionsVersion`.
-- [ ] **1.6 Definir contrato de guest/dev**
+- [x] **1.6 Definir contrato de guest/dev**
   - Guest local-only; Dev separado de Admin.
+- **Avance 2026-06-12:** contrato compartido implementado en `shared/authContract.json`, adaptadores frontend/backend creados, prueba focalizada Auth agregada y validacion local completa; issue `#28` pasa a `Review Manual` por cambio de contrato de producto.
 
 ### FASE 2: Backend Auth Real y Hardening Inicial
 
 GitHub/CI - Fase 2:
 
-- Issue/Project item: crear al iniciar fase.
-- Milestone sugerido: `Ciclo 4 - Auth y Seguridad`.
+- Issue/Project item: `#29` - `Auth Seguridad Fase 2 - Backend auth real y hardening inicial`.
+- Milestone: `Ciclo 4 - Auth y Seguridad` (`#7`).
 - Labels: `fase`, `infra`, `testing`, `low-cost`.
-- Estado al iniciar: `In Progress`.
+- Estado al iniciar: `In progress`.
 - Estado al cerrar: `Review Manual` si cambia login real o variables; `Done` tras tests.
 - Scripts obligatorios:
   - `npm run backend:check`
@@ -771,23 +776,25 @@ GitHub/CI - Fase 2:
   - `npm run typecheck`
   - `npm run lint -- --quiet`
   - `git diff --check`
+- Evidencia Fase 2: `context/infraestructura-ground-truth/06-auth-seguridad-sesion/auth-fase-2-backend-hardening-2026-06-12.md`.
 
-- [ ] **2.1 Extraer helpers backend**
+- [x] **2.1 Extraer helpers backend**
   - Crear helpers para tokens, passwords, roles/permisos, rate limit y respuestas.
-- [ ] **2.2 Implementar access + refresh token**
+- [x] **2.2 Implementar access + refresh token**
   - `auth_sessions`, refresh hash, rotacion y revocacion.
-- [ ] **2.3 Versionar password hashing**
+- [x] **2.3 Versionar password hashing**
   - Mantener PBKDF2 legacy y preparar bcrypt/equivalente si se aprueba.
-- [ ] **2.4 Endurecer registro/login**
+- [x] **2.4 Endurecer registro/login**
   - Password policy alineada, errores seguros, `ultimoAcceso`, auditoria minima.
-- [ ] **2.5 Endurecer recuperar/resetear**
+- [x] **2.5 Endurecer recuperar/resetear**
   - Codigos hasheados, TTL, intentos, `_devCode` solo con flag.
-- [ ] **2.6 Implementar rate limit low-cost**
+- [x] **2.6 Implementar rate limit low-cost**
   - Login/registro/recuperacion/reset/refresh.
-- [ ] **2.7 Endurecer CORS y headers**
+- [x] **2.7 Endurecer CORS y headers**
   - `ALLOWED_ORIGINS`, headers de seguridad, preflight consistente.
-- [ ] **2.8 Tests backend**
+- [x] **2.8 Tests backend**
   - Login exitoso/fallido, refresh, revocacion, reset, roles, rate limit.
+- **Avance 2026-06-12:** backend auth endurecido con helpers, sesiones refresh, reset codes hasheados, rate limit, headers y tests focalizados; issue `#29` listo para `Review Manual`, con sincronizacion remota pendiente por limite de uso del entorno.
 
 ### FASE 3: Frontend AuthContext, Storage Seguro y Session Service
 
@@ -1169,4 +1176,3 @@ Criterio en lenguaje de usuario:
 - No comprar servicios de seguridad empresariales.
 - No crear deploy permanente nuevo sin decision explicita.
 - No resolver por completo Chat, Excel, Calificacion o Reportes.
-

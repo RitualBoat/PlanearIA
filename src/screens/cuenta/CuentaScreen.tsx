@@ -24,7 +24,7 @@ import { useFontSize } from "../../context/FontSizeContext";
 import { useDaltonismo } from "../../context/DaltonismoContext";
 import { changeLanguage } from "../../locales/i18n";
 import { useTranslation } from "react-i18next";
-import { COLORS } from "../../../types";
+import { COLORS, getRoleLabel } from "../../../types";
 
 const FEATURE_HIGHLIGHTS = [
   {
@@ -201,7 +201,7 @@ const CuentaScreen: React.FC = () => {
     ? `${usuario.nombre}${usuario.apellidos ? ` ${usuario.apellidos}` : ""}`
     : "Usuario";
 
-  const userRole = isGuest ? "Invitado" : usuario?.rol === "admin" ? "Administrador" : "Docente";
+  const userRole = isGuest ? "Invitado" : usuario?.rol ? getRoleLabel(usuario.rol) : "Docente";
 
   return (
     <View style={styles.container}>

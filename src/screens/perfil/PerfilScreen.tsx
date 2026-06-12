@@ -23,6 +23,7 @@ import { useRecursos } from "../../context/RecursosContext";
 import { useTheme } from "../../context/ThemeContext";
 import Toast, { type ToastConfig } from "../../components/Toast";
 import ExpandedStatsModal, { type ExpandedStatsData } from "../../components/ExpandedStatsModal";
+import { getRoleLabel } from "../../../types";
 
 type Nav = StackNavigationProp<RootStackParamList>;
 
@@ -81,7 +82,7 @@ const PerfilScreen: React.FC = () => {
   const userName = usuario
     ? `${usuario.nombre}${usuario.apellidos ? ` ${usuario.apellidos}` : ""}`
     : "Usuario";
-  const userRole = isGuest ? "Invitado" : usuario?.rol === "admin" ? "Administrador" : "Docente";
+  const userRole = isGuest ? "Invitado" : usuario?.rol ? getRoleLabel(usuario.rol) : "Docente";
   const initials = usuario
     ? `${usuario.nombre?.[0] || ""}${usuario.apellidos?.[0] || ""}`.toUpperCase()
     : "U";

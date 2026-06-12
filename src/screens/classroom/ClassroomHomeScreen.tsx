@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Animated,
   Platform,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -34,6 +34,7 @@ const ClassroomHomeScreen: React.FC = () => {
   const { classrooms, isLoading, error, isEmpty, totalAlumnos, totalGrupos, totalPendientes, reload } =
     useClassroomHomeViewModel();
   const [activeTab, setActiveTab] = useState<HomeTab>("cursos");
+  const [scrollY] = React.useState(() => new Animated.Value(0));
   const allPendientes = classrooms.flatMap((item) =>
     item.pendientes.map((pendiente) => ({
       ...pendiente,
@@ -42,29 +43,54 @@ const ClassroomHomeScreen: React.FC = () => {
     })),
   );
 
+  const mobilePillOpacity = scrollY.interpolate({
+    inputRange: [0, 22, 56],
+    outputRange: [1, 0.55, 0],
+    extrapolate: "clamp",
+  });
+  const mobilePillTranslateY = scrollY.interpolate({
+    inputRange: [0, 56],
+    outputRange: [0, -16],
+    extrapolate: "clamp",
+  });
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView
+      <Animated.ScrollView
         style={styles.scroller}
         contentContainerStyle={styles.content}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => void reload()} />}
         showsVerticalScrollIndicator={Platform.OS === "web"}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: true,
+        })}
+        scrollEventThrottle={16}
       >
-        <AnimatedTopPill icon="school" title="Tus clases" size="large" subtitleNumberOfLines={3}>
-          <Text style={styles.pillSubtitle}>
-            Organiza cursos, unidades, materiales y actividades desde una experiencia tipo Classroom.
-          </Text>
-          <View style={styles.heroActions}>
-            <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("CrearGrupo", { returnToClassroom: true })}>
-              <MaterialIcons name="add" size={20} color="#FFFFFF" />
-              <Text style={styles.primaryButtonText}>Crear clase</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate("ImportarGrupos")}>
-              <MaterialIcons name="upload-file" size={20} color={COLORS.primary} />
-              <Text style={styles.secondaryButtonText}>Importar</Text>
-            </TouchableOpacity>
-          </View>
-        </AnimatedTopPill>
+        <View style={styles.headerBlock}>
+          <Animated.View
+            style={{
+              opacity: mobilePillOpacity,
+              transform: [{ translateY: mobilePillTranslateY }],
+            }}
+          >
+            <AnimatedTopPill
+              icon="school"
+              title="Tus clases"
+              subtitle="Organiza cursos, unidades, materiales y actividades."
+            />
+          </Animated.View>
+        </View>
+
+        <View style={styles.heroActions}>
+          <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("CrearGrupo", { returnToClassroom: true })}>
+            <MaterialIcons name="add" size={20} color="#FFFFFF" />
+            <Text style={styles.primaryButtonText}>Crear clase</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate("ImportarGrupos")}>
+            <MaterialIcons name="upload-file" size={20} color={COLORS.primary} />
+            <Text style={styles.secondaryButtonText}>Importar</Text>
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.kpiGrid}>
           <KpiCard label="Cursos" value={String(totalGrupos)} icon="groups" />
@@ -195,7 +221,7 @@ const ClassroomHomeScreen: React.FC = () => {
             }))}
           />
         ) : null}
-      </ScrollView>
+      </Animated.ScrollView>
     </SafeAreaView>
   );
 };
@@ -276,8 +302,13 @@ const styles = StyleSheet.create({
       : null),
   },
   content: {
-    padding: 18,
+    paddingHorizontal: 16,
+    paddingTop: 54,
     paddingBottom: Platform.OS === "web" ? 160 : 110,
+    gap: 14,
+  },
+  headerBlock: {
+    marginBottom: 2,
   },
   hero: {
     backgroundColor: "#FFFFFF",
@@ -311,12 +342,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 10,
-    marginTop: 18,
-  },
-  pillSubtitle: {
-    color: "#64758E",
-    fontSize: 15,
-    lineHeight: 21,
   },
   primaryButton: {
     alignItems: "center",

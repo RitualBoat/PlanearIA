@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_CONFIG } from "../sync/config/apiConfig";
+import { AUTH_PERMISSIONS_VERSION } from "../../types";
 import type { RolUsuario } from "../../types";
 
 const AUTH_TOKEN_KEY = "@planearia:auth_token";
@@ -34,6 +35,7 @@ export interface Usuario {
   biografia: string;
   pais: string;
   rol: RolUsuario;
+  permissionsVersion?: number;
   preferencias?: PreferenciasUsuario;
   expoPushToken?: string | null;
   fechaCreacion: string;
@@ -184,6 +186,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       biografia: "",
       pais: "México",
       rol: "usuario" as RolUsuario,
+      permissionsVersion: AUTH_PERMISSIONS_VERSION,
       fechaCreacion: new Date().toISOString(),
       fechaModificacion: new Date().toISOString(),
     };
@@ -206,7 +209,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       fotoPerfil: null,
       biografia: "Cuenta de desarrollador para pruebas",
       pais: "México",
-      rol: "admin" as RolUsuario,
+      rol: "dev" as RolUsuario,
+      permissionsVersion: AUTH_PERMISSIONS_VERSION,
       fechaCreacion: new Date().toISOString(),
       fechaModificacion: new Date().toISOString(),
     };

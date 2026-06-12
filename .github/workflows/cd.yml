@@ -8,7 +8,7 @@ on:
         required: false
         default: ""
       build_android:
-        description: "Build Android debug APK"
+        description: "Build Android standalone release APK"
         required: true
         default: "true"
         type: choice
@@ -61,10 +61,14 @@ jobs:
             planearia-web-*.zip.sha256
 
   android:
-    name: Build Android debug APK
+    name: Build Android standalone APK
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event.inputs.build_android == 'true'
     continue-on-error: true
+    env:
+      EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL || 'https://backend-eight-chi-54.vercel.app' }}
+      EXPO_PUBLIC_API_SECRET: ${{ secrets.EXPO_PUBLIC_API_SECRET }}
+      EXPO_PUBLIC_ALLOW_NATIVE_LOCALHOST: "false"
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -80,22 +84,38 @@ jobs:
           java-version: "17"
       - name: Install dependencies
         run: npm ci
+      - name: Validate Android app environment
+        run: |
+          if [ -z "$EXPO_PUBLIC_API_URL" ]; then
+            echo "EXPO_PUBLIC_API_URL is required to build the standalone APK."
+            exit 1
+          fi
+          if [ -z "$EXPO_PUBLIC_API_SECRET" ]; then
+            echo "EXPO_PUBLIC_API_SECRET is required as a GitHub Actions secret to build the standalone APK."
+            exit 1
+          fi
       - name: Generate Android project
         run: npm run build:android:prebuild
-      - name: Build debug APK
-        run: npm run build:android:debug:ci
-      - name: Package Android APK
+      - name: Build standalone release APK
+        run: npm run build:android:release:ci
+      - name: Package standalone Android APK
         run: |
           SHORT_SHA="${GITHUB_SHA::7}"
-          cp android/app/build/outputs/apk/debug/app-debug.apk "planearia-android-debug-${SHORT_SHA}.apk"
-          sha256sum "planearia-android-debug-${SHORT_SHA}.apk" > "planearia-android-debug-${SHORT_SHA}.apk.sha256"
+          APK_PATH="$(find android/app/build/outputs/apk/release -name '*.apk' | head -n 1)"
+          if [ -z "$APK_PATH" ]; then
+            echo "No release APK was generated."
+            find android/app/build/outputs -type f || true
+            exit 1
+          fi
+          cp "$APK_PATH" "PlanearIA-${SHORT_SHA}.apk"
+          sha256sum "PlanearIA-${SHORT_SHA}.apk" > "PlanearIA-${SHORT_SHA}.apk.sha256"
       - name: Upload Android artifact
         uses: actions/upload-artifact@v4
         with:
-          name: planearia-android-debug
+          name: planearia-android-standalone
           path: |
-            planearia-android-debug-*.apk
-            planearia-android-debug-*.apk.sha256
+            PlanearIA-*.apk
+            PlanearIA-*.apk.sha256
 
   release:
     name: Publish GitHub Release
@@ -135,9 +155,10 @@ jobs:
             echo ""
             echo "- Commit: ${GITHUB_SHA}"
             echo "- Web bundle: planearia-web-*.zip"
-            echo "- Android debug APK: planearia-android-debug-*.apk, if the Android job succeeded"
+            echo "- Android standalone APK: PlanearIA-*.apk, if the Android job succeeded"
             echo ""
-            echo "The APK is a debug/demo artifact, not a Play Store signed release."
+            echo "The APK is a standalone demo build of PlanearIA with the JS bundle embedded."
+            echo "It is signed for demo sideloading by the CI build, not as a Play Store upload artifact."
           } > "$NOTES_FILE"
 
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then

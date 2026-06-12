@@ -82,25 +82,24 @@ async function authFetch(
     };
   }
 
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "X-API-Key": API_CONFIG.apiSecret,
+  };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
+
   try {
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      "X-API-Key": API_CONFIG.apiSecret,
-    };
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-
     const res = await fetch(`${API_CONFIG.baseUrl}/api/auth`, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
       signal: controller.signal,
     });
-    clearTimeout(timeoutId);
     return (await res.json()) as BackendAuthResponse;
   } catch (error) {
     const message =
@@ -108,6 +107,8 @@ async function authFetch(
         ? "El servidor no respondio a tiempo."
         : "No se pudo conectar al servidor. Revisa que la URL del backend y CORS permitan este frontend.";
     return { success: false, error: message };
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 

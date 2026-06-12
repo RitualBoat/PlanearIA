@@ -10,6 +10,7 @@ jest.mock("../../sync/config/apiConfig", () => ({
     apiSecret: "test-secret",
     timeout: 5000,
   },
+  isAPIConfigured: jest.fn(() => true),
 }));
 
 const mockSessionStorage = {

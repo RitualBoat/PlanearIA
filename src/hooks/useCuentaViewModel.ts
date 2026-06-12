@@ -20,7 +20,7 @@ export interface CuentaViewModel {
 
 export const useCuentaViewModel = (): CuentaViewModel => {
   const navigation = useNavigation<Nav>();
-  const { usuario, isAuthenticated, logout, eliminarCuenta } = useAuth();
+  const { usuario, isAuthenticated, isGuest, logout, eliminarCuenta } = useAuth();
 
   const handleEditarPerfil = useCallback(() => {
     navigation.navigate("EditarPerfil");
@@ -31,14 +31,26 @@ export const useCuentaViewModel = (): CuentaViewModel => {
   }, [navigation]);
 
   const handleCerrarSesion = useCallback(() => {
-    const performLogout = async () => {
-      await logout();
+    const goToLogin = () => {
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
           routes: [{ name: "Login" }],
         })
       );
+    };
+
+    // A guest has no session to close: go straight to Login. This avoids a
+    // confusing "cerrar sesion?" confirm and the web confirm dialog entirely,
+    // which is why the guest "Iniciar sesion" button did nothing on web.
+    if (isGuest) {
+      goToLogin();
+      return;
+    }
+
+    const performLogout = async () => {
+      await logout();
+      goToLogin();
     };
 
     if (Platform.OS === "web") {
@@ -60,7 +72,7 @@ export const useCuentaViewModel = (): CuentaViewModel => {
         onPress: () => void performLogout(),
       },
     ]);
-  }, [navigation, logout]);
+  }, [navigation, logout, isGuest]);
 
   const handleEliminarCuenta = useCallback(
     async (password: string) => {

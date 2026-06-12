@@ -2,11 +2,13 @@ import React from "react";
 import {
   ActivityIndicator,
   Alert,
+  Modal,
   Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
   useWindowDimensions,
@@ -78,6 +80,14 @@ const ClassroomGroupScreen: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState<ClassroomTab>("tablon");
   const [aiLoading, setAiLoading] = React.useState(false);
   const [aiWarning, setAiWarning] = React.useState<string | null>(null);
+  // In-app text prompt: replaces window.prompt/Alert.prompt, which are
+  // unreliable on web/mobile web (the "button does nothing" bug).
+  const [prompt, setPrompt] = React.useState<{
+    title: string;
+    message: string;
+    onSubmit: (value: string) => void;
+  } | null>(null);
+  const [promptValue, setPromptValue] = React.useState("");
 
   const isCompact = width < 780;
   const nombre = model?.grupo.nombre ?? grupoNombre ?? "Grupo";
@@ -136,34 +146,24 @@ const ClassroomGroupScreen: React.FC = () => {
 
   const askText = React.useCallback(
     (title: string, message: string, fallback: string, onSubmit: (value: string) => void) => {
-      if (Platform.OS === "web") {
-        const value = window.prompt(`${title}\n\n${message}`, fallback);
-        if (value?.trim()) onSubmit(value.trim());
-        return;
-      }
-
-      const nativePrompt = (Alert as typeof Alert & {
-        prompt?: (
-          title: string,
-          message?: string,
-          callbackOrButtons?: (value: string) => void,
-          type?: "plain-text",
-          defaultValue?: string,
-        ) => void;
-      }).prompt;
-
-      if (Platform.OS === "ios" && nativePrompt) {
-        nativePrompt(title, message, (value) => {
-          if (value?.trim()) onSubmit(value.trim());
-        }, "plain-text", fallback);
-        return;
-      }
-
-      showMessage(title, "En Android se usara el nombre sugerido por ahora. Lo podremos reemplazar por un modal propio.");
-      onSubmit(fallback);
+      // Single cross-platform path: open an in-app modal with a TextInput.
+      setPromptValue(fallback);
+      setPrompt({ title, message, onSubmit });
     },
-    [showMessage],
+    [],
   );
+
+  const closePrompt = React.useCallback(() => {
+    setPrompt(null);
+    setPromptValue("");
+  }, []);
+
+  const submitPrompt = React.useCallback(() => {
+    const value = promptValue.trim();
+    const current = prompt;
+    closePrompt();
+    if (current && value) current.onSubmit(value);
+  }, [closePrompt, prompt, promptValue]);
 
   const handleCreateUnidad = React.useCallback(() => {
     askText("Nueva seccion", "Ejemplo: Unidad 1 - Introduccion", "Unidad 1", (value) => {
@@ -345,6 +345,33 @@ const ClassroomGroupScreen: React.FC = () => {
           />
         ) : null}
       </ScrollView>
+
+      <Modal visible={!!prompt} transparent animationType="fade" onRequestClose={closePrompt}>
+        <View style={styles.promptOverlay}>
+          <View style={styles.promptCard}>
+            <Text style={styles.promptTitle}>{prompt?.title}</Text>
+            {prompt?.message ? <Text style={styles.promptMessage}>{prompt.message}</Text> : null}
+            <TextInput
+              style={styles.promptInput}
+              value={promptValue}
+              onChangeText={setPromptValue}
+              placeholder="Escribe aqui"
+              placeholderTextColor={COLORS.textTertiary}
+              autoFocus
+              returnKeyType="done"
+              onSubmitEditing={submitPrompt}
+            />
+            <View style={styles.promptActions}>
+              <TouchableOpacity style={styles.promptCancel} onPress={closePrompt}>
+                <Text style={styles.promptCancelText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.promptConfirm} onPress={submitPrompt}>
+                <Text style={styles.promptConfirmText}>Guardar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -602,6 +629,67 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#F5F7FA",
+  },
+  promptOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  promptCard: {
+    width: "100%",
+    maxWidth: 380,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+    gap: 10,
+  },
+  promptTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#0F172A",
+  },
+  promptMessage: {
+    fontSize: 13,
+    color: "#475569",
+  },
+  promptInput: {
+    borderWidth: 1.5,
+    borderColor: "#CBD5E1",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+    color: "#0F172A",
+    marginTop: 4,
+  },
+  promptActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 10,
+    marginTop: 6,
+  },
+  promptCancel: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+  },
+  promptCancelText: {
+    color: "#475569",
+    fontWeight: "600",
+    fontSize: 15,
+  },
+  promptConfirm: {
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 10,
+    backgroundColor: COLORS.primary,
+  },
+  promptConfirmText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+    fontSize: 15,
   },
   scroller: {
     flex: 1,

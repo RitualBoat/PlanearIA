@@ -164,7 +164,7 @@ const PerfilScreen: React.FC = () => {
   if (isLoading) {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top"]}>
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <View style={styles.header}>
             <ShimmerBlock width={40} height={40} borderRadius={20} />
             <ShimmerBlock width={120} height={20} />
@@ -266,7 +266,7 @@ const PerfilScreen: React.FC = () => {
   if (isGuest) {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top"]}>
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity
@@ -613,6 +613,7 @@ const PerfilScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
+  scrollView: { flex: 1 },
   scroll: { paddingBottom: 40 },
   header: {
     flexDirection: "row",

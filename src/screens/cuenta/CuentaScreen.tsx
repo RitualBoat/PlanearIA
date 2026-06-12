@@ -211,6 +211,7 @@ const CuentaScreen: React.FC = () => {
 
       <SafeAreaView style={styles.safeArea}>
         <Animated.ScrollView
+          style={styles.scroller}
           contentContainerStyle={styles.scrollContent}
           onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
             useNativeDriver: true,
@@ -800,6 +801,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   safeArea: {
+    flex: 1,
+  },
+  scroller: {
     flex: 1,
   },
   scrollContent: {

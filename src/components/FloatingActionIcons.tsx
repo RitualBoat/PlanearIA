@@ -38,7 +38,9 @@ const FloatingActionIcons: React.FC = () => {
 
   const handleAccount = useCallback(() => {
     setMenuVisible(false);
-    navigation.navigate("Cuenta");
+    // Go to the Configuracion tab (keeps the bottom tab bar) instead of the
+    // stacked Cuenta route, which hid the tabs.
+    navigation.navigate("MainTabs", { screen: "ConfiguracionTab" });
   }, [navigation]);
 
   const handleLogout = useCallback(async () => {

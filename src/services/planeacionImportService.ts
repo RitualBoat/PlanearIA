@@ -1,4 +1,5 @@
 import type { DocumentPickerAsset } from "expo-document-picker";
+import { extractTextFromPdf } from "./pdfTextExtractor";
 import {
   NivelAcademico as NivelAcademicoLegacy,
   type Actividad,
@@ -238,30 +239,6 @@ const extractTextFromDocx = async (arrayBuffer: ArrayBuffer): Promise<string> =>
 
   const result = await mammothApi.extractRawText({ arrayBuffer });
   return result.value || "";
-};
-
-const extractTextFromPdf = async (arrayBuffer: ArrayBuffer): Promise<string> => {
-  const pdfjs = (await import("pdfjs-dist/legacy/build/pdf.mjs")) as {
-    getDocument: (options: Record<string, unknown>) => { promise: Promise<any> };
-  };
-
-  const data = new Uint8Array(arrayBuffer);
-  const documentTask = pdfjs.getDocument({ data, disableWorker: true });
-  const pdf = await documentTask.promise;
-  const pages: string[] = [];
-
-  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
-    const page = await pdf.getPage(pageNumber);
-    const content = await page.getTextContent();
-    const text = (content.items || [])
-      .map((item: { str?: string }) => item?.str || "")
-      .join(" ")
-      .trim();
-
-    if (text) pages.push(text);
-  }
-
-  return pages.join("\n");
 };
 
 const readAssetAsArrayBuffer = async (asset: DocumentPickerAsset): Promise<ArrayBuffer> => {

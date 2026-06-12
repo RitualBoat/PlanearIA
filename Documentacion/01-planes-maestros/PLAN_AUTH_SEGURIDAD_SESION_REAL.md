@@ -2,7 +2,7 @@
 
 > **Version:** 1.0  
 > **Fecha:** 2026-06-11  
-> **Estado:** [~] Plan en ejecucion; Fase 3 completada y validada en CI (typecheck, lint, jest 605/605, backend smoke en verde); Review Manual remoto pendiente.
+> **Estado:** [~] Plan en ejecucion; Fases 0-6 completadas y validadas en CI (typecheck, lint, jest 623/623, backend smoke + aislamiento en verde). Fases 7-8 cerradas en lo automatizable; pendientes: email real, datos sociales (posts/contactos/mensajes), namespacing local (5.4/5.5), validacion manual y sincronizacion GitHub Product OS.
 > **Alcance:** endurecer autenticacion, sesion, roles, permisos, recuperacion de cuenta, aislamiento multiusuario y seguridad backend/frontend antes de beta, datos reales o pilotos.  
 > **Stack:** React Native 0.81.5 - Expo 54 - TypeScript 5.9 - React Navigation 7 - Context/hooks MVVM - Backend Node/Vercel - MongoDB Atlas Free - AsyncStorage default / SQLite opt-in.  
 > **Modulo:** Auth, Cuenta, Seguridad, Sesion, RBAC, secretos, APIs protegidas y aislamiento por usuario.  
@@ -966,16 +966,17 @@ GitHub/CI - Fase 7:
   - `npm run test:classroom -- --runInBand` si Fase 5 toco Classroom/storage
   - `git diff --check`
 
-- [ ] **7.1 Ejecutar bateria automatica**
-  - Typecheck, lint, tests completos, backend smoke.
-- [ ] **7.2 Ejecutar matriz manual Auth**
-  - Registro, login, logout, refresh, offline, guest, dev, reset, admin roles.
-- [ ] **7.3 Ejecutar matriz multiusuario**
-  - Usuario A/B en backend y storage local.
-- [ ] **7.4 Validar errores y estados**
-  - Backend apagado, API no configurada, token expirado, refresh fallido.
-- [ ] **7.5 Crear checklist de validacion**
-  - Guardar en `Documentacion/03-validacion/` si se ejecuta fase.
+- [x] **7.1 Ejecutar bateria automatica**
+  - `tsc` 0, ESLint 0, jest 623/623 (87 suites), `backend:check` (smoke + aislamiento) en verde local y en CI (4 jobs).
+- [~] **7.2 Ejecutar matriz manual Auth**
+  - Matriz creada en checklist; ejecucion manual queda como Review Manual del desarrollador.
+- [x] **7.3 Ejecutar matriz multiusuario**
+  - Automatizada en `scripts/testBackendIsolation.mjs` (A/B en grupos, alumnos, calificaciones, notificaciones, sesiones). Matriz con dos cuentas reales queda en el checklist.
+- [~] **7.4 Validar errores y estados**
+  - Parcialmente cubierto por tests; backend apagado/offline/token expirado/refresh fallido quedan en checklist manual.
+- [x] **7.5 Crear checklist de validacion**
+  - `Documentacion/03-validacion/CHECKLIST_VALIDACION_MANUAL_AUTH.md`.
+- **Avance 2026-06-12:** Fase 7 cerrada en lo automatizable; bateria en verde y checklist manual creado para Review Manual.
 
 ### FASE 8: Limpieza Legacy Controlada y Documentacion
 
@@ -993,16 +994,16 @@ GitHub/CI - Fase 8:
   - `npm run backend:check`
   - `git diff --check`
 
-- [ ] **8.1 Retirar duplicaciones Auth**
-  - JWT/password/roles en helpers centralizados.
-- [ ] **8.2 Deprecar claves legacy de sesion**
-  - Solo despues de migracion y validacion; no borrar datos academicos.
-- [ ] **8.3 Documentar variables**
-  - `.env.example`, `backend/.env.example`, `ENTORNO_LOCAL.md`.
-- [ ] **8.4 Actualizar README/roadmap**
-  - Estado del plan, comandos, criterios.
-- [ ] **8.5 Registrar cierre**
-  - Evidencia, riesgos residuales, siguiente plan recomendado.
+- [x] **8.1 Retirar duplicaciones Auth**
+  - Verificado: JWT (`backend/lib/tokens.js`), password (`backend/lib/passwords.js`), roles/permisos (`backend/lib/authContract.js` + `shared/authContract.json`) centralizados. `backend/api/auth.js` no duplica cripto.
+- [~] **8.2 Deprecar claves legacy de sesion**
+  - Documentadas como deprecadas; NO borradas (regla). `legacyMigration.ts` migra `@planearia:auth_token` a la clave segura sin eliminar la legacy. Borrado definitivo queda para una decision posterior.
+- [x] **8.3 Documentar variables**
+  - Variables Auth en `ENTORNO_LOCAL.md`. La creacion de `.env.example`/`backend/.env.example` quedo bloqueada por la politica anti-secretos del entorno; se documenta esa limitacion.
+- [x] **8.4 Actualizar README/roadmap**
+  - `ROADMAP_PLANES_MAESTROS.md` actualizado con estado del plan. (README/meta_guia tienen cambios locales del desarrollador sin commitear; no se tocaron para no mezclarlos.)
+- [x] **8.5 Registrar cierre**
+  - Este bloque y la seccion de cierre registran evidencia, riesgos residuales y siguiente plan.
 
 ### FASE FINAL: Cierre del Plan
 
@@ -1019,10 +1020,14 @@ GitHub/CI - Fase Final:
   - tests focalizados Auth/Sync/Classroom si aplican
   - `git diff --check`
 
-- [ ] **F.1 Confirmar criterio de cierre**
-- [ ] **F.2 Actualizar GitHub Product OS**
-- [ ] **F.3 Actualizar documentacion vigente**
-- [ ] **F.4 Definir siguiente plan recomendado**
+- [~] **F.1 Confirmar criterio de cierre**
+  - Cumplido: login/registro/logout/refresh/recuperacion con errores claros, tokens nativos en SecureStore, dev separado de admin, roles canonicos probados, backend valida permisos reales, endpoints academicos propios filtran por `userId`, rate limiting, CORS/headers/secrets documentados, tests automatizados. Pendiente: email real, datos sociales (posts/contactos/mensajes), namespacing local (5.4/5.5) y validacion manual del desarrollador.
+- [~] **F.2 Actualizar GitHub Product OS**
+  - Pendiente: crear/cerrar issues de Fases 3-8 y mover items del Project. Markdown es la fuente de verdad actual.
+- [x] **F.3 Actualizar documentacion vigente**
+  - Plan, `ROADMAP_PLANES_MAESTROS.md`, `ENTORNO_LOCAL.md` y checklist de validacion actualizados.
+- [x] **F.4 Definir siguiente plan recomendado**
+  - Recomendado: `Plan Maestro: UX/UI y Navegacion Global`; y un plan Social/Chat que retome el aislamiento de `posts/contactos/mensajes` y la activacion del email real.
 
 ---
 

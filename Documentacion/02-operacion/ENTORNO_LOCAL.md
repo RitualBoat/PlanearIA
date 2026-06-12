@@ -100,6 +100,46 @@ MONGODB_URI=tu_uri_de_mongodb
 
 No guardar keys reales en Git. `.env`, `.env.local`, `backend/.env.local` y variantes locales deben permanecer ignoradas.
 
+### Variables de Auth y Seguridad (backend)
+
+Definidas por el plan Auth/Seguridad. Solo en backend; nunca como `EXPO_PUBLIC_*`.
+
+```text
+# Secretos
+API_SECRET=                      # guard X-API-Key (demo/backoffice)
+JWT_SECRET=                      # firma de access tokens (fallback: API_SECRET)
+AUTH_RESET_CODE_SECRET=          # opcional; hash de codigos de reset (fallback: JWT/API_SECRET)
+
+# Tokens
+AUTH_ACCESS_TOKEN_MINUTES=15     # vida del access token
+AUTH_REFRESH_TOKEN_DAYS=14       # vida del refresh token
+
+# Password
+AUTH_MIN_PASSWORD_LENGTH=6
+
+# Rate limit auth
+AUTH_RATE_LIMIT_MAX=
+AUTH_RATE_LIMIT_WINDOW_MS=
+
+# Reset de contrasena
+AUTH_RESET_CODE_TTL_MS=900000
+AUTH_RESET_CODE_MAX_ATTEMPTS=5
+AUTH_DEV_RESET_CODE=false        # dev only: devuelve el codigo en la respuesta. NUNCA en prod
+
+# Roles
+ALLOW_DEV_ROLE_ASSIGNMENT=false  # permitir asignar rol dev desde admin (false en prod)
+
+# CORS
+ALLOWED_ORIGINS=                 # lista separada por comas; vacio usa default seguro
+
+# Email (pendiente; modo dev por ahora)
+EMAIL_PROVIDER=                  # Resend/Brevo/SendGrid antes de beta
+EMAIL_FROM=
+EMAIL_API_KEY=
+```
+
+Nota: la creacion de `.env.example`/`backend/.env.example` quedo bloqueada por la politica anti-secretos del entorno; esta tabla es la fuente documental de variables Auth hasta crearlos manualmente.
+
 ## Matriz de URLs local/web/movil/backend
 
 | Escenario | `EXPO_PUBLIC_API_URL` | Notas |

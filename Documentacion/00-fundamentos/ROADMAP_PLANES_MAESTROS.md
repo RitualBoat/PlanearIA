@@ -19,7 +19,7 @@ Este archivo lista los planes maestros actuales y futuros. No reemplaza los plan
 | Classroom / Grupos y Recursos | `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md` | Cerrado. Fases 0-10, cierre final e issue #8 completados. |
 | Infraestructura Local, CI y Deploy Basico | `Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` | Cerrado. Fases 0 a 7 completadas. |
 | Storage Local SQLite y Migracion Offline | `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md` | Cerrado para entrega academica; SQLite opt-in con rollback. |
-| Auth, Seguridad y Sesion Real | `Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md` | Creado; pendiente de ejecucion. |
+| Auth, Seguridad y Sesion Real | `Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md` | En ejecucion; Fases 0-6 completadas (CI verde), 7-8 en cierre. Email real y datos sociales (posts/contactos/mensajes) diferidos. |
 | Meta Guia de Planes | `Documentacion/01-planes-maestros/meta_guia_planes.md` | Vigente como instructivo obligatorio. |
 
 ## Orden recomendado de planes futuros

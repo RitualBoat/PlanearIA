@@ -485,6 +485,119 @@ Despues:
 
 No necesitas pagar Pro solo para esta demo.
 
+### Le di `Redeploy` y sigue saliendo `No more than 12 Serverless Functions`
+
+Entonces Vercel probablemente redeployo un deployment viejo, no el ultimo commit.
+
+Verifica esto en Vercel:
+
+1. Entra al proyecto `planearia-api`.
+2. Abre `Deployments`.
+3. Abre el deployment que fallo.
+4. Busca el commit mostrado por Vercel.
+
+Debe ser:
+
+```text
+871c930 Use single Vercel API function for Hobby deploy
+```
+
+Si Vercel muestra:
+
+```text
+4074a0f Prepare hosted demo deploy
+```
+
+ese es el commit viejo y por eso sigue fallando.
+
+Soluciones:
+
+Opcion A, desde Vercel:
+
+1. Proyecto `planearia-api`.
+2. `Deployments`.
+3. Busca boton `Create Deployment`.
+4. En `Git Reference`, escribe:
+
+```text
+development
+```
+
+5. Deploy.
+
+Opcion B, desde terminal para forzar un nuevo deployment:
+
+```bash
+git commit --allow-empty -m "Trigger backend deploy"
+git push origin development
+```
+
+Luego espera a que Vercel cree un deployment nuevo automaticamente.
+
+### La URL `https://backend.vercel.app/api/health` devuelve otro mensaje
+
+No uses esa URL salvo que Vercel te la haya dado exactamente para tu proyecto `planearia-api`.
+
+La respuesta:
+
+```json
+{"success":false,"message":"API端点不存在"}
+```
+
+no viene del backend actual de PlanearIA. Nuestro endpoint `/api/health` responde con `service: "PlanearIA API"`.
+
+Para encontrar la URL correcta:
+
+1. Entra a Vercel.
+2. Abre el proyecto `planearia-api`.
+3. En `Deployments`, abre el deployment exitoso mas reciente.
+4. Copia la URL que aparece en `Domains` o `Deployment`.
+5. Prueba:
+
+```text
+https://ESA_URL/api/health
+```
+
+La respuesta correcta debe incluir:
+
+```json
+"service": "PlanearIA API"
+```
+
+### Error: `This Serverless Function has crashed`
+
+Si `/api/health` muestra:
+
+```text
+500: INTERNAL_SERVER_ERROR
+Code: FUNCTION_INVOCATION_FAILED
+```
+
+revisa primero que el commit desplegado incluya el router con imports estaticos en:
+
+```text
+backend/api/index.js
+```
+
+El router debe tener entradas asi:
+
+```js
+"/health": require("../routes/health.js")
+```
+
+No debe usar `require(routeModule)` con strings dinamicos, porque Vercel puede no empaquetar `backend/routes/*` dentro de la funcion serverless.
+
+Despues de corregirlo:
+
+```bash
+npm run backend:check
+git add backend/api/index.js Documentacion/02-operacion/DEPLOY_DEMO_HOSTEADA.md
+git commit -m "Bundle backend routes statically for Vercel"
+git push origin development
+```
+
+Luego crea un deployment nuevo desde el commit mas reciente.
+
 ### Cambie una variable y no paso nada
 
 Normal. En Vercel, cambiar variables no modifica deployments viejos.

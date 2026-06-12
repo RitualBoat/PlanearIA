@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "permissionsVersion": 1,
+  "roles": {
+    "canonical": ["dev", "admin", "docente", "alumno"],
+    "legacy": ["supervisor", "usuario"],
+    "aliases": {
+      "supervisor": "docente",
+      "usuario": "alumno"
+    },
+    "assignable": ["admin", "docente", "alumno", "supervisor", "usuario"],
+    "labels": {
+      "dev": "Desarrollador",
+      "admin": "Administrador",
+      "docente": "Docente",
+      "alumno": "Alumno",
+      "supervisor": "Supervisor",
+      "usuario": "Usuario"
+    }
+  },
+  "permissions": {
+    "GESTIONAR_USUARIOS": "gestionar_usuarios",
+    "CAMBIAR_ROLES": "cambiar_roles",
+    "VER_TODOS_GRUPOS": "ver_todos_grupos",
+    "GESTIONAR_PLANEACIONES": "gestionar_planeaciones",
+    "GESTIONAR_GRUPOS": "gestionar_grupos",
+    "GESTIONAR_ALUMNOS": "gestionar_alumnos",
+    "GESTIONAR_CALIFICACIONES": "gestionar_calificaciones",
+    "GESTIONAR_ENTREGABLES": "gestionar_entregables",
+    "GESTIONAR_RECURSOS": "gestionar_recursos",
+    "GESTIONAR_ASISTENCIA": "gestionar_asistencia",
+    "VER_PROPIOS_DATOS": "ver_propios_datos"
+  },
+  "permissionsByRole": {
+    "dev": [
+      "gestionar_usuarios",
+      "cambiar_roles",
+      "ver_todos_grupos",
+      "gestionar_planeaciones",
+      "gestionar_grupos",
+      "gestionar_alumnos",
+      "gestionar_calificaciones",
+      "gestionar_entregables",
+      "gestionar_recursos",
+      "gestionar_asistencia",
+      "ver_propios_datos"
+    ],
+    "admin": [
+      "gestionar_usuarios",
+      "cambiar_roles",
+      "ver_todos_grupos",
+      "gestionar_planeaciones",
+      "gestionar_grupos",
+      "gestionar_alumnos",
+      "gestionar_calificaciones",
+      "gestionar_entregables",
+      "gestionar_recursos",
+      "gestionar_asistencia",
+      "ver_propios_datos"
+    ],
+    "supervisor": [
+      "ver_todos_grupos",
+      "gestionar_planeaciones",
+      "gestionar_grupos",
+      "gestionar_alumnos",
+      "gestionar_calificaciones",
+      "gestionar_entregables",
+      "gestionar_recursos",
+      "gestionar_asistencia",
+      "ver_propios_datos"
+    ],
+    "docente": [
+      "gestionar_planeaciones",
+      "gestionar_grupos",
+      "gestionar_alumnos",
+      "gestionar_calificaciones",
+      "gestionar_entregables",
+      "gestionar_recursos",
+      "gestionar_asistencia",
+      "ver_propios_datos"
+    ],
+    "alumno": ["ver_propios_datos"],
+    "usuario": ["ver_propios_datos"]
+  },
+  "token": {
+    "type": "Bearer",
+    "accessTokenExpiresInMinutesTarget": 15,
+    "refreshTokenExpiresInDaysTarget": 14,
+    "claims": [
+      "sub",
+      "userId",
+      "email",
+      "role",
+      "rol",
+      "sessionId",
+      "jti",
+      "permissionsVersion",
+      "iat",
+      "exp"
+    ]
+  },
+  "guest": {
+    "role": "usuario",
+    "canonicalRole": "alumno",
+    "localOnly": true
+  },
+  "dev": {
+    "role": "dev",
+    "requiresDevEnvironment": true,
+    "assignableFromAdminUi": false,
+    "remoteRoleAssignmentEnv": "ALLOW_DEV_ROLE_ASSIGNMENT"
+  }
+}

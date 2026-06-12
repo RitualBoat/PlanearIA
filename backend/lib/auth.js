@@ -79,6 +79,8 @@ function ownsDoc(existing, userId, ownerField = "userId") {
 const ALLOWED_ORIGINS = [
   "https://planearia.app",
   "https://planearia.vercel.app",
+  "https://planearia-web.vercel.app",
+  "https://*.vercel.app",
   "http://localhost:8081",
   "http://localhost:19006",
 ];
@@ -92,7 +94,7 @@ function originMatchesAllowed(origin, allowedOrigin) {
   if (origin === allowedOrigin) return true;
   if (!allowedOrigin.includes("*")) return false;
 
-  const pattern = `^${escapeRegExp(allowedOrigin).replace(/\\\*/g, ".*")}$`;
+  const pattern = `^${allowedOrigin.split("*").map(escapeRegExp).join(".*")}$`;
   return new RegExp(pattern).test(origin);
 }
 

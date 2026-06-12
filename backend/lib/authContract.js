@@ -1,4 +1,4 @@
-const authContract = require("../../shared/authContract.json");
+const authContract = require("../shared/authContract.json");
 
 const CANONICAL_AUTH_ROLES = authContract.roles.canonical;
 const LEGACY_AUTH_ROLES = authContract.roles.legacy;

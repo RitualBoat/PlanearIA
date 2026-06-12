@@ -14,6 +14,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ASSIGNABLE_ROLES, COLORS, FONT_SIZES, getRoleLabel } from "../../../types";
 import type { RolUsuario } from "../../../types";
 import { useAdminRolesViewModel } from "../../hooks/useAdminRolesViewModel";
+import { usePermission } from "../../hooks/usePermission";
 
 const ROLES: { value: RolUsuario; label: string }[] = ASSIGNABLE_ROLES.map((value) => ({
   value,
@@ -39,8 +40,33 @@ const rolColor = (rol: RolUsuario): string => {
 };
 
 const AdminRolesScreen: React.FC = () => {
-  const { usuarios, isLoading, updatingId, cambiarRol, refetch, goBack } = useAdminRolesViewModel();
+  // Frontend gate: deny rendering the roster to anyone without the
+  // cambiar_roles permission. This blocks direct navigation/deep links.
+  // The backend still validates every listar_usuarios/cambiar_rol call.
+  const { can } = usePermission();
+  const permitted = can("cambiar_roles");
+  const { usuarios, isLoading, updatingId, cambiarRol, refetch, goBack } =
+    useAdminRolesViewModel(permitted);
   const [selectedUser, setSelectedUser] = useState<{ id: number; nombre: string } | null>(null);
+
+  if (!permitted) {
+    return (
+      <SafeAreaView style={styles.safe} edges={["top"]}>
+        <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+        <View style={styles.header}>
+          <TouchableOpacity onPress={goBack} style={styles.backBtn}>
+            <MaterialIcons name="arrow-back" size={24} color={COLORS.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Administrar Roles</Text>
+          <View style={styles.backBtn} />
+        </View>
+        <View style={styles.center}>
+          <MaterialIcons name="lock" size={48} color={COLORS.textTertiary} />
+          <Text style={styles.emptyText}>No tienes permiso para administrar roles.</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const renderItem = ({ item }: { item: (typeof usuarios)[0] }) => {
     const initials = `${item.nombre?.[0] || ""}${item.apellidos?.[0] || ""}`.toUpperCase();

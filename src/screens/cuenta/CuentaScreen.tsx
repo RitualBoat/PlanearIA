@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import AnimatedTopPill from "../../components/AnimatedTopPill";
 import { isWeb } from "../../utils/responsive";
 import { useCuentaViewModel } from "../../hooks/useCuentaViewModel";
+import { usePermission } from "../../hooks/usePermission";
 import { useAuth, PREFERENCIAS_DEFAULT } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import { useFontSize } from "../../context/FontSizeContext";
@@ -145,6 +146,7 @@ const CuentaScreen: React.FC = () => {
     handleEliminarCuenta,
   } = useCuentaViewModel();
   const { actualizarPreferencias, isGuest } = useAuth();
+  const { can } = usePermission();
 
   const prefs = { ...PREFERENCIAS_DEFAULT, ...usuario?.preferencias };
 
@@ -597,7 +599,7 @@ const CuentaScreen: React.FC = () => {
                         </TouchableOpacity>
                       )}
 
-                      {usuario?.rol === "admin" && (
+                      {can("cambiar_roles") && (
                         <TouchableOpacity
                           style={styles.secondaryAction}
                           onPress={() => (navigation as any).navigate("AdminRoles")}

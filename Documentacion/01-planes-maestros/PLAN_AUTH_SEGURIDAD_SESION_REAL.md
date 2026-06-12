@@ -862,18 +862,19 @@ GitHub/CI - Fase 4:
   - tests de navegacion/gates si existen
   - `git diff --check`
 
-- [ ] **4.1 Crear helpers `RoleGate`/`usePermission`**
-  - Frontend UX solamente.
-- [ ] **4.2 Proteger rutas sensibles**
-  - `AdminRoles`, editar perfil, sesiones, eliminar cuenta.
-- [ ] **4.3 Mejorar Cuenta**
-  - Seguridad, sesiones iniciadas, cerrar todas, estado de cuenta.
-- [ ] **4.4 Mantener guest mode claro**
-  - Local-only, acciones protegidas con `useAuthGate`.
-- [ ] **4.5 Validar deep links**
-  - No abrir rutas admin sin permiso.
-- [ ] **4.6 Tests y validacion manual**
-  - Web/movil, guest/docente/admin/dev.
+- [x] **4.1 Crear helpers `RoleGate`/`usePermission`**
+  - Frontend UX solamente. `src/hooks/usePermission.ts` (resuelve rol contra `shared/authContract.json`) y `src/components/auth/RoleGate.tsx`.
+- [x] **4.2 Proteger rutas sensibles**
+  - `AdminRolesScreen` ahora tiene guard de render (estado "sin permiso") y su viewmodel no hace fetch sin permiso. Editar perfil, eliminar cuenta y logout siguen accesibles solo a sesion autenticada no-invitada via `CuentaScreen`.
+- [~] **4.3 Mejorar Cuenta**
+  - Boton "Administrar roles" ahora se muestra por permiso `cambiar_roles` (dev+admin), no por `rol === "admin"`. La pantalla dedicada de sesiones iniciadas/cerrar todas se implementa en Fase 6.3 (donde el plan la ubica); pendiente backend `logout_all`.
+- [x] **4.4 Mantener guest mode claro**
+  - `useAuthGate` se conserva; `usePermission` niega todo permiso elevado a invitados; CuentaScreen oculta acciones de cuenta a invitados.
+- [x] **4.5 Validar deep links**
+  - `AdminRolesScreen` bloquea navegacion directa sin `cambiar_roles`. No existe deep link URL hacia rutas admin; la unica via es navegacion interna, ya guardada.
+- [x] **4.6 Tests y validacion manual**
+  - 3 suites: `usePermission`, `RoleGate`, `AdminRolesScreen.guard` (14 casos: dev/admin/docente/alumno/supervisor/guest). Validacion manual web/movil queda como Review Manual.
+- **Avance 2026-06-12:** Fase 4 RBAC UX implementada. Nuevos `usePermission`/`RoleGate`, guard de render en `AdminRolesScreen`, gate por permiso en `CuentaScreen`, `useAdminRolesViewModel(enabled)`. Validacion local: `tsc --noEmit` 0 errores, ESLint 0 en archivos tocados, jest 619/619 (86 suites). Sesiones iniciadas/cerrar todas diferido a Fase 6.3. Issue de Fase 4 y sincronizacion GitHub Product OS pendientes.
 
 ### FASE 5: Aislamiento Multiusuario en Backend, Sync y Repositories
 

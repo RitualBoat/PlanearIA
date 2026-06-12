@@ -14,15 +14,15 @@ interface UsuarioListItem {
   fechaCreacion: string;
 }
 
-export function useAdminRolesViewModel() {
+export function useAdminRolesViewModel(enabled: boolean = true) {
   const navigation = useNavigation();
   const { token } = useAuth();
   const [usuarios, setUsuarios] = useState<UsuarioListItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(enabled);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
 
   const fetchUsuarios = useCallback(async () => {
-    if (!token) return;
+    if (!token || !enabled) return;
     setIsLoading(true);
     try {
       const res = await fetch(`${API_CONFIG.baseUrl}/api/auth`, {
@@ -79,7 +79,7 @@ export function useAdminRolesViewModel() {
         setUpdatingId(null);
       }
     },
-    [token]
+    [token, enabled]
   );
 
   const goBack = useCallback(() => {

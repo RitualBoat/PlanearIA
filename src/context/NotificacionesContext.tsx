@@ -4,7 +4,8 @@ import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "../services/pushNotificationService";
 import { Notificacion, TipoNotificacion } from "../../types";
-import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
+import { isAPIConfigured } from "../sync/config/apiConfig";
+import { apiRequest } from "../utils/apiClient";
 import logger from "../utils/logger";
 import { isNetworkRequestError } from "../utils/networkErrors";
 import { useAuth } from "./AuthContext";
@@ -72,7 +73,10 @@ const MOCK_NOTIFICACIONES: Notificacion[] = [
 ];
 
 export const NotificacionesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, isGuest, actualizarPerfil } = useAuth();
+  const { isAuthenticated, isGuest, actualizarPerfil, usuario } = useAuth();
+  // Real owner id; the backend derives it from the JWT, this keeps the legacy
+  // query param aligned and falls back to "1" only for unauthenticated/demo.
+  const currentUserId = usuario?.id != null ? String(usuario.id) : CURRENT_USER_ID;
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,14 +84,8 @@ export const NotificacionesProvider: React.FC<{ children: React.ReactNode }> = (
   const fetchRemoteNotificaciones = async (): Promise<Notificacion[]> => {
     if (!isAPIConfigured()) return [];
     try {
-      const response = await fetch(
-        `${API_CONFIG.baseUrl}/api/notificaciones?usuarioId=${CURRENT_USER_ID}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "X-API-Key": API_CONFIG.apiSecret,
-          },
-        }
+      const response = await apiRequest(
+        `/api/notificaciones?usuarioId=${currentUserId}`
       );
       if (!response.ok) return [];
       const json = await response.json();
@@ -172,16 +170,12 @@ export const NotificacionesProvider: React.FC<{ children: React.ReactNode }> = (
     await saveNotificaciones(updated);
     // Sincronizar con backend si está disponible
     if (isAPIConfigured()) {
-      fetch(`${API_CONFIG.baseUrl}/api/notificaciones`, {
+      apiRequest(`/api/notificaciones`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-Key": API_CONFIG.apiSecret,
-        },
-        body: JSON.stringify({ usuarioId: CURRENT_USER_ID, marcarTodas: true }),
+        body: JSON.stringify({ usuarioId: currentUserId, marcarTodas: true }),
       }).catch(() => { /* silent — offline-first */ });
     }
-  }, [notificaciones]);
+  }, [notificaciones, currentUserId]);
 
   const eliminarNotificacion = useCallback(
     async (id: number) => {

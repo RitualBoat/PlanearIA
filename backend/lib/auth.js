@@ -32,6 +32,47 @@ function validateAuth(req) {
 /**
  * Obtiene la información del usuario desde el JWT token en la cabecera de la petición
  */
+
+/**
+ * Returns the userId (as string) from a valid JWT, or null when the request
+ * is authenticated only by API key. Additive isolation: callers add the
+ * userId filter when present and keep legacy behavior when absent, so the
+ * app keeps working offline-first while authenticated traffic gets isolated.
+ */
+function getScopeUserId(req) {
+  try {
+    const payload = getUserFromToken(req);
+    if (!payload || payload.userId === undefined || payload.userId === null) {
+      return null;
+    }
+    return String(payload.userId);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Returns a shallow copy of `filter` scoped to `userId` when present.
+ */
+function scopeFilter(filter, userId) {
+  if (!userId) return { ...filter };
+  return { ...filter, userId };
+}
+
+/**
+ * Ownership guard for a single existing doc under additive isolation.
+ * - Unscoped (API key only): always true (legacy compatibility).
+ * - Scoped: true only when the doc is new or already owned by userId.
+ *   Legacy/foreign docs (different or missing owner) are rejected.
+ */
+function ownsDoc(existing, userId, ownerField = "userId") {
+  if (!userId) return true;
+  if (!existing) return true;
+  const owner = existing[ownerField];
+  if (owner === undefined || owner === null) return false;
+  return String(owner) === String(userId);
+}
+
 /**
  * Orígenes permitidos para CORS
  */
@@ -116,6 +157,9 @@ function successResponse(res, data, status = 200) {
 module.exports = {
   validateAuth,
   getUserFromToken,
+  getScopeUserId,
+  scopeFilter,
+  ownsDoc,
   verifyToken,
   getCorsHeaders,
   handleCors,

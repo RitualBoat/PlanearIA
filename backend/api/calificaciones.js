@@ -9,6 +9,8 @@
 const { connectToDatabase } = require("../lib/mongodb");
 const {
   validateAuth,
+  getScopeUserId,
+  ownsDoc,
   handleCors,
   applyCors,
   errorResponse,
@@ -35,16 +37,20 @@ module.exports = async (req, res) => {
     await collection.createIndex({ id: 1 }, { unique: true });
     await collection.createIndex({ alumnoId: 1 });
     await collection.createIndex({ grupoId: 1 });
+    await collection.createIndex({ userId: 1, fechaRegistro: -1 });
+
+    // Additive per-user isolation: scoped when a JWT is present.
+    const userId = getScopeUserId(req);
 
     switch (req.method) {
       case "GET":
-        return await handleGet(req, res, collection);
+        return await handleGet(req, res, collection, userId);
       case "POST":
-        return await handlePost(req, res, collection);
+        return await handlePost(req, res, collection, userId);
       case "PUT":
-        return await handlePut(req, res, collection);
+        return await handlePut(req, res, collection, userId);
       case "DELETE":
-        return await handleDelete(req, res, collection);
+        return await handleDelete(req, res, collection, userId);
       default:
         return errorResponse(res, 405, `Method ${req.method} not allowed`);
     }
@@ -57,18 +63,19 @@ module.exports = async (req, res) => {
 /**
  * GET - Listar calificaciones con filtros opcionales
  */
-async function handleGet(req, res, collection) {
+async function handleGet(req, res, collection, userId) {
   const { id, grupoId, alumnoId, limit = 500 } = req.query;
 
   if (id) {
     const calificacion = await collection.findOne({ id: Number(id) });
-    if (!calificacion) {
+    if (!calificacion || (userId && String(calificacion.userId) !== userId)) {
       return errorResponse(res, 404, "Calificación no encontrada");
     }
     return successResponse(res, calificacion);
   }
 
   const query = {};
+  if (userId) query.userId = userId;
   if (grupoId) query.grupoId = Number(grupoId);
   if (alumnoId) query.alumnoId = Number(alumnoId);
 
@@ -87,7 +94,7 @@ async function handleGet(req, res, collection) {
 /**
  * POST - Crear registro(s) de calificación (soporte masivo)
  */
-async function handlePost(req, res, collection) {
+async function handlePost(req, res, collection, userId) {
   const body = req.body;
 
   // Soporte masivo: si body es un array, upsert múltiples
@@ -104,15 +111,15 @@ async function handlePost(req, res, collection) {
 
       const doc = {
         ...item,
+        ...(userId ? { userId } : {}),
         syncedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
 
-      const result = await collection.updateOne(
-        { alumnoId: doc.alumnoId, grupoId: doc.grupoId },
-        { $set: doc },
-        { upsert: true }
-      );
+      const matchKey = { alumnoId: doc.alumnoId, grupoId: doc.grupoId };
+      if (userId) matchKey.userId = userId;
+
+      const result = await collection.updateOne(matchKey, { $set: doc }, { upsert: true });
 
       if (result.upsertedCount > 0) created++;
       else updated++;
@@ -132,12 +139,16 @@ async function handlePost(req, res, collection) {
   }
 
   const existing = await collection.findOne({ id: calificacion.id });
+  if (existing && !ownsDoc(existing, userId)) {
+    return errorResponse(res, 403, "No autorizado");
+  }
   if (existing) {
     await collection.updateOne(
       { id: calificacion.id },
       {
         $set: {
           ...calificacion,
+          ...(userId ? { userId } : {}),
           syncedAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
@@ -148,6 +159,7 @@ async function handlePost(req, res, collection) {
 
   const doc = {
     ...calificacion,
+    ...(userId ? { userId } : {}),
     syncedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -160,7 +172,7 @@ async function handlePost(req, res, collection) {
 /**
  * PUT - Actualizar registro de calificación existente
  */
-async function handlePut(req, res, collection) {
+async function handlePut(req, res, collection, userId) {
   const calificacion = req.body;
 
   if (!calificacion || !calificacion.id) {
@@ -171,12 +183,16 @@ async function handlePut(req, res, collection) {
   if (!existing) {
     return errorResponse(res, 404, "Calificación no encontrada");
   }
+  if (!ownsDoc(existing, userId)) {
+    return errorResponse(res, 403, "No autorizado");
+  }
 
   await collection.updateOne(
     { id: calificacion.id },
     {
       $set: {
         ...calificacion,
+        ...(userId ? { userId } : {}),
         syncedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
@@ -189,11 +205,18 @@ async function handlePut(req, res, collection) {
 /**
  * DELETE - Eliminar registro de calificación
  */
-async function handleDelete(req, res, collection) {
+async function handleDelete(req, res, collection, userId) {
   const { id } = req.query;
 
   if (!id) {
     return errorResponse(res, 400, "ID requerido para eliminar");
+  }
+
+  if (userId) {
+    const existing = await collection.findOne({ id: Number(id) });
+    if (existing && !ownsDoc(existing, userId)) {
+      return errorResponse(res, 404, "Calificación no encontrada");
+    }
   }
 
   const result = await collection.deleteOne({ id: Number(id) });

@@ -10,6 +10,8 @@
 const { connectToDatabase } = require("../lib/mongodb");
 const {
   validateAuth,
+  getScopeUserId,
+  ownsDoc,
   handleCors,
   applyCors,
   errorResponse,
@@ -36,15 +38,20 @@ module.exports = async (req, res) => {
     await collection.createIndex({ usuarioId: 1, leida: 1 });
     await collection.createIndex({ fechaCreacion: -1 });
 
+    // When a JWT is present, the owner is derived from the token (usuarioId
+    // from the client is ignored) so a user can only touch their own
+    // notifications. API-key-only traffic keeps the legacy usuarioId param.
+    const tokenUserId = getScopeUserId(req);
+
     switch (req.method) {
       case "GET":
-        return await handleGet(req, res, collection);
+        return await handleGet(req, res, collection, tokenUserId);
       case "POST":
-        return await handlePost(req, res, collection);
+        return await handlePost(req, res, collection, tokenUserId);
       case "PUT":
-        return await handlePut(req, res, collection);
+        return await handlePut(req, res, collection, tokenUserId);
       case "DELETE":
-        return await handleDelete(req, res, collection);
+        return await handleDelete(req, res, collection, tokenUserId);
       default:
         return errorResponse(res, 405, `Method ${req.method} not allowed`);
     }
@@ -57,13 +64,15 @@ module.exports = async (req, res) => {
 /**
  * GET — Obtener notificaciones del usuario
  */
-async function handleGet(req, res, collection) {
-  const { id, usuarioId, soloNoLeidas, desde, limit = 50 } = req.query;
+async function handleGet(req, res, collection, tokenUserId) {
+  const { id, soloNoLeidas, desde, limit = 50 } = req.query;
+  // Scoped requests own only their notifications; ignore client usuarioId.
+  const usuarioId = tokenUserId || req.query.usuarioId;
 
   // Un solo ítem por ID
   if (id) {
     const notificacion = await collection.findOne({ id });
-    if (!notificacion)
+    if (!notificacion || (tokenUserId && String(notificacion.usuarioId) !== tokenUserId))
       return errorResponse(res, 404, "Notificación no encontrada");
     return successResponse(res, notificacion);
   }
@@ -97,8 +106,10 @@ async function handleGet(req, res, collection) {
 /**
  * POST — Crear notificación
  */
-async function handlePost(req, res, collection) {
-  const notificacion = req.body;
+async function handlePost(req, res, collection, tokenUserId) {
+  const notificacion = { ...req.body };
+  // Scoped requests can only create notifications they own.
+  if (tokenUserId) notificacion.usuarioId = tokenUserId;
 
   if (!notificacion || !notificacion.id || !notificacion.usuarioId) {
     return errorResponse(
@@ -109,6 +120,9 @@ async function handlePost(req, res, collection) {
   }
 
   const existing = await collection.findOne({ id: notificacion.id });
+  if (existing && !ownsDoc(existing, tokenUserId, "usuarioId")) {
+    return errorResponse(res, 403, "No autorizado");
+  }
   if (existing) {
     await collection.updateOne(
       { id: notificacion.id },
@@ -134,7 +148,7 @@ async function handlePost(req, res, collection) {
  * Body { id } → marca una sola notificación
  * Body { usuarioId, marcarTodas: true } → marca todas las del usuario
  */
-async function handlePut(req, res, collection) {
+async function handlePut(req, res, collection, tokenUserId) {
   const body = req.body;
 
   if (!body) {
@@ -142,9 +156,10 @@ async function handlePut(req, res, collection) {
   }
 
   // Marcar todas las del usuario como leídas
-  if (body.marcarTodas === true && body.usuarioId) {
+  const marcarUsuarioId = tokenUserId || body.usuarioId;
+  if (body.marcarTodas === true && marcarUsuarioId) {
     const result = await collection.updateMany(
-      { usuarioId: body.usuarioId, leida: false },
+      { usuarioId: marcarUsuarioId, leida: false },
       { $set: { leida: true, syncedAt: new Date().toISOString() } }
     );
     return successResponse(res, {
@@ -158,11 +173,19 @@ async function handlePut(req, res, collection) {
     return errorResponse(res, 400, "id o { usuarioId, marcarTodas } requerido");
   }
 
+  if (tokenUserId) {
+    const existing = await collection.findOne({ id: body.id });
+    if (existing && !ownsDoc(existing, tokenUserId, "usuarioId")) {
+      return errorResponse(res, 403, "No autorizado");
+    }
+  }
+
   const result = await collection.updateOne(
     { id: body.id },
     {
       $set: {
         ...body,
+        ...(tokenUserId ? { usuarioId: tokenUserId } : {}),
         leida: true,
         syncedAt: new Date().toISOString(),
       },
@@ -179,11 +202,18 @@ async function handlePut(req, res, collection) {
 /**
  * DELETE — Eliminar una notificación
  */
-async function handleDelete(req, res, collection) {
+async function handleDelete(req, res, collection, tokenUserId) {
   const { id } = req.query;
 
   if (!id) {
     return errorResponse(res, 400, "ID de notificación requerido");
+  }
+
+  if (tokenUserId) {
+    const existing = await collection.findOne({ id });
+    if (existing && !ownsDoc(existing, tokenUserId, "usuarioId")) {
+      return errorResponse(res, 404, "Notificación no encontrada");
+    }
   }
 
   const result = await collection.deleteOne({ id });

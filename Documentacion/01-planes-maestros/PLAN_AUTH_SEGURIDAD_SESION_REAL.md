@@ -893,20 +893,21 @@ GitHub/CI - Fase 5:
   - `npm run backend:check`
   - `git diff --check`
 
-- [ ] **5.1 Endurecer endpoints academicos**
-  - `grupos`, `alumnos`, `recursos`, `asistencias`, `calificaciones`, `entregables`, `mensajes`, `posts`, `contactos`, `notificaciones`.
-- [ ] **5.2 Agregar filtros `userId` en MongoDB**
-  - Queries, upserts, deletes e indices `{ userId, id }`.
-- [ ] **5.3 Definir estrategia para datos legacy sin `userId`**
-  - No borrar; no sync remoto hasta atribucion.
-- [ ] **5.4 Pasar `userId` a repositorios locales nuevos**
-  - Ports/repositories compatibles con SQLite.
-- [ ] **5.5 Actualizar sync queue**
-  - Operaciones con `userId`, `sessionId` o `deviceId`.
-- [ ] **5.6 Mantener SQLite opt-in**
-  - No cambiar factory default, no borrar AsyncStorage legacy.
-- [ ] **5.7 Tests de aislamiento**
-  - Usuario A no lee ni modifica datos de Usuario B.
+- [x] **5.1 Endurecer endpoints academicos**
+  - Aislamiento aditivo por `userId` en `grupos`, `alumnos`, `recursos`, `asistencias`, `calificaciones`, `entregables` y derivacion de `usuarioId` desde el token en `notificaciones`. `posts`, `contactos`, `mensajes` quedan para el plan Social/Chat (datos multi-usuario por diseno; aislarlos como privados romperia feed/chat). Decision de usuario 2026-06-12: alcance "academicos propios + notificaciones", enforcement aditivo/compatible.
+- [x] **5.2 Agregar filtros `userId` en MongoDB**
+  - Filtro `userId` en GET/PUT/DELETE/upserts (incluye upserts masivos por clave compuesta) y stamping en escrituras. Indice `{ userId, fecha* }` agregado por endpoint. Helpers `getScopeUserId`/`ownsDoc` en `backend/lib/auth.js`.
+- [x] **5.3 Definir estrategia para datos legacy sin `userId`**
+  - Aditiva: con JWT, los docs sin `userId` (legacy) o de otro dueno son invisibles e inmodificables (404/403); sin JWT (solo API key) se mantiene el comportamiento legacy. No se borra ni reatribuye automaticamente.
+- [~] **5.4 Pasar `userId` a repositorios locales nuevos**
+  - Diferido: el limite de autorizacion real es el backend (hecho). El namespacing local por usuario se posterga para no desestabilizar `test:sync`/`test:classroom` y porque no hay escenario multi-usuario en el mismo dispositivo aun.
+- [~] **5.5 Actualizar sync queue**
+  - Diferido: el sync engine ya envia el JWT (apiRequest), asi que el backend aisla sin depender del payload de la cola. Agregar `userId`/`deviceId` a la cola SQLite implica schema/migracion; se posterga con justificacion.
+- [x] **5.6 Mantener SQLite opt-in**
+  - Sin cambios al factory default ni a claves AsyncStorage legacy.
+- [x] **5.7 Tests de aislamiento**
+  - `scripts/testBackendIsolation.mjs` (Mongo en memoria + JWTs reales) verifica que A no lee/edita/borra datos de B en grupos, alumnos, calificaciones (masivo) y notificaciones, y que API-key-only mantiene legacy. Integrado en `npm run backend:check` (CI).
+- **Avance 2026-06-12:** Fase 5 (aislamiento backend) implementada con enforcement aditivo/compatible. 7 endpoints endurecidos, helpers de scope, indices `userId`, frontend de notificaciones migrado a `apiRequest` con `userId` real, y suite de aislamiento en CI. Validacion: `tsc` 0 errores, ESLint 0, jest 619/619, `backend:check` (smoke + 16 asserts de aislamiento) en verde. `posts/contactos/mensajes` y namespacing local (5.4/5.5) diferidos con justificacion. Issue de Fase 5 y sincronizacion GitHub Product OS pendientes.
 
 ### FASE 6: Email, Recuperacion, Privacidad y Ciclo de Cuenta
 

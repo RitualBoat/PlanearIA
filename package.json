@@ -22,7 +22,8 @@
     "backend:dev": "npm --prefix backend start",
     "backend:dev:local": "node scripts/localBackendServer.mjs",
     "backend:health": "node scripts/checkBackendHealth.mjs",
-    "backend:check": "node scripts/checkBackendApiStatic.mjs",
+    "backend:check": "node scripts/checkBackendApiStatic.mjs && node scripts/testBackendIsolation.mjs",
+    "backend:isolation": "node scripts/testBackendIsolation.mjs",
     "backend:deploy": "npm --prefix backend run deploy"
   },
   "dependencies": {

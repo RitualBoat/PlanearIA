@@ -10,6 +10,8 @@
 const { connectToDatabase } = require("../lib/mongodb");
 const {
   validateAuth,
+  getScopeUserId,
+  ownsDoc,
   handleCors,
   applyCors,
   errorResponse,
@@ -34,15 +36,18 @@ module.exports = async (req, res) => {
 
     await ensureIndexes(collection);
 
+    // Additive per-user isolation: scoped when a JWT is present, legacy when not.
+    const userId = getScopeUserId(req);
+
     switch (req.method) {
       case "GET":
-        return await handleGet(req, res, collection);
+        return await handleGet(req, res, collection, userId);
       case "POST":
-        return await handlePost(req, res, collection);
+        return await handlePost(req, res, collection, userId);
       case "PUT":
-        return await handlePut(req, res, collection);
+        return await handlePut(req, res, collection, userId);
       case "DELETE":
-        return await handleDelete(req, res, collection);
+        return await handleDelete(req, res, collection, userId);
       default:
         return errorResponse(res, 405, `Method ${req.method} not allowed`);
     }
@@ -54,24 +59,26 @@ module.exports = async (req, res) => {
 
 async function ensureIndexes(collection) {
   await collection.createIndex({ id: 1 }, { unique: true });
+  await collection.createIndex({ userId: 1, fechaModificacion: -1 });
   await collection.createIndex({ fechaModificacion: -1 });
 }
 
 /**
  * GET - Listar u obtener grupo
  */
-async function handleGet(req, res, collection) {
+async function handleGet(req, res, collection, userId) {
   const { id, desde, limit = 100 } = req.query;
 
   if (id) {
     const grupo = await collection.findOne({ id: id });
-    if (!grupo) {
+    if (!grupo || (userId && String(grupo.userId) !== userId)) {
       return errorResponse(res, 404, "Grupo no encontrado");
     }
     return successResponse(res, grupo);
   }
 
   const query = {};
+  if (userId) query.userId = userId;
   if (desde) {
     query.fechaModificacion = { $gt: desde };
   }
@@ -91,7 +98,7 @@ async function handleGet(req, res, collection) {
 /**
  * POST - Crear nuevo grupo
  */
-async function handlePost(req, res, collection) {
+async function handlePost(req, res, collection, userId) {
   const grupo = req.body;
 
   if (!grupo || !grupo.id) {
@@ -100,12 +107,16 @@ async function handlePost(req, res, collection) {
 
   const existing = await collection.findOne({ id: grupo.id });
   if (existing) {
+    if (!ownsDoc(existing, userId)) {
+      return errorResponse(res, 403, "No autorizado");
+    }
     return errorResponse(res, 409, "Ya existe un grupo con ese ID");
   }
 
   const nowIso = new Date().toISOString();
   const doc = {
     ...grupo,
+    ...(userId ? { userId } : {}),
     fechaCreacion: grupo.fechaCreacion || nowIso,
     fechaModificacion: grupo.fechaModificacion || nowIso,
     syncedAt: nowIso,
@@ -119,16 +130,24 @@ async function handlePost(req, res, collection) {
 /**
  * PUT - Actualizar grupo existente
  */
-async function handlePut(req, res, collection) {
+async function handlePut(req, res, collection, userId) {
   const grupo = req.body;
 
   if (!grupo || !grupo.id) {
     return errorResponse(res, 400, "ID de grupo requerido");
   }
 
+  if (userId) {
+    const existing = await collection.findOne({ id: grupo.id });
+    if (existing && !ownsDoc(existing, userId)) {
+      return errorResponse(res, 403, "No autorizado");
+    }
+  }
+
   const nowIso = new Date().toISOString();
   const payload = {
     ...grupo,
+    ...(userId ? { userId } : {}),
     fechaModificacion: grupo.fechaModificacion || nowIso,
     syncedAt: nowIso,
   };
@@ -149,11 +168,18 @@ async function handlePut(req, res, collection) {
 /**
  * DELETE - Eliminar grupo
  */
-async function handleDelete(req, res, collection) {
+async function handleDelete(req, res, collection, userId) {
   const { id } = req.query;
 
   if (!id) {
     return errorResponse(res, 400, "ID de grupo requerido");
+  }
+
+  if (userId) {
+    const existing = await collection.findOne({ id: id });
+    if (existing && !ownsDoc(existing, userId)) {
+      return errorResponse(res, 404, "Grupo no encontrado");
+    }
   }
 
   const result = await collection.deleteOne({ id: id });

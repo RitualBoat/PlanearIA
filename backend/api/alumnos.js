@@ -10,6 +10,8 @@
 const { connectToDatabase } = require("../lib/mongodb");
 const {
   validateAuth,
+  getScopeUserId,
+  ownsDoc,
   handleCors,
   applyCors,
   errorResponse,
@@ -35,16 +37,20 @@ module.exports = async (req, res) => {
     // Indices requeridos para alumnos (idempotente)
     await collection.createIndex({ id: 1 }, { unique: true });
     await collection.createIndex({ grupoId: 1 });
+    await collection.createIndex({ userId: 1, fechaModificacion: -1 });
+
+    // Additive per-user isolation: scoped when a JWT is present.
+    const userId = getScopeUserId(req);
 
     switch (req.method) {
       case "GET":
-        return await handleGet(req, res, collection);
+        return await handleGet(req, res, collection, userId);
       case "POST":
-        return await handlePost(req, res, collection);
+        return await handlePost(req, res, collection, userId);
       case "PUT":
-        return await handlePut(req, res, collection);
+        return await handlePut(req, res, collection, userId);
       case "DELETE":
-        return await handleDelete(req, res, collection);
+        return await handleDelete(req, res, collection, userId);
       default:
         return errorResponse(res, 405, `Method ${req.method} not allowed`);
     }
@@ -61,18 +67,20 @@ const normalizeId = (value) => {
   return Number.isNaN(numeric) ? value : numeric;
 };
 
-async function handleGet(req, res, collection) {
+async function handleGet(req, res, collection, userId) {
   const { id, grupoId, desde, limit = 200 } = req.query;
 
   if (id) {
     const alumno = await collection.findOne({ id: normalizeId(id) });
-    if (!alumno) {
+    if (!alumno || (userId && String(alumno.userId) !== userId)) {
       return errorResponse(res, 404, "Alumno no encontrado");
     }
     return successResponse(res, alumno);
   }
 
   const query = {};
+
+  if (userId) query.userId = userId;
 
   if (grupoId) {
     query.grupoId = normalizeId(grupoId);
@@ -94,7 +102,7 @@ async function handleGet(req, res, collection) {
   });
 }
 
-async function handlePost(req, res, collection) {
+async function handlePost(req, res, collection, userId) {
   const alumno = req.body;
 
   if (!alumno || alumno.id === undefined || alumno.id === null) {
@@ -105,6 +113,9 @@ async function handlePost(req, res, collection) {
   const nowIso = new Date().toISOString();
 
   const existing = await collection.findOne({ id: alumnoId });
+  if (existing && !ownsDoc(existing, userId)) {
+    return errorResponse(res, 403, "No autorizado");
+  }
   if (existing) {
     await collection.updateOne(
       { id: alumnoId },
@@ -112,6 +123,7 @@ async function handlePost(req, res, collection) {
         $set: {
           ...alumno,
           id: alumnoId,
+          ...(userId ? { userId } : {}),
           fechaModificacion: alumno.fechaModificacion || nowIso,
           syncedAt: nowIso,
         },
@@ -124,6 +136,7 @@ async function handlePost(req, res, collection) {
   await collection.insertOne({
     ...alumno,
     id: alumnoId,
+    ...(userId ? { userId } : {}),
     fechaModificacion: alumno.fechaModificacion || nowIso,
     createdAt: nowIso,
     syncedAt: nowIso,
@@ -132,7 +145,7 @@ async function handlePost(req, res, collection) {
   return successResponse(res, { action: "created", id: alumnoId }, 201);
 }
 
-async function handlePut(req, res, collection) {
+async function handlePut(req, res, collection, userId) {
   const alumno = req.body;
 
   if (!alumno || alumno.id === undefined || alumno.id === null) {
@@ -142,12 +155,20 @@ async function handlePut(req, res, collection) {
   const alumnoId = normalizeId(alumno.id);
   const nowIso = new Date().toISOString();
 
+  if (userId) {
+    const existing = await collection.findOne({ id: alumnoId });
+    if (existing && !ownsDoc(existing, userId)) {
+      return errorResponse(res, 403, "No autorizado");
+    }
+  }
+
   const result = await collection.updateOne(
     { id: alumnoId },
     {
       $set: {
         ...alumno,
         id: alumnoId,
+        ...(userId ? { userId } : {}),
         fechaModificacion: alumno.fechaModificacion || nowIso,
         syncedAt: nowIso,
       },
@@ -165,7 +186,7 @@ async function handlePut(req, res, collection) {
   });
 }
 
-async function handleDelete(req, res, collection) {
+async function handleDelete(req, res, collection, userId) {
   const { id } = req.query;
 
   if (id === undefined || id === null || id === "") {
@@ -173,6 +194,14 @@ async function handleDelete(req, res, collection) {
   }
 
   const alumnoId = normalizeId(id);
+
+  if (userId) {
+    const existing = await collection.findOne({ id: alumnoId });
+    if (existing && !ownsDoc(existing, userId)) {
+      return errorResponse(res, 404, "Alumno no encontrado");
+    }
+  }
+
   const result = await collection.deleteOne({ id: alumnoId });
 
   if (result.deletedCount === 0) {

@@ -9,6 +9,8 @@
 const { connectToDatabase } = require("../lib/mongodb");
 const {
   validateAuth,
+  getScopeUserId,
+  ownsDoc,
   handleCors,
   applyCors,
   errorResponse,
@@ -35,16 +37,20 @@ module.exports = async (req, res) => {
     await collection.createIndex({ id: 1 }, { unique: true });
     await collection.createIndex({ grupoId: 1 });
     await collection.createIndex({ fechaModificacion: -1 });
+    await collection.createIndex({ userId: 1, fechaModificacion: -1 });
+
+    // Additive per-user isolation: scoped when a JWT is present.
+    const userId = getScopeUserId(req);
 
     switch (req.method) {
       case "GET":
-        return await handleGet(req, res, collection);
+        return await handleGet(req, res, collection, userId);
       case "POST":
-        return await handlePost(req, res, collection);
+        return await handlePost(req, res, collection, userId);
       case "PUT":
-        return await handlePut(req, res, collection);
+        return await handlePut(req, res, collection, userId);
       case "DELETE":
-        return await handleDelete(req, res, collection);
+        return await handleDelete(req, res, collection, userId);
       default:
         return errorResponse(res, 405, `Method ${req.method} not allowed`);
     }
@@ -57,18 +63,19 @@ module.exports = async (req, res) => {
 /**
  * GET - Listar entregables con filtros opcionales
  */
-async function handleGet(req, res, collection) {
+async function handleGet(req, res, collection, userId) {
   const { id, grupoId, tipo, limit = 500 } = req.query;
 
   if (id) {
     const entregable = await collection.findOne({ id: Number(id) });
-    if (!entregable) {
+    if (!entregable || (userId && String(entregable.userId) !== userId)) {
       return errorResponse(res, 404, "Entregable no encontrado");
     }
     return successResponse(res, entregable);
   }
 
   const query = {};
+  if (userId) query.userId = userId;
   if (grupoId) query.grupoId = Number(grupoId);
   if (tipo) query.tipo = tipo;
 
@@ -87,15 +94,23 @@ async function handleGet(req, res, collection) {
 /**
  * POST - Crear entregable
  */
-async function handlePost(req, res, collection) {
+async function handlePost(req, res, collection, userId) {
   const body = req.body;
 
   if (!body || !body.titulo) {
     return errorResponse(res, 400, "El campo 'titulo' es requerido");
   }
 
+  if (userId) {
+    const existing = await collection.findOne({ id: body.id });
+    if (existing && !ownsDoc(existing, userId)) {
+      return errorResponse(res, 403, "No autorizado");
+    }
+  }
+
   const doc = {
     ...body,
+    ...(userId ? { userId } : {}),
     syncedAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -115,15 +130,23 @@ async function handlePost(req, res, collection) {
 /**
  * PUT - Actualizar entregable existente
  */
-async function handlePut(req, res, collection) {
+async function handlePut(req, res, collection, userId) {
   const body = req.body;
 
   if (!body || !body.id) {
     return errorResponse(res, 400, "El campo 'id' es requerido para actualizar");
   }
 
+  if (userId) {
+    const existing = await collection.findOne({ id: Number(body.id) });
+    if (existing && !ownsDoc(existing, userId)) {
+      return errorResponse(res, 403, "No autorizado");
+    }
+  }
+
   const update = {
     ...body,
+    ...(userId ? { userId } : {}),
     updatedAt: new Date().toISOString(),
   };
 
@@ -142,11 +165,18 @@ async function handlePut(req, res, collection) {
 /**
  * DELETE - Eliminar entregable por id
  */
-async function handleDelete(req, res, collection) {
+async function handleDelete(req, res, collection, userId) {
   const { id } = req.query;
 
   if (!id) {
     return errorResponse(res, 400, "Se requiere el parámetro 'id'");
+  }
+
+  if (userId) {
+    const existing = await collection.findOne({ id: Number(id) });
+    if (existing && !ownsDoc(existing, userId)) {
+      return errorResponse(res, 404, "Entregable no encontrado");
+    }
   }
 
   const result = await collection.deleteOne({ id: Number(id) });

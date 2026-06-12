@@ -178,7 +178,7 @@ Si no configuras IA, la app debe seguir funcionando con fallbacks o errores visi
 Guarda esa URL. La llamaremos:
 
 ```text
-BACKEND_URL=https://TU_BACKEND.vercel.app
+BACKEND_URL=https://planear-ia-git-development-ritualboats-projects.vercel.app
 ```
 
 ### 2.7 Probar backend
@@ -359,16 +359,16 @@ Para probar como profesor:
 
 ## Donde se configura cada cosa
 
-| Cosa | Donde esta |
-| --- | --- |
-| Codigo frontend | Repo local: raiz, `App.tsx`, `src/`, `assets/` |
-| Codigo backend | Repo local: `backend/api/`, `backend/lib/` |
-| Build web | Repo local: `package.json` script `build:web` |
-| Config Vercel frontend | Repo local: `vercel.json` |
-| Variables frontend | Vercel Dashboard -> `planearia-web` -> Settings -> Environment Variables |
-| Variables backend | Vercel Dashboard -> `planearia-api` -> Settings -> Environment Variables |
-| URL para profesor | La URL de `planearia-web`, no la del backend |
-| Health backend | `https://TU_BACKEND.vercel.app/api/health` |
+| Cosa                   | Donde esta                                                               |
+| ---------------------- | ------------------------------------------------------------------------ |
+| Codigo frontend        | Repo local: raiz, `App.tsx`, `src/`, `assets/`                           |
+| Codigo backend         | Repo local: `backend/api/`, `backend/lib/`                               |
+| Build web              | Repo local: `package.json` script `build:web`                            |
+| Config Vercel frontend | Repo local: `vercel.json`                                                |
+| Variables frontend     | Vercel Dashboard -> `planearia-web` -> Settings -> Environment Variables |
+| Variables backend      | Vercel Dashboard -> `planearia-api` -> Settings -> Environment Variables |
+| URL para profesor      | La URL de `planearia-web`, no la del backend                             |
+| Health backend         | `https://TU_BACKEND.vercel.app/api/health`                               |
 
 ---
 
@@ -541,7 +541,7 @@ No uses esa URL salvo que Vercel te la haya dado exactamente para tu proyecto `p
 La respuesta:
 
 ```json
-{"success":false,"message":"API端点不存在"}
+{ "success": false, "message": "API端点不存在" }
 ```
 
 no viene del backend actual de PlanearIA. Nuestro endpoint `/api/health` responde con `service: "PlanearIA API"`.
@@ -624,6 +624,62 @@ https://TU_BACKEND.vercel.app
 ```
 
 El backend es solo la API.
+
+---
+
+## Checklist si registro falla en el frontend hosteado
+
+Si en el celular o navegador ves `Error de registro` / `No se pudo conectar al servidor`:
+
+1. Abre la URL real del backend:
+
+```text
+https://TU_BACKEND.vercel.app/api/health
+```
+
+Debe responder con `success: true`.
+
+2. En el proyecto frontend de Vercel revisa `Settings` -> `Environment Variables`.
+
+Configura estas variables para el environment que estes usando (`Preview` si es URL de branch, `Production` si es dominio final):
+
+```text
+EXPO_PUBLIC_API_URL=https://TU_BACKEND.vercel.app
+EXPO_PUBLIC_API_SECRET=<mismo valor que API_SECRET del backend>
+```
+
+3. En el proyecto backend revisa que `ALLOWED_ORIGINS` incluya la URL exacta del frontend:
+
+```text
+https://TU_FRONTEND.vercel.app
+```
+
+Si estas probando con una URL preview de Vercel, tambien debe estar esa URL preview exacta.
+Tambien puedes usar un patron para demos preview:
+
+```text
+https://*.vercel.app
+```
+
+4. Haz `Redeploy` de ambos proyectos despues de cambiar variables.
+
+Vercel no recompila deployments viejos cuando cambias environment variables.
+
+## CD de builds demo
+
+El workflow `.github/workflows/cd.yml` corre en:
+
+- Push a `development`.
+- Push a `main`.
+- Tags `v*`.
+- Ejecucion manual desde `Actions` -> `CD Builds` -> `Run workflow`.
+
+El release generado sube:
+
+- `planearia-web-<commit>.zip`
+- `planearia-web-<commit>.zip.sha256`
+- `planearia-android-debug-<commit>.apk` si el job Android termina correctamente.
+- `planearia-android-debug-<commit>.apk.sha256`
 
 ---
 

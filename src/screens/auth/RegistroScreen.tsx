@@ -7,25 +7,28 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import { COLORS, FONT_SIZES } from "../../../types";
-import { isWeb } from "../../utils/responsive";
 import { useRegistroViewModel } from "../../hooks/useRegistroViewModel";
+import WebScrollView from "../../components/WebScrollView";
 
 const RegistroScreen: React.FC = () => {
   const { formData, isLoading, errors, updateField, handleRegistro, handleIrALogin } =
     useRegistroViewModel();
   const navigation = useNavigation();
+  const { width } = useWindowDimensions();
+  const isWideWeb = Platform.OS === "web" && width >= 768;
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        enabled={Platform.OS !== "web"}
       >
         {/* Header bar */}
         <View style={styles.headerBar}>
@@ -36,12 +39,15 @@ const RegistroScreen: React.FC = () => {
           <View style={{ width: 32 }} />
         </View>
 
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
+        <WebScrollView
+          contentContainerStyle={[
+            styles.scrollContent,
+            isWideWeb && styles.scrollContentCentered,
+          ]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.card}>
+          <View style={[styles.card, isWideWeb ? styles.cardWeb : styles.cardCompact]}>
             {/* Header */}
             <View style={styles.iconCircle}>
               <MaterialIcons name="person-add" size={36} color={COLORS.primary} />
@@ -167,7 +173,7 @@ const RegistroScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
           </View>
-        </ScrollView>
+        </WebScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -191,27 +197,32 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
+    paddingTop: 12,
     paddingBottom: 40,
+  },
+  scrollContentCentered: {
+    justifyContent: "center",
   },
   card: {
     width: "100%",
     maxWidth: 450,
     backgroundColor: COLORS.surface,
     borderRadius: 20,
-    padding: isWeb() ? 40 : 24,
     alignItems: "center",
-    ...(isWeb()
-      ? { boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.08)" }
-      : {
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.06,
-          shadowRadius: 12,
-          elevation: 4,
-        }),
+  },
+  cardWeb: {
+    padding: 40,
+    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.08)",
+  },
+  cardCompact: {
+    padding: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 4,
   },
   iconCircle: {
     width: 72,

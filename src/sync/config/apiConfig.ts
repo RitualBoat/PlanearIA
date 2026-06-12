@@ -15,7 +15,7 @@ import logger from "../../utils/logger";
 
 const API_SECRET_FROM_ENV = process.env.EXPO_PUBLIC_API_SECRET?.trim() ?? "";
 const API_BASE_URL_FROM_ENV = process.env.EXPO_PUBLIC_API_URL?.trim() ?? "";
-const FALLBACK_API_BASE_URL = "https://backend-eight-chi-54.vercel.app";
+const FALLBACK_API_BASE_URL = "";
 const LOCALHOST_API_PATTERN = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?/i;
 const ALLOW_NATIVE_LOCALHOST =
   process.env.EXPO_PUBLIC_ALLOW_NATIVE_LOCALHOST?.trim().toLowerCase() === "true";

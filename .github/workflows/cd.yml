@@ -16,6 +16,9 @@ on:
           - "true"
           - "false"
   push:
+    branches:
+      - development
+      - main
     tags:
       - "v*"
 

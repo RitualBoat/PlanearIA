@@ -83,6 +83,19 @@ const ALLOWED_ORIGINS = [
   "http://localhost:19006",
 ];
 
+function escapeRegExp(value) {
+  return value.replace(/[|\\{}()[\]^$+?.]/g, "\\$&");
+}
+
+function originMatchesAllowed(origin, allowedOrigin) {
+  if (!origin || !allowedOrigin) return false;
+  if (origin === allowedOrigin) return true;
+  if (!allowedOrigin.includes("*")) return false;
+
+  const pattern = `^${escapeRegExp(allowedOrigin).replace(/\\\*/g, ".*")}$`;
+  return new RegExp(pattern).test(origin);
+}
+
 /**
  * Headers CORS para permitir requests desde la app
  */
@@ -93,7 +106,9 @@ function getCorsHeaders(req) {
     .map((value) => value.trim())
     .filter(Boolean);
   const allowedOrigins = envOrigins.length ? envOrigins : ALLOWED_ORIGINS;
-  const allowedOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  const allowedOrigin = allowedOrigins.some((allowed) => originMatchesAllowed(origin, allowed))
+    ? origin
+    : allowedOrigins[0];
   return {
     "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",

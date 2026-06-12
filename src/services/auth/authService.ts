@@ -6,7 +6,7 @@
  * fetch calls or touching storage directly.
  */
 
-import { API_CONFIG } from "../../sync/config/apiConfig";
+import { API_CONFIG, isAPIConfigured } from "../../sync/config/apiConfig";
 import { normalizeRole, AUTH_PERMISSIONS_VERSION } from "../../../types/auth";
 import { sessionStorage, SESSION_KEYS } from "./sessionStorage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -58,6 +58,30 @@ async function authFetch(
   body: Record<string, unknown>,
   token?: string | null
 ): Promise<BackendAuthResponse> {
+  if (!API_CONFIG.baseUrl) {
+    return {
+      success: false,
+      error:
+        "Falta configurar EXPO_PUBLIC_API_URL en el frontend. Revisa las variables de entorno y redeploy.",
+    };
+  }
+
+  if (!API_CONFIG.apiSecret) {
+    return {
+      success: false,
+      error:
+        "Falta configurar EXPO_PUBLIC_API_SECRET en el frontend. Debe coincidir con API_SECRET del backend.",
+    };
+  }
+
+  if (!isAPIConfigured()) {
+    return {
+      success: false,
+      error:
+        "La API no esta configurada correctamente para este entorno. Revisa EXPO_PUBLIC_API_URL y EXPO_PUBLIC_API_SECRET.",
+    };
+  }
+
   try {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -78,8 +102,12 @@ async function authFetch(
     });
     clearTimeout(timeoutId);
     return (await res.json()) as BackendAuthResponse;
-  } catch {
-    return { success: false, error: "No se pudo conectar al servidor." };
+  } catch (error) {
+    const message =
+      error instanceof Error && error.name === "AbortError"
+        ? "El servidor no respondio a tiempo."
+        : "No se pudo conectar al servidor. Revisa que la URL del backend y CORS permitan este frontend.";
+    return { success: false, error: message };
   }
 }
 

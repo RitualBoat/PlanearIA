@@ -1,0 +1,147 @@
+name: CD Builds
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "GitHub Release tag. Empty creates demo-${run_number}."
+        required: false
+        default: ""
+      build_android:
+        description: "Build Android debug APK"
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  web:
+    name: Build web static bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Build web
+        run: npm run build:web
+      - name: Package web bundle
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          zip -r "planearia-web-${SHORT_SHA}.zip" dist
+          sha256sum "planearia-web-${SHORT_SHA}.zip" > "planearia-web-${SHORT_SHA}.zip.sha256"
+      - name: Upload web artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: planearia-web
+          path: |
+            planearia-web-*.zip
+            planearia-web-*.zip.sha256
+
+  android:
+    name: Build Android debug APK
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.inputs.build_android == 'true'
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install dependencies
+        run: npm ci
+      - name: Generate Android project
+        run: npm run build:android:prebuild
+      - name: Build debug APK
+        run: npm run build:android:debug:ci
+      - name: Package Android APK
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "planearia-android-debug-${SHORT_SHA}.apk"
+          sha256sum "planearia-android-debug-${SHORT_SHA}.apk" > "planearia-android-debug-${SHORT_SHA}.apk.sha256"
+      - name: Upload Android artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: planearia-android-debug
+          path: |
+            planearia-android-debug-*.apk
+            planearia-android-debug-*.apk.sha256
+
+  release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - web
+      - android
+    if: always() && needs.web.result == 'success'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Resolve release tag
+        id: release_tag
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            TAG="${GITHUB_REF_NAME}"
+          elif [[ -n "${{ github.event.inputs.release_tag }}" ]]; then
+            TAG="${{ github.event.inputs.release_tag }}"
+          else
+            TAG="demo-${GITHUB_RUN_NUMBER}"
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: planearia-*
+          path: release-assets
+          merge-multiple: true
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release_tag.outputs.tag }}
+        run: |
+          NOTES_FILE="release-notes.md"
+          {
+            echo "PlanearIA demo build"
+            echo ""
+            echo "- Commit: ${GITHUB_SHA}"
+            echo "- Web bundle: planearia-web-*.zip"
+            echo "- Android debug APK: planearia-android-debug-*.apk, if the Android job succeeded"
+            echo ""
+            echo "The APK is a debug/demo artifact, not a Play Store signed release."
+          } > "$NOTES_FILE"
+
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release-assets/* --clobber
+          else
+            gh release create "$RELEASE_TAG" release-assets/* \
+              --target "$GITHUB_SHA" \
+              --title "PlanearIA ${RELEASE_TAG}" \
+              --notes-file "$NOTES_FILE"
+          fi

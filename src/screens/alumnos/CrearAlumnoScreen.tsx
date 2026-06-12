@@ -17,12 +17,11 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import WebScrollView from "../../components/WebScrollView";
+import CarreraSelector from "../../components/CarreraSelector";
 import { useCrearAlumnoViewModel, type CarreraOption } from "../../hooks/useCrearAlumnoViewModel";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
 import { useAlumnos } from "../../context/AlumnosContext";
 import { COLORS } from "../../../types";
-
-const CARRERAS: CarreraOption[] = ["ISC", "IGE", "ARQ", "ITICS"];
 
 type Nav = StackNavigationProp<RootStackParamList, "CrearAlumno">;
 type Route = RouteProp<RootStackParamList, "CrearAlumno">;
@@ -88,16 +87,6 @@ const CrearAlumnoScreen: React.FC = () => {
       setShowValidationBanner(false);
     }
   }, [errors, showValidationBanner]);
-
-  const chooseCarrera = () => {
-    Alert.alert("Selecciona una carrera", "", [
-      ...CARRERAS.map((item) => ({
-        text: item,
-        onPress: () => setCarrera(item),
-      })),
-      { text: "Cancelar", style: "cancel" },
-    ]);
-  };
 
   const handleCancelar = () => {
     if (saveView !== "form") {
@@ -340,15 +329,11 @@ const CrearAlumnoScreen: React.FC = () => {
                 error={errors.numeroControl}
               />
 
-              <Text style={styles.label}>Carrera*</Text>
-              <TouchableOpacity
-                style={[styles.selectorButton, errors.carrera ? styles.selectorButtonError : null]}
-                onPress={chooseCarrera}
-              >
-                <Text style={styles.selectorText}>{carrera || "Selecciona carrera"}</Text>
-                <MaterialIcons name="expand-more" size={20} color="#6D7F98" />
-              </TouchableOpacity>
-              {errors.carrera ? <Text style={styles.errorText}>{errors.carrera}</Text> : null}
+              <CarreraSelector
+                value={carrera}
+                onChange={(value) => setCarrera(value as CarreraOption)}
+                error={errors.carrera}
+              />
 
               <FormField label="Escuela" value={escuela} onChangeText={setEscuela} />
               <FormField label="Especialidad" value={especialidad} onChangeText={setEspecialidad} />

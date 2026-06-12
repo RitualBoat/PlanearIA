@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { Alert } from "react-native";
+import { Alert, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { CommonActions } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
@@ -31,20 +31,33 @@ export const useCuentaViewModel = (): CuentaViewModel => {
   }, [navigation]);
 
   const handleCerrarSesion = useCallback(() => {
+    const performLogout = async () => {
+      await logout();
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "Login" }],
+        })
+      );
+    };
+
+    if (Platform.OS === "web") {
+      const confirmed =
+        typeof globalThis.confirm === "function"
+          ? globalThis.confirm("¿Estás seguro de que deseas cerrar sesión?")
+          : true;
+      if (confirmed) {
+        void performLogout();
+      }
+      return;
+    }
+
     Alert.alert("Cerrar Sesión", "¿Estás seguro de que deseas cerrar sesión?", [
       { text: "Cancelar", style: "cancel" },
       {
         text: "Cerrar Sesión",
         style: "destructive",
-        onPress: async () => {
-          await logout();
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: "Login" }],
-            })
-          );
-        },
+        onPress: () => void performLogout(),
       },
     ]);
   }, [navigation, logout]);

@@ -14,43 +14,54 @@ import { useNavigation, CommonActions } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS } from "../../types";
 import { useNotificaciones } from "../context/NotificacionesContext";
+import { useAuth } from "../context/AuthContext";
 
 const FloatingActionIcons: React.FC = () => {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
   const { unreadCount } = useNotificaciones();
+  const { logout } = useAuth();
   const [menuVisible, setMenuVisible] = useState(false);
 
-  const isWebDesktop = Platform.OS === "web" && width >= 1080;
+  const isWeb = Platform.OS === "web";
+  const topOffset = isWeb ? 18 : insets.top + 10;
+  const rightOffset = isWeb && width >= 768 ? 24 : 14;
 
   const openMenu = useCallback(() => setMenuVisible(true), []);
   const closeMenu = useCallback(() => setMenuVisible(false), []);
 
   const handleProfile = useCallback(() => {
+    setMenuVisible(false);
     navigation.navigate("Perfil");
   }, [navigation]);
 
-  const handleLogout = useCallback(() => {
+  const handleAccount = useCallback(() => {
     setMenuVisible(false);
+    navigation.navigate("Cuenta");
+  }, [navigation]);
+
+  const handleLogout = useCallback(async () => {
+    setMenuVisible(false);
+    await logout();
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
         routes: [{ name: "Login" }],
       })
     );
-  }, [navigation]);
-
-  if (isWebDesktop) return null;
+  }, [logout, navigation]);
 
   return (
     <>
-      <View style={[styles.wrap, { top: insets.top + 10 }]}>
+      <View style={[styles.wrap, { top: topOffset, right: rightOffset }]} pointerEvents="box-none">
         <View style={styles.row}>
           <TouchableOpacity
             style={styles.iconBtn}
             activeOpacity={0.85}
             onPress={() => navigation.navigate("Notificaciones")}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir notificaciones"
           >
             <View style={{ position: "relative", alignItems: "center", justifyContent: "center" }}>
               <MaterialIcons name="notifications-none" size={20} color={COLORS.textDark} />
@@ -65,10 +76,18 @@ const FloatingActionIcons: React.FC = () => {
             style={styles.iconBtn}
             activeOpacity={0.85}
             onPress={() => navigation.navigate("Ayuda")}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir centro de ayuda"
           >
             <MaterialIcons name="help-outline" size={20} color={COLORS.textDark} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.avatarBtn} activeOpacity={0.85} onPress={handleProfile}>
+          <TouchableOpacity
+            style={styles.avatarBtn}
+            activeOpacity={0.85}
+            onPress={openMenu}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir menú de cuenta"
+          >
             <View style={styles.avatarCircle}>
               <MaterialIcons name="person" size={16} color={COLORS.surface} />
             </View>
@@ -77,9 +96,13 @@ const FloatingActionIcons: React.FC = () => {
       </View>
 
       <Modal animationType="fade" transparent visible={menuVisible} onRequestClose={closeMenu}>
-        <View style={styles.menuOverlay}>
+        <Pressable style={styles.menuOverlay} onPress={closeMenu}>
           <View style={styles.menuContainer}>
             <Text style={styles.menuTitle}>Cuenta</Text>
+            <Pressable style={styles.menuOption} onPress={handleAccount}>
+              <MaterialIcons name="manage-accounts" size={20} color={COLORS.primary} />
+              <Text style={styles.menuText}>Cuenta y seguridad</Text>
+            </Pressable>
             <Pressable style={styles.menuOption} onPress={handleProfile}>
               <MaterialIcons name="person" size={20} color={COLORS.primary} />
               <Text style={styles.menuText}>Mi perfil</Text>
@@ -92,7 +115,7 @@ const FloatingActionIcons: React.FC = () => {
               <Text style={styles.closeBtnText}>Cancelar</Text>
             </Pressable>
           </View>
-        </View>
+        </Pressable>
       </Modal>
     </>
   );
@@ -101,8 +124,8 @@ const FloatingActionIcons: React.FC = () => {
 const styles = StyleSheet.create({
   wrap: {
     position: "absolute",
-    right: 14,
-    zIndex: 20,
+    zIndex: 1000,
+    elevation: 12,
   },
   row: {
     flexDirection: "row",
@@ -116,6 +139,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surfaceTertiary,
     alignItems: "center",
     justifyContent: "center",
+    boxShadow: Platform.OS === "web" ? "0px 8px 18px rgba(20, 48, 92, 0.12)" : undefined,
   },
   badge: {
     position: "absolute",
@@ -145,12 +169,15 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primaryMuted,
     alignItems: "center",
     justifyContent: "center",
+    boxShadow: Platform.OS === "web" ? "0px 8px 18px rgba(20, 48, 92, 0.12)" : undefined,
   },
   menuOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.35)",
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: Platform.OS === "web" ? "flex-start" : "center",
+    alignItems: Platform.OS === "web" ? "flex-end" : "center",
+    paddingTop: Platform.OS === "web" ? 62 : 0,
+    paddingRight: Platform.OS === "web" ? 24 : 0,
   },
   menuContainer: {
     width: 260,

@@ -27,6 +27,7 @@ import type {
   RolGrupo,
 } from "../../../types";
 import WebScrollView from "../../components/WebScrollView";
+import CarreraSelector from "../../components/CarreraSelector";
 import { useDetalleGrupoViewModel, TabType } from "../../hooks/useDetalleGrupoViewModel";
 import { calcularEstadisticasGrupo } from "../../services/grupoReportesService";
 import StatCard from "../../components/StatCard";
@@ -973,11 +974,10 @@ const DetalleGrupoScreen: React.FC = () => {
                     value={newStudentNumeroControl}
                     onChangeText={setNewStudentNumeroControl}
                   />
-                  <TextInput
-                    style={styles.createInput}
-                    placeholder="Carrera (ISC, IGE, ARQ, ITICS)"
+                  <CarreraSelector
+                    label="Carrera"
                     value={newStudentCarrera}
-                    onChangeText={setNewStudentCarrera}
+                    onChange={setNewStudentCarrera}
                   />
                 </View>
               )}

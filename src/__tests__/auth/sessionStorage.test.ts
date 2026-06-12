@@ -10,6 +10,15 @@ jest.mock("expo-secure-store", () => ({
   deleteItemAsync: jest.fn(() => Promise.resolve()),
 }), { virtual: true });
 
+// Replace react-native with a plain, mutable Platform object. The module
+// under test only needs Platform.OS. Mutating jest-expo's own Platform via
+// Object.defineProperty did not propagate into the module on CI (Linux),
+// which left the native branch untested. A plain object is deterministic
+// across platforms. Mirrors reportesExportService.alumno.test.ts.
+jest.mock("react-native", () => ({
+  Platform: { OS: "ios" },
+}));
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 import {
@@ -18,15 +27,8 @@ import {
   LEGACY_SESSION_KEYS,
 } from "../../services/auth/sessionStorage";
 
-// jest-expo defines Platform.OS as an accessor; on Linux a data (value)
-// descriptor does not take effect in the module under test, so the native
-// branch is never exercised. Redefine via a getter to match the proven
-// pattern in RichTextEditor.test.tsx, which passes on CI (Linux).
 function setPlatformOS(os: typeof Platform.OS) {
-  Object.defineProperty(Platform, "OS", {
-    configurable: true,
-    get: () => os,
-  });
+  (Platform as { OS: typeof Platform.OS }).OS = os;
 }
 
 describe("sessionStorage", () => {

@@ -18,11 +18,14 @@ import {
   LEGACY_SESSION_KEYS,
 } from "../../services/auth/sessionStorage";
 
+// jest-expo defines Platform.OS as an accessor; on Linux a data (value)
+// descriptor does not take effect in the module under test, so the native
+// branch is never exercised. Redefine via a getter to match the proven
+// pattern in RichTextEditor.test.tsx, which passes on CI (Linux).
 function setPlatformOS(os: typeof Platform.OS) {
   Object.defineProperty(Platform, "OS", {
     configurable: true,
-    value: os,
-    writable: true,
+    get: () => os,
   });
 }
 

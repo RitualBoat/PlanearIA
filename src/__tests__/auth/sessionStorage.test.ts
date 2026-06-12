@@ -18,6 +18,14 @@ import {
   LEGACY_SESSION_KEYS,
 } from "../../services/auth/sessionStorage";
 
+function setPlatformOS(os: typeof Platform.OS) {
+  Object.defineProperty(Platform, "OS", {
+    configurable: true,
+    value: os,
+    writable: true,
+  });
+}
+
 describe("sessionStorage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -25,8 +33,8 @@ describe("sessionStorage", () => {
 
   describe("SESSION_KEYS", () => {
     it("defines secure keys per the plan spec", () => {
-      expect(SESSION_KEYS.ACCESS_TOKEN).toBe("@planearia:secure:access_token");
-      expect(SESSION_KEYS.REFRESH_TOKEN).toBe("@planearia:secure:refresh_token");
+      expect(SESSION_KEYS.ACCESS_TOKEN).toBe("planearia.secure.access_token");
+      expect(SESSION_KEYS.REFRESH_TOKEN).toBe("planearia.secure.refresh_token");
       expect(SESSION_KEYS.USER).toBe("@planearia:auth_user");
       expect(SESSION_KEYS.IS_GUEST).toBe("@planearia:is_guest");
     });
@@ -42,11 +50,17 @@ describe("sessionStorage", () => {
 
     beforeAll(() => {
       originalOS = Platform.OS;
-      Object.defineProperty(Platform, "OS", { value: "web", writable: true });
     });
 
     afterAll(() => {
-      Object.defineProperty(Platform, "OS", { value: originalOS, writable: true });
+      setPlatformOS(originalOS);
+    });
+
+    beforeEach(() => {
+      setPlatformOS("web");
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+      (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
+      (AsyncStorage.removeItem as jest.Mock).mockResolvedValue(undefined);
     });
 
     it("creates an async storage adapter on web", () => {
@@ -92,15 +106,15 @@ describe("sessionStorage", () => {
 
     beforeAll(() => {
       originalOS = Platform.OS;
-      Object.defineProperty(Platform, "OS", { value: "android", writable: true });
       SecureStore = require("expo-secure-store");
     });
 
     afterAll(() => {
-      Object.defineProperty(Platform, "OS", { value: originalOS, writable: true });
+      setPlatformOS(originalOS);
     });
 
     beforeEach(() => {
+      setPlatformOS("android");
       (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(null);
       (SecureStore.setItemAsync as jest.Mock).mockResolvedValue(undefined);
       (SecureStore.deleteItemAsync as jest.Mock).mockResolvedValue(undefined);

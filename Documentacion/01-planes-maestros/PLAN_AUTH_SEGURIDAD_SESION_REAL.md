@@ -464,8 +464,8 @@ interface LocalSessionSnapshot {
 Storage:
 
 - Native SecureStore:
-  - `@planearia:secure:access_token`
-  - `@planearia:secure:refresh_token`
+  - `planearia.secure.access_token`
+  - `planearia.secure.refresh_token`
 - AsyncStorage fallback:
   - `@planearia:auth_user`
   - `@planearia:is_guest`

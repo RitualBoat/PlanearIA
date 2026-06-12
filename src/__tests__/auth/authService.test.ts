@@ -20,10 +20,17 @@ const mockSessionStorage = {
 };
 
 jest.mock("../../services/auth/sessionStorage", () => ({
-  sessionStorage: mockSessionStorage,
+  __esModule: true,
+  sessionStorage: {
+    getToken: (key: string) => mockSessionStorage.getToken(key),
+    setToken: (key: string, value: string) =>
+      mockSessionStorage.setToken(key, value),
+    removeToken: (key: string) => mockSessionStorage.removeToken(key),
+    clearTokens: () => mockSessionStorage.clearTokens(),
+  },
   SESSION_KEYS: {
-    ACCESS_TOKEN: "@planearia:secure:access_token",
-    REFRESH_TOKEN: "@planearia:secure:refresh_token",
+    ACCESS_TOKEN: "planearia.secure.access_token",
+    REFRESH_TOKEN: "planearia.secure.refresh_token",
     USER: "@planearia:auth_user",
     IS_GUEST: "@planearia:is_guest",
   },
@@ -50,8 +57,8 @@ import {
 } from "../../services/auth/authService";
 
 const KEYS = {
-  ACCESS_TOKEN: "@planearia:secure:access_token",
-  REFRESH_TOKEN: "@planearia:secure:refresh_token",
+  ACCESS_TOKEN: "planearia.secure.access_token",
+  REFRESH_TOKEN: "planearia.secure.refresh_token",
   USER: "@planearia:auth_user",
   IS_GUEST: "@planearia:is_guest",
 };

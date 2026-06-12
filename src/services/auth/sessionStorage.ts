@@ -14,13 +14,18 @@ import { Platform } from "react-native";
 // -- Storage keys (plan spec section 5.5) --
 
 export const SESSION_KEYS = {
-  /** Secure storage: access token (JWT) */
-  ACCESS_TOKEN: "@planearia:secure:access_token",
+  /**
+   * Secure storage: access token (JWT).
+   * SecureStore keys must match /^[\w.-]+$/ -- no "@" or ":" allowed --
+   * so secure keys use dot notation, not the legacy "@planearia:" namespace.
+   * These keys are new (no prior data), so the format change needs no migration.
+   */
+  ACCESS_TOKEN: "planearia.secure.access_token",
   /** Secure storage: refresh token */
-  REFRESH_TOKEN: "@planearia:secure:refresh_token",
-  /** AsyncStorage: serialized user object */
+  REFRESH_TOKEN: "planearia.secure.refresh_token",
+  /** AsyncStorage: serialized user object (legacy key, colons valid here) */
   USER: "@planearia:auth_user",
-  /** AsyncStorage: guest flag */
+  /** AsyncStorage: guest flag (legacy key, colons valid here) */
   IS_GUEST: "@planearia:is_guest",
 } as const;
 

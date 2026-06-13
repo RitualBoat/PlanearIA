@@ -15,7 +15,7 @@ export interface MenuOption {
   icon?: string;
   iconLibrary?: "FontAwesome5" | "MaterialIcons" | "Entypo";
   color: string;
-  route?: keyof RootStackParamList;
+  route?: string;
   onPress?: () => void;
 }
 
@@ -40,28 +40,28 @@ export const useHomeViewModel = (): HomeViewModel => {
         title: "Planeaciones",
         iconImage: require("../../assets/planeacionesIco.png"),
         color: COLORS.primaryLight,
-        route: "Planeaciones" as keyof RootStackParamList,
+        route: "Planeaciones",
       },
       {
         id: "grupos",
         title: "Grupos",
         iconImage: require("../../assets/alumnosIco.png"),
         color: COLORS.success,
-        route: "Grupos" as keyof RootStackParamList,
+        route: "Grupos",
       },
       {
         id: "recursosDidacticos",
         title: "Recursos Didácticos",
         iconImage: require("../../assets/recursosIco.png"),
         color: COLORS.purple,
-        route: "RecursosDidacticos" as keyof RootStackParamList,
+        route: "RecursosDidacticos",
       },
       {
         id: "cuenta",
         title: "Cuenta",
         iconImage: require("../../assets/CuentaYseguridadIco.png"),
         color: COLORS.errorLight,
-        route: "Cuenta" as keyof RootStackParamList,
+        route: "Cuenta",
       },
     ],
     []

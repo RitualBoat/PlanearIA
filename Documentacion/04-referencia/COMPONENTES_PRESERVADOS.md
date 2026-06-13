@@ -256,8 +256,6 @@ export default AnimatedTopPill;
 | SocialScreen | `src/screens/social/SocialScreen.tsx` | Social |
 | CuentaScreen | `src/screens/cuenta/CuentaScreen.tsx` | Configuracion |
 | RecursosDidacticosScreen | `src/screens/biblioteca/RecursosDidacticosScreen.tsx` | Recursos |
-| GruposDashboardScreen | `src/screens/grupos/GruposDashboardScreen.tsx` | Grupos |
-| GruposScreen | `src/screens/grupos/GruposScreen.tsx` | Grupos |
 | NotificacionesScreen | `src/screens/notificaciones/NotificacionesScreen.tsx` | Notificaciones |
 | AyudaScreen | `src/screens/ayuda/AyudaScreen.tsx` | Ayuda |
 

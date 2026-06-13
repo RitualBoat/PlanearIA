@@ -13,9 +13,10 @@ jest.mock("@react-native-community/netinfo", () => ({
   fetch: jest.fn().mockResolvedValue({ isConnected: true, isInternetReachable: true }),
 }));
 
-const { SyncProvider, usePlaneaciones } = require("../../sync/providers/SyncProvider");
+const { AuthProvider } = require("../../context/AuthContext");
+const { PlaneacionesProvider, usePlaneaciones } = require("../../context/PlaneacionesContext");
 
-describe("SyncProvider.clonarPlaneacion", () => {
+describe("PlaneacionesContext.clonarPlaneacion", () => {
   const contextRef: { current: any } = {
     current: null,
   };
@@ -58,9 +59,11 @@ describe("SyncProvider.clonarPlaneacion", () => {
 
   it("crea copia con ID distinto, nombre con '(Copia)' y estado independiente", async () => {
     render(
-      <SyncProvider>
-        <Consumer />
-      </SyncProvider>
+      <AuthProvider>
+        <PlaneacionesProvider>
+          <Consumer />
+        </PlaneacionesProvider>
+      </AuthProvider>
     );
 
     await waitFor(() => {

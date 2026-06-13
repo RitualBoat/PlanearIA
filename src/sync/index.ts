@@ -27,6 +27,3 @@ export {
   type EngineStatus,
   type EngineResult,
 } from "./services/syncEngine";
-
-// Provider
-export { SyncProvider, useSyncPlaneaciones, usePlaneaciones } from "./providers/SyncProvider";

@@ -23,7 +23,6 @@ import DocEditorScreen from "../screens/planeaciones/DocEditorScreen";
 import EscanerPlantillaScreen from "../screens/planeaciones/EscanerPlantillaScreen";
 
 // ImportaciÃƒÂ³n de pantallas de Grupos (NUEVA ARQUITECTURA)
-import GruposScreen from "../screens/grupos/GruposScreen";
 import ListaGruposScreen from "../screens/grupos/ListaGruposScreen";
 import CrearGrupoScreen from "../screens/grupos/CrearGrupoScreen";
 import DetalleGrupoScreen from "../screens/grupos/DetalleGrupoScreen";
@@ -135,7 +134,6 @@ export type RootStackParamList = {
   ListaPlaneaciones: undefined;
 
   // NUEVA ARQUITECTURA: Grupos (reemplaza Alumnos y Calificaciones)
-  Grupos: undefined;
   ListaGrupos: undefined;
   CrearGrupo:
     | undefined
@@ -425,14 +423,6 @@ const StackNavigator: React.FC = () => {
         }}
       />
       {/* ========== GRUPOS (NUEVA ARQUITECTURA) ========== */}
-      <Stack.Screen
-        name="Grupos"
-        component={GruposScreen}
-        options={{
-          title: "Grupos",
-          headerShown: false,
-        }}
-      />
       <Stack.Screen
         name="ListaGrupos"
         component={ListaGruposScreen}

@@ -145,3 +145,23 @@ Backend nuevo: `backend/routes/unidades.js`.
 Backend modificado: `backend/api/index.js`, rutas `grupos`, `alumnos`, `asistencias`, `calificaciones`, `entregables`, `recursos`, `plantillas`, `sync`, `health`.
 
 Pruebas: `scripts/testBackendIsolation.mjs` y suites de sync/grupos/contexts actualizadas a la nueva semantica.
+
+---
+
+## 9. Fix: banner "Servidor no disponible" falso por ruta no desplegada (2026-06-13)
+
+Sintoma: con sesion real e internet, el banner naranja "Servidor no disponible. Trabajando con datos locales." aparecia de forma permanente aunque grupos/alumnos/planeaciones si sincronizaban.
+
+Causa: el orquestador sincroniza todas las entidades, incluida la nueva `/api/unidades`. Esa ruta aun no esta desplegada en el backend de Vercel, asi que su GET responde 404 ("Ruta no encontrada"). El codigo marcaba cualquier fallo de entidad como `ok = false` y eso encendia el banner global de servidor caido.
+
+Diagnostico confirmado contra el backend desplegado: `/api/health` 200, `/api/grupos|alumnos|recursos|plantillas` 401 (existen, requieren auth), `/api/unidades` 404 (no desplegada).
+
+Correccion (cliente, sin necesidad de desplegar):
+
+- `EntitySyncOutcome` y `SyncSummary` ganan `unreachable`. Solo un fallo de red o un 5xx marca `unreachable = true`. Un 4xx (404 de ruta no desplegada, 401/403) deja `ok = false` pero `unreachable = false`.
+- `SyncContext` enciende el banner de "servidor no disponible" solo cuando `summary.unreachable` es verdadero. Si el backend responde pero una entidad da 4xx, el ciclo se considera `synced` (se registra el detalle en log) y no se alarma al usuario.
+- `PlaneacionesContext.runSync` aplica la misma clasificacion.
+
+Resultado: el banner solo aparece cuando el backend esta realmente inalcanzable (Vercel/Mongo caidos o sin red). Una ruta nueva sin desplegar deja de provocar el aviso falso. Al desplegar `backend/routes/unidades.js`, las unidades empiezan a sincronizar sin cambios adicionales en el cliente.
+
+Pendiente del usuario: desplegar el backend para activar `/api/unidades` y el endurecimiento JWT en todas las rutas academicas.

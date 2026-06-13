@@ -24,6 +24,7 @@ import {
   type GenericPendingOp,
 } from "./syncEngine";
 import { emitSyncEvent } from "./syncEvents";
+import { isNetworkRequestError } from "../../utils/networkErrors";
 import logger from "../../utils/logger";
 
 export interface SyncEntityConfig {
@@ -183,6 +184,13 @@ export interface EntitySyncOutcome {
   pushed: number;
   /** Items received from the backend in the pull phase */
   pulled: number;
+  /**
+   * True only when the backend was genuinely unreachable for this entity:
+   * a network failure or a 5xx. A 4xx (e.g. a route not deployed yet -> 404,
+   * or 401/403) is an entity-level issue, NOT "server down", so it must not
+   * trigger the global offline banner.
+   */
+  unreachable: boolean;
 }
 
 export const syncEntity = async (
@@ -194,6 +202,7 @@ export const syncEntity = async (
     changed: false,
     pushed: 0,
     pulled: 0,
+    unreachable: false,
   };
 
   // 1. Push queued local mutations
@@ -209,7 +218,13 @@ export const syncEntity = async (
       method: "GET",
     });
     if (!response.ok) {
-      throw new Error(`GET ${config.endpoint} -> HTTP ${response.status}`);
+      // 5xx = server can't serve it (down/broken); 4xx = entity/route issue
+      if (response.status >= 500) {
+        outcome.unreachable = true;
+      }
+      outcome.ok = false;
+      logger.log(`[entitySync] GET ${config.endpoint} -> HTTP ${response.status}`);
+      return outcome;
     }
 
     const payload = (await response.json()) as {
@@ -239,8 +254,13 @@ export const syncEntity = async (
       emitSyncEvent({ type: "entity-updated", entity: config.entity });
     }
   } catch (error) {
-    // Never touch local data on a failed pull
+    // Never touch local data on a failed pull. A fetch exception means the
+    // backend was not reachable (offline, DNS, Vercel/Mongo down).
     outcome.ok = false;
+    outcome.unreachable = true;
+    if (!isNetworkRequestError(error)) {
+      logger.error(`[entitySync] Pull failed for ${config.entity}:`, error);
+    }
   }
 
   return outcome;
@@ -267,6 +287,8 @@ export interface SyncSummary {
   pushed: number;
   changedEntities: string[];
   failedEntities: string[];
+  /** True when at least one entity could not reach the backend (network/5xx) */
+  unreachable: boolean;
   ranAt: string;
 }
 
@@ -286,6 +308,7 @@ export const syncAllEntities = async (): Promise<SyncSummary> => {
       pushed: 0,
       changedEntities: [],
       failedEntities: [],
+      unreachable: false,
       ranAt: new Date().toISOString(),
     };
 
@@ -303,6 +326,7 @@ export const syncAllEntities = async (): Promise<SyncSummary> => {
             changed: false,
             pushed: 0,
             pulled: 0,
+            unreachable: true,
           })
         )
       )
@@ -317,6 +341,7 @@ export const syncAllEntities = async (): Promise<SyncSummary> => {
             changed: false,
             pushed: 0,
             pulled: 0,
+            unreachable: true,
           })
         )
       )
@@ -325,6 +350,7 @@ export const syncAllEntities = async (): Promise<SyncSummary> => {
     for (const outcome of [...registryOutcomes, ...customOutcomes]) {
       summary.pushed += outcome.pushed;
       if (outcome.changed) summary.changedEntities.push(outcome.entity);
+      if (outcome.unreachable) summary.unreachable = true;
       if (!outcome.ok) {
         summary.ok = false;
         summary.failedEntities.push(outcome.entity);

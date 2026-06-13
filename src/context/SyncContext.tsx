@@ -126,9 +126,21 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
           pushed: summary.pushed,
         });
 
-        if (summary.ok) {
+        // Only a genuinely unreachable backend (network failure / 5xx) drives
+        // the "servidor no disponible" banner. A single entity returning 4xx
+        // (e.g. a route not deployed yet -> 404, or a stale 401/403) must not
+        // make the whole app claim the server is down while everything else
+        // syncs fine.
+        if (!summary.unreachable) {
           setStatus("synced");
           setLastSyncAt(summary.ranAt);
+
+          if (!summary.ok) {
+            logger.log(
+              "[sync] Reachable backend, entidades con error no fatal:",
+              summary.failedEntities.join(", ")
+            );
+          }
 
           const alwaysNotify =
             reason === "login" || reason === "startup" || reason === "reconnect" || reason === "manual";
@@ -140,7 +152,7 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
             showNotice("success", "Sincronización exitosa.");
           }
         } else {
-          // Device online but backend/MongoDB unreachable or partial failure
+          // Device online but backend/MongoDB unreachable
           const wasError = statusRef.current === "error";
           setStatus("error");
           if (!wasError && reason !== "interval" && reason !== "foreground") {
@@ -149,7 +161,7 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
               "No se pudo sincronizar con el servidor. Tus cambios están guardados en este dispositivo."
             );
           }
-          logger.log("[sync] Cycle finished with errors:", summary.failedEntities.join(", "));
+          logger.log("[sync] Backend no alcanzable:", summary.failedEntities.join(", "));
         }
       } catch (error) {
         setStatus("error");

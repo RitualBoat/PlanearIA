@@ -529,8 +529,16 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
     changed: boolean;
     pushed: number;
     pulled: number;
+    unreachable: boolean;
   }> => {
-    const outcome = { entity: "planeaciones", ok: true, changed: false, pushed: 0, pulled: 0 };
+    const outcome = {
+      entity: "planeaciones",
+      ok: true,
+      changed: false,
+      pushed: 0,
+      pulled: 0,
+      unreachable: false,
+    };
 
     if (authLoading || !isSyncConfigured || !(await canSyncRemotely())) {
       setSyncStatus("idle");
@@ -567,13 +575,16 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
         await AsyncStorage.setItem(LAST_SYNC_V2_KEY, now);
         setLastSync(now);
       } else {
+        // 5xx = server down; 4xx = route/entity issue (not "server down")
         outcome.ok = false;
+        if (response.status >= 500) outcome.unreachable = true;
       }
 
       await refreshPendingCount();
-      setSyncStatus(outcome.ok ? "synced" : "error");
+      setSyncStatus(outcome.ok ? "synced" : outcome.unreachable ? "error" : "synced");
     } catch (error) {
       outcome.ok = false;
+      outcome.unreachable = true;
       if (isNetworkRequestError(error)) {
         logger.debug("[planeaciones-context] Backend no disponible en forceSync, modo offline.");
         setIsOnline(false);

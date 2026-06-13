@@ -18,6 +18,9 @@ jest.mock("react-native-safe-area-context", () => {
   };
 });
 
+// Presentational back button uses useNavigation; stub it (no NavigationContainer here)
+jest.mock("../../components/ScreenBackButton", () => "ScreenBackButton");
+
 jest.mock("../../context/ThemeContext", () => ({
   useTheme: () => ({
     colors: {

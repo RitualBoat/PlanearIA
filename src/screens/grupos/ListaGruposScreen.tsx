@@ -17,6 +17,7 @@ import { COLORS, Grupo } from "../../../types";
 import { useGrupos } from "../../hooks/useGrupos";
 import { isWeb } from "../../utils/responsive";
 import WebScrollView from "../../components/WebScrollView";
+import ScreenBackButton from "../../components/ScreenBackButton";
 
 type ListaGruposScreenNavigationProp = StackNavigationProp<RootStackParamList, "ListaGrupos">;
 
@@ -93,6 +94,7 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
 
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
+          <ScreenBackButton style={{ marginLeft: -8, marginBottom: 2 }} />
           <Text style={styles.title}>Mis Grupos</Text>
           <Text style={styles.subtitle}>{conteoGrupos} grupos activos</Text>
 

@@ -214,12 +214,10 @@ describe("syncEngine", () => {
       expect(result.success).toBe(false);
     });
 
-    it("no procesa nada cuando no hay conectividad", async () => {
-      const NetInfo = require("@react-native-community/netinfo");
-      NetInfo.fetch.mockResolvedValueOnce({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+    it("conserva la cola sin consumir reintentos cuando no hay conectividad", async () => {
+      // Limpia mockResolvedValueOnce sin consumir de tests anteriores
+      (AsyncStorage.getItem as jest.Mock).mockReset();
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
 
       const op: GenericPendingOp<TestItem> = {
         opId: "offline_op",
@@ -232,10 +230,22 @@ describe("syncEngine", () => {
         failed: false,
       };
       mockStorageGet([op]);
+      // El request es la prueba real de conectividad (NetInfo no es confiable)
+      mockFetch.mockRejectedValueOnce(new Error("Network request failed"));
 
       const result = await flushQueue(ENTITY);
-      expect(result.success).toBe(false);
-      expect(mockFetch).not.toHaveBeenCalled();
+
+      expect(result.processed).toBe(0);
+      expect(result.skipped).toBe(1);
+
+      // La operacion sigue en cola, intacta (sin retry consumido)
+      const setItemCalls = (AsyncStorage.setItem as jest.Mock).mock.calls;
+      const persistedQueue: GenericPendingOp[] = JSON.parse(
+        setItemCalls[setItemCalls.length - 1][1] as string
+      );
+      expect(persistedQueue).toHaveLength(1);
+      expect(persistedQueue[0].retries).toBe(0);
+      expect(persistedQueue[0].failed).toBe(false);
     });
   });
 

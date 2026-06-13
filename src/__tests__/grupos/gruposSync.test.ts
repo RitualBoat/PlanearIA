@@ -8,12 +8,19 @@ import {
 // API is configured (deployed scenario).
 jest.mock("../../sync/config/apiConfig", () => ({
   isAPIConfigured: () => true,
+  SYNC_CONFIG: { debugMode: false },
+}));
+
+// Authenticated session: sync requires a real token.
+jest.mock("../../services/auth", () => ({
+  getAccessToken: jest.fn().mockResolvedValue("test-jwt-token"),
 }));
 
 // NetInfo reports NOT connected, mimicking unreliable web connectivity.
 // The fix must still attempt the real request instead of gating on this.
 jest.mock("@react-native-community/netinfo", () => ({
   fetch: jest.fn().mockResolvedValue({ isConnected: false, isInternetReachable: false }),
+  addEventListener: jest.fn(() => jest.fn()),
 }));
 
 const mockApiRequest = jest.fn();

@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
+import ScreenBackButton from "../../components/ScreenBackButton";
 import { useListaPlaneacionesViewModel } from "../../hooks/useListaPlaneacionesViewModel";
 import type { PlaneacionDocumento } from "../../../types/planeacionV2";
 import { NivelAcademico } from "../../../types/planeacionV2";
@@ -169,7 +170,10 @@ const ListaPlaneacionesScreen: React.FC = () => {
     <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}> 
       <View style={styles.header}>
         <View style={styles.headerTitleWrap}>
-          <Text style={[styles.title, { color: colors.onSurface }]}>Mis planeaciones</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <ScreenBackButton style={{ marginLeft: -8 }} color={colors.onSurface} />
+            <Text style={[styles.title, { color: colors.onSurface }]}>Mis planeaciones</Text>
+          </View>
           <Text style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
             {vm.documentosFiltrados.length} de {vm.documentos.length}
           </Text>

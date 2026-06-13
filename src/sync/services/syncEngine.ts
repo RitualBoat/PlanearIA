@@ -9,7 +9,6 @@
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import NetInfo from "@react-native-community/netinfo";
 import { SYNC_CONFIG } from "../config/apiConfig";
 import { apiRequest } from "../../utils/apiClient";
 import logger from "../../utils/logger";
@@ -59,6 +58,17 @@ const generateOpId = (): string =>
 const getStorageKey = (entity: string): string =>
   `${SYNC_PENDING_OPS_STORAGE_PREFIX}${entity}`;
 
+// Per-entity promise chain. enqueue and flush both read-modify-write the
+// same AsyncStorage key; running them concurrently can drop operations.
+const queueLocks = new Map<string, Promise<unknown>>();
+
+const withQueueLock = async <T>(entity: string, fn: () => Promise<T>): Promise<T> => {
+  const previous = queueLocks.get(entity) ?? Promise.resolve();
+  const next = previous.then(fn, fn);
+  queueLocks.set(entity, next.catch(() => undefined));
+  return next;
+};
+
 // ─── API pública del motor ────────────────────────────────────────────────────
 
 /**
@@ -71,7 +81,7 @@ export const enqueueOperation = async <T extends { id?: unknown }>(
   endpoint: string,
   type: EngineOperation,
   payload: T | null
-): Promise<void> => {
+): Promise<void> => withQueueLock(entity, async () => {
   const key = getStorageKey(entity);
   const raw = await AsyncStorage.getItem(key);
   const queue: GenericPendingOp<T>[] = raw ? JSON.parse(raw) : [];
@@ -104,7 +114,7 @@ export const enqueueOperation = async <T extends { id?: unknown }>(
   if (SYNC_CONFIG.debugMode) {
     logger.log(`[syncEngine] Enqueued ${type} for ${entity} (${newOp.opId})`);
   }
-};
+});
 
 /**
  * Obtiene las operaciones pendientes de una entidad.
@@ -150,7 +160,7 @@ export const clearFailedOps = async (): Promise<void> => {
 export const flushQueue = async (
   entity: string,
   methodMap: Partial<Record<EngineOperation, string>> = {}
-): Promise<EngineResult> => {
+): Promise<EngineResult> => withQueueLock(entity, async () => {
   const result: EngineResult = {
     success: true,
     processed: 0,
@@ -158,17 +168,9 @@ export const flushQueue = async (
     errors: [],
   };
 
-  // Verificar conectividad antes de intentar
-  const netState = await NetInfo.fetch();
-  const isOnline =
-    netState.isConnected === true && netState.isInternetReachable !== false;
-
-  if (!isOnline) {
-    if (SYNC_CONFIG.debugMode) {
-      logger.log(`[syncEngine] Offline — flush de ${entity} postponido`);
-    }
-    return { ...result, success: false };
-  }
+  // No connectivity pre-check: NetInfo is unreliable (especially on web),
+  // so the request itself is the connectivity test. Network failures keep
+  // the ops queued without consuming retries.
 
   const key = getStorageKey(entity);
   const queue: GenericPendingOp[] = await getPendingOps(entity);
@@ -179,8 +181,15 @@ export const flushQueue = async (
 
   const remaining: GenericPendingOp[] = [];
   const newFailed: GenericPendingOp[] = [];
+  let unreachable = false;
 
   for (const op of queue) {
+    if (unreachable) {
+      // Connectivity already failed in this cycle; keep the rest intact
+      remaining.push(op);
+      result.skipped++;
+      continue;
+    }
     const httpMethod =
       methodMap[op.type] ??
       (op.type === "create"
@@ -206,26 +215,47 @@ export const flushQueue = async (
       if (response.ok) {
         result.processed++;
         if (SYNC_CONFIG.debugMode) {
-          logger.log(`[syncEngine] ✓ ${op.type} ${entity} ${op.opId}`);
+          logger.log(`[syncEngine] ${op.type} ${entity} ${op.opId} ok`);
         }
       } else {
+        // Client errors (400/403/404...) will not fix themselves by
+        // retrying; drop the op to the failed queue right away. 401 may
+        // recover after a token refresh and 408/429 are transient.
+        const permanent =
+          response.status >= 400 &&
+          response.status < 500 &&
+          ![401, 408, 429].includes(response.status);
+        if (permanent) {
+          logger.error(
+            `[syncEngine] ${op.type} ${entity} rechazado con HTTP ${response.status}, no se reintenta`
+          );
+          newFailed.push({ ...op, retries: op.retries + 1, failed: true });
+          result.errors.push(`${entity}/${op.type} rechazado: HTTP ${response.status}`);
+          continue;
+        }
         throw new Error(`HTTP ${response.status}`);
       }
     } catch (err) {
+      if (isNetworkRequestError(err)) {
+        // Offline or backend down: not a server rejection. Keep the op
+        // intact (no retry penalty) and stop hitting the network.
+        remaining.push(op);
+        result.skipped++;
+        unreachable = true;
+        if (SYNC_CONFIG.debugMode) {
+          logger.log(`[syncEngine] Sin conexion durante flush de ${entity}, ops en cola`);
+        }
+        continue;
+      }
+
       const nextRetries = op.retries + 1;
 
       if (nextRetries >= MAX_RETRIES) {
         // Marcar como fallida y mover a cola de errores
-        if (isNetworkRequestError(err)) {
-          logger.debug(
-            `[syncEngine] ${op.type} ${entity} agoto reintentos por backend no disponible.`
-          );
-        } else {
-          logger.error(
-            `[syncEngine] ✗ ${op.type} ${entity} superó MAX_RETRIES (${MAX_RETRIES})`,
-            err
-          );
-        }
+        logger.error(
+          `[syncEngine] ${op.type} ${entity} supero MAX_RETRIES (${MAX_RETRIES})`,
+          err
+        );
         newFailed.push({ ...op, retries: nextRetries, failed: true });
         result.errors.push(
           `${entity}/${op.type} falló después de ${MAX_RETRIES} intentos`
@@ -257,7 +287,7 @@ export const flushQueue = async (
   }
 
   return result;
-};
+});
 
 /**
  * Resolución de conflictos Last-Write-Wins.

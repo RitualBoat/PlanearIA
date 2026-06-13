@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { Grupo } from "../../types";
+import { onSyncEvent } from "../sync/services/syncEvents";
 import {
   obtenerGrupos as obtenerGruposServicio,
   agregarGrupo as agregarGrupoServicio,
@@ -95,6 +96,17 @@ export const GruposProvider: React.FC<GruposProviderProps> = ({ children }) => {
   useEffect(() => {
     void syncGrupos();
   }, [syncGrupos]);
+
+  // A pull from the backend rewrote local storage: refresh state silently
+  useEffect(() => {
+    return onSyncEvent((event) => {
+      if (event.type !== "entity-updated" || event.entity !== "grupos") return;
+      void obtenerGruposServicio().then((data) => {
+        setGrupos(data);
+      });
+      void refreshSyncMeta();
+    });
+  }, [refreshSyncMeta]);
 
   const agregarGrupo = useCallback(
     async (grupo: Partial<Grupo>) => {

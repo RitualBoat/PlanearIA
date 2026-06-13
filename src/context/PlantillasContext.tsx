@@ -1,9 +1,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Plantilla } from "../../types";
-import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
+import { SYNC_ENTITIES, queueEntityOperation } from "../sync/services/entitySync";
+import { onSyncEvent } from "../sync/services/syncEvents";
+import { generateNumericId } from "../utils/generateId";
 
-const PLANTILLAS_STORAGE_KEY = "@planearia:plantillas";
+const PLANTILLAS_STORAGE_KEY = SYNC_ENTITIES.plantillas.storageKey;
 
 interface PlantillasContextData {
   plantillas: Plantilla[];
@@ -32,54 +34,6 @@ const parseStored = (raw: string | null): Plantilla[] => {
   return parsed as Plantilla[];
 };
 
-const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<Response> => {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    "X-API-Key": API_CONFIG.apiSecret,
-    ...options.headers,
-  };
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-
-  try {
-    const response = await fetch(`${API_CONFIG.baseUrl}${endpoint}`, {
-      ...options,
-      headers,
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
-};
-
-const syncPlantillaRemoto = async (
-  type: "create" | "update" | "delete",
-  payload: Partial<Plantilla>
-): Promise<boolean> => {
-  if (!isAPIConfigured()) return true;
-
-  try {
-    if (type === "delete") {
-      await apiRequest(`/api/plantillas?id=${payload.id}`, {
-        method: "DELETE",
-      });
-      return true;
-    }
-
-    await apiRequest("/api/plantillas", {
-      method: type === "create" ? "POST" : "PUT",
-      body: JSON.stringify(payload),
-    });
-    return true;
-  } catch {
-    return false;
-  }
-};
-
 export const PlantillasProvider: React.FC<PlantillasProviderProps> = ({ children }) => {
   const [plantillas, setPlantillas] = useState<Plantilla[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -102,6 +56,16 @@ export const PlantillasProvider: React.FC<PlantillasProviderProps> = ({ children
     void loadPlantillas();
   }, [loadPlantillas]);
 
+  // A pull from the backend rewrote local storage: refresh state silently
+  useEffect(() => {
+    return onSyncEvent((event) => {
+      if (event.type !== "entity-updated" || event.entity !== "plantillas") return;
+      void AsyncStorage.getItem(PLANTILLAS_STORAGE_KEY).then((raw) => {
+        setPlantillas(parseStored(raw));
+      });
+    });
+  }, []);
+
   const savePlantillas = useCallback(async (updated: Plantilla[]) => {
     setPlantillas(updated);
     await AsyncStorage.setItem(PLANTILLAS_STORAGE_KEY, JSON.stringify(updated));
@@ -111,11 +75,10 @@ export const PlantillasProvider: React.FC<PlantillasProviderProps> = ({ children
     async (
       plantilla: Omit<Plantilla, "id"> & { id?: number }
     ): Promise<{ plantilla: Plantilla; syncOk: boolean }> => {
-      const newId = plantilla.id ?? Date.now();
-      const nueva: Plantilla = { ...plantilla, id: newId } as Plantilla;
+      const nueva: Plantilla = { ...plantilla, id: plantilla.id ?? generateNumericId() } as Plantilla;
       const updated = [...plantillas, nueva];
       await savePlantillas(updated);
-      const syncOk = await syncPlantillaRemoto("create", nueva);
+      const syncOk = await queueEntityOperation(SYNC_ENTITIES.plantillas, "create", nueva);
       return { plantilla: nueva, syncOk };
     },
     [plantillas, savePlantillas]
@@ -123,9 +86,11 @@ export const PlantillasProvider: React.FC<PlantillasProviderProps> = ({ children
 
   const actualizarPlantilla = useCallback(
     async (id: number, cambios: Partial<Plantilla>): Promise<{ syncOk: boolean }> => {
-      const updated = plantillas.map((p) => (p.id === id ? { ...p, ...cambios } : p));
+      const actual = plantillas.find((p) => p.id === id);
+      const merged = { ...actual, ...cambios, id } as Plantilla;
+      const updated = plantillas.map((p) => (p.id === id ? merged : p));
       await savePlantillas(updated);
-      const syncOk = await syncPlantillaRemoto("update", { id, ...cambios });
+      const syncOk = await queueEntityOperation(SYNC_ENTITIES.plantillas, "update", merged);
       return { syncOk };
     },
     [plantillas, savePlantillas]
@@ -135,7 +100,7 @@ export const PlantillasProvider: React.FC<PlantillasProviderProps> = ({ children
     async (id: number): Promise<void> => {
       const updated = plantillas.filter((p) => p.id !== id);
       await savePlantillas(updated);
-      await syncPlantillaRemoto("delete", { id });
+      await queueEntityOperation(SYNC_ENTITIES.plantillas, "delete", { id });
     },
     [plantillas, savePlantillas]
   );

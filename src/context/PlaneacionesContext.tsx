@@ -8,7 +8,6 @@ import React, {
   type ReactNode,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import NetInfo from "@react-native-community/netinfo";
 import { useAuth } from "./AuthContext";
 import {
   type Planeacion,
@@ -34,10 +33,15 @@ import {
   enqueueOperation,
   flushQueue,
   getPendingOps,
-  mergeWithLocal,
 } from "../sync/services/syncEngine";
+import {
+  canSyncRemotely,
+  reconcileWithPending,
+  registerSyncTask,
+} from "../sync/services/entitySync";
+import { getIsOnline, subscribeConnectivity } from "../sync/services/connectivity";
 import { apiRequest } from "../utils/apiClient";
-import { STORAGE_KEYS, SYNC_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
+import { STORAGE_KEYS, isAPIConfigured } from "../sync/config/apiConfig";
 import logger from "../utils/logger";
 import { isNetworkRequestError } from "../utils/networkErrors";
 
@@ -504,41 +508,49 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
     [refreshPendingCount, saveLocal]
   );
 
-  const mergeRemoteChanges = useCallback(
-    async (remoteDocs: PlaneacionDocumento[]) => {
-      if (!remoteDocs.length) return;
-      const merged = mergeWithLocal(documentos, remoteDocs);
-      await saveLocal(merged);
-      setDocumentos(merged);
+  const applyRemoteList = useCallback(
+    async (remoteDocs: PlaneacionDocumento[]): Promise<boolean> => {
+      // Full-list reconcile: the server list is authoritative except for
+      // docs with queued local work, so cross-device deletes propagate
+      const pending = await getPendingOps("planeaciones");
+      const next = reconcileWithPending(documentos, remoteDocs, pending);
+      const changed = JSON.stringify(next) !== JSON.stringify(documentos);
+      if (changed) {
+        await saveLocal(next);
+        setDocumentos(next);
+      }
+      return changed;
     },
     [documentos, saveLocal]
   );
 
-  const forceSync = useCallback(async () => {
-    if (authLoading) return;
-    if (!isSyncConfigured) {
+  const runSync = useCallback(async (): Promise<{
+    ok: boolean;
+    changed: boolean;
+    pushed: number;
+    pulled: number;
+  }> => {
+    const outcome = { entity: "planeaciones", ok: true, changed: false, pushed: 0, pulled: 0 };
+
+    if (authLoading || !isSyncConfigured || !(await canSyncRemotely())) {
       setSyncStatus("idle");
-      return;
+      return outcome;
     }
 
-    const state = await NetInfo.fetch();
-    const connected = state.isConnected === true && state.isInternetReachable !== false;
+    const connected = await getIsOnline();
     setIsOnline(connected);
-    if (!connected) {
-      setSyncStatus("offline");
-      return;
-    }
 
     try {
       setSyncStatus("syncing");
 
       const flushResult = await flushQueue("planeaciones");
+      outcome.pushed = flushResult.processed;
+      if (!flushResult.success || flushResult.skipped > 0) {
+        outcome.ok = false;
+      }
 
-      const localLastSync = await AsyncStorage.getItem(LAST_SYNC_V2_KEY);
-      const query = localLastSync
-        ? `?desde=${encodeURIComponent(localLastSync)}&limit=500`
-        : "?limit=500";
-      const response = await apiRequest(`/api/planeaciones${query}`, { method: "GET" });
+      // Full list (not incremental) so deletes on other devices propagate
+      const response = await apiRequest("/api/planeaciones?limit=500", { method: "GET" });
 
       if (response.ok) {
         const data = await response.json();
@@ -548,26 +560,36 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
         const normalizedRemote = remote
           .map((doc) => normalizeInputToV2(doc, userId))
           .filter((doc) => doc.userId === userId);
-        await mergeRemoteChanges(normalizedRemote);
+        outcome.pulled = normalizedRemote.length;
+        outcome.changed = await applyRemoteList(normalizedRemote);
+
+        const now = new Date().toISOString();
+        await AsyncStorage.setItem(LAST_SYNC_V2_KEY, now);
+        setLastSync(now);
+      } else {
+        outcome.ok = false;
       }
 
-      const now = new Date().toISOString();
-      await AsyncStorage.setItem(LAST_SYNC_V2_KEY, now);
-      setLastSync(now);
       await refreshPendingCount();
-
-      setSyncStatus(flushResult.success ? "synced" : "error");
+      setSyncStatus(outcome.ok ? "synced" : "error");
     } catch (error) {
+      outcome.ok = false;
       if (isNetworkRequestError(error)) {
         logger.debug("[planeaciones-context] Backend no disponible en forceSync, modo offline.");
         setIsOnline(false);
         setSyncStatus("offline");
-        return;
+        return outcome;
       }
       logger.error("[planeaciones-context] Error en forceSync", error);
       setSyncStatus("error");
     }
-  }, [authLoading, isSyncConfigured, mergeRemoteChanges, refreshPendingCount, userId]);
+
+    return outcome;
+  }, [authLoading, isSyncConfigured, applyRemoteList, refreshPendingCount, userId]);
+
+  const forceSync = useCallback(async () => {
+    await runSync();
+  }, [runSync]);
 
   const crear = useCallback(
     async (doc: PlaneacionDocumento) => {
@@ -769,28 +791,23 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
     loadFromStorage();
   }, [authLoading, loadFromStorage]);
 
+  // Connectivity for the local badge; the global orchestrator owns the
+  // sync cadence (startup, login, reconnect, polling)
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      const connected = state.isConnected === true && state.isInternetReachable !== false;
+    const unsubscribe = subscribeConnectivity((connected) => {
       setIsOnline(connected);
-      if (connected) {
-        void forceSync();
-      } else {
-        setSyncStatus("offline");
-      }
+      if (!connected) setSyncStatus("offline");
     });
-    return () => unsubscribe();
-  }, [forceSync]);
+    return unsubscribe;
+  }, []);
 
+  // Planeaciones joins the orchestrator's sync cycle as a custom task
   useEffect(() => {
-    if (!isSyncConfigured) return undefined;
-    const interval = setInterval(() => {
-      if (isOnline) {
-        void forceSync();
-      }
-    }, SYNC_CONFIG.autoSyncInterval);
-    return () => clearInterval(interval);
-  }, [forceSync, isOnline, isSyncConfigured]);
+    return registerSyncTask("planeaciones", async () => {
+      const outcome = await runSync();
+      return { entity: "planeaciones", ...outcome };
+    });
+  }, [runSync]);
 
   useEffect(() => {
     const interval = setInterval(() => {

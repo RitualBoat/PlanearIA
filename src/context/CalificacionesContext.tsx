@@ -1,9 +1,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Calificacion } from "../../types";
-import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
+import { SYNC_ENTITIES, queueEntityOperation } from "../sync/services/entitySync";
+import { onSyncEvent } from "../sync/services/syncEvents";
+import { generateNumericId } from "../utils/generateId";
 
-const CALIFICACIONES_STORAGE_KEY = "@planearia:calificaciones";
+const CALIFICACIONES_STORAGE_KEY = SYNC_ENTITIES.calificaciones.storageKey;
 
 interface CalificacionesContextData {
   calificaciones: Calificacion[];
@@ -39,52 +41,6 @@ const parseStored = (raw: string | null): Calificacion[] => {
   return parsed as Calificacion[];
 };
 
-const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<Response> => {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    "X-API-Key": API_CONFIG.apiSecret,
-    ...options.headers,
-  };
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-
-  try {
-    const response = await fetch(`${API_CONFIG.baseUrl}${endpoint}`, {
-      ...options,
-      headers,
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
-};
-
-const syncCalificacionRemoto = async (
-  type: "create" | "update" | "delete",
-  payload: Partial<Calificacion> | Partial<Calificacion>[]
-): Promise<boolean> => {
-  if (!isAPIConfigured()) return true;
-
-  try {
-    if (type === "delete" && !Array.isArray(payload)) {
-      await apiRequest(`/api/calificaciones?id=${payload.id}`, { method: "DELETE" });
-      return true;
-    }
-
-    await apiRequest("/api/calificaciones", {
-      method: type === "create" ? "POST" : "PUT",
-      body: JSON.stringify(payload),
-    });
-    return true;
-  } catch {
-    return false;
-  }
-};
-
 export const CalificacionesProvider: React.FC<CalificacionesProviderProps> = ({ children }) => {
   const [calificaciones, setCalificaciones] = useState<Calificacion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -114,16 +70,24 @@ export const CalificacionesProvider: React.FC<CalificacionesProviderProps> = ({ 
     void reloadCalificaciones();
   }, [reloadCalificaciones]);
 
+  // A pull from the backend rewrote local storage: refresh state silently
+  useEffect(() => {
+    return onSyncEvent((event) => {
+      if (event.type !== "entity-updated" || event.entity !== "calificaciones") return;
+      void AsyncStorage.getItem(CALIFICACIONES_STORAGE_KEY).then((raw) => {
+        setCalificaciones(parseStored(raw));
+      });
+    });
+  }, []);
+
   const registrarCalificacion = useCallback(
     async (
       calificacion: Omit<Calificacion, "id"> & { id?: number }
     ): Promise<{ calificacion: Calificacion; syncOk: boolean }> => {
-      const nextId =
-        calificacion.id ?? calificaciones.reduce((max, item) => Math.max(max, item.id), 0) + 1;
-      const nueva: Calificacion = { ...calificacion, id: nextId };
+      const nueva: Calificacion = { ...calificacion, id: calificacion.id ?? generateNumericId() };
 
       await persist([...calificaciones, nueva]);
-      const syncOk = await syncCalificacionRemoto("create", nueva);
+      const syncOk = await queueEntityOperation(SYNC_ENTITIES.calificaciones, "create", nueva);
       return { calificacion: nueva, syncOk };
     },
     [calificaciones, persist]
@@ -133,18 +97,31 @@ export const CalificacionesProvider: React.FC<CalificacionesProviderProps> = ({ 
     async (
       registros: (Omit<Calificacion, "id"> & { id?: number })[]
     ): Promise<{ syncOk: boolean }> => {
-      let baseId = calificaciones.reduce((max, item) => Math.max(max, item.id), 0) + 1;
       const nuevas: Calificacion[] = registros.map((reg) => {
-        const id = reg.id ?? baseId++;
+        const id = reg.id ?? generateNumericId();
         return { ...reg, id } as Calificacion;
       });
 
       // Remove existing records for same grupo+alumno to allow re-registering
       const keys = new Set(nuevas.map((c) => `${c.grupoId}-${c.alumnoId}`));
+      const reemplazadas = calificaciones.filter((c) => keys.has(`${c.grupoId}-${c.alumnoId}`));
       const filtered = calificaciones.filter((c) => !keys.has(`${c.grupoId}-${c.alumnoId}`));
 
       await persist([...filtered, ...nuevas]);
-      const syncOk = await syncCalificacionRemoto("create", nuevas);
+
+      // The replaced records must also disappear from the backend or the
+      // next pull would resurrect them
+      let syncOk = true;
+      for (const reemplazada of reemplazadas) {
+        const ok = await queueEntityOperation(SYNC_ENTITIES.calificaciones, "delete", {
+          id: reemplazada.id,
+        });
+        syncOk = syncOk && ok;
+      }
+      for (const nueva of nuevas) {
+        const ok = await queueEntityOperation(SYNC_ENTITIES.calificaciones, "create", nueva);
+        syncOk = syncOk && ok;
+      }
       return { syncOk };
     },
     [calificaciones, persist]
@@ -152,9 +129,11 @@ export const CalificacionesProvider: React.FC<CalificacionesProviderProps> = ({ 
 
   const actualizarCalificacion = useCallback(
     async (id: number, cambios: Partial<Calificacion>) => {
-      const next = calificaciones.map((c) => (c.id === id ? { ...c, ...cambios } : c));
+      const actual = calificaciones.find((c) => c.id === id);
+      const merged = { ...actual, ...cambios, id } as Calificacion;
+      const next = calificaciones.map((c) => (c.id === id ? merged : c));
       await persist(next);
-      const syncOk = await syncCalificacionRemoto("update", { id, ...cambios });
+      const syncOk = await queueEntityOperation(SYNC_ENTITIES.calificaciones, "update", merged);
       return { syncOk };
     },
     [calificaciones, persist]
@@ -164,7 +143,7 @@ export const CalificacionesProvider: React.FC<CalificacionesProviderProps> = ({ 
     async (id: number) => {
       const next = calificaciones.filter((c) => c.id !== id);
       await persist(next);
-      await syncCalificacionRemoto("delete", { id });
+      await queueEntityOperation(SYNC_ENTITIES.calificaciones, "delete", { id });
     },
     [calificaciones, persist]
   );

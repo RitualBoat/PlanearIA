@@ -1,9 +1,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Recurso } from "../../types";
-import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
+import { SYNC_ENTITIES, queueEntityOperation } from "../sync/services/entitySync";
+import { onSyncEvent } from "../sync/services/syncEvents";
+import { generateNumericId } from "../utils/generateId";
 
-const RECURSOS_STORAGE_KEY = "@planearia:recursos";
+const RECURSOS_STORAGE_KEY = SYNC_ENTITIES.recursos.storageKey;
 
 interface RecursosContextData {
   recursos: Recurso[];
@@ -30,54 +32,6 @@ const parseStored = (raw: string | null): Recurso[] => {
   const parsed = JSON.parse(raw) as unknown;
   if (!Array.isArray(parsed)) return [];
   return parsed as Recurso[];
-};
-
-const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<Response> => {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    "X-API-Key": API_CONFIG.apiSecret,
-    ...options.headers,
-  };
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-
-  try {
-    const response = await fetch(`${API_CONFIG.baseUrl}${endpoint}`, {
-      ...options,
-      headers,
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
-};
-
-const syncRecursoRemoto = async (
-  type: "create" | "update" | "delete",
-  payload: Partial<Recurso>
-): Promise<boolean> => {
-  if (!isAPIConfigured()) return true;
-
-  try {
-    if (type === "delete") {
-      await apiRequest(`/api/recursos?id=${payload.id}`, {
-        method: "DELETE",
-      });
-      return true;
-    }
-
-    await apiRequest("/api/recursos", {
-      method: type === "create" ? "POST" : "PUT",
-      body: JSON.stringify(payload),
-    });
-    return true;
-  } catch {
-    return false;
-  }
 };
 
 export const RecursosProvider: React.FC<RecursosProviderProps> = ({ children }) => {
@@ -109,16 +63,24 @@ export const RecursosProvider: React.FC<RecursosProviderProps> = ({ children }) 
     void reloadRecursos();
   }, [reloadRecursos]);
 
+  // A pull from the backend rewrote local storage: refresh state silently
+  useEffect(() => {
+    return onSyncEvent((event) => {
+      if (event.type !== "entity-updated" || event.entity !== "recursos") return;
+      void AsyncStorage.getItem(RECURSOS_STORAGE_KEY).then((raw) => {
+        setRecursos(parseStored(raw));
+      });
+    });
+  }, []);
+
   const crearRecurso = useCallback(
     async (
       recurso: Omit<Recurso, "id"> & { id?: number }
     ): Promise<{ recurso: Recurso; syncOk: boolean }> => {
-      const nextId =
-        recurso.id ?? recursos.reduce((max, item) => Math.max(max, item.id as number), 0) + 1;
-      const nuevo: Recurso = { ...recurso, id: nextId };
+      const nuevo: Recurso = { ...recurso, id: recurso.id ?? generateNumericId() };
 
       await persist([...recursos, nuevo]);
-      const syncOk = await syncRecursoRemoto("create", nuevo);
+      const syncOk = await queueEntityOperation(SYNC_ENTITIES.recursos, "create", nuevo);
       return { recurso: nuevo, syncOk };
     },
     [recursos, persist]
@@ -126,9 +88,13 @@ export const RecursosProvider: React.FC<RecursosProviderProps> = ({ children }) 
 
   const actualizarRecurso = useCallback(
     async (id: number, cambios: Partial<Recurso>) => {
-      const next = recursos.map((r) => (r.id === id ? { ...r, ...cambios } : r));
+      const actual = recursos.find((r) => r.id === id);
+      const merged = { ...actual, ...cambios, id } as Recurso;
+      const next = recursos.map((r) => (r.id === id ? merged : r));
       await persist(next);
-      const syncOk = await syncRecursoRemoto("update", { id, ...cambios });
+      // Full doc: the backend upserts, so a partial patch could leave an
+      // incomplete document if the create never reached the server
+      const syncOk = await queueEntityOperation(SYNC_ENTITIES.recursos, "update", merged);
       return { syncOk };
     },
     [recursos, persist]
@@ -138,7 +104,7 @@ export const RecursosProvider: React.FC<RecursosProviderProps> = ({ children }) 
     async (id: number) => {
       const next = recursos.filter((r) => r.id !== id);
       await persist(next);
-      await syncRecursoRemoto("delete", { id });
+      await queueEntityOperation(SYNC_ENTITIES.recursos, "delete", { id });
     },
     [recursos, persist]
   );

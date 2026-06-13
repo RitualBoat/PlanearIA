@@ -13,11 +13,17 @@ jest.mock("../../sync/config/apiConfig", () => ({
     apiSecret: "",
     timeout: 1000,
   },
+  SYNC_CONFIG: { debugMode: false },
   isAPIConfigured: () => false,
+}));
+
+jest.mock("../../services/auth", () => ({
+  getAccessToken: jest.fn().mockResolvedValue(null),
 }));
 
 jest.mock("@react-native-community/netinfo", () => ({
   fetch: jest.fn().mockResolvedValue({ isConnected: true, isInternetReachable: true }),
+  addEventListener: jest.fn(() => jest.fn()),
 }));
 
 const storage: Record<string, string> = {};
@@ -57,7 +63,8 @@ describe("gruposService", () => {
     const grupos = await obtenerGrupos();
 
     expect(grupos).toHaveLength(1);
-    expect(grupos[0].id).toBe(1);
+    // Cross-device-safe ids are timestamp-based, not sequential
+    expect(typeof grupos[0].id).toBe("number");
     expect(grupos[0].nombre).toBe("7A - Matematicas");
     expect(AsyncStorage.setItem).toHaveBeenCalled();
   });

@@ -3,6 +3,7 @@ import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, Text, V
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
+import ScreenBackButton from "../../components/ScreenBackButton";
 import { useCrearPlaneacionViewModel } from "../../hooks/useCrearPlaneacionViewModel";
 
 const CrearPlaneacionScreen: React.FC = () => {
@@ -18,6 +19,7 @@ const CrearPlaneacionScreen: React.FC = () => {
         keyboardShouldPersistTaps="handled"
         style={[styles.scrollView, isWeb && styles.webScrollView]}
       >
+        <ScreenBackButton style={{ marginLeft: -8 }} color={colors.onSurface} />
         <Text style={[styles.title, { color: colors.onSurface }]}>Crear planeacion</Text>
         <Text style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
           Selecciona una plantilla y abre directamente el documento en DocEditor.

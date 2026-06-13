@@ -4,6 +4,9 @@ import ListaGruposScreen from "../../screens/grupos/ListaGruposScreen";
 
 jest.mock("@expo/vector-icons/MaterialIcons", () => "MaterialIcons");
 
+// Presentational back button uses useNavigation; stub it (no NavigationContainer here)
+jest.mock("../../components/ScreenBackButton", () => "ScreenBackButton");
+
 const mockSetSearchQuery = jest.fn();
 
 jest.mock("../../hooks/useGrupos", () => ({

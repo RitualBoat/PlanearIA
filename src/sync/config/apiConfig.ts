@@ -64,6 +64,13 @@ export const SYNC_CONFIG = {
   autoSyncInterval: 60000,
 
   /**
+   * Intervalo de polling del orquestador global cuando la app está activa.
+   * Corto para que los cambios de otro dispositivo aparezcan casi al
+   * instante (demo cross-device). Vercel/M0 free tier lo soporta.
+   */
+  pollInterval: 12000,
+
+  /**
    * Tiempo máximo de espera para requests (ms)
    */
   requestTimeout: 15000,

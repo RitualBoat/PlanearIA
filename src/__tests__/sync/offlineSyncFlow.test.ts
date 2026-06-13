@@ -63,8 +63,10 @@ describe("offlineSyncFlow", () => {
   });
 
   it("retiene operaciones en cola local mientras no hay conexion", async () => {
-    // 1) Simular perdida de conexion
+    // 1) Simular perdida de conexion: el request real falla (NetInfo no es
+    //    confiable, la peticion es la prueba de conectividad)
     mockIsConnected = false;
+    mockFetch.mockRejectedValue(new Error("Network request failed"));
 
     // 2) Intentar guardar un nuevo alumno y una calificacion offline
     const nuevoAlumno = { id: "a1", nombre: "Juan Perez" };
@@ -73,21 +75,24 @@ describe("offlineSyncFlow", () => {
     await enqueueOperation("alumnos", "/api/alumnos", "create", nuevoAlumno);
     await enqueueOperation("calificaciones", "/api/calificaciones", "create", nuevaCalificacion);
 
-    // 3) Intentar sincronizar (deberia fallar/omitirse por falta de red)
+    // 3) Intentar sincronizar: nada se procesa, todo queda en cola
     const syncAlumnos = await flushQueue("alumnos");
     const syncCalificaciones = await flushQueue("calificaciones");
 
-    expect(syncAlumnos.success).toBe(false);
-    expect(syncCalificaciones.success).toBe(false);
-    expect(mockFetch).not.toHaveBeenCalled();
+    expect(syncAlumnos.processed).toBe(0);
+    expect(syncAlumnos.skipped).toBe(1);
+    expect(syncCalificaciones.processed).toBe(0);
+    expect(syncCalificaciones.skipped).toBe(1);
 
-    // 4) Verificar que las operaciones siguen registradas localmente en AsyncStorage
+    // 4) Verificar que las operaciones siguen registradas localmente,
+    //    sin consumir reintentos (no fue un rechazo del servidor)
     const pendingAlumnos = await getPendingOps("alumnos");
     const pendingCalificaciones = await getPendingOps("calificaciones");
 
     expect(pendingAlumnos).toHaveLength(1);
     expect(pendingCalificaciones).toHaveLength(1);
     expect(pendingAlumnos[0].type).toBe("create");
+    expect(pendingAlumnos[0].retries).toBe(0);
     expect((pendingAlumnos[0].payload as typeof nuevoAlumno).nombre).toBe("Juan Perez");
   });
 

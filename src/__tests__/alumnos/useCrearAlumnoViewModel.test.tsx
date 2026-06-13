@@ -12,6 +12,20 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   setItem: (...args: unknown[]) => mockSetItem(...args),
 }));
 
+// The context under test owns local persistence; the sync engine has its
+// own suites (syncEngine.test.ts, offlineSyncFlow.test.ts)
+jest.mock("../../sync/services/entitySync", () => ({
+  SYNC_ENTITIES: {
+    alumnos: {
+      entity: "alumnos",
+      endpoint: "/api/alumnos",
+      storageKey: "@planearia:alumnos",
+      responseKey: "alumnos",
+    },
+  },
+  queueEntityOperation: jest.fn().mockResolvedValue(true),
+}));
+
 const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <AlumnosProvider>{children}</AlumnosProvider>;
 };

@@ -247,7 +247,11 @@ const BibliotecaPlantillasScreen: React.FC = () => {
       >
         <Text style={s.emptySecondaryBtnText}>Crear plantilla</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={s.emptyLink} onPress={() => {}} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={s.emptyLink}
+        onPress={() => navigation.navigate("Ayuda")}
+        activeOpacity={0.7}
+      >
         <Text style={s.emptyLinkText}>¿Qué son las plantillas?</Text>
         <MaterialIcons name="arrow-forward" size={18} color={DT.primaryContainer} />
       </TouchableOpacity>

@@ -1,9 +1,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Asistencia } from "../../types";
-import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
+import { SYNC_ENTITIES, queueEntityOperation } from "../sync/services/entitySync";
+import { onSyncEvent } from "../sync/services/syncEvents";
+import { generateNumericId } from "../utils/generateId";
 
-const ASISTENCIAS_STORAGE_KEY = "@planearia:asistencias";
+const ASISTENCIAS_STORAGE_KEY = SYNC_ENTITIES.asistencias.storageKey;
 
 interface AsistenciaContextData {
   asistencias: Asistencia[];
@@ -36,52 +38,6 @@ const parseStored = (raw: string | null): Asistencia[] => {
   if (!Array.isArray(parsed)) return [];
 
   return parsed as Asistencia[];
-};
-
-const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<Response> => {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    "X-API-Key": API_CONFIG.apiSecret,
-    ...options.headers,
-  };
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-
-  try {
-    const response = await fetch(`${API_CONFIG.baseUrl}${endpoint}`, {
-      ...options,
-      headers,
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
-};
-
-const syncAsistenciaRemoto = async (
-  type: "create" | "update" | "delete",
-  payload: Partial<Asistencia> | Partial<Asistencia>[]
-): Promise<boolean> => {
-  if (!isAPIConfigured()) return true;
-
-  try {
-    if (type === "delete" && !Array.isArray(payload)) {
-      await apiRequest(`/api/asistencias?id=${payload.id}`, { method: "DELETE" });
-      return true;
-    }
-
-    await apiRequest("/api/asistencias", {
-      method: type === "create" ? "POST" : "PUT",
-      body: JSON.stringify(payload),
-    });
-    return true;
-  } catch {
-    return false;
-  }
 };
 
 const normalizeFecha = (fecha: Date | string): string => {
@@ -118,16 +74,24 @@ export const AsistenciaProvider: React.FC<AsistenciaProviderProps> = ({ children
     void reloadAsistencias();
   }, [reloadAsistencias]);
 
+  // A pull from the backend rewrote local storage: refresh state silently
+  useEffect(() => {
+    return onSyncEvent((event) => {
+      if (event.type !== "entity-updated" || event.entity !== "asistencias") return;
+      void AsyncStorage.getItem(ASISTENCIAS_STORAGE_KEY).then((raw) => {
+        setAsistencias(parseStored(raw));
+      });
+    });
+  }, []);
+
   const registrarAsistencia = useCallback(
     async (
       asistencia: Omit<Asistencia, "id"> & { id?: number }
     ): Promise<{ asistencia: Asistencia; syncOk: boolean }> => {
-      const nextId =
-        asistencia.id ?? asistencias.reduce((max, item) => Math.max(max, item.id), 0) + 1;
-      const nueva: Asistencia = { ...asistencia, id: nextId };
+      const nueva: Asistencia = { ...asistencia, id: asistencia.id ?? generateNumericId() };
 
       await persist([...asistencias, nueva]);
-      const syncOk = await syncAsistenciaRemoto("create", nueva);
+      const syncOk = await queueEntityOperation(SYNC_ENTITIES.asistencias, "create", nueva);
       return { asistencia: nueva, syncOk };
     },
     [asistencias, persist]
@@ -137,20 +101,35 @@ export const AsistenciaProvider: React.FC<AsistenciaProviderProps> = ({ children
     async (
       registros: (Omit<Asistencia, "id"> & { id?: number })[]
     ): Promise<{ syncOk: boolean }> => {
-      let baseId = asistencias.reduce((max, item) => Math.max(max, item.id), 0) + 1;
       const nuevas: Asistencia[] = registros.map((reg) => {
-        const id = reg.id ?? baseId++;
+        const id = reg.id ?? generateNumericId();
         return { ...reg, id } as Asistencia;
       });
 
       // Remove any existing records for same grupo+fecha to allow re-registering
       const fechasGrupos = new Set(nuevas.map((a) => `${a.grupoId}-${normalizeFecha(a.fecha)}`));
+      const reemplazadas = asistencias.filter((a) =>
+        fechasGrupos.has(`${a.grupoId}-${normalizeFecha(a.fecha)}`)
+      );
       const filtered = asistencias.filter(
         (a) => !fechasGrupos.has(`${a.grupoId}-${normalizeFecha(a.fecha)}`)
       );
 
       await persist([...filtered, ...nuevas]);
-      const syncOk = await syncAsistenciaRemoto("create", nuevas);
+
+      // The replaced records must also disappear from the backend or the
+      // next pull would resurrect them
+      let syncOk = true;
+      for (const reemplazada of reemplazadas) {
+        const ok = await queueEntityOperation(SYNC_ENTITIES.asistencias, "delete", {
+          id: reemplazada.id,
+        });
+        syncOk = syncOk && ok;
+      }
+      for (const nueva of nuevas) {
+        const ok = await queueEntityOperation(SYNC_ENTITIES.asistencias, "create", nueva);
+        syncOk = syncOk && ok;
+      }
       return { syncOk };
     },
     [asistencias, persist]
@@ -158,9 +137,11 @@ export const AsistenciaProvider: React.FC<AsistenciaProviderProps> = ({ children
 
   const actualizarAsistencia = useCallback(
     async (id: number, cambios: Partial<Asistencia>) => {
-      const next = asistencias.map((a) => (a.id === id ? { ...a, ...cambios } : a));
+      const actual = asistencias.find((a) => a.id === id);
+      const merged = { ...actual, ...cambios, id } as Asistencia;
+      const next = asistencias.map((a) => (a.id === id ? merged : a));
       await persist(next);
-      const syncOk = await syncAsistenciaRemoto("update", { id, ...cambios });
+      const syncOk = await queueEntityOperation(SYNC_ENTITIES.asistencias, "update", merged);
       return { syncOk };
     },
     [asistencias, persist]
@@ -170,7 +151,7 @@ export const AsistenciaProvider: React.FC<AsistenciaProviderProps> = ({ children
     async (id: number) => {
       const next = asistencias.filter((a) => a.id !== id);
       await persist(next);
-      await syncAsistenciaRemoto("delete", { id });
+      await queueEntityOperation(SYNC_ENTITIES.asistencias, "delete", { id });
     },
     [asistencias, persist]
   );

@@ -34,6 +34,8 @@ export interface RegistroData {
 interface BackendAuthResponse {
   success: boolean;
   error?: string;
+  /** True when the request never reached the backend (offline/server down) */
+  networkError?: boolean;
   data?: {
     accessToken?: string;
     refreshToken?: string;
@@ -106,7 +108,7 @@ async function authFetch(
       error instanceof Error && error.name === "AbortError"
         ? "El servidor no respondio a tiempo."
         : "No se pudo conectar al servidor. Revisa que la URL del backend y CORS permitan este frontend.";
-    return { success: false, error: message };
+    return { success: false, error: message, networkError: true };
   } finally {
     clearTimeout(timeoutId);
   }
@@ -290,13 +292,21 @@ export async function registro(data: RegistroData): Promise<LoginResult> {
   return { success: true, session };
 }
 
+export interface RefreshResult {
+  session: AuthSession | null;
+  /** True when the backend was unreachable: keep the session, retry later */
+  networkError: boolean;
+}
+
 /**
  * Refresh the access token using the stored refresh token.
- * Returns the new session or null if refresh failed (requires re-login).
+ * Distinguishes a server rejection (re-login required) from a network
+ * failure (offline grace: the session must survive airplane mode and
+ * backend outages).
  */
-export async function refreshAccessToken(): Promise<AuthSession | null> {
+export async function refreshSession(): Promise<RefreshResult> {
   const refreshToken = await sessionStorage.getToken(SESSION_KEYS.REFRESH_TOKEN);
-  if (!refreshToken) return null;
+  if (!refreshToken) return { session: null, networkError: false };
 
   const currentAccessToken = await sessionStorage.getToken(SESSION_KEYS.ACCESS_TOKEN);
   const res = await authFetch(
@@ -304,11 +314,15 @@ export async function refreshAccessToken(): Promise<AuthSession | null> {
     currentAccessToken
   );
 
-  if (!res.success || !res.data) return null;
+  if (res.networkError) {
+    return { session: null, networkError: true };
+  }
+
+  if (!res.success || !res.data) return { session: null, networkError: false };
 
   const tokens = extractTokens(res.data);
   const user = extractUser(res.data);
-  if (!tokens) return null;
+  if (!tokens) return { session: null, networkError: false };
 
   // If backend didn't return user, keep existing local user
   let sessionUser = user;
@@ -318,7 +332,7 @@ export async function refreshAccessToken(): Promise<AuthSession | null> {
       sessionUser = JSON.parse(userJson) as AuthUser;
     }
   }
-  if (!sessionUser) return null;
+  if (!sessionUser) return { session: null, networkError: false };
 
   const session: AuthSession = {
     user: sessionUser,
@@ -329,7 +343,16 @@ export async function refreshAccessToken(): Promise<AuthSession | null> {
   };
 
   await persistSession(session);
-  return session;
+  return { session, networkError: false };
+}
+
+/**
+ * Legacy contract: new session or null. Prefer refreshSession() to react
+ * to offline conditions without dropping the local session.
+ */
+export async function refreshAccessToken(): Promise<AuthSession | null> {
+  const result = await refreshSession();
+  return result.session;
 }
 
 export async function logout(token?: string | null): Promise<void> {
@@ -341,9 +364,22 @@ export async function logout(token?: string | null): Promise<void> {
   await clearSession();
 }
 
-export async function verificarToken(token: string): Promise<boolean> {
+export type TokenVerification = "valid" | "invalid" | "unreachable";
+
+/**
+ * Three-state verification: a network failure is NOT an invalid token.
+ * Callers must keep the session alive when the backend is unreachable.
+ */
+export async function verificarTokenDetallado(token: string): Promise<TokenVerification> {
   const res = await authFetch({ action: "verificar" }, token);
-  return res.success === true;
+  if (res.success === true) return "valid";
+  if (res.networkError) return "unreachable";
+  return "invalid";
+}
+
+export async function verificarToken(token: string): Promise<boolean> {
+  const result = await verificarTokenDetallado(token);
+  return result === "valid";
 }
 
 export async function actualizarPerfil(

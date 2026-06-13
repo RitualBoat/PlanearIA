@@ -14,12 +14,20 @@ export {
   loginComoDesarrollador,
   restoreSession,
   refreshAccessToken,
+  refreshSession,
   verificarToken,
+  verificarTokenDetallado,
   actualizarPerfil,
   actualizarPreferencias,
   eliminarCuenta,
   getAccessToken,
 } from "./authService";
-export type { AuthResult, LoginResult, RegistroData } from "./authService";
+export type {
+  AuthResult,
+  LoginResult,
+  RegistroData,
+  RefreshResult,
+  TokenVerification,
+} from "./authService";
 
 export { migrateLegacySessionKeys } from "./legacyMigration";

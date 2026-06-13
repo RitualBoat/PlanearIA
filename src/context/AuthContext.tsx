@@ -114,18 +114,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Refresh 60s before expiry, minimum 10s from now
     const delayMs = Math.max(expiresMs - nowMs - 60_000, 10_000);
 
-    refreshTimerRef.current = setTimeout(async () => {
-      const refreshed = await authService.refreshAccessToken();
-      if (refreshed) {
-        applySession(refreshed);
-      } else {
-        // Refresh failed -- force re-login
-        setToken(null);
-        setUsuario(null);
-        setIsGuest(false);
-        await authService.logout();
+    const attemptRefresh = async () => {
+      const { session, networkError } = await authService.refreshSession();
+      if (session) {
+        applySession(session);
+        return;
       }
-    }, delayMs);
+      if (networkError) {
+        // Offline or backend down: keep the session and retry. Logging the
+        // user out in airplane mode would break offline-first.
+        refreshTimerRef.current = setTimeout(attemptRefresh, 60_000);
+        return;
+      }
+      // Server explicitly rejected the refresh -- force re-login
+      setToken(null);
+      setUsuario(null);
+      setIsGuest(false);
+      await authService.logout();
+    };
+
+    refreshTimerRef.current = setTimeout(attemptRefresh, delayMs);
   }, []);
 
   const applySession = useCallback(
@@ -209,18 +217,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const verificarTokenHandler = useCallback(async (): Promise<boolean> => {
     if (!token) return false;
-    const valid = await authService.verificarToken(token);
-    if (!valid) {
-      // Try refresh before giving up
-      const refreshed = await authService.refreshAccessToken();
-      if (refreshed) {
-        applySession(refreshed);
-        return true;
-      }
-      await logoutHandler();
-      return false;
+    const verification = await authService.verificarTokenDetallado(token);
+    if (verification === "valid") return true;
+    if (verification === "unreachable") {
+      // Offline grace: an unreachable backend is not an invalid session
+      return true;
     }
-    return true;
+    // Token rejected: try refresh before giving up
+    const { session, networkError } = await authService.refreshSession();
+    if (session) {
+      applySession(session);
+      return true;
+    }
+    if (networkError) return true;
+    await logoutHandler();
+    return false;
   }, [token, applySession, logoutHandler]);
 
   const actualizarPerfilHandler = useCallback(

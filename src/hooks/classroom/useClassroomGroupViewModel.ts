@@ -1,8 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { classroomFacade, type ClassroomFacade } from "../../services/classroom/classroomFacade";
 import type { BuildClassroomModelResult } from "../../services/classroom/classroomModel";
+import { onSyncEvent } from "../../sync/services/syncEvents";
 import type { Alumno, Asistencia, Calificacion, EntregaTarea, Recurso, Tarea } from "../../../types";
 import type { UnidadClassroom } from "../../../types/unidadClassroom";
+
+const CLASSROOM_SYNC_ENTITIES = new Set([
+  "grupos",
+  "unidades",
+  "alumnos",
+  "entregables",
+  "recursos",
+  "asistencias",
+  "calificaciones",
+]);
 
 export type ClassroomContentKind = "actividad" | "material";
 
@@ -63,10 +74,12 @@ export function useClassroomGroupViewModel(
   const [materiales, setMateriales] = useState<Recurso[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const hasLoadedRef = useRef(false);
 
   const reload = useCallback(async () => {
     try {
-      setIsLoading(true);
+      // Spinner only on first load; background syncs refresh silently
+      if (!hasLoadedRef.current) setIsLoading(true);
       setError(null);
       const [
         data,
@@ -95,12 +108,22 @@ export function useClassroomGroupViewModel(
       setAsistencias(asistenciasData);
       setCalificaciones(calificacionesData);
       setMateriales(materialesData);
+      hasLoadedRef.current = true;
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo cargar el grupo");
     } finally {
       setIsLoading(false);
     }
   }, [facade, grupoId]);
+
+  // Refresh when the sync orchestrator pulls classroom data from the cloud
+  useEffect(() => {
+    return onSyncEvent((event) => {
+      if (event.type === "entity-updated" && CLASSROOM_SYNC_ENTITIES.has(event.entity)) {
+        void reload();
+      }
+    });
+  }, [reload]);
 
   const crearUnidad = useCallback(
     async (nombre: string) => {

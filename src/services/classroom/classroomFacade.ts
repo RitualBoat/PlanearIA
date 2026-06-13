@@ -24,6 +24,7 @@ import {
   createClassroomRepository,
   type ClassroomRepository,
 } from "./classroomRepository";
+import { SYNC_ENTITIES, queueEntityOperation } from "../../sync/services/entitySync";
 
 export interface ClassroomFacade {
   listGrupos(): Promise<Array<Partial<Grupo>>>;
@@ -42,14 +43,22 @@ export interface ClassroomFacade {
   getEntregasByGrupoId(grupoId: ID): Promise<EntregaTarea[]>;
 }
 
+export interface ClassroomFacadeOptions {
+  /** Push unidades mutations to the backend queue (app singleton only) */
+  syncRemote?: boolean;
+}
+
 export function createClassroomFacade(
   storageOrRepository?: ClassroomStoragePort | ClassroomRepository,
+  options: ClassroomFacadeOptions = {},
 ): ClassroomFacade {
   const repository = isClassroomRepository(storageOrRepository)
     ? storageOrRepository
     : storageOrRepository
       ? createClassroomRepository(storageOrRepository)
       : classroomRepository;
+
+  const syncRemote = options.syncRemote ?? false;
 
   return {
     async listGrupos() {
@@ -86,15 +95,26 @@ export function createClassroomFacade(
     },
 
     async createUnidad(grupoId, nombre) {
-      return repository.createUnidad(grupoId, nombre);
+      const unidad = await repository.createUnidad(grupoId, nombre);
+      if (syncRemote) {
+        await queueEntityOperation(SYNC_ENTITIES.unidades, "create", unidad);
+      }
+      return unidad;
     },
 
     async updateUnidad(id, cambios) {
-      return repository.updateUnidad(id, cambios);
+      const updated = await repository.updateUnidad(id, cambios);
+      if (syncRemote && updated) {
+        await queueEntityOperation(SYNC_ENTITIES.unidades, "update", updated);
+      }
+      return updated;
     },
 
     async deleteUnidad(id) {
-      return repository.deleteUnidad(id);
+      await repository.deleteUnidad(id);
+      if (syncRemote) {
+        await queueEntityOperation(SYNC_ENTITIES.unidades, "delete", { id });
+      }
     },
 
     async getAlumnosByGrupoId(grupoId) {
@@ -123,7 +143,7 @@ export function createClassroomFacade(
   };
 }
 
-export const classroomFacade = createClassroomFacade();
+export const classroomFacade = createClassroomFacade(undefined, { syncRemote: true });
 
 function isClassroomRepository(value?: ClassroomStoragePort | ClassroomRepository): value is ClassroomRepository {
   return Boolean(value && "readDataset" in value && "getDatasetByGrupoId" in value);

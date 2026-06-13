@@ -27,6 +27,7 @@ import type {
   RolGrupo,
 } from "../../../types";
 import WebScrollView from "../../components/WebScrollView";
+import ScreenBackButton from "../../components/ScreenBackButton";
 import CarreraSelector from "../../components/CarreraSelector";
 import { useDetalleGrupoViewModel, TabType } from "../../hooks/useDetalleGrupoViewModel";
 import { calcularEstadisticasGrupo } from "../../services/grupoReportesService";
@@ -736,6 +737,7 @@ const DetalleGrupoScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         {/* Header con info del grupo */}
         <View style={styles.header}>
+          <ScreenBackButton style={{ marginLeft: -8, marginBottom: 2 }} />
           <Text style={styles.grupoNombre}>{grupoNombre}</Text>
           <Text style={styles.grupoId}>ID: {grupoId}</Text>
           <View style={styles.headerActions}>

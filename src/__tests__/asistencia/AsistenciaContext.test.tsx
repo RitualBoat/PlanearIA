@@ -15,6 +15,20 @@ jest.mock("../../sync/config/apiConfig", () => ({
   isAPIConfigured: () => false,
 }));
 
+// The context under test owns local persistence; the sync engine has its
+// own suites (syncEngine.test.ts, offlineSyncFlow.test.ts)
+jest.mock("../../sync/services/entitySync", () => ({
+  SYNC_ENTITIES: {
+    asistencias: {
+      entity: "asistencias",
+      endpoint: "/api/asistencias",
+      storageKey: "@planearia:asistencias",
+      responseKey: "asistencias",
+    },
+  },
+  queueEntityOperation: jest.fn().mockResolvedValue(true),
+}));
+
 const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <AsistenciaProvider>{children}</AsistenciaProvider>
 );
@@ -55,7 +69,8 @@ describe("AsistenciaContext", () => {
     });
 
     expect(response).toBeDefined();
-    expect(response!.asistencia.id).toBe(1);
+    // Cross-device-safe ids are timestamp-based, not sequential
+    expect(typeof response!.asistencia.id).toBe("number");
     expect(mockSetItem).toHaveBeenCalledWith(
       "@planearia:asistencias",
       expect.stringContaining('"alumnoId":1')

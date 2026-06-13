@@ -1,9 +1,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Alumno } from "../../types";
-import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
+import { SYNC_ENTITIES, queueEntityOperation } from "../sync/services/entitySync";
+import { onSyncEvent } from "../sync/services/syncEvents";
+import { generateNumericId } from "../utils/generateId";
 
-const ALUMNOS_STORAGE_KEY = "@planearia:alumnos";
+const ALUMNOS_STORAGE_KEY = SYNC_ENTITIES.alumnos.storageKey;
 
 interface AlumnosContextData {
   alumnos: Alumno[];
@@ -31,53 +33,6 @@ const parseStored = (raw: string | null): Alumno[] => {
   if (!Array.isArray(parsed)) return [];
 
   return parsed as Alumno[];
-};
-
-const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<Response> => {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    "X-API-Key": API_CONFIG.apiSecret,
-    ...options.headers,
-  };
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-
-  try {
-    const response = await fetch(`${API_CONFIG.baseUrl}${endpoint}`, {
-      ...options,
-      headers,
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
-};
-
-const syncAlumnoRemoto = async (
-  type: "create" | "update" | "delete",
-  payload: Partial<Alumno>
-): Promise<boolean> => {
-  if (!isAPIConfigured()) return true;
-
-  try {
-    if (type === "delete") {
-      await apiRequest(`/api/alumnos?id=${payload.id}`, { method: "DELETE" });
-      return true;
-    }
-
-    await apiRequest("/api/alumnos", {
-      method: type === "create" ? "POST" : "PUT",
-      body: JSON.stringify(payload),
-    });
-    return true;
-  } catch {
-    // Offline-first: el dato local ya se guardo, la sincronizacion se reintentara mas adelante.
-    return false;
-  }
 };
 
 export const AlumnosProvider: React.FC<AlumnosProviderProps> = ({ children }) => {
@@ -109,18 +64,27 @@ export const AlumnosProvider: React.FC<AlumnosProviderProps> = ({ children }) =>
     void reloadAlumnos();
   }, [reloadAlumnos]);
 
+  // A pull from the backend rewrote local storage: refresh state silently
+  useEffect(() => {
+    return onSyncEvent((event) => {
+      if (event.type !== "entity-updated" || event.entity !== "alumnos") return;
+      void AsyncStorage.getItem(ALUMNOS_STORAGE_KEY).then((raw) => {
+        setAlumnos(parseStored(raw));
+      });
+    });
+  }, []);
+
   const agregarAlumno = useCallback(
     async (
       alumno: Omit<Alumno, "id"> & { id?: number }
     ): Promise<{ alumno: Alumno; syncOk: boolean }> => {
-      const nextId = alumno.id ?? alumnos.reduce((max, item) => Math.max(max, item.id), 0) + 1;
       const nuevoAlumno: Alumno = {
         ...alumno,
-        id: nextId,
+        id: alumno.id ?? generateNumericId(),
       };
 
       await persist([...alumnos, nuevoAlumno]);
-      const syncOk = await syncAlumnoRemoto("create", nuevoAlumno);
+      const syncOk = await queueEntityOperation(SYNC_ENTITIES.alumnos, "create", nuevoAlumno);
       return { alumno: nuevoAlumno, syncOk };
     },
     [alumnos, persist]
@@ -128,9 +92,11 @@ export const AlumnosProvider: React.FC<AlumnosProviderProps> = ({ children }) =>
 
   const actualizarAlumno = useCallback(
     async (id: number, cambios: Partial<Alumno>) => {
-      const next = alumnos.map((alumno) => (alumno.id === id ? { ...alumno, ...cambios } : alumno));
+      const actual = alumnos.find((alumno) => alumno.id === id);
+      const merged = { ...actual, ...cambios, id } as Alumno;
+      const next = alumnos.map((alumno) => (alumno.id === id ? merged : alumno));
       await persist(next);
-      const syncOk = await syncAlumnoRemoto("update", { id, ...cambios });
+      const syncOk = await queueEntityOperation(SYNC_ENTITIES.alumnos, "update", merged);
       return { syncOk };
     },
     [alumnos, persist]
@@ -140,7 +106,7 @@ export const AlumnosProvider: React.FC<AlumnosProviderProps> = ({ children }) =>
     async (id: number) => {
       const next = alumnos.filter((alumno) => alumno.id !== id);
       await persist(next);
-      await syncAlumnoRemoto("delete", { id });
+      await queueEntityOperation(SYNC_ENTITIES.alumnos, "delete", { id });
     },
     [alumnos, persist]
   );

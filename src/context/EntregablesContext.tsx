@@ -1,9 +1,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Tarea } from "../../types";
-import { API_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
+import { SYNC_ENTITIES, queueEntityOperation } from "../sync/services/entitySync";
+import { onSyncEvent } from "../sync/services/syncEvents";
+import { generateNumericId } from "../utils/generateId";
 
-const ENTREGABLES_STORAGE_KEY = "@planearia:entregables";
+const ENTREGABLES_STORAGE_KEY = SYNC_ENTITIES.entregables.storageKey;
 
 interface EntregablesContextData {
   entregables: Tarea[];
@@ -31,54 +33,6 @@ const parseStored = (raw: string | null): Tarea[] => {
   const parsed = JSON.parse(raw) as unknown;
   if (!Array.isArray(parsed)) return [];
   return parsed as Tarea[];
-};
-
-const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<Response> => {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    "X-API-Key": API_CONFIG.apiSecret,
-    ...options.headers,
-  };
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-
-  try {
-    const response = await fetch(`${API_CONFIG.baseUrl}${endpoint}`, {
-      ...options,
-      headers,
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
-};
-
-const syncEntregableRemoto = async (
-  type: "create" | "update" | "delete",
-  payload: Partial<Tarea>
-): Promise<boolean> => {
-  if (!isAPIConfigured()) return true;
-
-  try {
-    if (type === "delete") {
-      await apiRequest(`/api/entregables?id=${payload.id}`, {
-        method: "DELETE",
-      });
-      return true;
-    }
-
-    await apiRequest("/api/entregables", {
-      method: type === "create" ? "POST" : "PUT",
-      body: JSON.stringify(payload),
-    });
-    return true;
-  } catch {
-    return false;
-  }
 };
 
 export const EntregablesProvider: React.FC<EntregablesProviderProps> = ({ children }) => {
@@ -110,16 +64,24 @@ export const EntregablesProvider: React.FC<EntregablesProviderProps> = ({ childr
     void reloadEntregables();
   }, [reloadEntregables]);
 
+  // A pull from the backend rewrote local storage: refresh state silently
+  useEffect(() => {
+    return onSyncEvent((event) => {
+      if (event.type !== "entity-updated" || event.entity !== "entregables") return;
+      void AsyncStorage.getItem(ENTREGABLES_STORAGE_KEY).then((raw) => {
+        setEntregables(parseStored(raw));
+      });
+    });
+  }, []);
+
   const crearEntregable = useCallback(
     async (
       entregable: Omit<Tarea, "id"> & { id?: number }
     ): Promise<{ entregable: Tarea; syncOk: boolean }> => {
-      const nextId =
-        entregable.id ?? entregables.reduce((max, item) => Math.max(max, item.id), 0) + 1;
-      const nuevo: Tarea = { ...entregable, id: nextId };
+      const nuevo: Tarea = { ...entregable, id: entregable.id ?? generateNumericId() };
 
       await persist([...entregables, nuevo]);
-      const syncOk = await syncEntregableRemoto("create", nuevo);
+      const syncOk = await queueEntityOperation(SYNC_ENTITIES.entregables, "create", nuevo);
       return { entregable: nuevo, syncOk };
     },
     [entregables, persist]
@@ -127,9 +89,11 @@ export const EntregablesProvider: React.FC<EntregablesProviderProps> = ({ childr
 
   const actualizarEntregable = useCallback(
     async (id: number, cambios: Partial<Tarea>) => {
-      const next = entregables.map((e) => (e.id === id ? { ...e, ...cambios } : e));
+      const actual = entregables.find((e) => e.id === id);
+      const merged = { ...actual, ...cambios, id } as Tarea;
+      const next = entregables.map((e) => (e.id === id ? merged : e));
       await persist(next);
-      const syncOk = await syncEntregableRemoto("update", { id, ...cambios });
+      const syncOk = await queueEntityOperation(SYNC_ENTITIES.entregables, "update", merged);
       return { syncOk };
     },
     [entregables, persist]
@@ -139,7 +103,7 @@ export const EntregablesProvider: React.FC<EntregablesProviderProps> = ({ childr
     async (id: number) => {
       const next = entregables.filter((e) => e.id !== id);
       await persist(next);
-      await syncEntregableRemoto("delete", { id });
+      await queueEntityOperation(SYNC_ENTITIES.entregables, "delete", { id });
     },
     [entregables, persist]
   );

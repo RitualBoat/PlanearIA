@@ -79,7 +79,8 @@ export const NotificacionesScreen: React.FC = () => {
     } else if (n.tipo === "mensaje") {
       navigation.navigate("MainTabs", { screen: "SocialTab" });
     } else if (n.tipo === "tarea") {
-      navigation.navigate("Grupos");
+      // Antes abria el menu legacy GruposScreen; ahora va al tab vivo de clases
+      navigation.navigate("MainTabs", { screen: "GruposTab" });
     }
   };
 

@@ -10,10 +10,10 @@ Auth: JWT con userId isolation.
 
 ## Plan de Trabajo Activo
 
-- No hay plan activo nuevo elegido en este momento; el siguiente plan debe crearse solo cuando el usuario lo pida.
-- El plan de Planeaciones quedo cerrado como referencia en `Documentacion/01-planes-maestros/plan_planeaciones.md`.
-- El plan de Pasos Iniciales quedo cerrado como cimiento organizativo en `Documentacion/01-planes-maestros/PLAN_PASOS_INICIALES.md`.
-- El plan SQLite quedo cerrado en `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`; nuevos datos academicos deben disenarse con ports/repositories compatibles con SQLite, sin nuevas lecturas directas a AsyncStorage.
+- Plan activo: `Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md` (en ejecucion; Fases 0-6 completadas, 7-8 en cierre). El proximo plan nuevo recomendado es UX/UI y Navegacion Global; crear cualquier plan nuevo solo cuando el usuario lo pida.
+- El plan de Planeaciones quedo cerrado como referencia en `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md`.
+- El plan de Pasos Iniciales quedo cerrado como cimiento organizativo en `Documentacion/01-planes-maestros/cerrados/PLAN_PASOS_INICIALES (closed).md`.
+- El plan SQLite quedo cerrado en `Documentacion/01-planes-maestros/cerrados/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE (closed).md`; nuevos datos academicos deben disenarse con ports/repositories compatibles con SQLite, sin nuevas lecturas directas a AsyncStorage.
 - La guia obligatoria para nuevos planes maestros es `Documentacion/01-planes-maestros/meta_guia_planes.md`.
 - Cada modulo importante tendra su propio plan maestro dentro de `Documentacion/01-planes-maestros/`, siguiendo tracking `[ ]`, `[~]`, `[x]`.
 - Las tareas se marcan con: `[ ]` pendiente, `[~]` en progreso, `[x]` completado.

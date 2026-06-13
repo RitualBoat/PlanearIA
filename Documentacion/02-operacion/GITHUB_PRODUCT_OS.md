@@ -1,6 +1,6 @@
 ﻿# GitHub Product OS - PlanearIA
 
-> Estado: guia operativa vigente. `PLAN_PASOS_INICIALES.md`, Classroom e Infraestructura quedaron cerrados como cimientos; esta guia mantiene GitHub Project alineado con planes activos/futuros.
+> Estado: guia operativa vigente. `cerrados/PLAN_PASOS_INICIALES (closed).md`, Classroom e Infraestructura quedaron cerrados como cimientos (ver `01-planes-maestros/cerrados/`); esta guia mantiene GitHub Project alineado con planes activos/futuros.
 
 ## Ramas oficiales
 

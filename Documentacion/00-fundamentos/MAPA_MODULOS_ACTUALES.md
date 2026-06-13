@@ -20,7 +20,7 @@
 | Excel | `alumnos`, `asistencia`, `calificaciones`, import/export | Plan posterior a Classroom base. |
 | WhatsApp docente | `chat`, `social`, `feed`, `notificaciones` | Reorientar red social pesada hacia comunicacion directa. |
 | Reportes | `reportes grupo`, `reportes alumno`, calificaciones, asistencia | Dejar al final; depende de datos reales. |
-| Cuenta/Auth | `auth`, `cuenta`, `perfil`, `onboarding`, `ayuda` | Endurecer antes de beta real. |
+| Cuenta/Auth | `auth`, `cuenta`, `perfil`, `onboarding`, `ayuda` | En ejecucion; cerrar antes de beta real. |
 
 ## Inventario por carpeta
 
@@ -41,7 +41,7 @@
 | `chat` | Chat, conversacion | Base para WhatsApp docente. |
 | `notificaciones` | Notificaciones | Mantener transversal. |
 | `cuenta` y `perfil` | Cuenta, editar perfil, admin roles, terminos, perfil | Mantener; endurecer en Auth/Seguridad. |
-| `auth` | Login, registro, recuperar contrasena | Endurecer antes de beta real. |
+| `auth` | Login, registro, recuperar contrasena | En ejecucion; cerrar antes de beta real. |
 | `onboarding` y `ayuda` | Onboarding, ayuda | Actualizar cuando cambien flujos principales. |
 
 ## Decision record inicial
@@ -50,6 +50,7 @@
 - UX/UI Global queda como plan transversal, pero su pulido fuerte debe esperar a que los modulos funcionales principales existan.
 - Infraestructura Local/CI/Deploy Basico quedo cerrado como cimiento operativo: scripts reproducibles, CI, backend smoke y demo ngrok/Vercel.
 - Storage Local SQLite y Migracion Offline quedo cerrado para entrega academica: SQLite existe como infraestructura opt-in; no activarlo como default ni borrar claves legacy sin decision explicita.
-- Auth/Seguridad se endurece antes de beta con usuarios reales.
+- Auth/Seguridad esta en ejecucion (Fases 0-6 completadas, 7-8 en cierre); se cierra antes de beta con usuarios reales.
+- Sincronizacion offline-first quedo unificada: motor por entidad, push/pull cross-device y backend con JWT + aislamiento por `userId`. Ver `Documentacion/02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md`.
 - Feed/social no se elimina ahora; se congela hasta decidir WhatsApp docente/comunidad.
 - Ningun modulo nuevo debe quedar aislado: debe tener entrada, salida, CTA principal y estado offline/error.

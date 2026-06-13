@@ -11,3 +11,4 @@ Reglas:
 Documentos:
 
 - `CHECKLIST_VALIDACION_MANUAL_FASE9.md`: cierre manual de Planeaciones Fase 9.
+- `CHECKLIST_VALIDACION_MANUAL_AUTH.md`: validacion manual del plan de Auth, Seguridad y Sesion Real.

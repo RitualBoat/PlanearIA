@@ -73,9 +73,9 @@ Regla: la documentacion puede estar desfasada. La fuente de verdad para planear 
 - `src/screens/`.
 - `backend/api/`.
 - `types/`.
-- `Documentacion/01-planes-maestros/plan_planeaciones.md`.
-- `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`.
-- `Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`.
+- `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md`.
+- `Documentacion/01-planes-maestros/cerrados/PLAN_CLASSROOM (closed).md`.
+- `Documentacion/01-planes-maestros/cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md`.
 
 ---
 
@@ -89,9 +89,9 @@ Regla de lectura: si este snapshot contradice el codigo, gana el codigo. Antes d
 
 | Dominio | Estado vigente | Plan/decision relacionada | Lectura minima antes de tocar |
 | --- | --- | --- | --- |
-| Planeaciones / Word-Docs | Cerrado como gran refactor. Modelo V2, editor, plantillas, escaner, exportacion e IA ya existen. | No reabrir salvo bug nuevo o decision explicita. | `Documentacion/01-planes-maestros/plan_planeaciones.md`, `src/screens/planeaciones/`, `types/planeacionV2.ts`. |
-| Classroom / Grupos | Cerrado como experiencia tipo Classroom/Classroomio. | Issue #8 cerrado; usar como base para Excel, reportes y calificacion avanzada. | `Documentacion/01-planes-maestros/PLAN_CLASSROOM.md`, `src/screens/classroom/`, `context/classroom-ground-truth/`. |
-| Infraestructura / CI / Deploy | Plan activo. Fase 0 completada; Fase 1 pendiente. | Continuar `PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`. | `.github/workflows/ci.yml`, `package.json`, `backend/package.json`, `Documentacion/02-operacion/ENTORNO_LOCAL.md`. |
+| Planeaciones / Word-Docs | Cerrado como gran refactor. Modelo V2, editor, plantillas, escaner, exportacion e IA ya existen. | No reabrir salvo bug nuevo o decision explicita. | `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md`, `src/screens/planeaciones/`, `types/planeacionV2.ts`. |
+| Classroom / Grupos | Cerrado como experiencia tipo Classroom/Classroomio. | Issue #8 cerrado; usar como base para Excel, reportes y calificacion avanzada. | `Documentacion/01-planes-maestros/cerrados/PLAN_CLASSROOM (closed).md`, `src/screens/classroom/`, `context/classroom-ground-truth/`. |
+| Infraestructura / CI / Deploy | Cerrado. Fases 0 a 7 completadas. | Ver `cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md`. | `.github/workflows/ci.yml`, `package.json`, `backend/package.json`, `Documentacion/02-operacion/ENTORNO_LOCAL.md`. |
 | Contenido / Hub de Recursos | Hub transversal para planeaciones, recursos, entregables y plantillas. | No debe competir con Classroom ni duplicar flujos contextuales. | `src/screens/contenido/ContenidoScreen.tsx`, `src/hooks/useContenidoViewModel.ts`. |
 | Recursos Didacticos / Biblioteca | CRUD/lista de recursos existe y se conecta con contenido/grupos. | Futuro plan Canva/Genially o Recursos Didacticos. | `src/screens/biblioteca/`, `src/context/RecursosContext.tsx`, `backend/api/recursos.js`. |
 | Recursos Evaluables / Tareas / Entregables | Existen tareas, entregas y calificacion. | Futuro plan de evaluables/calificacion avanzada. | `src/screens/grupos/tareas/`, `src/screens/tareas/`, `src/context/EntregablesContext.tsx`. |
@@ -176,7 +176,7 @@ Regla de lectura: si este snapshot contradice el codigo, gana el codigo. Antes d
 
 - Estado: plan activo; Fase 0 completada.
 - Clave: no microservicios; mantener monolito modular, CI barato, env vars seguras, backend local/cloud low-cost y preparacion SQLite.
-- Archivos: `.github/workflows/ci.yml`, `backend/api/`, `backend/lib/`, `src/sync/`, `src/sync/config/apiConfig.ts`, `Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`.
+- Archivos: `.github/workflows/ci.yml`, `backend/api/`, `backend/lib/`, `src/sync/`, `src/sync/config/apiConfig.ts`, `Documentacion/01-planes-maestros/cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md`.
 
 ### 3.4 Cuando Activar un Plan Nuevo
 
@@ -215,7 +215,7 @@ Antes de redactar cualquier plan futuro, la IA debe:
 - Leer `Documentacion/00-fundamentos/ARQUITECTURA.md`.
 - Leer `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`.
 - Leer `Documentacion/01-planes-maestros/meta_guia_planes.md`.
-- Leer `Documentacion/01-planes-maestros/plan_planeaciones.md` como ejemplo de calidad y tracking.
+- Leer `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md` como ejemplo de calidad y tracking.
 - Revisar `src/navigation/StackNavigator.tsx`.
 - Revisar `src/navigation/AppTabsNavigator.tsx`.
 - Revisar carpetas del modulo objetivo en `src/screens`, `src/hooks`, `src/context`, `src/services`, `types` y `backend/api`.
@@ -828,12 +828,12 @@ Si falta una carpeta `context/<modulo>-ground-truth/` o una referencia open sour
 
 ### 12.1 Planeaciones
 
-No generar un plan nuevo sin leer `Documentacion/01-planes-maestros/plan_planeaciones.md`.
+No generar un plan nuevo sin leer `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md`.
 
 Si se retoma:
 
 - Tratar Planeaciones como modulo cerrado y estable salvo bug nuevo, deuda puntual o decision explicita del usuario.
-- Leer primero `Documentacion/01-planes-maestros/plan_planeaciones.md` y `Documentacion/01-planes-maestros/PLANEACIONES_IA_EDITOR_FASE9.md`.
+- Leer primero `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md` y `Documentacion/01-planes-maestros/cerrados/PLANEACIONES_IA_EDITOR_FASE9 (closed).md`.
 - No volver al flujo legacy ni a formularios como experiencia principal.
 - Actualizar README/documentacion si cambia arquitectura, IA, editor, plantillas o exportacion.
 
@@ -1024,7 +1024,7 @@ Reglas obligatorias de seguridad pragmatica y low-cost:
 
 ### 12.9 Infraestructura y DevOps
 
-Plan activo actual: `Documentacion/01-planes-maestros/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md`. No crear otro plan de infraestructura sin cerrar, extender o reemplazar explicitamente ese archivo.
+Plan cerrado: `Documentacion/01-planes-maestros/cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md`. No crear otro plan de infraestructura sin cerrar, extender o reemplazar explicitamente ese archivo.
 
 Debe cubrir:
 

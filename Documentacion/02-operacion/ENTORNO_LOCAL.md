@@ -254,7 +254,7 @@ Estado vigente:
 - AsyncStorage sigue siendo la persistencia local actual.
 - Expo SQLite ya esta instalado como infraestructura opt-in para datos academicos relacionales.
 - No activar SQLite como default ni borrar claves legacy sin decision explicita.
-- Plan cerrado: `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md`.
+- Plan cerrado: `Documentacion/01-planes-maestros/cerrados/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE (closed).md`.
 - Evidencia academica: `context/infraestructura-ground-truth/05-sqlite-actividad-academica/`.
 
 Regla practica:

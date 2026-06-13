@@ -263,7 +263,7 @@ Transformar cada modulo de formularios nativos simples a experiencias docentes f
 
 ### Estado actual
 
-El modulo de **Planeaciones** cerro Fase 9 como primera gran refactorizacion. `PLAN_PASOS_INICIALES.md` y **Classroom** quedaron cerrados como cimientos funcionales. `PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY.md` quedo cerrado hasta Fase 7 con entorno local, CI, backend smoke y demo low-cost. `PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md` tambien quedo cerrado para entrega academica: SQLite existe como infraestructura opt-in para datos academicos relacionales y sync queue, mientras AsyncStorage sigue como default productivo y rollback.
+El modulo de **Planeaciones** cerro Fase 9 como primera gran refactorizacion. `cerrados/PLAN_PASOS_INICIALES (closed).md` y **Classroom** quedaron cerrados como cimientos funcionales. `cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md` quedo cerrado hasta Fase 7 con entorno local, CI, backend smoke y demo low-cost. `cerrados/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE (closed).md` tambien quedo cerrado para entrega academica: SQLite existe como infraestructura opt-in para datos academicos relacionales y sync queue, mientras AsyncStorage sigue como default productivo y rollback. La sincronizacion quedo unificada en un motor offline-first por entidad con push/pull cross-device, cola idempotente, endurecimiento de backend (JWT y aislamiento por `userId`, `/api/unidades`) y UX de estado de red; ver `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`. Auth/Seguridad esta en ejecucion (Fases 0-6 completadas, 7-8 en cierre).
 
 ---
 

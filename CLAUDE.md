@@ -67,10 +67,13 @@ PlanearIA/
 - Infraestructura Local/CI/Deploy (Phases 0-7)
 - Storage Local SQLite/Migration Offline (opt-in infrastructure)
 
+Closed plan docs are grouped in `Documentacion/01-planes-maestros/cerrados/`.
+
 ## Active/Pending Plans
 
-- Auth, Seguridad y Sesion Real: plan created, pending execution
-- UX/UI Global, Excel/Listas, Canva, WhatsApp, Reportes: future
+- Auth, Seguridad y Sesion Real: in execution; Phases 0-6 complete and CI-green, 7-8 closing (pending: real email, social data, manual validation)
+- Offline-first sync: unified per-entity engine with cross-device push/pull, backend JWT + userId isolation and offline UX (done; see Documentacion/02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md)
+- UX/UI Global, Excel/Listas, Canva, WhatsApp, Reportes, Configuracion/Accesibilidad: future (UX/UI Global is the next recommended new plan)
 
 ## Testing Rules (Mandatory)
 

@@ -85,7 +85,7 @@ Este plan no busca lanzar a produccion, comprar servicios ni redisenar toda la a
 | Meta guia | `Documentacion/01-planes-maestros/meta_guia_planes.md` | Estructura, fases, GitHub/CI, seguridad low-cost |
 | Arquitectura | `Documentacion/00-fundamentos/ARQUITECTURA.md` | Stack, MVVM, Auth/JWT, SecureStore pendiente |
 | Sync | `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md` | Offline-first, `X-API-Key`, CORS, sync legacy |
-| Storage SQLite | `Documentacion/01-planes-maestros/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE.md` | SQLite opt-in, rollback, no borrar AsyncStorage |
+| Storage SQLite | `Documentacion/01-planes-maestros/cerrados/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE (closed).md` | SQLite opt-in, rollback, no borrar AsyncStorage |
 | Entorno local | `Documentacion/02-operacion/ENTORNO_LOCAL.md` | Variables, backend local, demo low-cost |
 | Pruebas | `Documentacion/02-operacion/GUIA_PRUEBAS.md` | Validaciones tecnicas y manuales |
 | Product OS | `Documentacion/02-operacion/GITHUB_PRODUCT_OS.md` | Issues, labels, milestones, cierre de fases |

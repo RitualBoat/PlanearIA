@@ -18,6 +18,13 @@
 > - Un pull fallido nunca toca los datos locales: la app sobrevive a Vercel o
 >   MongoDB caidos y a modo avion, reintentando despues.
 > - Toda ruta academica del backend exige JWT y es idempotente para la cola.
+>
+> **Nota de vigencia:** los diagramas y ejemplos legacy que mencionan
+> `SyncProvider`, `useSync`, `syncService.ts` o sync exclusivo de planeaciones
+> quedan como referencia historica. Para implementar o planear modulos nuevos,
+> manda el motor actual documentado en `src/sync/README.md`,
+> `src/sync/services/entitySync.ts` y
+> `Documentacion/02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md`.
 
 ## Índice
 

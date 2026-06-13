@@ -112,6 +112,7 @@ El detalle y la secuencia completa viven en `00-fundamentos/ROADMAP_PLANES_MAEST
 - No duplicar flujos entre Contenido, Classroom y pantallas legacy.
 - Toda pantalla nueva parte de una pantalla madre responsiva/adaptativa mobile-first; excepcion `.web.tsx`/`.native.tsx` solo si el modulo lo justifica.
 - Todo plan nuevo que toque datos academicos asume SQLite como infraestructura opt-in y evita lecturas directas a AsyncStorage; usar ports/repositories.
+- Todo plan nuevo que toque datos sincronizables debe usar el motor global `src/sync` (`entitySync`, `syncEngine`, `syncEvents`, `SyncContext`) y no crear clientes HTTP/colas propias salvo excepcion justificada.
 - Mantener tracking markdown `[ ]`, `[~]`, `[x]` en planes.
 - Documentar costos y free tiers antes de proponer infraestructura o IA nueva.
 - Preservar contexto importante antes de borrar o archivar documentos.
@@ -127,10 +128,11 @@ El detalle y la secuencia completa viven en `00-fundamentos/ROADMAP_PLANES_MAEST
 - React Navigation 7.
 - Context + hooks ViewModel (MVVM).
 - AsyncStorage default productivo; SQLite/Expo SQLite opt-in para datos relacionales academicos y sync queue.
-- Backend Node serverless en `backend/api` (Vercel).
+- Sync offline-first global en `src/sync` con push/pull por entidad, cola idempotente, eventos de refresco y UX de estado de red.
+- Backend Node serverless en `backend/api/index.js` + `backend/routes` (Vercel).
 - MongoDB Atlas free tier.
 - IA gateway multi-provider en backend.
 - Jest + Testing Library.
 
-**Ultima actualizacion:** 2026-06-12
+**Ultima actualizacion:** 2026-06-13
 **Version documental:** 4.2

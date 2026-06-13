@@ -56,8 +56,8 @@ Todo plan futuro debe asumir este punto de partida, salvo que el codigo demuestr
 - Arquitectura objetivo: MVVM.
 - Persistencia local actual: AsyncStorage.
 - Persistencia local objetivo para datos relacionales/pesados: SQLite/Expo SQLite o una capa equivalente evaluada en el plan de infraestructura/storage.
-- Sync: offline-first con cola de operaciones.
-- Backend actual: funciones Node/serverless en `backend/api`.
+- Sync: motor offline-first global en `src/sync/`, con cola por entidad, `entitySync.ts`, `syncEngine.ts`, `syncEvents.ts`, `SyncContext`, push/pull autoritativo, eventos de refresco y UX de red/sync.
+- Backend actual: funciones Node/serverless con router unico en `backend/api/index.js` y handlers en `backend/routes/`.
 - Base remota actual: MongoDB Atlas.
 - Auth actual: `AuthContext`, backend `auth.js`, JWT/API secret en evolucion.
 - IA actual: gateway multi-provider en `backend/lib/aiGateway.js`, limiter en `backend/lib/aiUsageLimiter.js`, endpoints en `backend/api/planeaciones/*` y `backend/api/classroom/copiloto.js`.
@@ -70,8 +70,15 @@ Regla: la documentacion puede estar desfasada. La fuente de verdad para planear 
 - `src/context/`.
 - `src/hooks/`.
 - `src/services/`.
+- `src/sync/`.
+- `src/sync/services/entitySync.ts`.
+- `src/sync/services/syncEngine.ts`.
+- `src/sync/services/syncEvents.ts`.
+- `src/context/SyncContext.tsx`.
 - `src/screens/`.
 - `backend/api/`.
+- `backend/routes/`.
+- `Documentacion/02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md`.
 - `types/`.
 - `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md`.
 - `Documentacion/01-planes-maestros/cerrados/PLAN_CLASSROOM (closed).md`.
@@ -111,6 +118,9 @@ Regla de lectura: si este snapshot contradice el codigo, gana el codigo. Antes d
 - **Contenido es hub, no competidor.** Si una accion depende de una clase, debe vivir en Classroom. Si es biblioteca/global, puede vivir en Contenido.
 - **Legacy no debe ser entrada principal.** Si existe pantalla moderna equivalente, las rutas viejas quedan como respaldo temporal, redireccion o deuda explicitamente documentada.
 - **Offline-first desde el diseno.** AsyncStorage es la implementacion actual; SQLite/Expo SQLite es destino preferente para datos relacionales/pesados cuando se ejecute el plan de storage.
+- **Sync global, no sync por modulo.** Todo modulo nuevo con datos academicos sincronizables debe integrarse al motor global en `src/sync/`: registrar la entidad en `SYNC_ENTITIES` o crear una `registerSyncTask` justificada, usar `queueEntityOperation`/`syncEntity`/`syncAllEntities`, emitir/escuchar `syncEvents` para refresco y respetar `canSyncRemotely()` para invitado/dev-local. No crear clientes HTTP ad hoc ni flush/pull propios salvo excepcion documentada.
+- **Backend academico aislado por JWT.** Las rutas sincronizables deben exigir token real, filtrar por `userId`, ser idempotentes para reintentos offline (create/update como upsert cuando aplique, delete tolerante) y no depender de modo legacy solo `X-API-Key`.
+- **Pull autoritativo sin perder trabajo offline.** Un pull exitoso puede reescribir storage local solo despues de reconciliar operaciones pendientes; un pull fallido nunca debe tocar datos locales. Los deletes pendientes no deben resucitar documentos al reconciliar.
 - **Web/tablet/movil se unifican por defecto.** Cada pantalla nueva o refactorizada debe partir de una sola pantalla madre React Native/Expo, con layout responsivo/adaptativo mobile-first, ViewModel/logica compartida y estilos controlados por breakpoints. Evitar duplicar pantallas en `Screen.web.tsx` y `Screen.native.tsx` salvo excepcion justificada.
 - **Excepciones por plataforma solo para interacciones realmente distintas.** Se permite separar `.web.tsx`, `.native.tsx`, `.ios.tsx` o `.android.tsx` cuando el modulo lo exige por experiencia y rendimiento, por ejemplo Canva/Genially, editor de textos avanzado/Word, grids tipo Excel o flujos con teclado, mouse, canvas, gestos o atajos imposibles de mantener limpiamente en una sola pantalla. El plan debe justificar la separacion, mantener ViewModel/tipos/contratos compartidos y definir validacion para cada variante.
 - **GitHub Project acompana la ejecucion.** Plan markdown = arquitectura y decisiones; Project = estado operativo; Actions = evidencia automatica.
@@ -174,9 +184,9 @@ Regla de lectura: si este snapshot contradice el codigo, gana el codigo. Antes d
 
 #### Infraestructura, Sync y Backend
 
-- Estado: plan activo; Fase 0 completada.
-- Clave: no microservicios; mantener monolito modular, CI barato, env vars seguras, backend local/cloud low-cost y preparacion SQLite.
-- Archivos: `.github/workflows/ci.yml`, `backend/api/`, `backend/lib/`, `src/sync/`, `src/sync/config/apiConfig.ts`, `Documentacion/01-planes-maestros/cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md`.
+- Estado: infraestructura base cerrada; sync/offline evoluciono a motor global cross-device por entidad.
+- Clave: no microservicios; mantener monolito modular, CI/CD barato, env vars seguras, backend local/cloud low-cost, backend academico aislado por JWT y preparacion SQLite opt-in sin romper AsyncStorage default.
+- Archivos: `.github/workflows/ci.yml`, `.github/workflows/cd.yml`, `backend/api/index.js`, `backend/routes/`, `backend/lib/`, `src/context/SyncContext.tsx`, `src/components/SyncStatusBanner.tsx`, `src/sync/`, `src/sync/services/entitySync.ts`, `src/sync/services/syncEngine.ts`, `src/sync/services/syncEvents.ts`, `src/sync/config/apiConfig.ts`, `Documentacion/02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md`, `Documentacion/01-planes-maestros/cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md`.
 
 ### 3.4 Cuando Activar un Plan Nuevo
 
@@ -214,11 +224,13 @@ Antes de redactar cualquier plan futuro, la IA debe:
 - Leer `Documentacion/README.md`.
 - Leer `Documentacion/00-fundamentos/ARQUITECTURA.md`.
 - Leer `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`.
+- Leer `Documentacion/02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md` si el plan toca datos locales, backend academico, multiusuario, sync, offline, Classroom, alumnos, recursos, plantillas, entregables, asistencia, calificaciones o planeaciones.
 - Leer `Documentacion/01-planes-maestros/meta_guia_planes.md`.
 - Leer `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md` como ejemplo de calidad y tracking.
 - Revisar `src/navigation/StackNavigator.tsx`.
 - Revisar `src/navigation/AppTabsNavigator.tsx`.
 - Revisar carpetas del modulo objetivo en `src/screens`, `src/hooks`, `src/context`, `src/services`, `types` y `backend/api`.
+- Revisar `src/sync/`, especialmente `services/entitySync.ts`, `services/syncEngine.ts`, `services/syncEvents.ts`, `config/apiConfig.ts` y `src/context/SyncContext.tsx` cuando el modulo persista o sincronice datos.
 - Revisar tests existentes del modulo.
 - Revisar si hay datos reales o ejemplos en `context/`.
 - Ejecutar busquedas con `rg` para detectar rutas legacy, nombres duplicados y dependencias cruzadas.
@@ -415,12 +427,20 @@ Debe incluir:
 
 - Fuente local de verdad.
 - Fuente remota de verdad.
-- Cola de operaciones.
-- Reintentos.
+- Si la entidad entra al registry `SYNC_ENTITIES` o requiere `registerSyncTask` custom, con justificacion.
+- Endpoint backend y `responseKey` esperada.
+- `storageKey` local actual y ruta futura SQLite si aplica.
+- Cola de operaciones mediante `syncEngine`.
+- Reintentos y diferencia entre fallo de red recuperable vs rechazo 4xx no recuperable.
 - Conflictos.
 - Eliminacion logica.
 - Recuperacion de borradores.
 - Validacion offline/reconexion.
+- Validacion cross-device: crear/editar/borrar en dispositivo A, sincronizar, abrir dispositivo B/web y confirmar estado autoritativo.
+- Refresh de UI por `syncEvents` o razon documentada para no usarlo.
+- Comportamiento de invitado y dev-local: sin llamadas remotas, modo 100% local.
+- Aislamiento remoto por JWT/userId y endpoints idempotentes para cola offline.
+- Comportamiento si Vercel/MongoDB caen: pull fallido no toca storage local.
 - Estrategia de migracion si el modulo debe pasar de AsyncStorage a SQLite o a otra base local.
 
 ### 6.9 Limpieza Legacy
@@ -531,6 +551,9 @@ Todo plan futuro debe cumplir:
 - AsyncStorage es la implementacion actual para cache/datos simples.
 - SQLite/Expo SQLite debe evaluarse como destino preferente para modulos con relaciones, busquedas, volumen o sync complejo.
 - Ningun modulo nuevo debe acoplarse directamente a AsyncStorage si eso bloquea una migracion futura a SQLite.
+- Ningun modulo nuevo sincronizable debe crear su propio cliente HTTP/cola si puede usar `src/sync/services/entitySync.ts`, `src/sync/services/syncEngine.ts` y `src/utils/apiClient.ts`.
+- Las pantallas no deben llamar al backend directamente para CRUD academico sincronizable; deben pasar por ViewModel -> Context/Service -> storage local + cola sync.
+- Los contextos/servicios deben refrescarse con `syncEvents` cuando un pull autoritativo cambie storage local.
 - MongoDB/API como respaldo remoto cuando aplique.
 - `userId` en toda entidad sincronizable.
 - No duplicar fuente de verdad.
@@ -1244,7 +1267,7 @@ Esta guia es orientativa y no debe bloquear el trabajo si los modelos disponible
 > **Version:** 1.0
 > **Fecha:** YYYY-MM-DD
 > **Alcance:** [descripcion]
-> **Stack:** React Native - Expo - TypeScript - MongoDB Atlas - AsyncStorage default / SQLite opt-in - MVVM
+> **Stack:** React Native - Expo - TypeScript - MongoDB Atlas - AsyncStorage default / SQLite opt-in - MVVM - motor `src/sync` offline-first global
 > **Modulo:** [nombre]
 > **Estado actual:** [resumen basado en codigo]
 
@@ -1293,6 +1316,25 @@ Esta guia es orientativa y no debe bloquear el trabajo si los modelos disponible
 ## IA y Automatizacion
 
 ## Offline-First y Sync
+
+- Entidad sync:
+  - [Existe en `SYNC_ENTITIES` | requiere nueva entrada | requiere `registerSyncTask` custom].
+- Endpoint backend:
+  - `backend/routes/...`
+- Storage local:
+  - `@planearia:...`
+- Cola:
+  - `queueEntityOperation` / `syncEngine`.
+- Pull autoritativo:
+  - responseKey, reconciliacion con pendientes y deletes.
+- Eventos:
+  - `syncEvents` que refrescan contexto/pantalla.
+- Sesiones:
+  - token real requerido; invitado/dev-local sin sync remoto.
+- Backend:
+  - JWT/userId, idempotencia de create/update/delete, rate limiting si aplica.
+- Validacion:
+  - offline, reconexion, cross-device, servidor caido y pull fallido sin perdida local.
 
 ## Costos e Infraestructura
 

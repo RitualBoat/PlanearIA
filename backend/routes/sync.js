@@ -48,6 +48,10 @@ module.exports = async (req, res) => {
     const userPayload = getUserFromToken(req);
     const userIdFromToken = userPayload?.userId ? String(userPayload.userId) : "";
 
+    if (!userIdFromToken) {
+      return errorResponse(res, 401, "Se requiere sesión de usuario (JWT)");
+    }
+
     const { db } = await connectToDatabase();
     const collection = db.collection(COLLECTION);
 

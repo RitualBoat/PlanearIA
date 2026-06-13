@@ -29,6 +29,11 @@ module.exports = async (req, res) => {
     return errorResponse(res, 401, auth.error);
   }
 
+  const userId = getScopeUserId(req);
+  if (!userId) {
+    return errorResponse(res, 401, "Se requiere sesión de usuario (JWT)");
+  }
+
   try {
     const { db } = await connectToDatabase();
     const collection = db.collection(COLLECTION);
@@ -38,9 +43,6 @@ module.exports = async (req, res) => {
     await collection.createIndex({ alumnoId: 1 });
     await collection.createIndex({ grupoId: 1 });
     await collection.createIndex({ userId: 1, fechaRegistro: -1 });
-
-    // Additive per-user isolation: scoped when a JWT is present.
-    const userId = getScopeUserId(req);
 
     switch (req.method) {
       case "GET":
@@ -219,11 +221,12 @@ async function handleDelete(req, res, collection, userId) {
     }
   }
 
+  // Idempotente: borrar algo ya borrado es exito para la cola offline
   const result = await collection.deleteOne({ id: Number(id) });
 
-  if (result.deletedCount === 0) {
-    return errorResponse(res, 404, "Calificación no encontrada");
-  }
-
-  return successResponse(res, { action: "deleted", id: Number(id) });
+  return successResponse(res, {
+    action: "deleted",
+    id: Number(id),
+    deletedCount: result.deletedCount,
+  });
 }

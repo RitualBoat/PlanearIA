@@ -2,10 +2,12 @@
  * API de Grupos - Operaciones CRUD
  *
  * GET    /api/grupos         - Listar todos los grupos
- * POST   /api/grupos         - Crear nuevo grupo
+ * POST   /api/grupos         - Crear nuevo grupo (idempotente: upsert si ya existe y es propio)
  * GET    /api/grupos?id=xxx  - Obtener un grupo
- * PUT    /api/grupos         - Actualizar grupo
- * DELETE /api/grupos?id=xxx  - Eliminar grupo
+ * PUT    /api/grupos         - Actualizar grupo (upsert)
+ * DELETE /api/grupos?id=xxx  - Eliminar grupo (idempotente)
+ *
+ * Requiere JWT: toda operacion queda aislada por userId.
  */
 const { connectToDatabase } = require("../lib/mongodb");
 const {
@@ -30,14 +32,16 @@ module.exports = async (req, res) => {
     return errorResponse(res, 401, auth.error);
   }
 
+  const userId = getScopeUserId(req);
+  if (!userId) {
+    return errorResponse(res, 401, "Se requiere sesión de usuario (JWT)");
+  }
+
   try {
     const { db } = await connectToDatabase();
     const collection = db.collection(COLLECTION);
 
     await ensureIndexes(collection);
-
-    // Additive per-user isolation: scoped when a JWT is present, legacy when not.
-    const userId = getScopeUserId(req);
 
     switch (req.method) {
       case "GET":
@@ -52,7 +56,7 @@ module.exports = async (req, res) => {
         return errorResponse(res, 405, `Method ${req.method} not allowed`);
     }
   } catch (error) {
-    console.error("❌ Error en API de grupos:", error);
+    console.error("Error en API de grupos:", error);
     return errorResponse(res, 500, error.message);
   }
 };
@@ -63,6 +67,14 @@ async function ensureIndexes(collection) {
   await collection.createIndex({ fechaModificacion: -1 });
 }
 
+// Query-string ids llegan como string; los grupos se guardan con id numerico
+const normalizeId = (value) => {
+  if (typeof value === "number") return value;
+  if (typeof value !== "string") return value;
+  const numeric = Number(value);
+  return Number.isNaN(numeric) ? value : numeric;
+};
+
 /**
  * GET - Listar u obtener grupo
  */
@@ -70,15 +82,14 @@ async function handleGet(req, res, collection, userId) {
   const { id, desde, limit = 100 } = req.query;
 
   if (id) {
-    const grupo = await collection.findOne({ id: id });
-    if (!grupo || (userId && String(grupo.userId) !== userId)) {
+    const grupo = await collection.findOne({ id: normalizeId(id) });
+    if (!grupo || String(grupo.userId) !== userId) {
       return errorResponse(res, 404, "Grupo no encontrado");
     }
     return successResponse(res, grupo);
   }
 
-  const query = {};
-  if (userId) query.userId = userId;
+  const query = { userId };
   if (desde) {
     query.fechaModificacion = { $gt: desde };
   }
@@ -96,27 +107,44 @@ async function handleGet(req, res, collection, userId) {
 }
 
 /**
- * POST - Crear nuevo grupo
+ * POST - Crear nuevo grupo. Idempotente para la cola de sincronizacion:
+ * un reintento sobre un grupo propio ya creado lo actualiza en vez de 409.
  */
 async function handlePost(req, res, collection, userId) {
   const grupo = req.body;
 
-  if (!grupo || !grupo.id) {
+  if (!grupo || grupo.id === undefined || grupo.id === null) {
     return errorResponse(res, 400, "Datos de grupo inválidos");
   }
 
-  const existing = await collection.findOne({ id: grupo.id });
-  if (existing) {
-    if (!ownsDoc(existing, userId)) {
-      return errorResponse(res, 403, "No autorizado");
-    }
-    return errorResponse(res, 409, "Ya existe un grupo con ese ID");
+  const grupoId = normalizeId(grupo.id);
+  const nowIso = new Date().toISOString();
+
+  const existing = await collection.findOne({ id: grupoId });
+  if (existing && !ownsDoc(existing, userId)) {
+    return errorResponse(res, 403, "No autorizado");
   }
 
-  const nowIso = new Date().toISOString();
+  if (existing) {
+    await collection.updateOne(
+      { id: grupoId },
+      {
+        $set: {
+          ...grupo,
+          id: grupoId,
+          userId,
+          fechaModificacion: grupo.fechaModificacion || nowIso,
+          syncedAt: nowIso,
+        },
+      }
+    );
+    return successResponse(res, { action: "updated", id: grupoId });
+  }
+
   const doc = {
     ...grupo,
-    ...(userId ? { userId } : {}),
+    id: grupoId,
+    userId,
     fechaCreacion: grupo.fechaCreacion || nowIso,
     fechaModificacion: grupo.fechaModificacion || nowIso,
     syncedAt: nowIso,
@@ -124,49 +152,54 @@ async function handlePost(req, res, collection, userId) {
   };
 
   await collection.insertOne(doc);
-  return successResponse(res, { action: "created", id: grupo.id }, 201);
+  return successResponse(res, { action: "created", id: grupoId }, 201);
 }
 
 /**
- * PUT - Actualizar grupo existente
+ * PUT - Actualizar grupo (upsert: un update offline puede llegar antes
+ * de que el create haya tocado el servidor).
  */
 async function handlePut(req, res, collection, userId) {
   const grupo = req.body;
 
-  if (!grupo || !grupo.id) {
+  if (!grupo || grupo.id === undefined || grupo.id === null) {
     return errorResponse(res, 400, "ID de grupo requerido");
   }
 
-  if (userId) {
-    const existing = await collection.findOne({ id: grupo.id });
-    if (existing && !ownsDoc(existing, userId)) {
-      return errorResponse(res, 403, "No autorizado");
-    }
+  const grupoId = normalizeId(grupo.id);
+  const existing = await collection.findOne({ id: grupoId });
+  if (existing && !ownsDoc(existing, userId)) {
+    return errorResponse(res, 403, "No autorizado");
   }
 
   const nowIso = new Date().toISOString();
   const payload = {
     ...grupo,
-    ...(userId ? { userId } : {}),
+    id: grupoId,
+    userId,
     fechaModificacion: grupo.fechaModificacion || nowIso,
     syncedAt: nowIso,
   };
 
-  const result = await collection.updateOne({ id: grupo.id }, { $set: payload });
-
-  if (result.matchedCount === 0) {
-    return errorResponse(res, 404, "Grupo no encontrado");
-  }
+  const result = await collection.updateOne(
+    { id: grupoId },
+    {
+      $set: payload,
+      $setOnInsert: { createdAt: nowIso },
+    },
+    { upsert: true }
+  );
 
   return successResponse(res, {
-    action: "updated",
-    id: grupo.id,
+    action: result.upsertedCount > 0 ? "created" : "updated",
+    id: grupoId,
     modifiedCount: result.modifiedCount,
   });
 }
 
 /**
- * DELETE - Eliminar grupo
+ * DELETE - Eliminar grupo. Idempotente: borrar algo ya borrado es exito,
+ * asi la cola offline no reintenta operaciones imposibles.
  */
 async function handleDelete(req, res, collection, userId) {
   const { id } = req.query;
@@ -175,21 +208,17 @@ async function handleDelete(req, res, collection, userId) {
     return errorResponse(res, 400, "ID de grupo requerido");
   }
 
-  if (userId) {
-    const existing = await collection.findOne({ id: id });
-    if (existing && !ownsDoc(existing, userId)) {
-      return errorResponse(res, 404, "Grupo no encontrado");
-    }
-  }
-
-  const result = await collection.deleteOne({ id: id });
-  if (result.deletedCount === 0) {
+  const grupoId = normalizeId(id);
+  const existing = await collection.findOne({ id: grupoId });
+  if (existing && !ownsDoc(existing, userId)) {
     return errorResponse(res, 404, "Grupo no encontrado");
   }
 
+  const result = await collection.deleteOne({ id: grupoId, userId });
+
   return successResponse(res, {
     action: "deleted",
-    id,
+    id: grupoId,
     deletedCount: result.deletedCount,
   });
 }

@@ -29,6 +29,11 @@ module.exports = async (req, res) => {
     return errorResponse(res, 401, auth.error);
   }
 
+  const userId = getScopeUserId(req);
+  if (!userId) {
+    return errorResponse(res, 401, "Se requiere sesión de usuario (JWT)");
+  }
+
   try {
     const { db } = await connectToDatabase();
     const collection = db.collection(COLLECTION);
@@ -38,9 +43,6 @@ module.exports = async (req, res) => {
     await collection.createIndex({ tipo: 1 });
     await collection.createIndex({ fechaModificacion: -1 });
     await collection.createIndex({ userId: 1, fechaModificacion: -1 });
-
-    // Additive per-user isolation: scoped when a JWT is present.
-    const userId = getScopeUserId(req);
 
     switch (req.method) {
       case "GET":
@@ -145,18 +147,21 @@ async function handlePut(req, res, collection, userId) {
 
   const update = {
     ...body,
+    id: Number(body.id),
     ...(userId ? { userId } : {}),
     updatedAt: new Date().toISOString(),
   };
 
-  const result = await collection.updateOne({ id: Number(body.id) }, { $set: update });
-
-  if (result.matchedCount === 0) {
-    return errorResponse(res, 404, "Recurso no encontrado");
-  }
+  // Upsert: un update offline puede llegar antes que el create
+  const result = await collection.updateOne(
+    { id: Number(body.id) },
+    { $set: update, $setOnInsert: { createdAt: new Date().toISOString() } },
+    { upsert: true }
+  );
 
   return successResponse(res, {
     updated: true,
+    created: result.upsertedCount > 0,
     recurso: update,
   });
 }
@@ -178,11 +183,12 @@ async function handleDelete(req, res, collection, userId) {
     }
   }
 
+  // Idempotente: borrar algo ya borrado es exito para la cola offline
   const result = await collection.deleteOne({ id: Number(id) });
 
-  if (result.deletedCount === 0) {
-    return errorResponse(res, 404, "Recurso no encontrado");
-  }
-
-  return successResponse(res, { deleted: true, id: Number(id) });
+  return successResponse(res, {
+    deleted: true,
+    id: Number(id),
+    deletedCount: result.deletedCount,
+  });
 }

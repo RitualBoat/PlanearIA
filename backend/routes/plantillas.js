@@ -1,14 +1,19 @@
 /**
  * API de Plantillas - Operaciones CRUD
  *
- * GET    /api/plantillas                     - Listar plantillas (filtro por categoria, tipo)
+ * GET    /api/plantillas                     - Listar plantillas (propias + del sistema)
  * POST   /api/plantillas                     - Crear plantilla
- * PUT    /api/plantillas                     - Actualizar plantilla
- * DELETE /api/plantillas?id=xxx              - Eliminar plantilla
+ * PUT    /api/plantillas                     - Actualizar plantilla (upsert)
+ * DELETE /api/plantillas?id=xxx              - Eliminar plantilla (idempotente)
+ *
+ * Requiere JWT. Las plantillas con esDelSistema=true son visibles para
+ * todos los usuarios pero no pueden modificarse desde la app.
  */
 const { connectToDatabase } = require("../lib/mongodb");
 const {
   validateAuth,
+  getScopeUserId,
+  ownsDoc,
   handleCors,
   applyCors,
   errorResponse,
@@ -27,6 +32,11 @@ module.exports = async (req, res) => {
     return errorResponse(res, 401, auth.error);
   }
 
+  const userId = getScopeUserId(req);
+  if (!userId) {
+    return errorResponse(res, 401, "Se requiere sesión de usuario (JWT)");
+  }
+
   try {
     const { db } = await connectToDatabase();
     const collection = db.collection(COLLECTION);
@@ -37,40 +47,44 @@ module.exports = async (req, res) => {
     await collection.createIndex({ tipo: 1 });
     await collection.createIndex({ fechaModificacion: -1 });
     await collection.createIndex({ esDelSistema: 1 });
+    await collection.createIndex({ userId: 1, fechaModificacion: -1 });
 
     switch (req.method) {
       case "GET":
-        return await handleGet(req, res, collection);
+        return await handleGet(req, res, collection, userId);
       case "POST":
-        return await handlePost(req, res, collection);
+        return await handlePost(req, res, collection, userId);
       case "PUT":
-        return await handlePut(req, res, collection);
+        return await handlePut(req, res, collection, userId);
       case "DELETE":
-        return await handleDelete(req, res, collection);
+        return await handleDelete(req, res, collection, userId);
       default:
         return errorResponse(res, 405, `Method ${req.method} not allowed`);
     }
   } catch (error) {
-    console.error("❌ Error en API plantillas:", error);
+    console.error("Error en API plantillas:", error);
     return errorResponse(res, 500, error.message);
   }
 };
 
+const canRead = (doc, userId) =>
+  doc && (doc.esDelSistema === true || String(doc.userId) === userId);
+
 /**
- * GET - Listar plantillas con filtros opcionales
+ * GET - Listar plantillas propias + del sistema
  */
-async function handleGet(req, res, collection) {
+async function handleGet(req, res, collection, userId) {
   const { id, categoria, tipo, sistema, limit = 500 } = req.query;
 
   if (id) {
     const plantilla = await collection.findOne({ id: Number(id) });
-    if (!plantilla) {
+    if (!canRead(plantilla, userId)) {
       return errorResponse(res, 404, "Plantilla no encontrada");
     }
     return successResponse(res, plantilla);
   }
 
-  const query = {};
+  const query = { $or: [{ userId }, { esDelSistema: true }] };
   if (categoria) query.categoria = categoria;
   if (tipo) query.tipo = tipo;
   if (sistema !== undefined) query.esDelSistema = sistema === "true";
@@ -88,17 +102,24 @@ async function handleGet(req, res, collection) {
 }
 
 /**
- * POST - Crear plantilla
+ * POST - Crear plantilla (idempotente para la cola de sincronizacion)
  */
-async function handlePost(req, res, collection) {
+async function handlePost(req, res, collection, userId) {
   const body = req.body;
 
-  if (!body || !body.nombre) {
-    return errorResponse(res, 400, "El campo 'nombre' es requerido");
+  if (!body || !body.nombre || body.id === undefined || body.id === null) {
+    return errorResponse(res, 400, "Los campos 'nombre' e 'id' son requeridos");
+  }
+
+  const existing = await collection.findOne({ id: body.id });
+  if (existing && (existing.esDelSistema === true || !ownsDoc(existing, userId))) {
+    return errorResponse(res, 403, "No autorizado");
   }
 
   const doc = {
     ...body,
+    userId,
+    esDelSistema: false,
     syncedAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -116,47 +137,63 @@ async function handlePost(req, res, collection) {
 }
 
 /**
- * PUT - Actualizar plantilla existente
+ * PUT - Actualizar plantilla (upsert)
  */
-async function handlePut(req, res, collection) {
+async function handlePut(req, res, collection, userId) {
   const body = req.body;
 
   if (!body || !body.id) {
     return errorResponse(res, 400, "El campo 'id' es requerido para actualizar");
   }
 
+  const plantillaId = Number(body.id);
+  const existing = await collection.findOne({ id: plantillaId });
+  if (existing && (existing.esDelSistema === true || !ownsDoc(existing, userId))) {
+    return errorResponse(res, 403, "No autorizado");
+  }
+
   const update = {
     ...body,
+    id: plantillaId,
+    userId,
+    esDelSistema: false,
     updatedAt: new Date().toISOString(),
   };
 
-  const result = await collection.updateOne({ id: Number(body.id) }, { $set: update });
-
-  if (result.matchedCount === 0) {
-    return errorResponse(res, 404, "Plantilla no encontrada");
-  }
+  const result = await collection.updateOne(
+    { id: plantillaId },
+    { $set: update, $setOnInsert: { createdAt: new Date().toISOString() } },
+    { upsert: true }
+  );
 
   return successResponse(res, {
     updated: true,
+    created: result.upsertedCount > 0,
     plantilla: update,
   });
 }
 
 /**
- * DELETE - Eliminar plantilla por id
+ * DELETE - Eliminar plantilla propia (idempotente)
  */
-async function handleDelete(req, res, collection) {
+async function handleDelete(req, res, collection, userId) {
   const { id } = req.query;
 
   if (!id) {
     return errorResponse(res, 400, "Se requiere el parámetro 'id'");
   }
 
-  const result = await collection.deleteOne({ id: Number(id) });
-
-  if (result.deletedCount === 0) {
-    return errorResponse(res, 404, "Plantilla no encontrada");
+  const plantillaId = Number(id);
+  const existing = await collection.findOne({ id: plantillaId });
+  if (existing && (existing.esDelSistema === true || !ownsDoc(existing, userId))) {
+    return errorResponse(res, 403, "No autorizado");
   }
 
-  return successResponse(res, { deleted: true, id: Number(id) });
+  const result = await collection.deleteOne({ id: plantillaId, userId });
+
+  return successResponse(res, {
+    deleted: true,
+    id: plantillaId,
+    deletedCount: result.deletedCount,
+  });
 }

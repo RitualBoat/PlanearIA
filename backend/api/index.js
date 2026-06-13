@@ -16,6 +16,7 @@ const ROUTES = {
   "/posts": require("../routes/posts.js"),
   "/recursos": require("../routes/recursos.js"),
   "/sync": require("../routes/sync.js"),
+  "/unidades": require("../routes/unidades.js"),
   "/classroom/copiloto": require("../routes/classroom/copiloto.js"),
   "/planeaciones/copiloto": require("../routes/planeaciones/copiloto.js"),
   "/planeaciones/escanear-plantilla": require("../routes/planeaciones/escanear-plantilla.js"),

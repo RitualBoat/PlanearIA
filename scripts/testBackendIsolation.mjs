@@ -1,10 +1,10 @@
 /**
- * Backend per-user isolation smoke (Fase 5).
+ * Backend per-user isolation smoke (Fase 5, endurecido).
  *
  * Exercises the academic + notificaciones endpoints with real JWTs and an
  * in-memory Mongo collection to assert that an authenticated user cannot read,
- * update or delete another user's data, while API-key-only traffic keeps the
- * legacy (unscoped) behavior.
+ * update or delete another user's data, and that API-key-only traffic is
+ * rejected (401) on academic routes: every data operation requires a JWT.
  *
  * Runs offline (no real MongoDB) via a require.cache stub for lib/mongodb.
  */
@@ -122,6 +122,7 @@ const grupos = require("../backend/routes/grupos.js");
 const alumnos = require("../backend/routes/alumnos.js");
 const calificaciones = require("../backend/routes/calificaciones.js");
 const notificaciones = require("../backend/routes/notificaciones.js");
+const unidades = require("../backend/routes/unidades.js");
 const auth = require("../backend/routes/auth.js");
 
 // ---- Mock req/res ----
@@ -189,9 +190,23 @@ async function testGrupos() {
   const getBself = await call(grupos, { method: "GET", token: tokenB, query: { id: "g2" } });
   assert(getBself.statusCode === 200, "B can read its own grupo");
 
-  // Additive compat: API-key-only sees everything (legacy).
+  // Hardened: API-key-only traffic is rejected on academic routes.
   const listLegacy = await call(grupos, { method: "GET" });
-  assert(listLegacy.body.data.count === 2, "API-key-only request sees all grupos (legacy)");
+  assert(listLegacy.statusCode === 401, "API-key-only request is rejected (401)");
+
+  // Idempotent delete: removing an already-deleted grupo succeeds.
+  const delMissing = await call(grupos, { method: "DELETE", token: tokenA, query: { id: "nope" } });
+  assert(
+    delMissing.statusCode === 200 && delMissing.body.data.deletedCount === 0,
+    "Deleting a missing grupo is idempotent success"
+  );
+
+  // Idempotent create: retrying a create updates instead of 409.
+  const retryCreate = await call(grupos, { method: "POST", token: tokenA, body: { id: "g1", nombre: "A2" } });
+  assert(
+    retryCreate.statusCode === 200 && retryCreate.body.data.action === "updated",
+    "Retrying a create upserts instead of failing with 409"
+  );
 }
 
 async function testAlumnos() {
@@ -269,11 +284,41 @@ async function testSesiones() {
   assert(listB.body.data.sessions.length === 1 && listB.body.data.sessions[0].id === "sb", "B still sees only its own session");
 }
 
+async function testUnidades() {
+  resetDb();
+  console.log("[isolation] unidades");
+
+  await call(unidades, { method: "POST", token: tokenA, body: { id: "u1", grupoId: 1, nombre: "Unidad A" } });
+  await call(unidades, { method: "POST", token: tokenB, body: { id: "u2", grupoId: 2, nombre: "Unidad B" } });
+
+  const listA = await call(unidades, { method: "GET", token: tokenA });
+  assert(
+    listA.body.data.count === 1 && listA.body.data.unidades[0].id === "u1",
+    "A lists only its own unidades"
+  );
+
+  const getForeign = await call(unidades, { method: "GET", token: tokenA, query: { id: "u2" } });
+  assert(getForeign.statusCode === 404, "A cannot read B's unidad by id");
+
+  const putForeign = await call(unidades, { method: "PUT", token: tokenA, body: { id: "u2", nombre: "hack" } });
+  assert(putForeign.statusCode === 403, "A cannot update B's unidad");
+
+  const delForeign = await call(unidades, { method: "DELETE", token: tokenA, query: { id: "u2" } });
+  assert(delForeign.statusCode === 404, "A cannot delete B's unidad");
+
+  const noJwt = await call(unidades, { method: "GET" });
+  assert(noJwt.statusCode === 401, "API-key-only request is rejected (401)");
+
+  const retryCreate = await call(unidades, { method: "POST", token: tokenA, body: { id: "u1", grupoId: 1, nombre: "Unidad A2" } });
+  assert(retryCreate.statusCode === 200 && retryCreate.body.data.action === "updated", "Retrying a create upserts");
+}
+
 async function main() {
   await testGrupos();
   await testAlumnos();
   await testCalificacionesBulk();
   await testNotificaciones();
+  await testUnidades();
   await testSesiones();
 
   if (failures > 0) {

@@ -1,5 +1,24 @@
 ﻿# Flujo de Datos y Sincronización - PlanearIA
 
+> **Actualizacion 2026-06:** la sincronizacion se unifico en un motor por entidad
+> (`src/sync/services/entitySync.ts`) coordinado por un orquestador global
+> (`src/context/SyncContext.tsx`). El push/pull, la conectividad y los avisos de
+> UI ahora son transversales a todos los modulos academicos, no solo a
+> planeaciones. Ver el detalle completo en
+> `Documentacion/02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md`.
+>
+> Puntos clave del nuevo flujo:
+> - Cada entidad (grupos, alumnos, asistencias, calificaciones, entregables,
+>   recursos, plantillas, unidades, planeaciones) encola sus mutaciones y baja
+>   la lista autoritativa desde MongoDB conservando el trabajo offline en cola.
+> - La conectividad se evalua con `navigator.onLine` en web y NetInfo en nativo;
+>   la peticion misma es la prueba real (NetInfo no es fiable en web).
+> - El orquestador sincroniza en arranque, login, reconexion, foreground y
+>   polling (12 s) mientras la app esta activa.
+> - Un pull fallido nunca toca los datos locales: la app sobrevive a Vercel o
+>   MongoDB caidos y a modo avion, reintentando despues.
+> - Toda ruta academica del backend exige JWT y es idempotente para la cola.
+
 ## Índice
 
 1. [Visión General](#visión-general)

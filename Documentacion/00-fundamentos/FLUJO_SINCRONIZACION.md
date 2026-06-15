@@ -18,6 +18,15 @@
 > - Un pull fallido nunca toca los datos locales: la app sobrevive a Vercel o
 >   MongoDB caidos y a modo avion, reintentando despues.
 > - Toda ruta academica del backend exige JWT y es idempotente para la cola.
+> - Desde 2026-06-15 `validateAuth` autoriza con un JWT valido por si solo (la
+>   `X-API-Key` queda como legacy opcional): un `EXPO_PUBLIC_API_SECRET`
+>   desalineado ya no bloquea en silencio la sincronizacion de un usuario con
+>   sesion. Un 401/403 ahora se propaga como `authError` y muestra un banner de
+>   "vuelve a iniciar sesion" en vez de simular modo local.
+> - El backend solo acepta CORS desde una lista blanca (env `ALLOWED_ORIGINS` o
+>   el default en `backend/lib/auth.js`). Cada dominio nuevo del frontend
+>   (p. ej. `https://planearai.com`) debe agregarse ahi o el navegador bloquea
+>   el login con "No se pudo conectar al servidor".
 >
 > **Nota de vigencia:** los diagramas y ejemplos legacy que mencionan
 > `SyncProvider`, `useSync`, `syncService.ts` o sync exclusivo de planeaciones
@@ -484,24 +493,35 @@ Para evitar pérdida de datos en conflictos:
 
 ### Autenticación
 
-Todas las peticiones al backend incluyen:
+Las peticiones autenticadas envian el JWT de sesion (y, por compatibilidad
+legacy, la `X-API-Key`):
 
 ```javascript
 headers: {
- 'X-API-Key': 'planearia-dev-secret-2025',
+ 'Authorization': `Bearer ${accessToken}`,
+ 'X-API-Key': API_CONFIG.apiSecret, // legacy opcional
  'Content-Type': 'application/json'
 }
 ```
 
+`backend/lib/auth.js` `validateAuth` autoriza cuando hay un JWT valido (firmado
+por el backend, ya trae el `userId` para aislamiento) o, en su defecto, cuando
+la `X-API-Key` coincide con `API_SECRET`. `/api/auth` (login/registro) no exige
+la API key. Esto evita que un `EXPO_PUBLIC_API_SECRET` desalineado bloquee en
+silencio la sincronizacion de un usuario con sesion valida.
+
 ### CORS
 
-El backend permite peticiones desde cualquier origen (configurado para desarrollo):
+El backend restringe los origenes a una lista blanca, no a `*`. Se toma de la
+variable de entorno `ALLOWED_ORIGINS` (separada por comas) o, si no esta
+definida, del default en `backend/lib/auth.js`. Si el origen de la peticion no
+esta en la lista, la respuesta devuelve el primer origen permitido y el
+navegador bloquea la llamada; el frontend lo reporta como "No se pudo conectar
+al servidor. Revisa que la URL del backend y CORS permitan este frontend.".
 
-```javascript
-'Access-Control-Allow-Origin': '*'
-```
-
-**Nota**: En producción, restringir a dominios específicos.
+Al publicar el frontend en un dominio nuevo (por ejemplo `https://planearai.com`
+y `https://www.planearai.com`) hay que agregarlo a `ALLOWED_ORIGINS` o al
+default y redeployar el backend.
 
 ---
 
@@ -524,6 +544,6 @@ El backend permite peticiones desde cualquier origen (configurado para desarroll
 
 ---
 
-**Última actualización**: Diciembre 16, 2025
-**Versión del proyecto**: 3.0
+**Última actualización**: Junio 15, 2026
+**Versión del proyecto**: 3.1
 

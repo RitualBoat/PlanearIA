@@ -47,6 +47,8 @@ interface SyncContextData {
   pendingCount: number;
   /** False for guest/dev-local sessions or unconfigured API */
   syncEnabled: boolean;
+  /** True when sync is blocked by a 401/403 (session expired/invalid) */
+  authError: boolean;
   /** Transient toast payload (auto-dismissed) */
   notice: SyncNotice | null;
   dismissNotice: () => void;
@@ -64,6 +66,7 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [status, setStatus] = useState<GlobalSyncStatus>("idle");
   const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
   const [pendingCount, setPendingCount] = useState(0);
+  const [authError, setAuthError] = useState(false);
   const [notice, setNotice] = useState<SyncNotice | null>(null);
 
   const syncEnabled = useMemo(
@@ -74,11 +77,13 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isOnlineRef = useRef(isOnline);
   const syncEnabledRef = useRef(syncEnabled);
   const statusRef = useRef(status);
+  const authErrorRef = useRef(authError);
   const runningRef = useRef(false);
   const noticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   isOnlineRef.current = isOnline;
   syncEnabledRef.current = syncEnabled;
   statusRef.current = status;
+  authErrorRef.current = authError;
 
   const dismissNotice = useCallback(() => setNotice(null), []);
 
@@ -113,6 +118,9 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const summary = await syncAllEntities();
         await refreshPendingCount();
 
+        const wasAuthError = authErrorRef.current;
+        setAuthError(summary.authError);
+
         if (summary.skipped) {
           setStatus("idle");
           return;
@@ -126,12 +134,24 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
           pushed: summary.pushed,
         });
 
-        // Only a genuinely unreachable backend (network failure / 5xx) drives
-        // the "servidor no disponible" banner. A single entity returning 4xx
-        // (e.g. a route not deployed yet -> 404, or a stale 401/403) must not
-        // make the whole app claim the server is down while everything else
-        // syncs fine.
-        if (!summary.unreachable) {
+        if (summary.authError) {
+          // Backend reachable but the session was rejected (401/403). Surface a
+          // re-login prompt: never let an auth failure look like silent
+          // local-only mode. Throttled like the server-down notice so the
+          // 12s polling cycle does not spam it.
+          setStatus("error");
+          if (!wasAuthError && reason !== "interval" && reason !== "foreground") {
+            showNotice(
+              "warning",
+              "Tu sesión expiró o no es válida. Vuelve a iniciar sesión para sincronizar tus cambios."
+            );
+          }
+          logger.log("[sync] Sesión rechazada (401/403):", summary.failedEntities.join(", "));
+        } else if (!summary.unreachable) {
+          // Only a genuinely unreachable backend (network failure / 5xx) drives
+          // the "servidor no disponible" banner. A single entity returning a
+          // 4xx (e.g. a route not deployed yet -> 404) must not make the whole
+          // app claim the server is down while everything else syncs fine.
           setStatus("synced");
           setLastSyncAt(summary.ranAt);
 
@@ -218,6 +238,7 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (prev && !token) {
       setStatus("idle");
       setLastSyncAt(null);
+      setAuthError(false);
     }
   }, [authLoading, syncEnabled, syncNow, token]);
 
@@ -254,11 +275,12 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
       lastSyncAt,
       pendingCount,
       syncEnabled,
+      authError,
       notice,
       dismissNotice,
       syncNow,
     }),
-    [isOnline, status, lastSyncAt, pendingCount, syncEnabled, notice, dismissNotice, syncNow]
+    [isOnline, status, lastSyncAt, pendingCount, syncEnabled, authError, notice, dismissNotice, syncNow]
   );
 
   return <SyncContext.Provider value={value}>{children}</SyncContext.Provider>;

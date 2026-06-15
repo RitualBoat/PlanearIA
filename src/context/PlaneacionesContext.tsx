@@ -504,6 +504,18 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
       setDocumentos(nextDocs);
       await enqueueOperation("planeaciones", "/api/planeaciones", type, payload);
       await refreshPendingCount();
+
+      // Push immediately when online so the change reaches other devices right
+      // away, matching the registry entities' queueEntityOperation behavior
+      // instead of waiting for the next orchestrator cycle.
+      if (await canSyncRemotely()) {
+        try {
+          await flushQueue("planeaciones");
+        } catch (error) {
+          logger.error("[planeaciones-context] Immediate flush failed:", error);
+        }
+        await refreshPendingCount();
+      }
     },
     [refreshPendingCount, saveLocal]
   );
@@ -530,6 +542,7 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
     pushed: number;
     pulled: number;
     unreachable: boolean;
+    authError: boolean;
   }> => {
     const outcome = {
       entity: "planeaciones",
@@ -538,6 +551,7 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
       pushed: 0,
       pulled: 0,
       unreachable: false,
+      authError: false,
     };
 
     if (authLoading || !isSyncConfigured || !(await canSyncRemotely())) {
@@ -553,6 +567,7 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
 
       const flushResult = await flushQueue("planeaciones");
       outcome.pushed = flushResult.processed;
+      if (flushResult.authError) outcome.authError = true;
       if (!flushResult.success || flushResult.skipped > 0) {
         outcome.ok = false;
       }
@@ -578,6 +593,7 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
         // 5xx = server down; 4xx = route/entity issue (not "server down")
         outcome.ok = false;
         if (response.status >= 500) outcome.unreachable = true;
+        if (response.status === 401 || response.status === 403) outcome.authError = true;
       }
 
       await refreshPendingCount();

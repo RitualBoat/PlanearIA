@@ -247,6 +247,42 @@ describe("syncEngine", () => {
       expect(persistedQueue[0].retries).toBe(0);
       expect(persistedQueue[0].failed).toBe(false);
     });
+
+    it("marca authError y conserva la operacion intacta cuando el backend responde 401", async () => {
+      (AsyncStorage.getItem as jest.Mock).mockReset();
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+
+      const op: GenericPendingOp<TestItem> = {
+        opId: "auth_op",
+        entity: ENTITY,
+        type: "create",
+        endpoint: ENDPOINT,
+        payload: { id: "auth1", nombre: "Auth" },
+        createdAt: new Date().toISOString(),
+        retries: 0,
+        failed: false,
+      };
+      mockStorageGet([op]);
+      // Reachable backend rejecting the session/token
+      mockFetch.mockResolvedValueOnce({ ok: false, status: 401 });
+
+      const result = await flushQueue(ENTITY);
+
+      expect(result.authError).toBe(true);
+      expect(result.success).toBe(false);
+      expect(result.processed).toBe(0);
+      expect(result.skipped).toBe(1);
+
+      // La operacion sigue en cola intacta (sin reintento consumido), lista
+      // para reintentar tras re-login
+      const setItemCalls = (AsyncStorage.setItem as jest.Mock).mock.calls;
+      const persistedQueue: GenericPendingOp[] = JSON.parse(
+        setItemCalls[setItemCalls.length - 1][1] as string
+      );
+      expect(persistedQueue).toHaveLength(1);
+      expect(persistedQueue[0].retries).toBe(0);
+      expect(persistedQueue[0].failed).toBe(false);
+    });
   });
 
   // â”€â”€â”€ resolveConflict â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

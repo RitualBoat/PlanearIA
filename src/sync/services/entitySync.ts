@@ -186,11 +186,16 @@ export interface EntitySyncOutcome {
   pulled: number;
   /**
    * True only when the backend was genuinely unreachable for this entity:
-   * a network failure or a 5xx. A 4xx (e.g. a route not deployed yet -> 404,
-   * or 401/403) is an entity-level issue, NOT "server down", so it must not
-   * trigger the global offline banner.
+   * a network failure or a 5xx. A 4xx (e.g. a route not deployed yet -> 404)
+   * is an entity-level issue, NOT "server down", so it must not trigger the
+   * global offline banner.
    */
   unreachable: boolean;
+  /**
+   * True when the backend rejected the request with 401/403: reachable but
+   * unauthorized. Drives a re-login prompt instead of a silent local-only mode.
+   */
+  authError: boolean;
 }
 
 export const syncEntity = async (
@@ -203,11 +208,13 @@ export const syncEntity = async (
     pushed: 0,
     pulled: 0,
     unreachable: false,
+    authError: false,
   };
 
   // 1. Push queued local mutations
   const flush = await flushQueue(config.entity);
   outcome.pushed = flush.processed;
+  if (flush.authError) outcome.authError = true;
   if (!flush.success || flush.skipped > 0) {
     outcome.ok = false;
   }
@@ -221,6 +228,9 @@ export const syncEntity = async (
       // 5xx = server can't serve it (down/broken); 4xx = entity/route issue
       if (response.status >= 500) {
         outcome.unreachable = true;
+      }
+      if (response.status === 401 || response.status === 403) {
+        outcome.authError = true;
       }
       outcome.ok = false;
       logger.log(`[entitySync] GET ${config.endpoint} -> HTTP ${response.status}`);
@@ -289,6 +299,8 @@ export interface SyncSummary {
   failedEntities: string[];
   /** True when at least one entity could not reach the backend (network/5xx) */
   unreachable: boolean;
+  /** True when at least one entity was rejected with 401/403 (re-login needed) */
+  authError: boolean;
   ranAt: string;
 }
 
@@ -309,6 +321,7 @@ export const syncAllEntities = async (): Promise<SyncSummary> => {
       changedEntities: [],
       failedEntities: [],
       unreachable: false,
+      authError: false,
       ranAt: new Date().toISOString(),
     };
 
@@ -327,6 +340,7 @@ export const syncAllEntities = async (): Promise<SyncSummary> => {
             pushed: 0,
             pulled: 0,
             unreachable: true,
+            authError: false,
           })
         )
       )
@@ -342,6 +356,7 @@ export const syncAllEntities = async (): Promise<SyncSummary> => {
             pushed: 0,
             pulled: 0,
             unreachable: true,
+            authError: false,
           })
         )
       )
@@ -351,6 +366,7 @@ export const syncAllEntities = async (): Promise<SyncSummary> => {
       summary.pushed += outcome.pushed;
       if (outcome.changed) summary.changedEntities.push(outcome.entity);
       if (outcome.unreachable) summary.unreachable = true;
+      if (outcome.authError) summary.authError = true;
       if (!outcome.ok) {
         summary.ok = false;
         summary.failedEntities.push(outcome.entity);

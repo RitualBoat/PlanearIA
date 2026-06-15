@@ -18,18 +18,24 @@ import { COLORS } from "../../types";
 import { useSyncStatus, type SyncNotice } from "../context/SyncContext";
 
 export const SyncOfflineBar: React.FC = () => {
-  const { isOnline, status, pendingCount, syncEnabled, syncNow } = useSyncStatus();
+  const { isOnline, status, pendingCount, syncEnabled, authError, syncNow } = useSyncStatus();
   const insets = useSafeAreaInsets();
 
+  const showAuthError = isOnline && syncEnabled && authError;
   const showOffline = !isOnline;
-  const showServerDown = isOnline && syncEnabled && status === "error";
+  // Server-down only when it is not actually an auth rejection
+  const showServerDown = isOnline && syncEnabled && status === "error" && !authError;
 
-  if (!showOffline && !showServerDown) return null;
+  if (!showOffline && !showServerDown && !showAuthError) return null;
 
   const pendingSuffix = pendingCount > 0 ? ` ${pendingCount} cambios por sincronizar.` : "";
-  const message = showOffline
-    ? `Sin conexión. Puedes seguir trabajando: tus cambios se guardan en este dispositivo.${pendingSuffix}`
-    : `Servidor no disponible. Trabajando con datos locales.${pendingSuffix}`;
+  const message = showAuthError
+    ? `Tu sesión expiró o no es válida. Vuelve a iniciar sesión para sincronizar.${pendingSuffix}`
+    : showOffline
+      ? `Sin conexión. Puedes seguir trabajando: tus cambios se guardan en este dispositivo.${pendingSuffix}`
+      : `Servidor no disponible. Trabajando con datos locales.${pendingSuffix}`;
+
+  const iconName = showAuthError ? "lock-outline" : showOffline ? "cloud-off" : "cloud-queue";
 
   return (
     <View
@@ -38,7 +44,7 @@ export const SyncOfflineBar: React.FC = () => {
       accessibilityLabel={message}
     >
       <MaterialIcons
-        name={showOffline ? "cloud-off" : "cloud-queue"}
+        name={iconName}
         size={16}
         color={COLORS.textOnPrimary}
       />

@@ -11,16 +11,25 @@ if (!API_SECRET) {
 }
 
 /**
- * Valida que la request tenga el API secret correcto
+ * Authorizes a request. A valid JWT alone is sufficient: it is signed by the
+ * backend and already carries the userId used for isolation, so it is strictly
+ * stronger auth than the shared API key. The X-API-Key check stays as optional
+ * legacy for routes/clients that send only the key. This prevents a stale or
+ * mismatched EXPO_PUBLIC_API_SECRET from silently blocking all sync while the
+ * user is genuinely logged in.
  */
 function validateAuth(req) {
+  if (getUserFromToken(req)) {
+    return { valid: true };
+  }
+
   const authHeader = req.headers["x-api-key"] || req.headers["authorization"];
 
   if (!authHeader) {
     return { valid: false, error: "Missing API key" };
   }
 
-  const apiKey = authHeader.replace("Bearer ", "");
+  const apiKey = String(authHeader).replace(/^Bearer\s+/i, "").trim();
 
   if (apiKey !== API_SECRET) {
     return { valid: false, error: "Invalid API key" };
@@ -77,6 +86,8 @@ function ownsDoc(existing, userId, ownerField = "userId") {
  * Orígenes permitidos para CORS
  */
 const ALLOWED_ORIGINS = [
+  "https://planearai.com",
+  "https://www.planearai.com",
   "https://planearia.app",
   "https://planearia.vercel.app",
   "https://planearia-web.vercel.app",

@@ -165,3 +165,33 @@ Correccion (cliente, sin necesidad de desplegar):
 Resultado: el banner solo aparece cuando el backend esta realmente inalcanzable (Vercel/Mongo caidos o sin red). Una ruta nueva sin desplegar deja de provocar el aviso falso. Al desplegar `backend/routes/unidades.js`, las unidades empiezan a sincronizar sin cambios adicionales en el cliente.
 
 Pendiente del usuario: desplegar el backend para activar `/api/unidades` y el endurecimiento JWT en todas las rutas academicas.
+
+---
+
+## 10. Fix: secreto desalineado, fallo silencioso y dominio propio (2026-06-15)
+
+Sintoma original: nada sincronizaba cross-device. Crear una planeacion o grupos en un dispositivo no aparecia en otro, y la app se comportaba como si solo trabajara con datos locales, sin aviso de error.
+
+Causa raiz (auditoria contra el backend desplegado):
+
+- El `EXPO_PUBLIC_API_SECRET` del frontend no coincidia con el `API_SECRET` del backend. Como `/api/auth` no valida la API key, el login funcionaba y la app parecia autenticada, pero toda ruta academica respondia `401 "Invalid API key"`. El cliente trataba el 401 como transitorio y no mostraba banner: fallo 100% silencioso.
+- El deploy del backend habia quedado apuntando a la raiz del repo (build `npm run build:web`), por lo que `backend-eight-chi-54.vercel.app` servia el SPA web y `/api/*` devolvia HTML. Corregido fijando `Root Directory = backend` y build vacio (ver `Documentacion/02-operacion/DEPLOY_DEMO_HOSTEADA.md`, Caso A).
+
+Endurecimiento aplicado (cliente y backend):
+
+- `backend/lib/auth.js` `validateAuth`: ahora autoriza con un JWT valido aunque la `X-API-Key` falte o no coincida. El JWT esta firmado por el backend y ya trae el `userId` para aislamiento, asi que es auth mas fuerte que la API key compartida. Un `EXPO_PUBLIC_API_SECRET` desalineado ya no bloquea en silencio a un usuario con sesion. Tokens forjados se siguen rechazando.
+- `src/sync/services/syncEngine.ts`: un 401/403 marca `EngineResult.authError`, conserva la operacion en cola sin consumir reintentos y detiene el ciclo (un token invalido no se arregla a mitad de flush). Antes el 401 se reintentaba en silencio.
+- `src/sync/services/entitySync.ts`: `EntitySyncOutcome` y `SyncSummary` ganan `authError`, propagado desde push y pull.
+- `src/context/SyncContext.tsx`: expone `authError` y, ante 401/403, muestra un banner de "vuelve a iniciar sesion" en vez de simular modo local. Throttle igual que el banner de servidor caido.
+- `src/components/SyncStatusBanner.tsx`: tercer estado visual para `authError` (icono `lock-outline`, mensaje de re-login).
+- `src/context/PlaneacionesContext.tsx`: flush inmediato en create/update/delete (igual que `queueEntityOperation` del registry) para que el cambio llegue a otros dispositivos al instante y no espere al ciclo de 12 s; tambien propaga `authError`.
+
+Fix de CORS y dominio propio (`planearai.com`):
+
+- Sintoma: con backend ya sano, el login desde `https://planearai.com` devolvia "No se pudo conectar al servidor. Revisa que la URL del backend y CORS permitan este frontend.".
+- Diagnostico: el preflight a `/api/auth` con `Origin: https://planearai.com` devolvia `Access-Control-Allow-Origin: https://planearia.app` (fallback al primer origen permitido). El dominio nuevo no estaba en la lista blanca. El bundle del frontend si apuntaba bien a `https://backend-eight-chi-54.vercel.app`.
+- Correccion: se agregaron `https://planearai.com` y `https://www.planearai.com` al default `ALLOWED_ORIGINS` en `backend/lib/auth.js`. Alternativa equivalente: definir la env `ALLOWED_ORIGINS` (lista separada por comas) en el proyecto backend de Vercel. Requiere redeploy del backend.
+
+Validacion: `npx tsc --noEmit` OK, `npm run lint -- --quiet` (focalizado) OK, `npx jest src/__tests__/sync` 23/23 OK (incluye nuevo test de `authError` en 401), `npx jest src/__tests__/{planeaciones,contenido,chat,perfil}` 130/130 OK, smoke de `validateAuth` en Node (JWT solo autoriza, token forjado rechazado).
+
+Pendiente del usuario: tras desplegar el backend con estos cambios, validar cross-device (crear en web -> aparece en APK en ~12 s) y rotar la API key de Resend que quedo expuesta localmente.

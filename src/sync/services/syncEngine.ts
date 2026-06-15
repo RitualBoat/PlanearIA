@@ -43,6 +43,12 @@ export interface EngineResult {
   processed: number;
   skipped: number;
   errors: string[];
+  /**
+   * True when the backend rejected the request with 401/403. The backend is
+   * reachable but the session/token (or legacy API key) is not accepted, so
+   * this must surface as a re-login prompt instead of a silent local-only mode.
+   */
+  authError: boolean;
 }
 
 // ─── Constantes ──────────────────────────────────────────────────────────────
@@ -166,6 +172,7 @@ export const flushQueue = async (
     processed: 0,
     skipped: 0,
     errors: [],
+    authError: false,
   };
 
   // No connectivity pre-check: NetInfo is unreliable (especially on web),
@@ -182,10 +189,11 @@ export const flushQueue = async (
   const remaining: GenericPendingOp[] = [];
   const newFailed: GenericPendingOp[] = [];
   let unreachable = false;
+  let authHalt = false;
 
   for (const op of queue) {
-    if (unreachable) {
-      // Connectivity already failed in this cycle; keep the rest intact
+    if (unreachable || authHalt) {
+      // Connectivity or auth already failed in this cycle; keep the rest intact
       remaining.push(op);
       result.skipped++;
       continue;
@@ -217,14 +225,25 @@ export const flushQueue = async (
         if (SYNC_CONFIG.debugMode) {
           logger.log(`[syncEngine] ${op.type} ${entity} ${op.opId} ok`);
         }
+      } else if (response.status === 401 || response.status === 403) {
+        // Reachable backend but the session/token (or legacy API key) is not
+        // accepted. Not the op's fault: keep it queued without burning retries
+        // so it flushes after re-login, and stop this cycle (a bad token will
+        // not fix itself mid-flush). Surfaced as authError, never swallowed.
+        result.authError = true;
+        result.success = false;
+        remaining.push(op);
+        result.skipped++;
+        authHalt = true;
+        logger.error(`[syncEngine] ${op.type} ${entity} rechazado con HTTP ${response.status} (auth)`);
+        continue;
       } else {
-        // Client errors (400/403/404...) will not fix themselves by
-        // retrying; drop the op to the failed queue right away. 401 may
-        // recover after a token refresh and 408/429 are transient.
+        // Client errors (400/404...) will not fix themselves by retrying; drop
+        // the op to the failed queue right away. 408/429 are transient.
         const permanent =
           response.status >= 400 &&
           response.status < 500 &&
-          ![401, 408, 429].includes(response.status);
+          ![408, 429].includes(response.status);
         if (permanent) {
           logger.error(
             `[syncEngine] ${op.type} ${entity} rechazado con HTTP ${response.status}, no se reintenta`

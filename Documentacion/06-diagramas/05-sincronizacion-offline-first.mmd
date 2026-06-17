@@ -1,0 +1,45 @@
+%% Sincronizacion offline-first - PlanearIA
+%% Escritura optimista local + cola por entidad + push/pull autoritativo cross-device
+flowchart TB
+    subgraph device["Dispositivo (offline-first)"]
+        ui["Pantalla (View)"]
+        vm["Hook ViewModel"]
+        context["Context / Provider<br/>(verdad en memoria)"]
+
+        subgraph local["Persistencia local"]
+            asyncs[("AsyncStorage<br/>@planearia:* (default)")]
+            sqlite[("SQLite (opt-in)<br/>cola sync / datos relacionales")]
+        end
+
+        subgraph engine["Motor src/sync"]
+            queue["syncEngine<br/>cola FIFO por entidad<br/>@planearia:pending_ops_v2_*<br/>reintentos (max 5) + LWW"]
+            entity["entitySync<br/>SYNC_ENTITIES + reconcileWithPending"]
+            orch["SyncContext (orquestador)<br/>triggers: startup, login, reconnect,<br/>foreground, polling 12s, manual"]
+            conn["connectivity (NetInfo)"]
+            events["syncEvents<br/>entity-updated -> refresca contexts"]
+        end
+
+        banner["SyncStatusBanner<br/>offline / servidor caido / re-login"]
+    end
+
+    apiclient["utils/apiClient<br/>HTTPS + JWT Bearer"]
+    api["Vercel API<br/>/api/:entidad"]
+    mongo[("MongoDB Atlas<br/>aislado por userId")]
+
+    ui --> vm --> context
+    context -->|"1. escritura optimista (UI inmediata)"| local
+    context -->|"2. queueEntityOperation"| queue
+
+    orch -->|"syncAllEntities"| entity
+    entity -->|"PUSH: flushQueue"| queue
+    queue -->|"POST / PUT / DELETE (idempotente)"| apiclient
+    entity -->|"PULL: GET ?limit=500"| apiclient
+    apiclient <-->|"JSON"| api
+    api <-->|"CRUD por userId + indices"| mongo
+
+    entity -->|"reconcilia remoto + pendientes<br/>(pull fallido NO toca local)"| asyncs
+    asyncs --> events --> context
+    conn --> orch
+    orch --> banner
+
+    queue -. "invitado / dev-local / API no configurada<br/>= 100% local, sin red" .-> local

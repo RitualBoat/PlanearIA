@@ -1,0 +1,40 @@
+%% Flujo CI/CD - PlanearIA (GitHub Actions + Vercel)
+flowchart TB
+    subgraph triggers["Disparadores"]
+        pr["Pull Request<br/>-> main / development"]
+        push["Push<br/>-> main / development"]
+        tag["Tag v*"]
+        manual["workflow_dispatch (manual)"]
+    end
+
+    subgraph ci["CI .github/workflows/ci.yml (jobs en paralelo)"]
+        tc["typecheck<br/>npx tsc --noEmit"]
+        lint["lint<br/>npm run lint -- --quiet"]
+        test["test<br/>npm test -- --runInBand"]
+        smoke["backend smoke<br/>backend:check (static API + isolation)"]
+    end
+
+    subgraph cd["CD .github/workflows/cd.yml"]
+        webjob["web<br/>typecheck + expo export --platform web<br/>-> zip + sha256"]
+        androidjob["android<br/>prebuild + gradlew assembleRelease<br/>-> APK + sha256 (continue-on-error)"]
+        release["release<br/>publica GitHub Release (needs web)"]
+        webjob --> release
+        androidjob --> release
+    end
+
+    pr --> ci
+    push --> ci
+    push --> cd
+    tag --> cd
+    manual --> cd
+
+    ci -->|"estado verde requerido"| mergeok(["Merge / branch verde"])
+    release --> ghrel[("GitHub Releases<br/>web bundle + APK demo")]
+
+    subgraph deploy["Deploy hosteado (integracion Git de Vercel, fuera de Actions)"]
+        vercelbe["Vercel: backend serverless<br/>(/api/*)"]
+        vercelweb["Vercel: web hosteada<br/>planearia-web.vercel.app"]
+    end
+
+    push -.->|"auto-deploy Vercel"| vercelbe
+    push -.->|"auto-deploy Vercel"| vercelweb

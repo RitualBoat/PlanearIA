@@ -1,0 +1,66 @@
+%% Arquitectura del Backend - PlanearIA
+%% Node serverless en Vercel, router unico, MongoDB Atlas, IA gateway multi-provider
+flowchart TB
+    subgraph clients["Clientes"]
+        web["App Web<br/>(react-native-web)"]
+        apk["App Android<br/>(APK standalone)"]
+        expo["Expo Go / dev-client"]
+    end
+
+    subgraph vercel["Vercel Serverless (Node)"]
+        router["api/index.js<br/>router unico + normalizeApiPath + CORS"]
+
+        subgraph routes["backend/routes (handlers)"]
+            acad["Academico (sync por entidad)<br/>grupos, alumnos, unidades, asistencias,<br/>calificaciones, entregables, recursos,<br/>plantillas, planeaciones, sync"]
+            social["Social<br/>posts, contactos, mensajes, notificaciones"]
+            authr["auth.js<br/>login / registro / recuperar"]
+            ai["IA<br/>planeaciones/(copiloto, generar, mejorar,<br/>escanear-plantilla), classroom/copiloto"]
+            health["health.js"]
+        end
+
+        subgraph libs["backend/lib"]
+            authlib["auth.js<br/>validateAuth, getScopeUserId, ownsDoc, CORS"]
+            tokens["tokens.js (JWT)"]
+            passwords["passwords.js (bcrypt)"]
+            rate["rateLimit.js"]
+            sessions["authSessions.js / resetCodes.js"]
+            mongolib["mongodb.js<br/>cliente cacheado"]
+            idx["databaseIndexes.js<br/>createIndex idempotente"]
+            aigw["aiGateway.js<br/>cascada multi-provider"]
+            ailimit["aiUsageLimiter.js"]
+        end
+    end
+
+    subgraph data["Datos y servicios externos"]
+        mongo[("MongoDB Atlas M0<br/>planeariaDB<br/>aislado por userId")]
+        providers["Proveedores IA OpenAI-compatible<br/>OpenRouter / Groq / OpenAI"]
+    end
+
+    web -->|"HTTPS + JWT Bearer"| router
+    apk -->|"HTTPS + JWT Bearer"| router
+    expo -->|"HTTPS + JWT Bearer"| router
+
+    router --> acad
+    router --> social
+    router --> authr
+    router --> ai
+    router --> health
+
+    acad -->|"validateAuth + userId scope"| authlib
+    social --> authlib
+    authr --> authlib
+    authlib --> tokens
+    authr --> passwords
+    authr --> sessions
+    authr --> rate
+
+    acad -->|"connectToDatabase"| mongolib
+    social --> mongolib
+    authr --> mongolib
+    acad -.->|"ensureIndexes por endpoint"| idx
+    mongolib --> mongo
+    idx --> mongo
+
+    ai --> aigw
+    ai --> ailimit
+    aigw --> providers

@@ -1,0 +1,33 @@
+%% Estructura de carpetas del repositorio - PlanearIA
+flowchart LR
+    root["PlanearIA/"]
+
+    root --> appentry["App.tsx (entry point)"]
+    root --> src["src/ (frontend)"]
+    root --> backend["backend/ (serverless)"]
+    root --> types["types/ (tipos TS centralizados)"]
+    root --> doc["Documentacion/ (00-fundamentos ... 06-diagramas)"]
+    root --> ctx["context/ (ground truth, stitch-results)"]
+    root --> agents[".agents/skills/ (writing-style, token-efficiency)"]
+    root --> gh[".github/workflows/ (ci.yml, cd.yml)"]
+    root --> scripts["scripts/ (backend local, smoke, isolation)"]
+    root --> assets["assets/  ·  shared/  ·  dist/"]
+
+    src --> screens["screens/ (Views)<br/>classroom, planeaciones, alumnos, grupos,<br/>feed, social, chat, auth, biblioteca, ..."]
+    src --> hooks["hooks/ (ViewModels)"]
+    src --> context["context/ (Providers: Auth, Sync, Grupos,<br/>Alumnos, Theme, ...)"]
+    src --> services["services/ (auth, push, classroom I/O)"]
+    src --> sync["sync/ (motor offline-first)"]
+    src --> nav["navigation/ (StackNavigator, AppTabsNavigator)"]
+    src --> components["components/ (SyncStatusBanner, modales, ...)"]
+    src --> themes["themes/ (colors, tokens)"]
+    src --> utils["utils/ (apiClient, logger, networkErrors)"]
+    src --> tests["__tests__/ (Jest)"]
+    src --> locales["locales/ (i18n)"]
+
+    sync --> syncsvc["services/<br/>entitySync, syncEngine, syncEvents,<br/>connectivity, syncQueueSqlite*"]
+    sync --> synccfg["config/apiConfig.ts"]
+
+    backend --> api["api/index.js (router)"]
+    backend --> broutes["routes/ (CRUD academico + social + IA + auth)"]
+    backend --> blib["lib/ (auth, tokens, passwords, mongodb,<br/>aiGateway, aiUsageLimiter, rateLimit, ...)"]

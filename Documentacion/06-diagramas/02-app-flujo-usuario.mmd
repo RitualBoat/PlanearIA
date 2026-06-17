@@ -1,0 +1,41 @@
+%% Arquitectura de la App - Flujo de usuario + capas MVVM
+%% PlanearIA React Native + Expo, offline-first
+flowchart TD
+    start(["Inicio (App.tsx)"]) --> providers["Providers globales<br/>Auth, Sync, Theme, FontSize, Daltonismo,<br/>Grupos, Alumnos, Recursos, ..."]
+    providers --> authCheck{"Sesion valida?"}
+
+    authCheck -->|"No"| authStack["Stack Auth<br/>Login / Registro / Recuperar contrasena"]
+    authStack -->|"login ok"| authCheck
+    authStack -->|"continuar como invitado"| guest["Modo invitado<br/>(solo local, sin sync remoto)"]
+
+    authCheck -->|"Si"| onboarding{"Onboarding visto?"}
+    onboarding -->|"No"| onb["Onboarding"]
+    onboarding -->|"Si"| tabs
+    onb --> tabs
+    guest --> tabs
+
+    subgraph tabs["AppTabsNavigator (barra inferior)"]
+        feed["Feed"]
+        recursos["Recursos / Contenido"]
+        classroom["Classroom (Grupos)"]
+        social["Social"]
+        config["Configuracion"]
+    end
+
+    classroom --> grupos["Grupo -> Tablon, Personas,<br/>Unidades, Tareas, Asistencia, Calificaciones"]
+    recursos --> plan["Planeaciones (editor tipo Word/Docs + IA)"]
+    recursos --> biblio["Biblioteca / Plantillas"]
+    social --> chat["Chat / Contactos"]
+    config --> cuenta["Perfil / Cuenta / Accesibilidad"]
+
+    %% Capas MVVM que atraviesan cada pantalla
+    subgraph mvvm["Patron MVVM por pantalla"]
+        direction LR
+        view["View<br/>screens/*Screen.tsx"] --> viewmodel["ViewModel<br/>hooks/use*ViewModel.ts"]
+        viewmodel --> model["Model<br/>context/*Context.tsx"]
+        model --> svc["Services + Sync<br/>services/, sync/, utils/apiClient"]
+        svc --> persist[("Persistencia local<br/>AsyncStorage default<br/>SQLite opt-in")]
+        svc -->|"online"| remote["Backend Vercel + MongoDB"]
+    end
+
+    tabs -.->|"cada modulo usa"| mvvm

@@ -27,6 +27,7 @@ La estructura de tabs es provisional. El futuro plan UX/UI puede reemplazarla po
 | Experiencia objetivo | Carpetas actuales relacionadas | Decision vigente |
 | --- | --- | --- |
 | Inicio / Sistema Operativo Docente | `feed`, `contenido`, `classroom`, `notificaciones`, futuros widgets | No existe como experiencia objetivo aun; debe definirse en UX/UI Global. |
+| Asistente IA / ChatGPT Docente | `backend/lib/aiGateway.js`, endpoints IA de planeaciones/classroom, futuros `screens/ai` o panel contextual | No existe como experiencia completa; debe definirse como chat propio con adjuntos desde Office, Classroom y Canva. |
 | Office Docente | `planeaciones`, `plantillas`, `alumnos`, `asistencia`, `calificaciones`, import/export | Unifica Word + Excel: documentos, hojas, listas, rubricas, asistencia y calificaciones. |
 | Classroom / Clases | `classroom`, `grupos`, `alumnos`, `tareas`, `biblioteca`, `asistencia`, `calificaciones` | Cerrado como base funcional; puede redisenarse visualmente desde cero. |
 | Canva / Genially Docente | `biblioteca`, `plantillas`, recursos visuales futuros | Futuro editor/experiencia visual; no duplicar biblioteca sin decision. |
@@ -52,6 +53,7 @@ La estructura de tabs es provisional. El futuro plan UX/UI puede reemplazarla po
 | `feed` | Posts, retos, detalle | Congelar o reducir si distrae; posible comunidad futura. |
 | `social` | Busqueda de perfiles/contactos | Base para WhatsApp Docente. |
 | `chat` | Chats y conversaciones | Base para WhatsApp Docente. |
+| futuros `ai` / `asistente` | No existe carpeta dedicada | Futura experiencia ChatGPT/Gemini Docente; debe reutilizar `aiGateway` y objetos existentes. |
 | `notificaciones` | Notificaciones internas/push | Transversal. |
 | `auth` | Login, registro, recuperar | Base de Auth/Seguridad. |
 | `cuenta` | Perfil, roles, sesiones, terminos, preferencias | Cuenta/seguridad/accesibilidad. |
@@ -61,6 +63,7 @@ La estructura de tabs es provisional. El futuro plan UX/UI puede reemplazarla po
 ## Decisiones Vigentes
 
 - Office Docente debe reemplazar la separacion conceptual Word vs Excel.
+- Asistente IA / ChatGPT Docente debe existir como experiencia conversacional propia, pero todas sus acciones deben ser confirmables.
 - Classroom organiza y asigna; no debe crear todo.
 - Contenido/Biblioteca/Plantillas no deben duplicar Office, Classroom o Canva.
 - Feed/social no son prioridad si no ayudan al trabajo docente.
@@ -73,6 +76,7 @@ La estructura de tabs es provisional. El futuro plan UX/UI puede reemplazarla po
 - Definir navegacion objetivo.
 - Definir que pasa con `ContenidoTab`.
 - Decidir si Office Docente sera tab, hub, workspace o herramienta contextual.
+- Decidir si el Asistente IA sera tab, panel lateral, command palette o accion flotante contextual.
 - Decidir si WhatsApp Docente reemplaza Social/Chat/parte del Feed.
 - Decidir si Plantillas es global, parte de Office o parte de Canva.
 - Consolidar accesibilidad real y preferencias.

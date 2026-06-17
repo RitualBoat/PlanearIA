@@ -85,6 +85,18 @@ Regla: si existe flujo contextual en Classroom, no volver a formularios legacy c
 
 Estas rutas deben revisarse en UX/UI Global. Pueden vivir dentro de Office, Classroom, Canva o biblioteca transversal.
 
+### Asistente IA / ChatGPT Docente Futuro
+
+No existe ruta dedicada todavia. El futuro plan UX/UI debe decidir si vive como:
+
+- Tab principal.
+- Panel lateral.
+- Accion flotante contextual.
+- Command palette.
+- Pantalla stack invocada desde Office, Classroom, Canva, Reportes o Calendario.
+
+Regla: cualquier chatbot IA debe pasar por backend/AI Gateway y confirmar antes de guardar, asignar o enviar.
+
 ### Social / Chat / Comunidad
 
 - `PostDetail`
@@ -125,6 +137,7 @@ Base tecnica para WhatsApp Docente y comunidad profesional.
 La navegacion objetivo debe partir de la vision actual:
 
 - Inicio como sistema operativo docente.
+- Asistente IA como espacio conversacional propio conectado a objetos reales de la app.
 - Office Docente como workspace de documentos/hojas.
 - Classroom como organizador/asignador.
-- Canva, WhatsApp, Calendario, Reportes y Cuenta como experiencias conectadas.
+- Asistente IA, Canva, WhatsApp, Calendario, Reportes y Cuenta como experiencias conectadas.

@@ -15,6 +15,7 @@ Para experiencias madre de paridad alta, no basta escribir "tipo Classroom", "ti
 Experiencias de paridad alta actuales:
 
 - Office Docente: Word/Docs + Excel/Sheets + LibreOffice/OnlyOffice como ground truth conceptual.
+- Asistente IA / ChatGPT Docente: ChatGPT, Gemini, NotebookLM o copilotos similares como ground truth de conversacion, adjuntos y acciones.
 - Classroom: Google Classroom/Classroomio.
 - Canva/Genially.
 - WhatsApp profesional.
@@ -55,7 +56,7 @@ Antes de implementar una fase visual de paridad alta, la IA debe escribir un bri
 
 La vision nueva une Word y Excel dentro de Office Docente. Por lo tanto, futuros planes no deben tratar documentos y hojas como mundos aislados salvo que el plan lo justifique.
 
-Classroom sigue siendo experiencia madre, pero debe recibir objetos creados desde Office, Canva, WhatsApp y Calendario.
+Classroom sigue siendo experiencia madre, pero debe recibir objetos creados desde Office, Asistente IA, Canva, WhatsApp y Calendario.
 
 ## Relacion Con La Meta Guia
 

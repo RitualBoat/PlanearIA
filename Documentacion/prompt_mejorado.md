@@ -21,9 +21,10 @@ PlanearIA es una plataforma educativa para docentes mexicanos. Esta construida c
 - SQLite/Expo SQLite como infraestructura opt-in, no default.
 - Motor global de sincronizacion en `src/sync`.
 - IA centralizada en backend mediante `backend/lib/aiGateway.js`.
+- Vision de Asistente IA / ChatGPT Docente propio, con adjuntos desde experiencias y proveedores cloud/locales via AI Gateway.
 - CI/CD con GitHub Actions para typecheck, lint, tests, web bundle y APK standalone.
 
-El principio de producto es **cero friccion**: un docente no deberia sentir que aprende software nuevo. Debe sentir que abre una suite docente completa dentro de un solo ecosistema: Office Docente para documentos y hojas, Classroom para clases, Canva/Genially para materiales visuales, WhatsApp profesional para comunicacion, calendario, reportes, seguimiento e IA conectando todo.
+El principio de producto es **cero friccion**: un docente no deberia sentir que aprende software nuevo. Debe sentir que abre una suite docente completa dentro de un solo ecosistema: Office Docente para documentos y hojas, Asistente IA tipo ChatGPT/Gemini, Classroom para clases, Canva/Genially para materiales visuales, WhatsApp profesional para comunicacion, calendario, reportes, seguimiento e IA conectando todo.
 
 Soy estudiante universitario y desarrollador principal del proyecto. Necesito que expliques tus decisiones con lenguaje conceptual, tecnico pero entendible, como si estuvieras ayudando a un estudiante de ingenieria a tomar buenas decisiones reales. Evita jerga corporativa, humo y repeticiones tecnicas innecesarias.
 
@@ -38,6 +39,7 @@ Esto significa:
 - La experiencia Office Docente puede unir lo que hoy se piensa como planeaciones, documentos, plantillas, listas, asistencia, calificaciones, import/export y trabajo tabular.
 - Planeaciones, aunque ya tenga editor tipo Word, puede redisenarse por completo dentro de esa experiencia Office.
 - Classroom, aunque ya funcione como flujo principal, puede redisenarse por completo desde UX/UI.
+- El Asistente IA, aunque aun no exista como experiencia completa, debe diseniarse como parte real de la vision objetivo.
 - Feed, Contenido, Social, Cuenta, Plantillas, Alumnos, Tareas, Reportes y cualquier pantalla actual pueden repensarse.
 - Los planes cerrados sirven como evidencia funcional y tecnica, no como limite visual.
 - El codigo actual sirve como inventario de capacidades, datos, rutas, ViewModels, services y riesgos.
@@ -101,6 +103,7 @@ Si tienes acceso al repo, lee estos archivos antes de concluir:
 - `Documentacion/00-fundamentos/RESUMEN_EJECUTIVO.md`
 - `Documentacion/00-fundamentos/VISION_ACTUAL.md`
 - `Documentacion/00-fundamentos/ARQUITECTURA.md`
+- `Documentacion/00-fundamentos/IA_CHATBOT_LLM.md`
 - `Documentacion/00-fundamentos/MAPA_MODULOS_ACTUALES.md`
 - `Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md`
 - `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`
@@ -141,6 +144,8 @@ No propongas reescribir el proyecto tecnico desde cero. El redisenio UX/UI puede
 - No borrar claves legacy de AsyncStorage sin plan de migracion y rollback.
 - No meter secretos de IA, email o backend en frontend.
 - Toda IA debe pasar por backend, preferentemente por `aiGateway`.
+- El Asistente IA no debe llamar directo a OpenAI, Gemini, LM Studio ni ningun proveedor desde frontend.
+- LM Studio/local LLM solo aplica cuando el backend puede alcanzar la URL local o de red; no asumir que Vercel puede llamar al localhost del usuario.
 - Toda propuesta debe ser low-cost, viable para estudiante, demo y eventual beta cerrada.
 - Evita microservicios y dependencias caras si no aportan valor inmediato.
 - Mantener web, tablet y movil desde una pantalla madre responsiva por defecto. Usar `.web.tsx` o `.native.tsx` solo si la interaccion realmente lo exige.
@@ -180,7 +185,14 @@ Usa estas experiencias como punto de partida, pero puedes fusionarlas, separarla
    - Vista diaria del profesor: que sigue hoy, clases proximas, pendientes, documentos recientes, sync, alertas y sugerencias IA.
    - No debe ser landing page. Debe ser un tablero accionable para continuar trabajo.
 
-2. **Office Docente (Word + Excel)**
+2. **Asistente IA / ChatGPT Docente**
+   - Experiencia conversacional propia para docentes que ya usan ChatGPT, Gemini, Copilot o LLMs locales como parte de su trabajo.
+   - Debe permitir conversar con documentos, hojas, recursos visuales, clases, alumnos, entregas, reportes y archivos adjuntos.
+   - Debe proponer acciones confirmables: guardar como borrador, crear tarea, asignar a Classroom, crear recurso, crear recordatorio, compartir o descartar.
+   - Debe reutilizar `backend/lib/aiGateway.js`, contemplar proveedores cloud y locales como LM Studio via `AI_GATEWAY_PROVIDERS`, y explicar limites de Vercel/local.
+   - Debe diseniarse visualmente desde cero aunque hoy solo existan endpoints IA parciales para planeaciones/Classroom.
+
+3. **Office Docente (Word + Excel)**
    - Experiencia madre para documentos, planeaciones, plantillas, hojas, listas, tablas, asistencia, calificaciones, rubricas, import/export y trabajo escolar de oficina.
    - Debe unir lo documental y lo tabular como una suite, no tratarlos como dos modulos aislados por defecto.
    - Puede tomar como ground truth conceptual Microsoft Word/Excel, Google Docs/Sheets, LibreOffice Writer/Calc y OnlyOffice.
@@ -188,28 +200,28 @@ Usa estas experiencias como punto de partida, pero puedes fusionarlas, separarla
    - Debe redisenarse visualmente desde cero aunque ya exista `DocEditor` y aunque algunos flujos de planeaciones ya funcionen.
    - Debe contemplar IA que detecta titulo, materia, grupo, unidad, fechas, actividades, tablas y datos para sugerir asignacion a Classroom.
 
-3. **Classroom / Clases**
+4. **Classroom / Clases**
    - Experiencia madre para cursos, grupos, unidades, sesiones, materiales, actividades, entregas, alumnos, asistencia, calificaciones y seguimiento operativo.
-   - Debe recibir objetos creados desde Office, Canva, WhatsApp y Calendario sin que el docente descargue, copie o suba archivos manualmente.
+   - Debe recibir objetos creados desde Office, Asistente IA, Canva, WhatsApp y Calendario sin que el docente descargue, copie o suba archivos manualmente.
    - Debe redisenarse visualmente desde cero aunque ya exista `ClassroomHomeScreen` y `ClassroomGroupScreen`.
 
-4. **Canva / Genially Docente**
+5. **Canva / Genially Docente**
    - Experiencia para crear materiales visuales: presentaciones, actividades, mapas, lineas de tiempo, infografias, examenes visuales y recursos imprimibles.
    - Debe integrarse con Classroom para asignar materiales y con Office para convertir planeaciones en recursos visuales.
 
-5. **WhatsApp Docente / Comunidad Profesional**
+6. **WhatsApp Docente / Comunidad Profesional**
    - Comunicacion profesional, contactos docentes, conversaciones, envio de recursos, envio de planeaciones, colaboracion, estados de envio, busqueda y notificaciones.
    - El feed social actual puede mantenerse, transformarse o quedar como futuro secundario si distrae del flujo principal.
 
-6. **Calendario / Seguimiento Personal**
+7. **Calendario / Seguimiento Personal**
    - Vista temporal de clases, sesiones, tareas proximas, revision de entregas, fechas importantes, eventos y recordatorios sugeridos por IA.
    - No debe ser agenda aislada: debe abrir documentos, clases, actividades y reportes relacionados.
 
-7. **Reportes / Analitica / Gamificacion**
+8. **Reportes / Analitica / Gamificacion**
    - Rendimiento de alumnos, grupos y docente; avance por unidad, asistencia, calificaciones, entregas pendientes y alumnos en riesgo.
    - La gamificacion debe orientar y motivar sin infantilizar ni saturar.
 
-8. **Cuenta / Perfil / Configuracion / Accesibilidad / Seguridad**
+9. **Cuenta / Perfil / Configuracion / Accesibilidad / Seguridad**
    - Perfil, cuenta, roles, sesiones, privacidad, terminos, tema, fuente, daltonismo, preferencias, accesibilidad real y modo dev/admin cuando aplique.
 
 Considera especialmente que **Contenido / Biblioteca / Recursos / Plantillas** puede no ser una experiencia madre independiente. Evalua si debe vivir como biblioteca transversal, parte de Office, parte de Classroom, parte de Canva o un hub secundario.
@@ -252,6 +264,9 @@ Considera que:
 - `backend/lib/aiGateway.js` soporta proveedores OpenAI-compatible: OpenRouter, Groq, OpenAI, Together y custom providers.
 - `backend/lib/aiUsageLimiter.js` limita uso por accion.
 - Hay endpoints IA para planeaciones y Classroom.
+- La vision nueva contempla un Asistente IA / ChatGPT Docente propio con adjuntos desde Office, Classroom, Canva y archivos subidos.
+- Se esta considerando IA local con LM Studio u otros proveedores OpenAI-compatible mediante `AI_GATEWAY_PROVIDERS`.
+- LM Studio debe tratarse como opcion local/dev o de red controlada; la demo en Vercel no puede alcanzar el localhost del usuario.
 - El frontend no debe llamar modelos directamente.
 - Toda funcion IA debe tener fallback, timeout, costo estimado/controlado, error visible y revision humana.
 - La IA debe ayudar de forma silenciosa, no quitar control al docente.
@@ -344,7 +359,7 @@ Propon una estructura de navegacion objetivo:
 - Donde vive el dashboard.
 - Donde vive Office Docente y donde vive Classroom.
 - Que pasa con Feed, Social y Contenido.
-- Como se entra a Canva, WhatsApp, Reportes y Calendario.
+- Como se entra al Asistente IA, Canva, WhatsApp, Reportes y Calendario.
 - Como se conectan documentos, hojas, recursos visuales y mensajes con clases reales.
 - Como evitar duplicidad de flujos.
 
@@ -408,11 +423,14 @@ Propon un flujo de trabajo concreto:
 Para cada experiencia, indica:
 
 - Donde IA ayuda de verdad.
+- Donde conviene una conversacion tipo ChatGPT/Gemini.
 - Donde IA seria prematura.
 - Que debe ser automatico.
 - Que debe pedir confirmacion.
 - Que debe tener fallback local.
 - Que riesgos de costo/privacidad existen.
+- Que adjuntos/contexto puede usar: documentos, hojas, recursos visuales, clases, alumnos, entregas, reportes o archivos subidos.
+- Como distinguir proveedor cloud, proveedor local, IA no configurada y error temporal.
 
 ### 11. Plan De Transicion Conceptual
 
@@ -434,6 +452,8 @@ Lista cosas que una IA futura NO debe hacer:
 - Crear modulos aislados.
 - Duplicar Classroom y Contenido.
 - Hacer IA directa desde frontend.
+- Tratar LM Studio local como si funcionara automaticamente desde Vercel.
+- Permitir que el Asistente IA guarde, asigne o envie sin confirmacion.
 - Crear pantallas bonitas sin sync/offline.
 - Romper web/movil.
 - Ignorar accesibilidad.
@@ -469,6 +489,7 @@ Dame una decision clara:
 Tu respuesta sera buena si me deja listo para crear un futuro `Plan Maestro: UX/UI y Navegacion Global` que:
 
 - Redisene PlanearIA completa desde la vision docente.
+- Incluya Asistente IA / ChatGPT Docente como experiencia real y no solo como boton magico.
 - Defina Office Docente como posible experiencia madre para documentos, planeaciones, hojas y listas.
 - Incluya Classroom aunque ya funcione.
 - Respete MVVM, sync, backend, auth, offline-first e IA gateway.

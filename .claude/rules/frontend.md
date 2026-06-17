@@ -13,6 +13,7 @@ paths:
 - No direct AsyncStorage reads for new syncable academic data; use ports/repositories compatible with src/sync
 - Always handle: loading, error, empty, and offline states
 - Responsive: start from a shared web/tablet/mobile screen; platform-specific files need justification
-- Current UX vision is a connected teacher suite: Office Docente, Classroom, Canva/Genially, WhatsApp Docente, Calendar, Reports, Account
+- Current UX vision is a connected teacher suite: Asistente IA, Office Docente, Classroom, Canva/Genially, WhatsApp Docente, Calendar, Reports, Account
 - No skeleton/placeholder screens without clear entry points and exit CTAs
 - Do not copy legacy tab/module structure as the target UX unless the active plan justifies it
+- AI chatbot UI must never call OpenAI/Gemini/LM Studio directly; use backend gateway endpoints and confirm actions before saving/assigning

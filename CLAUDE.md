@@ -7,6 +7,7 @@ PlanearIA is an offline-first React Native + Expo SDK 54 + TypeScript app for Me
 The current product vision is not "many separate modules". It is a connected teacher suite:
 
 - Office Docente: documents, lesson plans, sheets, lists, rubrics, attendance, grades and import/export.
+- Asistente IA / ChatGPT Docente: a first-party chatbot for teachers, with attachments from Office, Classroom and Canva, routed through the backend AI gateway.
 - Classroom: classes, units, materials, activities, students, submissions and operational follow-up.
 - Canva/Genially Docente: visual learning materials.
 - WhatsApp Docente: professional teacher communication.
@@ -26,6 +27,7 @@ Built by a solo student developer. Budget is zero/low. Do not suggest expensive 
 - MongoDB Atlas M0.
 - JWT auth with refresh sessions.
 - AI gateway: `backend/lib/aiGateway.js`.
+- Future AI chatbot: first-party ChatGPT/Gemini-like assistant; cloud and local OpenAI-compatible providers must go through the gateway.
 - CI/CD: GitHub Actions (`ci.yml`, `cd.yml`).
 
 ## Architecture Rules
@@ -37,7 +39,7 @@ Built by a solo student developer. Budget is zero/low. Do not suggest expensive 
 - Do NOT activate SQLite as default without explicit approval.
 - Do NOT delete legacy AsyncStorage keys (`@planearia:*`) without migration, validation and rollback.
 - Every multiuser entity must be isolated by `userId`.
-- AI must go through backend, never frontend provider keys.
+- AI must go through backend, never frontend provider keys. This includes OpenAI/Gemini-like cloud models and local providers such as LM Studio.
 - No microservices or costly services unless the user explicitly asks and tradeoffs are documented.
 - Web/tablet/mobile should start from a shared responsive screen. Platform-specific files need justification.
 
@@ -49,6 +51,7 @@ Read before significant work:
 - `Documentacion/00-fundamentos/RESUMEN_EJECUTIVO.md`
 - `Documentacion/00-fundamentos/VISION_ACTUAL.md`
 - `Documentacion/00-fundamentos/ARQUITECTURA.md`
+- `Documentacion/00-fundamentos/IA_CHATBOT_LLM.md`
 - `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`
 - `Documentacion/00-fundamentos/MAPA_MODULOS_ACTUALES.md`
 - `Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md`
@@ -98,7 +101,7 @@ Closed plan docs live in `Documentacion/01-planes-maestros/cerrados/`.
 - Active/closing: `Auth, Seguridad y Sesion Real`.
 - Done: global offline-first sync engine in `src/sync`.
 - Next recommended new plan: `Plan Maestro: UX/UI y Navegacion Global`.
-- Future plans depend on UX/UI Global: Office Docente, Classroom redesign/integration, Cuenta/Accesibilidad, Calendario, WhatsApp Docente, Canva, Reportes.
+- Future plans depend on UX/UI Global: Office Docente, Asistente IA, Classroom redesign/integration, Cuenta/Accesibilidad, Calendario, WhatsApp Docente, Canva, Reportes.
 
 ## Testing Rules
 
@@ -145,6 +148,7 @@ Task states: `[ ]` pending, `[~]` in progress, `[x]` completed.
 For high-parity experiences, check or request ground truth before UI implementation:
 
 - Office Docente: Word/Docs + Excel/Sheets + LibreOffice/OnlyOffice conceptual references.
+- Asistente IA: ChatGPT/Gemini/NotebookLM-style chat patterns, with PlanearIA-specific permissions, attachments and confirmation flows.
 - Classroom: Google Classroom/Classroomio.
 - Canva/Genially.
 - WhatsApp professional messaging.

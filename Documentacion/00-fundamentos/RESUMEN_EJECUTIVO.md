@@ -11,6 +11,7 @@ La vision vigente es crear una suite docente conectada: el profesor debe poder c
 PlanearIA no debe sentirse como una coleccion de modulos sueltos. Debe sentirse como un solo lugar de trabajo docente:
 
 - Inicio / Sistema Operativo Docente.
+- Asistente IA / ChatGPT Docente.
 - Office Docente (Word + Excel).
 - Classroom / Clases.
 - Canva / Genially Docente.
@@ -19,7 +20,7 @@ PlanearIA no debe sentirse como una coleccion de modulos sueltos. Debe sentirse 
 - Reportes.
 - Cuenta, seguridad y accesibilidad.
 
-La IA debe conectar el flujo de forma silenciosa: detectar contenido, sugerir clase/unidad/fecha, proponer tareas o recursos y pedir confirmacion antes de guardar cambios importantes.
+La IA debe conectar el flujo de dos maneras: sugerencias silenciosas dentro de cada experiencia y un Asistente IA tipo ChatGPT/Gemini para conversar con documentos, recursos, clases y archivos adjuntos. En ambos casos debe pedir confirmacion antes de guardar, asignar, enviar o modificar datos importantes.
 
 ## Estado Real Del Proyecto
 
@@ -33,6 +34,7 @@ La IA debe conectar el flujo de forma silenciosa: detectar contenido, sugerir cl
 
 - Planeaciones: Fase 9 cerrada. Existe editor tipo documento, plantillas, import/export, escaner y asistencia IA. En la vision nueva se interpreta como parte de Office Docente.
 - Classroom: cerrado como base funcional. Incluye clases, unidades, materiales, actividades, alumnos, entregas, asistencia, calificaciones y flujo contextual.
+- IA actual: gateway multi-provider OpenAI-compatible en backend, con endpoints de planeaciones/Classroom. La vision nueva agrega un Asistente IA conversacional propio y soporte planificado para proveedores locales como LM Studio via `AI_GATEWAY_PROVIDERS`.
 - Infraestructura local/CI/deploy basico: cerrado.
 - SQLite/storage: cerrado como infraestructura opt-in. AsyncStorage sigue como default productivo.
 - Sync offline-first: motor global por entidad en `src/sync`, orquestado por `SyncContext`.
@@ -46,6 +48,8 @@ La IA debe conectar el flujo de forma silenciosa: detectar contenido, sugerir cl
 - Crear el `Plan Maestro: UX/UI y Navegacion Global`.
 - Definir sistema visual, navegacion objetivo y arquitectura de experiencias.
 - Decidir como se implementa Office Docente: documentos + hojas/listas + asignacion inteligente a Classroom.
+- Decidir donde vive el Asistente IA: tab, panel lateral, accion flotante, command palette o espacio contextual.
+- Definir plan tecnico de chat IA: historial, adjuntos, permisos, costos, proveedores cloud/locales y fallback.
 - Despues de UX/UI Global, crear subplanes por experiencia o subexperiencia.
 
 ## Stack Vigente
@@ -59,7 +63,7 @@ La IA debe conectar el flujo de forma silenciosa: detectar contenido, sugerir cl
 - Expo SecureStore en nativo para tokens; AsyncStorage en web.
 - Backend Node serverless en `backend/api/index.js` + `backend/routes`.
 - MongoDB Atlas M0.
-- IA gateway multi-provider en backend.
+- IA gateway multi-provider en backend, extensible a proveedores custom OpenAI-compatible como LM Studio en entorno local.
 - Jest + Testing Library.
 - GitHub Actions CI/CD.
 
@@ -68,6 +72,7 @@ La IA debe conectar el flujo de forma silenciosa: detectar contenido, sugerir cl
 - No crear pantallas aisladas sin entrada, salida y CTA claro.
 - No duplicar flujos entre Office, Classroom, Contenido y rutas legacy.
 - No llamar modelos IA desde frontend.
+- No conectar LM Studio ni proveedores cloud directo desde frontend; todo debe pasar por backend/AI Gateway.
 - No crear colas/clientes HTTP paralelos si el dato puede usar `src/sync`.
 - No activar SQLite como default sin plan, validacion y rollback.
 - No borrar claves `@planearia:*` sin migracion controlada.

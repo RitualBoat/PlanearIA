@@ -13,3 +13,4 @@ paths:
 - Never store secrets in code or commits; use environment variables
 - Add CORS and security headers (helmet or equivalent)
 - AI provider calls must go through backend/lib/aiGateway.js or a backend wrapper that preserves the same contract
+- Local providers such as LM Studio are allowed only behind the backend gateway and only when the backend can reach them

@@ -13,10 +13,12 @@ PlanearIA es una app React Native + Expo SDK 54 + TypeScript para docentes mexic
 - Expo SQLite instalado como infraestructura opt-in, no default.
 - Motor de sync offline-first en `src/sync`.
 - IA centralizada en backend mediante `backend/lib/aiGateway.js`.
+- Futuro Asistente IA / ChatGPT Docente conectado a Office, Classroom, Canva y proveedores cloud/locales via AI Gateway.
 
 La vision actual no es "muchos modulos separados". La vision es una suite docente conectada:
 
 - Inicio / Sistema Operativo Docente.
+- Asistente IA / ChatGPT Docente.
 - Office Docente: documentos, planeaciones, hojas, listas, rubricas, asistencia, calificaciones e import/export.
 - Classroom / Clases: grupos, unidades, materiales, actividades, alumnos, entregas y seguimiento.
 - Canva / Genially Docente.
@@ -35,9 +37,10 @@ Antes de trabajos relevantes, leer en este orden:
 4. `Documentacion/00-fundamentos/RESUMEN_EJECUTIVO.md`
 5. `Documentacion/00-fundamentos/VISION_ACTUAL.md`
 6. `Documentacion/00-fundamentos/ARQUITECTURA.md`
-7. `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`
-8. `Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md`
-9. `Documentacion/01-planes-maestros/meta_guia_planes.md`
+7. `Documentacion/00-fundamentos/IA_CHATBOT_LLM.md`
+8. `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`
+9. `Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md`
+10. `Documentacion/01-planes-maestros/meta_guia_planes.md`
 
 Para UX/UI global, leer tambien `Documentacion/prompt_mejorado.md`.
 
@@ -66,7 +69,7 @@ Cuando el usuario pida trabajar en una tarea de plan:
 - No activar SQLite como default sin aprobacion explicita.
 - No borrar claves `@planearia:*` sin migracion, validacion y rollback.
 - Toda entidad multiusuario debe aislarse por `userId`.
-- Toda IA debe pasar por backend; no poner provider keys en frontend.
+- Toda IA debe pasar por backend; no poner provider keys ni URLs privadas de LM Studio en frontend.
 - No proponer microservicios ni infraestructura costosa sin justificacion fuerte.
 - Web, tablet y movil deben partir de una pantalla madre responsiva. Archivos platform-specific requieren justificacion.
 

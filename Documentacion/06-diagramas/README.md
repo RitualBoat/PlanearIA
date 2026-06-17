@@ -45,7 +45,8 @@ ejecutar nada para verlas; abre los archivos de esa carpeta. Para regenerarlas t
 Node serverless en Vercel con router unico (`backend/api/index.js`) que despacha a los
 handlers de `backend/routes`. Toda ruta academica valida JWT y aisla por `userId`, crea sus
 indices de forma idempotente y reutiliza la conexion cacheada a MongoDB Atlas. La IA pasa por
-un gateway multi-provider; las API keys viven solo en el backend.
+un gateway multi-provider; las API keys viven solo en el backend. El gateway tambien contempla
+proveedores custom/locales OpenAI-compatible como LM Studio cuando el backend pueda alcanzarlos.
 
 ```mermaid
 flowchart TB
@@ -62,7 +63,7 @@ flowchart TB
             acad["Academico (sync por entidad)<br/>grupos, alumnos, unidades, asistencias,<br/>calificaciones, entregables, recursos,<br/>plantillas, planeaciones, sync"]
             social["Social<br/>posts, contactos, mensajes, notificaciones"]
             authr["auth.js<br/>login / registro / recuperar"]
-            ai["IA<br/>planeaciones/(copiloto, generar, mejorar,<br/>escanear-plantilla), classroom/copiloto"]
+            ai["IA<br/>planeaciones, classroom/copiloto,<br/>futuro asistente/chatbot"]
             health["health.js"]
         end
 
@@ -81,7 +82,8 @@ flowchart TB
 
     subgraph data["Datos y servicios externos"]
         mongo[("MongoDB Atlas M0<br/>planeariaDB<br/>aislado por userId")]
-        providers["Proveedores IA OpenAI-compatible<br/>OpenRouter / Groq / OpenAI"]
+        providers["Proveedores IA OpenAI-compatible<br/>OpenRouter / Groq / OpenAI / Together"]
+        localai["Proveedor local compatible<br/>LM Studio (solo si backend lo alcanza)"]
     end
 
     web -->|"HTTPS + JWT Bearer"| router
@@ -112,6 +114,7 @@ flowchart TB
     ai --> aigw
     ai --> ailimit
     aigw --> providers
+    aigw -.-> localai
 ```
 
 ---
@@ -149,6 +152,7 @@ flowchart TD
     recursos --> plan["Office Docente parcial<br/>Planeaciones (editor documento + IA)"]
     recursos --> biblio["Biblioteca / Plantillas"]
     social --> chat["Chat / Contactos"]
+    tabs -.-> asistente["Futuro Asistente IA<br/>chat con documentos, recursos y clases"]
     config --> cuenta["Perfil / Cuenta / Accesibilidad"]
 
     subgraph mvvm["Patron MVVM por pantalla"]
@@ -158,6 +162,7 @@ flowchart TD
         model --> svc["Services + Sync<br/>services/, sync/, utils/apiClient"]
         svc --> persist[("Persistencia local<br/>AsyncStorage default<br/>SQLite opt-in")]
         svc -->|"online"| remote["Backend Vercel + MongoDB"]
+        svc -->|"IA"| aigw["AI Gateway<br/>cloud o local compatible"]
     end
 
     tabs -.->|"cada modulo usa"| mvvm
@@ -180,7 +185,7 @@ flowchart LR
     root --> types["types/ (tipos TS centralizados)"]
     root --> doc["Documentacion/ (00-fundamentos ... 06-diagramas)"]
     root --> ctx["context/ (ground truth, stitch-results)"]
-    root --> agents[".agents/skills/ (writing-style, token-efficiency)"]
+    root --> agents[".agents/skills/ (ux-ui, ai-gateway,<br/>sync, testing, accesibilidad, token-efficiency)"]
     root --> gh[".github/workflows/ (ci.yml, cd.yml)"]
     root --> scripts["scripts/ (backend local, smoke, isolation)"]
     root --> assets["assets/  ·  shared/  ·  dist/"]

@@ -60,7 +60,7 @@ Todo plan futuro debe asumir este punto de partida, salvo que el codigo demuestr
 - Backend actual: funciones Node/serverless con router unico en `backend/api/index.js` y handlers en `backend/routes/`.
 - Base remota actual: MongoDB Atlas.
 - Auth actual: `AuthContext`, backend `auth.js`, JWT/API secret en evolucion.
-- IA actual: gateway multi-provider en `backend/lib/aiGateway.js`, limiter en `backend/lib/aiUsageLimiter.js`, endpoints en `backend/api/planeaciones/*` y `backend/api/classroom/copiloto.js`.
+- IA actual: gateway multi-provider OpenAI-compatible en `backend/lib/aiGateway.js`, limiter en `backend/lib/aiUsageLimiter.js`, endpoints en `backend/api/planeaciones/*` y `backend/api/classroom/copiloto.js`. La vision futura agrega Asistente IA / ChatGPT Docente con adjuntos y proveedores custom/locales como LM Studio via `AI_GATEWAY_PROVIDERS`.
 - Testing: Jest + Testing Library React Native.
 
 Regla: la documentacion puede estar desfasada. La fuente de verdad para planear es el codigo actual, especialmente:
@@ -125,7 +125,7 @@ Regla de lectura: si este snapshot contradice el codigo, gana el codigo. Antes d
 - **Web/tablet/movil se unifican por defecto.** Cada pantalla nueva o refactorizada debe partir de una sola pantalla madre React Native/Expo, con layout responsivo/adaptativo mobile-first, ViewModel/logica compartida y estilos controlados por breakpoints. Evitar duplicar pantallas en `Screen.web.tsx` y `Screen.native.tsx` salvo excepcion justificada.
 - **Excepciones por plataforma solo para interacciones realmente distintas.** Se permite separar `.web.tsx`, `.native.tsx`, `.ios.tsx` o `.android.tsx` cuando el modulo lo exige por experiencia y rendimiento, por ejemplo Canva/Genially, Office Docente avanzado, grids tabulares, teclado, mouse, canvas, gestos o atajos imposibles de mantener limpiamente en una sola pantalla. El plan debe justificar la separacion, mantener ViewModel/tipos/contratos compartidos y definir validacion para cada variante.
 - **GitHub Project acompana la ejecucion.** Plan markdown = arquitectura y decisiones; Project = estado operativo; Actions = evidencia automatica.
-- **Ground truth manda en experiencias madre.** Para Office Docente, Classroom, Canva/Genially o WhatsApp, no basta escribir "tipo X"; cada fase debe citar capturas/referencias concretas.
+- **Ground truth manda en experiencias madre.** Para Office Docente, Asistente IA, Classroom, Canva/Genially o WhatsApp, no basta escribir "tipo X"; cada fase debe citar capturas/referencias concretas.
 
 ### 3.3 Fichas Rapidas por Dominio
 
@@ -247,7 +247,7 @@ Antes de redactar cualquier plan futuro, la IA debe:
 
 Antes de escribir o ejecutar un plan, la IA debe clasificar el modulo por nivel de paridad esperado:
 
-- `Clon/paridad alta`: debe sentirse casi como una experiencia conocida. Aplica a Office Docente (Word/Docs + Excel/Sheets), Classroom/Classroomio, Canva/Genially y WhatsApp profesional.
+- `Clon/paridad alta`: debe sentirse casi como una experiencia conocida. Aplica a Office Docente (Word/Docs + Excel/Sheets), Asistente IA (ChatGPT/Gemini/NotebookLM), Classroom/Classroomio, Canva/Genially y WhatsApp profesional.
 - `Inspirado/paridad media`: toma patrones de una app conocida, pero puede adaptar la experiencia. Aplica a social, chat docente si no se busca clon exacto, reportes y notificaciones.
 - `Funcional/administrativo`: prioriza robustez, seguridad, costo y mantenibilidad. Aplica a infraestructura, auth/seguridad, sync y configuracion interna.
 
@@ -486,13 +486,17 @@ Todo plan que toque pantallas debe resolver explicitamente:
 Debe incluir:
 
 - Casos de uso IA.
+- Si aplica, superficie IA: sugerencia contextual, chatbot explicito, copiloto de editor, generador batch o analisis de archivos.
 - Endpoints requeridos.
 - Proveedor/modelo.
+- Adjuntos/contexto permitidos: documentos, hojas, recursos visuales, clases, alumnos, entregas, reportes o archivos subidos.
 - Variables de entorno.
 - Fallback si no hay API key.
+- Fallback si proveedor local como LM Studio no esta disponible.
 - Timeout y errores.
 - Prompting esperado.
 - Validacion humana.
+- Acciones confirmables antes de guardar, asignar, enviar o modificar datos.
 - Costos y limites.
 
 ### 6.8 Offline-First y Sync
@@ -650,6 +654,7 @@ La IA debe:
 - Verificar precios actuales antes de recomendar servicios.
 - No asumir que hay presupuesto mensual.
 - Considerar uso local de la laptop del desarrollador.
+- Considerar LM Studio u otros LLM locales solo cuando el backend pueda alcanzarlos; Vercel no puede acceder al `localhost` del usuario.
 - Considerar Docker solo si simplifica desarrollo, pruebas o despliegue.
 - Considerar Vercel/MongoDB Atlas free tier si sigue siendo suficiente.
 - Considerar alternativas como backend local, VPS barato o self-hosting cuando el modulo lo justifique.
@@ -916,6 +921,7 @@ Cuando un plan toque estos dominios, debe tratarlos como experiencias madre cone
 | Experiencia | Ground truth esperado | Nota |
 | --- | --- | --- |
 | Inicio / Sistema Operativo Docente | Dashboards operativos, calendarios ligeros, pendientes, actividad reciente | Debe ser util al abrir la app, no landing decorativa. |
+| Asistente IA / ChatGPT Docente | ChatGPT, Gemini, NotebookLM, Copilot-style assistants | Chat con adjuntos, contexto de app, acciones confirmables, historial, costos y privacidad. |
 | Office Docente | Word/Docs + Excel/Sheets + LibreOffice/OnlyOffice | Documentos, hojas, listas, tablas, plantillas, import/export y asignacion inteligente. |
 | Classroom / Clases | Google Classroom/Classroomio | Cursos, unidades, trabajo de clase, personas, actividades, materiales y seguimiento. |
 | Canva / Genially Docente | Canva/Genially | Canvas, templates, panel lateral, paginas, capas y exportacion. |
@@ -945,7 +951,30 @@ Debe exigir:
 - Empty states que inviten a crear clase, documento o recurso.
 - No duplicar listas que ya viven en Classroom u Office.
 
-### 12.2 Office Docente
+### 12.2 Asistente IA / ChatGPT Docente
+
+Debe cubrir:
+
+- Chat propio dentro de PlanearIA.
+- Adjuntos desde Office Docente: documentos, planeaciones, hojas, listas y rubricas.
+- Adjuntos desde Canva/Genially: recursos visuales y materiales.
+- Contexto desde Classroom: clase, unidad, actividad, alumno, entrega o reporte.
+- Subida de archivos cuando el flujo lo permita.
+- Historial de conversaciones.
+- Acciones: guardar como borrador, crear tarea, asignar a clase, crear recordatorio, compartir, copiar o descartar.
+- Proveedores cloud y locales a traves de `backend/lib/aiGateway.js`.
+
+Debe exigir:
+
+- No llamar modelos desde frontend.
+- No guardar ni asignar resultados sin confirmacion docente.
+- Definir privacidad y permisos para documentos, alumnos y conversaciones.
+- Definir limites por usuario/accion con `aiUsageLimiter`.
+- Definir fallback si no hay proveedor configurado.
+- Documentar que LM Studio/local LLM funciona solo si el backend puede alcanzar la URL; no asumir que Vercel puede usar el localhost del usuario.
+- UX clara para distinguir proveedor cloud, proveedor local, IA no configurada y error temporal.
+
+### 12.3 Office Docente
 
 Office Docente une lo que antes se planeaba como Word y Excel.
 
@@ -970,7 +999,7 @@ Debe exigir:
 - Conectar documentos y hojas con Classroom.
 - Permitir que una hoja/lista se convierta en alumnos, asistencia, calificaciones o rubrica si el docente confirma.
 
-### 12.3 Classroom / Clases
+### 12.4 Classroom / Clases
 
 Debe cubrir:
 
@@ -988,11 +1017,11 @@ Debe exigir:
 
 - Leer `Documentacion/01-planes-maestros/cerrados/PLAN_CLASSROOM (closed).md`.
 - Mantener Classroom como organizador/asignador.
-- Recibir objetos desde Office, Canva, WhatsApp y Calendario.
+- Recibir objetos desde Office, Asistente IA, Canva, WhatsApp y Calendario.
 - Evitar formularios legacy si existe flujo contextual.
 - No crear documentos complejos dentro de Classroom si pertenecen a Office.
 
-### 12.4 Canva / Genially Docente
+### 12.5 Canva / Genially Docente
 
 Debe cubrir:
 
@@ -1012,7 +1041,7 @@ Debe exigir:
 - Conversion desde planeaciones/documentos cuando tenga sentido.
 - Justificar variantes web/native si usa canvas, gestos o rendimiento especifico.
 
-### 12.5 WhatsApp Docente / Comunidad Profesional
+### 12.6 WhatsApp Docente / Comunidad Profesional
 
 Debe cubrir:
 
@@ -1033,7 +1062,7 @@ Debe exigir:
 - No duplicar mensajes en sync.
 - Guardar recursos compartidos en Office, Classroom o biblioteca segun corresponda.
 
-### 12.6 Calendario Y Seguimiento Personal
+### 12.7 Calendario Y Seguimiento Personal
 
 Debe cubrir:
 
@@ -1052,7 +1081,7 @@ Debe exigir:
 - Crear recordatorios desde planeaciones y actividades.
 - Sync/offline y estados claros.
 
-### 12.7 Reportes, Analitica Y Gamificacion
+### 12.8 Reportes, Analitica Y Gamificacion
 
 Debe cubrir:
 
@@ -1072,7 +1101,7 @@ Debe exigir:
 - Gamificacion prudente: orientar y motivar, no infantilizar.
 - IA solo como apoyo revisable.
 
-### 12.8 Cuenta, Seguridad, Configuracion Y Accesibilidad
+### 12.9 Cuenta, Seguridad, Configuracion Y Accesibilidad
 
 Debe cubrir:
 
@@ -1095,7 +1124,7 @@ Debe exigir:
 - Roles reales validados en backend.
 - Accesibilidad verificable, no solo switches decorativos.
 
-### 12.9 Seguridad y Autenticacion
+### 12.10 Seguridad y Autenticacion
 
 Debe cubrir:
 
@@ -1135,7 +1164,7 @@ Reglas obligatorias de seguridad pragmatica y low-cost:
 - Agregar cabeceras HTTP seguras y CORS estricto con herramientas simples como `helmet`/config equivalente si el backend lo permite.
 - Debe funcionar en local, Render/Vercel/EAS/MongoDB Atlas free tier o alternativas gratuitas razonables.
 
-### 12.10 Infraestructura y DevOps
+### 12.11 Infraestructura y DevOps
 
 Plan cerrado: `Documentacion/01-planes-maestros/cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md`. No crear otro plan de infraestructura sin cerrar, extender o reemplazar explicitamente ese archivo.
 
@@ -1163,7 +1192,7 @@ Debe exigir:
 - Rollback.
 - Seguridad de secretos.
 
-### 12.11 Despliegue y Distribucion
+### 12.12 Despliegue y Distribucion
 
 Debe cubrir:
 
@@ -1188,7 +1217,7 @@ Debe exigir:
 - Crash reporting.
 - Analitica basica.
 
-### 12.12 Notificaciones
+### 12.13 Notificaciones
 
 Debe cubrir:
 
@@ -1205,7 +1234,7 @@ Debe exigir:
 - Opt-in/opt-out.
 - Costos.
 
-### 12.13 Onboarding y Ayuda
+### 12.14 Onboarding y Ayuda
 
 Debe cubrir:
 

@@ -7,6 +7,7 @@ PlanearIA es una app React Native/Expo offline-first para docentes. Tecnica y pr
 La experiencia objetivo es una suite docente conectada:
 
 - Office Docente para documentos, planeaciones, hojas y listas.
+- Asistente IA / ChatGPT Docente para conversar con documentos, recursos, clases y archivos adjuntos.
 - Classroom para organizar clases y asignar trabajo.
 - Canva/Genially para crear materiales visuales.
 - WhatsApp Docente para colaborar.
@@ -28,7 +29,7 @@ La arquitectura debe permitir que una accion creada en una experiencia pueda usa
 | Storage tokens nativo | Expo SecureStore | Instalado para auth en Android/iOS |
 | Backend | Node serverless en Vercel | Vigente |
 | Base remota | MongoDB Atlas M0 | Vigente |
-| IA | `backend/lib/aiGateway.js` | Vigente |
+| IA | `backend/lib/aiGateway.js` OpenAI-compatible + custom providers | Vigente |
 | CI/CD | GitHub Actions | CI + builds web/APK |
 
 ## Principios Arquitectonicos
@@ -38,7 +39,7 @@ La arquitectura debe permitir que una accion creada en una experiencia pueda usa
 3. **Sync global**: datos academicos sincronizables usan `src/sync`, no colas por modulo.
 4. **Aislamiento por usuario**: todo dato multiusuario se filtra por `userId`.
 5. **Backend simple**: no microservicios; router unico serverless y rutas por dominio.
-6. **IA por backend**: nunca exponer API keys ni llamar modelos desde frontend.
+6. **IA por backend**: nunca exponer API keys ni llamar modelos desde frontend; proveedores cloud o locales deben pasar por `aiGateway`.
 7. **SQLite opt-in**: no activarlo como default sin plan, validacion manual y rollback.
 8. **Vision responsive**: una pantalla madre por defecto para web/tablet/movil; variantes `.web.tsx` o `.native.tsx` solo con justificacion real.
 
@@ -143,6 +144,7 @@ Reglas:
 - CORS se controla con `ALLOWED_ORIGINS` o defaults seguros en `backend/lib/auth.js`.
 - Auth vive en `backend/routes/auth.js` y helpers en `backend/lib/`.
 - IA vive detras de `backend/lib/aiGateway.js` y `backend/lib/aiUsageLimiter.js`.
+- El Asistente IA / ChatGPT Docente futuro debe reutilizar ese gateway.
 
 Endpoints relevantes:
 
@@ -152,7 +154,7 @@ Endpoints relevantes:
 | Auth | `/api/auth` |
 | Sync/academico | `/api/grupos`, `/api/unidades`, `/api/alumnos`, `/api/asistencias`, `/api/calificaciones`, `/api/entregables`, `/api/recursos`, `/api/plantillas`, `/api/planeaciones`, `/api/sync` |
 | Social | posts, contactos, mensajes, notificaciones |
-| IA | planeaciones y classroom via gateway |
+| IA | planeaciones, classroom y futuro chatbot/docente via gateway |
 
 ## Auth Y Sesiones
 
@@ -209,6 +211,26 @@ Toda IA debe:
 - Pedir revision humana antes de guardar cambios importantes.
 - No guardar contenido generado sin confirmacion docente.
 
+### Superficies IA
+
+La vision vigente contempla dos superficies:
+
+- **IA contextual**: sugerencias dentro de Office, Classroom, Canva, WhatsApp, Calendario y Reportes.
+- **Asistente IA / ChatGPT Docente**: chat propio para conversar con documentos, hojas, recursos visuales, clases, entregas, reportes y archivos adjuntos.
+
+### Proveedores Cloud Y Locales
+
+`aiGateway.js` usa proveedores OpenAI-compatible en cascada y acepta `AI_GATEWAY_PROVIDERS` para proveedores custom.
+
+LM Studio puede conectarse como proveedor local si expone una API compatible con OpenAI, pero con estas restricciones:
+
+- Funciona cuando el backend puede alcanzar la URL local o de red.
+- En Vercel, el backend no puede acceder al `localhost` del usuario.
+- Para demo hosteada se necesita proveedor cloud o un puente/proxy explicitamente aprobado.
+- No se debe exponer LM Studio ni llaves de proveedores desde frontend.
+
+Referencia vigente: `Documentacion/00-fundamentos/IA_CHATBOT_LLM.md`.
+
 ## Estado De Planes
 
 - Cerrados: Planeaciones, Classroom, Pasos Iniciales, Infraestructura, SQLite opt-in.
@@ -228,4 +250,4 @@ Toda IA debe:
 ## Version
 
 - Ultima actualizacion: 2026-06-17.
-- Version de arquitectura: 4.3.
+- Version de arquitectura: 4.4.

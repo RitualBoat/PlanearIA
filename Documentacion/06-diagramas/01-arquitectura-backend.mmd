@@ -14,7 +14,7 @@ flowchart TB
             acad["Academico (sync por entidad)<br/>grupos, alumnos, unidades, asistencias,<br/>calificaciones, entregables, recursos,<br/>plantillas, planeaciones, sync"]
             social["Social<br/>posts, contactos, mensajes, notificaciones"]
             authr["auth.js<br/>login / registro / recuperar"]
-            ai["IA<br/>planeaciones/(copiloto, generar, mejorar,<br/>escanear-plantilla), classroom/copiloto"]
+            ai["IA<br/>planeaciones, classroom/copiloto,<br/>futuro asistente/chatbot"]
             health["health.js"]
         end
 
@@ -33,7 +33,8 @@ flowchart TB
 
     subgraph data["Datos y servicios externos"]
         mongo[("MongoDB Atlas M0<br/>planeariaDB<br/>aislado por userId")]
-        providers["Proveedores IA OpenAI-compatible<br/>OpenRouter / Groq / OpenAI"]
+        providers["Proveedores IA OpenAI-compatible<br/>OpenRouter / Groq / OpenAI / Together"]
+        localai["Proveedor local compatible<br/>LM Studio (solo si backend lo alcanza)"]
     end
 
     web -->|"HTTPS + JWT Bearer"| router
@@ -64,3 +65,4 @@ flowchart TB
     ai --> aigw
     ai --> ailimit
     aigw --> providers
+    aigw -.-> localai

@@ -14,6 +14,8 @@ La meta no es tener muchos modulos separados. La meta es que todas las cargas de
 - Asignar trabajos.
 - Revisar entregas.
 - Hablar con otros docentes.
+- Conversar con un asistente IA propio tipo ChatGPT/Gemini.
+- Subir o adjuntar documentos, hojas, recursos visuales y contexto de clase a la IA.
 - Ver pendientes, reportes y calendario.
 
 Todo debe sentirse familiar, como herramientas que el profesor ya conoce, pero conectado de forma nativa dentro de PlanearIA.
@@ -44,15 +46,19 @@ PlanearIA no debe parecer una app educativa rara que obliga al docente a aprende
 - Classroom para clases, alumnos, materiales y tareas.
 - Canva/Genially para recursos visuales.
 - WhatsApp para comunicacion docente.
+- ChatGPT/Gemini para conversar con IA y transformar materiales.
 - Un dashboard personal para calendario, pendientes y seguimiento.
 
 La innovacion real esta en la conexion entre herramientas, no en inventar controles extranos.
 
-### 2. Automatizacion Silenciosa, No Invasiva
+### 2. IA Silenciosa Y Chat Explicito
 
-La IA debe trabajar en segundo plano y aparecer solo cuando tenga una sugerencia util.
+La IA debe tener dos formas de aparecer:
 
-Debe poder:
+- **Silenciosa/contextual**: trabaja en segundo plano y aparece solo cuando tiene una sugerencia util.
+- **Conversacional**: un asistente propio tipo ChatGPT/Gemini donde el docente puede preguntar, subir o adjuntar materiales y pedir transformaciones abiertas.
+
+La IA silenciosa debe poder:
 
 - Leer documentos y detectar temas, grupos, fechas, actividades y materiales.
 - Sugerir a que clase pertenece un recurso.
@@ -61,7 +67,16 @@ Debe poder:
 - Proponer recordatorios y eventos.
 - Sugerir rubricas, instrucciones, materiales o retroalimentacion.
 
-Pero siempre debe pedir confirmacion. El docente sigue siendo quien decide.
+El Asistente IA / ChatGPT Docente debe poder:
+
+- Recibir archivos subidos por el docente cuando el flujo lo permita.
+- Adjuntar documentos, planeaciones, hojas, listas o rubricas desde Office Docente.
+- Adjuntar recursos visuales desde Canva/Genially.
+- Usar contexto de Classroom: clase, unidad, actividad, alumno, entrega o reporte.
+- Generar borradores, resumenes, rubricas, instrucciones, mensajes, actividades y recordatorios.
+- Proponer acciones: guardar como borrador, asignar a una clase, crear tarea, crear evento, crear recurso o descartar.
+
+Pero siempre debe pedir confirmacion antes de guardar, asignar, enviar o modificar datos importantes. El docente sigue siendo quien decide.
 
 ### 3. Todo Se Puede Asignar
 
@@ -72,6 +87,7 @@ Cada objeto importante debe poder conectarse a una clase, unidad, alumno, activi
 - Hoja/lista -> alumnos/asistencia/calificaciones.
 - Diseno visual -> material/actividad.
 - Mensaje -> recurso compartido o colaboracion.
+- Conversacion IA -> borrador/documento/tarea/recurso/recordatorio.
 - Reporte -> grupo/alumno/ciclo.
 
 Si algo se crea dentro de PlanearIA, debe tener un camino claro para usarse en el aula.
@@ -123,7 +139,48 @@ No debe ser una landing page ni una pantalla decorativa. Debe ser un tablero uti
 
 ---
 
-## Experiencia 2: Office Docente (Word + Excel)
+## Experiencia 2: Asistente IA / ChatGPT Docente
+
+PlanearIA debe tener una experiencia conversacional propia para docentes que ya usan ChatGPT, Gemini, Copilot u otros LLMs como parte de su trabajo diario.
+
+No debe ser solo una caja de chat generica. Debe entender objetos reales de PlanearIA.
+
+Debe permitir:
+
+- Conversar con un asistente docente.
+- Subir documentos cuando el flujo lo permita.
+- Adjuntar planeaciones, documentos, hojas, listas o rubricas de Office Docente.
+- Adjuntar recursos visuales de Canva/Genially.
+- Adjuntar contexto de Classroom: clase, unidad, actividad, alumno, entrega o reporte.
+- Pedir transformaciones entre formatos.
+- Guardar resultados como borradores editables.
+- Asignar resultados a Classroom solo con confirmacion.
+
+### Flujo ideal
+
+- El docente abre el asistente.
+- Selecciona o adjunta una planeacion, hoja, recurso visual o clase.
+- Pide algo como: "Convierteme esto en una actividad para Matematicas 2A con rubrica y fecha de entrega".
+- La IA genera una propuesta editable.
+- PlanearIA ofrece acciones claras: guardar en Office, crear tarea en Classroom, crear recordatorio, compartir por WhatsApp Docente o descartar.
+- El docente confirma, ajusta o cancela.
+
+### IA local y proveedores
+
+El asistente debe funcionar sobre `backend/lib/aiGateway.js`, no desde frontend directo.
+
+El gateway puede conectar proveedores cloud OpenAI-compatible y tambien proveedores locales compatibles, como LM Studio, cuando el backend pueda alcanzarlos.
+
+Reglas:
+
+- LM Studio local aplica principalmente para desarrollo/local o una red/proxy explicitamente configurada.
+- Vercel no puede llamar al `localhost` de la computadora del usuario.
+- Si no hay proveedor configurado, la app debe mostrar fallback claro y permitir trabajo manual.
+- La privacidad de documentos, alumnos y conversaciones debe tratarse como parte del plan de seguridad.
+
+---
+
+## Experiencia 3: Office Docente (Word + Excel)
 
 La experiencia Office unifica el trabajo documental y tabular del docente.
 
@@ -174,7 +231,7 @@ El docente no deberia tener que pasar datos a mano entre documentos, listas y cl
 
 ---
 
-## Experiencia 3: Classroom / Clases
+## Experiencia 4: Classroom / Clases
 
 Classroom es el espacio donde el docente organiza la vida de cada grupo.
 
@@ -214,7 +271,7 @@ Pero Classroom debe poder recibir y usar todo eso sin friccion.
 
 ---
 
-## Experiencia 4: Canva / Genially Docente
+## Experiencia 5: Canva / Genially Docente
 
 Esta experiencia permite crear recursos visuales sin salir de PlanearIA.
 
@@ -241,7 +298,7 @@ La ventaja no es solo crear disenos. La ventaja es evitar el flujo externo de cr
 
 ---
 
-## Experiencia 5: WhatsApp Docente / Comunidad Profesional
+## Experiencia 6: WhatsApp Docente / Comunidad Profesional
 
 La comunicacion debe sentirse como WhatsApp profesional, no como red social pesada.
 
@@ -267,7 +324,7 @@ El feed publico o social puede existir mas adelante, pero no debe distraer del o
 
 ---
 
-## Experiencia 6: Calendario Y Seguimiento Personal
+## Experiencia 7: Calendario Y Seguimiento Personal
 
 El calendario debe ayudar al docente a saber que hacer y cuando hacerlo.
 
@@ -292,7 +349,7 @@ El calendario no debe ser una agenda aislada. Debe ser la vista temporal de todo
 
 ---
 
-## Experiencia 7: Reportes, Analitica Y Gamificacion
+## Experiencia 8: Reportes, Analitica Y Gamificacion
 
 Los reportes deben ayudar al docente a entender como van sus grupos y alumnos sin saturar la experiencia diaria.
 
@@ -317,7 +374,7 @@ La gamificacion debe usarse con cuidado. Debe motivar y orientar, no infantiliza
 
 ---
 
-## Experiencia 8: Cuenta, Perfil, Configuracion Y Accesibilidad
+## Experiencia 9: Cuenta, Perfil, Configuracion Y Accesibilidad
 
 Esta experiencia sostiene la confianza del usuario.
 
@@ -341,10 +398,14 @@ No debe ser una pantalla decorativa. Debe ser el lugar donde el docente entiende
 
 ## La IA Como Hilo Conductor
 
-La IA de PlanearIA no debe ser un modulo aislado llamado "Asistente". Debe aparecer en el flujo correcto.
+La IA de PlanearIA no debe ser solamente un modulo aislado llamado "Asistente". Debe tener dos capas:
+
+- Una capa contextual dentro de cada experiencia.
+- Una experiencia explicita de chat para conversaciones abiertas y trabajo con adjuntos.
 
 Ejemplos:
 
+- En el Asistente IA, conversa con documentos, recursos, clases, reportes y archivos adjuntos.
 - En Office, detecta contenido y sugiere asignaciones.
 - En Classroom, propone actividades, rubricas y recordatorios.
 - En Canva, sugiere estructura visual.
@@ -358,6 +419,8 @@ La IA debe tener estas reglas:
 - No guarda cambios importantes sin confirmacion.
 - No debe ser costosa por defecto.
 - Debe tener fallback si no hay API key.
+- Debe poder usar proveedores cloud o locales a traves del AI Gateway.
+- Debe indicar cuando un proveedor local como LM Studio no esta disponible para la demo hosteada.
 - Debe explicar que hizo y permitir deshacer o ajustar.
 
 ---
@@ -367,6 +430,7 @@ La IA debe tener estas reglas:
 PlanearIA debe sentirse como una suite docente completa:
 
 - Office para crear y organizar.
+- ChatGPT/Gemini Docente para conversar, transformar y trabajar con adjuntos.
 - Classroom para asignar y dar seguimiento.
 - Canva para disenar.
 - WhatsApp para colaborar.

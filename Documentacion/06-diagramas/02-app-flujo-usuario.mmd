@@ -26,6 +26,7 @@ flowchart TD
     recursos --> plan["Office Docente parcial<br/>Planeaciones (editor documento + IA)"]
     recursos --> biblio["Biblioteca / Plantillas"]
     social --> chat["Chat / Contactos"]
+    tabs -.-> asistente["Futuro Asistente IA<br/>chat con documentos, recursos y clases"]
     config --> cuenta["Perfil / Cuenta / Accesibilidad"]
 
     %% Capas MVVM que atraviesan cada pantalla
@@ -36,6 +37,7 @@ flowchart TD
         model --> svc["Services + Sync<br/>services/, sync/, utils/apiClient"]
         svc --> persist[("Persistencia local<br/>AsyncStorage default<br/>SQLite opt-in")]
         svc -->|"online"| remote["Backend Vercel + MongoDB"]
+        svc -->|"IA"| aigw["AI Gateway<br/>cloud o local compatible"]
     end
 
     tabs -.->|"cada modulo usa"| mvvm

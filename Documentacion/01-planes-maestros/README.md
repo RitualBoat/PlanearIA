@@ -32,6 +32,7 @@ Plan Maestro: UX/UI y Navegacion Global
 Debe definir la arquitectura de experiencias:
 
 - Inicio / Sistema Operativo Docente.
+- Asistente IA / ChatGPT Docente.
 - Office Docente.
 - Classroom.
 - Canva / Genially Docente.
@@ -39,6 +40,7 @@ Debe definir la arquitectura de experiencias:
 - Calendario.
 - Reportes.
 - Cuenta / Seguridad / Accesibilidad.
+- Reglas de AI Gateway, adjuntos y proveedores locales/cloud para el asistente.
 
 No debe tratar la UX actual como intocable. Los planes cerrados son evidencia funcional, no limite visual.
 

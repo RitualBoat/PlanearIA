@@ -9,11 +9,12 @@ Leer en este orden antes de auditar o proponer planes:
 1. `00-fundamentos/RESUMEN_EJECUTIVO.md`
 2. `00-fundamentos/VISION_ACTUAL.md`
 3. `00-fundamentos/ARQUITECTURA.md`
-4. `00-fundamentos/FLUJO_SINCRONIZACION.md`
-5. `00-fundamentos/MAPA_MODULOS_ACTUALES.md`
-6. `00-fundamentos/ROADMAP_PLANES_MAESTROS.md`
-7. `01-planes-maestros/meta_guia_planes.md`
-8. `prompt_mejorado.md`
+4. `00-fundamentos/IA_CHATBOT_LLM.md`
+5. `00-fundamentos/FLUJO_SINCRONIZACION.md`
+6. `00-fundamentos/MAPA_MODULOS_ACTUALES.md`
+7. `00-fundamentos/ROADMAP_PLANES_MAESTROS.md`
+8. `01-planes-maestros/meta_guia_planes.md`
+9. `prompt_mejorado.md`
 
 Si hay contradiccion entre documentos, gana este orden:
 
@@ -26,11 +27,12 @@ Si hay contradiccion entre documentos, gana este orden:
 
 ## Vision Vigente
 
-PlanearIA esta evolucionando hacia una suite docente offline-first. La regla central es cero friccion: el profesor debe poder hacer su trabajo completo sin cambiar entre Word, Excel, Classroom, Canva, WhatsApp, calendarios, carpetas y archivos sueltos.
+PlanearIA esta evolucionando hacia una suite docente offline-first. La regla central es cero friccion: el profesor debe poder hacer su trabajo completo sin cambiar entre Word, Excel, ChatGPT/Gemini, Classroom, Canva, WhatsApp, calendarios, carpetas y archivos sueltos.
 
 Experiencias objetivo:
 
 - Inicio / Sistema Operativo Docente.
+- Asistente IA / ChatGPT Docente: chat propio con adjuntos, documentos, recursos, clases y acciones confirmables.
 - Office Docente (Word + Excel): documentos, planeaciones, hojas, listas, rubricas, asistencia, calificaciones e import/export.
 - Classroom / Clases.
 - Canva / Genially Docente.
@@ -78,7 +80,7 @@ Experiencias objetivo:
 
 1. Cerrar formalmente `PLAN_AUTH_SEGURIDAD_SESION_REAL.md` con validacion manual, email real o decision explicita de diferirlo, y tracking GitHub actualizado.
 2. Iniciar `Plan Maestro: UX/UI y Navegacion Global`.
-3. Dentro de ese plan, decidir la arquitectura de experiencias: Office Docente, Classroom, Canva, WhatsApp, Calendario, Reportes y Cuenta/Accesibilidad.
+3. Dentro de ese plan, decidir la arquitectura de experiencias: Asistente IA, Office Docente, Classroom, Canva, WhatsApp, Calendario, Reportes y Cuenta/Accesibilidad.
 4. Solo despues crear subplanes de implementacion por experiencia o subexperiencia.
 
 ## Documentos Principales
@@ -88,6 +90,7 @@ Experiencias objetivo:
 | `00-fundamentos/RESUMEN_EJECUTIVO.md` | Estado vigente y reglas de direccion. |
 | `00-fundamentos/VISION_ACTUAL.md` | Vision de producto: una suite docente conectada. |
 | `00-fundamentos/ARQUITECTURA.md` | Stack, MVVM, backend, storage, sync y reglas tecnicas. |
+| `00-fundamentos/IA_CHATBOT_LLM.md` | Vision y reglas para Asistente IA tipo ChatGPT/Gemini, adjuntos, AI Gateway y LM Studio. |
 | `00-fundamentos/MAPA_MODULOS_ACTUALES.md` | Inventario de carpetas actuales mapeadas a experiencias objetivo. |
 | `00-fundamentos/ROADMAP_PLANES_MAESTROS.md` | Orden recomendado de planes. |
 | `00-fundamentos/FLUJO_SINCRONIZACION.md` | Motor offline-first vigente. |
@@ -106,6 +109,7 @@ Experiencias objetivo:
 - Mantener MVVM: pantallas delgadas, hooks ViewModel, Context/Services para estado e I/O.
 - Todo dato multiusuario debe aislarse por `userId`.
 - IA solo via backend y con fallback/costo controlado.
+- Asistente IA y proveedores locales/cloud siempre via AI Gateway; nunca directo desde frontend.
 - No copiar codigo open source sin revisar licencia, stack y compatibilidad.
 - Ground truth obligatorio para experiencias de paridad alta: Office, Classroom, Canva/Genially y WhatsApp.
 - No cerrar UX/UI de alta paridad solo con tests automaticos; pedir validacion manual.
@@ -115,4 +119,4 @@ Experiencias objetivo:
 ## Version
 
 - Ultima actualizacion: 2026-06-17.
-- Version documental: 4.3.
+- Version documental: 4.4.

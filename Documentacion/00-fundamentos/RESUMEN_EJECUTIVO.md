@@ -20,7 +20,7 @@ PlanearIA no debe sentirse como una coleccion de modulos sueltos. Debe sentirse 
 - Reportes.
 - Cuenta, seguridad y accesibilidad.
 
-La IA debe conectar el flujo de dos maneras: sugerencias silenciosas dentro de cada experiencia y un Asistente IA tipo ChatGPT/Gemini para conversar con documentos, recursos, clases y archivos adjuntos. En ambos casos debe pedir confirmacion antes de guardar, asignar, enviar o modificar datos importantes.
+La IA debe conectar el flujo de dos maneras: sugerencias silenciosas dentro de cada experiencia y un Asistente IA tipo ChatGPT/Gemini para conversar con documentos, recursos, clases y archivos adjuntos. La IA silenciosa tambien puede pedir permiso para mandar una tarea al LLM de PlanearIA en segundo plano, por ejemplo correcciones de un documento. En todos los casos debe pedir confirmacion antes de guardar, asignar, enviar, sobrescribir o modificar datos importantes.
 
 ## Estado Real Del Proyecto
 
@@ -49,7 +49,7 @@ La IA debe conectar el flujo de dos maneras: sugerencias silenciosas dentro de c
 - Definir sistema visual, navegacion objetivo y arquitectura de experiencias.
 - Decidir como se implementa Office Docente: documentos + hojas/listas + asignacion inteligente a Classroom.
 - Decidir donde vive el Asistente IA: tab, panel lateral, accion flotante, command palette o espacio contextual.
-- Definir plan tecnico de chat IA: historial, adjuntos, permisos, costos, proveedores cloud/locales y fallback.
+- Definir plan tecnico de chat IA: historial, adjuntos, solicitudes en segundo plano, permisos, costos, proveedores cloud/locales y fallback.
 - Despues de UX/UI Global, crear subplanes por experiencia o subexperiencia.
 
 ## Stack Vigente
@@ -73,6 +73,7 @@ La IA debe conectar el flujo de dos maneras: sugerencias silenciosas dentro de c
 - No duplicar flujos entre Office, Classroom, Contenido y rutas legacy.
 - No llamar modelos IA desde frontend.
 - No conectar LM Studio ni proveedores cloud directo desde frontend; todo debe pasar por backend/AI Gateway.
+- No sobrescribir documentos originales con resultados IA; generar copia, borrador, resumen o comparacion revisable.
 - No crear colas/clientes HTTP paralelos si el dato puede usar `src/sync`.
 - No activar SQLite como default sin plan, validacion y rollback.
 - No borrar claves `@planearia:*` sin migracion controlada.

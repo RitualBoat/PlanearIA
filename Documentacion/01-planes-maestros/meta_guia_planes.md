@@ -486,7 +486,7 @@ Todo plan que toque pantallas debe resolver explicitamente:
 Debe incluir:
 
 - Casos de uso IA.
-- Si aplica, superficie IA: sugerencia contextual, chatbot explicito, copiloto de editor, generador batch o analisis de archivos.
+- Si aplica, superficie IA: sugerencia contextual, solicitud en segundo plano, chatbot explicito, copiloto de editor, generador batch o analisis de archivos.
 - Endpoints requeridos.
 - Proveedor/modelo.
 - Adjuntos/contexto permitidos: documentos, hojas, recursos visuales, clases, alumnos, entregas, reportes o archivos subidos.
@@ -497,6 +497,8 @@ Debe incluir:
 - Prompting esperado.
 - Validacion humana.
 - Acciones confirmables antes de guardar, asignar, enviar o modificar datos.
+- Estados para tareas IA en segundo plano: pendiente, generando, listo, error, cancelado.
+- Salida esperada: copia corregida, borrador editable, comparacion de cambios, resumen en chat o accion descartable.
 - Costos y limites.
 
 ### 6.8 Offline-First y Sync
@@ -968,11 +970,13 @@ Debe exigir:
 
 - No llamar modelos desde frontend.
 - No guardar ni asignar resultados sin confirmacion docente.
+- No sobrescribir archivos originales; las correcciones IA deben generar copia, resumen, borrador o comparacion revisable.
 - Definir privacidad y permisos para documentos, alumnos y conversaciones.
 - Definir limites por usuario/accion con `aiUsageLimiter`.
 - Definir fallback si no hay proveedor configurado.
 - Documentar que LM Studio/local LLM funciona solo si el backend puede alcanzar la URL; no asumir que Vercel puede usar el localhost del usuario.
 - UX clara para distinguir proveedor cloud, proveedor local, IA no configurada y error temporal.
+- UX clara para solicitudes iniciadas desde IA silenciosa: origen, estado, resultado y opcion de cancelar o revisar.
 
 ### 12.3 Office Docente
 
@@ -989,6 +993,7 @@ Debe cubrir:
 - Plantillas.
 - Import/export DOCX/PDF/CSV/XLSX cuando aplique.
 - IA que detecta tema, grupo, unidad, fechas, actividades y datos tabulares.
+- IA silenciosa que puede sugerir "Pedir correcciones al DocenteLLM?" y generar en segundo plano una copia corregida, resumen o comparacion.
 
 Debe exigir:
 

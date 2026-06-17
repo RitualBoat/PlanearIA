@@ -9,7 +9,7 @@ La vision vigente ya no es "muchos modulos separados". PlanearIA apunta a ser un
 | Experiencia objetivo               | Proposito                                                                                                                                                      |
 | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Inicio / Sistema Operativo Docente | Pendientes, clases del dia, documentos recientes, estado de sync y sugerencias IA.                                                                             |
-| Asistente IA / ChatGPT Docente     | Chat propio tipo ChatGPT/Gemini con adjuntos desde Office, Classroom y Canva; genera borradores y acciones confirmables.                                      |
+| Asistente IA / ChatGPT Docente     | Chat propio tipo ChatGPT/Gemini con adjuntos desde Office, Classroom y Canva; recibe borradores, correcciones y acciones confirmables generadas por IA.       |
 | Office Docente                     | Documentos, planeaciones, plantillas, hojas, listas, asistencia, calificaciones, rubricas e import/export. Une Word + Excel como una sola experiencia escolar. |
 | Classroom / Clases                 | Cursos, unidades, materiales, actividades, alumnos, entregas y seguimiento operativo.                                                                          |
 | Canva / Genially Docente           | Creacion visual de materiales, presentaciones, infografias, actividades y recursos imprimibles.                                                                |
@@ -31,7 +31,7 @@ PlanearIA ya tiene una base funcional importante:
 - Planeaciones Fase 9 cerrada: editor tipo documento, plantillas, import/export, IA via backend y fallback.
 - Motor global offline-first en `src/sync`: cola por entidad, push/pull cross-device, eventos de refresco y UX de estado de red.
 - Backend Node serverless en Vercel con router unico, rutas academicas aisladas por JWT y MongoDB Atlas.
-- IA centralizada en backend mediante `backend/lib/aiGateway.js`, con vision de Asistente IA propio y proveedores cloud/locales OpenAI-compatible.
+- IA centralizada en backend mediante `backend/lib/aiGateway.js`, con vision de Asistente IA propio, solicitudes en segundo plano y proveedores cloud/locales OpenAI-compatible.
 - CI con typecheck, lint, Jest y backend smoke.
 - CD con build web estatico y APK Android standalone publicados como artifacts/releases de GitHub.
 
@@ -125,6 +125,7 @@ Leer en este orden:
 - No duplicar flujos entre Contenido, Classroom, Office Docente y pantallas legacy.
 - No llamar IA desde frontend; toda IA pasa por backend.
 - No conectar ChatGPT/Gemini/LM Studio directo desde frontend; el Asistente IA debe pasar por `aiGateway`.
+- No sobrescribir documentos con correcciones IA; generar copia, resumen, borrador o comparacion revisable.
 - No crear clientes HTTP o colas propias si el dato es sincronizable; usar `src/sync`.
 - No activar SQLite como default ni borrar claves `@planearia:*` sin plan, validacion y rollback.
 - No tratar planes cerrados como vision visual intocable: son evidencia funcional, no limite UX.

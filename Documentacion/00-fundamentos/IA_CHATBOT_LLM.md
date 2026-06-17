@@ -22,8 +22,29 @@ El docente debe poder:
 - Pedir conversiones: documento a tarea, planeacion a calendario, hoja a asistencia, recurso visual a material de clase.
 - Guardar respuestas como borradores editables.
 - Enviar o asignar resultados a Classroom solo con confirmacion.
+- Recibir solicitudes iniciadas desde la IA silenciosa, por ejemplo correcciones de un documento aceptadas desde Office Docente.
 
 La regla sigue siendo la misma: la IA puede proponer, pero el docente decide.
+
+## Solicitudes IA En Segundo Plano
+
+La IA silenciosa puede detectar una oportunidad concreta y pedir permiso para mandar una tarea al LLM de PlanearIA, nombre conceptual: `DocenteLLM`.
+
+Ejemplo:
+
+```text
+Pedir correcciones al DocenteLLM?
+```
+
+Si el docente acepta:
+
+- La solicitud se procesa en segundo plano mediante backend/AI Gateway.
+- La app muestra estado discreto: pendiente, generando, listo, error o cancelado.
+- El docente puede seguir editando o cambiar de pantalla.
+- El resultado puede aparecer como copia corregida, borrador editable, comparacion de cambios o resumen dentro del Asistente IA.
+- El archivo original no se sobrescribe sin confirmacion.
+
+Este patron aplica a documentos, hojas, planeaciones, rubricas, recursos visuales, mensajes o reportes cuando tenga sentido.
 
 ## Arquitectura Esperada
 
@@ -76,6 +97,7 @@ La app sigue siendo offline-first para trabajo manual y datos locales. La IA loc
 - Si la IA falla, no se debe perder el trabajo.
 - Las respuestas generadas deben guardarse solo cuando el docente confirme.
 - Los adjuntos usados por IA deben respetar permisos, `userId` y privacidad.
+- Las solicitudes en segundo plano deben tener estado persistible o recuperable para no perder resultados si el usuario navega, cierra la app o se cae la red.
 
 ## Riesgos
 
@@ -83,15 +105,18 @@ La app sigue siendo offline-first para trabajo manual y datos locales. La IA loc
 - Privacidad al enviar documentos o datos de alumnos a proveedores externos.
 - Latencia o respuestas pobres en modelos locales pequenos.
 - Confusion si la IA parece tomar acciones sin confirmacion.
+- Confusion si una tarea en segundo plano parece reemplazar el trabajo original en vez de crear un resultado revisable.
 - Duplicar chat, Classroom y Office si no se define bien donde vive cada accion.
 
 ## Reglas De Producto
 
 - El asistente debe poder leer contexto de la app, pero no actuar sin permiso.
 - Cada respuesta importante debe ofrecer acciones claras: guardar como borrador, asignar, crear tarea, crear recurso, crear recordatorio, copiar o descartar.
+- Las solicitudes en segundo plano deben poder abrirse desde el chat o desde la experiencia donde nacieron.
+- Toda correccion IA debe mostrar cambios sugeridos antes de aplicar o reemplazar contenido.
 - La interfaz debe explicar si se usa proveedor cloud, proveedor local o IA no configurada.
 - El futuro plan UX/UI debe decidir si el asistente vive como tab, panel lateral, command palette o accion flotante contextual.
-- El futuro plan tecnico debe definir historial de conversaciones, adjuntos, limites, privacidad, costos y pruebas.
+- El futuro plan tecnico debe definir historial de conversaciones, adjuntos, solicitudes en segundo plano, limites, privacidad, costos y pruebas.
 
 ## Planes Relacionados
 

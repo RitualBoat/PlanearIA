@@ -17,3 +17,4 @@ paths:
 - No skeleton/placeholder screens without clear entry points and exit CTAs
 - Do not copy legacy tab/module structure as the target UX unless the active plan justifies it
 - AI chatbot UI must never call OpenAI/Gemini/LM Studio directly; use backend gateway endpoints and confirm actions before saving/assigning
+- Background AI corrections must show status and produce a reviewable copy, draft, diff or summary before applying changes

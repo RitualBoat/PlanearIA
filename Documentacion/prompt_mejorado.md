@@ -22,6 +22,7 @@ PlanearIA es una plataforma educativa para docentes mexicanos. Esta construida c
 - Motor global de sincronizacion en `src/sync`.
 - IA centralizada en backend mediante `backend/lib/aiGateway.js`.
 - Vision de Asistente IA / ChatGPT Docente propio, con adjuntos desde experiencias y proveedores cloud/locales via AI Gateway.
+- Vision de IA silenciosa que puede pedir permiso para mandar solicitudes al LLM de PlanearIA en segundo plano, por ejemplo correcciones de documentos, y devolver copia corregida, resumen o comparacion revisable.
 - CI/CD con GitHub Actions para typecheck, lint, tests, web bundle y APK standalone.
 
 El principio de producto es **cero friccion**: un docente no deberia sentir que aprende software nuevo. Debe sentir que abre una suite docente completa dentro de un solo ecosistema: Office Docente para documentos y hojas, Asistente IA tipo ChatGPT/Gemini, Classroom para clases, Canva/Genially para materiales visuales, WhatsApp profesional para comunicacion, calendario, reportes, seguimiento e IA conectando todo.
@@ -40,6 +41,7 @@ Esto significa:
 - Planeaciones, aunque ya tenga editor tipo Word, puede redisenarse por completo dentro de esa experiencia Office.
 - Classroom, aunque ya funcione como flujo principal, puede redisenarse por completo desde UX/UI.
 - El Asistente IA, aunque aun no exista como experiencia completa, debe diseniarse como parte real de la vision objetivo.
+- Las solicitudes IA en segundo plano, aunque aun no existan como sistema completo, deben contemplarse como parte del flujo Office/Asistente IA.
 - Feed, Contenido, Social, Cuenta, Plantillas, Alumnos, Tareas, Reportes y cualquier pantalla actual pueden repensarse.
 - Los planes cerrados sirven como evidencia funcional y tecnica, no como limite visual.
 - El codigo actual sirve como inventario de capacidades, datos, rutas, ViewModels, services y riesgos.
@@ -189,6 +191,7 @@ Usa estas experiencias como punto de partida, pero puedes fusionarlas, separarla
    - Experiencia conversacional propia para docentes que ya usan ChatGPT, Gemini, Copilot o LLMs locales como parte de su trabajo.
    - Debe permitir conversar con documentos, hojas, recursos visuales, clases, alumnos, entregas, reportes y archivos adjuntos.
    - Debe proponer acciones confirmables: guardar como borrador, crear tarea, asignar a Classroom, crear recurso, crear recordatorio, compartir o descartar.
+   - Debe recibir resultados de solicitudes iniciadas desde IA silenciosa, como correcciones de documentos pedidas al LLM de PlanearIA en segundo plano.
    - Debe reutilizar `backend/lib/aiGateway.js`, contemplar proveedores cloud y locales como LM Studio via `AI_GATEWAY_PROVIDERS`, y explicar limites de Vercel/local.
    - Debe diseniarse visualmente desde cero aunque hoy solo existan endpoints IA parciales para planeaciones/Classroom.
 
@@ -199,6 +202,7 @@ Usa estas experiencias como punto de partida, pero puedes fusionarlas, separarla
    - Repos open source como LibreOffice pueden servir como referencia de patrones de interfaz y flujos, no como codigo a copiar sin revisar licencia, stack y compatibilidad.
    - Debe redisenarse visualmente desde cero aunque ya exista `DocEditor` y aunque algunos flujos de planeaciones ya funcionen.
    - Debe contemplar IA que detecta titulo, materia, grupo, unidad, fechas, actividades, tablas y datos para sugerir asignacion a Classroom.
+   - Debe contemplar sugerencias silenciosas tipo "Pedir correcciones al DocenteLLM?" que, si el docente acepta, procesan en segundo plano y devuelven copia, resumen o comparacion sin sobrescribir el original.
 
 4. **Classroom / Clases**
    - Experiencia madre para cursos, grupos, unidades, sesiones, materiales, actividades, entregas, alumnos, asistencia, calificaciones y seguimiento operativo.
@@ -265,12 +269,14 @@ Considera que:
 - `backend/lib/aiUsageLimiter.js` limita uso por accion.
 - Hay endpoints IA para planeaciones y Classroom.
 - La vision nueva contempla un Asistente IA / ChatGPT Docente propio con adjuntos desde Office, Classroom, Canva y archivos subidos.
+- La IA silenciosa puede pedir permiso para enviar tareas al LLM de PlanearIA en segundo plano; ejemplo: correcciones de un documento, hoja, recurso o mensaje.
 - Se esta considerando IA local con LM Studio u otros proveedores OpenAI-compatible mediante `AI_GATEWAY_PROVIDERS`.
 - LM Studio debe tratarse como opcion local/dev o de red controlada; la demo en Vercel no puede alcanzar el localhost del usuario.
 - El frontend no debe llamar modelos directamente.
 - Toda funcion IA debe tener fallback, timeout, costo estimado/controlado, error visible y revision humana.
 - La IA debe ayudar de forma silenciosa, no quitar control al docente.
 - No guardar contenido generado por IA sin oportunidad de revision.
+- No sobrescribir contenido original con correcciones IA; producir copia, borrador, resumen de cambios o comparacion revisable.
 - No proponer features IA costosas si no hay free tier o fallback claro.
 
 Evalua como cada experiencia futura puede integrarse IA-first sin romper bajo costo, privacidad, offline-first ni UX.
@@ -431,6 +437,7 @@ Para cada experiencia, indica:
 - Que riesgos de costo/privacidad existen.
 - Que adjuntos/contexto puede usar: documentos, hojas, recursos visuales, clases, alumnos, entregas, reportes o archivos subidos.
 - Como distinguir proveedor cloud, proveedor local, IA no configurada y error temporal.
+- Como manejar solicitudes IA en segundo plano: origen de la sugerencia, estado, cancelacion, resultado, revision y aplicacion manual.
 
 ### 11. Plan De Transicion Conceptual
 

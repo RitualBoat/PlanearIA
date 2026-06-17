@@ -14,6 +14,7 @@ PlanearIA es una app React Native + Expo SDK 54 + TypeScript para docentes mexic
 - Motor de sync offline-first en `src/sync`.
 - IA centralizada en backend mediante `backend/lib/aiGateway.js`.
 - Futuro Asistente IA / ChatGPT Docente conectado a Office, Classroom, Canva y proveedores cloud/locales via AI Gateway.
+- IA silenciosa puede sugerir solicitudes al LLM en segundo plano, como correcciones de documentos, pero nunca debe sobrescribir originales sin revision docente.
 
 La vision actual no es "muchos modulos separados". La vision es una suite docente conectada:
 
@@ -70,6 +71,7 @@ Cuando el usuario pida trabajar en una tarea de plan:
 - No borrar claves `@planearia:*` sin migracion, validacion y rollback.
 - Toda entidad multiusuario debe aislarse por `userId`.
 - Toda IA debe pasar por backend; no poner provider keys ni URLs privadas de LM Studio en frontend.
+- Correcciones IA: entregar copia, borrador, comparacion o resumen revisable antes de aplicar.
 - No proponer microservicios ni infraestructura costosa sin justificacion fuerte.
 - Web, tablet y movil deben partir de una pantalla madre responsiva. Archivos platform-specific requieren justificacion.
 

@@ -66,6 +66,8 @@ La IA silenciosa debe poder:
 - Detectar alumnos, listas o calificaciones dentro de tablas.
 - Proponer recordatorios y eventos.
 - Sugerir rubricas, instrucciones, materiales o retroalimentacion.
+- Detectar cuando un documento, hoja o recurso podria beneficiarse de una revision y ofrecer una accion clara, por ejemplo: "Pedir correcciones al DocenteLLM?".
+- Si el docente acepta, enviar la solicitud al LLM de PlanearIA en segundo plano y mostrar progreso sin bloquear el trabajo.
 
 El Asistente IA / ChatGPT Docente debe poder:
 
@@ -74,6 +76,7 @@ El Asistente IA / ChatGPT Docente debe poder:
 - Adjuntar recursos visuales desde Canva/Genially.
 - Usar contexto de Classroom: clase, unidad, actividad, alumno, entrega o reporte.
 - Generar borradores, resumenes, rubricas, instrucciones, mensajes, actividades y recordatorios.
+- Recibir resultados generados en segundo plano por la IA contextual: copia corregida, resumen de cambios, diferencias sugeridas o borrador editable.
 - Proponer acciones: guardar como borrador, asignar a una clase, crear tarea, crear evento, crear recurso o descartar.
 
 Pero siempre debe pedir confirmacion antes de guardar, asignar, enviar o modificar datos importantes. El docente sigue siendo quien decide.
@@ -155,6 +158,7 @@ Debe permitir:
 - Pedir transformaciones entre formatos.
 - Guardar resultados como borradores editables.
 - Asignar resultados a Classroom solo con confirmacion.
+- Recibir tareas IA iniciadas desde otra experiencia, como correcciones de documentos solicitadas desde Office Docente.
 
 ### Flujo ideal
 
@@ -164,6 +168,15 @@ Debe permitir:
 - La IA genera una propuesta editable.
 - PlanearIA ofrece acciones claras: guardar en Office, crear tarea en Classroom, crear recordatorio, compartir por WhatsApp Docente o descartar.
 - El docente confirma, ajusta o cancela.
+
+### Flujo de solicitud silenciosa al LLM
+
+- El docente esta editando un documento, hoja o recurso.
+- PlanearIA detecta una oportunidad util y pregunta: "Pedir correcciones al DocenteLLM?".
+- Si el docente acepta, la solicitud se manda al LLM de PlanearIA en segundo plano.
+- El docente puede seguir trabajando mientras la app muestra un estado discreto: pendiente, generando, listo o error.
+- Al terminar, PlanearIA puede entregar una copia corregida, un resumen de cambios sugeridos en el chat o un borrador comparativo.
+- Nada reemplaza el original sin confirmacion.
 
 ### IA local y proveedores
 
@@ -216,6 +229,7 @@ Repos open source como LibreOffice pueden servir como ground truth conceptual de
 - Escribe, edita tablas, inserta secciones y usa IA cuando quiere.
 - Al guardar, la IA detecta grupo, materia, unidad, fechas y actividades.
 - PlanearIA sugiere asignarla a la clase correcta.
+- Si detecta problemas de redaccion, formato o claridad, puede sugerir pedir correcciones al LLM de PlanearIA en segundo plano.
 
 ### Flujo tabular ideal
 
@@ -406,7 +420,7 @@ La IA de PlanearIA no debe ser solamente un modulo aislado llamado "Asistente". 
 Ejemplos:
 
 - En el Asistente IA, conversa con documentos, recursos, clases, reportes y archivos adjuntos.
-- En Office, detecta contenido y sugiere asignaciones.
+- En Office, detecta contenido, sugiere asignaciones y puede pedir correcciones al LLM en segundo plano con permiso docente.
 - En Classroom, propone actividades, rubricas y recordatorios.
 - En Canva, sugiere estructura visual.
 - En WhatsApp, ayuda a redactar mensajes o resumir recursos.
@@ -417,6 +431,8 @@ La IA debe tener estas reglas:
 
 - No reemplaza el criterio docente.
 - No guarda cambios importantes sin confirmacion.
+- No sobrescribe archivos originales con contenido generado; debe crear copia, borrador, resumen o comparacion revisable.
+- Si una tarea IA corre en segundo plano, debe mostrar estado, permitir cancelar cuando sea viable y explicar el resultado.
 - No debe ser costosa por defecto.
 - Debe tener fallback si no hay API key.
 - Debe poder usar proveedores cloud o locales a traves del AI Gateway.

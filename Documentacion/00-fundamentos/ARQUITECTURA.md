@@ -8,6 +8,7 @@ La experiencia objetivo es una suite docente conectada:
 
 - Office Docente para documentos, planeaciones, hojas y listas.
 - Asistente IA / ChatGPT Docente para conversar con documentos, recursos, clases y archivos adjuntos.
+- Solicitudes IA en segundo plano iniciadas desde sugerencias contextuales, como correcciones de documentos aprobadas por el docente.
 - Classroom para organizar clases y asignar trabajo.
 - Canva/Genially para crear materiales visuales.
 - WhatsApp Docente para colaborar.
@@ -213,10 +214,13 @@ Toda IA debe:
 
 ### Superficies IA
 
-La vision vigente contempla dos superficies:
+La vision vigente contempla tres superficies:
 
 - **IA contextual**: sugerencias dentro de Office, Classroom, Canva, WhatsApp, Calendario y Reportes.
+- **Solicitudes IA en segundo plano**: acciones aprobadas por el docente desde una sugerencia contextual, por ejemplo pedir correcciones al LLM de PlanearIA y recibir despues una copia corregida, resumen de cambios o borrador comparativo.
 - **Asistente IA / ChatGPT Docente**: chat propio para conversar con documentos, hojas, recursos visuales, clases, entregas, reportes y archivos adjuntos.
+
+Toda solicitud en segundo plano debe conservar estado visible o recuperable: pendiente, generando, listo, error o cancelado. No debe sobrescribir contenido original sin confirmacion.
 
 ### Proveedores Cloud Y Locales
 

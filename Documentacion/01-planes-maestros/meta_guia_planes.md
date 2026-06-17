@@ -298,9 +298,82 @@ Regla de cierre: en modulos de paridad alta, TypeScript, lint y tests no bastan.
 
 ---
 
+### 5.2 Dinamica de Entrega Iterativa para Evitar Fatiga de Contexto
+
+Esta meta guia es grande a proposito, pero una IA no debe convertirla en una respuesta gigante, superficial y dificil de revisar. Cuando el usuario pida crear un plan maestro nuevo, la IA debe trabajar por bloques y pedir aprobacion antes de avanzar al siguiente bloque, salvo que el usuario pida explicitamente "entregalo completo de una vez".
+
+Regla general:
+
+- El plan final debe terminar cubriendo toda la estructura obligatoria de la seccion 6.
+- La conversacion para construirlo debe ser iterativa.
+- Cada entrega debe ser lo bastante pequena para que el desarrollador pueda corregir rumbo.
+- La IA debe cerrar cada entrega con una pregunta de aprobacion o ajuste.
+- No se debe avanzar a fases detalladas si el alcance, la experiencia madre, la navegacion o la arquitectura base todavia estan ambiguas.
+
+#### Entrega 1: Encuadre, Vision y Auditoria Base
+
+La primera respuesta al crear un plan maestro debe entregar solo:
+
+- Objetivo del plan y alcance propuesto.
+- Estado actual real del modulo basado en codigo y documentacion.
+- Contrato de experiencia madre y nivel de paridad.
+- Ground truth disponible y ground truth faltante.
+- Inventario inicial de pantallas, hooks/ViewModels, contextos, services, tipos, backend, tests y rutas.
+- Riesgos principales y decisiones que requieren aprobacion temprana.
+
+Al final debe preguntar si el desarrollador aprueba el enfoque, alcance y experiencia madre antes de seguir.
+
+#### Entrega 2: Arquitectura Objetivo y UX/UI
+
+Solo despues de recibir luz verde, la IA debe entregar:
+
+- Decisiones tecnicas y alternativas evaluadas.
+- Modelo de datos objetivo.
+- UX/UI objetivo.
+- Estrategia web/tablet/movil.
+- Mapa de navegacion del modulo.
+- IA y automatizacion.
+- Offline-first y sync.
+- Costos e infraestructura.
+- Limpieza legacy prevista.
+
+Al final debe preguntar si el desarrollador aprueba la arquitectura y experiencia objetivo antes de convertirla en fases.
+
+#### Entrega 3: Fases, Validacion y Tracking
+
+Solo despues de recibir luz verde, la IA debe entregar:
+
+- Fases numeradas con checkboxes `[ ]`, `[~]`, `[x]`.
+- Brief Ground Truth por fase cuando aplique.
+- Bloque GitHub/CI por fase.
+- Validaciones por fase y validacion final.
+- Modo de trabajo recomendado (`NORMAL`, `CAVEMAN` o mixto).
+- Criterio de cierre en lenguaje de usuario.
+- Open questions y riesgos pendientes.
+
+Al final debe preguntar si el desarrollador quiere ajustar fases o consolidar el plan final.
+
+#### Entrega 4: Plan Final Integrado
+
+Solo con aprobacion explicita, la IA debe consolidar el plan maestro final en un unico markdown, listo para guardarse en `Documentacion/01-planes-maestros/`.
+
+El plan final puede ser largo, pero para entonces ya debe haber sido revisado por partes. No debe introducir decisiones nuevas grandes en la consolidacion final; si aparece una decision nueva, debe marcarse como `Open Question` o pedir aprobacion.
+
+#### Excepciones Permitidas
+
+La IA puede entregar un plan completo en una sola respuesta solo cuando:
+
+- El usuario lo pide explicitamente.
+- El plan es pequeno, focalizado y de bajo riesgo.
+- No toca UX/UI de paridad alta, sync, auth, backend, IA, datos sensibles ni navegacion global.
+
+Si el plan toca UX/UI Global, una experiencia madre completa, datos sincronizables, auth/seguridad, backend o IA, la entrega iterativa es obligatoria.
+
+---
+
 ## 6. Estructura Obligatoria de Todo Plan Maestro
 
-Todo plan futuro debe seguir esta estructura:
+Todo plan futuro debe terminar cubriendo esta estructura. La IA puede construirlo por entregas iterativas segun la seccion 5.2, pero el markdown final debe incluir las secciones necesarias para que otra IA pueda implementarlo sin redescubrir el repo.
 
 ### 6.1 Encabezado
 
@@ -1272,6 +1345,16 @@ Esta guia es orientativa y no debe bloquear el trabajo si los modelos disponible
 > **Estado actual:** [resumen basado en codigo]
 
 ---
+
+## Dinamica de Entrega y Aprobacion
+
+- Este plan se construye por entregas iterativas segun `meta_guia_planes.md` seccion 5.2.
+- Entrega 1 aprobada: [si/no/pendiente].
+- Entrega 2 aprobada: [si/no/pendiente].
+- Entrega 3 aprobada: [si/no/pendiente].
+- Consolidacion final aprobada: [si/no/pendiente].
+- Decisiones que requieren luz verde antes de ejecutar:
+  - ...
 
 ## Analisis del Ground Truth
 

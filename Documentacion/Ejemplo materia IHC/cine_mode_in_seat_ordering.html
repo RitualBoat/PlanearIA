@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <title>Cine Mode - In-Seat Ordering</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <!-- React & Router Dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/history@5/umd/history.development.js"></script>
+    <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+    <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#e2e2e2",
+                        "error-container": "#93000a",
+                        "surface-tint": "#e9c176",
+                        "secondary-container": "#474746",
+                        "surface-variant": "#353535",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-surface": "#e2e2e2",
+                        "primary-fixed": "#ffdea5",
+                        "on-tertiary-container": "#233a65",
+                        "tertiary": "#b0c6f9",
+                        "on-primary-fixed-variant": "#5d4201",
+                        "surface-container-low": "#1b1b1b",
+                        "tertiary-fixed": "#d8e2ff",
+                        "secondary-fixed": "#e5e2e1",
+                        "surface": "#131313",
+                        "on-tertiary-fixed-variant": "#304671",
+                        "on-primary": "#412d00",
+                        "inverse-surface": "#e2e2e2",
+                        "surface-bright": "#393939",
+                        "outline": "#9a8f80",
+                        "primary-fixed-dim": "#e9c176",
+                        "secondary": "#c8c6c5",
+                        "error": "#ffb4ab",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-highest": "#353535",
+                        "inverse-primary": "#775a19",
+                        "primary-container": "#c5a059",
+                        "background": "#131313",
+                        "on-error-container": "#ffdad6",
+                        "primary": "#e9c176",
+                        "on-tertiary": "#173059",
+                        "tertiary-fixed-dim": "#b0c6f9",
+                        "inverse-on-surface": "#303030",
+                        "on-secondary-container": "#b7b5b4",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "surface-dim": "#131313",
+                        "on-error": "#690005",
+                        "on-secondary": "#313030",
+                        "on-surface-variant": "#d1c5b4",
+                        "tertiary-container": "#8fa5d6",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "on-secondary-fixed-variant": "#474746",
+                        "outline-variant": "#4e4639",
+                        "surface-container": "#1f1f1f",
+                        "on-primary-fixed": "#261900",
+                        "on-tertiary-fixed": "#001a41",
+                        "on-primary-container": "#4e3700"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "md": "24px",
+                        "base": "8px",
+                        "xl": "64px",
+                        "lg": "40px",
+                        "touch-target-min": "56px",
+                        "sm": "12px",
+                        "safe": "env(safe-area-inset-bottom, 24px)"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Manrope"],
+                        "label-md": ["JetBrains Mono"],
+                        "button-lg": ["Manrope"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Manrope"],
+                        "headline-lg": ["Manrope"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "button-lg": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000000;
+            color: #e2e2e2;
+            -webkit-tap-highlight-color: transparent;
+            min-height: max(884px, 100dvh);
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .fade-in { animation: fadeIn 0.8s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .pulse-soft { animation: pulseSoft 3s infinite; }
+        @keyframes pulseSoft {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(0.98); }
+        }
+
+        .animate-subtle-pulse { animation: subtle-pulse 3s infinite; }
+        @keyframes subtle-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 24px); }
+        .pt-safe { padding-top: env(safe-area-inset-top, 24px); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-body-md antialiased md:max-w-md md:mx-auto md:border-x md:border-surface-container md:shadow-2xl overflow-x-hidden relative">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { createRoot } = ReactDOM;
+        const { MemoryRouter, Routes, Route, Link, useNavigate, useLocation } = ReactRouterDOM;
+
+        // --- Shared Components ---
+
+        const TopAppBar = ({ title = "Cine Mode", leftIcon = "dark_mode", rightIcon = "account_circle", onLeftClick, onRightClick }) => (
+            <header className="fixed top-0 w-full md:max-w-md z-50 bg-surface-container-lowest border-b border-outline-variant pt-safe h-[calc(56px+env(safe-area-inset-top))]">
+                <div className="flex justify-between items-center px-md h-touch-target-min">
+                    <button onClick={onLeftClick} className="w-touch-target-min h-touch-target-min flex items-center justify-start text-primary active:scale-95 transition-transform duration-300 hover:opacity-80 transition-opacity duration-300 -ml-sm">
+                        <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>{leftIcon}</span>
+                    </button>
+                    <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-primary flex-1 text-center truncate px-4">{title}</h1>
+                    <button onClick={onRightClick} className="w-touch-target-min h-touch-target-min flex items-center justify-end text-primary active:scale-95 transition-transform duration-300 hover:opacity-80 transition-opacity duration-300 -mr-sm">
+                        {rightIcon && <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>{rightIcon}</span>}
+                    </button>
+                </div>
+            </header>
+        );
+
+        const BottomNavBar = () => {
+            const location = useLocation();
+            const isActive = (path) => location.pathname === path;
+
+            return (
+                <nav className="fixed bottom-0 w-full md:max-w-md z-50 border-t border-outline-variant bg-surface-container-lowest flex justify-around items-center h-touch-target-min px-md pb-safe">
+                    <Link to="/" className={`flex flex-col items-center justify-center w-16 h-14 rounded-xl transition-colors duration-300 active:scale-90 ${isActive('/') ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant hover:bg-surface-variant'}`}>
+                        <span className="material-symbols-outlined mb-1" style={{ fontVariationSettings: "'FILL' 1" }}>qr_code_scanner</span>
+                        <span className="font-label-md text-label-md text-[10px]">Home</span>
+                    </Link>
+                    <Link to="/menu" className={`flex flex-col items-center justify-center w-16 h-14 rounded-xl transition-colors duration-300 active:scale-90 ${isActive('/menu') ? 'bg-primary-container text-on-primary-container rounded-full' : 'text-on-surface-variant hover:bg-surface-variant'}`}>
+                        <span className="material-symbols-outlined mb-1" style={{ fontVariationSettings: "'FILL' 1" }}>fastfood</span>
+                        <span className="font-label-md text-label-md text-[10px]">Menu</span>
+                    </Link>
+                    <Link to="#" className="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors duration-300 active:scale-90 w-16 h-14 rounded-xl">
+                        <span className="material-symbols-outlined mb-1" style={{ fontVariationSettings: "'FILL' 1" }}>confirmation_number</span>
+                        <span className="font-label-md text-label-md text-[10px]">Orders</span>
+                    </Link>
+                    <Link to="#" className="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors duration-300 active:scale-90 w-16 h-14 rounded-xl">
+                        <span className="material-symbols-outlined mb-1" style={{ fontVariationSettings: "'FILL' 1" }}>person</span>
+                        <span className="font-label-md text-label-md text-[10px]">Profile</span>
+                    </Link>
+                </nav>
+            );
+        };
+
+        // --- Screens ---
+
+        const ConnectSeatScreen = () => {
+            const navigate = useNavigate();
+            return (
+                <div className="flex flex-col min-h-screen bg-surface-container-lowest text-on-background pb-24">
+                    <TopAppBar />
+                    <main className="flex-grow flex flex-col justify-center items-center px-md pt-24 pb-32 fade-in mt-[72px]">
+                        <div className="text-center mb-xl">
+                            <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-on-background mb-xs tracking-tight">Connect to Seat</h1>
+                            <p className="font-body-md text-body-md text-on-surface-variant">Tap to scan and order directly to your location.</p>
+                        </div>
+                        <button onClick={() => navigate('/menu')} className="w-full max-w-sm aspect-square bg-primary text-on-primary rounded-xl flex flex-col items-center justify-center p-md pulse-soft shadow-[0_0_40px_rgba(233,193,118,0.1)] active:scale-95 transition-all duration-300 hover:opacity-90">
+                            <span className="material-symbols-outlined mb-lg" style={{ fontVariationSettings: "'FILL' 1", fontSize: '80px' }}>qr_code_scanner</span>
+                            <span className="font-button-lg text-button-lg mb-xs">SCAN CUP HOLDER QR CODE</span>
+                            <span className="font-label-md text-label-md opacity-80 uppercase tracking-wider">To auto-detect your seat</span>
+                        </button>
+                        <div className="mt-xl text-center">
+                            <button onClick={() => navigate('/menu')} className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-300 pb-1 border-b-2 border-surface-container-high hover:border-primary">
+                                Or enter seat manually (Row J, Seat 12)
+                            </button>
+                        </div>
+                    </main>
+                    <BottomNavBar />
+                </div>
+            );
+        };
+
+        const MenuScreen = () => {
+            const navigate = useNavigate();
+            const products = [
+                { id: 1, name: "LARGE POPCORN" },
+                { id: 2, name: "MEDIUM POPCORN" },
+                { id: 3, name: "SMALL POPCORN" },
+                { id: 4, name: "CARAMEL CORN" },
+            ];
+
+            return (
+                <div className="flex flex-col min-h-screen pb-24 bg-black">
+                    <TopAppBar />
+                    <main className="flex-1 pt-[72px] px-md">
+                        <div className="py-md mt-[56px]">
+                            <h2 className="font-display-lg text-display-lg text-on-surface uppercase tracking-tight">SNACKS</h2>
+                        </div>
+                        <nav className="flex overflow-x-auto hide-scrollbar gap-sm pb-md border-b-2 border-surface-container-high mb-lg">
+                            <button className="px-md py-sm font-button-lg text-button-lg text-primary border-b-2 border-primary -mb-[2px] whitespace-nowrap active:scale-95 transition-transform duration-300">Popcorn</button>
+                            <button className="px-md py-sm font-button-lg text-button-lg text-on-surface-variant whitespace-nowrap hover:text-on-surface active:scale-95 transition-transform duration-300">Drinks</button>
+                            <button className="px-md py-sm font-button-lg text-button-lg text-on-surface-variant whitespace-nowrap hover:text-on-surface active:scale-95 transition-transform duration-300">Candy</button>
+                        </nav>
+                        <div className="grid grid-cols-2 gap-sm md:gap-md">
+                            {products.map((p, i) => (
+                                <article key={p.id} className="bg-[#121212] border border-[#1A1A1A] rounded-lg p-md flex flex-col items-center justify-between aspect-square relative group hover:border-[#2A2A2A] transition-colors duration-300">
+                                    <span className="material-symbols-outlined text-on-surface text-4xl mb-sm mt-sm" style={{ fontVariationSettings: "'FILL' 1", fontSize: '64px' }}>shopping_basket</span>
+                                    <h3 className="font-button-lg text-button-lg text-on-surface text-center uppercase mt-auto leading-tight">{p.name}</h3>
+                                    <button onClick={() => navigate('/checkout')} className={`absolute top-sm right-sm w-12 h-12 rounded-full flex items-center justify-center font-display-lg text-display-lg active:scale-90 transition-transform duration-300 leading-none pb-1 ${i === 0 ? 'bg-primary text-on-primary' : 'bg-[#1A1A1A] text-on-surface hover:bg-primary hover:text-on-primary'}`}>+</button>
+                                </article>
+                            ))}
+                        </div>
+                    </main>
+                    <BottomNavBar />
+                </div>
+            );
+        };
+
+        const CheckoutScreen = () => {
+            const navigate = useNavigate();
+            return (
+                <div className="flex flex-col min-h-screen bg-background pt-safe pb-[100px]">
+                    <TopAppBar title="YOUR ORDER" leftIcon="arrow_back" rightIcon="" onLeftClick={() => navigate(-1)} />
+                    <main className="flex-grow flex flex-col px-md pt-[calc(56px+env(safe-area-inset-top)+24px)] gap-lg mt-[72px]">
+                        <section className="flex flex-col gap-sm">
+                            <div className="flex items-center justify-between bg-surface-container-low rounded-lg p-sm border border-surface-container-high">
+                                <div className="flex items-center gap-sm">
+                                    <div className="w-touch-target-min h-touch-target-min bg-surface rounded-md flex items-center justify-center">
+                                        <span className="material-symbols-outlined text-primary text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>local_dining</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="font-button-lg text-button-lg text-on-background">1x Large Popcorn</span>
+                                        <span className="font-body-md text-body-md text-on-surface-variant">Butter & Salt</span>
+                                    </div>
+                                </div>
+                                <span className="font-label-md text-label-md text-on-background">$9.50</span>
+                            </div>
+                            <div className="flex items-center justify-between bg-surface-container-low rounded-lg p-sm border border-surface-container-high">
+                                <div className="flex items-center gap-sm">
+                                    <div className="w-touch-target-min h-touch-target-min bg-surface rounded-md flex items-center justify-center">
+                                        <span className="material-symbols-outlined text-primary text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>local_drink</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="font-button-lg text-button-lg text-on-background">1x Soda</span>
+                                        <span className="font-body-md text-body-md text-on-surface-variant">Cola, Large</span>
+                                    </div>
+                                </div>
+                                <span className="font-label-md text-label-md text-on-background">$5.50</span>
+                            </div>
+                            <div className="flex justify-between items-center pt-md mt-sm border-t border-surface-container-high">
+                                <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant">Total</span>
+                                <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary">$15.00</span>
+                            </div>
+                        </section>
+                        <section className="flex flex-col gap-sm">
+                            <h2 className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest pl-xs">Payment Method</h2>
+                            <div className="flex items-center justify-between bg-[#121212] rounded-xl p-md border border-[#1a1a1a]">
+                                <div className="flex items-center gap-md">
+                                    <span className="material-symbols-outlined text-primary text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>credit_card</span>
+                                    <div className="flex flex-col">
+                                        <span className="font-button-lg text-button-lg text-on-background tracking-widest">**** 4567</span>
+                                        <span className="font-body-md text-body-md text-on-surface-variant">Visa</span>
+                                    </div>
+                                </div>
+                                <button className="text-primary font-label-md text-label-md hover:text-primary-container active:scale-95 transition-transform">EDIT</button>
+                            </div>
+                        </section>
+                    </main>
+                    <div className="fixed bottom-0 w-full md:max-w-md bg-background z-50 px-md pb-safe pt-md shadow-[0_-20px_40px_rgba(0,0,0,0.8)]">
+                        <button onClick={() => navigate('/tracker')} className="w-full h-touch-target-min bg-primary text-on-primary rounded-full font-button-lg text-button-lg flex items-center justify-center gap-sm active:scale-[0.98] hover:bg-primary-container transition-all mb-4">
+                            <span>CONFIRM & PAY NOW</span>
+                            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>fingerprint</span>
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const TrackerScreen = () => {
+            const navigate = useNavigate();
+            return (
+                <div className="flex flex-col min-h-screen bg-black text-on-background">
+                    <TopAppBar title="ORDER STATUS" leftIcon="close" rightIcon="" onLeftClick={() => navigate('/')} />
+                    <main className="flex-1 flex flex-col justify-center items-center px-md pt-[80px] pb-[100px] w-full mt-[56px]">
+                        <div className="flex flex-col items-center justify-center mb-xl w-full mt-12">
+                            <div className="text-on-surface-variant font-label-md text-label-md mb-md uppercase tracking-wider">Estimated Delivery</div>
+                            <div className="font-display-lg text-display-lg text-primary animate-subtle-pulse tabular-nums">~5 MINS</div>
+                            <div className="text-on-surface-variant font-body-md text-body-md mt-sm">Preparing your order</div>
+                        </div>
+                        <div className="w-full max-w-sm mb-xl">
+                            <div className="flex justify-between items-center relative">
+                                <div className="absolute top-1/2 left-0 w-full h-[2px] bg-[#1A1A1A] -translate-y-1/2 z-0"></div>
+                                <div className="absolute top-1/2 left-0 w-[15%] h-[2px] bg-primary -translate-y-1/2 z-0 transition-all duration-1000 ease-in-out"></div>
+                                <div className="relative z-10 flex flex-col items-center gap-xs">
+                                    <div className="w-sm h-sm rounded-full bg-primary flex items-center justify-center ring-4 ring-black">
+                                        <div className="w-[6px] h-[6px] bg-black rounded-full"></div>
+                                    </div>
+                                    <span className="font-label-md text-label-md text-primary absolute top-6 whitespace-nowrap">Preparing</span>
+                                </div>
+                                <div className="relative z-10 flex flex-col items-center gap-xs">
+                                    <div className="w-sm h-sm rounded-full bg-[#1A1A1A] flex items-center justify-center ring-4 ring-black"></div>
+                                    <span className="font-label-md text-label-md text-on-surface-variant absolute top-6 whitespace-nowrap">En Route</span>
+                                </div>
+                                <div className="relative z-10 flex flex-col items-center gap-xs">
+                                    <div className="w-sm h-sm rounded-full bg-[#1A1A1A] flex items-center justify-center ring-4 ring-black"></div>
+                                    <span className="font-label-md text-label-md text-on-surface-variant absolute top-6 whitespace-nowrap">Delivered</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="w-full bg-[#121212] border border-[#1A1A1A] rounded-lg p-md mt-auto">
+                            <div className="flex items-start gap-md">
+                                <div className="text-primary mt-xs shrink-0">
+                                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>vibration</span>
+                                </div>
+                                <div>
+                                    <h3 className="font-button-lg text-button-lg text-on-surface mb-xs">LOCK YOUR SCREEN NOW</h3>
+                                    <p className="font-body-md text-body-md text-on-surface-variant">
+                                        Your phone will vibrate gently when the server is near your seat <strong>Row J, Seat 12</strong>.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <MemoryRouter>
+                    <Routes>
+                        <Route path="/" element={<ConnectSeatScreen />} />
+                        <Route path="/menu" element={<MenuScreen />} />
+                        <Route path="/checkout" element={<CheckoutScreen />} />
+                        <Route path="/tracker" element={<TrackerScreen />} />
+                    </Routes>
+                </MemoryRouter>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

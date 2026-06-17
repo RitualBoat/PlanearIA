@@ -40,14 +40,17 @@ const RegistroScreen: React.FC = () => {
         </View>
 
         <WebScrollView
-          contentContainerStyle={[
-            styles.scrollContent,
-            isWideWeb && styles.scrollContentCentered,
-          ]}
+          contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={[styles.card, isWideWeb ? styles.cardWeb : styles.cardCompact]}>
+          <View
+            style={[
+              styles.card,
+              isWideWeb ? styles.cardWeb : styles.cardCompact,
+              isWideWeb && styles.cardCenteredWeb,
+            ]}
+          >
             {/* Header */}
             <View style={styles.iconCircle}>
               <MaterialIcons name="person-add" size={36} color={COLORS.primary} />
@@ -202,8 +205,11 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 40,
   },
-  scrollContentCentered: {
-    justifyContent: "center",
+  // Auto vertical margins center the card on wide web while keeping it fully
+  // scrollable. justifyContent:"center" on the scroll content clips the top of
+  // overflowing content in browsers (flexbox + overflow:auto), breaking scroll.
+  cardCenteredWeb: {
+    marginVertical: "auto",
   },
   card: {
     width: "100%",

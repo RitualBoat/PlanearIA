@@ -1,101 +1,132 @@
-# PlanearIA - Plataforma Inteligente para Docentes
+# PlanearIA
 
-<div align="center">
+PlanearIA es una plataforma educativa para docentes mexicanos construida con React Native, Expo y TypeScript. Su objetivo es reducir la carga administrativa del profesor con una app offline-first, familiar y conectada: crear, organizar, asignar, comunicar y dar seguimiento sin saltar entre pestanas, archivos, chats y herramientas externas.
 
-![Version](https://img.shields.io/badge/version-4.1-blue.svg)
-![React Native](https://img.shields.io/badge/React%20Native-0.81.5-61dafb.svg)
-![Expo](https://img.shields.io/badge/Expo-54.0-000020.svg)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6.svg)
-![Vercel](https://img.shields.io/badge/Vercel-Serverless-000000.svg)
-![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248.svg)
+## Vision
 
-**La plataforma educativa diseñada para funcionar donde el internet no llega.**
+La vision vigente ya no es "muchos modulos separados". PlanearIA apunta a ser una suite docente:
 
-</div>
+| Experiencia objetivo               | Proposito                                                                                                                                                      |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Inicio / Sistema Operativo Docente | Pendientes, clases del dia, documentos recientes, estado de sync y sugerencias IA.                                                                             |
+| Office Docente                     | Documentos, planeaciones, plantillas, hojas, listas, asistencia, calificaciones, rubricas e import/export. Une Word + Excel como una sola experiencia escolar. |
+| Classroom / Clases                 | Cursos, unidades, materiales, actividades, alumnos, entregas y seguimiento operativo.                                                                          |
+| Canva / Genially Docente           | Creacion visual de materiales, presentaciones, infografias, actividades y recursos imprimibles.                                                                |
+| WhatsApp Docente                   | Contactos, conversaciones, envio de recursos y colaboracion profesional entre docentes.                                                                        |
+| Calendario                         | Vista temporal de clases, sesiones, tareas, entregas y recordatorios.                                                                                          |
+| Reportes                           | Analitica, avance, alumnos en riesgo y gamificacion prudente.                                                                                                  |
+| Cuenta / Accesibilidad / Seguridad | Perfil, sesiones, roles, privacidad, preferencias y accesibilidad real.                                                                                        |
 
----
+La promesa de producto es:
 
-## ¿Qué es PlanearIA?
+> Creo algo, PlanearIA entiende que es, me sugiere donde va, lo asigno, le doy seguimiento y obtengo reportes sin salir de la app.
 
-**PlanearIA** es una plataforma educativa integral diseñada por y para docentes. Permite estructurar clases, gestionar alumnos, organizar materiales y redactar planeaciones didácticas asistidas por Inteligencia Artificial. 
+## Estado Actual
 
-El mayor diferenciador de PlanearIA es su arquitectura **Offline-First**. Entendiendo la realidad de los planteles educativos, la aplicación permite a los profesores trabajar fluidamente sin conexión a internet, guardando los datos localmente y sincronizándolos de forma automática con la nube en cuanto se restablece la red.
+PlanearIA ya tiene una base funcional importante:
 
-##  Nuestra Visión: "Cero Fricción"
+- Auth funcional con JWT, sesiones, refresh token, modo invitado/dev y aislamiento por `userId`.
+- Classroom base cerrado: clases, unidades, materiales, actividades, alumnos, entregas, asistencia y calificaciones contextuales.
+- Planeaciones Fase 9 cerrada: editor tipo documento, plantillas, import/export, IA via backend y fallback.
+- Motor global offline-first en `src/sync`: cola por entidad, push/pull cross-device, eventos de refresco y UX de estado de red.
+- Backend Node serverless en Vercel con router unico, rutas academicas aisladas por JWT y MongoDB Atlas.
+- IA centralizada en backend mediante `backend/lib/aiGateway.js`.
+- CI con typecheck, lint, Jest y backend smoke.
+- CD con build web estatico y APK Android standalone publicados como artifacts/releases de GitHub.
 
-PlanearIA se construye bajo una regla central: **Un profesor no debería sentir que aprende software nuevo.** En lugar de crear interfaces complejas, unificamos herramientas que el docente ya conoce dentro de un solo ecosistema:
+La app sigue en desarrollo activo. No debe asumirse como producto lanzado a usuarios reales. La demo hosteada y el APK sirven para validacion, clases, pruebas con profesor y beta controlada.
 
-* **Planeaciones = Experiencia Word/Docs:** Editor de texto enriquecido para redactar y exportar planeaciones con asistencia de IA pedagógica.
-* **Grupos y Alumnos = Experiencia Classroom:** Gestión de aulas, unidades temáticas, materiales y estudiantes.
-* **Persistencia = Experiencia Ininterrumpida:** Al igual que en apps modernas, si se pierde la conexión, el docente puede seguir escribiendo y guardando su trabajo de forma local.
+## Stack
 
----
+- React Native 0.81.5 + Expo 54.
+- TypeScript 5.9.
+- React Navigation 7.
+- React Context + hooks como ViewModels (MVVM pragmatico).
+- `react-native-web` para web.
+- AsyncStorage como persistencia local default.
+- Expo SQLite instalado como infraestructura opt-in para datos relacionales/sync queue, no default.
+- Backend Node serverless en `backend/api/index.js` + `backend/routes`.
+- MongoDB Atlas M0.
+- GitHub Actions para CI/CD.
 
-##  Vistazo a la Plataforma
+## Mapa Rapido Del Repo
 
-> <img width="2542" height="1434" alt="image" src="https://github.com/user-attachments/assets/004abb23-00ae-41ef-b9eb-b998464d247a" />
+```text
+PlanearIA/
+  src/                    App React Native: screens, hooks/ViewModels, context, services, sync, navigation
+  backend/                API serverless Node/Vercel, rutas, auth, IA gateway y utilidades backend
+  Documentacion/          Vision, arquitectura, planes maestros, operacion, referencias y archivo historico
+  context/                Ground truth, referencias y handoffs usados como memoria tecnica
+  assets/                 Imagenes, iconos y recursos estaticos de la app
+  types/                  Tipos compartidos del frontend
+  shared/                 Codigo compartido cuando aplica entre frontend/backend
+  scripts/                Scripts auxiliares del proyecto
+  .github/                Workflows CI/CD, templates e instrucciones para Copilot
+  .claude/                Reglas compartidas para Claude Code
+  .agents/skills/         Skills locales ignoradas por Git; apoyo opcional, no fuente de verdad
+```
 
+La fuente de verdad para entender el producto es `Documentacion/` + `CLAUDE.md`. Carpetas generadas o locales como `node_modules/`, `.expo/`, `.vercel/`, `.venv/` y `dist/` no deben usarse como referencia arquitectonica.
 
-### 1. Panel de Gestión de Clases (Módulo Classroom)
+## Como Levantar Local
 
-> <img width="2548" height="1434" alt="image" src="https://github.com/user-attachments/assets/6d2f8c2e-4d95-4ac7-9a50-1c8a2b2b4ca0" />
+Instala dependencias:
 
+```bash
+npm install
+npm run backend:install
+```
 
-### 2. Editor de Planeaciones Asistido por IA
+Levanta web:
 
-> <img width="2544" height="1434" alt="image" src="https://github.com/user-attachments/assets/c978f35c-57be-4922-9ff3-b914eeca339d" />
+```bash
+npm run web
+```
 
----
+Levanta backend local:
 
-##  Alcance Actual del Proyecto
+```bash
+npm run backend:dev
+```
 
-En su estado actual, la plataforma es un producto funcional que incluye:
+Validacion rapida:
 
-* **Sistema de Autenticación y Cuentas:** Registro e inicio de sesión con aislamiento de datos por usuario (`userId`). Las sesiones persisten correctamente.
-* **Módulo Classroom Integrado:** Creación de clases, gestión de secciones temáticas y asignación de materiales. 
-* **Editor de Planeaciones (Fase 9):** Procesador de texto integrado con capacidades de exportación y asistencia para la redacción de secuencias didácticas.
-* **Motor de Sincronización Local-First:** Integración de una cola de operaciones (`op_queue`) que retiene las acciones del docente en una caché local (SQLite/AsyncStorage) cuando no hay red y las empuja al servidor (MongoDB) al recuperar la conexión.
-* **Diseño Responsivo Web/Móvil:** Un diseño base adaptativo (One Codebase) que funciona tanto en la pantalla de un celular como en el monitor de una PC.
+```bash
+npm run typecheck
+npm run lint -- --quiet
+npm test -- --runInBand
+npm run backend:check
+```
 
----
+Detalles completos:
 
-##  Stack Tecnológico y Arquitectura
+- [Entorno local](./Documentacion/02-operacion/ENTORNO_LOCAL.md)
+- [Guia de pruebas](./Documentacion/02-operacion/GUIA_PRUEBAS.md)
+- [Deploy demo hosteada](./Documentacion/02-operacion/DEPLOY_DEMO_HOSTEADA.md)
 
-PlanearIA se sostiene sobre una arquitectura de **Monolito Modular** y **Funciones Serverless**, diseñada para mantener los costos bajos, facilitar el desarrollo solitario y maximizar la resiliencia:
+## Documentacion Para IAs y Colaboradores
 
-* **Frontend (Móvil y Web):** React Native, Expo, TypeScript.
-* **Patrón de Diseño:** MVVM (Model-View-ViewModel).
-* **Almacenamiento Local:** SQLite + AsyncStorage (Caché y Cola de transacciones).
-* **Backend y API:** Node.js desplegado como *Serverless Functions* en **Vercel**.
-* **Base de Datos Remota:** Clúster NoSQL en **MongoDB Atlas** (Free Tier).
-* **CI/CD y DevOps:** GitHub Actions (Validación de tipos, ESLint y suite de +500 pruebas Jest).
+Leer en este orden:
 
----
+1. [Documentacion/README.md](./Documentacion/README.md)
+2. [Resumen ejecutivo](./Documentacion/00-fundamentos/RESUMEN_EJECUTIVO.md)
+3. [Vision actual](./Documentacion/00-fundamentos/VISION_ACTUAL.md)
+4. [Arquitectura](./Documentacion/00-fundamentos/ARQUITECTURA.md)
+5. [Flujo de sincronizacion](./Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md)
+6. [Roadmap de planes maestros](./Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md)
+7. [Meta guia de planes](./Documentacion/01-planes-maestros/meta_guia_planes.md)
+8. [Prompt mejorado para Claude](./Documentacion/prompt_mejorado.md)
 
-##  ¿Dónde probar PlanearIA?
+## Reglas Importantes
 
-PlanearIA es un desarrollo multiplataforma. Puedes acceder a ella a través de la web o instalarla directamente en tu dispositivo Android.
+- No crear pantallas aisladas sin ruta, entrada, salida y CTA claro.
+- No duplicar flujos entre Contenido, Classroom, Office Docente y pantallas legacy.
+- No llamar IA desde frontend; toda IA pasa por backend.
+- No crear clientes HTTP o colas propias si el dato es sincronizable; usar `src/sync`.
+- No activar SQLite como default ni borrar claves `@planearia:*` sin plan, validacion y rollback.
+- No tratar planes cerrados como vision visual intocable: son evidencia funcional, no limite UX.
 
-###  Acceso Vía Web (Despliegue en Vercel)
-La plataforma está hosteada y operativa directamente desde el navegador. Puedes ingresar, registrarte y sincronizar tus datos accediendo al siguiente enlace:
-👉 https://planearai.com
+## Version Documental
 
-###  Descarga para Android (APK)
-Para la experiencia nativa con soporte completo fuera de línea, puedes instalar la aplicación en tu celular Android.
-1. Dirígete a la pestaña de https://github.com/RitualBoat/PlanearIA/releases en este repositorio.
-2. Descarga la versión más reciente del archivo `.apk` disponible.
-3. Instálalo en tu dispositivo Android (asegúrate de permitir la instalación desde orígenes desconocidos si tu teléfono lo solicita).
-
----
-
-##  Documentación del Proyecto
-
-El proyecto cuenta con una documentación exhaustiva que detalla las decisiones arquitectónicas, los flujos de sincronización y los reportes de calidad:
-
-* 🏛️ **[Arquitectura y Fundamentos](./Documentacion/00-fundamentos/ARQUITECTURA.md)**
-* 🔄 **[Flujo de Sincronización Offline-First](./Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md)**
-* 📋 **[Planes Maestros y Metodología (SDD)](./Documentacion/01-planes-maestros/README.md)**
-* ⚙️ **[Guía para levantar el Entorno Local](./Documentacion/02-operacion/ENTORNO_LOCAL.md)**
-
----
-*Desarrollado con ♥ por Ignacio Barboza Espinoza para la comunidad docente.*
+- Estado documental: 2026-06-17.
+- Vision vigente: suite docente conectada con Office Docente + Classroom + IA silenciosa.

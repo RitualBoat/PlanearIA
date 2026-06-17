@@ -1,138 +1,118 @@
-# Documentacion PlanearIA v4.2
+# Documentacion PlanearIA
 
-Esta carpeta contiene la documentacion tecnica, estrategica y operativa de PlanearIA.
+Esta carpeta contiene la documentacion vigente, operativa e historica del proyecto. Su proposito es que una IA, Claude, Codex o un colaborador humano pueda entender rapidamente que es PlanearIA, que ya existe, que esta cerrado, que sigue activo y hacia donde va el producto.
 
-PlanearIA esta evolucionando de app de planeaciones a plataforma integral para docentes. La regla vigente es cero friccion: experiencias familiares tipo Word/Docs, Classroom, Canva, Excel, WhatsApp docente y reportes, sobre una base offline-first.
+## Lectura Rapida Para Claude
 
-## Lectura Rapida
+Leer en este orden antes de auditar o proponer planes:
 
-Si eres una IA o agente nuevo, lee en este orden:
+1. `00-fundamentos/RESUMEN_EJECUTIVO.md`
+2. `00-fundamentos/VISION_ACTUAL.md`
+3. `00-fundamentos/ARQUITECTURA.md`
+4. `00-fundamentos/FLUJO_SINCRONIZACION.md`
+5. `00-fundamentos/MAPA_MODULOS_ACTUALES.md`
+6. `00-fundamentos/ROADMAP_PLANES_MAESTROS.md`
+7. `01-planes-maestros/meta_guia_planes.md`
+8. `prompt_mejorado.md`
 
-1. `00-fundamentos/RESUMEN_EJECUTIVO.md` (estado vigente y reglas de direccion).
-2. `00-fundamentos/VISION_ACTUAL.md` (manifiesto de producto y modulos objetivo).
-3. `00-fundamentos/ARQUITECTURA.md` (stack, MVVM, offline-first, backend).
-4. `00-fundamentos/FLUJO_SINCRONIZACION.md` (sync offline-first cross-device).
-5. `00-fundamentos/ROADMAP_PLANES_MAESTROS.md` (que se hizo y cual es el proximo plan).
-6. `01-planes-maestros/meta_guia_planes.md` antes de crear o ejecutar cualquier plan.
-7. `02-operacion/ENTORNO_LOCAL.md` y `02-operacion/GUIA_PRUEBAS.md` para levantar y validar.
+Si hay contradiccion entre documentos, gana este orden:
 
-## Mapa del repositorio
+1. Codigo real.
+2. `00-fundamentos/`.
+3. Plan maestro activo.
+4. Documentos operativos.
+5. Planes cerrados e historicos.
+6. Analisis de IA archivados o no ejecutables.
+
+## Vision Vigente
+
+PlanearIA esta evolucionando hacia una suite docente offline-first. La regla central es cero friccion: el profesor debe poder hacer su trabajo completo sin cambiar entre Word, Excel, Classroom, Canva, WhatsApp, calendarios, carpetas y archivos sueltos.
+
+Experiencias objetivo:
+
+- Inicio / Sistema Operativo Docente.
+- Office Docente (Word + Excel): documentos, planeaciones, hojas, listas, rubricas, asistencia, calificaciones e import/export.
+- Classroom / Clases.
+- Canva / Genially Docente.
+- WhatsApp Docente / Comunidad Profesional.
+- Calendario.
+- Reportes, analitica y gamificacion.
+- Cuenta, seguridad, preferencias y accesibilidad.
+
+## Mapa Del Repositorio
 
 | Ruta | Contenido |
 | --- | --- |
-| `App.tsx`, `src/` | Frontend React Native/Expo: pantallas, hooks ViewModel, context, services, sync y navegacion. |
-| `backend/` | Funciones Node serverless (Vercel) y librerias (auth, IA gateway). |
-| `types/` | Tipos TypeScript centralizados. |
-| `Documentacion/` | Fundamentos, planes maestros, operacion, validacion, referencia, analisis IA y archivo. |
-| `context/` | Ground truth por modulo, capturas, referencias open source y evidencias de fases. |
-| `.agents/skills/` | Skills del proyecto (writing-style, token-efficiency). |
+| `App.tsx`, `src/` | Frontend React Native/Expo: pantallas, hooks ViewModel, context, services, sync, navegacion, temas y tests. |
+| `backend/` | Backend Node serverless para Vercel: router unico, rutas, auth, MongoDB e IA gateway. |
+| `types/` | Tipos TypeScript compartidos por dominios. |
+| `Documentacion/` | Fundamentos, planes, operacion, validacion, referencia, analisis IA y archivo historico. |
+| `context/` | Ground truth, referencias open source, evidencias y material por modulo/experiencia. |
+| `.github/workflows/` | CI y CD. |
 
-## Estructura de la documentacion
+## Estructura De La Documentacion
 
 | Carpeta | Uso |
 | --- | --- |
-| `00-fundamentos/` | Vision vigente, arquitectura, resumen ejecutivo, flujo de sync, roadmap y mapa de modulos. |
-| `01-planes-maestros/` | Meta guia obligatoria, plan activo (Auth) y carpeta `cerrados/` con los planes ya cerrados. |
-| `02-operacion/` | Entorno local, GitHub Product OS, guia de pruebas, deploy hosteado y changelogs. |
+| `00-fundamentos/` | Fuente de verdad vigente: vision, arquitectura, sync, mapa de modulos y roadmap. |
+| `01-planes-maestros/` | Meta guia obligatoria, plan activo y planes cerrados. |
+| `02-operacion/` | Entorno local, pruebas, deploy, GitHub Product OS y changelogs. |
 | `03-validacion/` | Checklists manuales de cierre. |
-| `04-referencia/` | Mapa de navegacion vigente y componentes preservados. |
-| `05-analisis-ia/` | Opiniones y revisiones de IA conservadas como contexto, no como fuente unica. |
-| `99-archivo/` | Documentacion legacy archivada; no usar para implementar. |
+| `04-referencia/` | Referencias vivas: navegacion actual y componentes preservados. |
+| `05-analisis-ia/` | Opiniones de IA conservadas como contexto historico/no ejecutable. |
+| `06-diagramas/` | Diagramas Mermaid de arquitectura, app, CI/CD y sync. |
+| `99-archivo/` | Documentacion legacy o borradores antiguos. No usar para implementar. |
 
 ## Estado Actual
 
-- Planeaciones: cerrado como experiencia Word/Docs. Fase 9 aprobada.
-- Pasos Iniciales: cerrado como organizacion de GitHub, CI inicial y entorno.
-- Classroom: cerrado. Fases 0 a 10, validacion final e issue #8 completados.
-- Infraestructura Local/CI/Deploy Basico: cerrado; Fases 0 a 7 completadas.
-- Storage Local SQLite y Migracion Offline: cerrado para entrega academica; SQLite opt-in con rollback, AsyncStorage sigue default.
-- Sincronizacion offline-first: motor unificado por entidad, push/pull cross-device, endurecimiento backend (JWT + aislamiento por `userId`, cola idempotente) y UX de estado de red. Ver `02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md`.
-- Despliegue de demo: web hosteada en Vercel (`https://planearia-web.vercel.app/`) y APK Android en Releases.
-- Auth/Seguridad y Sesion Real: en ejecucion; Fases 0-6 completadas y validadas en CI; 7-8 en cierre.
-- UX/UI Global, Excel/Listas, Canva, WhatsApp docente, Reportes, Configuracion/Accesibilidad y activacion SQLite como default quedan como planes futuros.
+- Planeaciones: cerrado como base funcional tipo documento; en la vision nueva pasa a ser parte de Office Docente.
+- Classroom: cerrado como base funcional para clases, grupos, unidades, materiales, actividades, alumnos, entregas, asistencia y calificaciones.
+- Infraestructura local/CI/deploy basico: cerrado.
+- Storage SQLite/migracion offline: cerrado como infraestructura opt-in; AsyncStorage sigue siendo default.
+- Sync offline-first: motor global por entidad en `src/sync`, con `SyncContext`, `SyncStatusBanner`, push/pull, JWT y `userId`.
+- Auth/Seguridad/Sesion Real: plan activo/en cierre; ya existen JWT, refresh tokens, SecureStore nativo, AsyncStorage web, sesiones y roles base. Pendientes principales: email real, datos sociales completos, validacion manual y sincronizacion final de GitHub Product OS.
+- Demo/CD: web bundle y APK standalone se construyen en GitHub Actions; despliegue web/backend se maneja por Vercel.
+- UX/UI Global: siguiente plan recomendado para fijar navegacion, sistema visual, accesibilidad y blueprint de experiencias conectadas.
 
-## Proximo plan recomendado
+## Proximo Plan Recomendado
 
-El detalle y la secuencia completa viven en `00-fundamentos/ROADMAP_PLANES_MAESTROS.md`. En resumen:
-
-1. Cerrar el plan activo `Auth, Seguridad y Sesion Real` (email real, datos sociales, validacion manual).
-2. Iniciar `Plan Maestro: UX/UI y Navegacion Global` para fijar sistema visual, tokens, navegacion y accesibilidad antes de construir mas modulos.
+1. Cerrar formalmente `PLAN_AUTH_SEGURIDAD_SESION_REAL.md` con validacion manual, email real o decision explicita de diferirlo, y tracking GitHub actualizado.
+2. Iniciar `Plan Maestro: UX/UI y Navegacion Global`.
+3. Dentro de ese plan, decidir la arquitectura de experiencias: Office Docente, Classroom, Canva, WhatsApp, Calendario, Reportes y Cuenta/Accesibilidad.
+4. Solo despues crear subplanes de implementacion por experiencia o subexperiencia.
 
 ## Documentos Principales
-
-### Fundamentos
 
 | Documento | Descripcion |
 | --- | --- |
 | `00-fundamentos/RESUMEN_EJECUTIVO.md` | Estado vigente y reglas de direccion. |
-| `00-fundamentos/VISION_ACTUAL.md` | Manifiesto de producto: Word, Classroom, Canva, Excel, WhatsApp y reportes. |
-| `00-fundamentos/ARQUITECTURA.md` | Stack, MVVM, offline-first, backend y convenciones. |
-| `00-fundamentos/MAPA_MODULOS_ACTUALES.md` | Inventario de modulos y experiencias madre. |
-| `00-fundamentos/ROADMAP_PLANES_MAESTROS.md` | Orden, estado y proximo plan recomendado. |
-| `00-fundamentos/FLUJO_SINCRONIZACION.md` | Sync offline-first y relacion AsyncStorage/MongoDB. |
+| `00-fundamentos/VISION_ACTUAL.md` | Vision de producto: una suite docente conectada. |
+| `00-fundamentos/ARQUITECTURA.md` | Stack, MVVM, backend, storage, sync y reglas tecnicas. |
+| `00-fundamentos/MAPA_MODULOS_ACTUALES.md` | Inventario de carpetas actuales mapeadas a experiencias objetivo. |
+| `00-fundamentos/ROADMAP_PLANES_MAESTROS.md` | Orden recomendado de planes. |
+| `00-fundamentos/FLUJO_SINCRONIZACION.md` | Motor offline-first vigente. |
+| `01-planes-maestros/meta_guia_planes.md` | Instructivo obligatorio para crear o ejecutar planes. |
+| `01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md` | Plan activo/en cierre. |
+| `02-operacion/ENTORNO_LOCAL.md` | Como levantar app/backend. |
+| `02-operacion/GUIA_PRUEBAS.md` | Validaciones tecnicas/manuales. |
+| `02-operacion/DEPLOY_DEMO_HOSTEADA.md` | Guia para Vercel, web y APK. |
+| `prompt_mejorado.md` | Prompt listo para pedir a Claude la auditoria UX/UI global. |
 
-### Planes Maestros
+## Reglas Para Futuras IAs
 
-| Documento | Estado |
-| --- | --- |
-| `01-planes-maestros/meta_guia_planes.md` | Vigente; instructivo obligatorio para crear planes. |
-| `01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md` | En ejecucion; Fases 0-6 completadas, 7-8 en cierre. |
-| `01-planes-maestros/PLANES MAESTROS AUDITADOS.md` | Retrospectiva de Classroom y regla de ground truth por fase. |
-| `01-planes-maestros/cerrados/` | Planes cerrados (Planeaciones, Classroom, Pasos Iniciales, Infraestructura, SQLite). Ver `cerrados/README.md`. |
+- Leer `meta_guia_planes.md` antes de escribir un plan maestro.
+- Leer `VISION_ACTUAL.md` antes de proponer UX/UI.
+- Usar `src/sync` para cualquier dato academico sincronizable.
+- Mantener MVVM: pantallas delgadas, hooks ViewModel, Context/Services para estado e I/O.
+- Todo dato multiusuario debe aislarse por `userId`.
+- IA solo via backend y con fallback/costo controlado.
+- No copiar codigo open source sin revisar licencia, stack y compatibilidad.
+- Ground truth obligatorio para experiencias de paridad alta: Office, Classroom, Canva/Genially y WhatsApp.
+- No cerrar UX/UI de alta paridad solo con tests automaticos; pedir validacion manual.
+- Los planes cerrados son evidencia funcional, no candados visuales.
+- Los documentos en `99-archivo/` y borradores antiguos no son fuente vigente.
 
-### Operacion y Validacion
+## Version
 
-| Documento | Descripcion |
-| --- | --- |
-| `02-operacion/ENTORNO_LOCAL.md` | Levantar frontend/backend local y configurar env vars. |
-| `02-operacion/GITHUB_PRODUCT_OS.md` | Ramas, Project, labels, milestones, issues y criterio de merge. |
-| `02-operacion/GUIA_PRUEBAS.md` | Guia vigente de validacion tecnica/manual. |
-| `02-operacion/DEPLOY_DEMO_HOSTEADA.md` | Despliegue de la demo web/APK hosteada. |
-| `02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md` | Changelog de la sesion de sincronizacion offline. |
-| `03-validacion/CHECKLIST_VALIDACION_MANUAL_FASE9.md` | Cierre manual de Planeaciones Fase 9. |
-| `03-validacion/CHECKLIST_VALIDACION_MANUAL_AUTH.md` | Validacion manual del plan de Auth. |
-
-### Referencia
-
-| Documento | Descripcion |
-| --- | --- |
-| `04-referencia/MAPA_NAVEGACION_ACTUAL.md` | Navegacion vigente resumida. |
-| `04-referencia/COMPONENTES_PRESERVADOS.md` | Componentes visuales a preservar como referencia. |
-| `../context/README.md` | Protocolo para ground truth, capturas y referencias por modulo. |
-| `../context/referencias-opensource/README.md` | Repos open source curados y referencias pendientes. |
-
-## Reglas para Futuras IAs
-
-- Leer `01-planes-maestros/meta_guia_planes.md` antes de crear cualquier plan.
-- Leer `01-planes-maestros/PLANES MAESTROS AUDITADOS.md` como retrospectiva de lo que fallo en Classroom.
-- Si el modulo busca paridad alta con Word, Classroom, Excel, Canva o WhatsApp, crear/citar ground truth por fase en `context/<modulo>-ground-truth/`.
-- Consultar `context/referencias-opensource/README.md` y pedir URLs de repos si faltan referencias open source.
-- No cerrar fases visuales de paridad alta solo por pasar TypeScript/lint/tests; exigir validacion manual contra capturas/referencias.
-- No crear rutas/pantallas aisladas sin mapa de navegacion.
-- No duplicar flujos entre Contenido, Classroom y pantallas legacy.
-- Toda pantalla nueva parte de una pantalla madre responsiva/adaptativa mobile-first; excepcion `.web.tsx`/`.native.tsx` solo si el modulo lo justifica.
-- Todo plan nuevo que toque datos academicos asume SQLite como infraestructura opt-in y evita lecturas directas a AsyncStorage; usar ports/repositories.
-- Todo plan nuevo que toque datos sincronizables debe usar el motor global `src/sync` (`entitySync`, `syncEngine`, `syncEvents`, `SyncContext`) y no crear clientes HTTP/colas propias salvo excepcion justificada.
-- Mantener tracking markdown `[ ]`, `[~]`, `[x]` en planes.
-- Documentar costos y free tiers antes de proponer infraestructura o IA nueva.
-- Preservar contexto importante antes de borrar o archivar documentos.
-
-## Documentacion Archivada
-
-`99-archivo/` contiene documentos legacy de noviembre 2025 y el README principal anterior. Se conservan por historia, pero no deben guiar implementaciones nuevas.
-
-## Stack Vigente
-
-- React Native 0.81.5 + Expo 54.
-- TypeScript 5.9.
-- React Navigation 7.
-- Context + hooks ViewModel (MVVM).
-- AsyncStorage default productivo; SQLite/Expo SQLite opt-in para datos relacionales academicos y sync queue.
-- Sync offline-first global en `src/sync` con push/pull por entidad, cola idempotente, eventos de refresco y UX de estado de red.
-- Backend Node serverless en `backend/api/index.js` + `backend/routes` (Vercel).
-- MongoDB Atlas free tier.
-- IA gateway multi-provider en backend.
-- Jest + Testing Library.
-
-**Ultima actualizacion:** 2026-06-13
-**Version documental:** 4.2
+- Ultima actualizacion: 2026-06-17.
+- Version documental: 4.3.

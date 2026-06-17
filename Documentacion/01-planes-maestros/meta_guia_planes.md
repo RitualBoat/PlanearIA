@@ -96,13 +96,13 @@ Regla de lectura: si este snapshot contradice el codigo, gana el codigo. Antes d
 
 | Dominio | Estado vigente | Plan/decision relacionada | Lectura minima antes de tocar |
 | --- | --- | --- | --- |
-| Planeaciones / Word-Docs | Cerrado como gran refactor. Modelo V2, editor, plantillas, escaner, exportacion e IA ya existen. | No reabrir salvo bug nuevo o decision explicita. | `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md`, `src/screens/planeaciones/`, `types/planeacionV2.ts`. |
-| Classroom / Grupos | Cerrado como experiencia tipo Classroom/Classroomio. | Issue #8 cerrado; usar como base para Excel, reportes y calificacion avanzada. | `Documentacion/01-planes-maestros/cerrados/PLAN_CLASSROOM (closed).md`, `src/screens/classroom/`, `context/classroom-ground-truth/`. |
+| Office Docente / Planeaciones / Hojas | Planeaciones esta cerrado como base documental; hojas/listas aun no tienen experiencia madre completa. | La vision nueva une Word + Excel en Office Docente. No reabrir planeaciones salvo bug o decision explicita, pero si puede redisenarse visualmente en UX/UI Global. | `Documentacion/00-fundamentos/VISION_ACTUAL.md`, `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md`, `src/screens/planeaciones/`, `types/planeacionV2.ts`. |
+| Classroom / Grupos | Cerrado como experiencia tipo Classroom/Classroomio. | Issue #8 cerrado; usar como base para asignar objetos creados en Office/Canva/WhatsApp y para reportes/calificacion avanzada. | `Documentacion/01-planes-maestros/cerrados/PLAN_CLASSROOM (closed).md`, `src/screens/classroom/`, `context/classroom-ground-truth/`. |
 | Infraestructura / CI / Deploy | Cerrado. Fases 0 a 7 completadas. | Ver `cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md`. | `.github/workflows/ci.yml`, `package.json`, `backend/package.json`, `Documentacion/02-operacion/ENTORNO_LOCAL.md`. |
 | Contenido / Hub de Recursos | Hub transversal para planeaciones, recursos, entregables y plantillas. | No debe competir con Classroom ni duplicar flujos contextuales. | `src/screens/contenido/ContenidoScreen.tsx`, `src/hooks/useContenidoViewModel.ts`. |
 | Recursos Didacticos / Biblioteca | CRUD/lista de recursos existe y se conecta con contenido/grupos. | Futuro plan Canva/Genially o Recursos Didacticos. | `src/screens/biblioteca/`, `src/context/RecursosContext.tsx`, `backend/api/recursos.js`. |
 | Recursos Evaluables / Tareas / Entregables | Existen tareas, entregas y calificacion. | Futuro plan de evaluables/calificacion avanzada. | `src/screens/grupos/tareas/`, `src/screens/tareas/`, `src/context/EntregablesContext.tsx`. |
-| Alumnos | CRUD, detalle, notas, import/export y reportes. | Debe seguir conectado a Classroom y futuro Excel/Listas. | `src/screens/alumnos/`, `src/context/AlumnosContext.tsx`. |
+| Alumnos | CRUD, detalle, notas, import/export y reportes. | Debe seguir conectado a Classroom y a Office Docente tabular. | `src/screens/alumnos/`, `src/context/AlumnosContext.tsx`. |
 | Asistencia y Calificaciones | Existen flujos basicos por grupo/alumno. | Reubicar con cuidado; no crear modulos sueltos sin contexto. | `src/screens/asistencia/`, `src/screens/calificaciones/`, contexts respectivos. |
 | Plantillas | Hay plantillas legacy/generales y `PlantillaDocumento` para planeaciones. | Futuro plan debe decidir integrar, migrar o separar. | `src/screens/plantillas/`, `src/context/PlantillasContext.tsx`, `types/plantillaDocumento.ts`. |
 | Feed / Social / Chat | Existen feed, contactos y mensajeria. | Futuro enfoque: WhatsApp docente/comunidad con bajo ruido. | `src/screens/feed/`, `src/screens/social/`, `src/screens/chat/`. |
@@ -113,7 +113,8 @@ Regla de lectura: si este snapshot contradice el codigo, gana el codigo. Antes d
 
 ### 3.2 Reglas Transversales Vigentes
 
-- **Classroom organiza y asigna; no crea todo.** La clase puede subir archivos simples, enlaces y actividades ligeras. La creacion profunda debe vivir en modulos especializados: Word/Docs, Canva/Genially, Excel/Listas o Evaluables.
+- **Office Docente une Word + Excel.** Documentos, planeaciones, hojas, listas, rubricas, asistencia y calificaciones tabulares deben pensarse como una suite escolar, no como modulos separados por defecto.
+- **Classroom organiza y asigna; no crea todo.** La clase puede subir archivos simples, enlaces y actividades ligeras. La creacion profunda debe vivir en experiencias especializadas: Office Docente, Canva/Genially, WhatsApp Docente o evaluables.
 - **Calificar requiere contexto.** No crear pantallas de calificacion sueltas si no existe actividad asignada, entrega real y alumno asociado.
 - **Contenido es hub, no competidor.** Si una accion depende de una clase, debe vivir en Classroom. Si es biblioteca/global, puede vivir en Contenido.
 - **Legacy no debe ser entrada principal.** Si existe pantalla moderna equivalente, las rutas viejas quedan como respaldo temporal, redireccion o deuda explicitamente documentada.
@@ -122,16 +123,16 @@ Regla de lectura: si este snapshot contradice el codigo, gana el codigo. Antes d
 - **Backend academico aislado por JWT.** Las rutas sincronizables deben exigir token real, filtrar por `userId`, ser idempotentes para reintentos offline (create/update como upsert cuando aplique, delete tolerante) y no depender de modo legacy solo `X-API-Key`. Desde 2026-06-15 `backend/lib/auth.js` `validateAuth` autoriza con un JWT valido aunque la `X-API-Key` falte o no coincida (evita que un `EXPO_PUBLIC_API_SECRET` desalineado bloquee en silencio la sync); todo dominio nuevo del frontend debe agregarse a `ALLOWED_ORIGINS`/CORS o el login falla con "No se pudo conectar al servidor".
 - **Pull autoritativo sin perder trabajo offline.** Un pull exitoso puede reescribir storage local solo despues de reconciliar operaciones pendientes; un pull fallido nunca debe tocar datos locales. Los deletes pendientes no deben resucitar documentos al reconciliar.
 - **Web/tablet/movil se unifican por defecto.** Cada pantalla nueva o refactorizada debe partir de una sola pantalla madre React Native/Expo, con layout responsivo/adaptativo mobile-first, ViewModel/logica compartida y estilos controlados por breakpoints. Evitar duplicar pantallas en `Screen.web.tsx` y `Screen.native.tsx` salvo excepcion justificada.
-- **Excepciones por plataforma solo para interacciones realmente distintas.** Se permite separar `.web.tsx`, `.native.tsx`, `.ios.tsx` o `.android.tsx` cuando el modulo lo exige por experiencia y rendimiento, por ejemplo Canva/Genially, editor de textos avanzado/Word, grids tipo Excel o flujos con teclado, mouse, canvas, gestos o atajos imposibles de mantener limpiamente en una sola pantalla. El plan debe justificar la separacion, mantener ViewModel/tipos/contratos compartidos y definir validacion para cada variante.
+- **Excepciones por plataforma solo para interacciones realmente distintas.** Se permite separar `.web.tsx`, `.native.tsx`, `.ios.tsx` o `.android.tsx` cuando el modulo lo exige por experiencia y rendimiento, por ejemplo Canva/Genially, Office Docente avanzado, grids tabulares, teclado, mouse, canvas, gestos o atajos imposibles de mantener limpiamente en una sola pantalla. El plan debe justificar la separacion, mantener ViewModel/tipos/contratos compartidos y definir validacion para cada variante.
 - **GitHub Project acompana la ejecucion.** Plan markdown = arquitectura y decisiones; Project = estado operativo; Actions = evidencia automatica.
-- **Ground truth manda en experiencias madre.** Para Word, Classroom, Excel, Canva o WhatsApp, no basta escribir "tipo X"; cada fase debe citar capturas/referencias concretas.
+- **Ground truth manda en experiencias madre.** Para Office Docente, Classroom, Canva/Genially o WhatsApp, no basta escribir "tipo X"; cada fase debe citar capturas/referencias concretas.
 
 ### 3.3 Fichas Rapidas por Dominio
 
-#### Planeaciones
+#### Office Docente / Planeaciones / Hojas
 
-- Estado: cerrado; no tocar sin bug o decision explicita.
-- Clave: `PlaneacionV2`, `PlantillaDocumento`, `DocEditor`, escaner/import/export e IA.
+- Estado: planeaciones cerrado funcionalmente; hojas/listas pendientes como subexperiencia Office.
+- Clave: `PlaneacionV2`, `PlantillaDocumento`, `DocEditor`, escaner/import/export, IA, tablas, listas, asistencia/calificaciones tabulares y asignacion inteligente a Classroom.
 - Archivos: `src/screens/planeaciones/`, `src/hooks/useCrearPlaneacionViewModel.ts`, `src/hooks/useDocEditorViewModel.ts`, `src/context/PlaneacionesContext.tsx`, `backend/api/planeaciones*`, `types/planeacionV2.ts`.
 
 #### Classroom / Grupos / Alumnos
@@ -148,8 +149,8 @@ Regla de lectura: si este snapshot contradice el codigo, gana el codigo. Antes d
 
 #### Asistencia, Calificaciones y Reportes
 
-- Estado: existen flujos basicos, pero deben integrarse con actividades, alumnos y grupos sin sentirse aislados.
-- Clave: no duplicar calificacion fuera de entregas; reportes deben esperar datos reales suficientes.
+- Estado: existen flujos basicos, pero deben integrarse con actividades, alumnos, grupos y Office Docente sin sentirse aislados.
+- Clave: no duplicar calificacion fuera de entregas o de una hoja/lista con proposito claro; reportes deben esperar datos reales suficientes.
 - Archivos: `src/screens/asistencia/`, `src/screens/calificaciones/`, `src/services/promediosService.ts`, reportes de grupo/alumno.
 
 #### Plantillas
@@ -173,7 +174,7 @@ Regla de lectura: si este snapshot contradice el codigo, gana el codigo. Antes d
 #### Cuenta, Perfil, Configuracion y Accesibilidad
 
 - Estado: perfil/cuenta/roles/terminos y providers visuales existen.
-- Clave: cualquier rediseño global debe preservar `ThemeContext`, `FontSizeContext` y `DaltonismoContext`.
+- Clave: cualquier redisenio global debe preservar `ThemeContext`, `FontSizeContext` y `DaltonismoContext`.
 - Archivos: `src/screens/cuenta/`, `src/screens/perfil/`, `src/context/ThemeContext.tsx`, `src/context/FontSizeContext.tsx`, `src/context/DaltonismoContext.tsx`.
 
 #### Auth / Seguridad
@@ -192,8 +193,8 @@ Regla de lectura: si este snapshot contradice el codigo, gana el codigo. Antes d
 
 - Activar **Infraestructura** si se van a cambiar scripts, CI, backend, variables, deploy, demo o SQLite.
 - Activar **Auth/Seguridad** antes de beta, usuarios reales, datos sensibles o roles reales.
-- Activar **UX/UI Global** cuando los flujos principales existan y el problema sea navegacion, consistencia, accesibilidad o pulido final.
-- Activar **Excel/Listas** cuando se necesiten registros tabulares conectados a Classroom, asistencia o calificaciones.
+- Activar **UX/UI Global** cuando los flujos principales existan y el problema sea navegacion, consistencia, accesibilidad, blueprint de experiencias o pulido final.
+- Activar **Office Docente** cuando se necesite redisenar documentos + hojas/listas como una suite conectada a Classroom.
 - Activar **Canva/Genially** cuando se requiera creacion visual compleja de recursos didacticos.
 - Activar **WhatsApp Docente** cuando chat/contactos deban reemplazar la red social pesada.
 - Activar **Reportes/Gamificacion** cuando haya datos suficientes de Classroom, evaluables, asistencia y calificaciones.
@@ -246,7 +247,7 @@ Antes de redactar cualquier plan futuro, la IA debe:
 
 Antes de escribir o ejecutar un plan, la IA debe clasificar el modulo por nivel de paridad esperado:
 
-- `Clon/paridad alta`: debe sentirse casi como una experiencia conocida. Aplica a Word/Docs, Classroom/Classroomio, Excel/Sheets, Canva/Genially y WhatsApp profesional.
+- `Clon/paridad alta`: debe sentirse casi como una experiencia conocida. Aplica a Office Docente (Word/Docs + Excel/Sheets), Classroom/Classroomio, Canva/Genially y WhatsApp profesional.
 - `Inspirado/paridad media`: toma patrones de una app conocida, pero puede adaptar la experiencia. Aplica a social, chat docente si no se busca clon exacto, reportes y notificaciones.
 - `Funcional/administrativo`: prioriza robustez, seguridad, costo y mantenibilidad. Aplica a infraestructura, auth/seguridad, sync y configuracion interna.
 
@@ -278,7 +279,7 @@ Antes de implementar cualquier fase de un modulo de paridad alta, la IA debe gen
 - Flujos legacy prohibidos:
   - ...
 - Criterio de cierre UX:
-  - El usuario confirma que se siente como [Word/Classroom/Excel/Canva/WhatsApp], no como modulos sueltos.
+  - El usuario confirma que se siente como [Office/Classroom/Canva/WhatsApp], no como modulos sueltos.
 ```
 
 Si no existe carpeta de ground truth para el modulo, la IA debe crear o pedir al desarrollador esta estructura antes de cerrar el plan:
@@ -549,7 +550,7 @@ Formato obligatorio para fases de paridad alta:
 
 Brief Ground Truth - Fase X:
 
-- Experiencia madre a imitar: [Word/Docs | Classroom/Classroomio | Excel/Sheets | Canva/Genially | WhatsApp].
+- Experiencia madre a imitar: [Office Docente | Classroom/Classroomio | Canva/Genially | WhatsApp | Calendario | Reportes].
 - Referencias reales:
   - `context/<modulo>-ground-truth/03-referencias-reales/...`
 - Capturas actuales:
@@ -906,179 +907,195 @@ Todo plan con IA debe exigir:
 
 ---
 
-## 12. Directrices por Modulo Futuro
+## 12. Directrices por Experiencia Futura
 
 ### 12.0 Experiencias Madre Declaradas
 
-Cuando un plan toque estos dominios, debe tratarlos como `Clon/paridad alta` salvo que el desarrollador diga lo contrario:
+Cuando un plan toque estos dominios, debe tratarlos como experiencias madre conectadas, no como modulos sueltos:
 
-| Dominio | Experiencia madre | Ground truth esperado |
+| Experiencia | Ground truth esperado | Nota |
 | --- | --- | --- |
-| Planeaciones | Word/Google Docs | Documento paginado, toolbar, plantillas, import/export. |
-| Classroom/Grupos | Google Classroom/Classroomio | Cursos, tablon, trabajo por unidades, personas, detalle de actividad/material. |
-| Recursos visuales | Canva/Genially | Canvas, templates, panel lateral, capas, paginas, exportacion. |
-| Listas/registros | Excel/Google Sheets | Grid editable, columnas, formulas, filtros, import/export. |
-| Chat/mensajeria | WhatsApp profesional | Lista de chats, conversacion, adjuntos, estados de envio, busqueda. |
+| Inicio / Sistema Operativo Docente | Dashboards operativos, calendarios ligeros, pendientes, actividad reciente | Debe ser util al abrir la app, no landing decorativa. |
+| Office Docente | Word/Docs + Excel/Sheets + LibreOffice/OnlyOffice | Documentos, hojas, listas, tablas, plantillas, import/export y asignacion inteligente. |
+| Classroom / Clases | Google Classroom/Classroomio | Cursos, unidades, trabajo de clase, personas, actividades, materiales y seguimiento. |
+| Canva / Genially Docente | Canva/Genially | Canvas, templates, panel lateral, paginas, capas y exportacion. |
+| WhatsApp Docente | WhatsApp profesional | Chats, contactos, adjuntos, estados de envio, busqueda y notificaciones. |
+| Calendario | Google Calendar/agenda docente | Fechas, clases, tareas, entregas y recordatorios conectados. |
+| Reportes | Dashboards educativos claros | Rendimiento, riesgo, avance, asistencia y calificaciones sin saturar. |
+| Cuenta / Seguridad / Accesibilidad | Apps con ajustes claros y accesibles | Perfil, sesiones, roles, preferencias, privacidad y accesibilidad real. |
 
-Si falta una carpeta `context/<modulo>-ground-truth/` o una referencia open source para cualquiera de estas experiencias, la IA debe pedirla antes de implementar fases visuales.
+Si falta una carpeta `context/<experiencia>-ground-truth/` o una referencia open source para una experiencia de paridad alta, la IA debe pedirla antes de implementar fases visuales.
 
-### 12.1 Planeaciones
-
-No generar un plan nuevo sin leer `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md`.
-
-Si se retoma:
-
-- Tratar Planeaciones como modulo cerrado y estable salvo bug nuevo, deuda puntual o decision explicita del usuario.
-- Leer primero `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md` y `Documentacion/01-planes-maestros/cerrados/PLANEACIONES_IA_EDITOR_FASE9 (closed).md`.
-- No volver al flujo legacy ni a formularios como experiencia principal.
-- Actualizar README/documentacion si cambia arquitectura, IA, editor, plantillas o exportacion.
-
-### 12.2 Recursos Evaluables
+### 12.1 Inicio / Sistema Operativo Docente
 
 Debe cubrir:
 
-- Examenes.
-- Trabajos.
-- Rubricas.
-- Proyectos con revisiones.
-- Entregables.
-- Correccion.
-- Calificacion.
-- Retroalimentacion.
-
-Debe conectarse con:
-
-- Grupos.
-- Alumnos.
-- Calificaciones.
-- Entregables.
-- Recursos didacticos.
-- Notificaciones.
+- Pendientes del dia.
+- Clases proximas.
+- Documentos recientes.
+- Actividades por revisar.
+- Estado de sync.
+- Alertas y sugerencias IA.
+- Accesos rapidos a Office, Classroom, calendario y reportes.
 
 Debe exigir:
 
-- Banco de preguntas.
-- Rubricas reutilizables.
-- Estados por alumno.
-- Asignacion individual/grupal.
-- Calificacion offline.
-- Exportacion.
-- IA para crear reactivos, revisar respuestas y sugerir retroalimentacion.
-- Revision humana obligatoria.
+- Acciones inmediatas, no marketing.
+- Carga cognitiva baja.
+- Empty states que inviten a crear clase, documento o recurso.
+- No duplicar listas que ya viven en Classroom u Office.
 
-### 12.3 Recursos Didacticos
+### 12.2 Office Docente
+
+Office Docente une lo que antes se planeaba como Word y Excel.
 
 Debe cubrir:
 
-- Diapositivas.
-- PDFs.
-- Videos.
-- Notas de voz.
-- Mapas mentales.
-- Lineas de tiempo.
+- Planeaciones.
 - Documentos.
-- Enlaces.
+- Hojas/listas.
+- Tablas.
+- Rubricas.
+- Asistencia y calificaciones tabulares.
+- Plantillas.
+- Import/export DOCX/PDF/CSV/XLSX cuando aplique.
+- IA que detecta tema, grupo, unidad, fechas, actividades y datos tabulares.
 
 Debe exigir:
 
-- Galeria/biblioteca profesional.
-- Previews.
-- Metadatos.
-- Tags.
-- Versiones.
-- Asignacion a grupos.
-- Compartir en feed/chat.
-- IA para resumir, transformar, generar diapositivas y crear mapas.
-- Control de almacenamiento local.
-- Cache offline.
+- Leer primero `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md` y `Documentacion/01-planes-maestros/cerrados/PLANEACIONES_IA_EDITOR_FASE9 (closed).md`.
+- Tratar Planeaciones como base funcional cerrada, no como limite visual.
+- No volver a formularios legacy como experiencia principal.
+- Evaluar LibreOffice/OnlyOffice como ground truth conceptual, sin copiar codigo sin licencia/stack review.
+- Conectar documentos y hojas con Classroom.
+- Permitir que una hoja/lista se convierta en alumnos, asistencia, calificaciones o rubrica si el docente confirma.
 
-### 12.4 Gestion de Grupos y Alumnos
+### 12.3 Classroom / Clases
 
 Debe cubrir:
 
-- Grupos.
+- Cursos/grupos.
+- Unidades/sesiones.
+- Materiales.
+- Actividades.
 - Alumnos.
+- Entregas.
 - Asistencia.
 - Calificaciones.
-- Notas.
-- Reportes.
-- Estadisticas.
+- Comentarios/avisos.
 
 Debe exigir:
 
-- Tablero docente.
-- Historial por alumno.
-- Alertas de riesgo.
-- Importacion/exportacion CSV/XLSX.
-- Reportes PDF.
-- Integracion con tareas, entregables y recursos.
-- Cuidado de datos personales.
-- Offline-first robusto.
+- Leer `Documentacion/01-planes-maestros/cerrados/PLAN_CLASSROOM (closed).md`.
+- Mantener Classroom como organizador/asignador.
+- Recibir objetos desde Office, Canva, WhatsApp y Calendario.
+- Evitar formularios legacy si existe flujo contextual.
+- No crear documentos complejos dentro de Classroom si pertenecen a Office.
 
-### 12.5 Red Social Educativa
+### 12.4 Canva / Genially Docente
 
 Debe cubrir:
 
-- Feed.
-- Posts.
-- Comentarios.
-- Reacciones.
-- Retos.
-- Contactos.
-- Solicitudes.
-- Compartir recursos/planeaciones.
+- Presentaciones.
+- Infografias.
+- Mapas mentales.
+- Lineas de tiempo.
+- Examenes visuales.
+- Actividades.
+- Materiales imprimibles.
 
 Debe exigir:
 
-- Privacidad por audiencia.
-- Moderacion.
-- Reportes.
-- Anti-spam basico.
-- Notificaciones.
-- IA opcional para resumir, redactar y moderar.
-- Separacion entre contenido privado y compartido.
+- Editor visual opcional, no obligatorio.
+- Templates, paginas/capas, preview y exportacion.
+- Asignacion directa a Classroom.
+- Conversion desde planeaciones/documentos cuando tenga sentido.
+- Justificar variantes web/native si usa canvas, gestos o rendimiento especifico.
 
-### 12.6 Chat y Mensajeria
+### 12.5 WhatsApp Docente / Comunidad Profesional
 
 Debe cubrir:
 
+- Contactos docentes.
 - Conversaciones.
 - Mensajes.
 - Adjuntos.
-- Planeaciones compartidas.
-- Recursos compartidos.
+- Planeaciones/recursos compartidos.
 - Estados de envio.
+- Busqueda.
+- Notificaciones.
 
 Debe exigir:
 
+- Reorientar feed/social hacia comunicacion practica si el plan lo decide.
+- Privacidad, bloqueo/reporte basico y anti-spam pragmatico.
 - Offline/pendiente/error.
-- Reintentos.
-- Adjuntos seguros.
-- Busqueda.
-- Notificaciones.
-- Privacidad.
 - No duplicar mensajes en sync.
+- Guardar recursos compartidos en Office, Classroom o biblioteca segun corresponda.
 
-### 12.7 Plantillas
+### 12.6 Calendario Y Seguimiento Personal
 
 Debe cubrir:
 
-- Plantillas legacy.
-- Plantillas de recursos.
-- Plantillas de planeaciones.
-- Galeria del sistema.
-- Plantillas del usuario.
+- Clases por dia.
+- Sesiones planeadas.
+- Fechas de entrega.
+- Recordatorios.
+- Revision de tareas.
+- Eventos escolares.
+- Pendientes sugeridos por IA.
 
 Debe exigir:
 
-- Decidir si se unifican o se mantienen separadas por dominio.
-- Modelo de preview.
-- Metadata.
-- Versionado.
-- Importacion/exportacion.
-- Sanitizacion de datos personales antes de compartir.
+- No ser agenda aislada.
+- Abrir clase, documento, actividad o reporte relacionado.
+- Crear recordatorios desde planeaciones y actividades.
+- Sync/offline y estados claros.
 
-### 12.8 Seguridad y Autenticacion
+### 12.7 Reportes, Analitica Y Gamificacion
+
+Debe cubrir:
+
+- Rendimiento por grupo.
+- Avance por unidad.
+- Asistencia.
+- Calificaciones.
+- Entregas pendientes.
+- Alumnos en riesgo.
+- Recomendaciones.
+- Resumen de ciclo.
+
+Debe exigir:
+
+- No saturar la experiencia diaria.
+- Esperar datos reales suficientes.
+- Gamificacion prudente: orientar y motivar, no infantilizar.
+- IA solo como apoyo revisable.
+
+### 12.8 Cuenta, Seguridad, Configuracion Y Accesibilidad
+
+Debe cubrir:
+
+- Perfil docente.
+- Perfil publico vs privado.
+- Sesiones activas.
+- Roles y permisos.
+- Terminos y privacidad.
+- Tema.
+- Tamano de fuente.
+- Daltonismo.
+- Preferencias.
+- Accesibilidad real.
+- Modo dev/admin cuando aplique.
+
+Debe exigir:
+
+- Persistencia offline de preferencias.
+- Sincronizacion cuando aplique.
+- Roles reales validados en backend.
+- Accesibilidad verificable, no solo switches decorativos.
+
+### 12.9 Seguridad y Autenticacion
 
 Debe cubrir:
 
@@ -1118,7 +1135,7 @@ Reglas obligatorias de seguridad pragmatica y low-cost:
 - Agregar cabeceras HTTP seguras y CORS estricto con herramientas simples como `helmet`/config equivalente si el backend lo permite.
 - Debe funcionar en local, Render/Vercel/EAS/MongoDB Atlas free tier o alternativas gratuitas razonables.
 
-### 12.9 Infraestructura y DevOps
+### 12.10 Infraestructura y DevOps
 
 Plan cerrado: `Documentacion/01-planes-maestros/cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md`. No crear otro plan de infraestructura sin cerrar, extender o reemplazar explicitamente ese archivo.
 
@@ -1146,7 +1163,7 @@ Debe exigir:
 - Rollback.
 - Seguridad de secretos.
 
-### 12.10 Despliegue y Distribucion
+### 12.11 Despliegue y Distribucion
 
 Debe cubrir:
 
@@ -1171,7 +1188,7 @@ Debe exigir:
 - Crash reporting.
 - Analitica basica.
 
-### 12.11 Notificaciones
+### 12.12 Notificaciones
 
 Debe cubrir:
 
@@ -1187,26 +1204,6 @@ Debe exigir:
 - Permisos.
 - Opt-in/opt-out.
 - Costos.
-
-### 12.12 Cuenta, Perfil, Configuracion y Accesibilidad
-
-Debe cubrir:
-
-- Perfil docente.
-- Preferencias.
-- Tema.
-- Tamano de fuente.
-- Daltonismo.
-- Roles.
-- Terminos.
-- Privacidad.
-
-Debe exigir:
-
-- Accesibilidad real.
-- Persistencia offline.
-- Sincronizacion de preferencias.
-- Separacion entre perfil publico y configuracion privada.
 
 ### 12.13 Onboarding y Ayuda
 
@@ -1289,7 +1286,7 @@ Cuando una IA implemente una fase:
 - Debe leer la fase completa.
 - Debe leer el `Brief Ground Truth - Fase X` de esa fase si existe.
 - Si la fase no tiene brief y toca UX/UI o flujo de un modulo de paridad alta, debe detenerse y crear/pedir ese brief antes de programar.
-- Debe leer `.agents/skills/token-efficiency/SKILL.md` y decidir modo `NORMAL` o `CAVEMAN` antes de actuar.
+- Durante ejecucion de planes maestros, debe leer `.agents/skills/token-efficiency/SKILL.md` si existe y decidir modo `NORMAL` o `CAVEMAN` antes de actuar.
 - Debe revisar `git status`.
 - Debe no revertir cambios ajenos.
 - Debe actualizar el plan al completar avances.
@@ -1304,9 +1301,9 @@ Cuando una IA implemente una fase:
 - Debe pedir confirmacion antes de saltar a otra fase grande si el usuario lo solicito.
 - Debe detenerse si una decision de producto cambia el rumbo.
 
-### 14.1 Uso Obligatorio de `token-efficiency` / Modo Caveman
+### 14.1 Uso Dirigido de `token-efficiency` / Modo Caveman
 
-Cada plan maestro debe indicar en que fases conviene usar la skill:
+Esta skill no es una regla global para todas las conversaciones. Se usa durante ejecucion de planes maestros o cuando una issue/prompt lo pida explicitamente. Cada plan maestro debe indicar en que fases conviene usarla:
 
 - Skill fuente: `.agents/skills/token-efficiency/SKILL.md`.
 - Modo `NORMAL`: usar para auditoria, planeacion, arquitectura, decisiones UX/UI, decisiones de producto, investigacion, prompts de IA, dudas, checkpoints y entregables documentales.
@@ -1326,7 +1323,7 @@ Esta guia es orientativa y no debe bloquear el trabajo si los modelos disponible
 
 - Planeacion estrategica, arquitectura, auditorias profundas, seguridad, UX/IHC con Nielsen: usar modelos fuertes con razonamiento `high` o `xhigh` como Codex 5.5, Claude Opus thinking o Gemini 3.1 Pro.
 - Implementacion extensa con contexto de repo, refactors, tests y fixes: usar Codex 5.4 o 5.5 en `medium/high`; subir a `xhigh` si hay bugs dificiles o migraciones delicadas.
-- Cambios mecanicos, documentacion menor, checkboxes, labels, issues y validaciones repetitivas: usar Codex 5.4 mini o modelo rapido en `low/medium`, siempre con modo `CAVEMAN`.
+- Cambios mecanicos, documentacion menor, checkboxes, labels, issues y validaciones repetitivas: usar Codex 5.4 mini o modelo rapido en `low/medium`; aplicar modo `CAVEMAN` solo si la tarea ya esta aprobada y no requiere decisiones nuevas.
 - Revisiones cruzadas de producto, copy UX o alternativas de diseno: usar un segundo modelo fuerte en `high` como contraste, sin copiar codigo externo.
 - IA/costos/infraestructura: preferir razonamiento alto para decidir, pero implementacion en modo eficiente una vez aprobada la ruta.
 

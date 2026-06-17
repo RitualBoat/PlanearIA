@@ -1,56 +1,79 @@
-﻿# Mapa de Modulos Actuales - PlanearIA
+# Mapa de Modulos Actuales - PlanearIA
 
-> Estado: fotografia vigente para orientar Classroom, UX global y futuros planes. Classroom quedo cerrado como experiencia tipo Classroom/Classroomio.
+Este documento es una fotografia del codigo actual. No define la UX objetivo. Sirve para que una IA entienda que carpetas existen y como deberian mapearse a la vision nueva.
 
-## Tabs principales actuales
+Fuente tecnica de verdad:
 
-- `FeedTab` -> `FeedScreen`.
-- `ContenidoTab` -> `ContenidoScreen`.
-- `GruposTab` -> `ClassroomHomeScreen`.
-- `SocialTab` -> `SocialScreen`.
-- `ConfiguracionTab` -> `CuentaScreen`.
+- `src/navigation/StackNavigator.tsx`
+- `src/navigation/AppTabsNavigator.tsx`
+- `src/screens/`
+- `src/context/`
+- `src/sync/`
 
-## Experiencias madre objetivo
+## Tabs Actuales
 
-| Experiencia madre | Modulos actuales relacionados | Decision inicial |
+| Tab actual | Pantalla | Lectura vigente |
 | --- | --- | --- |
-| Word/Docs | `planeaciones`, `plantillas` | Planeaciones queda cerrada Fase 9; plantillas se retomara en Canva/UX. |
-| Classroom | `grupos`, `alumnos`, `tareas`, `biblioteca`, `asistencia`, `calificaciones`, `contenido` | Cerrado; Fases 0-10 e issue #8 completados. |
-| Canva/Genially | `biblioteca`, `plantillas`, recursos visuales futuros | Congelar hasta tener Classroom base, salvo demo visual. |
-| Excel | `alumnos`, `asistencia`, `calificaciones`, import/export | Plan posterior a Classroom base. |
-| WhatsApp docente | `chat`, `social`, `feed`, `notificaciones` | Reorientar red social pesada hacia comunicacion directa. |
-| Reportes | `reportes grupo`, `reportes alumno`, calificaciones, asistencia | Dejar al final; depende de datos reales. |
-| Cuenta/Auth | `auth`, `cuenta`, `perfil`, `onboarding`, `ayuda` | En ejecucion; cerrar antes de beta real. |
+| `FeedTab` | `FeedScreen` | Feed actual; posible futuro secundario o reorientacion a comunidad. |
+| `ContenidoTab` | `ContenidoScreen` | Hub transversal actual; debe revisarse para no competir con Office/Classroom. |
+| `GruposTab` | `ClassroomHomeScreen` | Entrada principal al Classroom funcional actual. |
+| `SocialTab` | `SocialScreen` | Contactos/perfiles; base para WhatsApp Docente. |
+| `ConfiguracionTab` | `CuentaScreen` | Cuenta, roles, sesiones, preferencias y accesibilidad base. |
 
-## Inventario por carpeta
+La estructura de tabs es provisional. El futuro plan UX/UI puede reemplazarla por dashboard, sidebar, home modular, tabs hibridas o navegacion por experiencias.
 
-| Carpeta | Pantallas principales | Clasificacion inicial |
+## Experiencias Objetivo
+
+| Experiencia objetivo | Carpetas actuales relacionadas | Decision vigente |
 | --- | --- | --- |
-| `planeaciones` | Crear, DocEditor, Escaner, Importar, Exportar, Lista | Mantener como modulo referencia Word/Docs. |
-| `contenido` | Hub de contenido | Mantener como entrada transversal; revisar en UX global. |
-| `classroom` | Home y pantalla de clase | Nueva capa principal para experiencia Classroom. |
-| `grupos` | Dashboard, lista, crear, detalle, importar, reportes, tareas | Classroom es el flujo principal; legacy queda como respaldo/puente, no como entrada primaria. |
-| `alumnos` | Lista, crear, detalle, notas, importar/exportar, reportes | Fusionar en Classroom/Excel. |
-| `tareas` y `grupos/tareas` | Entregables, crear/asignar/detalle/calificar | Fusionar en Classroom. |
-| `biblioteca` | Recursos didacticos, lista, crear | Fusionar en Classroom y despues Canva. |
-| `asistencia` | Registrar, historial | Fusionar en Classroom/Excel. |
-| `calificaciones` | Capturar, promedios | Fusionar en Classroom/Excel. |
-| `plantillas` | Biblioteca, lista, detalle, editor | Congelar hasta plan Canva/Plantillas. |
-| `feed` | Feed, post, retos, preguntas | Congelar/reorientar hacia colaboracion docente. |
-| `social` | Social, buscador perfiles | Base para WhatsApp docente/contactos. |
-| `chat` | Chat, conversacion | Base para WhatsApp docente. |
-| `notificaciones` | Notificaciones | Mantener transversal. |
-| `cuenta` y `perfil` | Cuenta, editar perfil, admin roles, terminos, perfil | Mantener; endurecer en Auth/Seguridad. |
-| `auth` | Login, registro, recuperar contrasena | En ejecucion; cerrar antes de beta real. |
-| `onboarding` y `ayuda` | Onboarding, ayuda | Actualizar cuando cambien flujos principales. |
+| Inicio / Sistema Operativo Docente | `feed`, `contenido`, `classroom`, `notificaciones`, futuros widgets | No existe como experiencia objetivo aun; debe definirse en UX/UI Global. |
+| Office Docente | `planeaciones`, `plantillas`, `alumnos`, `asistencia`, `calificaciones`, import/export | Unifica Word + Excel: documentos, hojas, listas, rubricas, asistencia y calificaciones. |
+| Classroom / Clases | `classroom`, `grupos`, `alumnos`, `tareas`, `biblioteca`, `asistencia`, `calificaciones` | Cerrado como base funcional; puede redisenarse visualmente desde cero. |
+| Canva / Genially Docente | `biblioteca`, `plantillas`, recursos visuales futuros | Futuro editor/experiencia visual; no duplicar biblioteca sin decision. |
+| WhatsApp Docente | `social`, `chat`, `feed`, `notificaciones` | Reorientar hacia comunicacion profesional y colaboracion docente. |
+| Calendario | no hay carpeta principal dedicada | Plan futuro conectado con clases, planeaciones, actividades y entregas. |
+| Reportes | reportes de grupo/alumno, `calificaciones`, `asistencia`, `entregables` | Depende de datos reales; no saturar la experiencia diaria. |
+| Cuenta / Accesibilidad / Seguridad | `auth`, `cuenta`, `perfil`, `onboarding`, `ayuda` | Auth activo/en cierre; UX/Accesibilidad pendiente de plan global o dedicado. |
 
-## Decision record inicial
+## Inventario Por Carpeta
 
-- Classroom concentra mayor valor diario y conecta grupos, alumnos, recursos, tareas, asistencia y calificaciones; queda cerrado como base funcional para futuros planes.
-- UX/UI Global queda como plan transversal, pero su pulido fuerte debe esperar a que los modulos funcionales principales existan.
-- Infraestructura Local/CI/Deploy Basico quedo cerrado como cimiento operativo: scripts reproducibles, CI, backend smoke y demo ngrok/Vercel.
-- Storage Local SQLite y Migracion Offline quedo cerrado para entrega academica: SQLite existe como infraestructura opt-in; no activarlo como default ni borrar claves legacy sin decision explicita.
-- Auth/Seguridad esta en ejecucion (Fases 0-6 completadas, 7-8 en cierre); se cierra antes de beta con usuarios reales.
-- Sincronizacion offline-first quedo unificada: motor por entidad, push/pull cross-device y backend con JWT + aislamiento por `userId`. Ver `Documentacion/02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md`.
-- Feed/social no se elimina ahora; se congela hasta decidir WhatsApp docente/comunidad.
-- Ningun modulo nuevo debe quedar aislado: debe tener entrada, salida, CTA principal y estado offline/error.
+| Carpeta | Que contiene hoy | Como debe interpretarse |
+| --- | --- | --- |
+| `planeaciones` | Crear, lista, importar, exportar, escaner, `DocEditor` | Base documental de Office Docente. Cerrado funcionalmente, no visualmente intocable. |
+| `plantillas` | Biblioteca/lista/detalle/editor de plantillas generales | Decidir si vive en Office, Canva o biblioteca transversal. |
+| `contenido` | Hub transversal | Puede cambiar radicalmente; evitar que compita con Office/Classroom. |
+| `classroom` | Home y grupo con tablon/trabajo/personas | Base funcional de Classroom. |
+| `grupos` | Flujos legacy y soporte alrededor de grupos/tareas/reportes | Puente tecnico; no debe dominar la UX objetivo si Classroom lo reemplaza. |
+| `alumnos` | CRUD, detalle, notas, import/export, reportes | Debe vivir contextual en Classroom y tabular en Office. |
+| `asistencia` | Registrar/historial | Contextual en Classroom y/o hoja de Office. |
+| `calificaciones` | Captura/promedios | Contextual en Classroom y/o hoja de Office. |
+| `tareas` | Entregables/lista | Contextual en Classroom. |
+| `biblioteca` | Recursos didacticos/lista/crear | Puede ser biblioteca transversal o parte de Classroom/Canva. |
+| `feed` | Posts, retos, detalle | Congelar o reducir si distrae; posible comunidad futura. |
+| `social` | Busqueda de perfiles/contactos | Base para WhatsApp Docente. |
+| `chat` | Chats y conversaciones | Base para WhatsApp Docente. |
+| `notificaciones` | Notificaciones internas/push | Transversal. |
+| `auth` | Login, registro, recuperar | Base de Auth/Seguridad. |
+| `cuenta` | Perfil, roles, sesiones, terminos, preferencias | Cuenta/seguridad/accesibilidad. |
+| `perfil` | Perfil publico | Decidir relacion con Cuenta y WhatsApp Docente. |
+| `onboarding`, `ayuda` | Primer uso y soporte | Actualizar despues de UX/UI Global. |
+
+## Decisiones Vigentes
+
+- Office Docente debe reemplazar la separacion conceptual Word vs Excel.
+- Classroom organiza y asigna; no debe crear todo.
+- Contenido/Biblioteca/Plantillas no deben duplicar Office, Classroom o Canva.
+- Feed/social no son prioridad si no ayudan al trabajo docente.
+- Todo nuevo dato academico sincronizable debe usar `src/sync`.
+- Toda pantalla nueva debe funcionar en web, tablet y movil desde una pantalla madre salvo excepcion justificada.
+- Los planes cerrados prueban que algo funciona; no impiden redisenar UX/UI desde cero.
+
+## Deuda A Considerar En UX/UI Global
+
+- Definir navegacion objetivo.
+- Definir que pasa con `ContenidoTab`.
+- Decidir si Office Docente sera tab, hub, workspace o herramienta contextual.
+- Decidir si WhatsApp Docente reemplaza Social/Chat/parte del Feed.
+- Decidir si Plantillas es global, parte de Office o parte de Canva.
+- Consolidar accesibilidad real y preferencias.
+- Evitar botones sin destino, scroll roto y paridad desigual web/movil.

@@ -23,7 +23,7 @@ PlanearIA es una plataforma educativa para docentes mexicanos. Esta construida c
 - IA centralizada en backend mediante `backend/lib/aiGateway.js`.
 - CI/CD con GitHub Actions para typecheck, lint, tests, web bundle y APK standalone.
 
-El principio de producto es **cero friccion**: un docente no deberia sentir que aprende software nuevo. Debe sentir que abre herramientas familiares dentro de un solo ecosistema: Word/Docs, Classroom, Excel/Sheets, Canva/Genially, WhatsApp profesional, reportes y seguimiento docente.
+El principio de producto es **cero friccion**: un docente no deberia sentir que aprende software nuevo. Debe sentir que abre una suite docente completa dentro de un solo ecosistema: Office Docente para documentos y hojas, Classroom para clases, Canva/Genially para materiales visuales, WhatsApp profesional para comunicacion, calendario, reportes, seguimiento e IA conectando todo.
 
 Soy estudiante universitario y desarrollador principal del proyecto. Necesito que expliques tus decisiones con lenguaje conceptual, tecnico pero entendible, como si estuvieras ayudando a un estudiante de ingenieria a tomar buenas decisiones reales. Evita jerga corporativa, humo y repeticiones tecnicas innecesarias.
 
@@ -35,12 +35,13 @@ Aunque algunas partes ya funcionan o esten marcadas como cerradas en planes ante
 
 Esto significa:
 
-- Planeaciones, aunque ya tenga editor tipo Word, puede redisenarse por completo desde UX/UI.
+- La experiencia Office Docente puede unir lo que hoy se piensa como planeaciones, documentos, plantillas, listas, asistencia, calificaciones, import/export y trabajo tabular.
+- Planeaciones, aunque ya tenga editor tipo Word, puede redisenarse por completo dentro de esa experiencia Office.
 - Classroom, aunque ya funcione como flujo principal, puede redisenarse por completo desde UX/UI.
 - Feed, Contenido, Social, Cuenta, Plantillas, Alumnos, Tareas, Reportes y cualquier pantalla actual pueden repensarse.
 - Los planes cerrados sirven como evidencia funcional y tecnica, no como limite visual.
 - El codigo actual sirve como inventario de capacidades, datos, rutas, ViewModels, services y riesgos.
-- La interfaz actual no debe encadenar la vision futura.
+- La interfaz actual, las tabs actuales y los nombres legacy no deben encadenar la vision futura.
 - Despues se podra decidir que componentes, codigo o pantallas se reutilizan, pero esa no es la prioridad de esta auditoria.
 
 Piensa el trabajo como una etapa de **discovery + arquitectura UX/UI + blueprint de producto**, no como un refactor incremental.
@@ -80,6 +81,7 @@ Si tienes acceso al repo, lee estos archivos antes de concluir:
 - `src/screens/`
 - `src/services/`
 - `src/sync/`
+- `src/sync/README.md`
 - `src/sync/services/entitySync.ts`
 - `src/sync/services/syncEngine.ts`
 - `src/sync/services/syncEvents.ts`
@@ -95,16 +97,20 @@ Si tienes acceso al repo, lee estos archivos antes de concluir:
 - `.github/workflows/ci.yml`
 - `.github/workflows/cd.yml`
 - `Documentacion/README.md`
+- `Documentacion/00-fundamentos/README.md`
 - `Documentacion/00-fundamentos/RESUMEN_EJECUTIVO.md`
 - `Documentacion/00-fundamentos/VISION_ACTUAL.md`
 - `Documentacion/00-fundamentos/ARQUITECTURA.md`
 - `Documentacion/00-fundamentos/MAPA_MODULOS_ACTUALES.md`
 - `Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md`
 - `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`
+- `Documentacion/01-planes-maestros/README.md`
 - `Documentacion/01-planes-maestros/meta_guia_planes.md`
 - `Documentacion/01-planes-maestros/PLANES MAESTROS AUDITADOS.md`
 - `Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md`
+- `Documentacion/01-planes-maestros/cerrados/README.md`
 - `Documentacion/02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md`
+- `Documentacion/02-operacion/GUIA_PRUEBAS.md`
 - `Documentacion/04-referencia/MAPA_NAVEGACION_ACTUAL.md`
 - `Documentacion/04-referencia/COMPONENTES_PRESERVADOS.md`
 - `context/referencias-opensource/README.md`
@@ -162,48 +168,53 @@ Tambien hay rutas stack para:
 - Notificaciones y ayuda.
 - Cuenta, perfil, roles, sesiones, terminos.
 
-Para esta auditoria, esta navegacion es un mapa de lo que existe. Puedes proponer una navegacion completamente distinta si mejora la experiencia docente, siempre que expliques como se migraria luego sin perder datos ni romper la arquitectura.
+Para esta auditoria, esta navegacion es un mapa de lo que existe, no el diseno objetivo. No organices la vision desde las tabs legacy. Usalas solo para entender capacidades actuales, riesgos y rutas de migracion. Puedes proponer una navegacion completamente distinta si mejora la experiencia docente, siempre que expliques como se migraria luego sin perder datos ni romper la arquitectura.
 
 ## Experiencias Principales A Redisenar
 
-Audita y propone la estructura de experiencias que deberia tener PlanearIA en su version UX/UI objetivo. Puedes conservar, fusionar, separar o renombrar estas experiencias si lo justificas:
+Audita y propone la estructura de experiencias que deberia tener PlanearIA en su version UX/UI objetivo. La vision base no es "muchos modulos sueltos"; es una suite docente conectada donde el profesor crea, organiza, asigna, comunica y da seguimiento sin cambiar de app.
 
-1. **Inicio / Dashboard Docente**
-   - Vista de trabajo diaria del profesor: que sigue hoy, clases proximas, pendientes, sync, alertas y sugerencias IA.
+Usa estas experiencias como punto de partida, pero puedes fusionarlas, separarlas o renombrarlas si lo justificas:
 
-2. **Planeaciones Como Word/Google Docs**
-   - Editor documental, plantillas, import/export, IA pedagogica y asignacion silenciosa a clases.
-   - Debe redisenarse visualmente desde cero aunque ya exista `DocEditor`.
+1. **Inicio / Sistema Operativo Docente**
+   - Vista diaria del profesor: que sigue hoy, clases proximas, pendientes, documentos recientes, sync, alertas y sugerencias IA.
+   - No debe ser landing page. Debe ser un tablero accionable para continuar trabajo.
 
-3. **Classroom / Clases / Grupos**
-   - Cursos, unidades, materiales, actividades, alumnos, entregas, asistencia, calificaciones y reportes operativos.
+2. **Office Docente (Word + Excel)**
+   - Experiencia madre para documentos, planeaciones, plantillas, hojas, listas, tablas, asistencia, calificaciones, rubricas, import/export y trabajo escolar de oficina.
+   - Debe unir lo documental y lo tabular como una suite, no tratarlos como dos modulos aislados por defecto.
+   - Puede tomar como ground truth conceptual Microsoft Word/Excel, Google Docs/Sheets, LibreOffice Writer/Calc y OnlyOffice.
+   - Repos open source como LibreOffice pueden servir como referencia de patrones de interfaz y flujos, no como codigo a copiar sin revisar licencia, stack y compatibilidad.
+   - Debe redisenarse visualmente desde cero aunque ya exista `DocEditor` y aunque algunos flujos de planeaciones ya funcionen.
+   - Debe contemplar IA que detecta titulo, materia, grupo, unidad, fechas, actividades, tablas y datos para sugerir asignacion a Classroom.
+
+3. **Classroom / Clases**
+   - Experiencia madre para cursos, grupos, unidades, sesiones, materiales, actividades, entregas, alumnos, asistencia, calificaciones y seguimiento operativo.
+   - Debe recibir objetos creados desde Office, Canva, WhatsApp y Calendario sin que el docente descargue, copie o suba archivos manualmente.
    - Debe redisenarse visualmente desde cero aunque ya exista `ClassroomHomeScreen` y `ClassroomGroupScreen`.
 
-4. **Contenido / Biblioteca / Recursos / Plantillas**
-   - Hub transversal de recursos docentes, archivos, enlaces, plantillas, materiales reutilizables y contenido generado.
-   - Debe decidirse si es hub propio, parte de Classroom o biblioteca global.
+4. **Canva / Genially Docente**
+   - Experiencia para crear materiales visuales: presentaciones, actividades, mapas, lineas de tiempo, infografias, examenes visuales y recursos imprimibles.
+   - Debe integrarse con Classroom para asignar materiales y con Office para convertir planeaciones en recursos visuales.
 
-5. **Excel / Listas / Registros Tabulares**
-   - Listas libres, asistencia, calificaciones, import/export CSV/XLSX, grid editable, filtros y sincronizacion bidireccional con Classroom.
+5. **WhatsApp Docente / Comunidad Profesional**
+   - Comunicacion profesional, contactos docentes, conversaciones, envio de recursos, envio de planeaciones, colaboracion, estados de envio, busqueda y notificaciones.
+   - El feed social actual puede mantenerse, transformarse o quedar como futuro secundario si distrae del flujo principal.
 
-6. **Canva / Genially / Diseno Didactico**
-   - Editor visual opcional para presentaciones, actividades, mapas, lineas de tiempo, examenes visuales y materiales.
+6. **Calendario / Seguimiento Personal**
+   - Vista temporal de clases, sesiones, tareas proximas, revision de entregas, fechas importantes, eventos y recordatorios sugeridos por IA.
+   - No debe ser agenda aislada: debe abrir documentos, clases, actividades y reportes relacionados.
 
-7. **WhatsApp Docente / Chat / Contactos / Comunidad**
-   - Mensajeria profesional, envio de recursos, contactos, estados de envio, notificaciones y colaboracion docente.
-   - El feed social actual puede mantenerse, transformarse o quedar como futuro secundario.
+7. **Reportes / Analitica / Gamificacion**
+   - Rendimiento de alumnos, grupos y docente; avance por unidad, asistencia, calificaciones, entregas pendientes y alumnos en riesgo.
+   - La gamificacion debe orientar y motivar sin infantilizar ni saturar.
 
-8. **Reportes / Analitica / Gamificacion**
-   - Rendimiento de alumnos, grupos y docente. Idealmente consultable sin saturar la experiencia diaria.
+8. **Cuenta / Perfil / Configuracion / Accesibilidad / Seguridad**
+   - Perfil, cuenta, roles, sesiones, privacidad, terminos, tema, fuente, daltonismo, preferencias, accesibilidad real y modo dev/admin cuando aplique.
 
-9. **Calendario / Seguimiento Personal**
-   - Clases por dia, tareas proximas, sesiones planeadas, eventos importantes y posible integracion futura con calendarios.
+Considera especialmente que **Contenido / Biblioteca / Recursos / Plantillas** puede no ser una experiencia madre independiente. Evalua si debe vivir como biblioteca transversal, parte de Office, parte de Classroom, parte de Canva o un hub secundario.
 
-10. **Cuenta / Perfil / Configuracion / Accesibilidad / Seguridad**
-
-- Perfil, cuenta, roles, sesiones, privacidad, terminos, tema, fuente, daltonismo, preferencias y accesibilidad real.
-
-No te limites a esta lista si el repo o la vision sugieren otra organizacion mejor. Tu responsabilidad es proponer la arquitectura de experiencia mas coherente para docentes.
+Tu responsabilidad es proponer la arquitectura de experiencia mas coherente para docentes, no proteger la organizacion actual del repo.
 
 ## Punto Especial: Stitch, Figma, Claude Design Y Prompts Visuales
 
@@ -223,7 +234,7 @@ El repo ya tiene:
 Necesito que evalues:
 
 - Si conviene usar Stitch/Figma/Claude Design primero para vision visual global, no para codigo final.
-- Como crear prompts visuales por modulo.
+- Como crear prompts visuales por experiencia, flujo o pantalla.
 - Como validar pantallas generadas contra heuristicas de Nielsen.
 - Como traducir un mockup a React Native manteniendo MVVM.
 - Como crear tokens, componentes base y layouts compartidos antes de codificar pantallas finales.
@@ -331,9 +342,10 @@ Propon una estructura de navegacion objetivo:
 - Tabs o sidebar.
 - Diferencias movil/tablet/web.
 - Donde vive el dashboard.
-- Donde viven Planeaciones y Classroom.
+- Donde vive Office Docente y donde vive Classroom.
 - Que pasa con Feed, Social y Contenido.
-- Como se entra a herramientas avanzadas como Excel, Canva, Reportes y Calendario.
+- Como se entra a Canva, WhatsApp, Reportes y Calendario.
+- Como se conectan documentos, hojas, recursos visuales y mensajes con clases reales.
 - Como evitar duplicidad de flujos.
 
 ### 6. Sistema Visual Y Componentes Base
@@ -389,7 +401,7 @@ Propon un flujo de trabajo concreto:
 - Que descartar.
 - Como pasar de mockup a componentes.
 - Como documentar decisiones.
-- Como mantener homogeneidad entre modulos.
+- Como mantener homogeneidad entre experiencias sin volverlas modulos aislados.
 
 ### 10. IA-First En La UX
 
@@ -433,7 +445,7 @@ Dame una decision clara:
 
 - Cual deberia ser el alcance del `Plan Maestro: UX/UI y Navegacion Global`.
 - Si debe ser un solo plan gigante o varios subplanes coordinados.
-- Que modulo o experiencia deberia disenar primero.
+- Que experiencia o flujo deberia disenar primero.
 - Que entregables deberia producir antes de escribir codigo.
 - Como mantener el proyecto viable para un estudiante que trabaja solo.
 
@@ -457,7 +469,8 @@ Dame una decision clara:
 Tu respuesta sera buena si me deja listo para crear un futuro `Plan Maestro: UX/UI y Navegacion Global` que:
 
 - Redisene PlanearIA completa desde la vision docente.
-- Incluya Planeaciones y Classroom aunque ya funcionen.
+- Defina Office Docente como posible experiencia madre para documentos, planeaciones, hojas y listas.
+- Incluya Classroom aunque ya funcione.
 - Respete MVVM, sync, backend, auth, offline-first e IA gateway.
 - Defina una experiencia web/tablet/movil coherente.
 - Use Stitch/Figma/Claude Design como apoyo de diseno, no como arquitectura.

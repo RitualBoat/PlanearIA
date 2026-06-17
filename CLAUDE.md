@@ -2,131 +2,162 @@
 
 ## Project Overview
 
-PlanearIA is an offline-first React Native + Expo SDK 54 + TypeScript app for Mexican teachers. Modular monolith architecture (MVVM). The goal is zero-friction: each module must feel like a tool the teacher already knows (Word, Classroom, Excel, Canva, WhatsApp).
+PlanearIA is an offline-first React Native + Expo SDK 54 + TypeScript app for Mexican teachers. It uses a modular monolith architecture and pragmatic MVVM.
 
-Built by a solo student developer. Not in production. No real users yet. Budget is zero/low.
+The current product vision is not "many separate modules". It is a connected teacher suite:
+
+- Office Docente: documents, lesson plans, sheets, lists, rubrics, attendance, grades and import/export.
+- Classroom: classes, units, materials, activities, students, submissions and operational follow-up.
+- Canva/Genially Docente: visual learning materials.
+- WhatsApp Docente: professional teacher communication.
+- Calendar, reports, account, security and accessibility.
+
+Built by a solo student developer. Budget is zero/low. Do not suggest expensive infrastructure or full rewrites without strong justification.
 
 ## Stack
 
-- React Native 0.81.5 + Expo 54 + TypeScript 5.9
-- React Navigation 7, Context + hooks as ViewModels
-- AsyncStorage (default local persistence) + SQLite/Expo SQLite (opt-in for relational academic data)
-- Backend: Node serverless in `backend/api/`, MongoDB Atlas M0, JWT auth
-- AI gateway: multi-provider in `backend/lib/aiGateway.js`
-- Testing: Jest + Testing Library
+- React Native 0.81.5 + Expo 54 + TypeScript 5.9.
+- React Navigation 7.
+- Context + hooks as ViewModels.
+- AsyncStorage as default local persistence.
+- Expo SQLite installed as opt-in infrastructure, not default.
+- Expo SecureStore for native session tokens; AsyncStorage fallback on web.
+- Backend: Node serverless in `backend/api/index.js` + `backend/routes`.
+- MongoDB Atlas M0.
+- JWT auth with refresh sessions.
+- AI gateway: `backend/lib/aiGateway.js`.
+- CI/CD: GitHub Actions (`ci.yml`, `cd.yml`).
 
 ## Architecture Rules
 
-- MVVM: thin screens, hooks as ViewModels, Context for shared state, services for I/O
-- Offline-first from design. AsyncStorage is current default; SQLite is opt-in infrastructure
-- New academic data modules MUST use ports/repositories compatible with SQLite, no direct AsyncStorage reads
-- Do NOT activate SQLite as default without explicit approval
-- Do NOT delete legacy AsyncStorage keys (`@planearia:*`)
-- userId isolation in every syncable entity
-- No microservices, no expensive infrastructure without warning
-- Conventional Commits: `type(scope): description`
+- MVVM: thin screens, hooks as ViewModels, Context for shared state, services for I/O.
+- Offline-first from design.
+- New syncable academic data MUST use `src/sync`; do not create parallel HTTP clients or queues.
+- New academic modules should use ports/repositories compatible with future SQLite default.
+- Do NOT activate SQLite as default without explicit approval.
+- Do NOT delete legacy AsyncStorage keys (`@planearia:*`) without migration, validation and rollback.
+- Every multiuser entity must be isolated by `userId`.
+- AI must go through backend, never frontend provider keys.
+- No microservices or costly services unless the user explicitly asks and tradeoffs are documented.
+- Web/tablet/mobile should start from a shared responsive screen. Platform-specific files need justification.
 
 ## Key Documentation
 
-Read these before any plan or significant work:
+Read before significant work:
 
-- @Documentacion/README.md
-- @Documentacion/00-fundamentos/RESUMEN_EJECUTIVO.md
-- @Documentacion/00-fundamentos/ARQUITECTURA.md
-- @Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md
-- @Documentacion/01-planes-maestros/meta_guia_planes.md
+- `Documentacion/README.md`
+- `Documentacion/00-fundamentos/RESUMEN_EJECUTIVO.md`
+- `Documentacion/00-fundamentos/VISION_ACTUAL.md`
+- `Documentacion/00-fundamentos/ARQUITECTURA.md`
+- `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`
+- `Documentacion/00-fundamentos/MAPA_MODULOS_ACTUALES.md`
+- `Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md`
+- `Documentacion/01-planes-maestros/meta_guia_planes.md`
+- `Documentacion/prompt_mejorado.md` for the UX/UI Claude audit.
 
 ## Project Structure
 
-```
+```text
 PlanearIA/
-  App.tsx                    # Entry point
+  App.tsx
   src/
-    screens/                 # Views (React Native)
-    hooks/                   # ViewModels
-    context/                 # State providers
-    services/                # I/O, sync, storage, AI, API
-    navigation/              # StackNavigator, AppTabsNavigator
-    sync/                    # Offline sync engine
-    themes/                  # Colors, tokens
-    __tests__/               # Jest tests
+    screens/
+    hooks/
+    context/
+    services/
+    navigation/
+    sync/
+    themes/
+    utils/
+    __tests__/
   backend/
-    api/                     # Vercel serverless endpoints
-    lib/                     # Auth, AI gateway, helpers
-  types/                     # TypeScript types
-  Documentacion/             # Plans, architecture, operations
-  context/                   # Ground truth, stitch results, references
-  .agents/skills/            # Project AI skills (multi-agent)
+    api/index.js
+    routes/
+    lib/
+    shared/
+  types/
+  Documentacion/
+  context/
+  .github/workflows/
 ```
 
-## Closed Plans (do not reopen without explicit request)
+## Closed Plans
 
-- Planeaciones (Word/Docs editor, Phase 9)
-- Pasos Iniciales (GitHub Product OS setup)
-- Classroom (Grupos, Alumnos, Recursos)
-- Infraestructura Local/CI/Deploy (Phases 0-7)
-- Storage Local SQLite/Migration Offline (opt-in infrastructure)
+Do not reopen without explicit request:
 
-Closed plan docs are grouped in `Documentacion/01-planes-maestros/cerrados/`.
+- Planeaciones: closed as functional document editor base. In the current vision it becomes part of Office Docente.
+- Classroom: closed as functional class-management base. It can still be visually redesigned in UX/UI Global.
+- Pasos Iniciales.
+- Infraestructura Local/CI/Deploy.
+- Storage Local SQLite/Migration Offline: closed as opt-in infrastructure.
 
-## Active/Pending Plans
+Closed plan docs live in `Documentacion/01-planes-maestros/cerrados/`.
 
-- Auth, Seguridad y Sesion Real: in execution; Phases 0-6 complete and CI-green, 7-8 closing (pending: real email, social data, manual validation)
-- Offline-first sync: unified per-entity engine with cross-device push/pull, backend JWT + userId isolation and offline UX (done; see Documentacion/02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md)
-- UX/UI Global, Excel/Listas, Canva, WhatsApp, Reportes, Configuracion/Accesibilidad: future (UX/UI Global is the next recommended new plan)
+## Active And Pending
 
-## Testing Rules (Mandatory)
+- Active/closing: `Auth, Seguridad y Sesion Real`.
+- Done: global offline-first sync engine in `src/sync`.
+- Next recommended new plan: `Plan Maestro: UX/UI y Navegacion Global`.
+- Future plans depend on UX/UI Global: Office Docente, Classroom redesign/integration, Cuenta/Accesibilidad, Calendario, WhatsApp Docente, Canva, Reportes.
 
-Every code change MUST:
-1. Search existing tests in `src/__tests__/`
-2. Run affected tests: `npm test -- --testPathPattern="<pattern>"`
-3. Create new tests if module has no coverage
-4. Fix failing tests before marking complete
-5. On Windows: add `--rootDir c:\Users\jarco\dev\PlanearIA`
+## Testing Rules
 
-## Validation Commands
+For code changes:
+
+1. Search existing tests in `src/__tests__/`.
+2. Run affected tests.
+3. Add tests if risk/blast radius warrants it.
+4. Fix failing tests before marking complete.
+
+Useful commands:
 
 ```bash
-npx tsc --noEmit
+npm run typecheck
 npm run lint -- --quiet
 npm test -- --runInBand
-npm run test:classroom -- --runInBand
-npm run test:sync -- --runInBand
+npm run test:classroom
+npm run test:planeaciones
+npm run test:sync
+npm run backend:check
 ```
 
-## MongoDB Index Rule
+On Windows, if Jest path resolution needs it, add:
 
-Every backend CRUD endpoint MUST create indexes. `createIndex` is idempotent.
+```bash
+--rootDir c:\Users\jarco\dev\PlanearIA
+```
 
-## Writing Style
+## Working With Plans
 
-- No emojis anywhere (code, docs, commits, logs)
-- No verbose/flowery language
-- Comments explain WHY, not WHAT
-- English for logs, Spanish acceptable for user-facing docs
-- See @.agents/skills/writing-style/SKILL.md
+When asked to work on a plan:
 
-## Token Efficiency
-
-- Use CAVEMAN mode for mechanical/approved tasks (minimal prose)
-- Use NORMAL mode for planning, architecture, questions, ambiguity
-- See @.agents/skills/token-efficiency/SKILL.md
-
-## Working with Plans
-
-When asked to "work on the next task":
-1. Read `Documentacion/README.md` and the active plan
-2. Find next pending `[ ]` task
-3. Implement it
-4. Run related tests
-5. Mark as `[x]` with date and evidence
+1. Read `Documentacion/README.md`.
+2. Read the active plan.
+3. Find next pending `[ ]` task.
+4. Implement.
+5. Validate.
+6. Mark as `[x]` only with evidence.
 
 Task states: `[ ]` pending, `[~]` in progress, `[x]` completed.
 
 ## Ground Truth
 
-For modules with "clone/high-parity" (Word, Classroom, Excel, Canva, WhatsApp): always check `context/<module>-ground-truth/` and `context/stitch-results/` before implementing UI.
+For high-parity experiences, check or request ground truth before UI implementation:
+
+- Office Docente: Word/Docs + Excel/Sheets + LibreOffice/OnlyOffice conceptual references.
+- Classroom: Google Classroom/Classroomio.
+- Canva/Genially.
+- WhatsApp professional messaging.
+
+Do not copy open source code without license/stack review.
+
+## Writing Style
+
+- No emojis in code, docs, commits or logs.
+- Clear, practical language.
+- Comments explain why, not what.
+- Spanish is acceptable for docs and user-facing text.
 
 ## Python
 
-Executable: `C:/Users/jarco/AppData/Local/Programs/Python/Python312/python.exe` (has `requests`).
+Executable: `C:/Users/jarco/AppData/Local/Programs/Python/Python312/python.exe`.

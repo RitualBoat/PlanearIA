@@ -146,7 +146,7 @@ flowchart TD
     end
 
     classroom --> grupos["Grupo -> Tablon, Personas,<br/>Unidades, Tareas, Asistencia, Calificaciones"]
-    recursos --> plan["Planeaciones (editor tipo Word/Docs + IA)"]
+    recursos --> plan["Office Docente parcial<br/>Planeaciones (editor documento + IA)"]
     recursos --> biblio["Biblioteca / Plantillas"]
     social --> chat["Chat / Contactos"]
     config --> cuenta["Perfil / Cuenta / Accesibilidad"]

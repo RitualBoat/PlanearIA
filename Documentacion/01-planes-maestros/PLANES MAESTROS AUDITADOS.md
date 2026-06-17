@@ -1,74 +1,66 @@
-# Auditoria del Plan Classroom y Correccion de Metodo para Futuros Planes
+# Auditoria De Planes Maestros Y Correccion De Metodo
 
-## Resumen
+Este documento conserva la leccion aprendida del plan Classroom y de planes de paridad alta.
 
-El problema no fue que faltara capacidad tecnica. El problema fue que el plan permitio avanzar fases funcionales antes de fijar un contrato visual/flujo tipo “clon Classroom/Classroomio”. Por eso despues de Fase 2 se acumularon refactors: la IA implemento un Classroom funcional, pero no suficientemente fiel a las referencias reales.
+## Problema Detectado
 
-Conclusion: futuros planes deben seguir siendo planes maestros completos, pero cada fase ejecutable debe incluir su propio “brief de ground truth” con rutas concretas de capturas/referencias, criterios de paridad visual/flujo y restricciones legacy. La implementacion debe avanzar fase por fase, no como una ejecucion larga donde la IA pueda perder el norte.
+El problema no fue falta de capacidad tecnica. El problema fue permitir avanzar fases funcionales antes de fijar un contrato visual y de flujo suficientemente claro.
 
-## Hallazgos Clave
+En Classroom, varias fases integraron alumnos, materiales, actividades, asistencia, reportes e IA, pero la experiencia podia sentirse mas como dashboard administrativo que como una experiencia cercana a Google Classroom/Classroomio.
 
-- El plan decia “tipo Google Classroom/Classroomio”, pero no convertia las capturas en contrato obligatorio por fase.
-- Las fases 3-9 priorizaron integrar funcionalidad existente: alumnos, materiales, actividades, asistencia, reportes, IA. Eso produjo una app operativa, pero con sabor a dashboard administrativo.
-- La limpieza legacy estaba demasiado tarde. Permitio que crear/editar siguiera saltando a formularios antiguos.
-- La Fase 10 corrigio tarde decisiones base de UX: tabs reales, trabajo por unidades, sin “Sin seccion”, editor contextual, adjuntos multiples y retorno correcto.
-- Las referencias reales en `context/classroom-ground-truth/03-referencias-reales` debieron estar citadas dentro de cada fase, no solo en una seccion global.
-- Varias fases se marcaron como completadas por pasar TypeScript/tests, aunque la validacion manual de paridad visual/flujo seguia abierta.
-- La frase “UX/UI Global lo pule despues” fue demasiado permisiva. Para modulos que buscan clonar una experiencia madre, la UX base no puede posponerse al final.
+## Leccion Principal
 
-## Cambios Recomendados al Metodo de Planes Maestros
+Para experiencias madre de paridad alta, no basta escribir "tipo Classroom", "tipo Office" o "tipo Canva". Cada fase debe convertir el ground truth en contrato verificable.
 
-- Agregar en `meta_guia_planes.md` una regla llamada `Contrato de Experiencia Madre`.
-- Cada plan debe declarar si el modulo es:
-  - `Clon/paridad alta`: Word, Classroom, Excel, Canva.
-  - `Inspirado/paridad media`: social, chat, reportes.
-  - `Funcional/administrativo`: configuracion, seguridad, infraestructura.
-- Si es `Clon/paridad alta`, no se puede cerrar una fase UI sin comparar contra capturas/referencias.
-- Cada fase debe incluir:
-  - rutas exactas de ground truth,
-  - pantallas afectadas,
-  - flujos prohibidos,
-  - rutas legacy que no deben usarse,
-  - criterio visual y de navegacion.
-- Antes de implementar una fase, la IA debe generar un mini-brief de fase con referencias concretas y confirmarlo contra el plan.
-- Despues de cada fase, debe existir validacion manual o checklist visual antes de avanzar a la siguiente fase grande.
-- Los tests automaticos no sustituyen la validacion de experiencia clon.
+Experiencias de paridad alta actuales:
 
-## Regla Nueva Para Futuros Modulos
+- Office Docente: Word/Docs + Excel/Sheets + LibreOffice/OnlyOffice como ground truth conceptual.
+- Classroom: Google Classroom/Classroomio.
+- Canva/Genially.
+- WhatsApp profesional.
 
-Para experiencias madre:
+## Reglas Nuevas Para Futuros Planes
 
-- `Planeaciones = Word/Docs`: cada fase debe citar referencias de documento/editor/plantilla.
-- `Classroom = Google Classroom/Classroomio`: cada fase debe citar capturas de cursos, trabajo de clase, personas, detalle de actividad/material.
-- `Recursos visuales = Canva/Genially`: cada fase debe citar editor canvas, templates, panel lateral, timeline/capas si aplica.
-- `Listas = Excel`: cada fase debe citar grid, formulas, filtros, columnas, import/export.
-- `Chat = WhatsApp profesional`: cada fase debe citar lista de chats, conversacion, adjuntos, estados de envio.
+- Todo plan de paridad alta debe declarar su experiencia madre.
+- Cada fase visual debe citar referencias concretas.
+- Cada fase debe prohibir rutas legacy que rompan el flujo.
+- TypeScript, lint y tests no bastan para cerrar UX/UI de alta paridad.
+- Debe existir validacion manual o checklist visual antes de marcar fase como `[x]`.
+- Los planes cerrados prueban funcionalidad, no congelan la vision visual.
 
-## Ajuste al Flujo de Ejecucion
+## Brief De Ground Truth Por Fase
 
-No recomiendo generar solo una fase del plan maestro a la vez. Eso perderia vision completa.
+Antes de implementar una fase visual de paridad alta, la IA debe escribir un brief con:
 
-Recomiendo este esquema:
+- Nivel de paridad.
+- Capturas/referencias reales.
+- Referencias open source si existen.
+- Pantallas a imitar.
+- Pantallas o flujos prohibidos.
+- Rutas legacy que no deben abrirse.
+- Criterio de cierre visual y de navegacion.
 
-- Plan maestro completo para arquitectura, dependencias y roadmap.
-- Ejecucion estrictamente por fase.
-- Antes de cada fase: crear “Brief de Implementacion de Fase” con ground truth exacto.
-- Despues de cada fase: captura/validacion manual contra referencias.
-- No avanzar si el flujo se siente como “modulos sueltos” aunque compile perfecto.
+## Checklist Obligatorio
 
-## Checklist Obligatorio Para Cada Fase UX
-
-- [ ] La fase cita rutas concretas de `context/<modulo>-ground-truth/`.
+- [ ] La fase cita rutas concretas de `context/<experiencia>-ground-truth/`.
 - [ ] La fase cita referencias open source o reales relevantes.
-- [ ] La fase define qué comportamiento debe parecerse al producto madre.
-- [ ] La fase define qué rutas legacy quedan prohibidas.
+- [ ] La fase define que comportamiento debe parecerse al producto madre.
+- [ ] La fase define que rutas legacy quedan prohibidas.
 - [ ] Crear, editar, guardar, cancelar y volver tienen destino claro.
 - [ ] La pantalla no introduce CTAs administrativos sueltos si el producto madre no los tiene.
-- [ ] Web y movil tienen validacion manual.
-- [ ] El usuario confirma si la experiencia se siente como el producto madre antes de cerrar la fase.
+- [ ] Web, tablet y movil tienen validacion manual cuando aplica.
+- [ ] El usuario confirma si la experiencia se siente como la experiencia madre antes de cerrar la fase.
 
-## Asunciones
+## Interpretacion Actual
 
-- La meta futura no es solo “inspirarse”, sino lograr paridad alta con experiencias conocidas: Word, Classroom, Canva y Excel.
-- Los planes deben seguir siendo detallados, pero menos permisivos con UX vaga.
-- La documentacion debe guiar a futuras IAs para no interpretar “tipo Classroom” como “dashboard escolar con tarjetas”.
+La vision nueva une Word y Excel dentro de Office Docente. Por lo tanto, futuros planes no deben tratar documentos y hojas como mundos aislados salvo que el plan lo justifique.
+
+Classroom sigue siendo experiencia madre, pero debe recibir objetos creados desde Office, Canva, WhatsApp y Calendario.
+
+## Relacion Con La Meta Guia
+
+Las reglas vigentes viven en:
+
+- `Documentacion/01-planes-maestros/meta_guia_planes.md`
+- `Documentacion/00-fundamentos/VISION_ACTUAL.md`
+- `Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md`

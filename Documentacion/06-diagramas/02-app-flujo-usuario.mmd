@@ -16,14 +16,14 @@ flowchart TD
 
     subgraph tabs["AppTabsNavigator (barra inferior)"]
         feed["Feed"]
-        recursos["Recursos / Contenido"]
+        recursos["Contenido / Office parcial"]
         classroom["Classroom (Grupos)"]
         social["Social"]
         config["Configuracion"]
     end
 
     classroom --> grupos["Grupo -> Tablon, Personas,<br/>Unidades, Tareas, Asistencia, Calificaciones"]
-    recursos --> plan["Planeaciones (editor tipo Word/Docs + IA)"]
+    recursos --> plan["Office Docente parcial<br/>Planeaciones (editor documento + IA)"]
     recursos --> biblio["Biblioteca / Plantillas"]
     social --> chat["Chat / Contactos"]
     config --> cuenta["Perfil / Cuenta / Accesibilidad"]

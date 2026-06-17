@@ -1,96 +1,130 @@
 # Instrucciones para GitHub Copilot -- PlanearIA
 
-## Contexto del Proyecto
+## Contexto Vigente
 
-PlanearIA es una app React Native + Expo SDK 54 + TypeScript para docentes mexicanos.
-Arquitectura MVVM con hooks como ViewModels.
-Backend: Vercel serverless + MongoDB Atlas.
-Storage local default: AsyncStorage (offline-first). SQLite/Expo SQLite existe como infraestructura opt-in para datos academicos relacionales y sync queue.
-Auth: JWT con userId isolation.
+PlanearIA es una app React Native + Expo SDK 54 + TypeScript para docentes mexicanos. Usa una arquitectura modular monolitica con MVVM pragmatico:
 
-## Plan de Trabajo Activo
+- Screens como vistas delgadas.
+- Hooks como ViewModels.
+- Context para estado compartido.
+- Services/repositories para I/O.
+- Backend serverless en Vercel con MongoDB Atlas.
+- AsyncStorage como persistencia local productiva.
+- Expo SQLite instalado como infraestructura opt-in, no default.
+- Motor de sync offline-first en `src/sync`.
+- IA centralizada en backend mediante `backend/lib/aiGateway.js`.
 
-- Plan activo: `Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md` (en ejecucion; Fases 0-6 completadas, 7-8 en cierre). El proximo plan nuevo recomendado es UX/UI y Navegacion Global; crear cualquier plan nuevo solo cuando el usuario lo pida.
-- El plan de Planeaciones quedo cerrado como referencia en `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md`.
-- El plan de Pasos Iniciales quedo cerrado como cimiento organizativo en `Documentacion/01-planes-maestros/cerrados/PLAN_PASOS_INICIALES (closed).md`.
-- El plan SQLite quedo cerrado en `Documentacion/01-planes-maestros/cerrados/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE (closed).md`; nuevos datos academicos deben disenarse con ports/repositories compatibles con SQLite, sin nuevas lecturas directas a AsyncStorage.
-- La guia obligatoria para nuevos planes maestros es `Documentacion/01-planes-maestros/meta_guia_planes.md`.
-- Cada modulo importante tendra su propio plan maestro dentro de `Documentacion/01-planes-maestros/`, siguiendo tracking `[ ]`, `[~]`, `[x]`.
-- Las tareas se marcan con: `[ ]` pendiente, `[~]` en progreso, `[x]` completado.
-- Al completar una tarea, actualizar su estado en el plan.
+La vision actual no es "muchos modulos separados". La vision es una suite docente conectada:
 
-### Cuando el usuario pida "trabajar en la proxima tarea"
+- Inicio / Sistema Operativo Docente.
+- Office Docente: documentos, planeaciones, hojas, listas, rubricas, asistencia, calificaciones e import/export.
+- Classroom / Clases: grupos, unidades, materiales, actividades, alumnos, entregas y seguimiento.
+- Canva / Genially Docente.
+- WhatsApp Docente.
+- Calendario, reportes, cuenta, seguridad y accesibilidad.
 
-1. Leer `Documentacion/README.md`, `Documentacion/00-fundamentos/RESUMEN_EJECUTIVO.md` y el plan maestro del modulo activo para encontrar la siguiente tarea pendiente `[ ]`
-2. Implementar la tarea en el codigo
-3. **Ejecutar tests** relacionados (`npm test -- --testPathPattern="<patron>"`)
-4. Cambiar su estado en el plan a `[x]`
-5. Informar al usuario del resultado
+El principio de producto es cero friccion: si el docente crea algo, PlanearIA debe sugerir como conectarlo, asignarlo y darle seguimiento sin cambiar de app.
 
-### Testing CI/CD -- Regla obligatoria
+## Fuentes Obligatorias
 
-**Cada vez que implementes o modifiques codigo funcional, DEBES:**
+Antes de trabajos relevantes, leer en este orden:
 
-1. **Buscar tests existentes** que cubran el modulo modificado en `src/__tests__/`
-2. **Ejecutar los tests afectados** y verificar que pasen
-3. **Crear tests nuevos** si el modulo no tiene cobertura o si se crean archivos nuevos (context, viewModel, componente, servicio)
-4. **Si un test falla**, arreglarlo antes de marcar la tarea como completada
-5. Los tests se ejecutan con: `npm test` o `npm test -- --testPathPattern="<archivo>"`
-6. En Windows, usar `--rootDir c:\Users\jarco\dev\PlanearIA` para evitar conflictos de Haste Map
+1. `README.md`
+2. `CLAUDE.md`
+3. `Documentacion/README.md`
+4. `Documentacion/00-fundamentos/RESUMEN_EJECUTIVO.md`
+5. `Documentacion/00-fundamentos/VISION_ACTUAL.md`
+6. `Documentacion/00-fundamentos/ARQUITECTURA.md`
+7. `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`
+8. `Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md`
+9. `Documentacion/01-planes-maestros/meta_guia_planes.md`
 
-### Python
+Para UX/UI global, leer tambien `Documentacion/prompt_mejorado.md`.
 
-- Ejecutable: `C:/Users/jarco/AppData/Local/Programs/Python/Python312/python.exe`
-- Tiene `requests` instalado
+## Planes
 
-## Notas de Desarrollo
+- Plan activo/en cierre: `Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md`.
+- Proximo plan recomendado: `Plan Maestro: UX/UI y Navegacion Global`.
+- Los planes cerrados viven en `Documentacion/01-planes-maestros/cerrados/`.
+- Los planes cerrados son evidencia funcional y tecnica; no son limite visual para el rediseno UX/UI.
+- Usar estados `[ ]`, `[~]`, `[x]` solo cuando exista evidencia.
 
-### Pantallas Esqueleto ("Proximamente")
+Cuando el usuario pida trabajar en una tarea de plan:
 
-La app tiene pantallas/modulos que existen como esqueleto visual pero **no tienen funcionalidad implementada**. Al desarrollar:
+1. Leer `Documentacion/README.md`.
+2. Leer el plan activo o indicado.
+3. Encontrar la siguiente tarea pendiente `[ ]`.
+4. Implementar de forma acotada.
+5. Validar.
+6. Marcar `[x]` solo si hay evidencia real.
 
-- No elimines pantallas esqueleto sin revisar el plan maestro vigente y la navegacion global.
-- Cuando el usuario intente usar una funcionalidad no implementada, mostrar un mensaje como: "Esta funcion se implementara proximamente".
-- Al implementar un modulo nuevo, verificar si ya tiene pantalla esqueleto y **reutilizarla**.
-- Si un boton, card o ruta `Proximamente` aumenta carga cognitiva o parece accion real rota, documentarlo para UX/UI Global y considerar ocultarlo/redirigirlo con aprobacion del plan.
+## Reglas De Arquitectura
 
-### MongoDB -- Base de Datos y Endpoints Backend
+- Mantener MVVM: no convertir screens en contenedores gigantes.
+- Nueva data academica sincronizable debe pasar por `src/sync`; no crear colas ni clientes HTTP paralelos.
+- Disenar nuevos datos academicos con ports/repositories compatibles con futura migracion SQLite.
+- No activar SQLite como default sin aprobacion explicita.
+- No borrar claves `@planearia:*` sin migracion, validacion y rollback.
+- Toda entidad multiusuario debe aislarse por `userId`.
+- Toda IA debe pasar por backend; no poner provider keys en frontend.
+- No proponer microservicios ni infraestructura costosa sin justificacion fuerte.
+- Web, tablet y movil deben partir de una pantalla madre responsiva. Archivos platform-specific requieren justificacion.
 
-La base de datos MongoDB Atlas (`planeariaDB`) esta conectada. La app es offline-first: AsyncStorage sigue como default productivo y rollback; SQLite queda como infraestructura opt-in para datos academicos relacionales. MongoDB es el respaldo via sincronizacion.
+## Backend
 
-#### Regla obligatoria: Indices al crear endpoints
+- Cada endpoint CRUD debe filtrar por `userId`.
+- Decodificar JWT con `getUserFromToken` desde `backend/lib/auth.js`.
+- Usar headers `Authorization: Bearer <JWT>` y `Content-Type: application/json`.
+- Crear indices MongoDB con `createIndex`; es idempotente.
+- Aplicar rate limiting a login, register, recovery, sync, bulk create e IA.
+- No guardar secretos en codigo ni commits.
 
-**Cada vez que implementes un endpoint backend CRUD, DEBES crear indices** en la coleccion:
+## Frontend
 
-```javascript
-const collection = db.collection("grupos");
-await collection.createIndex({ id: 1 }, { unique: true });
-await collection.createIndex({ fechaModificacion: -1 });
+- Usar `src/themes/colors.ts` y utilidades responsive existentes.
+- Preservar ThemeContext, FontSizeContext y DaltonismoContext.
+- Manejar loading, error, empty y offline states.
+- No dejar botones que parezcan funcionales si realmente son "proximamente".
+- Si una pantalla actual contradice la nueva vision, documentar la migracion en vez de copiar el patron viejo.
+
+## Testing
+
+Para cambios funcionales:
+
+1. Buscar tests existentes en `src/__tests__/`.
+2. Ejecutar tests afectados.
+3. Agregar tests si el cambio toca logica compartida, sync, auth, backend o flujos de usuario.
+4. Arreglar fallas antes de marcar tareas como completadas.
+
+Comandos utiles:
+
+```bash
+npm run typecheck
+npm run lint -- --quiet
+npm test -- --runInBand
+npm run test:classroom
+npm run test:planeaciones
+npm run test:sync
+npm run backend:check
 ```
 
-**Indices por coleccion:**
+En Windows, si Jest tiene conflictos de Haste Map:
 
-| Coleccion        | Indices requeridos                                         |
-| ---------------- | ---------------------------------------------------------- |
-| `planeaciones`   | `{ userId: 1, fechaModificacion: -1 }`, `{ id: 1 }` unique |
-| `grupos`         | `{ id: 1 }` unique, `{ fechaModificacion: -1 }`            |
-| `alumnos`        | `{ id: 1 }` unique, `{ grupoId: 1 }`                       |
-| `entregables`    | `{ id: 1 }` unique, `{ grupoId: 1 }`                       |
-| `usuarios`       | `{ id: 1 }` unique, `{ email: 1 }` unique                  |
-| `asistencias`    | `{ id: 1 }` unique, `{ grupoId: 1, fecha: -1 }`            |
-| `calificaciones` | `{ id: 1 }` unique, `{ alumnoId: 1 }`                      |
-
-`createIndex` es idempotente. Seguro llamarlo en cada invocacion.
-
-### Autenticacion
-
-El backend usa JWT. Las peticiones incluyen:
-
-```javascript
-headers: {
-  'Authorization': 'Bearer <JWT>',
-  'Content-Type': 'application/json'
-}
+```bash
+--rootDir c:\Users\jarco\dev\PlanearIA
 ```
 
-El JWT contiene `userId`. El backend decodifica con `getUserFromToken` en `backend/lib/auth.js`. Cada endpoint filtra datos por `userId` para aislamiento.
+## Estilo
+
+- Sin emojis en codigo, docs, commits o logs.
+- Lenguaje claro, practico y estudiantil.
+- Explicar decisiones con razon tecnica, no con jerga.
+- No copiar codigo open source sin revisar licencia, stack y compatibilidad.
+
+## Python
+
+Ejecutable local:
+
+```text
+C:/Users/jarco/AppData/Local/Programs/Python/Python312/python.exe
+```

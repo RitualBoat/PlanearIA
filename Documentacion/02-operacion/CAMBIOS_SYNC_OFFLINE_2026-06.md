@@ -81,7 +81,7 @@ Archivo nuevo: `src/components/SyncStatusBanner.tsx`.
 
 - **`SyncOfflineBar`**: barra superior persistente. Distingue "Sin conexion" (dispositivo offline) de "Servidor no disponible" (online pero backend/Mongo caidos). Siempre aclara que el trabajo se guarda local y la app sigue usable. Boton de reintento cuando el servidor esta caido.
 - **`SyncNoticeToast`**: toast inferior transitorio: "Sincronizacion exitosa", "Conexion restablecida. Sincronizacion exitosa." y avisos de fallo. Auto-descartado.
-- Cableado en `App.tsx` dentro de `SafeAreaProvider` + `SyncProvider`.
+- Cableado vigente en `App.tsx` mediante `SyncContext` y `SyncStatusBanner`. Nota historica: el wrapper `src/sync/providers/SyncProvider.tsx` fue borrado en la limpieza adicional de 2026-06-12.
 
 Escenarios cubiertos (pruebas de resiliencia):
 

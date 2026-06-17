@@ -6,7 +6,7 @@ Esta carpeta agrupa los planes maestros que ya quedaron cerrados. Se conservan c
 
 | Plan | Archivo | Cierre |
 | --- | --- | --- |
-| Planeaciones (Word/Docs) | `plan_planeaciones (closed).md` | Fase 9 aprobada. Referencia de calidad y tracking. |
+| Planeaciones (base documental de Office Docente) | `plan_planeaciones (closed).md` | Fase 9 aprobada. Referencia de calidad y tracking. |
 | Soporte IA/Editor Planeaciones Fase 9 | `PLANEACIONES_IA_EDITOR_FASE9 (closed).md` | Cierre del editor e IA de Planeaciones. |
 | Pasos Iniciales | `PLAN_PASOS_INICIALES (closed).md` | Cimiento organizativo: GitHub Product OS, CI inicial y entorno. |
 | Classroom / Grupos y Recursos | `PLAN_CLASSROOM (closed).md` | Fases 0-10 e issue #8 completados. |
@@ -15,7 +15,7 @@ Esta carpeta agrupa los planes maestros que ya quedaron cerrados. Se conservan c
 
 ## Nota sobre referencias historicas
 
-Antes de esta reorganizacion estos planes vivian en `Documentacion/01-planes-maestros/<PLAN>.md`. Documentos historicos con fecha (evidencias en `context/` o archivos en `Documentacion/99-archivo/`) pueden citar la ruta anterior; se conservan como registro de su momento y no se reescriben. La ruta vigente de cada plan cerrado es:
+Antes de esta reorganizacion estos planes vivian en `Documentacion/01-planes-maestros/<PLAN>.md`. Documentos historicos con fecha (evidencias en `context/` o archivos en `Documentacion/99-archivo/`) pueden citar rutas anteriores; se conservan como registro de su momento y no se reescriben. La ruta vigente de cada plan cerrado es:
 
 ```
 Documentacion/01-planes-maestros/cerrados/<PLAN> (closed).md
@@ -26,3 +26,7 @@ Documentacion/01-planes-maestros/cerrados/<PLAN> (closed).md
 - Activo en ejecucion: `../PLAN_AUTH_SEGURIDAD_SESION_REAL.md`.
 - Vigente como instructivo obligatorio: `../meta_guia_planes.md`.
 - Retrospectiva y auditoria: `../PLANES MAESTROS AUDITADOS.md`.
+
+## Nota de vision actual
+
+Los planes cerrados son evidencia funcional, no candados visuales. En la vision vigente, Planeaciones pasa a formar parte de Office Docente y Classroom puede redisenarse visualmente en el futuro Plan Maestro UX/UI.

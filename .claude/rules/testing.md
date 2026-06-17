@@ -12,4 +12,5 @@ paths:
 - Windows: add --rootDir c:\Users\jarco\dev\PlanearIA
 - Classroom tests: npm run test:classroom -- --runInBand
 - Sync tests: npm run test:sync -- --runInBand
+- Backend smoke: npm run backend:check
 - Fix failing tests before marking tasks complete

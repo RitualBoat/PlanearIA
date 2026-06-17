@@ -6,8 +6,8 @@ La ruta mas facil para este repo es:
 
 ```text
 GitHub repo PlanearIA
-  ├─ Proyecto Vercel 1: planearia-api  -> usa la carpeta backend/
-  └─ Proyecto Vercel 2: planearia-web  -> usa la raiz del repo ./
+  +-- Proyecto Vercel 1: planearia-api  -> usa la carpeta backend/
+  +-- Proyecto Vercel 2: planearia-web  -> usa la raiz del repo ./
 ```
 
 Vercel va a leer el mismo repositorio dos veces, pero cada proyecto apunta a una carpeta distinta.

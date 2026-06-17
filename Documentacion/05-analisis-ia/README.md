@@ -1,15 +1,30 @@
 # Analisis de IA
 
-Esta carpeta conserva opiniones, recomendaciones y revisiones generadas por IA.
+Esta carpeta conserva opiniones y revisiones generadas por IA. No son fuente ejecutable ni verdad vigente.
 
-Reglas:
+## Regla De Lectura
 
-- Estos documentos no son fuente ejecutable unica.
-- Si contradicen `00-fundamentos` o `01-planes-maestros`, ganan los documentos vigentes.
-- Sirven para recuperar razonamientos, riesgos e ideas de infraestructura/producto.
+Si un documento de esta carpeta contradice:
 
-Documentos:
+1. el codigo real,
+2. `Documentacion/00-fundamentos/`,
+3. `Documentacion/01-planes-maestros/meta_guia_planes.md`,
+4. el plan activo,
 
-- `INFRAESTRUCTURA_SUGERIDA.md`: opinion estrategica low-cost sobre infraestructura.
-- `OPINION_DE_IA_TRAS_LEER_META_GUIA_PLANEACIONES.md`: revision de la meta guia y enfoque de hardware/local-first.
-- `REVISION-GPT-TRAS-LEER-ARCHIVOS-DOCUMENTACION.md`: evaluacion estrategica tras leer documentos fundacionales.
+entonces gana la fuente mas alta de esa lista.
+
+## Uso Correcto
+
+Estos documentos sirven para recuperar ideas, riesgos y razonamientos. No deben usarse para implementar sin volver a cruzarlos contra el estado actual.
+
+## Estado Actual
+
+Los analisis anteriores se movieron a `Documentacion/99-archivo/` porque mezclaban recomendaciones historicas con decisiones ya superadas por el estado actual: Vercel, CD con APK standalone, Office Docente y sync global.
+
+Archivos archivados:
+
+- `99-archivo/INFRAESTRUCTURA_SUGERIDA_LEGACY_IA.md`
+- `99-archivo/OPINION_DE_IA_META_GUIA_LEGACY.md`
+- `99-archivo/REVISION_GPT_DOCUMENTACION_LEGACY.md`
+
+Para lectura vigente, usar primero `Documentacion/README.md` y `Documentacion/00-fundamentos/`.

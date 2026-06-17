@@ -1,307 +1,231 @@
-﻿# Arquitectura de PlanearIA
-
-## Indice
-
-1. [Vision General](#vision-general)
-2. [Stack Tecnologico](#stack-tecnologico)
-3. [Capas de la Arquitectura](#capas-de-la-arquitectura)
-4. [Estructura del Proyecto](#estructura-del-proyecto)
-5. [Sistema de Tipos](#sistema-de-tipos)
-6. [Flujo de Datos](#flujo-de-datos)
-7. [Backend](#backend)
-8. [Estrategia de Refactorizacion](#estrategia-de-refactorizacion)
-
----
+# Arquitectura de PlanearIA
 
 ## Vision General
 
-PlanearIA es una aplicacion movil para docentes mexicanos. Permite gestionar planeaciones didacticas, grupos, alumnos, recursos educativos y evaluaciones.
+PlanearIA es una app React Native/Expo offline-first para docentes. Tecnica y productivamente se mantiene como monolito modular: una sola app, un backend logico simple y dominios separados por carpetas, contratos y planes.
 
-### Principios de Diseno
+La experiencia objetivo es una suite docente conectada:
 
-1. **Offline-first**: Todos los datos se guardan localmente en AsyncStorage. MongoDB Atlas es el respaldo en la nube.
-2. **MVVM**: Pantallas (View) consumen hooks personalizados (ViewModel) que acceden a Context providers (Model).
-3. **Monolito modular**: PlanearIA debe mantenerse como una aplicacion unificada y un backend logico simple, separando dominios por carpetas y contratos internos antes de pensar en microservicios.
-4. **Cero friccion**: cada modulo debe sentirse como una herramienta conocida por docentes: Word/Docs, Classroom, Canva, Excel o WhatsApp profesional.
-5. **Vision de editor**: Cada modulo de creacion/edicion evolucionara de formularios nativos simples a experiencias profesionales, empezando por Planeaciones como Word/Docs.
+- Office Docente para documentos, planeaciones, hojas y listas.
+- Classroom para organizar clases y asignar trabajo.
+- Canva/Genially para crear materiales visuales.
+- WhatsApp Docente para colaborar.
+- Calendario y reportes para seguimiento.
 
----
+La arquitectura debe permitir que una accion creada en una experiencia pueda usarse en otra sin duplicar datos ni obligar al docente a copiar/pegar.
 
 ## Stack Tecnologico
 
-| Tecnologia | Version | Proposito |
-|-----------|---------|-----------|
-| React Native | 0.81.5 | Framework UI cross-platform |
-| Expo | 54.0.21 | Tooling de desarrollo (Expo Go) |
-| TypeScript | 5.9.2 | Tipado estatico |
-| React Navigation | 7.x | Navegacion (native stack) |
-| AsyncStorage | - | Persistencia local offline-first |
-| MongoDB Atlas | M0 | Base de datos cloud |
-| Vercel | - | Hosting de funciones serverless |
-| JWT | - | Autenticacion con userId isolation |
-| Jest | - | Unit testing |
-| @expo/vector-icons | - | Iconos (imports directos, no barrel) |
+| Capa | Tecnologia | Estado |
+| --- | --- | --- |
+| App | React Native 0.81.5 + Expo 54 | Vigente |
+| Lenguaje | TypeScript 5.9 | Vigente |
+| Navegacion | React Navigation 7 | Vigente |
+| Web | `react-native-web` | Vigente |
+| Estado | React Context + hooks ViewModel | Vigente |
+| Storage local | AsyncStorage | Default productivo |
+| Storage opt-in | Expo SQLite | Infraestructura instalada, no default |
+| Storage tokens nativo | Expo SecureStore | Instalado para auth en Android/iOS |
+| Backend | Node serverless en Vercel | Vigente |
+| Base remota | MongoDB Atlas M0 | Vigente |
+| IA | `backend/lib/aiGateway.js` | Vigente |
+| CI/CD | GitHub Actions | CI + builds web/APK |
 
-### Tecnologias NO usadas
+## Principios Arquitectonicos
 
-- **Realm**: Nunca fue implementado. El proyecto usa AsyncStorage + MongoDB Atlas.
-- **Docker**: Planeado para v5.0. El backend actual corre en Vercel.
-- **expo-router**: Se usa @react-navigation directamente.
-- **expo-secure-store**: Pendiente de instalar. Auth token actualmente en AsyncStorage.
+1. **MVVM pragmatico**: pantallas delgadas, hooks como ViewModels, Context como modelo compartido y Services para I/O.
+2. **Offline-first**: toda escritura academica importante debe guardar local primero y sincronizar despues.
+3. **Sync global**: datos academicos sincronizables usan `src/sync`, no colas por modulo.
+4. **Aislamiento por usuario**: todo dato multiusuario se filtra por `userId`.
+5. **Backend simple**: no microservicios; router unico serverless y rutas por dominio.
+6. **IA por backend**: nunca exponer API keys ni llamar modelos desde frontend.
+7. **SQLite opt-in**: no activarlo como default sin plan, validacion manual y rollback.
+8. **Vision responsive**: una pantalla madre por defecto para web/tablet/movil; variantes `.web.tsx` o `.native.tsx` solo con justificacion real.
 
----
+## Capas
 
-## Capas de la Arquitectura
-
-```
-+-------------------------------------------------------------+
-|                     PRESENTACION                             |
-|  Screens (React Native components)                          |
-|  EditorPlaneacionScreen, ListaPlaneacionesScreen, etc.      |
-+-------------------------------------------------------------+
-                            |
-+-------------------------------------------------------------+
-|                     VIEWMODEL                                |
-|  Custom hooks                                               |
-|  useEditorState, useFilteredPlaneaciones, etc.               |
-+-------------------------------------------------------------+
-                            |
-+-------------------------------------------------------------+
-|                     CONTEXT (Model)                          |
-|  React Context providers                                    |
-|  AuthContext, PlaneacionesContext, NotificacionesContext      |
-+-------------------------------------------------------------+
-                            |
-+-------------------------------------------------------------+
-|                     SERVICIOS                                |
-|  apiClient.ts, syncService.ts, syncEngine.ts                |
-|  pushNotificationService.ts                                  |
-+-------------------------------------------------------------+
-                            |
-              +-------------+-------------+
-              |                           |
-+-------------------------+  +-------------------------+
-|   STORAGE LOCAL         |  |   BACKEND REMOTO        |
-|   AsyncStorage          |  |   Vercel Serverless     |
-|   @planearia:*          |  |   /api/planeaciones     |
-|                         |  |   /api/sync             |
-+-------------------------+  +-------------------------+
-                                          |
-                              +-------------------------+
-                              |   MongoDB Atlas M0      |
-                              |   planeariaDB           |
-                              |   Collection:           |
-                              |   - planeaciones        |
-                              +-------------------------+
+```text
+Screen (View)
+  -> hook ViewModel
+    -> Context / Service de dominio
+      -> storage local + src/sync
+        -> apiClient con JWT
+          -> backend/api/index.js
+            -> backend/routes/*
+              -> MongoDB Atlas
 ```
 
----
-
-## Estructura del Proyecto
+## Estructura Principal
 
 ```text
 PlanearIA/
-+-- App.tsx
-+-- README.md
-+-- Documentacion/
-|   +-- README.md
-|   +-- 00-fundamentos/
-|   +-- 01-planes-maestros/
-|   +-- 02-operacion/
-|   +-- 03-validacion/
-|   +-- 04-referencia/
-|   +-- 05-analisis-ia/
-|   +-- 99-archivo/
-+-- backend/
-|   +-- api/
-|   +-- lib/
-+-- context/
-|   +-- planeaciones-ground-truth/
-|   +-- classroom-ground-truth/
-|   +-- referencias-opensource/
-+-- src/
-|   +-- components/
-|   +-- context/
-|   +-- hooks/
-|   +-- navigation/
-|   +-- screens/
-|   +-- services/
-|   +-- sync/
-|   +-- themes/
-|   +-- utils/
-|   +-- __tests__/
-+-- types/
+  App.tsx
+  src/
+    components/
+    context/
+    hooks/
+    navigation/
+    screens/
+    services/
+    sync/
+    themes/
+    utils/
+    __tests__/
+  backend/
+    api/index.js
+    routes/
+    lib/
+    shared/
+  types/
+  Documentacion/
+  context/
+  .github/workflows/
 ```
 
-La documentacion vigente se organiza por carpetas. Los documentos legacy de 2025 viven en `Documentacion/99-archivo/` y no deben guiar implementaciones nuevas.
-```
+## Frontend
 
----
+### Pantallas
 
-## Sistema de Tipos
+Las pantallas viven en `src/screens/`. Deben encargarse de renderizar y delegar logica a hooks/contextos.
 
-### V1 (Legacy - en deprecacion)
+Directorios actuales:
 
-Definidos en `types/planeacion.ts`. Estructura plana con campos basicos:
+- `auth`
+- `classroom`
+- `planeaciones`
+- `contenido`
+- `biblioteca`
+- `grupos`
+- `alumnos`
+- `asistencia`
+- `calificaciones`
+- `tareas`
+- `feed`
+- `social`
+- `chat`
+- `cuenta`
+- `perfil`
+- `plantillas`
+- `notificaciones`
+- `onboarding`
+- `ayuda`
 
-```typescript
-interface Planeacion {
-  id: string;
-  titulo: string;
-  asignatura: string;
-  grado: string;
-  semanas: Semana[];
-  // ...campos simples
-}
-```
+Estos directorios son inventario tecnico, no la arquitectura UX objetivo. El futuro plan UX/UI puede reorganizar la experiencia sin mover todo el codigo de inmediato.
 
-### V2 (Actual - alineado a NEM)
+### ViewModels
 
-Definidos en `types/planeacionV2.ts`. Estructura jerarquica que soporta desde primaria hasta universidad:
+Los hooks en `src/hooks/` encapsulan estado derivado, acciones, validaciones y navegacion de una pantalla o flujo.
 
-```typescript
-interface PlaneacionDocumento {
-  id: string;
-  metadatos: MetadatosPlaneacion;      // Institucion, docente, periodo
-  configuracion: ConfiguracionNivel;    // Nivel educativo y campos
-  contenido: ContenidoPlaneacion;       // Semanas con sesiones y actividades
-  estadoSync: EstadoSincronizacion;     // Control de sync
-}
-```
+### Context
 
-La funcion `migrateV1toV2` en `src/utils/migrateV1toV2.ts` convierte documentos V1 a V2.
+Los providers en `src/context/` sostienen estado compartido: auth, sync, dominios academicos, tema, fuente, daltonismo, etc.
 
-### Plantillas
+### Temas Y Accesibilidad
 
-Definidas en `types/plantillaDocumento.ts`. Representan la estructura NEM escaneada de documentos reales.
+La app ya tiene:
 
----
+- `ThemeContext`
+- `FontSizeContext`
+- `DaltonismoContext`
+- `src/themes/colors.ts`
 
-## Flujo de Datos
-
-### Escritura (optimistic update)
-
-```
-Usuario edita â†’ setState (UI inmediata)
-             â†’ AsyncStorage.setItem (persistencia local)
-             â†’ Cola de sync (operacion pendiente)
-             â†’ [Cuando hay red] POST /api/sync â†’ MongoDB Atlas
-```
-
-### Lectura
-
-```
-App inicia â†’ AsyncStorage.getItem â†’ setState (datos locales)
-          â†’ [Si hay red] GET /api/sync â†’ merge con datos remotos
-```
-
-### Conflictos
-
-Estrategia last-write-wins basada en `fechaModificacion`. El documento mas reciente sobrescribe.
-
----
+El futuro plan UX/UI debe consolidar tokens, no inventar una paleta paralela en cada modulo.
 
 ## Backend
 
-### Endpoints
+El backend usa `backend/api/index.js` como router unico serverless y delega en `backend/routes/`.
 
-| Endpoint | Metodo | Descripcion |
-|----------|--------|-------------|
-| `/api/health` | GET | Health check |
-| `/api/auth` | POST | Login, registro |
-| `/api/planeaciones` | GET/POST/PUT/DELETE | CRUD con userId isolation |
-| `/api/sync` | POST | Sincronizacion batch |
+Reglas:
 
-### Autenticacion
+- Cada ruta academica exige JWT real cuando corresponde.
+- Cada query multiusuario filtra por `userId`.
+- Cada endpoint CRUD crea indices idempotentes.
+- CORS se controla con `ALLOWED_ORIGINS` o defaults seguros en `backend/lib/auth.js`.
+- Auth vive en `backend/routes/auth.js` y helpers en `backend/lib/`.
+- IA vive detras de `backend/lib/aiGateway.js` y `backend/lib/aiUsageLimiter.js`.
 
-```
-Authorization: Bearer <JWT>
-```
+Endpoints relevantes:
 
-El JWT contiene `userId`. El backend decodifica con `getUserFromToken` y filtra todos los queries por `userId`.
+| Dominio | Rutas |
+| --- | --- |
+| Health | `/api/health` |
+| Auth | `/api/auth` |
+| Sync/academico | `/api/grupos`, `/api/unidades`, `/api/alumnos`, `/api/asistencias`, `/api/calificaciones`, `/api/entregables`, `/api/recursos`, `/api/plantillas`, `/api/planeaciones`, `/api/sync` |
+| Social | posts, contactos, mensajes, notificaciones |
+| IA | planeaciones y classroom via gateway |
 
-### Indices MongoDB
+## Auth Y Sesiones
 
-```javascript
-// Planeaciones
-{ userId: 1, fechaModificacion: -1 }
+Estado actual:
 
-// Cada coleccion futura
-{ id: 1 } // unique
-{ userId: 1 } // isolation
-```
+- JWT access token.
+- Refresh token opaco con hash en backend.
+- Sesiones activas y revocacion.
+- SecureStore en nativo.
+- AsyncStorage en web.
+- Modo invitado/dev.
+- Roles base `dev`, `admin`, `docente`, `alumno`.
 
----
+Pendientes del plan activo:
 
-## Estrategia de Refactorizacion
+- Email real.
+- Validacion manual.
+- Datos sociales completos.
+- Namespacing local final donde aplique.
+- Sincronizacion final con GitHub Product OS.
 
-### Enfoque modular
+## Sync Offline-First
 
-Cada modulo de la app recibe su propio plan de refactorizacion. El plan sigue un patron estandarizado de 8 fases:
+La fuente tecnica actual esta en `src/sync/README.md` y `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`.
 
-| Fase | Nombre | Descripcion |
-|------|--------|-------------|
-| 0 | Limpieza Legacy | Eliminar codigo muerto, tipos duplicados, dependencias no usadas |
-| 1 | Tipos y Modelo | Crear tipos V2 alineados al dominio, funciones de migracion |
-| 2 | Capa de Datos | Context provider, sync, backend isolation |
-| 3 | Editor Base | Instalar dependencias de UI (tentap-editor), crear componentes base |
-| 4 | Pantallas | Rediseno completo de screens y ViewModels |
-| 5 | Scanner | Escaner de plantillas/documentos existentes |
-| 6 | IA Copiloto | Integrar asistencia de IA contextual |
-| 7 | Export | Exportacion a PDF/DOCX, navegacion final |
-| 8 | Verificacion | Eliminar codigo viejo, tests end-to-end |
+Resumen:
 
-### Vision
+- `syncEngine.ts`: cola por entidad, locks, reintentos y flush.
+- `entitySync.ts`: registry `SYNC_ENTITIES`, push, pull y reconciliacion.
+- `syncEvents.ts`: eventos para refrescar contextos.
+- `SyncContext.tsx`: orquestador global.
+- `SyncStatusBanner.tsx`: UX de offline/servidor/auth.
 
-Transformar cada modulo de formularios nativos simples a experiencias docentes familiares:
-- Planeaciones como Word/Docs.
-- Grupos, recursos y tareas como Classroom.
-- Diseno didactico como Canva/Genially.
-- Listas y registros como Excel.
-- Comunicacion docente como WhatsApp profesional.
-- IA contextual con validacion humana, fallback local y costos controlados.
+Regla: ningun modulo nuevo con datos academicos sincronizables debe crear su propia cola o cliente HTTP si el motor global cubre el caso.
 
-### Estado actual
+## Storage
 
-El modulo de **Planeaciones** cerro Fase 9 como primera gran refactorizacion. `cerrados/PLAN_PASOS_INICIALES (closed).md` y **Classroom** quedaron cerrados como cimientos funcionales. `cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md` quedo cerrado hasta Fase 7 con entorno local, CI, backend smoke y demo low-cost. `cerrados/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE (closed).md` tambien quedo cerrado para entrega academica: SQLite existe como infraestructura opt-in para datos academicos relacionales y sync queue, mientras AsyncStorage sigue como default productivo y rollback. La sincronizacion quedo unificada en un motor offline-first por entidad con push/pull cross-device, cola idempotente, endurecimiento de backend (JWT y aislamiento por `userId`, `/api/unidades`) y UX de estado de red; ver `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`. Auth/Seguridad esta en ejecucion (Fases 0-6 completadas, 7-8 en cierre).
+| Uso | Decision |
+| --- | --- |
+| Preferencias simples, flags, caches pequenos | AsyncStorage |
+| Tokens nativos | SecureStore |
+| Tokens web | AsyncStorage |
+| Datos academicos actuales | AsyncStorage default + sync |
+| Datos relacionales/pesados futuros | SQLite opt-in mediante ports/repositories |
+| Borrado de claves legacy | Solo con plan, migracion, validacion y rollback |
 
----
+## IA
+
+Toda IA debe:
+
+- Pasar por backend.
+- Tener fallback o error visible.
+- Tener limites de costo/uso.
+- Pedir revision humana antes de guardar cambios importantes.
+- No guardar contenido generado sin confirmacion docente.
+
+## Estado De Planes
+
+- Cerrados: Planeaciones, Classroom, Pasos Iniciales, Infraestructura, SQLite opt-in.
+- Activo/en cierre: Auth, Seguridad y Sesion Real.
+- Siguiente recomendado: UX/UI y Navegacion Global.
 
 ## Convenciones
 
-### Nomenclatura
+- Pantallas: `NombreScreen.tsx`.
+- Hooks: `useNombre.ts`.
+- Contextos: `NombreContext.tsx`.
+- Services: I/O y logica compartida.
+- Tests: `src/__tests__/`.
+- Commits: Conventional Commits cuando aplique.
+- Sin secretos reales en commits.
 
-- Pantallas: `[Nombre]Screen.tsx` (PascalCase)
-- Componentes: `[Nombre].tsx` (PascalCase)
-- Hooks: `use[Nombre].ts` (camelCase)
-- Utilidades: `[nombre].ts` (camelCase)
-- Tipos: `[nombre].ts` (camelCase)
+## Version
 
-### Colores
-
-Definidos en `src/themes/colors.ts`:
-
-```typescript
-COLORS = {
-  primary: '#2196F3',
-  secondary: '#87CEEB',
-  background: '#f8fbff',
-  surface: '#ffffff',
-  error: '#f44336',
-  text: '#1a1a1a',
-  textSecondary: '#6b7280',
-};
-```
-
-### Estilo de escritura
-
-- Sin emojis en codigo, comentarios, commits, ni documentacion
-- Commits en formato Conventional Commits: `type(scope): description`
-- Comentarios explican WHY, no WHAT
-- Ver `.agents/skills/writing-style/SKILL.md`
-
----
-
-**Ultima actualizacion**: Junio 2026
-**Version de Arquitectura**: 4.1
-
+- Ultima actualizacion: 2026-06-17.
+- Version de arquitectura: 4.3.

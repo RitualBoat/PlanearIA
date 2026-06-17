@@ -1,77 +1,130 @@
 # Mapa de Navegacion Actual - PlanearIA
 
-## Fuente real
+Este archivo resume la navegacion real actual. No define la navegacion objetivo.
 
-La fuente tecnica de verdad es `src/navigation/StackNavigator.tsx` y `src/navigation/AppTabsNavigator.tsx`.
+Fuentes de verdad:
 
-Este archivo resume la navegacion vigente para planificacion. No debe inventar rutas que no existan.
+- `src/navigation/AppTabsNavigator.tsx`
+- `src/navigation/StackNavigator.tsx`
 
-## Tabs actuales
+## Tabs Actuales
 
-- Feed: comunidad/feed actual, pendiente de reorientar hacia WhatsApp docente.
-- Contenido: hub transversal para planeaciones, recursos, entregables y plantillas.
-- Classroom/Grupos: entrada al flujo tipo Classroom.
-- Social: contactos y busqueda de perfiles.
-- Configuracion/Cuenta: perfil, roles, accesibilidad, terminos y preferencias.
+| Tab | Ruta | Pantalla | Lectura vigente |
+| --- | --- | --- | --- |
+| Feed | `FeedTab` | `FeedScreen` | Feed/comunidad actual; puede reducirse o reorientarse. |
+| Contenido | `ContenidoTab` | `ContenidoScreen` | Hub transversal; debe evaluarse contra Office/Classroom. |
+| Grupos | `GruposTab` | `ClassroomHomeScreen` | Entrada actual a Classroom. |
+| Social | `SocialTab` | `SocialScreen` | Base para contactos/WhatsApp Docente. |
+| Configuracion | `ConfiguracionTab` | `CuentaScreen` | Cuenta, perfil, sesiones, roles y preferencias. |
 
-La estructura de tabs es provisional. La decision final pertenece al futuro `Plan Maestro: UX/UI y Navegacion Global`.
+La tab bar actual es provisional. El futuro `Plan Maestro: UX/UI y Navegacion Global` puede reemplazarla.
 
-## Flujos principales
+## Stack Principal
 
-### Planeaciones
+### Auth
 
-Entrada principal:
+- `Onboarding`
+- `Login`
+- `Registro`
+- `RecuperarContrasena`
+- `MainTabs`
 
-- `Contenido` -> crear planeacion -> selector de plantillas -> `DocEditor`.
+### Office Docente Actual Parcial
 
-Entradas secundarias:
+Rutas documentales ya existentes:
 
-- Lista de planeaciones.
-- Card/menu contextual de planeacion.
-- Material de Classroom con URL `planeacion://<id>`.
+- `Planeaciones`
+- `CrearPlaneacion`
+- `ImportarPlaneacion`
+- `EscanerPlantilla`
+- `ExportarPlaneacion`
+- `DocEditor`
+- `ListaPlaneaciones`
 
-Regla:
+En la vision nueva, estas rutas son la base documental de Office Docente. La parte tabular tipo Excel aun debe definirse.
 
-- No volver a formularios legacy como flujo principal.
+### Classroom Actual
 
-### Classroom
+Entrada viva:
 
-Entrada principal:
+- `GruposTab` -> `ClassroomHomeScreen` -> `ClassroomGroup`
 
-- Tab Classroom/Grupos -> `ClassroomHomeScreen` -> `ClassroomGroupScreen`.
+Rutas relacionadas:
 
-Dentro de una clase:
+- `ClassroomGroup`
+- `DetalleActividadClassroom`
+- `AgregarContenidoClassroom`
+- `DetalleRecursoClassroom`
+- `CrearGrupo`
+- `ListaGrupos`
+- `ImportarGrupos`
+- `RegistrarAsistencia`
+- `HistorialAsistencia`
+- `CapturarCalificaciones`
+- `PromediosCalificaciones`
+- `CrearAlumno`
+- `ListaAlumnos`
+- `ImportarAlumnos`
+- `ExportarAlumnos`
+- `DetalleAlumno`
+- `NotasAlumno`
+- `ReportesAlumno`
+- `ReportesGrupo`
 
-- `Tablon`: feed/resumen contextual del curso, proximas entregas y actividad reciente.
-- `Trabajo de clase`: secciones/unidades colapsables con materiales y actividades.
-- `Personas`: docentes/alumnos inscritos, importacion/exportacion y detalle de alumno.
-- Materiales: se crean/asignan desde `AgregarContenidoClassroom`, admiten enlaces/archivos multiples y se abren en `DetalleRecursoClassroom`.
-- Actividades: se crean/asignan desde `AgregarContenidoClassroom`, admiten fechas, entrega tardia, notas y calificacion contextual por entregas.
-- Asistencia, reportes y calificaciones: no deben aparecer como modulos sueltos de primer plano; se ubican de forma contextual o quedan para planes especializados.
+Regla: si existe flujo contextual en Classroom, no volver a formularios legacy como experiencia principal.
 
-### Contenido
+### Biblioteca / Plantillas / Contenido
 
-Debe mantenerse como hub transversal, no como competidor de Classroom.
+- `RecursosDidacticos`
+- `ListaRecursos`
+- `CrearRecurso`
+- `BibliotecaPlantillas`
+- `ListaPlantillas`
+- `DetallePlantilla`
+- `EditorPlantilla`
 
-- Si la accion depende de una clase, debe vivir en Classroom.
-- Si la accion es biblioteca/global, puede vivir en Contenido.
+Estas rutas deben revisarse en UX/UI Global. Pueden vivir dentro de Office, Classroom, Canva o biblioteca transversal.
 
-### Cuenta/Auth
+### Social / Chat / Comunidad
 
-Auth actual existe, pero seguridad real se endurecera en el plan de Auth/Seguridad.
+- `PostDetail`
+- `RetoResolucion`
+- `RetoResultado`
+- `QuestionEditor`
+- `BuscadorPerfiles`
+- `Chat`
+- `Conversacion`
 
-## Rutas legacy conocidas
+Base tecnica para WhatsApp Docente y comunidad profesional.
 
-- Detalle legacy de grupo no debe ser flujo principal si existe equivalente Classroom.
-- Crear/editar materiales o actividades desde una clase no debe mandar a formularios legacy si existe pantalla contextual.
-- Pantallas viejas de navegacion 2025 no deben usarse como referencia. Ver `Documentacion/99-archivo/`.
+### Cuenta / Perfil / Soporte
 
-## Checklist de navegacion para cualquier fase
+- `Cuenta`
+- `EditarPerfil`
+- `AdminRoles`
+- `SesionesActivas`
+- `Terminos`
+- `Perfil`
+- `Notificaciones`
+- `Ayuda`
 
-- [ ] Hay entrada clara desde tab/hub/card/FAB.
-- [ ] Hay salida segura: volver, cancelar, guardar o cerrar.
-- [ ] No se pierde contexto del grupo/recurso/planeacion.
-- [ ] No hay doble captura del mismo dato.
-- [ ] No hay botones sin destino.
-- [ ] Web y movil permiten scroll completo.
+## Checklist Para Cualquier Cambio De Navegacion
+
+- [ ] Tiene entrada clara.
+- [ ] Tiene salida segura.
+- [ ] No pierde contexto.
+- [ ] No duplica captura de datos.
+- [ ] No abre rutas legacy si existe ruta moderna.
+- [ ] Funciona en web y movil.
+- [ ] Scroll completo en pantallas largas.
 - [ ] Empty states llevan a la accion correcta.
+- [ ] Acciones cruzadas explican a donde mandan al usuario.
+
+## Nota Para UX/UI Global
+
+La navegacion objetivo debe partir de la vision actual:
+
+- Inicio como sistema operativo docente.
+- Office Docente como workspace de documentos/hojas.
+- Classroom como organizador/asignador.
+- Canva, WhatsApp, Calendario, Reportes y Cuenta como experiencias conectadas.

@@ -78,7 +78,7 @@ PlanearIA es un desarrollo multiplataforma. Puedes acceder a ella a través de l
 
 ###  Acceso Vía Web (Despliegue en Vercel)
 La plataforma está hosteada y operativa directamente desde el navegador. Puedes ingresar, registrarte y sincronizar tus datos accediendo al siguiente enlace:
-👉 https://planearia-web.vercel.app/
+👉 https://planearai.com
 
 ###  Descarga para Android (APK)
 Para la experiencia nativa con soporte completo fuera de línea, puedes instalar la aplicación en tu celular Android.

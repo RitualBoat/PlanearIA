@@ -1,0 +1,19 @@
+# Project-scoped Codex configuration for PlanearIA.
+# Loaded by Codex CLI, the Codex VS Code extension, and the Codex app when this repo is trusted.
+
+project_doc_max_bytes = 65536
+project_doc_fallback_filenames = ["CLAUDE.md", ".github/copilot-instructions.md"]
+
+[features]
+goals = true
+
+[mcp_servers.openaiDeveloperDocs]
+url = "https://developers.openai.com/mcp"
+startup_timeout_sec = 20
+tool_timeout_sec = 60
+
+[mcp_servers.playwright]
+command = "cmd"
+args = ["/c", "npx", "@playwright/mcp@latest"]
+startup_timeout_sec = 30
+tool_timeout_sec = 120

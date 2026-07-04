@@ -48,12 +48,19 @@ devops_config.json
 # GitHub Copilot skills
 skills/
 skills-lock.json
-.agents/
+.agents/*
+.codex/*
 roadmap-context
 stitch-results
 
-# Exception: Claude Code / OpenSpec skills MUST be versioned (they configure the SDD workflow).
-# The generic "skills/" pattern above also matched .claude/skills/, so re-include it here.
+# Exceptions: shared agent workflows MUST be versioned because they configure the SDD workflow.
+# The generic "skills/" pattern above also matches nested tool skill folders, so re-include the
+# project-owned ones explicitly.
+!.agents/skills/
+!.agents/skills/**
+!.codex/config.toml
+!.codex/skills/
+!.codex/skills/**
 !.claude/skills/
 !.claude/skills/**
 

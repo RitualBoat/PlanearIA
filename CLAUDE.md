@@ -57,7 +57,8 @@ Read before significant work:
 - `Documentacion/00-fundamentos/MAPA_MODULOS_ACTUALES.md`
 - `Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md`
 - `Documentacion/01-planes-maestros/meta_guia_planes.md`
-- `Documentacion/prompt_mejorado.md` for the UX/UI Claude audit.
+- `Documentacion/00-fundamentos/IHC_DISCOVERY_DOCENTE.md` for personas, journeys, interview guide and the Nielsen gate.
+- `Documentacion/01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md` for the active UX/UI plan (blueprint + change backlog).
 
 ## Project Structure
 
@@ -99,10 +100,11 @@ Closed plan docs live in `Documentacion/01-planes-maestros/cerrados/`.
 
 ## Active And Pending
 
+- Active: `Plan Maestro: UX/UI y Navegacion Global` (`Documentacion/01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md`), SDD format: blueprint + change backlog in waves. Pilot change: `theming-runtime` (Ola 0).
 - Active/closing: `Auth, Seguridad y Sesion Real`.
 - Done: global offline-first sync engine in `src/sync`.
-- Next recommended new plan: `Plan Maestro: UX/UI y Navegacion Global`.
-- Future plans depend on UX/UI Global: Office Docente, Asistente IA, Classroom redesign/integration, Cuenta/Accesibilidad, Calendario, WhatsApp Docente, Canva, Reportes.
+- Former "future plans" (Office Docente, Asistente IA, Classroom redesign, Cuenta/Accesibilidad, Calendario, WhatsApp Docente, Canva, Reportes) are now change groups inside the UX/UI plan backlog, not separate plan documents.
+- Suite naming (confirmed 2026-07): NotasPLAN (docs), CalcuPLAN (sheets), PresentaPLAN (slides), DiseñaPLAN (creative), AsistePLAN (AI chat), ConectaPLAN (messaging), Escritorio Docente (home/launcher).
 
 ## Testing Rules
 
@@ -133,16 +135,42 @@ On Windows, if Jest path resolution needs it, add:
 
 ## Working With Plans
 
+Master plans follow `Documentacion/01-planes-maestros/meta_guia_planes.md` v3 (SDD format):
+a plan is a Blueprint + a backlog of OpenSpec changes in waves. Plans do NOT contain sequential
+technical task phases; `/opsx:propose` generates each change's specs and `tasks.md`.
+
 When asked to work on a plan:
 
-1. Read `Documentacion/README.md`.
-2. Read the active plan.
-3. Find next pending `[ ]` task.
-4. Implement.
-5. Validate.
-6. Mark as `[x]` only with evidence.
+1. Read `Documentacion/README.md` and the active plan.
+2. Pick the next `pendiente` change in the active wave whose dependencies are archived.
+3. Run the SDD cycle for that change (see OpenSpec section below and meta guia v3 section 2).
+4. On archive, mark the change `archivado` in the plan's backlog and sync GitHub Project.
 
-Task states: `[ ]` pending, `[~]` in progress, `[x]` completed.
+Task states `[ ]` / `[~]` / `[x]` still apply inside each change's `tasks.md` and in legacy plans
+(e.g. Auth). `[x]` only with evidence (typecheck, lint, affected tests; visual validation for UI).
+
+## OpenSpec (Spec Driven Development)
+
+PlanearIA uses OpenSpec for product-facing changes. Config: `openspec/config.yaml`
+(project context and rules live there; keep it in sync with this file and `Documentacion/`).
+
+Workflow (Claude Code slash commands, `opsx` prefix):
+
+1. `/enrich-us <issue-o-idea>` (optional): turn a vague idea or GitHub issue into an
+   implementation-ready story. GitHub issues via `gh`/GitHub MCP, never Jira.
+2. `/opsx:explore`: investigate before proposing when scope is unclear.
+3. `/opsx:propose "<idea>"`: create the change (proposal, specs, design, tasks) in `openspec/changes/`.
+4. `/opsx:apply`: implement tasks one at a time; mark `[x]` only with typecheck/lint/test evidence.
+5. `/adversarial-review`: independent red-team pass before archiving (ideally a fresh session).
+6. `/opsx:archive`: move the completed change's specs into `openspec/specs/` as permanent truth.
+
+Rules:
+
+- Specs in `openspec/specs/` are the source of truth for system behavior; update them via archive, not by hand.
+- Changes in progress live in `openspec/changes/`. Do not implement product changes without a proposal for non-trivial work.
+- `openspec/config.yaml` context points at `Documentacion/00-fundamentos/*` and `.claude/rules/*`. All OpenSpec artifacts must respect those and the Architecture Rules above.
+- This project does NOT use symlinked skills (Windows). Skills are real files under `.claude/skills/`.
+- Reference/study material for the SDD setup lives in `context/OpenSpec/` (lidr-specboot template + screenshots); it is not the active config.
 
 ## Ground Truth
 

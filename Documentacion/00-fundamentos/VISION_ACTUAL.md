@@ -42,7 +42,7 @@ El resultado ideal es un flujo rapidisimo: crear, detectar, sugerir, asignar y d
 
 PlanearIA no debe parecer una app educativa rara que obliga al docente a aprender otra forma de trabajar. Debe sentirse como:
 
-- Office para documentos y hojas.
+- Office para documentos, hojas y presentaciones.
 - Classroom para clases, alumnos, materiales y tareas.
 - Canva/Genially para recursos visuales.
 - WhatsApp para comunicacion docente.
@@ -50,6 +50,18 @@ PlanearIA no debe parecer una app educativa rara que obliga al docente a aprende
 - Un dashboard personal para calendario, pendientes y seguimiento.
 
 La innovacion real esta en la conexion entre herramientas, no en inventar controles extranos.
+
+Decision 2026-07 (auditoria UX/UI): las herramientas de creacion tienen nombre propio para reforzar la
+familiaridad. **NotasPLAN** es el editor de documentos (Word/Docs), **CalcuPLAN** el de hojas de calculo
+(Excel/Sheets), **PresentaPLAN** el de presentaciones (PowerPoint/Slides) y **DiseñaPLAN** el editor
+creativo (Canva/Genially). El mensaje de producto es: "Vas a seguir trabajando igual, con las herramientas
+que ya conoces, pero conectadas y sin archivos perdidos". Ese mensaje vive en onboarding, empty states y
+landing; el uso diario no se satura con discurso.
+
+Regla de creacion (tipo-primero, intencion-despues): el boton "Crear" ofrece tipos de archivo
+(documento, hoja de calculo, presentacion, diseno, preguntar a la IA), no una lista de tareas escolares.
+Ya dentro del editor, la IA silenciosa puede preguntar con un chip descartable si se esta creando una
+planeacion, examen, trabajo o reporte, y ofrecer plantilla o ayuda. Nunca un modal que bloquee.
 
 ### 2. IA Silenciosa Y Chat Explicito
 
@@ -117,9 +129,15 @@ La pregunta clave para cada pantalla es:
 
 ---
 
-## Experiencia 1: Inicio / Sistema Operativo Docente
+## Experiencia 1: Inicio / Escritorio Docente
 
 El inicio debe ser el centro de trabajo diario del profesor.
+
+Decision 2026-07: el Inicio es un **escritorio con dock de herramientas**. Una fila superior fija muestra
+las herramientas de la suite (NotasPLAN, CalcuPLAN, PresentaPLAN, DiseñaPLAN, Asistente, Clases) como
+tiles reconocibles de un toque, igual que abrir Word/Excel/PowerPoint/ChatGPT desde un menu. Debajo vive
+el tablero accionable del dia. Asi el Inicio cumple dos trabajos: lanzador ("aqui estan todas mis
+herramientas") y tablero ("se que hacer ahora"). Reemplaza al feed como ruta inicial de la app.
 
 Debe responder rapido:
 
@@ -193,9 +211,10 @@ Reglas:
 
 ---
 
-## Experiencia 3: Office Docente (Word + Excel)
+## Experiencia 3: Office Docente (NotasPLAN + CalcuPLAN + PresentaPLAN)
 
-La experiencia Office unifica el trabajo documental y tabular del docente.
+La experiencia Office unifica el trabajo documental, tabular y de presentaciones del docente, con
+editores nombrados: NotasPLAN (Word/Docs), CalcuPLAN (Excel/Sheets) y PresentaPLAN (PowerPoint/Slides).
 
 Incluye:
 
@@ -285,9 +304,15 @@ Pero Classroom debe poder recibir y usar todo eso sin friccion.
 
 ---
 
-## Experiencia 5: Canva / Genially Docente
+## Experiencia 5: DiseñaPLAN (Canva / Genially Docente)
 
 Esta experiencia permite crear recursos visuales sin salir de PlanearIA.
+
+Frontera con PresentaPLAN (decision 2026-07): PresentaPLAN es para diapositivas lineales, texto-primero,
+rapidas de armar y exportables a PPTX/PDF ("las laminas de mi clase de manana"). DiseñaPLAN es el lienzo
+visual con plantillas ricas para infografias, materiales interactivos e imprimibles ("algo visualmente
+atractivo"). Ambos pueden producir presentaciones, pero resuelven intenciones distintas y no deben
+fusionarse ni duplicarse.
 
 Debe servir para:
 
@@ -312,9 +337,14 @@ La ventaja no es solo crear disenos. La ventaja es evitar el flujo externo de cr
 
 ---
 
-## Experiencia 6: WhatsApp Docente / Comunidad Profesional
+## Experiencia 6: ConectaPLAN (WhatsApp Docente / Comunidad Profesional)
 
 La comunicacion debe sentirse como WhatsApp profesional, no como red social pesada.
+
+Decision 2026-07: Feed y Social se funden en esta unica experiencia, disenada desde cero. Las pantallas
+legacy de feed/posts/retos sirven solo como inventario tecnico, no como referencia de diseno. El feed
+publico deja de ser la entrada de la app; una comunidad/muro puede reevaluarse en el futuro como
+superficie secundaria.
 
 Debe permitir:
 

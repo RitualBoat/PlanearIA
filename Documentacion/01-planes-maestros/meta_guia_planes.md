@@ -1,288 +1,207 @@
-# Meta Guia de Planes Arquitectonicos - PlanearIA
+# Meta Guia de Planes Maestros - PlanearIA (v3, SDD con OpenSpec)
 
-> **Proposito:** esta guia define el estandar obligatorio para crear futuros planes maestros de refactorizacion o construccion de modulos en PlanearIA.
-> **Uso previsto:** entregar este archivo a futuras IAs antes de pedirles un plan de modulo.
-> **Regla central:** no generar planes superficiales. Cada plan debe partir del estado real del repo, del flujo docente real, del presupuesto disponible y de la arquitectura objetivo de PlanearIA.
-
----
-
-## 1. Contexto Real de PlanearIA
-
-PlanearIA es una plataforma integral para docentes, construida principalmente por un solo estudiante. Esto cambia las decisiones tecnicas:
-
-- Se debe priorizar una ruta profesional pero alcanzable.
-- Se debe cuidar el costo mensual.
-- Se deben favorecer servicios con free tier, self-hosting local o despliegues simples.
-- Se debe evitar infraestructura empresarial innecesaria antes de validar la app.
-- Se debe documentar claramente cuando una opcion requiere pago, cuenta externa, dominio, tarjeta, build service o mantenimiento continuo.
-- Se debe preferir una arquitectura que pueda lanzarse al final de una materia sin sacrificar calidad basica.
-
-El desarrollador cuenta con una laptop potente:
-
-- Ryzen 7 7735h.
-- RTX 4060 8GB VRAM GDDR6.
-- 64 GB RAM DDR5 4800MHZ.
-
-Por lo tanto, futuros planes de infraestructura deben considerar tambien:
-
-- Backend local para desarrollo.
-- Docker local si aporta valor real.
-- Servidor local temporal para demos.
-- Procesos batch locales para IA, conversion de documentos o pruebas.
-- Alternativas self-hosted cuando reduzcan costo sin romper la experiencia.
-
-Antes de decidir infraestructura de produccion, la IA futura debe preguntar explicitamente que camino se desea:
-
-- Free tier cloud simple.
-- Backend local/self-hosted.
-- VPS economico.
-- Vercel/Serverless.
-- Docker.
-- FastAPI/Node.
-- Hibrido.
+> **Proposito:** esta guia define el estandar obligatorio para crear y ejecutar planes maestros en PlanearIA.
+> **Cambio central de la v3:** los planes maestros ya NO son documentos con fases y tareas tecnicas secuenciales.
+> Ahora un plan maestro es **Blueprint + Backlog de changes OpenSpec**. Las historias/features del backlog se
+> "destripan" en specs y tareas tecnicas mediante el flujo SDD (`/opsx:propose`), una a la vez, con evidencia.
+> **Version anterior:** `Documentacion/99-archivo/meta_guia_planes_v2_pre-sdd_2026-07.md` (referencia historica;
+> sus reglas valiosas fueron migradas aqui, a `openspec/config.yaml` y a `.claude/rules/`).
 
 ---
 
-## 2. Stack y Arquitectura Base
+## 0. Que Cambio y Que No Cambio
 
-Todo plan futuro debe asumir este punto de partida, salvo que el codigo demuestre que cambio:
+**Cambio:**
 
-- Frontend: React Native 0.81.5 + Expo 54.
-- Web: react-native-web.
-- UI multiplataforma: una pantalla madre responsiva/adaptativa por defecto, mobile-first, con `react-native-web` y breakpoints compartidos.
-- Lenguaje: TypeScript 5.9.
-- Navegacion: React Navigation 7.
-- Estado: React Context + hooks ViewModel.
-- Arquitectura objetivo: MVVM.
-- Persistencia local actual: AsyncStorage.
-- Persistencia local objetivo para datos relacionales/pesados: SQLite/Expo SQLite o una capa equivalente evaluada en el plan de infraestructura/storage.
-- Sync: motor offline-first global en `src/sync/`, con cola por entidad, `entitySync.ts`, `syncEngine.ts`, `syncEvents.ts`, `SyncContext`, push/pull autoritativo, eventos de refresco y UX de red/sync.
-- Backend actual: funciones Node/serverless con router unico en `backend/api/index.js` y handlers en `backend/routes/`.
-- Base remota actual: MongoDB Atlas.
-- Auth actual: `AuthContext`, backend `auth.js`, JWT/API secret en evolucion.
-- IA actual: gateway multi-provider OpenAI-compatible en `backend/lib/aiGateway.js`, limiter en `backend/lib/aiUsageLimiter.js`, endpoints en `backend/api/planeaciones/*` y `backend/api/classroom/copiloto.js`. La vision futura agrega Asistente IA / ChatGPT Docente con adjuntos y proveedores custom/locales como LM Studio via `AI_GATEWAY_PROVIDERS`.
-- Testing: Jest + Testing Library React Native.
+- Un plan maestro ya no lista fases `FASE 0..N` con checkboxes de implementacion.
+- Cada unidad de trabajo es un **change de OpenSpec**: una feature/historia en lenguaje docente que el flujo
+  SDD convierte en `proposal.md` + `specs/` (requirements con escenarios WHEN/THEN) + `design.md` + `tasks.md`.
+- Las tareas tecnicas pequenas viven en el `tasks.md` de cada change (las genera `/opsx:propose`), no en el plan.
+- Al archivar un change, sus specs se acumulan en `openspec/specs/` como **verdad permanente** del comportamiento
+  del sistema. El plan maestro solo marca el change como archivado.
 
-Regla: la documentacion puede estar desfasada. La fuente de verdad para planear es el codigo actual, especialmente:
+**No cambio:**
 
-- `src/navigation/StackNavigator.tsx`.
-- `src/navigation/AppTabsNavigator.tsx`.
-- `src/context/`.
-- `src/hooks/`.
-- `src/services/`.
-- `src/sync/`.
-- `src/sync/services/entitySync.ts`.
-- `src/sync/services/syncEngine.ts`.
-- `src/sync/services/syncEvents.ts`.
-- `src/context/SyncContext.tsx`.
-- `src/screens/`.
-- `backend/api/`.
-- `backend/routes/`.
-- `Documentacion/02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md`.
-- `types/`.
-- `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md`.
-- `Documentacion/01-planes-maestros/cerrados/PLAN_CLASSROOM (closed).md`.
-- `Documentacion/01-planes-maestros/cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md`.
+- Las reglas de arquitectura (MVVM, `src/sync`, `userId`, IA via gateway, offline-first, presupuesto bajo).
+  Viven en `CLAUDE.md`, `openspec/config.yaml` (bloque `context` + `rules`) y `.claude/rules/`.
+- El contrato de ground truth y niveles de paridad (seccion 4).
+- GitHub Projects como tablero operativo y Actions como evidencia (seccion 6).
+- La regla de evidencia: nada se marca completo sin typecheck/lint/tests, y la UI de alta paridad
+  exige ademas validacion visual manual.
+- El contexto real: desarrollador solo, estudiante, presupuesto cero/bajo, laptop potente
+  (Ryzen 7 7735H, RTX 4060 8GB, 64GB RAM) que permite backend local, LLM local via LM Studio
+  (solo detras del gateway y solo si el backend lo alcanza) y procesos batch locales.
 
 ---
 
-## 3. Estado Actual Detectado de Modulos
+## 1. Anatomia de un Plan Maestro (formato SDD)
 
-Esta seccion es un **snapshot operativo**, no un plan de refactorizacion. Su objetivo es que una IA nueva entienda rapidamente que existe, que ya quedo cerrado, que esta activo y que debe revisarse antes de proponer cambios.
+Todo plan maestro nuevo se guarda en `Documentacion/01-planes-maestros/` y tiene tres partes:
 
-Regla de lectura: si este snapshot contradice el codigo, gana el codigo. Antes de planear o ejecutar, verificar con `rg`, `git status`, tests y los archivos reales del modulo.
+1. **Blueprint.** La vision y las decisiones estables: objetivo, arquitectura de experiencia, decisiones
+   tecnicas/UX tomadas, nivel de paridad, ground truth, riesgos y anti-patrones. Es referencia, no checklist.
+   Se construye de forma iterativa con el desarrollador (encuadre -> vision -> arquitectura -> backlog),
+   pidiendo aprobacion por bloques; no se entrega de golpe.
+2. **Backlog de changes por olas.** La cola ordenada de features. Cada entrada usa la plantilla de la
+   seccion 10.2: historia en lenguaje docente, criterio de aceptacion, ground truth requerido, dependencias
+   y estado. Las olas agrupan changes que conviene ejecutar juntos (fundaciones -> shell -> experiencias).
+3. **Registro de decisiones y open questions.** Que se decidio, que quedo abierto, que requiere luz verde.
 
-### 3.1 Resumen Ejecutivo de Estado
+Estados de un change en el backlog:
 
-| Dominio | Estado vigente | Plan/decision relacionada | Lectura minima antes de tocar |
-| --- | --- | --- | --- |
-| Office Docente / Planeaciones / Hojas | Planeaciones esta cerrado como base documental; hojas/listas aun no tienen experiencia madre completa. | La vision nueva une Word + Excel en Office Docente. No reabrir planeaciones salvo bug o decision explicita, pero si puede redisenarse visualmente en UX/UI Global. | `Documentacion/00-fundamentos/VISION_ACTUAL.md`, `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md`, `src/screens/planeaciones/`, `types/planeacionV2.ts`. |
-| Classroom / Grupos | Cerrado como experiencia tipo Classroom/Classroomio. | Issue #8 cerrado; usar como base para asignar objetos creados en Office/Canva/WhatsApp y para reportes/calificacion avanzada. | `Documentacion/01-planes-maestros/cerrados/PLAN_CLASSROOM (closed).md`, `src/screens/classroom/`, `context/classroom-ground-truth/`. |
-| Infraestructura / CI / Deploy | Cerrado. Fases 0 a 7 completadas. | Ver `cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md`. | `.github/workflows/ci.yml`, `package.json`, `backend/package.json`, `Documentacion/02-operacion/ENTORNO_LOCAL.md`. |
-| Contenido / Hub de Recursos | Hub transversal para planeaciones, recursos, entregables y plantillas. | No debe competir con Classroom ni duplicar flujos contextuales. | `src/screens/contenido/ContenidoScreen.tsx`, `src/hooks/useContenidoViewModel.ts`. |
-| Recursos Didacticos / Biblioteca | CRUD/lista de recursos existe y se conecta con contenido/grupos. | Futuro plan Canva/Genially o Recursos Didacticos. | `src/screens/biblioteca/`, `src/context/RecursosContext.tsx`, `backend/api/recursos.js`. |
-| Recursos Evaluables / Tareas / Entregables | Existen tareas, entregas y calificacion. | Futuro plan de evaluables/calificacion avanzada. | `src/screens/grupos/tareas/`, `src/screens/tareas/`, `src/context/EntregablesContext.tsx`. |
-| Alumnos | CRUD, detalle, notas, import/export y reportes. | Debe seguir conectado a Classroom y a Office Docente tabular. | `src/screens/alumnos/`, `src/context/AlumnosContext.tsx`. |
-| Asistencia y Calificaciones | Existen flujos basicos por grupo/alumno. | Reubicar con cuidado; no crear modulos sueltos sin contexto. | `src/screens/asistencia/`, `src/screens/calificaciones/`, contexts respectivos. |
-| Plantillas | Hay plantillas legacy/generales y `PlantillaDocumento` para planeaciones. | Futuro plan debe decidir integrar, migrar o separar. | `src/screens/plantillas/`, `src/context/PlantillasContext.tsx`, `types/plantillaDocumento.ts`. |
-| Feed / Social / Chat | Existen feed, contactos y mensajeria. | Futuro enfoque: WhatsApp docente/comunidad con bajo ruido. | `src/screens/feed/`, `src/screens/social/`, `src/screens/chat/`. |
-| Notificaciones | Contexto, pantalla y servicio push existen. | Expo Go limita push; dev build puede ser necesario. | `src/context/NotificacionesContext.tsx`, `src/services/pushNotificationService.ts`. |
-| Cuenta / Perfil / Accesibilidad | Perfil, roles, terminos, tema, fuente y daltonismo existen. | UX/UI global y Auth deben respetar estos providers. | `src/screens/cuenta/`, `src/screens/perfil/`, `src/context/ThemeContext.tsx`. |
-| Auth / Seguridad | Login, registro, recuperar contrasena, JWT/API secret en evolucion. | Futuro plan obligatorio antes de beta real. | `src/screens/auth/`, `src/context/AuthContext.tsx`, `backend/api/auth.js`, `backend/lib/auth.js`. |
-| Onboarding / Ayuda | Existen pantallas base. | Actualizar cuando cambien flujos principales. | `src/screens/onboarding/`, `src/screens/ayuda/`. |
+- `pendiente`: solo existe la historia en el plan.
+- `en curso`: existe en `openspec/changes/<nombre>/` (ya paso por propose).
+- `archivado`: vive en `openspec/changes/archive/` y sus specs en `openspec/specs/`.
 
-### 3.2 Reglas Transversales Vigentes
-
-- **Office Docente une Word + Excel.** Documentos, planeaciones, hojas, listas, rubricas, asistencia y calificaciones tabulares deben pensarse como una suite escolar, no como modulos separados por defecto.
-- **Classroom organiza y asigna; no crea todo.** La clase puede subir archivos simples, enlaces y actividades ligeras. La creacion profunda debe vivir en experiencias especializadas: Office Docente, Canva/Genially, WhatsApp Docente o evaluables.
-- **Calificar requiere contexto.** No crear pantallas de calificacion sueltas si no existe actividad asignada, entrega real y alumno asociado.
-- **Contenido es hub, no competidor.** Si una accion depende de una clase, debe vivir en Classroom. Si es biblioteca/global, puede vivir en Contenido.
-- **Legacy no debe ser entrada principal.** Si existe pantalla moderna equivalente, las rutas viejas quedan como respaldo temporal, redireccion o deuda explicitamente documentada.
-- **Offline-first desde el diseno.** AsyncStorage es la implementacion actual; SQLite/Expo SQLite es destino preferente para datos relacionales/pesados cuando se ejecute el plan de storage.
-- **Sync global, no sync por modulo.** Todo modulo nuevo con datos academicos sincronizables debe integrarse al motor global en `src/sync/`: registrar la entidad en `SYNC_ENTITIES` o crear una `registerSyncTask` justificada, usar `queueEntityOperation`/`syncEntity`/`syncAllEntities`, emitir/escuchar `syncEvents` para refresco y respetar `canSyncRemotely()` para invitado/dev-local. No crear clientes HTTP ad hoc ni flush/pull propios salvo excepcion documentada.
-- **Backend academico aislado por JWT.** Las rutas sincronizables deben exigir token real, filtrar por `userId`, ser idempotentes para reintentos offline (create/update como upsert cuando aplique, delete tolerante) y no depender de modo legacy solo `X-API-Key`. Desde 2026-06-15 `backend/lib/auth.js` `validateAuth` autoriza con un JWT valido aunque la `X-API-Key` falte o no coincida (evita que un `EXPO_PUBLIC_API_SECRET` desalineado bloquee en silencio la sync); todo dominio nuevo del frontend debe agregarse a `ALLOWED_ORIGINS`/CORS o el login falla con "No se pudo conectar al servidor".
-- **Pull autoritativo sin perder trabajo offline.** Un pull exitoso puede reescribir storage local solo despues de reconciliar operaciones pendientes; un pull fallido nunca debe tocar datos locales. Los deletes pendientes no deben resucitar documentos al reconciliar.
-- **Web/tablet/movil se unifican por defecto.** Cada pantalla nueva o refactorizada debe partir de una sola pantalla madre React Native/Expo, con layout responsivo/adaptativo mobile-first, ViewModel/logica compartida y estilos controlados por breakpoints. Evitar duplicar pantallas en `Screen.web.tsx` y `Screen.native.tsx` salvo excepcion justificada.
-- **Excepciones por plataforma solo para interacciones realmente distintas.** Se permite separar `.web.tsx`, `.native.tsx`, `.ios.tsx` o `.android.tsx` cuando el modulo lo exige por experiencia y rendimiento, por ejemplo Canva/Genially, Office Docente avanzado, grids tabulares, teclado, mouse, canvas, gestos o atajos imposibles de mantener limpiamente en una sola pantalla. El plan debe justificar la separacion, mantener ViewModel/tipos/contratos compartidos y definir validacion para cada variante.
-- **GitHub Project acompana la ejecucion.** Plan markdown = arquitectura y decisiones; Project = estado operativo; Actions = evidencia automatica.
-- **Ground truth manda en experiencias madre.** Para Office Docente, Asistente IA, Classroom, Canva/Genially o WhatsApp, no basta escribir "tipo X"; cada fase debe citar capturas/referencias concretas.
-
-### 3.3 Fichas Rapidas por Dominio
-
-#### Office Docente / Planeaciones / Hojas
-
-- Estado: planeaciones cerrado funcionalmente; hojas/listas pendientes como subexperiencia Office.
-- Clave: `PlaneacionV2`, `PlantillaDocumento`, `DocEditor`, escaner/import/export, IA, tablas, listas, asistencia/calificaciones tabulares y asignacion inteligente a Classroom.
-- Archivos: `src/screens/planeaciones/`, `src/hooks/useCrearPlaneacionViewModel.ts`, `src/hooks/useDocEditorViewModel.ts`, `src/context/PlaneacionesContext.tsx`, `backend/api/planeaciones*`, `types/planeacionV2.ts`.
-
-#### Classroom / Grupos / Alumnos
-
-- Estado: cerrado como flujo principal de clases.
-- Clave: `Tablon`, `Trabajo de clase`, `Personas`, unidades/secciones, materiales, actividades y detalle contextual.
-- Archivos: `src/screens/classroom/`, `src/screens/grupos/`, `src/screens/alumnos/`, `src/services/classroom/`, `src/context/GruposContext.tsx`, `src/context/AlumnosContext.tsx`.
-
-#### Recursos Didacticos y Evaluables
-
-- Estado: funcional parcial; requiere planes propios si se profesionaliza.
-- Clave: biblioteca global, recursos asignados, tareas, entregables, calificacion y futuras rubricas/proyectos/examenes.
-- Archivos: `src/screens/biblioteca/`, `src/screens/grupos/tareas/`, `src/screens/tareas/`, `src/context/RecursosContext.tsx`, `src/context/EntregablesContext.tsx`, `backend/api/recursos.js`, `backend/api/entregables.js`.
-
-#### Asistencia, Calificaciones y Reportes
-
-- Estado: existen flujos basicos, pero deben integrarse con actividades, alumnos, grupos y Office Docente sin sentirse aislados.
-- Clave: no duplicar calificacion fuera de entregas o de una hoja/lista con proposito claro; reportes deben esperar datos reales suficientes.
-- Archivos: `src/screens/asistencia/`, `src/screens/calificaciones/`, `src/services/promediosService.ts`, reportes de grupo/alumno.
-
-#### Plantillas
-
-- Estado: hay plantillas legacy/generales y plantillas documento de planeaciones.
-- Clave: futuro plan debe decidir si se integran, migran, separan o reemplazan.
-- Archivos: `src/screens/plantillas/`, `src/context/PlantillasContext.tsx`, `backend/api/plantillas.js`, `types/plantillaDocumento.ts`.
-
-#### Feed, Social, Contactos y Chat
-
-- Estado: existen feed, posts, contactos, invitaciones, lista de chats y conversacion.
-- Clave: futuro rumbo recomendado es mensajeria docente tipo WhatsApp profesional, no red social pesada sin proposito claro.
-- Archivos: `src/screens/feed/`, `src/screens/social/`, `src/screens/chat/`, `src/context/PostsContext.tsx`, `src/context/ContactosContext.tsx`, `src/context/MensajesContext.tsx`, `backend/api/posts.js`, `backend/api/contactos.js`, `backend/api/mensajes.js`.
-
-#### Notificaciones
-
-- Estado: contexto, pantalla y push service existen.
-- Clave: Expo Go ya no cubre todos los casos de push; planes futuros deben contemplar dev build/EAS si se requiere push real.
-- Archivos: `src/screens/notificaciones/`, `src/context/NotificacionesContext.tsx`, `src/services/pushNotificationService.ts`, `backend/api/notificaciones.js`.
-
-#### Cuenta, Perfil, Configuracion y Accesibilidad
-
-- Estado: perfil/cuenta/roles/terminos y providers visuales existen.
-- Clave: cualquier redisenio global debe preservar `ThemeContext`, `FontSizeContext` y `DaltonismoContext`.
-- Archivos: `src/screens/cuenta/`, `src/screens/perfil/`, `src/context/ThemeContext.tsx`, `src/context/FontSizeContext.tsx`, `src/context/DaltonismoContext.tsx`.
-
-#### Auth / Seguridad
-
-- Estado: existe auth funcional basica; seguridad robusta pendiente.
-- Clave: futuro plan debe cubrir RBAC `Dev/Admin/Docente/Alumno`, JWT, bcrypt, rate limiting, CORS/Helmet, secretos y aislamiento por `userId`.
-- Archivos: `src/screens/auth/`, `src/context/AuthContext.tsx`, `backend/api/auth.js`, `backend/lib/auth.js`.
-
-#### Infraestructura, Sync y Backend
-
-- Estado: infraestructura base cerrada; sync/offline evoluciono a motor global cross-device por entidad.
-- Clave: no microservicios; mantener monolito modular, CI/CD barato, env vars seguras, backend local/cloud low-cost, backend academico aislado por JWT y preparacion SQLite opt-in sin romper AsyncStorage default.
-- Archivos: `.github/workflows/ci.yml`, `.github/workflows/cd.yml`, `backend/api/index.js`, `backend/routes/`, `backend/lib/`, `src/context/SyncContext.tsx`, `src/components/SyncStatusBanner.tsx`, `src/sync/`, `src/sync/services/entitySync.ts`, `src/sync/services/syncEngine.ts`, `src/sync/services/syncEvents.ts`, `src/sync/config/apiConfig.ts`, `Documentacion/02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md`, `Documentacion/01-planes-maestros/cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md`.
-
-### 3.4 Cuando Activar un Plan Nuevo
-
-- Activar **Infraestructura** si se van a cambiar scripts, CI, backend, variables, deploy, demo o SQLite.
-- Activar **Auth/Seguridad** antes de beta, usuarios reales, datos sensibles o roles reales.
-- Activar **UX/UI Global** cuando los flujos principales existan y el problema sea navegacion, consistencia, accesibilidad, blueprint de experiencias o pulido final.
-- Activar **Office Docente** cuando se necesite redisenar documentos + hojas/listas como una suite conectada a Classroom.
-- Activar **Canva/Genially** cuando se requiera creacion visual compleja de recursos didacticos.
-- Activar **WhatsApp Docente** cuando chat/contactos deban reemplazar la red social pesada.
-- Activar **Reportes/Gamificacion** cuando haya datos suficientes de Classroom, evaluables, asistencia y calificaciones.
+Regla: **no implementar cambios de producto no triviales sin un change propuesto.** El plan maestro es el mapa;
+el change es la unidad ejecutable.
 
 ---
 
-## 4. Rol de la IA que Genere Planes
+## 2. El Ciclo SDD por Change (guia operativa para el desarrollador)
 
-Toda IA que use esta guia debe actuar como:
+Este es el flujo completo para ejecutar UNA entrada del backlog. Los comandos son slash commands de Claude Code.
 
-- Arquitecto de software senior.
-- Product designer orientado a docentes.
-- Lead engineer de React Native, Expo y TypeScript.
-- Auditor de legacy.
-- Arquitecto offline-first.
-- Lead prompt engineer para IA pedagogica.
-- Consejero pragmatico de infraestructura de bajo costo.
+### Paso 0 — Elegir el change
 
-La IA no debe generar el plan de un modulo sin revisar antes el estado actual del codigo.
+Toma la siguiente entrada `pendiente` de la ola activa cuyo `Depende de:` ya este archivado.
+No abras dos changes grandes a la vez.
 
----
+### Paso 1 — (Opcional) Crear el issue en GitHub
 
-## 5. Procedimiento Obligatorio Antes de Escribir un Plan
+Si quieres tracking operativo desde el inicio:
 
-Antes de redactar cualquier plan futuro, la IA debe:
-
-- Leer `README.md`.
-- Leer `Documentacion/README.md`.
-- Leer `Documentacion/00-fundamentos/ARQUITECTURA.md`.
-- Leer `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`.
-- Leer `Documentacion/02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md` si el plan toca datos locales, backend academico, multiusuario, sync, offline, Classroom, alumnos, recursos, plantillas, entregables, asistencia, calificaciones o planeaciones.
-- Leer `Documentacion/01-planes-maestros/meta_guia_planes.md`.
-- Leer `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md` como ejemplo de calidad y tracking.
-- Revisar `src/navigation/StackNavigator.tsx`.
-- Revisar `src/navigation/AppTabsNavigator.tsx`.
-- Revisar carpetas del modulo objetivo en `src/screens`, `src/hooks`, `src/context`, `src/services`, `types` y `backend/api`.
-- Revisar `src/sync/`, especialmente `services/entitySync.ts`, `services/syncEngine.ts`, `services/syncEvents.ts`, `config/apiConfig.ts` y `src/context/SyncContext.tsx` cuando el modulo persista o sincronice datos.
-- Revisar tests existentes del modulo.
-- Revisar si hay datos reales o ejemplos en `context/`.
-- Ejecutar busquedas con `rg` para detectar rutas legacy, nombres duplicados y dependencias cruzadas.
-- Verificar si la documentacion esta desfasada contra el codigo.
-- Identificar que otros modulos dependen del modulo objetivo.
-- Identificar restricciones de costo, despliegue y tiempo de entrega.
-- Leer `Documentacion/02-operacion/GITHUB_PRODUCT_OS.md` si el plan tendra ejecucion inmediata.
-- Revisar el estado del GitHub Project si `gh` esta disponible y el usuario permite tocar work items.
-
-- Consultar el directorio `context/referencias-opensource/README.md`. Si el modulo a planificar tiene una arquitectura de referencia asignada en ese documento, la IA debe analizar los archivos curados de esa subcarpeta. La IA usara estas referencias estrictamente como inspiracion arquitectonica, sin copiar codigo literal y traduciendo los conceptos logicos a nuestro stack local.
-
-### 5.1 Contrato de Experiencia Madre y Ground Truth por Fase
-
-Antes de escribir o ejecutar un plan, la IA debe clasificar el modulo por nivel de paridad esperado:
-
-- `Clon/paridad alta`: debe sentirse casi como una experiencia conocida. Aplica a Office Docente (Word/Docs + Excel/Sheets), Asistente IA (ChatGPT/Gemini/NotebookLM), Classroom/Classroomio, Canva/Genially y WhatsApp profesional.
-- `Inspirado/paridad media`: toma patrones de una app conocida, pero puede adaptar la experiencia. Aplica a social, chat docente si no se busca clon exacto, reportes y notificaciones.
-- `Funcional/administrativo`: prioriza robustez, seguridad, costo y mantenibilidad. Aplica a infraestructura, auth/seguridad, sync y configuracion interna.
-
-Si el modulo es `Clon/paridad alta`, el plan no puede quedarse en frases como "tipo Classroom" o "tipo Canva". Debe convertir las referencias en contrato verificable:
-
-- Rutas exactas de capturas en `context/<modulo>-ground-truth/`.
-- Rutas exactas de referencias reales dentro de `context/<modulo>-ground-truth/03-referencias-reales/`.
-- Repos open source relevantes segun `context/referencias-opensource/README.md`.
-- Pantallas/flujos que se desean clonar.
-- Pantallas/flujos que se prohibe introducir porque rompen la experiencia madre.
-- Rutas legacy que no deben aparecer en el flujo principal.
-- Checklist visual y de navegacion por fase.
-
-Antes de implementar cualquier fase de un modulo de paridad alta, la IA debe generar un `Brief de Implementacion de Fase` dentro del plan o del issue activo. Ese brief debe incluir:
-
-```markdown
-### Brief Ground Truth - Fase X
-
-- Nivel de paridad: Clon/paridad alta.
-- Referencias reales obligatorias:
-  - `context/<modulo>-ground-truth/03-referencias-reales/...`
-- Capturas actuales a comparar:
-  - `context/<modulo>-ground-truth/02-capturas-actuales-de-la-app/...`
-- Referencias open source obligatorias:
-  - `context/referencias-opensource/<repo>/FUENTE.md`
-  - `context/referencias-opensource/<repo>/ARCHITECTURE_PATHS.md`
-- Pantallas/flujo a imitar:
-  - ...
-- Flujos legacy prohibidos:
-  - ...
-- Criterio de cierre UX:
-  - El usuario confirma que se siente como [Office/Classroom/Canva/WhatsApp], no como modulos sueltos.
+```bash
+gh issue create --title "<nombre-del-change>" --body "<historia del backlog>" --label "change,ux-ui"
 ```
 
-Si no existe carpeta de ground truth para el modulo, la IA debe crear o pedir al desarrollador esta estructura antes de cerrar el plan:
+y agregalo al GitHub Project del plan. Tambien puedes crearlo despues del propose, con el scope ya afinado.
+
+### Paso 2 — Enriquecer la historia: `/enrich-us`
+
+Cuando la historia del backlog esta verde o vaga:
+
+```text
+/enrich-us <pega la historia del backlog o el numero de issue>
+```
+
+Devuelve `## Original` + `## Enriquecida` (descripcion funcional, datos, endpoints, archivos MVVM,
+definition of done, NFRs). Revisala: tu decides que entra. Si la historia del backlog ya es especifica,
+puedes saltarte este paso.
+
+### Paso 3 — (Opcional) Explorar: `/opsx:explore`
+
+Si el alcance o el enfoque tecnico no estan claros, explora antes de proponer. Explore piensa y compara,
+no implementa.
+
+### Paso 4 — Proponer: `/opsx:propose`
+
+```text
+/opsx:propose "<historia enriquecida o resumen del change>"
+```
+
+Genera en `openspec/changes/<nombre>/`: `proposal.md` (why/what/capabilities/impact + No objetivos),
+`specs/` (requirements con escenarios `#### Scenario:` WHEN/THEN), `design.md` y `tasks.md`.
+**Tu trabajo aqui es revisar y corregir la spec, no el codigo.** Es el momento barato de cambiar de opinion.
+Verifica que las specs cumplan las reglas de `openspec/config.yaml` (estados loading/empty/error/offline,
+IA confirmable, accesibilidad) y que `design.md` cite el ground truth visual si toca UI.
+
+### Paso 5 — Implementar: `/opsx:apply`
+
+```text
+/opsx:apply
+```
+
+La IA implementa `tasks.md` una tarea a la vez y marca `[x]` solo con evidencia (typecheck, lint, tests
+afectados). Si el change toca UI, la ultima tarea es validacion visual: capturas por breakpoint
+(Playwright MCP en web) contra el ground truth + checklist Nielsen
+(`Documentacion/00-fundamentos/IHC_DISCOVERY_DOCENTE.md`, seccion 6). Si la IA se bloquea, pausa y pregunta;
+no adivina. Un fix que cambie el comportamiento esperado se corrige primero en la spec, luego en el codigo.
+
+### Paso 6 — Red team: `/adversarial-review`
+
+Idealmente en una sesion nueva (contexto limpio):
+
+```text
+/adversarial-review
+```
+
+Veredictos: PASS / PASS CON HUECOS / FAIL. Blockers (sev. 4) y Majors (sev. 3) se corrigen antes de archivar.
+
+### Paso 7 — Archivar: `/opsx:archive`
+
+```text
+/opsx:archive
+```
+
+Mueve el change a `openspec/changes/archive/YYYY-MM-DD-<nombre>/` y sincroniza sus specs a
+`openspec/specs/` como verdad permanente. `openspec/specs/` NUNCA se edita a mano; solo via archive
+(o `/opsx:sync` en casos especiales).
+
+### Paso 8 — Cerrar el ciclo
+
+- Marcar el change como `archivado` en el backlog del plan maestro.
+- Mover el issue/item del Project a `Done` (o `Review Manual` si quedo validacion visual pendiente).
+- Commit/PR si se desea (la IA solo commitea si se lo pides).
+- Actualizar documentacion de `Documentacion/` solo si cambio la arquitectura o la vision.
+
+### Prompts utiles durante el ciclo
+
+- Revisar una spec: `Lee openspec/changes/<n>/specs/ y dime que escenarios faltan segun las reglas de config.yaml.`
+- Retomar trabajo: `Continua /opsx:apply del change <n>; revisa tasks.md para ver donde quedamos.`
+- Estado general: `openspec status --json` (CLI) o `Lista los changes activos y su avance.`
+- Antes de archivar: `Corre /adversarial-review sobre el change <n> comparando spec vs git diff.`
+
+---
+
+## 3. Reglas que Todo Change Debe Respetar
+
+Las fuentes normativas, en orden:
+
+1. **Codigo real** (si contradice a la documentacion, gana el codigo).
+2. `openspec/config.yaml` — contexto + reglas de oro + reglas por artefacto (se inyectan solas en propose/apply).
+3. `CLAUDE.md` y `.claude/rules/{backend,frontend,testing}.md`.
+4. `Documentacion/00-fundamentos/` (vision, arquitectura, sync, IA, mapa de modulos, roadmap, IHC).
+
+Reglas de producto transversales que ningun change debe violar:
+
+- **Office Docente une lo documental y lo tabular** (NotasPLAN/CalcuPLAN/PresentaPLAN); no crear mundos separados.
+- **Classroom organiza y asigna; no crea todo.** La creacion profunda vive en Office/DiseñaPLAN.
+- **Contenido/Biblioteca es transversal**, no experiencia madre: selector de adjuntos + biblioteca, sin competir
+  con Office/Classroom.
+- **Calificar requiere contexto**: no pantallas de calificacion sueltas sin actividad/entrega/alumno.
+- **Legacy no es entrada principal**: si existe flujo moderno, la ruta vieja se redirige o se documenta como deuda.
+- **La IA propone, el docente decide**: confirmacion antes de guardar/asignar/enviar; correcciones como
+  copia/borrador/diff, nunca sobrescribir.
+- **Toda pantalla nueva parte de una pantalla madre responsiva** (movil <768, tablet 768-1279, web >=1280);
+  `.web.tsx`/`.native.tsx` solo por interaccion, con justificacion.
+
+---
+
+## 4. Contrato de Experiencia Madre y Ground Truth
+
+Antes de proponer un change de UI, clasificar el nivel de paridad:
+
+- **Clon/paridad alta**: debe sentirse como la experiencia conocida. Office Docente (Word/Excel/PowerPoint),
+  AsistePLAN (ChatGPT/Gemini), Classroom, DiseñaPLAN (Canva/Genially), ConectaPLAN (WhatsApp).
+- **Inspirado/paridad media**: toma patrones pero adapta. Escritorio, Calendario, Reportes, Notificaciones.
+- **Funcional/administrativo**: prioriza robustez y costo. Infra, auth, sync, configuracion.
+
+Para paridad alta, el `design.md` del change debe incluir un contrato verificable (no basta "tipo Word"):
+
+```markdown
+### Brief Ground Truth
+
+- Nivel de paridad: Clon/paridad alta.
+- Ground truth visual: [link Figma frame aprobado y/o ruta en context/<modulo>-ground-truth/]
+- Referencias reales: context/<modulo>-ground-truth/03-referencias-reales/...
+- Referencias open source: context/referencias-opensource/<repo>/FUENTE.md (inspiracion, no copia)
+- Flujos prohibidos: [rutas legacy, patrones que rompen la experiencia madre]
+- Criterio de cierre UX: el desarrollador confirma que se siente como [X], no como modulos sueltos.
+```
+
+Si falta ground truth, **declararlo como bloqueo** en el design y conseguirlo antes de implementar pantallas.
+Estructura estandar si hay que crear la carpeta:
 
 ```text
 context/<modulo>-ground-truth/
@@ -293,1252 +212,176 @@ context/<modulo>-ground-truth/
   05-notas-del-desarrollador/README.md
 ```
 
-Si faltan referencias open source para el modulo objetivo, la IA debe pedir URLs de repositorios GitHub y registrar la necesidad en `context/referencias-opensource/README.md`. No debe inventar que tiene referencia open source si no existe.
+Pipeline visual vigente (detalle en el plan UX/UI): Stitch/Claude Design generan conceptos ->
+el frame curado en **Figma** es el ground truth oficial -> Figma MCP (`get_design_context`) alimenta la
+implementacion -> Playwright MCP captura la app real por breakpoint para comparar. Los resultados
+intermedios de Stitch se guardan en `context/stitch-results/<tarea>/`.
 
-Regla de cierre: en modulos de paridad alta, TypeScript, lint y tests no bastan. La fase solo puede cerrarse como `[x]` cuando tambien exista validacion manual o checklist visual contra ground truth.
-
----
-
-### 5.2 Dinamica de Entrega Iterativa para Evitar Fatiga de Contexto
-
-Esta meta guia es grande a proposito, pero una IA no debe convertirla en una respuesta gigante, superficial y dificil de revisar. Cuando el usuario pida crear un plan maestro nuevo, la IA debe trabajar por bloques y pedir aprobacion antes de avanzar al siguiente bloque, salvo que el usuario pida explicitamente "entregalo completo de una vez".
-
-Regla general:
-
-- El plan final debe terminar cubriendo toda la estructura obligatoria de la seccion 6.
-- La conversacion para construirlo debe ser iterativa.
-- Cada entrega debe ser lo bastante pequena para que el desarrollador pueda corregir rumbo.
-- La IA debe cerrar cada entrega con una pregunta de aprobacion o ajuste.
-- No se debe avanzar a fases detalladas si el alcance, la experiencia madre, la navegacion o la arquitectura base todavia estan ambiguas.
-
-#### Entrega 1: Encuadre, Vision y Auditoria Base
-
-La primera respuesta al crear un plan maestro debe entregar solo:
-
-- Objetivo del plan y alcance propuesto.
-- Estado actual real del modulo basado en codigo y documentacion.
-- Contrato de experiencia madre y nivel de paridad.
-- Ground truth disponible y ground truth faltante.
-- Inventario inicial de pantallas, hooks/ViewModels, contextos, services, tipos, backend, tests y rutas.
-- Riesgos principales y decisiones que requieren aprobacion temprana.
-
-Al final debe preguntar si el desarrollador aprueba el enfoque, alcance y experiencia madre antes de seguir.
-
-#### Entrega 2: Arquitectura Objetivo y UX/UI
-
-Solo despues de recibir luz verde, la IA debe entregar:
-
-- Decisiones tecnicas y alternativas evaluadas.
-- Modelo de datos objetivo.
-- UX/UI objetivo.
-- Estrategia web/tablet/movil.
-- Mapa de navegacion del modulo.
-- IA y automatizacion.
-- Offline-first y sync.
-- Costos e infraestructura.
-- Limpieza legacy prevista.
-
-Al final debe preguntar si el desarrollador aprueba la arquitectura y experiencia objetivo antes de convertirla en fases.
-
-#### Entrega 3: Fases, Validacion y Tracking
-
-Solo despues de recibir luz verde, la IA debe entregar:
-
-- Fases numeradas con checkboxes `[ ]`, `[~]`, `[x]`.
-- Brief Ground Truth por fase cuando aplique.
-- Bloque GitHub/CI por fase.
-- Validaciones por fase y validacion final.
-- Modo de trabajo recomendado (`NORMAL`, `CAVEMAN` o mixto).
-- Criterio de cierre en lenguaje de usuario.
-- Open questions y riesgos pendientes.
-
-Al final debe preguntar si el desarrollador quiere ajustar fases o consolidar el plan final.
-
-#### Entrega 4: Plan Final Integrado
-
-Solo con aprobacion explicita, la IA debe consolidar el plan maestro final en un unico markdown, listo para guardarse en `Documentacion/01-planes-maestros/`.
-
-El plan final puede ser largo, pero para entonces ya debe haber sido revisado por partes. No debe introducir decisiones nuevas grandes en la consolidacion final; si aparece una decision nueva, debe marcarse como `Open Question` o pedir aprobacion.
-
-#### Excepciones Permitidas
-
-La IA puede entregar un plan completo en una sola respuesta solo cuando:
-
-- El usuario lo pide explicitamente.
-- El plan es pequeno, focalizado y de bajo riesgo.
-- No toca UX/UI de paridad alta, sync, auth, backend, IA, datos sensibles ni navegacion global.
-
-Si el plan toca UX/UI Global, una experiencia madre completa, datos sincronizables, auth/seguridad, backend o IA, la entrega iterativa es obligatoria.
+Regla de cierre: en paridad alta, TypeScript/lint/tests NO bastan; el change solo se archiva con
+validacion visual manual confirmada por el desarrollador.
 
 ---
 
-## 6. Estructura Obligatoria de Todo Plan Maestro
+## 5. Validacion y Evidencia
 
-Todo plan futuro debe terminar cubriendo esta estructura. La IA puede construirlo por entregas iterativas segun la seccion 5.2, pero el markdown final debe incluir las secciones necesarias para que otra IA pueda implementarlo sin redescubrir el repo.
+Comandos base (la regla de `tasks` en config.yaml los exige antes de marcar `[x]`):
 
-### 6.1 Encabezado
-
-Debe incluir:
-
-- Nombre del plan.
-- Version.
-- Fecha.
-- Alcance.
-- Stack.
-- Modulo.
-- Estado actual.
-- Relacion con otros modulos.
-
-### 6.2 Analisis de Ground Truth
-
-Debe incluir:
-
-- Ejemplos reales o representativos del trabajo docente.
-- Comparacion entre flujo actual y flujo ideal.
-- Tabla de brechas.
-- Hallazgos clave.
-- Implicaciones en datos, UX, IA, backend y offline-first.
-- Nivel de paridad esperado: `Clon/paridad alta`, `Inspirado/paridad media` o `Funcional/administrativo`.
-- Tabla de referencias obligatorias con rutas concretas a `context/<modulo>-ground-truth/` y `context/referencias-opensource/`.
-- Lista de capturas o repositorios faltantes que el desarrollador debe proporcionar antes de ejecutar fases UI.
-
-Si no hay ground truth suficiente, la IA debe pedirlo o crear una investigacion local basada en pantallas existentes, tipos y casos docentes realistas. Para modulos de `Clon/paridad alta`, pedir ground truth no es opcional: se debe indicar exactamente que carpetas crear y que capturas/URLs entregar antes de implementar pantallas.
-
-### 6.3 Inventario del Codigo Actual
-
-Debe incluir:
-
-- Pantallas.
-- ViewModels/hooks.
-- Contextos.
-- Servicios.
-- Tipos.
-- Backend.
-- Tests.
-- Navegacion.
-- Componentes compartidos.
-- Dependencias cruzadas.
-- Archivos legacy.
-
-### 6.4 Decisiones Tecnicas
-
-Debe incluir:
-
-- Arquitectura elegida.
-- Alternativas evaluadas.
-- Por que se descartan o aceptan.
-- Riesgos.
-- Dependencias nuevas.
-- Impacto en Expo Go, dev client, web, Android e iOS.
-- Estrategia web/tablet/movil: pantalla madre responsiva por defecto o separacion `.web.tsx`/`.native.tsx` justificada.
-- Hook, helper o sistema de breakpoints compartido si el modulo requiere adaptacion visual; no repetir `useWindowDimensions()` sin una abstraccion clara.
-- Impacto en costo.
-- Impacto en offline-first.
-- Estrategia de migracion.
-
-### 6.5 Modelo de Datos
-
-Debe incluir:
-
-- Tipos nuevos o modificados.
-- Compatibilidad o reemplazo legacy.
-- Entidades relacionadas.
-- Indices locales/remotos.
-- Claves locales actuales o futuras: AsyncStorage actual, tablas SQLite futuras o repositorio local equivalente.
-- Forma de sync.
-- Forma de exportacion/importacion.
-- Campos de auditoria: `userId`, `fechaCreacion`, `fechaModificacion`, `syncStatus` o equivalente.
-
-### 6.6 UX/UI Objetivo
-
-Debe incluir:
-
-- Flujo principal.
-- Flujos alternos.
-- Mapa de entrada y salida del modulo.
-- Botones, CTAs y rutas que llevan al modulo.
-- Acciones internas que conectan con otros modulos.
-- Pantallas desde donde se puede crear, editar, ver, compartir, exportar o eliminar una entidad.
-- Estados vacios.
-- Estados loading/error/offline.
-- Web/tablet/movil.
-- Accesibilidad.
-- Criterios visuales.
-- Eliminacion de pasos duplicados.
-- Pantallas legacy a eliminar o redirigir.
-- Validacion de que el modulo no queda aislado ni inaccesible desde tabs, hubs, menus, buscadores o acciones contextuales.
-- Recomendaciones de redisenio del flujo si la navegacion actual es redundante, confusa o profunda.
-
-#### 6.6.1 Estrategia Web/Tablet/Movil
-
-Todo plan que toque pantallas debe resolver explicitamente:
-
-- En movil: flujo principal mobile-first, jerarquia, scroll, estados vacios y acciones primarias.
-- En tablet/web: que elementos se convierten en columnas, panel lateral, tabla, grid, toolbar ampliada o vista de detalle.
-- Breakpoints propuestos o referencia al helper/hook compartido del proyecto.
-- Componentes que se comparten entre plataformas y componentes que solo cambian layout.
-- Componentes pesados que no deben cargarse en movil si solo existen para web.
-- Si se propone `.web.tsx`/`.native.tsx`: razon tecnica, costo de mantenimiento, contrato compartido, pruebas por plataforma y criterio para evitar que una variante quede atrasada.
-- Validacion manual minima en web, tablet y movil antes de cerrar fases visuales.
-
-### 6.7 IA y Automatizacion
-
-Debe incluir:
-
-- Casos de uso IA.
-- Si aplica, superficie IA: sugerencia contextual, solicitud en segundo plano, chatbot explicito, copiloto de editor, generador batch o analisis de archivos.
-- Endpoints requeridos.
-- Proveedor/modelo.
-- Adjuntos/contexto permitidos: documentos, hojas, recursos visuales, clases, alumnos, entregas, reportes o archivos subidos.
-- Variables de entorno.
-- Fallback si no hay API key.
-- Fallback si proveedor local como LM Studio no esta disponible.
-- Timeout y errores.
-- Prompting esperado.
-- Validacion humana.
-- Acciones confirmables antes de guardar, asignar, enviar o modificar datos.
-- Estados para tareas IA en segundo plano: pendiente, generando, listo, error, cancelado.
-- Salida esperada: copia corregida, borrador editable, comparacion de cambios, resumen en chat o accion descartable.
-- Costos y limites.
-
-### 6.8 Offline-First y Sync
-
-Debe incluir:
-
-- Fuente local de verdad.
-- Fuente remota de verdad.
-- Si la entidad entra al registry `SYNC_ENTITIES` o requiere `registerSyncTask` custom, con justificacion.
-- Endpoint backend y `responseKey` esperada.
-- `storageKey` local actual y ruta futura SQLite si aplica.
-- Cola de operaciones mediante `syncEngine`.
-- Reintentos y diferencia entre fallo de red recuperable vs rechazo 4xx no recuperable.
-- Conflictos.
-- Eliminacion logica.
-- Recuperacion de borradores.
-- Validacion offline/reconexion.
-- Validacion cross-device: crear/editar/borrar en dispositivo A, sincronizar, abrir dispositivo B/web y confirmar estado autoritativo.
-- Refresh de UI por `syncEvents` o razon documentada para no usarlo.
-- Comportamiento de invitado y dev-local: sin llamadas remotas, modo 100% local.
-- Aislamiento remoto por JWT/userId y endpoints idempotentes para cola offline.
-- Comportamiento si Vercel/MongoDB caen: pull fallido no toca storage local.
-- Estrategia de migracion si el modulo debe pasar de AsyncStorage a SQLite o a otra base local.
-
-### 6.9 Limpieza Legacy
-
-Debe incluir:
-
-- Rutas a eliminar o redirigir.
-- Pantallas obsoletas.
-- Tipos duplicados.
-- Contextos viejos.
-- Servicios duplicados.
-- Tests obsoletos.
-- Criterio para borrar compatibilidad temporal.
-
-### 6.10 Fases Numeradas
-
-Cada plan debe tener fases numeradas con checkboxes:
-
-- `[ ]` Pendiente.
-- `[~]` En progreso.
-- `[x]` Completado.
-
-No usar otros estados.
-
-Cada fase que toque UX, navegacion, pantallas, modales, flujos de creacion/edicion o integracion con otros modulos debe incluir un bloque `Brief Ground Truth - Fase X`. Ese bloque debe citar referencias concretas y no solo una descripcion general.
-
-Cada fase ejecutable tambien debe incluir un bloque `GitHub/CI - Fase X`. Ese bloque evita que el avance quede solo en markdown y obliga a declarar issue/Project item, milestone, labels, estado inicial/final del tablero, scripts de validacion y si GitHub Actions/CI remoto debe revisarse.
-
-Formato obligatorio para fases de paridad alta:
-
-```markdown
-### FASE X: [Nombre]
-
-Brief Ground Truth - Fase X:
-
-- Experiencia madre a imitar: [Office Docente | Classroom/Classroomio | Canva/Genially | WhatsApp | Calendario | Reportes].
-- Referencias reales:
-  - `context/<modulo>-ground-truth/03-referencias-reales/...`
-- Capturas actuales:
-  - `context/<modulo>-ground-truth/02-capturas-actuales-de-la-app/...`
-- Referencias open source:
-  - `context/referencias-opensource/<repo>/FUENTE.md`
-- Flujos prohibidos:
-  - [rutas legacy, modales antiguos, CTAs administrativos sueltos].
-- Validacion visual:
-  - [comparacion manual requerida antes de cerrar].
-
-GitHub/CI - Fase X:
-
-- Issue/Project item: [crear/usar #...].
-- Milestone: [ciclo].
-- Labels: `fase`, ...
-- Estado al iniciar: `In progress`.
-- Estado al cerrar: `Done` si no requiere revision manual; `Review Manual` si toca UX/UI, navegacion o paridad alta.
-- Scripts obligatorios:
-  - `npx tsc --noEmit`
-  - `npm run lint -- --quiet` o lint focalizado justificado.
-  - `npm test -- --runInBand` o tests focalizados justificados.
-- GitHub Actions: revisar CI remoto si existe workflow activo o si el cambio se sube a rama/PR.
-
-- [ ] **X.1 ...**
+```bash
+npm run typecheck
+npm run lint -- --quiet
+npm test -- --runInBand        # o tests focalizados justificados
+npm run backend:check           # si el change toca backend
 ```
 
-Estructura recomendada:
+Ademas, por tipo de change:
 
-- Fase 0: Auditoria y preparacion.
-- Fase 1: Tipos y modelo.
-- Fase 2: Datos, contexto y sync.
-- Fase 3: Componentes base.
-- Fase 4: Pantallas y flujo principal.
-- Fase 5: IA/import/export/funciones avanzadas.
-- Fase 6: Integracion con otros modulos.
-- Fase 7: Limpieza legacy.
-- Fase final: validacion, docs y release.
-
-### 6.11 Validacion
-
-Debe incluir:
-
-- `npx tsc --noEmit`.
-- `npm run lint -- --quiet`.
-- `npm test -- --runInBand`.
-- Tests focalizados.
-- Validacion web.
-- Validacion Android/iOS.
-- Validacion offline.
-- Validacion backend.
-- Validacion de costo/configuracion cuando aplique.
-- Validacion de navegacion: entrar al modulo desde todos los puntos esperados, ejecutar acciones principales y volver sin perder contexto.
-- Validacion UX/UI: revisar redundancia, claridad de CTAs, contraste, jerarquia visual, estados vacios y accesibilidad basica.
-- Validacion de paridad para experiencias madre: comparar pantalla/flujo contra las rutas de ground truth citadas en la fase.
-- Confirmacion del desarrollador cuando el objetivo sea un clon/paridad alta: no cerrar como `[x]` solo por pasar validaciones automaticas.
+- **UI:** capturas por breakpoint (Playwright MCP en web; movil manual o emulador) + checklist Nielsen
+  con severidad 0-4 (`IHC_DISCOVERY_DOCENTE.md` seccion 6).
+- **Sync/datos:** validar offline -> reconexion -> cross-device -> servidor caido sin perdida local.
+- **IA:** probar exito, error de proveedor, sin proveedor configurado y limite de uso.
+- **Navegacion:** entrar desde todos los puntos esperados, ejecutar acciones principales y volver sin
+  perder contexto; sin botones muertos ni pantallas sin salida.
 
 ---
 
-## 7. Reglas de Consistencia Arquitectonica
+## 6. GitHub Product OS (tracking)
 
-Todo plan futuro debe cumplir:
+- El markdown (plan + specs archivadas) es la fuente de verdad arquitectonica.
+- GitHub Projects es la fuente de verdad operativa diaria.
+- GitHub Actions es evidencia automatica, no gestor de tareas.
 
-- Mantener MVVM.
-- Pantallas delgadas.
-- Hooks como ViewModels.
-- Contextos para estado compartido.
-- Servicios para I/O, storage, import/export, IA y API.
-- Tipos centralizados y versionados.
-- Offline-first desde el diseno.
-- Persistencia local mediante una capa desacoplada.
-- AsyncStorage es la implementacion actual para cache/datos simples.
-- SQLite/Expo SQLite debe evaluarse como destino preferente para modulos con relaciones, busquedas, volumen o sync complejo.
-- Ningun modulo nuevo debe acoplarse directamente a AsyncStorage si eso bloquea una migracion futura a SQLite.
-- Ningun modulo nuevo sincronizable debe crear su propio cliente HTTP/cola si puede usar `src/sync/services/entitySync.ts`, `src/sync/services/syncEngine.ts` y `src/utils/apiClient.ts`.
-- Las pantallas no deben llamar al backend directamente para CRUD academico sincronizable; deben pasar por ViewModel -> Context/Service -> storage local + cola sync.
-- Los contextos/servicios deben refrescarse con `syncEvents` cuando un pull autoritativo cambie storage local.
-- MongoDB/API como respaldo remoto cuando aplique.
-- `userId` en toda entidad sincronizable.
-- No duplicar fuente de verdad.
-- No mezclar legacy con nuevo modelo sin migracion clara.
-- No introducir dependencia cara o compleja sin justificar.
-- No romper web si el modulo se usa desde web.
-- No dejar spinners infinitos.
-- No dejar pantallas sin estados de error.
-
----
-
-## 8. Reglas de Presupuesto e Infraestructura
-
-Cada plan debe incluir una seccion de costos si toca backend, IA, almacenamiento, notificaciones, hosting o distribucion.
-
-La IA debe:
-
-- Evaluar opciones gratis o de bajo costo.
-- Separar costos de desarrollo, demo, beta y produccion.
-- Verificar precios actuales antes de recomendar servicios.
-- No asumir que hay presupuesto mensual.
-- Considerar uso local de la laptop del desarrollador.
-- Considerar LM Studio u otros LLM locales solo cuando el backend pueda alcanzarlos; Vercel no puede acceder al `localhost` del usuario.
-- Considerar Docker solo si simplifica desarrollo, pruebas o despliegue.
-- Considerar Vercel/MongoDB Atlas free tier si sigue siendo suficiente.
-- Considerar alternativas como backend local, VPS barato o self-hosting cuando el modulo lo justifique.
-- Documentar riesgos de depender de la maquina local.
-- Documentar riesgos de free tiers: limites, suspension, cold starts, almacenamiento, cuotas.
-- Preguntar antes de elegir infraestructura definitiva.
-
-Regla de oro: profesional no significa caro. La solucion debe poder crecer, pero empezar simple.
-
----
-
-## 9. Reglas de UX/UI
-
-Todo plan debe exigir:
-
-- Flujos de maximo sentido para docentes reales.
-- Interfaces profesionales, no demos.
-- Acciones principales visibles.
-- Estados claros.
-- Sin pasos duplicados.
-- Sin formularios legacy cuando el modulo requiera editor moderno.
-- Buen contraste.
-- Botones seleccionados legibles.
-- Accesibilidad basica.
-- Experiencia responsive.
-- Validacion manual en web y movil.
-
-Cuando un modulo tenga edicion compleja, se debe preferir una experiencia tipo herramienta real, no solo un formulario.
-
-### 9.0 Estrategia UX/UI Hibrida por Modulo
-
-Cada modulo debe tener una UX base profesional dentro de su propio plan, pero el redisenio final de toda la app debe reservarse para `Plan Maestro: UX/UI y Navegacion Global`.
-
-Reglas:
-
-- En el plan del modulo se corrigen problemas propios del flujo: scroll roto, pantallas cortadas, botones inaccesibles, jerarquia confusa, estados vacios pobres y responsive movil/web.
-- En el plan del modulo se implementa una plantilla visual base alineada con referencias reales y ground truth local.
-- No convertir cada modulo en un mega redisenio final si eso bloquea funcionalidad.
-- Antes de tocar UI, revisar `context/<modulo>-ground-truth/` si existe.
-- Si el desarrollador entrega pantallas de Stitch/Figma, HTML, MD, tokens o capturas, ese material tiene prioridad como ground truth visual.
-- El plan UX/UI Global debe consolidar: prompts para Stitch/Figma, sistema visual, tokens, navegacion global, Nielsen, accesibilidad y severidad 0-4.
-
-### 9.1 Metodologia IHC obligatoria para el Plan Maestro UX/UI
-
-El `Plan Maestro: UX/UI y Navegacion Global - PlanearIA` sera una fase de pulido posterior a los modulos funcionales principales. Cuando se genere, no debe basarse en gustos subjetivos. Debe usar rigor de Interaccion Humano-Computadora:
-
-- Usar las **10 Heuristicas de Usabilidad de Jakob Nielsen** como marco obligatorio de auditoria y propuesta.
-- Clasificar cada hallazgo con severidad clasica: `0` no es problema, `1` cosmetico, `2` menor, `3` mayor, `4` catastrofe.
-- Priorizar reduccion de carga cognitiva y cero friccion.
-- Auditar consistencia entre sistema y mundo real docente.
-- Prevenir errores: ocultar, eliminar o desactivar botones `Proximamente`, acciones sin destino, rutas aisladas y CTAs que no hacen nada.
-- Revisar accesibilidad: labels, roles, contraste, tamanos tocables, navegacion por teclado/web y lectores de pantalla en acciones principales.
-- Centralizar tokens visuales en `ThemeContext` o capa equivalente para evitar interfaces Frankenstein entre modulos.
-- Convertir recomendaciones en cambios accionables, con criterio de aceptacion verificable en web, tablet y movil.
-
-### 9.2 Estado Actual del Diseno Visual
-
-PlanearIA no tiene un diseno maestro definido todavia. No existe un sistema de tokens visual final, no hay Figma/Stitch aprobado como fuente de verdad global y no hay una guia de estilo cerrada.
-
-Reglas mientras no exista un diseno maestro:
-
-- Las pantallas nuevas o modificadas deben ser lo mas homogeneas posible con el estado actual de la app.
-- No inventar paletas, tipografias o estilos nuevos que contradigan lo que ya existe.
-- Si un modulo necesita pantallas nuevas, basarse en los patrones visuales existentes: spacing, colores de `ThemeContext`, cards, botones y tab bars internas.
-- La app no esta en produccion y todo puede cambiar. Ningun plan debe asumir que el diseno actual es definitivo.
-- El diseno final se definira cuando se cree el `Plan Maestro: UX/UI y Navegacion Global`.
-
-### 9.3 Workflow de Diseno con Google Stitch
-
-Este workflow aplica exclusivamente al futuro `Plan Maestro: UX/UI y Navegacion Global`. Los planes de modulos individuales no deben incluir fases de Stitch ni bloquear su avance por diseno visual. Los modulos deben implementar una UX base funcional y profesional; el pulido visual global se hace despues.
-
-Cuando se cree el plan de UX/UI Global, la IA debe seguir este flujo iterativo con el desarrollador:
-
-#### Paso 1: Generar prompts para Stitch
-
-La IA debe proponer entre 2 y 4 prompts alternativos para Google Stitch por cada pantalla o flujo pequeno. Cada prompt debe:
-
-- Describir la pantalla, el contenido, la jerarquia visual y las acciones principales.
-- Basarse en las reglas de UX/UI de esta guia, las heuristicas de Nielsen y el ground truth del modulo.
-- Consultar las carpetas `context/referencias-opensource/` y `context/<modulo>-ground-truth/` para inspirar flujos coherentes con experiencias reales.
-- Tener en cuenta como funciona la app actualmente para no proponer flujos desconectados del estado real.
-- Variar entre si: una opcion puede priorizar compacidad, otra puede priorizar jerarquia visual, otra puede explorar un layout alternativo.
-
-Ejemplo de formato:
-
-```markdown
-## Prompts para Stitch: Classroom Home
-
-**Prompt 1:** Pantalla Classroom con clases activas como cards grandes, acceso rapido a materiales
-recientes y barra de busqueda superior. Estilo inspirado en Google Classroom.
-
-**Prompt 2:** Pantalla Classroom con tres secciones: Mis Cursos, Actividad Reciente y Pendientes.
-Cada seccion es colapsable. Navegacion por pestanas internas.
-
-**Prompt 3:** Pantalla Classroom minimalista: lista vertical de grupos/clases con KPIs inline
-(alumnos, tareas, asistencia). FAB para crear grupo. Sin secciones separadas.
-```
-
-#### Paso 2: El desarrollador elige
-
-El desarrollador usa los prompts en Google Stitch, genera los disenos, descarga los resultados y los coloca en `context/stitch-results/<tarea>/` como HTML, preview y JSON/MD.
-
-#### Paso 3: Implementar e iterar
-
-La IA lee el resultado de Stitch, implementa la pantalla y permite iteracion hasta que el desarrollador este satisfecho. Solo cuando el desarrollador apruebe el diseno se pasa al siguiente flujo.
-
-#### Paso 4: Avanzar al siguiente flujo
-
-Al iniciar el siguiente flujo de UX/UI, la IA debe tener en cuenta los disenos ya aprobados para mantener homogeneidad visual.
-
-#### Paso 5: Diseno global opcional
-
-La IA tambien puede proponer prompts para Stitch sobre el diseno global de la app: paleta de colores, tipografia, tokens, navegacion y estilo general. Esto permite que todos los flujos posteriores se basen en un sistema visual coherente desde el principio.
-
-#### Paso 6: Auditoria final
-
-Al cerrar el ciclo de diseno, se debe hacer una auditoria estricta de UX/UI y homogeneidad visual. Se daran varias repasadas hasta que quede pulido.
-
-Regla de trazabilidad:
-
-- Los resultados de Stitch se guardan en `context/stitch-results/` siguiendo la estructura documentada en `context/stitch-results/README.md`.
-- Los prompts generados por la IA se incluyen en el plan maestro de UX/UI Global.
-- Las imagenes aprobadas se conservan como ground truth dentro de la carpeta del modulo correspondiente en `context/<modulo>-ground-truth/`.
-
-### 9.4 Respaldo de Componentes Visuales
-
-El archivo `Documentacion/04-referencia/COMPONENTES_PRESERVADOS.md` contiene el codigo fuente de componentes visuales que el desarrollador quiere tener respaldados como referencia. Este archivo es solo un respaldo documental; no obliga a futuras IAs a mantener esos componentes en la app. Si un plan de modulo o de UX/UI Global decide reemplazar o eliminar un componente documentado ahi, puede hacerlo sin restriccion.
-
-### 9.5 Navegacion Global: Estructura de Tabs y Modulos
-
-La estructura de tabs actual es provisional y puede cambiar radicalmente. Las 5 tabs actuales de la barra inferior son:
-
-1. Feed.
-2. Recursos.
-3. Classroom (antes Grupos).
-4. Social.
-5. Configuracion.
-
-Esta estructura no es definitiva. El desarrollador ha planteado varias alternativas posibles:
-
-- **Modelo actual:** tabs globales fijas en la barra inferior, cada tab es un modulo.
-- **Home supremo:** sin tab bar global, una pantalla home con accesos a modulos. Al entrar a un modulo, ese modulo tiene sus propias pestanas internas.
-- **Tabs por modulo con swipe:** cada modulo tiene tabs propias en la barra inferior. Para cambiar de modulo se desliza horizontalmente o se usa un boton flotante/selector de modulo siempre visible.
-- **Hibrido:** una tab bar global reducida con los modulos principales y tabs internas dentro de cada modulo para sus secciones.
-
-Regla para futuras IAs:
-
-- No asumir que la estructura de tabs actual es permanente.
-- Si un plan de modulo necesita tabs internas, implementarlas de forma que puedan convivir con cualquier estructura global.
-- La decision final sobre la estructura de navegacion debe tomarse en el `Plan Maestro: UX/UI y Navegacion Global` o cuando el desarrollador lo decida.
-- Cualquier plan que toque tabs principales debe documentar el impacto si la estructura cambia.
-- No bloquear funcionalidad por esperar la decision de tabs. Construir modulos con entradas claras que funcionen con cualquier modelo de navegacion.
-
----
-
-## 10. Reglas de Navegacion y UX/UI Global
-
-Cada plan de modulo debe incluir una auditoria de navegacion. No basta con que el modulo funcione aislado.
-
-Todo plan debe responder:
-
-- Desde donde entra el usuario al modulo.
-- A donde vuelve despues de crear, editar, guardar, cancelar, exportar o eliminar.
-- Que tab, hub, FAB, menu contextual, card, buscador o deep link lleva al modulo.
-- Que rutas deben desaparecer, redirigirse o quedar ocultas por legacy.
-- Que acciones cruzadas conectan con otros modulos.
-- Que ocurre en web, tablet y movil.
-- Que estado se conserva al volver: filtros, busqueda, tab activa, borrador o seleccion.
-- Que pantallas quedan bloqueadas si el usuario esta offline.
-- Que botones principales y secundarios deben existir.
-- Que flujos son redundantes y deben fusionarse.
-
-Todo plan debe incluir un mapa minimo de flujos:
-
-```markdown
-## Mapa de Navegacion del Modulo
-
-- Entrada principal: [tab/hub/ruta].
-- Entradas secundarias: [FAB/menu/card/deep link].
-- Crear: [origen] -> [selector/configuracion] -> [editor/detalle] -> [lista/detalle].
-- Editar: [lista/card/buscador] -> [editor] -> [detalle/lista].
-- Compartir/exportar/asignar: [origen] -> [accion] -> [resultado].
-- Salidas seguras: cancelar, guardar, volver, cerrar modal.
-- Rutas legacy: eliminar, ocultar o redirigir.
-```
-
-Todo plan debe incluir una fase o bloque dedicado a UX/UI y navegacion cuando:
-
-- El modulo toca tabs principales.
-- El modulo toca `ContenidoScreen`.
-- El modulo crea rutas nuevas.
-- El modulo elimina rutas legacy.
-- El modulo se conecta con otros modulos.
-- El modulo agrega FAB, modales, menus contextuales o cards.
-- El flujo actual queda profundo, duplicado o poco intuitivo.
-
-Puede existir un plan independiente llamado `Plan Maestro: UX/UI y Navegacion Global - PlanearIA` cuando el objetivo sea:
-
-- Auditar toda la app.
-- Redisenar tabs principales.
-- Unificar hubs.
-- Revisar todos los CTAs.
-- Reducir redundancia.
-- Mejorar accesibilidad.
-- Modernizar visualmente la app.
-- Asegurar que ningun modulo quede aislado.
-- Definir estandares visuales y de interaccion para todos los modulos.
-
-Ese plan global debe revisar como minimo:
-
-- `src/navigation/StackNavigator.tsx`.
-- `src/navigation/AppTabsNavigator.tsx`.
-- `src/screens/contenido/ContenidoScreen.tsx`.
-- `src/components/CrearNuevoModal.tsx`.
-- `src/components/FloatingActionIcons.tsx`.
-- Todos los menus contextuales.
-- Todos los empty states.
-- Todas las acciones de crear/editar/ver/detalle/exportar/compartir/asignar.
-
-Checklist obligatorio para UX/UI y navegacion:
-
-- [ ] Cada modulo tiene entrada principal clara.
-- [ ] Cada modulo tiene ruta para volver sin perder contexto.
-- [ ] Cada accion primaria tiene un CTA visible.
-- [ ] No hay doble captura de datos.
-- [ ] No hay dos pantallas haciendo lo mismo sin justificacion.
-- [ ] No hay rutas modernas escondidas detras de hubs legacy.
-- [ ] No hay modales que bloqueen clicks al cerrarse.
-- [ ] No hay botones activos ilegibles.
-- [ ] No hay cards sin accion clara.
-- [ ] No hay flujos que terminen en una pantalla sin salida evidente.
-- [ ] Los empty states llevan a la accion correcta.
-- [ ] Web, tablet y movil tienen navegacion usable.
-- [ ] Las pantallas nuevas usan pantalla madre responsiva/adaptativa por defecto o documentan una excepcion `.web.tsx`/`.native.tsx` justificada.
-- [ ] Existe criterio de cierre visual en movil, tablet y web, con capturas/checklist cuando el modulo toca UX/UI.
-- [ ] Los lectores de pantalla tienen labels basicos en acciones principales.
-
----
-
-## 11. Reglas de IA
-
-Todo plan con IA debe exigir:
-
-- Proveedor/modelo documentado.
-- Variables de entorno documentadas.
-- Prompt y schema definidos.
-- Fallback si falta API key.
-- Timeout.
-- Errores visibles.
-- Validacion humana.
-- Pruebas de exito/error/fallback.
-- Estimacion o control de costos.
-- Debounce y limites si hay IA predictiva.
-- No guardar contenido IA sin oportunidad de revision docente.
-
----
-
-## 12. Directrices por Experiencia Futura
-
-### 12.0 Experiencias Madre Declaradas
-
-Cuando un plan toque estos dominios, debe tratarlos como experiencias madre conectadas, no como modulos sueltos:
-
-| Experiencia | Ground truth esperado | Nota |
-| --- | --- | --- |
-| Inicio / Sistema Operativo Docente | Dashboards operativos, calendarios ligeros, pendientes, actividad reciente | Debe ser util al abrir la app, no landing decorativa. |
-| Asistente IA / ChatGPT Docente | ChatGPT, Gemini, NotebookLM, Copilot-style assistants | Chat con adjuntos, contexto de app, acciones confirmables, historial, costos y privacidad. |
-| Office Docente | Word/Docs + Excel/Sheets + LibreOffice/OnlyOffice | Documentos, hojas, listas, tablas, plantillas, import/export y asignacion inteligente. |
-| Classroom / Clases | Google Classroom/Classroomio | Cursos, unidades, trabajo de clase, personas, actividades, materiales y seguimiento. |
-| Canva / Genially Docente | Canva/Genially | Canvas, templates, panel lateral, paginas, capas y exportacion. |
-| WhatsApp Docente | WhatsApp profesional | Chats, contactos, adjuntos, estados de envio, busqueda y notificaciones. |
-| Calendario | Google Calendar/agenda docente | Fechas, clases, tareas, entregas y recordatorios conectados. |
-| Reportes | Dashboards educativos claros | Rendimiento, riesgo, avance, asistencia y calificaciones sin saturar. |
-| Cuenta / Seguridad / Accesibilidad | Apps con ajustes claros y accesibles | Perfil, sesiones, roles, preferencias, privacidad y accesibilidad real. |
-
-Si falta una carpeta `context/<experiencia>-ground-truth/` o una referencia open source para una experiencia de paridad alta, la IA debe pedirla antes de implementar fases visuales.
-
-### 12.1 Inicio / Sistema Operativo Docente
-
-Debe cubrir:
-
-- Pendientes del dia.
-- Clases proximas.
-- Documentos recientes.
-- Actividades por revisar.
-- Estado de sync.
-- Alertas y sugerencias IA.
-- Accesos rapidos a Office, Classroom, calendario y reportes.
-
-Debe exigir:
-
-- Acciones inmediatas, no marketing.
-- Carga cognitiva baja.
-- Empty states que inviten a crear clase, documento o recurso.
-- No duplicar listas que ya viven en Classroom u Office.
-
-### 12.2 Asistente IA / ChatGPT Docente
-
-Debe cubrir:
-
-- Chat propio dentro de PlanearIA.
-- Adjuntos desde Office Docente: documentos, planeaciones, hojas, listas y rubricas.
-- Adjuntos desde Canva/Genially: recursos visuales y materiales.
-- Contexto desde Classroom: clase, unidad, actividad, alumno, entrega o reporte.
-- Subida de archivos cuando el flujo lo permita.
-- Historial de conversaciones.
-- Acciones: guardar como borrador, crear tarea, asignar a clase, crear recordatorio, compartir, copiar o descartar.
-- Proveedores cloud y locales a traves de `backend/lib/aiGateway.js`.
-
-Debe exigir:
-
-- No llamar modelos desde frontend.
-- No guardar ni asignar resultados sin confirmacion docente.
-- No sobrescribir archivos originales; las correcciones IA deben generar copia, resumen, borrador o comparacion revisable.
-- Definir privacidad y permisos para documentos, alumnos y conversaciones.
-- Definir limites por usuario/accion con `aiUsageLimiter`.
-- Definir fallback si no hay proveedor configurado.
-- Documentar que LM Studio/local LLM funciona solo si el backend puede alcanzar la URL; no asumir que Vercel puede usar el localhost del usuario.
-- UX clara para distinguir proveedor cloud, proveedor local, IA no configurada y error temporal.
-- UX clara para solicitudes iniciadas desde IA silenciosa: origen, estado, resultado y opcion de cancelar o revisar.
-
-### 12.3 Office Docente
-
-Office Docente une lo que antes se planeaba como Word y Excel.
-
-Debe cubrir:
-
-- Planeaciones.
-- Documentos.
-- Hojas/listas.
-- Tablas.
-- Rubricas.
-- Asistencia y calificaciones tabulares.
-- Plantillas.
-- Import/export DOCX/PDF/CSV/XLSX cuando aplique.
-- IA que detecta tema, grupo, unidad, fechas, actividades y datos tabulares.
-- IA silenciosa que puede sugerir "Pedir correcciones al DocenteLLM?" y generar en segundo plano una copia corregida, resumen o comparacion.
-
-Debe exigir:
-
-- Leer primero `Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md` y `Documentacion/01-planes-maestros/cerrados/PLANEACIONES_IA_EDITOR_FASE9 (closed).md`.
-- Tratar Planeaciones como base funcional cerrada, no como limite visual.
-- No volver a formularios legacy como experiencia principal.
-- Evaluar LibreOffice/OnlyOffice como ground truth conceptual, sin copiar codigo sin licencia/stack review.
-- Conectar documentos y hojas con Classroom.
-- Permitir que una hoja/lista se convierta en alumnos, asistencia, calificaciones o rubrica si el docente confirma.
-
-### 12.4 Classroom / Clases
-
-Debe cubrir:
-
-- Cursos/grupos.
-- Unidades/sesiones.
-- Materiales.
-- Actividades.
-- Alumnos.
-- Entregas.
-- Asistencia.
-- Calificaciones.
-- Comentarios/avisos.
-
-Debe exigir:
-
-- Leer `Documentacion/01-planes-maestros/cerrados/PLAN_CLASSROOM (closed).md`.
-- Mantener Classroom como organizador/asignador.
-- Recibir objetos desde Office, Asistente IA, Canva, WhatsApp y Calendario.
-- Evitar formularios legacy si existe flujo contextual.
-- No crear documentos complejos dentro de Classroom si pertenecen a Office.
-
-### 12.5 Canva / Genially Docente
-
-Debe cubrir:
-
-- Presentaciones.
-- Infografias.
-- Mapas mentales.
-- Lineas de tiempo.
-- Examenes visuales.
-- Actividades.
-- Materiales imprimibles.
-
-Debe exigir:
-
-- Editor visual opcional, no obligatorio.
-- Templates, paginas/capas, preview y exportacion.
-- Asignacion directa a Classroom.
-- Conversion desde planeaciones/documentos cuando tenga sentido.
-- Justificar variantes web/native si usa canvas, gestos o rendimiento especifico.
-
-### 12.6 WhatsApp Docente / Comunidad Profesional
-
-Debe cubrir:
-
-- Contactos docentes.
-- Conversaciones.
-- Mensajes.
-- Adjuntos.
-- Planeaciones/recursos compartidos.
-- Estados de envio.
-- Busqueda.
-- Notificaciones.
-
-Debe exigir:
-
-- Reorientar feed/social hacia comunicacion practica si el plan lo decide.
-- Privacidad, bloqueo/reporte basico y anti-spam pragmatico.
-- Offline/pendiente/error.
-- No duplicar mensajes en sync.
-- Guardar recursos compartidos en Office, Classroom o biblioteca segun corresponda.
-
-### 12.7 Calendario Y Seguimiento Personal
-
-Debe cubrir:
-
-- Clases por dia.
-- Sesiones planeadas.
-- Fechas de entrega.
-- Recordatorios.
-- Revision de tareas.
-- Eventos escolares.
-- Pendientes sugeridos por IA.
-
-Debe exigir:
-
-- No ser agenda aislada.
-- Abrir clase, documento, actividad o reporte relacionado.
-- Crear recordatorios desde planeaciones y actividades.
-- Sync/offline y estados claros.
-
-### 12.8 Reportes, Analitica Y Gamificacion
-
-Debe cubrir:
-
-- Rendimiento por grupo.
-- Avance por unidad.
-- Asistencia.
-- Calificaciones.
-- Entregas pendientes.
-- Alumnos en riesgo.
-- Recomendaciones.
-- Resumen de ciclo.
-
-Debe exigir:
-
-- No saturar la experiencia diaria.
-- Esperar datos reales suficientes.
-- Gamificacion prudente: orientar y motivar, no infantilizar.
-- IA solo como apoyo revisable.
-
-### 12.9 Cuenta, Seguridad, Configuracion Y Accesibilidad
-
-Debe cubrir:
-
-- Perfil docente.
-- Perfil publico vs privado.
-- Sesiones activas.
-- Roles y permisos.
-- Terminos y privacidad.
-- Tema.
-- Tamano de fuente.
-- Daltonismo.
-- Preferencias.
-- Accesibilidad real.
-- Modo dev/admin cuando aplique.
-
-Debe exigir:
-
-- Persistencia offline de preferencias.
-- Sincronizacion cuando aplique.
-- Roles reales validados en backend.
-- Accesibilidad verificable, no solo switches decorativos.
-
-### 12.10 Seguridad y Autenticacion
-
-Debe cubrir:
-
-- Login real.
-- Registro.
-- Recuperacion de contrasena.
-- JWT.
-- Refresh token.
-- Emails.
-- Roles.
-- Permisos.
-- Proteccion de rutas.
-- RBAC pragmatico para roles `Dev/Desarrollador`, `Admin`, `Docente` y `Alumno`.
-
-Debe exigir:
-
-- Hash seguro.
-- Tokens seguros.
-- Almacenamiento seguro.
-- Validacion backend.
-- Rate limiting si aplica.
-- Politica de privacidad.
-- Manejo de secretos.
-- Plan de bajo costo para email.
-
-Reglas obligatorias de seguridad pragmatica y low-cost:
-
-- El plan debe asumir presupuesto cero o muy bajo: local primero, free tiers y servicios con HTTPS/SSL incluido cuando aplique.
-- No proponer servicios empresariales de seguridad salvo que se justifique como opcional futuro.
-- Implementar RBAC en frontend solo como ayuda UX; la autorizacion real debe validarse en backend, APIs y queries a base de datos.
-- Toda consulta multiusuario debe filtrar por `userId`, rol y permisos cuando corresponda.
-- El rol `Dev/Desarrollador` debe existir para desarrollo, soporte y pruebas internas; debe quedar separado de `Admin` y no debe habilitar privilegios peligrosos en produccion sin validacion explicita.
-- Endpoints criticos como login, recuperacion, registro, sync, creacion masiva e IA deben evaluar rate limiting.
-- Contrasenas con `bcrypt` o equivalente estandar; nunca texto plano.
-- Sesiones con JWT y plan claro para expiracion, refresh token y revocacion basica.
-- Variables de entorno y secretos nunca deben almacenarse en frontend ni en commits.
-- Agregar cabeceras HTTP seguras y CORS estricto con herramientas simples como `helmet`/config equivalente si el backend lo permite.
-- Debe funcionar en local, Render/Vercel/EAS/MongoDB Atlas free tier o alternativas gratuitas razonables.
-
-### 12.11 Infraestructura y DevOps
-
-Plan cerrado: `Documentacion/01-planes-maestros/cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md`. No crear otro plan de infraestructura sin cerrar, extender o reemplazar explicitamente ese archivo.
-
-Debe cubrir:
-
-- Backend.
-- Base de datos.
-- CI/CD.
-- Entornos.
-- Docker.
-- FastAPI vs Node.
-- Vercel vs VPS vs local.
-- Backups.
-- Logs.
-- Monitoreo.
-
-Debe exigir:
-
-- Evaluacion de costos.
-- Camino minimo viable para entrega escolar.
-- Camino profesional escalable.
-- Uso posible de laptop local.
-- Riesgos de self-hosting.
-- Scripts reproducibles.
-- Rollback.
-- Seguridad de secretos.
-
-### 12.12 Despliegue y Distribucion
-
-Debe cubrir:
-
-- Android.
-- iOS.
-- Web.
-- Landing page.
-- Hosting.
-- Dominio.
-- App stores.
-- Builds.
-- Versionado.
-
-Debe exigir:
-
-- Checklist de release.
-- Costos de cuentas.
-- EAS/dev build si aplica.
-- Politicas legales.
-- Pruebas en dispositivos reales.
-- Beta testing.
-- Crash reporting.
-- Analitica basica.
-
-### 12.13 Notificaciones
-
-Debe cubrir:
-
-- Push notifications.
-- Notificaciones internas.
-- Preferencias.
-- Relacion con tareas, mensajes, social y grupos.
-
-Debe exigir:
-
-- Compatibilidad con Expo Go/dev build.
-- Fallback local/in-app.
-- Permisos.
-- Opt-in/opt-out.
-- Costos.
-
-### 12.14 Onboarding y Ayuda
-
-Debe cubrir:
-
-- Primer uso.
-- Tutoriales.
-- Ayuda contextual.
-- Guia de modulos.
-
-Debe exigir:
-
-- Actualizarse despues de refactors grandes.
-- No bloquear flujo experto.
-- Explicar IA, offline y sync con lenguaje docente.
-
----
-
-## 13. Tracking Obligatorio
-
-Cada tarea debe usar:
-
-- `[ ]` Pendiente.
-- `[~]` En progreso.
-- `[x]` Completado.
-
-Formato recomendado:
-
-```markdown
-- [x] **3.2 Crear ViewModel principal**
-  - **Completado 2026-05-28:** se creo `useModuloViewModel`, se agregaron tests y paso `npx tsc --noEmit`.
-```
-
-Cada avance debe registrar:
-
-- Fecha.
-- Que cambio.
-- Archivos principales.
-- Validacion ejecutada.
-- Riesgos pendientes.
-
-### 13.1 Markdown + GitHub Projects
-
-Los planes maestros no deben quedarse solo en markdown cuando entren a ejecucion. La regla operativa es:
-
-- El archivo markdown es la fuente de verdad arquitectonica, historica y de decisiones.
-- GitHub Projects es la fuente de verdad operativa diaria: Kanban, prioridad, estado, bloqueo y seguimiento.
-- GitHub Actions no debe usarse para guardar tareas; Actions solo valida automatizaciones como typecheck, lint, tests y deploy.
-
-Modelo recomendado para un desarrollador solo:
-
-- Crear un issue o draft item tipo `epic` por cada plan maestro.
-- Crear work items por fase cuando el plan este por ejecutarse.
-- No crear desde el primer dia un issue por cada checkbox interno si eso genera demasiado ruido.
-- Convertir a issues las tareas de la fase activa y de la siguiente fase inmediata.
-- Mantener las tareas futuras como checklist dentro del markdown hasta que esten cerca de ejecutarse.
-- Usar milestones como ciclos/sprints/release goals, no como epicas permanentes.
-- Usar labels para clasificar trabajo: `fase`, `legacy`, `ux-ui`, `offline-first`, `ai`, `infra`, `testing`, `docs`, `needs-input`, `low-cost`.
-- Al completar una fase, actualizar tanto el markdown como el Project.
-- Cada fase ejecutada debe dejar evidencia de comandos: TypeScript, lint, tests, validacion focalizada y/o GitHub Actions. Si se decide no correr un script global por costo/tiempo, el plan debe justificarlo y dejar comando focalizado equivalente.
-- Si varias fases se ejecutan juntas por refactor, crear un unico issue consolidado que explique alcance, fases cubiertas, evidencia tecnica y validacion manual pendiente.
-
-Mapping recomendado:
+Mapping vigente (adaptado a SDD):
 
 | Elemento | Donde vive | Uso |
 | --- | --- | --- |
-| Plan maestro | Markdown + issue/draft `epic` | Vision, alcance y seguimiento macro. |
-| Fase | Issue o Project item | Trabajo accionable en Kanban. |
-| Tarea pequena | Checklist del issue activo | Detalle diario sin llenar el Project de ruido. |
-| Milestone | GitHub Milestone | Ciclo de trabajo o release parcial. |
-| Label | GitHub Label | Clasificacion tecnica/producto. |
-| Validacion CI | GitHub Actions | Evidencia automatica de calidad. |
+| Plan maestro | Markdown + issue/draft `epic` | Vision, backlog y seguimiento macro. |
+| Ola | Milestone | Ciclo de trabajo. |
+| Change | Issue + item del Project | Unidad ejecutable en Kanban. |
+| Tarea tecnica | `tasks.md` dentro del change | Detalle diario; no ensuciar el Project con esto. |
+| Validacion CI | GitHub Actions | Evidencia automatica. |
+
+Labels sugeridas: `change`, `ux-ui`, `offline-first`, `ai`, `infra`, `testing`, `docs`, `needs-input`, `low-cost`.
+No crear issues para todos los changes futuros de golpe; solo la ola activa y la siguiente.
 
 ---
 
-## 14. Reglas para IAs Durante Ejecucion
+## 7. Presupuesto e Infraestructura
 
-Cuando una IA implemente una fase:
+Sin cambios de fondo respecto a la v2:
 
-- Debe leer la fase completa.
-- Debe leer el `Brief Ground Truth - Fase X` de esa fase si existe.
-- Si la fase no tiene brief y toca UX/UI o flujo de un modulo de paridad alta, debe detenerse y crear/pedir ese brief antes de programar.
-- Durante ejecucion de planes maestros, debe leer `.agents/skills/token-efficiency/SKILL.md` si existe y decidir modo `NORMAL` o `CAVEMAN` antes de actuar.
-- Debe revisar `git status`.
-- Debe no revertir cambios ajenos.
-- Debe actualizar el plan al completar avances.
-- Debe actualizar GitHub Project si el plan ya esta en ejecucion y hay work items creados.
-- Debe actualizar documentacion si cambia arquitectura.
-- Debe validar que las rutas nuevas queden enlazadas desde tabs, hubs, CTAs, menus o cards reales.
-- Debe comparar los flujos implementados contra capturas/referencias reales citadas en la fase.
-- Debe correr validaciones proporcionales.
-- Debe registrar en el plan y/o issue activo los scripts ejecutados y el resultado: `npx tsc --noEmit`, `npm run lint -- --quiet`, `npm test -- --runInBand`, tests focalizados y GitHub Actions si aplica.
-- No debe saltarse la sincronizacion de GitHub Project: si una fase queda en `[x]`, el item debe moverse a `Done` o `Review Manual`; si queda en `[~]`, debe moverse a `In progress` o `Review Manual`; si requiere input, debe llevar `needs-input`.
-- Debe hacer commit solo si el usuario lo pide.
-- Debe pedir confirmacion antes de saltar a otra fase grande si el usuario lo solicito.
-- Debe detenerse si una decision de producto cambia el rumbo.
-
-### 14.1 Uso Dirigido de `token-efficiency` / Modo Caveman
-
-Esta skill no es una regla global para todas las conversaciones. Se usa durante ejecucion de planes maestros o cuando una issue/prompt lo pida explicitamente. Cada plan maestro debe indicar en que fases conviene usarla:
-
-- Skill fuente: `.agents/skills/token-efficiency/SKILL.md`.
-- Modo `NORMAL`: usar para auditoria, planeacion, arquitectura, decisiones UX/UI, decisiones de producto, investigacion, prompts de IA, dudas, checkpoints y entregables documentales.
-- Modo `CAVEMAN`: usar para ejecutar tareas ya aprobadas y mecanicas: crear archivos desde una especificacion, mover/renombrar, actualizar imports, implementar helpers/facades, escribir tests definidos, corregir lint/typecheck, correr validaciones, marcar checkboxes y sincronizar GitHub Project.
-- No usar `CAVEMAN` cuando todavia haya ambiguedad, riesgo de arquitectura, decision de navegacion, decision de costo, seguridad o UX/IHC.
-- Si una fase mezcla pensamiento y ejecucion, la IA debe trabajar primero en `NORMAL`, cerrar decision, y despues cambiar a `CAVEMAN` para la implementacion mecanica.
-- Al final de una fase, volver a `NORMAL` para resumir evidencia, riesgos y pedir confirmacion si aplica.
-
-Regla de trazabilidad:
-
-- En cada plan nuevo debe existir una seccion breve llamada `Modo de Trabajo Recomendado` o notas por fase indicando si se espera `NORMAL`, `CAVEMAN` o mixto.
-- Las issues de GitHub pueden incluir una linea `Modo sugerido: NORMAL/CAVEMAN/Mixto` para orientar a futuras IAs.
-
-### 14.2 Guia Opcional de Modelos y Razonamiento
-
-Esta guia es orientativa y no debe bloquear el trabajo si los modelos disponibles cambian:
-
-- Planeacion estrategica, arquitectura, auditorias profundas, seguridad, UX/IHC con Nielsen: usar modelos fuertes con razonamiento `high` o `xhigh` como Codex 5.5, Claude Opus thinking o Gemini 3.1 Pro.
-- Implementacion extensa con contexto de repo, refactors, tests y fixes: usar Codex 5.4 o 5.5 en `medium/high`; subir a `xhigh` si hay bugs dificiles o migraciones delicadas.
-- Cambios mecanicos, documentacion menor, checkboxes, labels, issues y validaciones repetitivas: usar Codex 5.4 mini o modelo rapido en `low/medium`; aplicar modo `CAVEMAN` solo si la tarea ya esta aprobada y no requiere decisiones nuevas.
-- Revisiones cruzadas de producto, copy UX o alternativas de diseno: usar un segundo modelo fuerte en `high` como contraste, sin copiar codigo externo.
-- IA/costos/infraestructura: preferir razonamiento alto para decidir, pero implementacion en modo eficiente una vez aprobada la ruta.
+- Presupuesto cero/bajo. Free tiers (Vercel, MongoDB Atlas M0, OpenRouter/Groq free) primero.
+- La laptop del desarrollador puede dar backend local, LLM local (LM Studio detras del gateway,
+  nunca asumir que Vercel alcanza localhost) y batch local.
+- Todo change que toque backend, IA, almacenamiento, notificaciones o distribucion debe declarar costo
+  en su `proposal.md` (regla candidata si se repite el olvido).
+- Documentar riesgos de free tier: limites, cold starts, suspension.
+- Profesional no significa caro: empezar simple, poder crecer.
 
 ---
 
-## 15. Plantilla Rapida para Nuevo Plan
+## 8. Directrices por Experiencia
+
+La vision completa vive en `Documentacion/00-fundamentos/VISION_ACTUAL.md`. Resumen normativo para changes:
+
+| Experiencia | Regla clave para cualquier change |
+| --- | --- |
+| Escritorio (Inicio) | Launcher de herramientas + tablero accionable del dia; nunca landing decorativa ni feed. |
+| NotasPLAN / CalcuPLAN / PresentaPLAN | Se sienten como Word/Excel/PowerPoint; "Crear" ofrece tipos de archivo, la IA detecta la intencion escolar despues (chip descartable). |
+| AsistePLAN | Chat propio via gateway; adjuntos de objetos reales; toda accion de salida confirmable; estados cloud/local/no-configurada/error/2o-plano visibles. |
+| Clases (Classroom) | Organiza, asigna y da seguimiento; recibe objetos de Office/DiseñaPLAN/AsistePLAN sin descargas manuales. |
+| DiseñaPLAN | Editor visual opcional; empezar minimal (plantillas + bloques + export); frontera clara con PresentaPLAN. |
+| ConectaPLAN | Mensajeria profesional 1:1/grupos disenada desde cero; el feed social no es la entrada de nada. |
+| AgendaPLAN | Vista temporal de objetos reales; cada evento abre su clase/documento/actividad. |
+| ReportaPLAN | Espera datos reales; gamificacion prudente; alertas de riesgo siempre con el dato que las sustenta. |
+| Cuenta/Accesibilidad | Tema/fuente/daltonismo deben propagarse en runtime (useTheme), no switches decorativos. |
+| Auth/Seguridad | RBAC pragmatico validado en backend; bcrypt, JWT+refresh, rate limiting en criticos, secretos solo en env. |
+| Notificaciones | Compatibilidad Expo Go/dev build; fallback in-app; opt-in/opt-out. |
+| Onboarding/Ayuda | Actualizar tras refactors grandes; el mensaje de suite vive aqui y en empty states, no en el uso diario. |
+
+---
+
+## 9. Modo de Trabajo y Modelos (orientativo)
+
+- **NORMAL** (razonamiento alto): explore, propose, revision de specs, decisiones de arquitectura/UX/costos,
+  adversarial-review.
+- **CAVEMAN / eficiente** (`.agents/skills/token-efficiency/SKILL.md` si existe): apply de tareas ya
+  especificadas, fixes de lint/typecheck, marcar checkboxes, sincronizar Project.
+- Si una tarea de apply revela ambiguedad o decision nueva: volver a NORMAL, decidir (o actualizar la spec),
+  y solo entonces continuar.
+- Modelos: fuertes con razonamiento alto para planear/red-team; rapidos para lo mecanico. No bloquear el
+  trabajo si la oferta de modelos cambia.
+
+---
+
+## 10. Plantillas
+
+### 10.1 Plantilla de Plan Maestro (Blueprint + Backlog)
 
 ```markdown
-# Plan Maestro: [Modulo] - PlanearIA
+# Plan Maestro: [Nombre] - PlanearIA
 
 > **Version:** 1.0
 > **Fecha:** YYYY-MM-DD
-> **Alcance:** [descripcion]
-> **Stack:** React Native - Expo - TypeScript - MongoDB Atlas - AsyncStorage default / SQLite opt-in - MVVM - motor `src/sync` offline-first global
-> **Modulo:** [nombre]
-> **Estado actual:** [resumen basado en codigo]
+> **Formato:** SDD con OpenSpec (meta_guia_planes.md v3)
+> **Alcance:** [que cubre y que no]
+> **Estado:** [en construccion | activo | cerrado]
 
----
+## 1. Blueprint
 
-## Dinamica de Entrega y Aprobacion
+### 1.1 Objetivo y vision
+### 1.2 Decisiones tomadas (con fecha)
+### 1.3 Nivel de paridad y ground truth por experiencia
+### 1.4 Riesgos y anti-patrones
+### 1.5 No objetivos
 
-- Este plan se construye por entregas iterativas segun `meta_guia_planes.md` seccion 5.2.
-- Entrega 1 aprobada: [si/no/pendiente].
-- Entrega 2 aprobada: [si/no/pendiente].
-- Entrega 3 aprobada: [si/no/pendiente].
-- Consolidacion final aprobada: [si/no/pendiente].
-- Decisiones que requieren luz verde antes de ejecutar:
-  - ...
+## 2. Backlog de Changes
 
-## Analisis del Ground Truth
+### Ola 0: [nombre]
+[entradas con la plantilla 10.2]
 
-## Contrato de Experiencia Madre
+### Ola 1: [nombre]
+...
 
-- Nivel de paridad: [Clon/paridad alta | Inspirado/paridad media | Funcional/administrativo]
-- Ground truth local:
-  - `context/[modulo]-ground-truth/01-errores-actuales/README.md`
-  - `context/[modulo]-ground-truth/02-capturas-actuales-de-la-app/`
-  - `context/[modulo]-ground-truth/03-referencias-reales/`
-- Referencias open source:
-  - `context/referencias-opensource/[repo]/FUENTE.md`
-- Referencias faltantes a pedir:
-  - ...
+## 3. Registro de Decisiones y Open Questions
 
-## Inventario del Codigo Actual
+## 4. Criterio de Cierre del Plan
+```
 
-## Decisiones Tecnicas
+### 10.2 Plantilla de Entrada de Backlog (change story)
 
-## Modelo de Datos Objetivo
+```markdown
+#### Change: `<nombre-kebab-case>`
 
-## UX/UI Objetivo
-
-## Estrategia Web/Tablet/Movil
-
-- Default: pantalla madre responsiva/adaptativa, mobile-first, con ViewModel/logica compartida.
-- Breakpoints/helper previsto:
-  - ...
-- Cambios de layout esperados:
-  - Movil: ...
-  - Tablet: ...
-  - Web: ...
-- Excepcion por plataforma:
-  - [No aplica | `.web.tsx`/`.native.tsx` justificado por ...]
-- Validacion minima:
-  - Web: ...
-  - Tablet: ...
-  - Movil: ...
-
-## Mapa de Navegacion y UX/UI Global
-
-## IA y Automatizacion
-
-## Offline-First y Sync
-
-- Entidad sync:
-  - [Existe en `SYNC_ENTITIES` | requiere nueva entrada | requiere `registerSyncTask` custom].
-- Endpoint backend:
-  - `backend/routes/...`
-- Storage local:
-  - `@planearia:...`
-- Cola:
-  - `queueEntityOperation` / `syncEngine`.
-- Pull autoritativo:
-  - responseKey, reconciliacion con pendientes y deletes.
-- Eventos:
-  - `syncEvents` que refrescan contexto/pantalla.
-- Sesiones:
-  - token real requerido; invitado/dev-local sin sync remoto.
-- Backend:
-  - JWT/userId, idempotencia de create/update/delete, rate limiting si aplica.
-- Validacion:
-  - offline, reconexion, cross-device, servidor caido y pull fallido sin perdida local.
-
-## Costos e Infraestructura
-
-## Limpieza Legacy
-
-## Modo de Trabajo Recomendado
-
-- NORMAL: auditoria, decisiones, arquitectura, UX/UI, seguridad, IA, costos y checkpoints.
-- CAVEMAN: implementacion mecanica aprobada, tests, validaciones, updates de plan y GitHub Project.
-- Modelo sugerido: [opcional, segun complejidad y disponibilidad].
-
-## Fases de Ejecucion
-
-### FASE 0: Auditoria y Preparacion
-
-Brief Ground Truth - Fase 0:
-
-- Referencias reales:
-  - ...
-- Capturas actuales:
-  - ...
-- Referencias open source:
-  - ...
-- Flujos prohibidos:
-  - ...
-
-- [ ] ...
-
-### FASE 1: Modelo y Tipos
-
-- [ ] ...
-
-### FASE 2: Datos, Contexto y Sync
-
-- [ ] ...
-
-### FASE 3: Componentes Base
-
-- [ ] ...
-
-### FASE 4: Pantallas y Flujo Principal
-
-- [ ] ...
-
-### FASE 5: IA / Funciones Avanzadas
-
-- [ ] ...
-
-### FASE 6: Integracion, Navegacion y UX/UI Global
-
-- [ ] ...
-
-### FASE FINAL: Limpieza, Validacion y Documentacion
-
-- [ ] ...
-
-## Resumen de Archivos
-
-## Open Questions
-
-## Criterio de Cierre
+- **Historia:** Como docente, [quiero/veo/puedo ...] para [beneficio].
+- **Criterio de aceptacion:** [2-5 bullets observables en lenguaje docente]
+- **Paridad:** [alta | media | funcional]
+- **Ground truth:** [frame Figma / carpeta context/... / "pendiente: bloqueo"]
+- **Depende de:** [changes previos o "nada"]
+- **Estado:** pendiente | en curso | archivado (YYYY-MM-DD)
+- **Notas:** [decisiones locales, riesgos, costo si aplica]
 ```
 
 ---
 
-## 16. Criterio de Calidad de un Buen Plan
+## 11. Criterio de Calidad y Mandato Final
 
-Un plan es aceptable solo si:
+Un plan maestro es aceptable solo si:
 
-- Una IA futura puede implementarlo sin redescubrir todo.
-- Distingue legacy vs objetivo.
-- Integra offline-first desde el inicio.
-- Considera presupuesto bajo.
-- Considera web, Android e iOS.
-- Define estrategia web/tablet/movil: pantalla madre responsiva por defecto o excepcion por plataforma justificada.
-- Define IA con fallback.
-- Incluye validacion.
-- Incluye costos cuando aplica.
-- Considera dependencias entre modulos.
-- Garantiza que el modulo no queda aislado y que sus flujos de entrada/salida son claros.
-- Detecta redundancias de UX/UI y propone eliminarlas o consolidarlas.
+- Una IA futura puede tomar cualquier entrada del backlog y proponerla sin redescubrir el repo.
+- El blueprint distingue legacy vs objetivo y declara paridad + ground truth por experiencia.
+- El backlog tiene dependencias explicitas y olas realistas para un desarrollador solo.
+- Cada historia esta en lenguaje docente con criterio de aceptacion observable.
+- Integra offline-first, presupuesto bajo, web/tablet/movil e IA con fallback desde la historia, no como parche.
 - Define criterio de cierre en lenguaje de usuario.
-- Define nivel de paridad y ground truth por fase cuando el modulo imita una experiencia madre.
-- Pide capturas, URLs o repos open source faltantes antes de implementar pantallas si no existen referencias suficientes.
-- No permite cerrar fases visuales de paridad alta solo con tests automaticos.
+
+Mandato final (sin cambios): PlanearIA debe crecer como una app profesional con una estrategia realista para
+un estudiante que trabaja solo. La meta no es impresionar con tecnologia: es que la app funcione bien para
+docentes reales, cueste lo minimo razonable, sea mantenible, aproveche IA con responsabilidad y pueda
+evolucionar experiencia por experiencia.
 
 ---
 
-## 17. Mandato Final
+## Version
 
-PlanearIA debe crecer como una app profesional, pero con una estrategia realista para un estudiante que trabaja solo. Cada plan futuro debe ayudar a construir algo que pueda demostrarse, mantenerse y eventualmente lanzarse sin quedar atrapado en complejidad innecesaria.
-
-La meta no es impresionar con tecnologia. La meta es que la app funcione bien para docentes reales, cueste lo minimo razonable, sea mantenible, aproveche IA con responsabilidad y pueda evolucionar modulo por modulo.
+- v3.0 — 2026-07-04. Migracion al formato SDD con OpenSpec. Version anterior en
+  `Documentacion/99-archivo/meta_guia_planes_v2_pre-sdd_2026-07.md`.

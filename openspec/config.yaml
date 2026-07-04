@@ -1,0 +1,59 @@
+schema: spec-driven
+
+# Contexto del proyecto PlanearIA.
+# Esto se muestra a la IA cada vez que crea o aplica un artefacto (propose/apply).
+context: |
+  PlanearIA: app offline-first para docentes mexicanos.
+  Stack: React Native 0.81.5 + Expo SDK 54 + TypeScript 5.9, React Navigation 7.
+  Patron: MVVM pragmatico (pantallas delgadas, hooks como ViewModels, Context para estado
+  compartido, services para I/O). Persistencia local por defecto: AsyncStorage. SQLite es
+  infraestructura opt-in, NO activar como default sin aprobacion explicita.
+  Backend: Node serverless en backend/api/index.js + backend/routes. MongoDB Atlas M0.
+  Auth JWT con sesiones de refresh. Gateway de IA en backend/lib/aiGateway.js.
+  CI/CD: GitHub Actions (ci.yml, cd.yml). Desarrollador solo, presupuesto cero/bajo.
+
+  Fuentes de verdad tecnica (leer y respetar antes de crear cualquier artefacto):
+  - CLAUDE.md — reglas de arquitectura, testing, plan activo y estilo del proyecto.
+  - Documentacion/00-fundamentos/VISION_ACTUAL.md — vision de producto (suite docente conectada).
+  - Documentacion/00-fundamentos/ARQUITECTURA.md — arquitectura y capas.
+  - Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md — motor de sync offline-first.
+  - Documentacion/00-fundamentos/IA_CHATBOT_LLM.md — asistente IA y gateway.
+  - Documentacion/00-fundamentos/MAPA_MODULOS_ACTUALES.md — modulos actuales.
+  - Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md — roadmap de planes maestros.
+  - Documentacion/00-fundamentos/IHC_DISCOVERY_DOCENTE.md — personas, recorridos y checklist Nielsen (gate de UI).
+  - Documentacion/01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md — plan UX/UI activo (blueprint + backlog de changes).
+  - .claude/rules/backend.md, frontend.md, testing.md — reglas por capa.
+
+  REGLAS DE ORO (aplican SIEMPRE, en cualquier artefacto e implementacion):
+  - Todo dato academico sincronizable DEBE usar src/sync. No crear clientes HTTP ni colas paralelas.
+  - Toda entidad multiusuario debe aislarse por userId.
+  - La IA solo accede a modelos via el backend gateway (backend/lib/aiGateway.js). Nunca keys de
+    proveedor en el frontend, ni cloud (OpenAI/Gemini) ni local (LM Studio).
+  - Las correcciones generadas por IA NO sobreescriben el original: crear copia, borrador, diff o
+    resultado de chat para revision del docente.
+  - No activar SQLite como default ni borrar llaves legacy @planearia:* sin migracion, validacion y rollback.
+  - Nada de microservicios ni servicios costosos salvo peticion explicita con tradeoffs documentados.
+  - Web, tablet y movil parten de una pantalla responsive compartida; archivos por plataforma requieren justificacion.
+
+  Idioma: espanol permitido en docs y texto de usuario. Sin emojis en codigo, docs, commits ni logs.
+  Comentarios explican el porque, no el que.
+
+# Reglas por artefacto. Claves validas en el schema spec-driven: proposal, specs, design, tasks.
+rules:
+  proposal:
+    - Incluir siempre una seccion de "No objetivos" (fuera de alcance).
+    - Referenciar el plan maestro afectado en Documentacion/01-planes-maestros cuando aplique.
+  specs:
+    - Escribir requirements como comportamiento observable por el docente (SHALL + escenarios WHEN/THEN), no como detalles de implementacion.
+    - Toda pantalla o flujo de UI debe incluir escenarios de loading, empty, error y offline/sync pendiente.
+    - Toda accion de IA debe incluir escenarios de confirmacion explicita del docente, fallback sin proveedor configurado, error temporal y resultado revisable que nunca sobreescribe el original.
+    - Incluir criterios de accesibilidad cuando la spec toque UI (labels accesibles, contraste via tokens, area de toque minima 44pt).
+  design:
+    - Para UI de alta paridad, referenciar el ground truth visual (link Figma/Stitch o captura) antes de implementar; si no existe, declararlo como bloqueo, no improvisar.
+    - Especificar comportamiento responsive desde la pantalla madre compartida por breakpoint (movil <768, tablet 768-1279, web >=1280).
+    - Colores y estilos solo desde tokens de src/themes; las pantallas redisenadas consumen el tema en runtime, no el COLORS estatico.
+    - Archivos .web.tsx/.native.tsx solo si la interaccion (no el tamano) lo exige, con justificacion escrita.
+  tasks:
+    - Tareas pequenas y revisables, una a la vez.
+    - Ninguna tarea se marca completada sin evidencia (salida de typecheck, lint y tests afectados).
+    - Si el change toca UI, incluir una tarea final de validacion visual con capturas por breakpoint (Playwright MCP en web) contra el ground truth; la UI de alta paridad no se cierra solo con tests automaticos.

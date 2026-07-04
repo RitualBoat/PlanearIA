@@ -13,8 +13,9 @@ Leer en este orden antes de auditar o proponer planes:
 5. `00-fundamentos/FLUJO_SINCRONIZACION.md`
 6. `00-fundamentos/MAPA_MODULOS_ACTUALES.md`
 7. `00-fundamentos/ROADMAP_PLANES_MAESTROS.md`
-8. `01-planes-maestros/meta_guia_planes.md`
-9. `prompt_mejorado.md`
+8. `00-fundamentos/IHC_DISCOVERY_DOCENTE.md`
+9. `01-planes-maestros/meta_guia_planes.md` (v3: planes = Blueprint + backlog de changes OpenSpec)
+10. `01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md` (plan activo de UX/UI)
 
 Si hay contradiccion entre documentos, gana este orden:
 
@@ -74,14 +75,20 @@ Experiencias objetivo:
 - Sync offline-first: motor global por entidad en `src/sync`, con `SyncContext`, `SyncStatusBanner`, push/pull, JWT y `userId`.
 - Auth/Seguridad/Sesion Real: plan activo/en cierre; ya existen JWT, refresh tokens, SecureStore nativo, AsyncStorage web, sesiones y roles base. Pendientes principales: email real, datos sociales completos, validacion manual y sincronizacion final de GitHub Product OS.
 - Demo/CD: web bundle y APK standalone se construyen en GitHub Actions; despliegue web/backend se maneja por Vercel.
-- UX/UI Global: siguiente plan recomendado para fijar navegacion, sistema visual, accesibilidad y blueprint de experiencias conectadas.
+- Metodologia de trabajo: SDD con OpenSpec. Los planes maestros son Blueprint + backlog de changes; las
+  tareas tecnicas viven en el `tasks.md` de cada change y las specs archivadas en `openspec/specs/` son
+  la verdad de comportamiento. Ver `01-planes-maestros/meta_guia_planes.md` (v3) y la seccion OpenSpec de `CLAUDE.md`.
+- UX/UI Global: plan ACTIVO (`01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md`). Define la suite
+  (Escritorio, NotasPLAN/CalcuPLAN/PresentaPLAN, Clases, AsistePLAN, DiseñaPLAN, ConectaPLAN, AgendaPLAN,
+  ReportaPLAN), la navegacion adaptativa y el backlog de changes por olas.
 
-## Proximo Plan Recomendado
+## Proximo Paso Recomendado
 
 1. Cerrar formalmente `PLAN_AUTH_SEGURIDAD_SESION_REAL.md` con validacion manual, email real o decision explicita de diferirlo, y tracking GitHub actualizado.
-2. Iniciar `Plan Maestro: UX/UI y Navegacion Global`.
-3. Dentro de ese plan, decidir la arquitectura de experiencias: Asistente IA, Office Docente, Classroom, Canva, WhatsApp, Calendario, Reportes y Cuenta/Accesibilidad.
-4. Solo despues crear subplanes de implementacion por experiencia o subexperiencia.
+2. Ejecutar la Ola 0 del `PLAN_UXUI_NAVEGACION_GLOBAL.md` con el ciclo SDD (`/opsx:propose` del change
+   `theming-runtime` es el piloto natural del flujo OpenSpec).
+3. Aplicar las entrevistas IHC (`00-fundamentos/IHC_DISCOVERY_DOCENTE.md`, seccion 5) cuando exista el
+   prototipo de Escritorio + Crear (Ola 2).
 
 ## Documentos Principales
 
@@ -94,12 +101,13 @@ Experiencias objetivo:
 | `00-fundamentos/MAPA_MODULOS_ACTUALES.md` | Inventario de carpetas actuales mapeadas a experiencias objetivo. |
 | `00-fundamentos/ROADMAP_PLANES_MAESTROS.md` | Orden recomendado de planes. |
 | `00-fundamentos/FLUJO_SINCRONIZACION.md` | Motor offline-first vigente. |
-| `01-planes-maestros/meta_guia_planes.md` | Instructivo obligatorio para crear o ejecutar planes. |
+| `00-fundamentos/IHC_DISCOVERY_DOCENTE.md` | Proto-personas, recorridos, guion de entrevistas y checklist Nielsen. |
+| `01-planes-maestros/meta_guia_planes.md` | Instructivo obligatorio v3: planes SDD con OpenSpec. |
+| `01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md` | Plan activo: blueprint y backlog de changes UX/UI. |
 | `01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md` | Plan activo/en cierre. |
 | `02-operacion/ENTORNO_LOCAL.md` | Como levantar app/backend. |
 | `02-operacion/GUIA_PRUEBAS.md` | Validaciones tecnicas/manuales. |
 | `02-operacion/DEPLOY_DEMO_HOSTEADA.md` | Guia para Vercel, web y APK. |
-| `prompt_mejorado.md` | Prompt listo para pedir a Claude la auditoria UX/UI global. |
 
 ## Reglas Para Futuras IAs
 
@@ -119,5 +127,5 @@ Experiencias objetivo:
 
 ## Version
 
-- Ultima actualizacion: 2026-06-17.
-- Version documental: 4.4.
+- Ultima actualizacion: 2026-07-04.
+- Version documental: 5.0 (adopcion SDD/OpenSpec, plan UX/UI activo, IHC discovery, nombres de suite).

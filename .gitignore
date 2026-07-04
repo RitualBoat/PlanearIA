@@ -52,6 +52,14 @@ skills-lock.json
 roadmap-context
 stitch-results
 
+# Exception: Claude Code / OpenSpec skills MUST be versioned (they configure the SDD workflow).
+# The generic "skills/" pattern above also matched .claude/skills/, so re-include it here.
+!.claude/skills/
+!.claude/skills/**
+
+# Playwright MCP scratch output (page snapshots, traces)
+.playwright-mcp/
+
 
 # AI coding tools (agent config directories)
 .adal/
@@ -86,6 +94,12 @@ CLAUDE.local.md
 .windsurf/
 .zencoder/
 .stitch-results/
+
+# =============================================================================
+# OpenSpec reference material (foreign template, study only, not active config)
+# Keep Capturas/ tracked; ignore the cloned specboot template repo.
+# =============================================================================
+context/OpenSpec/Repo/
 
 # =============================================================================
 # IDE / Editor

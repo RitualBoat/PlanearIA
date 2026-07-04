@@ -172,6 +172,31 @@ Rules:
 - This project does NOT use symlinked skills (Windows). Skills are real files under `.claude/skills/`.
 - Reference/study material for the SDD setup lives in `context/OpenSpec/` (lidr-specboot template + screenshots); it is not the active config.
 
+## CodeGraph MCP
+
+PlanearIA is initialized for CodeGraph to reduce repeated grep/read exploration.
+
+- Start structural code questions with CodeGraph: "how does X work?", call flow, dependencies, impact
+  radius, affected tests, or where a symbol lives.
+- MCP config lives in `.mcp.json`; the server command is `codegraph serve --mcp`.
+- The local index lives in `.codegraph/` and is ignored by Git. Rebuild with `npm run codegraph:init`
+  or refresh with `npm run codegraph:sync`.
+- If an agent session does not expose MCP tools, use the CLI equivalent:
+
+```bash
+npm run codegraph:explore -- "how does SyncContext reach entitySync and syncEngine?"
+```
+
+Treat returned CodeGraph source blocks as already read. Fall back to `rg` and direct reads when working
+with non-indexed docs/assets, full-file edits, generated outputs, or files outside the indexed project.
+
+Shared project MCPs in `.mcp.json`: CodeGraph, Figma, Context7, GitHub, Vercel, Expo, Playwright and
+PlanearIA SQLite read-only.
+When Expo local MCP project context is needed during development, start Expo with `npm run start:mcp`.
+For local SQLite diagnostics, use `planearia-sqlite` or `npm run sqlite:inspect`; never use arbitrary SQL
+or activate SQLite as default because of this inspector. MongoDB MCP is opt-in only with dev/staging read-only
+credentials outside Git.
+
 ## Ground Truth
 
 For high-parity experiences, check or request ground truth before UI implementation:

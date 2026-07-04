@@ -5,6 +5,7 @@
   "scripts": {
     "start": "expo start",
     "start:dev": "expo start --dev-client",
+    "start:mcp": "node scripts/startExpoMcp.mjs",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
@@ -28,7 +29,16 @@
     "backend:health": "node scripts/checkBackendHealth.mjs",
     "backend:check": "node scripts/checkBackendApiStatic.mjs && node scripts/testBackendIsolation.mjs",
     "backend:isolation": "node scripts/testBackendIsolation.mjs",
-    "backend:deploy": "npm --prefix backend run deploy"
+    "backend:deploy": "npm --prefix backend run deploy",
+    "codegraph:init": "npx @colbymchenry/codegraph init",
+    "codegraph:status": "npx @colbymchenry/codegraph status",
+    "codegraph:sync": "npx @colbymchenry/codegraph sync",
+    "codegraph:explore": "npx @colbymchenry/codegraph explore",
+    "mcp:test": "node --no-warnings scripts/testMcpServers.mjs",
+    "mcp:github": "node --no-warnings scripts/mcpGithubFromGh.mjs",
+    "sqlite:inspect": "node --no-warnings scripts/planeariaSqliteInspect.mjs",
+    "mcp:sqlite": "node --no-warnings scripts/mcpPlaneariaSqlite.mjs",
+    "mcp:mongodb:readonly": "npx -y mongodb-mcp-server@latest --readOnly --indexCheck --telemetry disabled"
   },
   "dependencies": {
     "@10play/tentap-editor": "^1.0.1",
@@ -87,6 +97,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-native": "^5.0.0",
+    "expo-mcp": "~0.2.1",
     "jest": "^29.7.0",
     "jest-expo": "~54.0.0",
     "prettier": "^3.8.1",

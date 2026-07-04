@@ -2,8 +2,7 @@
 flowchart TB
     subgraph triggers["Disparadores"]
         pr["Pull Request<br/>-> main / development"]
-        push["Push<br/>-> main / development"]
-        tag["Tag v*"]
+        push["Push app/backend/build<br/>-> main / development"]
         manual["workflow_dispatch (manual)"]
     end
 
@@ -15,26 +14,23 @@ flowchart TB
     end
 
     subgraph cd["CD .github/workflows/cd.yml"]
-        webjob["web<br/>typecheck + expo export --platform web<br/>-> zip + sha256"]
-        androidjob["android<br/>prebuild + gradlew assembleRelease<br/>-> APK + sha256 (continue-on-error)"]
-        release["release<br/>publica GitHub Release (needs web)"]
-        webjob --> release
+        androidjob["android<br/>prebuild + gradlew assembleRelease<br/>-> APK"]
+        release["release<br/>publica GitHub Release (APK)"]
         androidjob --> release
     end
 
     pr --> ci
     push --> ci
     push --> cd
-    tag --> cd
     manual --> cd
 
     ci -->|"estado verde requerido"| mergeok(["Merge / branch verde"])
-    release --> ghrel[("GitHub Releases<br/>web bundle + APK demo")]
+    release --> ghrel[("GitHub Releases<br/>APK Android demo")]
 
-    subgraph deploy["Deploy hosteado (integracion Git de Vercel, fuera de Actions)"]
+    subgraph deploy["Deploy hosteado (Vercel fuera de Actions, filtrado por ignoreCommand)"]
         vercelbe["Vercel: backend serverless<br/>(/api/*)"]
         vercelweb["Vercel: web hosteada<br/>planearia-web.vercel.app"]
     end
 
-    push -.->|"auto-deploy Vercel"| vercelbe
-    push -.->|"auto-deploy Vercel"| vercelweb
+    push -.->|"Vercel si cambia backend/"| vercelbe
+    push -.->|"Vercel si cambia app/web"| vercelweb

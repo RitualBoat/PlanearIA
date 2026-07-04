@@ -52,6 +52,32 @@ Rules:
 - Specs archived in `openspec/specs/` are behavioral truth; update them through archive/sync, not by
   hand during implementation.
 
+## CodeGraph MCP First
+
+This repo is initialized for CodeGraph. For codebase-navigation questions, architecture tracing, impact
+analysis, or "how does X work?", start with CodeGraph before falling back to broad `rg` + file reads.
+
+- MCP server: `codegraph` in `.mcp.json` (`codegraph serve --mcp`).
+- Local index: `.codegraph/` (generated per machine and ignored by Git).
+- Health check: `npm run codegraph:status`.
+- Manual refresh: `npm run codegraph:sync`.
+- CLI fallback when MCP tools are not loaded:
+
+```bash
+npm run codegraph:explore -- "how does SyncContext reach entitySync and syncEngine?"
+```
+
+Use CodeGraph results as already-read source for the returned files/symbols. Re-run CodeGraph after edits
+or if the staleness/status output says the index is behind. Use normal file reads when the answer needs
+non-indexed docs/assets, exact full-file editing context, generated files, or anything outside this repo.
+
+Shared project MCPs in `.mcp.json`: CodeGraph, Figma, Context7, GitHub, Vercel, Expo, Playwright and
+PlanearIA SQLite read-only.
+When Expo local MCP project context is needed during development, start Expo with `npm run start:mcp`.
+For local SQLite diagnostics, use `planearia-sqlite` or `npm run sqlite:inspect`; never use arbitrary SQL
+or activate SQLite as default because of this inspector. MongoDB MCP is opt-in only with dev/staging read-only
+credentials outside Git.
+
 ## Validation Commands
 
 Use the smallest meaningful checks, then broaden with risk:

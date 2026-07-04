@@ -3,6 +3,7 @@
   "buildCommand": "npm run build:web",
   "devCommand": "expo",
   "framework": null,
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- App.tsx index.js package.json package-lock.json app.json app.config.* babel.config.js metro.config.js tsconfig.json assets src shared types vercel.json",
   "outputDirectory": "dist",
   "rewrites": [
     {

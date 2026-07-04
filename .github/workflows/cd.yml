@@ -7,20 +7,27 @@ on:
         description: "GitHub Release tag. Empty creates demo-${run_number}."
         required: false
         default: ""
-      build_android:
-        description: "Build Android standalone release APK"
-        required: true
-        default: "true"
-        type: choice
-        options:
-          - "true"
-          - "false"
   push:
     branches:
       - development
       - main
-    tags:
-      - "v*"
+    paths:
+      - "App.tsx"
+      - "index.js"
+      - "package.json"
+      - "package-lock.json"
+      - "app.json"
+      - "app.config.*"
+      - "babel.config.js"
+      - "metro.config.js"
+      - "tsconfig.json"
+      - "assets/**"
+      - "backend/**"
+      - "scripts/**"
+      - "shared/**"
+      - "src/**"
+      - "types/**"
+      - ".github/workflows/cd.yml"
 
 permissions:
   contents: write
@@ -30,41 +37,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  web:
-    name: Build web static bundle
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20
-          cache: npm
-      - name: Install dependencies
-        run: npm ci
-      - name: Typecheck
-        run: npm run typecheck
-      - name: Build web
-        run: npm run build:web
-      - name: Package web bundle
-        run: |
-          SHORT_SHA="${GITHUB_SHA::7}"
-          zip -r "planearia-web-${SHORT_SHA}.zip" dist
-          sha256sum "planearia-web-${SHORT_SHA}.zip" > "planearia-web-${SHORT_SHA}.zip.sha256"
-      - name: Upload web artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: planearia-web
-          path: |
-            planearia-web-*.zip
-            planearia-web-*.zip.sha256
-
   android:
     name: Build Android standalone APK
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event.inputs.build_android == 'true'
-    continue-on-error: true
     env:
       EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL || 'https://backend-eight-chi-54.vercel.app' }}
       EXPO_PUBLIC_API_SECRET: ${{ secrets.EXPO_PUBLIC_API_SECRET }}
@@ -108,22 +83,17 @@ jobs:
             exit 1
           fi
           cp "$APK_PATH" "PlanearIA-${SHORT_SHA}.apk"
-          sha256sum "PlanearIA-${SHORT_SHA}.apk" > "PlanearIA-${SHORT_SHA}.apk.sha256"
       - name: Upload Android artifact
         uses: actions/upload-artifact@v4
         with:
-          name: planearia-android-standalone
-          path: |
-            PlanearIA-*.apk
-            PlanearIA-*.apk.sha256
+          name: planearia-android-apk
+          path: PlanearIA-*.apk
 
   release:
     name: Publish GitHub Release
     runs-on: ubuntu-latest
     needs:
-      - web
       - android
-    if: always() && needs.web.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -141,9 +111,8 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: planearia-*
+          name: planearia-android-apk
           path: release-assets
-          merge-multiple: true
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -154,8 +123,7 @@ jobs:
             echo "PlanearIA demo build"
             echo ""
             echo "- Commit: ${GITHUB_SHA}"
-            echo "- Web bundle: planearia-web-*.zip"
-            echo "- Android standalone APK: PlanearIA-*.apk, if the Android job succeeded"
+            echo "- Android standalone APK: PlanearIA-*.apk"
             echo ""
             echo "The APK is a standalone demo build of PlanearIA with the JS bundle embedded."
             echo "It is signed for demo sideloading by the CI build, not as a Play Store upload artifact."

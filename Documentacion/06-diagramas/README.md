@@ -215,15 +215,16 @@ flowchart LR
 ## 4. Flujo CI/CD
 
 `ci.yml` corre en PR y push a `main`/`development` (typecheck, lint, jest, backend smoke).
-`cd.yml` construye web y APK Android y publica un GitHub Release. El backend y la web hosteada
-se despliegan en Vercel mediante su integracion Git (fuera de Actions).
+`cd.yml` construye solo APK Android y publica un GitHub Release. Solo corre por cambios reales de
+app/backend/build o ejecucion manual; cambios solo de documentacion no lo disparan. El backend y la web
+hosteada se despliegan en Vercel mediante su integracion Git (fuera de Actions), tambien filtrada por
+`ignoreCommand`.
 
 ```mermaid
 flowchart TB
     subgraph triggers["Disparadores"]
         pr["Pull Request<br/>-> main / development"]
-        push["Push<br/>-> main / development"]
-        tag["Tag v*"]
+        push["Push app/backend/build<br/>-> main / development"]
         manual["workflow_dispatch (manual)"]
     end
 
@@ -235,29 +236,26 @@ flowchart TB
     end
 
     subgraph cd["CD .github/workflows/cd.yml"]
-        webjob["web<br/>typecheck + expo export --platform web<br/>-> zip + sha256"]
-        androidjob["android<br/>prebuild + gradlew assembleRelease<br/>-> APK + sha256 (continue-on-error)"]
-        release["release<br/>publica GitHub Release (needs web)"]
-        webjob --> release
+        androidjob["android<br/>prebuild + gradlew assembleRelease<br/>-> APK"]
+        release["release<br/>publica GitHub Release (APK)"]
         androidjob --> release
     end
 
     pr --> ci
     push --> ci
     push --> cd
-    tag --> cd
     manual --> cd
 
     ci -->|"estado verde requerido"| mergeok(["Merge / branch verde"])
-    release --> ghrel[("GitHub Releases<br/>web bundle + APK demo")]
+    release --> ghrel[("GitHub Releases<br/>APK Android demo")]
 
-    subgraph deploy["Deploy hosteado (integracion Git de Vercel, fuera de Actions)"]
+    subgraph deploy["Deploy hosteado (Vercel fuera de Actions, filtrado por ignoreCommand)"]
         vercelbe["Vercel: backend serverless<br/>(/api/*)"]
         vercelweb["Vercel: web hosteada<br/>planearia-web.vercel.app"]
     end
 
-    push -.->|"auto-deploy Vercel"| vercelbe
-    push -.->|"auto-deploy Vercel"| vercelweb
+    push -.->|"Vercel si cambia backend/"| vercelbe
+    push -.->|"Vercel si cambia app/web"| vercelweb
 ```
 
 ---

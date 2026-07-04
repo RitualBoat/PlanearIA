@@ -40,7 +40,7 @@ La IA debe conectar el flujo de dos maneras: sugerencias silenciosas dentro de c
 - Sync offline-first: motor global por entidad en `src/sync`, orquestado por `SyncContext`.
 - Backend: router unico serverless, rutas academicas con JWT, `userId`, MongoDB e indices idempotentes.
 - Auth: JWT, refresh tokens, sesiones, SecureStore nativo, AsyncStorage web, modo invitado/dev y roles base ya existen.
-- CD: build web y APK standalone en GitHub Actions.
+- CD: APK Android standalone en GitHub Actions; no corre por cambios solo de documentacion.
 
 ## Trabajo Activo O Pendiente
 

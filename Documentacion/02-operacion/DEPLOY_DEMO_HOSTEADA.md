@@ -669,17 +669,22 @@ Vercel no recompila deployments viejos cuando cambias environment variables.
 
 El workflow `.github/workflows/cd.yml` corre en:
 
-- Push a `development`.
-- Push a `main`.
-- Tags `v*`.
+- Push a `development` o `main` solo cuando cambian rutas reales de app/backend/build:
+  `src/**`, `backend/**`, `assets/**`, `types/**`, `shared/**`, `scripts/**` o archivos raiz de build/config.
 - Ejecucion manual desde `Actions` -> `CD Builds` -> `Run workflow`.
 
 El release generado sube:
 
-- `planearia-web-<commit>.zip`
-- `planearia-web-<commit>.zip.sha256`
-- `planearia-android-debug-<commit>.apk` si el job Android termina correctamente.
-- `planearia-android-debug-<commit>.apk.sha256`
+- `PlanearIA-<commit>.apk`
+
+Cambios solo de documentacion, README, prompts, issues o planes no disparan CD. La web hosteada se sigue
+desplegando por la integracion Git de Vercel, fuera de este workflow.
+
+Vercel tambien queda filtrado por `ignoreCommand`:
+
+- `vercel.json` solo reconstruye el frontend web cuando cambian archivos reales de app/build web.
+- `backend/vercel.json` solo redeploya el backend cuando cambia algo dentro de `backend/`.
+- Cambios solo en documentacion o archivos de planificacion devuelven "ignored build" en Vercel.
 
 ---
 

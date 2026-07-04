@@ -31,7 +31,7 @@ La arquitectura debe permitir que una accion creada en una experiencia pueda usa
 | Backend | Node serverless en Vercel | Vigente |
 | Base remota | MongoDB Atlas M0 | Vigente |
 | IA | `backend/lib/aiGateway.js` OpenAI-compatible + custom providers | Vigente |
-| CI/CD | GitHub Actions | CI + builds web/APK |
+| CI/CD | GitHub Actions + Vercel | CI + CD Android APK; Vercel filtrado por `ignoreCommand` para web/backend |
 
 ## Principios Arquitectonicos
 

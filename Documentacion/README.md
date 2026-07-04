@@ -74,7 +74,7 @@ Experiencias objetivo:
 - Storage SQLite/migracion offline: cerrado como infraestructura opt-in; AsyncStorage sigue siendo default.
 - Sync offline-first: motor global por entidad en `src/sync`, con `SyncContext`, `SyncStatusBanner`, push/pull, JWT y `userId`.
 - Auth/Seguridad/Sesion Real: plan activo/en cierre; ya existen JWT, refresh tokens, SecureStore nativo, AsyncStorage web, sesiones y roles base. Pendientes principales: email real, datos sociales completos, validacion manual y sincronizacion final de GitHub Product OS.
-- Demo/CD: web bundle y APK standalone se construyen en GitHub Actions; despliegue web/backend se maneja por Vercel.
+- Demo/CD: GitHub Actions construye solo el APK Android standalone cuando cambian rutas reales de app/backend/build; despliegue web/backend se maneja por Vercel con `ignoreCommand`.
 - Metodologia de trabajo: SDD con OpenSpec. Los planes maestros son Blueprint + backlog de changes; las
   tareas tecnicas viven en el `tasks.md` de cada change y las specs archivadas en `openspec/specs/` son
   la verdad de comportamiento. Ver `01-planes-maestros/meta_guia_planes.md` (v3) y la seccion OpenSpec de `CLAUDE.md`.
@@ -107,7 +107,7 @@ Experiencias objetivo:
 | `01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md` | Plan activo/en cierre. |
 | `02-operacion/ENTORNO_LOCAL.md` | Como levantar app/backend. |
 | `02-operacion/GUIA_PRUEBAS.md` | Validaciones tecnicas/manuales. |
-| `02-operacion/DEPLOY_DEMO_HOSTEADA.md` | Guia para Vercel, web y APK. |
+| `02-operacion/DEPLOY_DEMO_HOSTEADA.md` | Guia para web/backend en Vercel y CD del APK Android. |
 
 ## Reglas Para Futuras IAs
 

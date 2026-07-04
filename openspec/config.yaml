@@ -24,6 +24,16 @@ context: |
   - Documentacion/01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md — plan UX/UI activo (blueprint + backlog de changes).
   - .claude/rules/backend.md, frontend.md, testing.md — reglas por capa.
 
+  Contexto eficiente: para investigar codigo existente durante explore/propose/apply, usar primero
+  CodeGraph MCP o `npm run codegraph:explore -- "<pregunta>"` en preguntas estructurales, flujos,
+  dependencias e impacto. Usar `rg`/lecturas directas cuando el indice no aplique o se necesite contexto
+  exacto no indexado.
+
+  Flujo MCP: usar GitHub MCP para issues/Project, Context7 para APIs recientes, Figma como ground truth
+  visual, Playwright MCP para validacion visual web y `planearia-sqlite` solo para diagnostico read-only de
+  SQLite local opt-in. MongoDB MCP no es universal: solo dev/staging read-only fuera de Git cuando haga falta
+  evidencia de sync remoto o aislamiento por userId.
+
   REGLAS DE ORO (aplican SIEMPRE, en cualquier artefacto e implementacion):
   - Todo dato academico sincronizable DEBE usar src/sync. No crear clientes HTTP ni colas paralelas.
   - Toda entidad multiusuario debe aislarse por userId.

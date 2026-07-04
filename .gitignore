@@ -67,6 +67,18 @@ stitch-results
 # Playwright MCP scratch output (page snapshots, traces)
 .playwright-mcp/
 
+# CodeGraph MCP local index (generated per machine; never commit the SQLite DB)
+.codegraph/
+
+# Local SQLite databases and sidecar files (device/export/debug only)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+.mcp.local.json
+.mcp.local.*.json
+
 
 # AI coding tools (agent config directories)
 .adal/

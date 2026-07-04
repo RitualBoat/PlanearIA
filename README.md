@@ -33,7 +33,7 @@ PlanearIA ya tiene una base funcional importante:
 - Backend Node serverless en Vercel con router unico, rutas academicas aisladas por JWT y MongoDB Atlas.
 - IA centralizada en backend mediante `backend/lib/aiGateway.js`, con vision de Asistente IA propio, solicitudes en segundo plano y proveedores cloud/locales OpenAI-compatible.
 - CI con typecheck, lint, Jest y backend smoke.
-- CD con build web estatico y APK Android standalone publicados como artifacts/releases de GitHub.
+- CD con APK Android standalone publicado como artifact/release de GitHub; GitHub Actions y Vercel no corren por cambios solo de docs.
 
 La app sigue en desarrollo activo. No debe asumirse como producto lanzado a usuarios reales. La demo hosteada y el APK sirven para validacion, clases, pruebas con profesor y beta controlada.
 
@@ -99,11 +99,34 @@ npm test -- --runInBand
 npm run backend:check
 ```
 
+Contexto rapido con CodeGraph MCP:
+
+```bash
+npm run codegraph:status
+npm run codegraph:explore -- "how does SyncContext reach entitySync and syncEngine?"
+```
+
+MCPs compartidos del proyecto: CodeGraph, Figma, Context7, GitHub, Vercel, Expo, Playwright y
+PlanearIA SQLite read-only. Para
+levantar Expo con capacidades MCP locales durante desarrollo:
+
+```bash
+npm run start:mcp
+```
+
+Inspeccion segura de SQLite local opt-in:
+
+```bash
+npm run sqlite:inspect -- sync-queue --db C:\ruta\planearia_classroom.db
+```
+
 Detalles completos:
 
 - [Entorno local](./Documentacion/02-operacion/ENTORNO_LOCAL.md)
 - [Guia de pruebas](./Documentacion/02-operacion/GUIA_PRUEBAS.md)
 - [Deploy demo hosteada](./Documentacion/02-operacion/DEPLOY_DEMO_HOSTEADA.md)
+- [MCPs y flujos de IA](./Documentacion/02-operacion/MCP_FLUJOS_PLANEARIA.md)
+- [CodeGraph MCP](./Documentacion/02-operacion/CODEGRAPH_MCP.md)
 
 ## Documentacion Para IAs y Colaboradores
 

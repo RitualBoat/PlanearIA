@@ -25,7 +25,7 @@ Documentacion/01-planes-maestros/cerrados/<PLAN> (closed).md
 
 - Activo en ejecucion: `../PLAN_AUTH_SEGURIDAD_SESION_REAL.md`.
 - Vigente como instructivo obligatorio: `../meta_guia_planes.md`.
-- Retrospectiva y auditoria: `../PLANES MAESTROS AUDITADOS.md`.
+- Retrospectiva y auditoria (archivada 2026-07-06): `../../99-archivo/PLANES_MAESTROS_AUDITADOS_LEGACY.md`.
 
 ## Nota de vision actual
 

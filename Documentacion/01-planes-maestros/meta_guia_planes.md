@@ -154,6 +154,51 @@ Mueve el change a `openspec/changes/archive/YYYY-MM-DD-<nombre>/` y sincroniza s
 
 ---
 
+## 2.5 Protocolo de Interaccion Guiada (estandar de ejecucion con el desarrollador)
+
+El ciclo SDD de la seccion 2 dice QUE artefactos se generan. Este protocolo dice COMO se ejecuta con el
+desarrollador: con paradas explicitas para aprobar y con QA real obligatoria. Es el estandar por defecto
+para implementar cualquier historia de usuario; nace de un piloto que fallo por saltarse GitHub Projects y
+por auto-eximirse de la validacion visual ("tests verdes" != "feature lista").
+
+Pasos y paradas:
+
+- **Paso 0 - Creacion.** Se sugiere la User Story y se crea en GitHub Projects (issue + item del board).
+  **PARADA:** se espera OK del desarrollador.
+- **Paso 1 - Enrich.** Se enriquece la historia con criterios de aceptacion observables en el issue (`/enrich-us`).
+  **PARADA:** se espera OK del desarrollador.
+- **Paso 2 - Propose & Apply.** `/opsx:propose` (spec WHEN/THEN) + `/opsx:apply` (codigo real, tarea a tarea con evidencia).
+- **Paso 3 - Audit & QA.** **OBLIGATORIO** para UI: levantar la app y validar con el MCP de navegador
+  (Playwright), tomando capturas por breakpoint que demuestren cada criterio de aceptacion, y adjuntar el
+  reporte al issue. No se cierra un change de UI solo con tests automaticos.
+
+Override: si el desarrollador dice "hazlo de inicio a fin en automatico", se corren los 4 pasos de corrido
+**sin omitir** la QA real del Paso 3.
+
+Reglas anti-fallo (lecciones del piloto):
+
+- No redefinir el objetivo para auto-eximirse del QA. Si el change toca una pantalla visible, el gate visual
+  aplica; declararlo "N/A" no es una opcion valida por defecto.
+- No saltarse GitHub Projects: todo trabajo formal nace como issue en el board (Paso 0).
+- "Tests verdes" no es "feature lista": la evidencia visual del Paso 3 es parte del Definition of Done.
+- Antes de navegar con Playwright, levantar `expo start --web` y **esperar** a que el bundler responda
+  (HTTP 200 en el puerto, tipicamente 8081); navegar antes produce `ERR_CONNECTION_REFUSED`.
+
+### MCP por paso
+
+| Paso | MCP principal | Por que |
+| --- | --- | --- |
+| 0 Creacion | `github` (via `gh`/puente local) | Crear issue y agregarlo al Project. |
+| 1 Enrich | `github` + `codegraph` | Enriquecer con criterios; verificar el codigo real antes de prometer. |
+| 2 Propose | `codegraph`, `context7`, `figma` | Impacto/flujos, APIs recientes, ground truth visual. |
+| 2 Apply | `codegraph` | Editar con blast radius a la vista; el codigo gana sobre el diagnostico previo. |
+| 3 QA (UI) | `playwright` (+ `expo` si hace falta) | Levantar web, navegar, capturar por breakpoint, adjuntar evidencia. |
+| 3 QA (datos) | `planearia-sqlite` / MongoDB opt-in | Diagnostico read-only de cola offline o aislamiento por `userId`. |
+
+Detalle canonico de MCPs por flujo: `Documentacion/02-operacion/MCP_FLUJOS_PLANEARIA.md`.
+
+---
+
 ## 3. Reglas que Todo Change Debe Respetar
 
 Las fuentes normativas, en orden:

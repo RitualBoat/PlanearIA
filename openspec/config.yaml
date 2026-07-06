@@ -66,4 +66,5 @@ rules:
   tasks:
     - Tareas pequenas y revisables, una a la vez.
     - Ninguna tarea se marca completada sin evidencia (salida de typecheck, lint y tests afectados).
-    - Si el change toca UI, incluir una tarea final de validacion visual con capturas por breakpoint (Playwright MCP en web) contra el ground truth; la UI de alta paridad no se cierra solo con tests automaticos.
+    - Si el change toca una pantalla visible, incluir una tarea final de validacion visual con capturas por breakpoint (Playwright MCP en web) contra el ground truth, adjuntas al issue; declarar este gate "N/A" NO es una opcion valida por defecto y la UI no se cierra solo con tests automaticos. Antes de navegar, levantar expo start --web y esperar a que el bundler responda (HTTP 200, tipicamente localhost:8081).
+    - El estandar de ejecucion es el Protocolo de Interaccion Guiada (Documentacion/01-planes-maestros/meta_guia_planes.md seccion 2.5): Paso 0 US en GitHub Projects, Paso 1 enrich, Paso 2 propose+apply, Paso 3 QA real de navegador.

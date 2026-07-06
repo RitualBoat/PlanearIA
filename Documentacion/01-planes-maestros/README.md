@@ -4,10 +4,12 @@ Esta carpeta contiene la meta guia, el plan activo y los planes cerrados.
 
 ## Lectura Obligatoria
 
-1. `meta_guia_planes.md` antes de crear o ejecutar cualquier plan.
-2. `PLAN_AUTH_SEGURIDAD_SESION_REAL.md` si se toca auth, sesiones, roles, secretos, backend multiusuario o aislamiento por `userId`.
-3. `PLANES MAESTROS AUDITADOS.md` para entender por que los planes de paridad alta necesitan ground truth por fase.
+1. `meta_guia_planes.md` antes de crear o ejecutar cualquier plan (v3 SDD; el estandar de ejecucion es el Protocolo de Interaccion Guiada, seccion 2.5).
+2. `PLAN_UXUI_NAVEGACION_GLOBAL.md` (plan activo) para el backlog de changes UX/UI por olas.
+3. `PLAN_AUTH_SEGURIDAD_SESION_REAL.md` si se toca auth, sesiones, roles, secretos, backend multiusuario o aislamiento por `userId`.
 4. `cerrados/README.md` para ubicar planes ya cerrados.
+
+> Nota: la retrospectiva `PLANES MAESTROS AUDITADOS.md` se archivo el 2026-07-06 en `../99-archivo/PLANES_MAESTROS_AUDITADOS_LEGACY.md`; para el orden vigente de planes usar `../00-fundamentos/ROADMAP_PLANES_MAESTROS.md`.
 
 ## Estado
 

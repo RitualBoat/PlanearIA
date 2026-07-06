@@ -49,7 +49,7 @@ Experiencias objetivo:
 | `App.tsx`, `src/` | Frontend React Native/Expo: pantallas, hooks ViewModel, context, services, sync, navegacion, temas y tests. |
 | `backend/` | Backend Node serverless para Vercel: router unico, rutas, auth, MongoDB e IA gateway. |
 | `types/` | Tipos TypeScript compartidos por dominios. |
-| `Documentacion/` | Fundamentos, planes, operacion, validacion, referencia, analisis IA y archivo historico. |
+| `Documentacion/` | Fundamentos, planes, operacion, validacion, referencia, diagramas y archivo historico. |
 | `context/` | Ground truth, referencias open source, evidencias y material por modulo/experiencia. |
 | `.github/workflows/` | CI y CD. |
 
@@ -62,9 +62,8 @@ Experiencias objetivo:
 | `02-operacion/` | Entorno local, pruebas, deploy, GitHub Product OS y changelogs. |
 | `03-validacion/` | Checklists manuales de cierre. |
 | `04-referencia/` | Referencias vivas: navegacion actual y componentes preservados. |
-| `05-analisis-ia/` | Opiniones de IA conservadas como contexto historico/no ejecutable. |
 | `06-diagramas/` | Diagramas Mermaid de arquitectura, app, CI/CD y sync. |
-| `99-archivo/` | Documentacion legacy o borradores antiguos. No usar para implementar. |
+| `99-archivo/` | Documentacion legacy, borradores antiguos y opiniones de IA no ejecutables (incluye `05-analisis-ia/` archivado el 2026-07-06). No usar para implementar. |
 
 ## Estado Actual
 
@@ -127,5 +126,7 @@ Experiencias objetivo:
 
 ## Version
 
-- Ultima actualizacion: 2026-07-04.
-- Version documental: 5.0 (adopcion SDD/OpenSpec, plan UX/UI activo, IHC discovery, nombres de suite).
+- Ultima actualizacion: 2026-07-06.
+- Version documental: 5.1 (Protocolo de Interaccion Guiada en meta_guia v3 seccion 2.5 y CLAUDE.md;
+  gate visual Playwright reforzado en config.yaml; distractores movidos a `99-archivo/`:
+  `05-analisis-ia/`, `PLANES MAESTROS AUDITADOS`, `CHECKLIST ... FASE9`, handoff de junio).

@@ -22,6 +22,7 @@ import { NotificacionesProvider } from "./src/context/NotificacionesContext";
 import { ThemeProvider } from "./src/context/ThemeContext";
 import { FontSizeProvider } from "./src/context/FontSizeContext";
 import { DaltonismoProvider } from "./src/context/DaltonismoContext";
+import { AccessibilityPreferencesProvider } from "./src/context/AccessibilityPreferencesContext";
 import KeyboardDismissFab from "./src/components/KeyboardDismissFab";
 import "./src/locales/i18n";
 
@@ -40,42 +41,44 @@ const App: React.FC = () => {
       <ThemeProvider>
         <FontSizeProvider>
           <DaltonismoProvider>
-            <AuthProvider>
-              <SyncProvider>
-                <PlaneacionesProvider>
-                  <AlumnosProvider>
-                    <GruposProvider>
-                      <AsistenciaProvider>
-                        <CalificacionesProvider>
-                          <EntregablesProvider>
-                            <RecursosProvider>
-                              <PlantillasProvider>
-                                <PostsProvider>
-                                  <ContactosProvider>
-                                    <MensajesProvider>
-                                      <NotificacionesProvider>
-                                        <View style={{ flex: 1 }}>
-                                          <SyncOfflineBar />
-                                          <NavigationContainer>
-                                            <StackNavigator />
-                                          </NavigationContainer>
-                                          <SyncNoticeToast />
-                                        </View>
-                                        <KeyboardDismissFab />
-                                      </NotificacionesProvider>
-                                    </MensajesProvider>
-                                  </ContactosProvider>
-                                </PostsProvider>
-                              </PlantillasProvider>
-                            </RecursosProvider>
-                          </EntregablesProvider>
-                        </CalificacionesProvider>
-                      </AsistenciaProvider>
-                    </GruposProvider>
-                  </AlumnosProvider>
-                </PlaneacionesProvider>
-              </SyncProvider>
-            </AuthProvider>
+            <AccessibilityPreferencesProvider>
+              <AuthProvider>
+                <SyncProvider>
+                  <PlaneacionesProvider>
+                    <AlumnosProvider>
+                      <GruposProvider>
+                        <AsistenciaProvider>
+                          <CalificacionesProvider>
+                            <EntregablesProvider>
+                              <RecursosProvider>
+                                <PlantillasProvider>
+                                  <PostsProvider>
+                                    <ContactosProvider>
+                                      <MensajesProvider>
+                                        <NotificacionesProvider>
+                                          <View style={{ flex: 1 }}>
+                                            <SyncOfflineBar />
+                                            <NavigationContainer>
+                                              <StackNavigator />
+                                            </NavigationContainer>
+                                            <SyncNoticeToast />
+                                          </View>
+                                          <KeyboardDismissFab />
+                                        </NotificacionesProvider>
+                                      </MensajesProvider>
+                                    </ContactosProvider>
+                                  </PostsProvider>
+                                </PlantillasProvider>
+                              </RecursosProvider>
+                            </EntregablesProvider>
+                          </CalificacionesProvider>
+                        </AsistenciaProvider>
+                      </GruposProvider>
+                    </AlumnosProvider>
+                  </PlaneacionesProvider>
+                </SyncProvider>
+              </AuthProvider>
+            </AccessibilityPreferencesProvider>
           </DaltonismoProvider>
         </FontSizeProvider>
       </ThemeProvider>

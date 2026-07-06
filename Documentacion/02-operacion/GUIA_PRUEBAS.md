@@ -57,7 +57,7 @@ Como leer un fallo:
 
 Estado: Fase 9 cerrada.
 
-Checklist detallado: `Documentacion/03-validacion/CHECKLIST_VALIDACION_MANUAL_FASE9.md`.
+Checklist detallado (archivado): `Documentacion/99-archivo/CHECKLIST_VALIDACION_MANUAL_FASE9_LEGACY.md`.
 
 Smoke test recomendado:
 

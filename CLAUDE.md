@@ -164,6 +164,22 @@ Workflow (Claude Code slash commands, `opsx` prefix):
 5. `/adversarial-review`: independent red-team pass before archiving (ideally a fresh session).
 6. `/opsx:archive`: move the completed change's specs into `openspec/specs/` as permanent truth.
 
+Interaction Protocol (Protocolo de Interaccion Guiada): the standard for executing a user story is
+Paso 0 create+track the US in GitHub Projects (STOP for OK) -> Paso 1 enrich with acceptance criteria in the
+issue (STOP for OK) -> Paso 2 `/opsx:propose` + `/opsx:apply` -> Paso 3 mandatory browser QA. If the user says
+"do it end to end automatically", run all steps without skipping Paso 3. Full spec:
+`Documentacion/01-planes-maestros/meta_guia_planes.md` section 2.5.
+
+MCP usage (when/why; canonical map in `Documentacion/02-operacion/MCP_FLUJOS_PLANEARIA.md`):
+- `codegraph`: FIRST for structural questions and before edits (blast radius). Code wins over stale diagnosis.
+- `github` (via `gh`/local bridge): issues and GitHub Projects for Paso 0/1. Never Jira.
+- `context7`: current library/API docs before touching unfamiliar APIs.
+- `figma`: visual ground truth for high-parity UI.
+- `playwright`: MANDATORY visual gate for any change touching a visible screen. Start `expo start --web`
+  and WAIT for the bundler to respond (HTTP 200, usually `http://localhost:8081`) BEFORE navigating;
+  capture before/after per breakpoint and attach to the issue. "N/A" is not a valid default when there is UI.
+- `planearia-sqlite` / MongoDB (opt-in): read-only diagnostics for the offline queue / `userId` isolation.
+
 Rules:
 
 - Specs in `openspec/specs/` are the source of truth for system behavior; update them via archive, not by hand.

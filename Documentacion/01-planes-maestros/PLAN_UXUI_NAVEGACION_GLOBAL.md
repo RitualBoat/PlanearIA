@@ -163,9 +163,13 @@ herramientas familiares, no en controles nuevos.
 - **Criterio de aceptacion:** cambiar tema oscuro repinta cualquier pantalla rediseñada; fuente escala
   tipografia; daltonismo ajusta colores de estado; nada de esto rompe pantallas legacy no migradas.
 - **Paridad:** funcional. **Ground truth:** no aplica.
-- **Depende de:** nada. **Estado:** pendiente.
-- **Notas:** hook `useTheme()` + fabrica de estilos memoizada; `COLORS` queda como fallback legacy;
-  regla de lint contra `import { COLORS }` en archivos nuevos/rediseñados. Resuelve R1.
+- **Depende de:** nada. **Estado:** pendiente (patron piloteado en 1 pantalla; falta el rollout completo).
+- **Notas:** hook `useTheme()` + fabrica de estilos `getStyles(DT, isDark, scaled, ...)`; `COLORS` queda
+  como fallback legacy; regla de lint contra `import { COLORS }` en archivos nuevos/rediseñados. Resuelve R1.
+- **Piloto real (2026-07-06):** el patron se aplico y valido en `CuentaScreen` via el change archivado
+  `apply-cuenta-runtime-accessibility` (issue #34): fabrica de estilos por tema + `scaled()` + `applyDaltonismo`
+  + `AccessibilityPreferencesContext` para los 3 toggles. QA Playwright en 3 breakpoints
+  (`Documentacion/03-validacion/openspec-sdd-cuenta-2026-07-06/`). Ese change es la plantilla para migrar el resto.
 
 #### Change: `breakpoints-reactivos`
 

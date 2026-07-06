@@ -1,26 +1,26 @@
-# Meta Guia de Planes Maestros - PlanearIA (v3, SDD con OpenSpec)
+﻿# Meta Guia de Planes Maestros - PlanearIA (v3, SDD con OpenSpec)
 
 > **Proposito:** esta guia define el estandar obligatorio para crear y ejecutar planes maestros en PlanearIA.
-> **Cambio central de la v3:** los planes maestros ya NO son documentos con fases y tareas tecnicas secuenciales.
-> Ahora un plan maestro es **Blueprint + Backlog de changes OpenSpec**. Las historias/features del backlog se
+> **Regla central de la v3:** los planes maestros son Blueprint + Backlog de changes OpenSpec.
+> Las historias/features del backlog se
 > "destripan" en specs y tareas tecnicas mediante el flujo SDD (`/opsx:propose`), una a la vez, con evidencia.
-> **Version anterior:** `Documentacion/99-archivo/meta_guia_planes_v2_pre-sdd_2026-07.md` (referencia historica;
+> **Version anterior:** externalizada en respaldo historico del usuario; no es fuente ejecutable.
 > sus reglas valiosas fueron migradas aqui, a `openspec/config.yaml` y a `.claude/rules/`).
 
 ---
 
-## 0. Que Cambio y Que No Cambio
+## 0. Contrato Vigente
 
-**Cambio:**
+**Formato vigente:**
 
-- Un plan maestro ya no lista fases `FASE 0..N` con checkboxes de implementacion.
+- Un plan maestro contiene blueprint, decisiones y backlog de changes; las tareas tecnicas viven en cada change OpenSpec.
 - Cada unidad de trabajo es un **change de OpenSpec**: una feature/historia en lenguaje docente que el flujo
   SDD convierte en `proposal.md` + `specs/` (requirements con escenarios WHEN/THEN) + `design.md` + `tasks.md`.
 - Las tareas tecnicas pequenas viven en el `tasks.md` de cada change (las genera `/opsx:propose`), no en el plan.
 - Al archivar un change, sus specs se acumulan en `openspec/specs/` como **verdad permanente** del comportamiento
   del sistema. El plan maestro solo marca el change como archivado.
 
-**No cambio:**
+**Reglas permanentes:**
 
 - Las reglas de arquitectura (MVVM, `src/sync`, `userId`, IA via gateway, offline-first, presupuesto bajo).
   Viven en `CLAUDE.md`, `openspec/config.yaml` (bloque `context` + `rules`) y `.claude/rules/`.
@@ -62,12 +62,12 @@ el change es la unidad ejecutable.
 
 Este es el flujo completo para ejecutar UNA entrada del backlog. Los comandos son slash commands de Claude Code.
 
-### Paso 0 — Elegir el change
+### Paso 0 - Elegir el change
 
 Toma la siguiente entrada `pendiente` de la ola activa cuyo `Depende de:` ya este archivado.
 No abras dos changes grandes a la vez.
 
-### Paso 1 — (Opcional) Crear el issue en GitHub
+### Paso 1 - (Opcional) Crear el issue en GitHub
 
 Si quieres tracking operativo desde el inicio:
 
@@ -77,7 +77,7 @@ gh issue create --title "<nombre-del-change>" --body "<historia del backlog>" --
 
 y agregalo al GitHub Project del plan. Tambien puedes crearlo despues del propose, con el scope ya afinado.
 
-### Paso 2 — Enriquecer la historia: `/enrich-us`
+### Paso 2 - Enriquecer la historia: `/enrich-us`
 
 Cuando la historia del backlog esta verde o vaga:
 
@@ -89,12 +89,12 @@ Devuelve `## Original` + `## Enriquecida` (descripcion funcional, datos, endpoin
 definition of done, NFRs). Revisala: tu decides que entra. Si la historia del backlog ya es especifica,
 puedes saltarte este paso.
 
-### Paso 3 — (Opcional) Explorar: `/opsx:explore`
+### Paso 3 - (Opcional) Explorar: `/opsx:explore`
 
 Si el alcance o el enfoque tecnico no estan claros, explora antes de proponer. Explore piensa y compara,
 no implementa.
 
-### Paso 4 — Proponer: `/opsx:propose`
+### Paso 4 - Proponer: `/opsx:propose`
 
 ```text
 /opsx:propose "<historia enriquecida o resumen del change>"
@@ -106,7 +106,7 @@ Genera en `openspec/changes/<nombre>/`: `proposal.md` (why/what/capabilities/imp
 Verifica que las specs cumplan las reglas de `openspec/config.yaml` (estados loading/empty/error/offline,
 IA confirmable, accesibilidad) y que `design.md` cite el ground truth visual si toca UI.
 
-### Paso 5 — Implementar: `/opsx:apply`
+### Paso 5 - Implementar: `/opsx:apply`
 
 ```text
 /opsx:apply
@@ -118,7 +118,7 @@ afectados). Si el change toca UI, la ultima tarea es validacion visual: capturas
 (`Documentacion/00-fundamentos/IHC_DISCOVERY_DOCENTE.md`, seccion 6). Si la IA se bloquea, pausa y pregunta;
 no adivina. Un fix que cambie el comportamiento esperado se corrige primero en la spec, luego en el codigo.
 
-### Paso 6 — Red team: `/adversarial-review`
+### Paso 6 - Red team: `/adversarial-review`
 
 Idealmente en una sesion nueva (contexto limpio):
 
@@ -128,7 +128,7 @@ Idealmente en una sesion nueva (contexto limpio):
 
 Veredictos: PASS / PASS CON HUECOS / FAIL. Blockers (sev. 4) y Majors (sev. 3) se corrigen antes de archivar.
 
-### Paso 7 — Archivar: `/opsx:archive`
+### Paso 7 - Archivar: `/opsx:archive`
 
 ```text
 /opsx:archive
@@ -138,7 +138,7 @@ Mueve el change a `openspec/changes/archive/YYYY-MM-DD-<nombre>/` y sincroniza s
 `openspec/specs/` como verdad permanente. `openspec/specs/` NUNCA se edita a mano; solo via archive
 (o `/opsx:sync` en casos especiales).
 
-### Paso 8 — Cerrar el ciclo
+### Paso 8 - Cerrar el ciclo
 
 - Marcar el change como `archivado` en el backlog del plan maestro.
 - Mover el issue/item del Project a `Done` (o `Review Manual` si quedo validacion visual pendiente).
@@ -204,14 +204,14 @@ Detalle canonico de MCPs por flujo: `Documentacion/02-operacion/MCP_FLUJOS_PLANE
 Las fuentes normativas, en orden:
 
 1. **Codigo real** (si contradice a la documentacion, gana el codigo).
-2. `openspec/config.yaml` — contexto + reglas de oro + reglas por artefacto (se inyectan solas en propose/apply).
+2. `openspec/config.yaml` - contexto + reglas de oro + reglas por artefacto (se inyectan solas en propose/apply).
 3. `CLAUDE.md` y `.claude/rules/{backend,frontend,testing}.md`.
 4. `Documentacion/00-fundamentos/` (vision, arquitectura, sync, IA, mapa de modulos, roadmap, IHC).
 
 Reglas de producto transversales que ningun change debe violar:
 
 - **Office Docente une lo documental y lo tabular** (NotasPLAN/CalcuPLAN/PresentaPLAN); no crear mundos separados.
-- **Classroom organiza y asigna; no crea todo.** La creacion profunda vive en Office/DiseñaPLAN.
+- **Classroom organiza y asigna; no crea todo.** La creacion profunda vive en Office/DisenaPLAN.
 - **Contenido/Biblioteca es transversal**, no experiencia madre: selector de adjuntos + biblioteca, sin competir
   con Office/Classroom.
 - **Calificar requiere contexto**: no pantallas de calificacion sueltas sin actividad/entrega/alumno.
@@ -228,7 +228,7 @@ Reglas de producto transversales que ningun change debe violar:
 Antes de proponer un change de UI, clasificar el nivel de paridad:
 
 - **Clon/paridad alta**: debe sentirse como la experiencia conocida. Office Docente (Word/Excel/PowerPoint),
-  AsistePLAN (ChatGPT/Gemini), Classroom, DiseñaPLAN (Canva/Genially), ConectaPLAN (WhatsApp).
+  AsistePLAN (ChatGPT/Gemini), Classroom, DisenaPLAN (Canva/Genially), ConectaPLAN (WhatsApp).
 - **Inspirado/paridad media**: toma patrones pero adapta. Escritorio, Calendario, Reportes, Notificaciones.
 - **Funcional/administrativo**: prioriza robustez y costo. Infra, auth, sync, configuracion.
 
@@ -240,7 +240,7 @@ Para paridad alta, el `design.md` del change debe incluir un contrato verificabl
 - Nivel de paridad: Clon/paridad alta.
 - Ground truth visual: [link Figma frame aprobado y/o ruta en context/<modulo>-ground-truth/]
 - Referencias reales: context/<modulo>-ground-truth/03-referencias-reales/...
-- Referencias open source: context/referencias-opensource/<repo>/FUENTE.md (inspiracion, no copia)
+- Referencias open source: context/referencias-opensource/README.md (indice minimo; material completo en respaldo externo)
 - Flujos prohibidos: [rutas legacy, patrones que rompen la experiencia madre]
 - Criterio de cierre UX: el desarrollador confirma que se siente como [X], no como modulos sueltos.
 ```
@@ -260,7 +260,7 @@ context/<modulo>-ground-truth/
 Pipeline visual vigente (detalle en el plan UX/UI): Stitch/Claude Design generan conceptos ->
 el frame curado en **Figma** es el ground truth oficial -> Figma MCP (`get_design_context`) alimenta la
 implementacion -> Playwright MCP captura la app real por breakpoint para comparar. Los resultados
-intermedios de Stitch se guardan en `context/stitch-results/<tarea>/`.
+intermedios de Stitch se guardan fuera del repo y se citan en evidencia solo cuando el usuario los aporta.
 
 Regla de cierre: en paridad alta, TypeScript/lint/tests NO bastan; el change solo se archiva con
 validacion visual manual confirmada por el desarrollador.
@@ -333,8 +333,8 @@ La vision completa vive en `Documentacion/00-fundamentos/VISION_ACTUAL.md`. Resu
 | Escritorio (Inicio) | Launcher de herramientas + tablero accionable del dia; nunca landing decorativa ni feed. |
 | NotasPLAN / CalcuPLAN / PresentaPLAN | Se sienten como Word/Excel/PowerPoint; "Crear" ofrece tipos de archivo, la IA detecta la intencion escolar despues (chip descartable). |
 | AsistePLAN | Chat propio via gateway; adjuntos de objetos reales; toda accion de salida confirmable; estados cloud/local/no-configurada/error/2o-plano visibles. |
-| Clases (Classroom) | Organiza, asigna y da seguimiento; recibe objetos de Office/DiseñaPLAN/AsistePLAN sin descargas manuales. |
-| DiseñaPLAN | Editor visual opcional; empezar minimal (plantillas + bloques + export); frontera clara con PresentaPLAN. |
+| Clases (Classroom) | Organiza, asigna y da seguimiento; recibe objetos de Office/DisenaPLAN/AsistePLAN sin descargas manuales. |
+| DisenaPLAN | Editor visual opcional; empezar minimal (plantillas + bloques + export); frontera clara con PresentaPLAN. |
 | ConectaPLAN | Mensajeria profesional 1:1/grupos disenada desde cero; el feed social no es la entrada de nada. |
 | AgendaPLAN | Vista temporal de objetos reales; cada evento abre su clase/documento/actividad. |
 | ReportaPLAN | Espera datos reales; gamificacion prudente; alertas de riesgo siempre con el dato que las sustenta. |
@@ -420,7 +420,7 @@ Un plan maestro es aceptable solo si:
 - Define criterio de cierre en lenguaje de usuario.
 
 Mandato final (sin cambios): PlanearIA debe crecer como una app profesional con una estrategia realista para
-un estudiante que trabaja solo. La meta no es impresionar con tecnologia: es que la app funcione bien para
+un estudiante que trabaja solo. La meta es que la app funcione bien para
 docentes reales, cueste lo minimo razonable, sea mantenible, aproveche IA con responsabilidad y pueda
 evolucionar experiencia por experiencia.
 
@@ -428,5 +428,5 @@ evolucionar experiencia por experiencia.
 
 ## Version
 
-- v3.0 — 2026-07-04. Migracion al formato SDD con OpenSpec. Version anterior en
-  `Documentacion/99-archivo/meta_guia_planes_v2_pre-sdd_2026-07.md`.
+- v3.0 - 2026-07-04. Migracion al formato SDD con OpenSpec. Version anterior en
+  el respaldo historico externo del usuario cuando haga falta comparar versiones anteriores.

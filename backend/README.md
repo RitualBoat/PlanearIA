@@ -1,284 +1,112 @@
-# 🚀 PlanearIA API - Backend Serverless
+# PlanearIA Backend
 
-API serverless para sincronización de PlanearIA con MongoDB Atlas.
-Diseñado para desplegarse en Vercel (100% gratis).
+> **Estado:** vigente.
+> **Uso:** guia operativa del backend serverless.
+> **Fuente de verdad:** `backend/api/index.js`, `backend/routes/`, `backend/lib/`, `Documentacion/00-fundamentos/ARQUITECTURA.md`.
+> **No usar para:** exponer secretos, crear clientes paralelos o saltarse `userId`.
 
-## 🤖 Integración IA (Gateway multi-provider)
+## Arquitectura
 
-- **Gateway:** `backend/lib/aiGateway.js`
-- **Endpoints usados:** `POST /api/planeaciones/generar`, `mejorar`, `copiloto`, `escanear-plantilla`
-- **Proveedores soportados:** OpenRouter, Groq, OpenAI, Together y cualquier endpoint OpenAI-compatible via `AI_GATEWAY_PROVIDERS`
-- **API keys:** siempre en backend/Vercel, nunca en la app movil/web
-- **Limite por accion:** `AI_MAX_REQUESTS_PER_ACTION` (default `10`) y `AI_LIMIT_WINDOW_MS` (default 24h)
-- **Modo dev:** `AI_DEV_MODE=true` activa limite ampliado solo para token dev/admin-dev y devuelve `usage.warning` en cada uso.
+El backend de PlanearIA es Node serverless para Vercel:
 
-### Criterio de seleccion (resumen)
-
-- El gateway permite empezar con proveedores gratuitos/free-tier y cambiar automaticamente al siguiente proveedor si uno falla o agota cuota.
-- OpenRouter puede usar `OPENROUTER_MODEL=openrouter/free`; Groq/Together requieren configurar un modelo vigente desde su dashboard.
-- `copiloto`, `mejorar` y `escanear-plantilla` tienen fallback heuristico para no bloquear la UX si no hay keys.
-- `generar` requiere al menos un proveedor IA configurado porque produce una planeacion completa nueva.
-
-### Evidencia de PoC
-
-- Flujo validado con pruebas automatizadas en frontend:
-  - `npm test -- --runTestsByPath src/__tests__/planeaciones/useCrearPlaneacionViewModel.test.tsx`
-  - Caso de éxito cubierto: `genera planeación con IA y mapea respuesta al modelo`
-  - Resultado actual: `6 passed, 6 total`
-
-## 📋 Estructura
-
-```
-backend/
-├── api/
-│   ├── health.js       # GET /api/health - Health check
-│   ├── planeaciones.js # CRUD /api/planeaciones
-│   ├── planeaciones/
-│   │   └── generar.js  # POST /api/planeaciones/generar - IA
-│   │   └── mejorar.js  # POST /api/planeaciones/mejorar - Sugerencias IA
-│   └── sync.js         # POST /api/sync - Sincronización batch
-├── lib/
-│   ├── mongodb.js      # Conexión a MongoDB Atlas
-│   └── auth.js         # Autenticación y utilidades
-├── package.json
-├── vercel.json         # Configuración de Vercel
-└── README.md
+```text
+backend/api/index.js
+  -> backend/routes/*
+    -> backend/lib/auth.js / tokens / sessions / rateLimit
+    -> backend/lib/mongodb.js
+    -> backend/lib/aiGateway.js
 ```
 
-## 🚀 Deploy en Vercel (5 minutos)
+Reglas:
 
-### Paso 1: Crear cuenta en Vercel
+- Rutas academicas usan JWT cuando corresponde.
+- Toda consulta multiusuario se filtra por `userId`.
+- Los endpoints crean indices MongoDB de forma idempotente.
+- CORS se controla desde `backend/lib/auth.js` y variables de entorno.
+- IA pasa por `backend/lib/aiGateway.js` y `backend/lib/aiUsageLimiter.js`.
+- `X-API-Key` existe como compatibilidad/demo donde aplique; JWT valido es el camino principal para usuario autenticado.
 
-1. Ve a [vercel.com](https://vercel.com)
-2. Crea cuenta con GitHub (gratis)
+## Entorno
 
-### Paso 2: Instalar Vercel CLI
+Variables principales:
 
-```bash
-npm install -g vercel
-```
+| Variable | Uso |
+| --- | --- |
+| `MONGODB_URI` | Conexion MongoDB Atlas. |
+| `JWT_SECRET` / secrets relacionados | Firma y validacion de tokens. |
+| `API_SECRET` | Compatibilidad/demo para rutas que aun aceptan `X-API-Key`. |
+| `ALLOWED_ORIGINS` | Origenes permitidos para CORS. |
+| `OPENROUTER_API_KEY`, `GROQ_API_KEY`, `OPENAI_API_KEY`, `TOGETHER_API_KEY` | Proveedores IA opcionales. |
+| `AI_GATEWAY_PROVIDERS` | Proveedores OpenAI-compatible custom, incluido LM Studio local si el backend lo alcanza. |
+| `AI_MAX_REQUESTS_PER_ACTION`, `AI_LIMIT_WINDOW_MS` | Limites de uso IA. |
 
-### Paso 3: Login en Vercel
+Nunca guardar valores reales en Git.
 
-```bash
-vercel login
-```
+## Desarrollo Local
 
-### Paso 4: Configurar variables de entorno
-
-Antes del deploy, necesitas configurar las variables de entorno:
-
-```bash
-# Navegar al directorio backend
-cd backend
-
-# Configurar MongoDB URI
-vercel env add MONGODB_URI
-
-# Cuando pregunte el valor, pega tu URI real desde un gestor seguro.
-# Ejemplo placeholder:
-# mongodb+srv://replace_user:replace_password@replace_cluster.mongodb.net/planeariaDB?retryWrites=true&w=majority
-
-# Configurar API Secret
-vercel env add API_SECRET
-
-# Cuando pregunte el valor, usa una cadena aleatoria segura.
-# Debe coincidir con EXPO_PUBLIC_API_SECRET en la app para desarrollo/demo.
-
-# Configurar al menos un proveedor IA del gateway
-vercel env add OPENROUTER_API_KEY
-vercel env add OPENROUTER_MODEL
-
-# Opcionales: otros proveedores OpenAI-compatible
-vercel env add GROQ_API_KEY
-vercel env add GROQ_MODEL
-vercel env add OPENAI_API_KEY
-vercel env add OPENAI_MODEL
-vercel env add TOGETHER_API_KEY
-vercel env add TOGETHER_MODEL
-
-# Opcional: limites y timeout
-vercel env add AI_MAX_REQUESTS_PER_ACTION
-vercel env add AI_DEV_MODE
-vercel env add AI_DEV_MAX_REQUESTS_PER_ACTION
-vercel env add AI_DEV_TOKEN
-vercel env add AI_LIMIT_WINDOW_MS
-vercel env add OPENAI_TIMEOUT_MS
-```
-
-### Paso 5: Deploy
-
-```bash
-# Desde el directorio backend
-cd backend
-vercel --prod
-```
-
-### Paso 6: Copiar la URL
-
-Después del deploy, Vercel te dará una URL como:
-
-```
-https://planearia-api-xxxxx.vercel.app
-```
-
-### Paso 7: Actualizar la app
-
-Configura en la app la variable pública para autenticación con backend:
-
-```bash
-EXPO_PUBLIC_API_SECRET=tu_api_secret
-```
-
-Luego verifica `src/sync/config/apiConfig.ts`:
-
-```typescript
-export const API_CONFIG = {
-  baseUrl: "https://tu-url-de-vercel.vercel.app", // ← Tu URL aquí
-  apiSecret: process.env.EXPO_PUBLIC_API_SECRET,
-  timeout: 15000,
-};
-```
-
----
-
-## 🔧 Desarrollo Local
+Desde la raiz:
 
 ```bash
 npm run backend:install
 npm run backend:dev
-npm run backend:dev:local
 ```
 
-La API estará en `http://localhost:3000`
+Servidor local esperado:
 
----
+```text
+http://localhost:3000
+```
 
-## 📡 Endpoints
-
-Smoke test desde otra terminal:
+Health/checks:
 
 ```bash
 npm run backend:health
+npm run backend:check
+npm run backend:isolation
 ```
 
-### Health Check
+## Dominios Principales
 
-```
-GET /api/health
-```
+| Dominio | Rutas/archivos |
+| --- | --- |
+| Health | `/api/health` |
+| Auth | `backend/routes/auth.js` |
+| Academico/sync | grupos, unidades, alumnos, asistencias, calificaciones, entregables, recursos, plantillas, planeaciones, sync |
+| Social/comunicacion | posts, contactos, mensajes, notificaciones |
+| IA | planeaciones, classroom/copiloto y futuro AsistePLAN via `aiGateway` |
 
-### Planeaciones CRUD
+## IA Gateway
 
-```
-GET    /api/planeaciones         # Listar todas
-GET    /api/planeaciones?id=xxx  # Obtener una
-POST   /api/planeaciones         # Crear/Upsert
-PUT    /api/planeaciones         # Actualizar
-DELETE /api/planeaciones?id=xxx  # Eliminar
-```
+`backend/lib/aiGateway.js` soporta proveedores OpenAI-compatible. El frontend no llama proveedores directamente.
 
-### Grupos CRUD
+Reglas IA:
 
-```
-GET    /api/grupos         # Listar todos
-GET    /api/grupos?id=xxx  # Obtener uno
-POST   /api/grupos         # Crear
-PUT    /api/grupos         # Actualizar
-DELETE /api/grupos?id=xxx  # Eliminar
-```
+- Sin keys en frontend.
+- Fallback claro si no hay proveedor configurado.
+- Limites de uso por accion.
+- Resultados IA revisables; no sobrescribir contenido original sin confirmacion docente.
+- LM Studio local funciona solo cuando el backend puede alcanzar su URL; Vercel no puede llamar al `localhost` del usuario.
 
-### Generación con IA
+## Seguridad Y Datos
 
-```
-POST /api/planeaciones/generar
-Body: {
-  prompt: string,
-  nivelAcademico: "primaria" | "secundaria" | "preparatoria" | "universidad",
-  contexto?: {
-    asignatura?: string,
-    grado?: string,
-    grupo?: string,
-    fecha?: string,
-    horaInicio?: string
-  }
-}
-```
+- Validar JWT y scope antes de leer/escribir datos academicos.
+- Filtrar por `userId` en MongoDB.
+- Aplicar rate limiting en auth, sync, bulk e IA donde corresponda.
+- No registrar secretos ni payloads sensibles en logs.
+- Mantener compatibilidad con modo invitado/local sin pantalla roja.
 
-### Mejora de planeación con IA
+## Deploy
 
-```
-POST /api/planeaciones/mejorar
-Body: {
-  planeacion: Planeacion,
-  maxSugerencias?: number
-}
+El backend se despliega en Vercel como parte del proyecto. Ver guia completa:
 
-Response: {
-  sugerencias: [
-    {
-      campo: string,
-      categoria: "ortografia" | "redaccion" | "contenido",
-      original: string,
-      mejorado: string,
-      justificacion: string
-    }
-  ]
-}
-```
+- `../Documentacion/02-operacion/DEPLOY_DEMO_HOSTEADA.md`
+- `../Documentacion/02-operacion/ENTORNO_LOCAL.md`
 
-### Sincronización Batch
-
-```
-POST /api/sync
-Body: {
-  deviceId: string,
-  lastSync: string (ISO date),
-  operations: [
-    { type: 'create' | 'update' | 'delete', data: Planeacion }
-  ]
-}
-```
-
----
-
-## 🔐 Autenticación
-
-Todas las requests requieren el header:
-
-```
-X-API-Key: replace_with_same_value_as_backend_API_SECRET
-```
-
----
-
-## 🆓 Límites Gratuitos
-
-| Servicio         | Límite                   |
-| ---------------- | ------------------------ |
-| Vercel Functions | 100,000 invocaciones/mes |
-| Vercel Bandwidth | 100 GB/mes               |
-| MongoDB M0       | 512 MB storage           |
-
-Más que suficiente para uso personal/desarrollo.
-
----
-
-## 🐛 Troubleshooting
-
-### Error: "Cannot find module 'mongodb'"
+## Validacion Recomendada
 
 ```bash
-cd backend
-npm install
+npm run backend:check
+npm run typecheck
+npm run lint -- --quiet
+npm test -- --runInBand
 ```
-
-### Error 500 en API
-
-- Verifica que `MONGODB_URI` esté configurado en Vercel
-- Revisa los logs: `vercel logs`
-
-### Error de conexión a MongoDB
-
-- Verifica que IP 0.0.0.0/0 esté permitida en Atlas
-- Revisa usuario y contraseña

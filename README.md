@@ -1,96 +1,97 @@
 # PlanearIA
 
-PlanearIA es una plataforma educativa para docentes mexicanos construida con React Native, Expo y TypeScript. Su objetivo es reducir la carga administrativa del profesor con una app offline-first, familiar y conectada: crear, organizar, asignar, comunicar y dar seguimiento sin saltar entre pestanas, archivos, chats y herramientas externas.
+> **Estado:** desarrollo activo.
+> **Uso:** puerta de entrada para humanos e IAs.
+> **Fuente de verdad:** `CLAUDE.md`, `AGENTS.md`, `Documentacion/README.md`, `openspec/config.yaml`, codigo real.
+> **No usar para:** sustituir OpenSpec, specs archivadas o validacion tecnica.
 
-## Vision
+PlanearIA es una suite docente offline-first para profesores mexicanos. Integra herramientas familiares de trabajo escolar: Office Docente, Clases, AsistePLAN, DiseñaPLAN, ConectaPLAN, AgendaPLAN, ReportaPLAN, cuenta, seguridad y accesibilidad.
 
-La vision vigente ya no es "muchos modulos separados". PlanearIA apunta a ser una suite docente:
-
-| Experiencia objetivo               | Proposito                                                                                                                                                      |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Inicio / Sistema Operativo Docente | Pendientes, clases del dia, documentos recientes, estado de sync y sugerencias IA.                                                                             |
-| Asistente IA / ChatGPT Docente     | Chat propio tipo ChatGPT/Gemini con adjuntos desde Office, Classroom y Canva; recibe borradores, correcciones y acciones confirmables generadas por IA.       |
-| Office Docente                     | Documentos, planeaciones, plantillas, hojas, listas, asistencia, calificaciones, rubricas e import/export. Une Word + Excel como una sola experiencia escolar. |
-| Classroom / Clases                 | Cursos, unidades, materiales, actividades, alumnos, entregas y seguimiento operativo.                                                                          |
-| Canva / Genially Docente           | Creacion visual de materiales, presentaciones, infografias, actividades y recursos imprimibles.                                                                |
-| WhatsApp Docente                   | Contactos, conversaciones, envio de recursos y colaboracion profesional entre docentes.                                                                        |
-| Calendario                         | Vista temporal de clases, sesiones, tareas, entregas y recordatorios.                                                                                          |
-| Reportes                           | Analitica, avance, alumnos en riesgo y gamificacion prudente.                                                                                                  |
-| Cuenta / Accesibilidad / Seguridad | Perfil, sesiones, roles, privacidad, preferencias y accesibilidad real.                                                                                        |
-
-La promesa de producto es:
+La promesa de producto es simple:
 
 > Creo algo, PlanearIA entiende que es, me sugiere donde va, lo asigno, le doy seguimiento y obtengo reportes sin salir de la app.
 
-## Estado Actual
-
-PlanearIA ya tiene una base funcional importante:
-
-- Auth funcional con JWT, sesiones, refresh token, modo invitado/dev y aislamiento por `userId`.
-- Classroom base cerrado: clases, unidades, materiales, actividades, alumnos, entregas, asistencia y calificaciones contextuales.
-- Planeaciones Fase 9 cerrada: editor tipo documento, plantillas, import/export, IA via backend y fallback.
-- Motor global offline-first en `src/sync`: cola por entidad, push/pull cross-device, eventos de refresco y UX de estado de red.
-- Backend Node serverless en Vercel con router unico, rutas academicas aisladas por JWT y MongoDB Atlas.
-- IA centralizada en backend mediante `backend/lib/aiGateway.js`, con vision de Asistente IA propio, solicitudes en segundo plano y proveedores cloud/locales OpenAI-compatible.
-- CI con typecheck, lint, Jest y backend smoke.
-- CD con APK Android standalone publicado como artifact/release de GitHub; GitHub Actions y Vercel no corren por cambios solo de docs.
-
-La app sigue en desarrollo activo. No debe asumirse como producto lanzado a usuarios reales. La demo hosteada y el APK sirven para validacion, clases, pruebas con profesor y beta controlada.
-
 ## Stack
 
-- React Native 0.81.5 + Expo 54.
-- TypeScript 5.9.
+- React Native 0.81.5 + Expo SDK 54 + TypeScript 5.9.
 - React Navigation 7.
-- React Context + hooks como ViewModels (MVVM pragmatico).
-- `react-native-web` para web.
+- Context + hooks como ViewModels.
 - AsyncStorage como persistencia local default.
-- Expo SQLite instalado como infraestructura opt-in para datos relacionales/sync queue, no default.
+- Expo SQLite instalado como infraestructura opt-in, no default.
 - Backend Node serverless en `backend/api/index.js` + `backend/routes`.
 - MongoDB Atlas M0.
-- GitHub Actions para CI/CD.
+- JWT con refresh sessions.
+- IA centralizada en `backend/lib/aiGateway.js`.
+- GitHub Actions para CI/CD y Vercel para demo/backend.
 
-## Mapa Rapido Del Repo
+## Mapa Rapido
 
 ```text
 PlanearIA/
-  src/                    App React Native: screens, hooks/ViewModels, context, services, sync, navigation
-  backend/                API serverless Node/Vercel, rutas, auth, IA gateway y utilidades backend
-  Documentacion/          Vision, arquitectura, planes maestros, operacion, referencias y archivo historico
-  context/                Ground truth, referencias y handoffs usados como memoria tecnica
-  assets/                 Imagenes, iconos y recursos estaticos de la app
-  types/                  Tipos compartidos del frontend
-  shared/                 Codigo compartido cuando aplica entre frontend/backend
-  scripts/                Scripts auxiliares del proyecto
-  .github/                Workflows CI/CD, templates e instrucciones para Copilot
-  .claude/                Reglas compartidas para Claude Code
-  .agents/skills/         Skills locales ignoradas por Git; apoyo opcional, no fuente de verdad
+  App.tsx
+  src/                    App Expo: screens, hooks, context, services, sync, navigation, themes, tests
+  backend/                API serverless, rutas, auth, MongoDB, IA gateway
+  types/                  Tipos compartidos
+  Documentacion/          Fundamentos, planes, operacion, validacion, context engineering, archivo
+  context/                Ground truth, referencias, ejemplos reales y material de estudio
+  openspec/               Specs, changes y config SDD
+  .github/                Workflows, templates e instrucciones Copilot
+  .claude/ .codex/        Skills y comandos SDD versionados para agentes
 ```
 
-La fuente de verdad para entender el producto es `Documentacion/` + `CLAUDE.md`. Carpetas generadas o locales como `node_modules/`, `.expo/`, `.vercel/`, `.venv/` y `dist/` no deben usarse como referencia arquitectonica.
+## Flujo De Trabajo Obligatorio
 
-## Como Levantar Local
+PlanearIA usa OpenSpec SDD para trabajo no trivial:
 
-Instala dependencias:
+```text
+Issue GitHub
+  -> enrich con criterios observables
+  -> OpenSpec propose/design/spec/tasks
+  -> apply tarea por tarea
+  -> evidencia tecnica y visual
+  -> adversarial review
+  -> archive
+```
+
+Reglas del flujo:
+
+- Todo trabajo formal nace como issue.
+- El issue se enriquece antes de proponer.
+- Las specs usan `SHALL` y escenarios WHEN/THEN.
+- Las tareas se marcan `[x]` solo con evidencia.
+- UI visible requiere QA con Playwright por breakpoint.
+- `openspec/specs/` es verdad de comportamiento; no se edita a mano.
+
+## Lectura Para IAs
+
+1. `AGENTS.md` o `CLAUDE.md`.
+2. `Documentacion/README.md`.
+3. `Documentacion/05-context-engineering/README.md`.
+4. `openspec/config.yaml`.
+5. El plan, spec o carpeta `context/` correspondiente.
+
+## Reglas Criticas
+
+- Mantener monolito modular y MVVM pragmatico.
+- Datos academicos sincronizables usan `src/sync`.
+- Toda entidad multiusuario filtra por `userId`.
+- Toda IA pasa por backend y `backend/lib/aiGateway.js`.
+- Correcciones IA generan copia, borrador, diff o resumen revisable; no sobrescriben originales sin confirmacion.
+- SQLite sigue opt-in; no activar como default sin aprobacion, validacion y rollback.
+- No borrar claves `@planearia:*` sin migracion controlada.
+- Presupuesto bajo/cero: free tiers y soluciones simples primero.
+- No copiar codigo open source sin revisar licencia, stack y compatibilidad.
+
+## Comandos Locales
 
 ```bash
 npm install
 npm run backend:install
-```
-
-Levanta web:
-
-```bash
 npm run web
-```
-
-Levanta backend local:
-
-```bash
 npm run backend:dev
 ```
 
-Validacion rapida:
+Validacion:
 
 ```bash
 npm run typecheck
@@ -99,61 +100,24 @@ npm test -- --runInBand
 npm run backend:check
 ```
 
-Contexto rapido con CodeGraph MCP:
+CodeGraph:
 
 ```bash
 npm run codegraph:status
 npm run codegraph:explore -- "how does SyncContext reach entitySync and syncEngine?"
 ```
 
-MCPs compartidos del proyecto: CodeGraph, Figma, Context7, GitHub, Vercel, Expo, Playwright y
-PlanearIA SQLite read-only. Para
-levantar Expo con capacidades MCP locales durante desarrollo:
+## Documentos Principales
 
-```bash
-npm run start:mcp
-```
+- `Documentacion/README.md`: mapa documental.
+- `Documentacion/05-context-engineering/README.md`: rutas de lectura para IAs.
+- `Documentacion/00-fundamentos/ARQUITECTURA.md`: arquitectura vigente.
+- `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`: sync offline-first.
+- `Documentacion/00-fundamentos/IA_CHATBOT_LLM.md`: IA y gateway.
+- `Documentacion/01-planes-maestros/meta_guia_planes.md`: SDD con OpenSpec.
+- `Documentacion/02-operacion/MCP_FLUJOS_PLANEARIA.md`: MCPs y QA Playwright.
 
-Inspeccion segura de SQLite local opt-in:
+## Version
 
-```bash
-npm run sqlite:inspect -- sync-queue --db C:\ruta\planearia_classroom.db
-```
-
-Detalles completos:
-
-- [Entorno local](./Documentacion/02-operacion/ENTORNO_LOCAL.md)
-- [Guia de pruebas](./Documentacion/02-operacion/GUIA_PRUEBAS.md)
-- [Deploy demo hosteada](./Documentacion/02-operacion/DEPLOY_DEMO_HOSTEADA.md)
-- [MCPs y flujos de IA](./Documentacion/02-operacion/MCP_FLUJOS_PLANEARIA.md)
-- [CodeGraph MCP](./Documentacion/02-operacion/CODEGRAPH_MCP.md)
-
-## Documentacion Para IAs y Colaboradores
-
-Leer en este orden:
-
-1. [Documentacion/README.md](./Documentacion/README.md)
-2. [Resumen ejecutivo](./Documentacion/00-fundamentos/RESUMEN_EJECUTIVO.md)
-3. [Vision actual](./Documentacion/00-fundamentos/VISION_ACTUAL.md)
-4. [Arquitectura](./Documentacion/00-fundamentos/ARQUITECTURA.md)
-5. [IA, chatbot y LLM propio](./Documentacion/00-fundamentos/IA_CHATBOT_LLM.md)
-6. [Flujo de sincronizacion](./Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md)
-7. [Roadmap de planes maestros](./Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md)
-8. [Meta guia de planes](./Documentacion/01-planes-maestros/meta_guia_planes.md)
-9. [Prompt mejorado para Claude](./Documentacion/prompt_mejorado.md)
-
-## Reglas Importantes
-
-- No crear pantallas aisladas sin ruta, entrada, salida y CTA claro.
-- No duplicar flujos entre Contenido, Classroom, Office Docente y pantallas legacy.
-- No llamar IA desde frontend; toda IA pasa por backend.
-- No conectar ChatGPT/Gemini/LM Studio directo desde frontend; el Asistente IA debe pasar por `aiGateway`.
-- No sobrescribir documentos con correcciones IA; generar copia, resumen, borrador o comparacion revisable.
-- No crear clientes HTTP o colas propias si el dato es sincronizable; usar `src/sync`.
-- No activar SQLite como default ni borrar claves `@planearia:*` sin plan, validacion y rollback.
-- No tratar planes cerrados como vision visual intocable: son evidencia funcional, no limite UX.
-
-## Version Documental
-
-- Estado documental: 2026-06-17.
-- Vision vigente: suite docente conectada con Office Docente + Asistente IA + Classroom + IA silenciosa/contextual.
+- Actualizado: 2026-07-06.
+- Version documental: AI-Friendly First.

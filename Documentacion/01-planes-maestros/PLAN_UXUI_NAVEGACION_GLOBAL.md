@@ -1,4 +1,4 @@
-# Plan Maestro: UX/UI y Navegacion Global - PlanearIA
+﻿# Plan Maestro: UX/UI y Navegacion Global - PlanearIA
 
 > **Version:** 1.0
 > **Fecha:** 2026-07-04
@@ -18,7 +18,7 @@
 
 ### 1.1 Objetivo y vision
 
-PlanearIA deja de ser "una app de planeaciones con modulos" y se convierte en un **escritorio docente**:
+PlanearIA opera como un **escritorio docente**:
 el profesor abre sus herramientas de siempre (Word, Excel, PowerPoint, Canva, Classroom, ChatGPT, WhatsApp)
 al instante, ya conectadas entre si y sincronizadas offline-first.
 
@@ -42,7 +42,7 @@ herramientas familiares, no en controles nuevos.
 | D5 | Feed + Social se funden en **ConectaPLAN** | WhatsApp Docente disenado desde cero, sin arrastrar el feed/social legacy. Retos/posts se retiran del flujo principal. |
 | D6 | ContenidoTab se disuelve | Su funcion pasa a: biblioteca dentro de Office + selector transversal "Asignar/Adjuntar". |
 | D7 | Navegacion adaptativa | Movil: 5 tabs (Inicio, Office, Clases, Asistente, Mas). Tablet: rail. Web: sidebar completa + panel IA. Misma arquitectura de informacion, distinta presentacion. |
-| D8 | Editor creativo separado | **DiseñaPLAN** (Canva/Genially). Frontera: PresentaPLAN = laminas lineales texto-primero; DiseñaPLAN = lienzo visual/infografias/interactivos. |
+| D8 | Editor creativo separado | **DisenaPLAN** (Canva/Genially). Frontera: PresentaPLAN = laminas lineales texto-primero; DisenaPLAN = lienzo visual/infografias/interactivos. |
 | D9 | Nombres secundarios (provisionales) | AgendaPLAN (calendario), ReportaPLAN (reportes), Clases (sin sufijo por ahora). Revisables. |
 | D10 | Plan en formato SDD | Blueprint + backlog de changes OpenSpec; specs se acumulan en `openspec/specs/` como verdad de comportamiento UX. |
 | D11 | Pipeline visual | Stitch/Claude Design divergen -> frame curado en Figma = ground truth oficial -> Figma MCP alimenta implementacion -> Playwright MCP captura y compara por breakpoint. |
@@ -58,7 +58,7 @@ herramientas familiares, no en controles nuevos.
 | AsistePLAN | Conversacion IA con adjuntos reales + tareas en 2o plano | Tab movil / panel acoplable web | P1 |
 | Cuenta/Accesibilidad | Control de cuenta, sesiones, tema/fuente/daltonismo reales | Secundaria + chrome global | P1 |
 | ConectaPLAN | Mensajeria profesional docente | Secundaria (hub Mas / sidebar) | P2 |
-| DiseñaPLAN | Materiales visuales (empezar minimal: plantillas+bloques+export) | Secundaria | P2 |
+| DisenaPLAN | Materiales visuales (empezar minimal: plantillas+bloques+export) | Secundaria | P2 |
 | AgendaPLAN | Vista temporal; cada evento abre el objeto real | "Hoy" en Escritorio + vista completa secundaria | P2 |
 | ReportaPLAN | Analitica y gamificacion prudente | Secundaria | P3 |
 | (Transversal) AssignSheet | Selector "Asignar a clase / Adjuntar" sobre `SYNC_ENTITIES` | Componente, no pantalla | P0 |
@@ -90,7 +90,7 @@ herramientas familiares, no en controles nuevos.
 | AsistePLAN | Alta (ChatGPT/Gemini/NotebookLM) | Frames Figma + patrones de chat con adjuntos |
 | Clases | Alta (Google Classroom/Classroomio) | Frames Figma + `context/classroom-ground-truth/` (ya existe) |
 | ConectaPLAN | Alta (WhatsApp profesional) | Frames Figma; NO usar pantallas legacy como referencia |
-| DiseñaPLAN | Alta (Canva/Genially), version minimal | Frames Figma del MVP |
+| DisenaPLAN | Alta (Canva/Genially), version minimal | Frames Figma del MVP |
 | Escritorio, AgendaPLAN, ReportaPLAN | Media | Concepto Stitch/Figma aprobado |
 | Cuenta, shell, sync UI | Funcional | Tokens + biblioteca base |
 
@@ -125,7 +125,7 @@ herramientas familiares, no en controles nuevos.
 
 - No se reescribe el motor de sync, el gateway de IA ni el backend academico existente.
 - No se activa SQLite como default ni se tocan claves `@planearia:*`.
-- No se construye el lienzo completo de DiseñaPLAN (solo MVP con plantillas cuando toque).
+- No se construye el lienzo completo de DisenaPLAN (solo MVP con plantillas cuando toque).
 - No se disena para alumnos/padres (solo docente en este plan).
 - No se implementa email real ni cierre de Auth (plan aparte, activo).
 
@@ -143,7 +143,7 @@ herramientas familiares, no en controles nuevos.
 - **Se rescata (referencia tecnica, no limite visual):** `SyncContext`, `aiGateway` + `aiUsageLimiter`,
   `DocEditor`/tentap, import/export (mammoth/docx/xlsx/pdfjs), `WebScrollView`, todos los Contexts de
   datos, pantallas actuales como inventario.
-- **Se difiere:** DiseñaPLAN completo, ReportaPLAN/gamificacion, PresentaPLAN avanzado, comunidad publica.
+- **Se difiere:** DisenaPLAN completo, ReportaPLAN/gamificacion, PresentaPLAN avanzado, comunidad publica.
 - **Migracion segura:** la nueva navegacion es capa de presentacion; cero cambios destructivos en
   AsyncStorage o `SYNC_ENTITIES`. Rutas legacy se reapuntan, no se borran de golpe.
 
@@ -160,16 +160,16 @@ herramientas familiares, no en controles nuevos.
 
 - **Historia:** Como docente, cuando cambio el tema, el tamano de fuente o el modo daltonismo en
   preferencias, toda la app lo refleja al instante, sin reiniciar.
-- **Criterio de aceptacion:** cambiar tema oscuro repinta cualquier pantalla rediseñada; fuente escala
+- **Criterio de aceptacion:** cambiar tema oscuro repinta cualquier pantalla redisenada; fuente escala
   tipografia; daltonismo ajusta colores de estado; nada de esto rompe pantallas legacy no migradas.
 - **Paridad:** funcional. **Ground truth:** no aplica.
 - **Depende de:** nada. **Estado:** pendiente (patron piloteado en 1 pantalla; falta el rollout completo).
 - **Notas:** hook `useTheme()` + fabrica de estilos `getStyles(DT, isDark, scaled, ...)`; `COLORS` queda
-  como fallback legacy; regla de lint contra `import { COLORS }` en archivos nuevos/rediseñados. Resuelve R1.
+  como fallback legacy; regla de lint contra `import { COLORS }` en archivos nuevos/redisenados. Resuelve R1.
 - **Piloto real (2026-07-06):** el patron se aplico y valido en `CuentaScreen` via el change archivado
   `apply-cuenta-runtime-accessibility` (issue #34): fabrica de estilos por tema + `scaled()` + `applyDaltonismo`
   + `AccessibilityPreferencesContext` para los 3 toggles. QA Playwright en 3 breakpoints
-  (`Documentacion/03-validacion/openspec-sdd-cuenta-2026-07-06/`). Ese change es la plantilla para migrar el resto.
+  (evidencia historica externalizada en respaldo del usuario). Ese change es antecedente; el trabajo nuevo debe generar evidencia vigente en su propio issue/change.
 
 #### Change: `breakpoints-reactivos`
 
@@ -231,7 +231,7 @@ herramientas familiares, no en controles nuevos.
 #### Change: `escritorio-docente`
 
 - **Historia:** Como docente, al abrir PlanearIA veo mi escritorio: mis herramientas (NotasPLAN, CalcuPLAN,
-  PresentaPLAN, DiseñaPLAN, Asistente, Clases) y mi dia (que sigue, pendientes, continuar trabajo,
+  PresentaPLAN, DisenaPLAN, Asistente, Clases) y mi dia (que sigue, pendientes, continuar trabajo,
   una sugerencia IA descartable), en vez de un feed.
 - **Criterio de aceptacion:** dock de herramientas + tablero accionable; empty state de docente nuevo con
   3 caminos (crear clase / crear-importar documento / probar asistente); chip de sync en el encabezado;
@@ -333,7 +333,7 @@ Decisiones: ver 1.2 (D1-D12).
 
 Open questions:
 
-- OQ1: nombres finales de DiseñaPLAN/AsistePLAN/ConectaPLAN/AgendaPLAN/ReportaPLAN ("de momento asi",
+- OQ1: nombres finales de DisenaPLAN/AsistePLAN/ConectaPLAN/AgendaPLAN/ReportaPLAN ("de momento asi",
   revisar antes de Ola 3).
 - OQ2: destino de `FloatingActionIcons` (se decide en `app-shell-navegacion`).
 - OQ3: politica de privacidad de datos de alumnos hacia proveedores IA cloud (se decide en la spec de
@@ -351,8 +351,8 @@ El plan se cierra cuando:
   redisenadas y AsistePLAN base operando con confirmaciones.
 - Un docente (entrevistas de Ola 2 + validacion final) reconoce la app como "mis herramientas de siempre,
   conectadas" y completa los 3 recorridos IHC sin ayuda.
-- Tema oscuro, fuente y daltonismo se propagan en todas las pantallas rediseñadas.
-- Ninguna pantalla rediseñada carece de estados loading/empty/error/offline.
+- Tema oscuro, fuente y daltonismo se propagan en todas las pantallas redisenadas.
+- Ninguna pantalla redisenada carece de estados loading/empty/error/offline.
 - `openspec/specs/` contiene la verdad de comportamiento de shell, Escritorio, Office base, Clases y
   Asistente.
 - La Ola 4 queda como backlog priorizado (no es requisito ejecutarla para cerrar este plan).

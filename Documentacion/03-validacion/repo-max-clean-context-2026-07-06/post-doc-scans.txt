@@ -1,0 +1,16 @@
+﻿## Mojibake / corruption scan
+CORRUPTION_MATCHES=0
+
+## Deleted-path reference scan
+DELETED_PATH_ACTIVE_REFS=0
+
+## Findability route test
+AGENTS.md=True
+CLAUDE.md=True
+Documentacion/README.md=True
+Documentacion/05-context-engineering/README.md=True
+context/README.md=True
+openspec/specs/ai-friendly-repository-context/spec.md=True
+Documentacion/00-fundamentos/ARQUITECTURA.md=True
+Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md=True
+backend/README.md=True

@@ -1,86 +1,86 @@
+<!-- CODEGRAPH_START -->
+## CodeGraph
+
+In repositories indexed by CodeGraph (a `.codegraph/` directory exists at the repo root), reach for it BEFORE grep/find or reading code when you need to understand or locate implementation.
+
+- MCP tool when available: `codegraph_explore`.
+- CLI fallback: `npm run codegraph:explore -- "<question>"`.
+- Use direct reads/`rg` for Markdown docs, assets, generated files, exact full-file editing context, or files outside the index.
+<!-- CODEGRAPH_END -->
+
 # PlanearIA - Codex Agent Guide
 
-This file is the Codex entry point for the repo. Keep `CLAUDE.md` as the shared long-form project
-context; when this file and `CLAUDE.md` disagree, follow the newest explicit user request first, then
-prefer the more specific repo instruction.
+> **Estado:** vigente.
+> **Uso:** entrada de Codex para trabajar en PlanearIA.
+> **Fuente de verdad:** `CLAUDE.md`, `Documentacion/README.md`, `Documentacion/05-context-engineering/README.md`, `openspec/config.yaml`.
+> **No usar para:** saltarse OpenSpec SDD o cerrar trabajo sin evidencia.
 
-## Read First
+## Lectura Inicial
 
-For significant work, read:
+Para trabajo significativo, leer:
 
-- `CLAUDE.md`
-- `Documentacion/README.md`
-- `Documentacion/00-fundamentos/VISION_ACTUAL.md`
-- `Documentacion/00-fundamentos/ARQUITECTURA.md`
-- `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`
-- `Documentacion/00-fundamentos/IA_CHATBOT_LLM.md`
-- `Documentacion/01-planes-maestros/meta_guia_planes.md`
-- `Documentacion/01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md` when touching UX/UI.
+1. `CLAUDE.md`
+2. `Documentacion/README.md`
+3. `Documentacion/05-context-engineering/README.md`
+4. `Documentacion/00-fundamentos/ARQUITECTURA.md`
+5. `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`
+6. `Documentacion/00-fundamentos/IA_CHATBOT_LLM.md`
+7. `Documentacion/01-planes-maestros/meta_guia_planes.md`
+8. Plan activo, spec o carpeta `context/` relacionada.
 
-## Product And Architecture
+## Arquitectura Base
 
-- PlanearIA is an offline-first React Native + Expo SDK 54 + TypeScript app for Mexican teachers.
-- Keep the modular monolith and pragmatic MVVM: thin screens, hooks as ViewModels, Context for shared
-  state, services/repositories for I/O.
-- Syncable academic data goes through `src/sync`; do not create parallel HTTP clients or queues.
-- Backend AI calls go through `backend/lib/aiGateway.js`. Never put provider keys in frontend code.
-- Do not activate SQLite as default or delete legacy `@planearia:*` keys without explicit approval,
-  migration, validation, and rollback.
-- Every multiuser/backend academic path must isolate by `userId`.
-- Budget is zero/low. Avoid microservices, paid infrastructure, or rewrites unless the user explicitly
-  asks and tradeoffs are documented.
+- PlanearIA es una app React Native + Expo SDK 54 + TypeScript para docentes mexicanos.
+- Arquitectura: monolito modular + MVVM pragmatico.
+- Screens delgadas, hooks como ViewModels, Context para estado compartido, services/repositories para I/O.
+- Datos academicos sincronizables usan `src/sync`.
+- Backend: `backend/api/index.js` + `backend/routes`.
+- IA: `backend/lib/aiGateway.js`; nunca keys ni modelos desde frontend.
+- Multiusuario: toda ruta/entidad academica filtra por `userId`.
+- SQLite es opt-in; AsyncStorage sigue como default.
+- Claves `@planearia:*` se borran solo con migracion, validacion y rollback.
+- Presupuesto bajo/cero; evitar microservicios e infraestructura cara.
 
-## OpenSpec SDD In Codex
+## OpenSpec SDD En Codex
 
-PlanearIA uses OpenSpec for non-trivial product changes. The active config is `openspec/config.yaml`.
+Trabajo formal no trivial sigue este protocolo:
 
-In Claude, the workflow is exposed as `/opsx:*` commands. In Codex, prefer the repo skills:
-
-- `$openspec-explore` for investigation before proposal.
-- `$openspec-propose` to create `openspec/changes/<change>/` artifacts.
-- `$openspec-apply-change` to implement tasks one at a time.
-- `$openspec-sync-specs` to sync delta specs when needed.
-- `$openspec-archive-change` to archive completed changes.
-
-The user's local Codex setup may also expose deprecated custom prompts such as `/prompts:opsx-propose`
-or `/opsx-propose`. Treat skills as the portable source of truth.
-
-Rules:
-
-- Do not implement non-trivial product changes without a proposed OpenSpec change.
-- Mark tasks `[x]` only after evidence: typecheck/lint/tests, and visual validation for UI.
-- Specs archived in `openspec/specs/` are behavioral truth; update them through archive/sync, not by
-  hand during implementation.
-
-## CodeGraph MCP First
-
-This repo is initialized for CodeGraph. For codebase-navigation questions, architecture tracing, impact
-analysis, or "how does X work?", start with CodeGraph before falling back to broad `rg` + file reads.
-
-- MCP server: `codegraph` in `.mcp.json` (`codegraph serve --mcp`).
-- Local index: `.codegraph/` (generated per machine and ignored by Git).
-- Health check: `npm run codegraph:status`.
-- Manual refresh: `npm run codegraph:sync`.
-- CLI fallback when MCP tools are not loaded:
-
-```bash
-npm run codegraph:explore -- "how does SyncContext reach entitySync and syncEngine?"
+```text
+Paso 0: crear issue GitHub / item Project
+Paso 1: enrich con criterios observables
+Paso 2: OpenSpec propose + apply
+Paso 3: audit + QA real
 ```
 
-Use CodeGraph results as already-read source for the returned files/symbols. Re-run CodeGraph after edits
-or if the staleness/status output says the index is behind. Use normal file reads when the answer needs
-non-indexed docs/assets, exact full-file editing context, generated files, or anything outside this repo.
+En Codex, usar skills del repo:
 
-Shared project MCPs in `.mcp.json`: CodeGraph, Figma, Context7, GitHub, Vercel, Expo, Playwright and
-PlanearIA SQLite read-only.
-When Expo local MCP project context is needed during development, start Expo with `npm run start:mcp`.
-For local SQLite diagnostics, use `planearia-sqlite` or `npm run sqlite:inspect`; never use arbitrary SQL
-or activate SQLite as default because of this inspector. MongoDB MCP is opt-in only with dev/staging read-only
-credentials outside Git.
+- `$openspec-explore` para investigar.
+- `$openspec-propose` para crear proposal/design/spec/tasks.
+- `$openspec-apply-change` para implementar tarea por tarea.
+- `$openspec-sync-specs` cuando aplique.
+- `$openspec-archive-change` para archivar.
 
-## Validation Commands
+Reglas:
 
-Use the smallest meaningful checks, then broaden with risk:
+- No implementar cambios de producto no triviales sin change OpenSpec.
+- No marcar `[x]` sin evidencia.
+- UI visible requiere Playwright por breakpoint; el gate visual no es N/A por defecto.
+- Specs archivadas en `openspec/specs/` son verdad de comportamiento y no se editan a mano.
+
+## MCPs Y Herramientas
+
+- `codegraph`: primero para estructura, flujos, dependencias e impacto de codigo.
+- `github`: issues, PRs y tracking operativo.
+- `context7`: documentacion actual de librerias/APIs.
+- `figma`: ground truth visual cuando exista.
+- `playwright`: QA visual web obligatoria para UI.
+- `planearia-sqlite`: diagnostico read-only de SQLite local opt-in.
+
+Detalle canonico: `Documentacion/02-operacion/MCP_FLUJOS_PLANEARIA.md`.
+
+## Validacion
+
+Usar el set minimo significativo y ampliar segun riesgo:
 
 ```bash
 npm run typecheck
@@ -92,15 +92,12 @@ npm run test:sync
 npm run backend:check
 ```
 
-On Windows, if Jest path resolution needs it:
+En Windows, si Jest lo necesita:
 
 ```bash
 --rootDir c:\Users\jarco\dev\PlanearIA
 ```
 
-## Review Guidelines
+## Review
 
-- Prioritize bugs, data loss, auth/user isolation, sync regressions, missing tests, and broken UI states.
-- Check loading, empty, error, offline, and accessibility states for user-facing flows.
-- Never commit secrets, `.env` values, personal Codex state, local MCP auth, or screenshots/logs with
-  tokens.
+Priorizar bugs, perdida de datos, auth/user isolation, sync, botones muertos, estados loading/empty/error/offline, accesibilidad y evidencia faltante.

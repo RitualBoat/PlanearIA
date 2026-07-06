@@ -1,8 +1,8 @@
-# Guia de Pruebas Vigente - PlanearIA
+﻿# Guia de Pruebas Vigente - PlanearIA
 
 ## Objetivo
 
-Validar cambios sin depender de documentacion legacy. Esta guia reemplaza la guia 2025 archivada en `Documentacion/99-archivo/GUIA_PRUEBAS_LEGACY_2025.md`.
+Validar cambios sin depender de documentacion legacy. La guia 2025 vive en respaldo externo historico y no es fuente ejecutable.
 
 ## Validacion tecnica base
 
@@ -57,7 +57,7 @@ Como leer un fallo:
 
 Estado: Fase 9 cerrada.
 
-Checklist detallado (archivado): `Documentacion/99-archivo/CHECKLIST_VALIDACION_MANUAL_FASE9_LEGACY.md`.
+Checklist detallado legacy: externalizado en respaldo historico del usuario; usar solo si el usuario lo aporta como contexto.
 
 Smoke test recomendado:
 

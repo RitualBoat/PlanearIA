@@ -1,54 +1,38 @@
-# Planes Maestros
+﻿# Planes Maestros
 
-Esta carpeta contiene la meta guia, el plan activo y los planes cerrados.
+> **Estado:** vigente.
+> **Uso:** meta guia y planes activos.
+> **Fuente de verdad:** `meta_guia_planes.md`, planes activos, issue GitHub y OpenSpec.
+> **No usar para:** implementar directo desde un plan sin issue enriquecido ni change OpenSpec.
 
 ## Lectura Obligatoria
 
-1. `meta_guia_planes.md` antes de crear o ejecutar cualquier plan (v3 SDD; el estandar de ejecucion es el Protocolo de Interaccion Guiada, seccion 2.5).
-2. `PLAN_UXUI_NAVEGACION_GLOBAL.md` (plan activo) para el backlog de changes UX/UI por olas.
-3. `PLAN_AUTH_SEGURIDAD_SESION_REAL.md` si se toca auth, sesiones, roles, secretos, backend multiusuario o aislamiento por `userId`.
-4. `cerrados/README.md` para ubicar planes ya cerrados.
-
-> Nota: la retrospectiva `PLANES MAESTROS AUDITADOS.md` se archivo el 2026-07-06 en `../99-archivo/PLANES_MAESTROS_AUDITADOS_LEGACY.md`; para el orden vigente de planes usar `../00-fundamentos/ROADMAP_PLANES_MAESTROS.md`.
+1. `meta_guia_planes.md`: formato SDD y Protocolo de Interaccion Guiada.
+2. `PLAN_UXUI_NAVEGACION_GLOBAL.md`: plan activo de UX/UI y backlog por olas.
+3. `PLAN_AUTH_SEGURIDAD_SESION_REAL.md`: auth, sesiones, roles, secretos, backend multiusuario y `userId`.
+4. `../05-context-engineering/README.md`: rutas de lectura y carbonizacion para IAs.
 
 ## Estado
 
 | Plan | Estado |
 | --- | --- |
 | Meta Guia de Planes | Vigente. Instructivo obligatorio. |
-| Auth, Seguridad y Sesion Real | Activo/en cierre. Automatizable casi completo; pendientes principales: email real o decision de diferir, datos sociales, validacion manual y GitHub Product OS. |
-| Planeaciones | Cerrado funcionalmente. Ahora se interpreta como parte de Office Docente. |
-| Classroom | Cerrado funcionalmente. Puede redisenarse visualmente dentro de UX/UI Global. |
-| Pasos Iniciales | Cerrado. |
-| Infraestructura Local/CI/Deploy Basico | Cerrado. |
-| Storage Local SQLite y Migracion Offline | Cerrado como opt-in con rollback. |
+| UX/UI y Navegacion Global | Activo. Blueprint + backlog de changes OpenSpec. |
+| Auth, Seguridad y Sesion Real | Activo/en cierre. |
 
-## Siguiente Plan Nuevo
+Los planes cerrados completos viven en respaldo externo. Sus reglas vigentes estan migradas a fundamentos, specs o planes activos.
 
-El siguiente plan recomendado es:
+## Como Se Ejecuta Un Plan
 
 ```text
-Plan Maestro: UX/UI y Navegacion Global
+Backlog del plan
+  -> Change pendiente
+    -> Issue GitHub
+      -> Enrich
+        -> OpenSpec propose/apply
+          -> Evidencia
+            -> Adversarial review
+              -> Archive
 ```
 
-Debe definir la arquitectura de experiencias:
-
-- Inicio / Sistema Operativo Docente.
-- Asistente IA / ChatGPT Docente.
-- Office Docente.
-- Classroom.
-- Canva / Genially Docente.
-- WhatsApp Docente.
-- Calendario.
-- Reportes.
-- Cuenta / Seguridad / Accesibilidad.
-- Reglas de AI Gateway, adjuntos y proveedores locales/cloud para el asistente.
-
-No debe tratar la UX actual como intocable. Los planes cerrados son evidencia funcional, no limite visual.
-
-## Regla De Mantenimiento
-
-- No borrar tareas de un plan activo.
-- No mover planes cerrados fuera de `cerrados/` salvo decision explicita.
-- Si un plan cerrado contiene texto viejo, no reescribir su historia; actualizar los indices y fundamentos para explicar como debe interpretarse hoy.
-- Mantener tracking `[ ]`, `[~]`, `[x]`.
+Las specs archivadas son verdad de comportamiento. El historial completo se consulta solo si el usuario aporta el respaldo externo.

@@ -119,7 +119,6 @@ export const MensajesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           signal: controller.signal,
           headers: {
             "Content-Type": "application/json",
-            "X-API-Key": API_CONFIG.apiSecret,
           },
         }
       );

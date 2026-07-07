@@ -38,7 +38,6 @@ async function authRequest(body: Record<string, unknown>): Promise<{
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-API-Key": API_CONFIG.apiSecret,
       },
       body: JSON.stringify(body),
     });

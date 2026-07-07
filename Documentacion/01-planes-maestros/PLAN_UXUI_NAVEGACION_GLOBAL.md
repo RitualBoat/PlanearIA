@@ -86,10 +86,10 @@ herramientas familiares, no en controles nuevos.
 
 | Experiencia | Paridad | Ground truth requerido antes de UI final |
 | --- | --- | --- |
-| NotasPLAN / CalcuPLAN / PresentaPLAN | Alta (Word/Excel/PowerPoint, Docs/Sheets/Slides, LibreOffice/OnlyOffice) | Frames Figma aprobados + `context/office-ground-truth/` |
-| AsistePLAN | Alta (ChatGPT/Gemini/NotebookLM) | Frames Figma + patrones de chat con adjuntos |
+| NotasPLAN / CalcuPLAN / PresentaPLAN | Alta (Word/Excel/PowerPoint, Docs/Sheets/Slides, LibreOffice/OnlyOffice) | Frames Figma + `context/planeaciones-ground-truth/` (docs) y `context/excel-ground-truth/` (hojas), ambos ya existen |
+| AsistePLAN | Alta (ChatGPT/Gemini/NotebookLM) | Frames Figma + patrones de chat con adjuntos (crear `context/asistente-ground-truth/`) |
 | Clases | Alta (Google Classroom/Classroomio) | Frames Figma + `context/classroom-ground-truth/` (ya existe) |
-| ConectaPLAN | Alta (WhatsApp profesional) | Frames Figma; NO usar pantallas legacy como referencia |
+| ConectaPLAN | Alta (WhatsApp profesional) | Frames Figma + `context/chat-ground-truth/` (ya existe); NO usar pantallas legacy como referencia |
 | DisenaPLAN | Alta (Canva/Genially), version minimal | Frames Figma del MVP |
 | Escritorio, AgendaPLAN, ReportaPLAN | Media | Concepto Stitch/Figma aprobado |
 | Cuenta, shell, sync UI | Funcional | Tokens + biblioteca base |
@@ -164,6 +164,11 @@ herramientas familiares, no en controles nuevos.
   tipografia; daltonismo ajusta colores de estado; nada de esto rompe pantallas legacy no migradas.
 - **Paridad:** funcional. **Ground truth:** no aplica.
 - **Depende de:** nada. **Estado:** pendiente (patron piloteado en 1 pantalla; falta el rollout completo).
+- **Dimensionamiento (verificado 2026-07):** 60 archivos importan `COLORS` estatico; 18 pantallas ya usan
+  el patron reactivo (`getStyles`/`useTheme`). O sea el trabajo es **desplegar un patron probado**, no
+  inventarlo. Es un rollout grande: acotar el piloto a (a) construir la infra `useTheme()` + fabrica +
+  lint, y (b) migrar un primer lote demostrativo, dejando el resto como rollout rastreado. No intentar
+  los 60 archivos en un solo change.
 - **Notas:** hook `useTheme()` + fabrica de estilos `getStyles(DT, isDark, scaled, ...)`; `COLORS` queda
   como fallback legacy; regla de lint contra `import { COLORS }` en archivos nuevos/redisenados. Resuelve R1.
 - **Piloto real (2026-07-06):** el patron se aplico y valido en `CuentaScreen` via el change archivado
@@ -177,7 +182,18 @@ herramientas familiares, no en controles nuevos.
   se reacomoda al momento.
 - **Criterio de aceptacion:** hook `useBreakpoint()` reactivo (movil/tablet/web); `responsive.ts` jubilado
   o delegando al hook; rotacion/resize no requiere recargar.
-- **Paridad:** funcional. **Depende de:** nada. **Estado:** pendiente. **Notas:** resuelve R2.
+- **Paridad:** funcional. **Depende de:** `theming-runtime` (comparte la migracion, ver abajo). **Estado:** pendiente.
+- **Hallazgo verificado (2026-07):** el problema real de R2 no es `Dimensions.get()`, es que 10 de 11
+  consumidores llaman `responsive()`/`isWeb()` dentro de un `StyleSheet.create` **a nivel de modulo**
+  (congelado al importar). Jubilar `responsive.ts` obliga a mover esos estilos a una fabrica
+  `getStyles(theme, width, ...)` en render — **la misma migracion que exige `theming-runtime`**. Regla:
+  tocar cada archivo UNA sola vez. `theming-runtime` establece la fabrica `getStyles(theme, ...)`;
+  `breakpoints-reactivos` solo le agrega el parametro `width` y provee `useBreakpoint()`. Memoizar la
+  fabrica (ej. `useMemo` por bucket de ancho) para no recrear estilos en cada render.
+- **Superficie:** 11 archivos, 4 primitivas (`responsive`, `isWeb`, `isLargeScreen`, `getScreenDimensions`).
+  Los 6 que mezclan ambas estrategias (`ListaRecursosScreen`, `RecursosDidacticosScreen`, `CuentaScreen`,
+  `CrearGrupoScreen`, `ListaGruposScreen`, `ListaPlantillasScreen`) son los de mayor riesgo de
+  inconsistencia visual: priorizarlos y cubrirlos con QA Playwright por breakpoint. **Notas:** resuelve R2.
 
 #### Change: `tokens-completos`
 
@@ -315,10 +331,13 @@ herramientas familiares, no en controles nuevos.
 
 ### Ola 4+: Resto de la suite (activar por prioridad tras Ola 3)
 
-- `cuenta-preferencias`: pantallas de Cuenta/Preferencias/Accesibilidad con el nuevo sistema; verificacion
-  real de accesibilidad (depende de `theming-runtime`).
+- `cuenta-preferencias`: pantallas de Cuenta/Preferencias/Accesibilidad con el nuevo sistema. **Construye
+  sobre** la spec ya archivada `settings-accessibility-preferences` (no rehacerla); extiende accesibilidad
+  al resto de la app via `theming-runtime`.
 - `conectaplan`: mensajeria profesional desde cero (contactos, hilos, compartir recursos con guardar/asignar
   del receptor); reusa fontaneria de mensajes/contactos, cero UI legacy.
+- `notificaciones-chrome`: rediseno de la pantalla de Notificaciones y su badge; se decide junto con el
+  destino de `FloatingActionIcons` en `app-shell-navegacion` (puede quedar como parte de ese change si es chico).
 - `agendaplan`: vista semana/mes; cada evento abre su objeto real; recordatorios con expo-notifications.
 - `presentaplan-mvp`: laminas lineales texto-primero con export.
 - `disenaplan-mvp`: plantillas rellenables + bloques simples + export; NO lienzo completo.
@@ -340,6 +359,23 @@ Open questions:
   `asistente-ia-base`; minimo: avisar que se envia y a que tipo de proveedor).
 - OQ4: comunidad publica (muro) futura: fuera de este plan; reevaluar tras ConectaPLAN.
 - OQ5: CLI de openspec global no esta en `package.json` (documentado; decidir si se agrega como devDependency).
+
+Coordinacion con trabajo en vuelo (verificado 2026-07):
+
+- Hay un change activo `raise-react-doctor-score-baseline` (23/23 tareas implementadas,
+  issue #38). Es de **seguridad/calidad**, no de UI: toca `apiConfig`/`apiClient`/`authService`
+  (frontera del `EXPO_PUBLIC_API_SECRET`), helper de escape HTML para exports
+  (`alumno/grupo/reportesExportService`), decision de `pdfjs-dist` y config de react-doctor.
+- **No hay colision de archivos con la Ola 0:** react-doctor toca servicios/config/exports; theming y
+  breakpoints tocan pantallas y `src/themes`. Son ortogonales.
+- **Aun asi, secuenciar react-doctor ANTES de la Ola 0**, por tres razones: (1) su propia proposal dice
+  que estabiliza seguridad/calidad *antes* de construir la suite encima; (2) arregla riesgos reales
+  (secreto publico en frontend, HTML sin escapar en exports, supply-chain); (3) la Seccion 2
+  (frontera del API secret) se entrelaza con el plan de Auth activo/en cierre, no con UX. Regla
+  "un change grande a la vez" para dev solo. No fusionar seguridad con estilos.
+- El flujo SDD ya esta probado end-to-end en este repo: `openspec list` responde y hay specs archivadas
+  (`ai-friendly-repository-context`, `settings-accessibility-preferences`) + un archive
+  (`2026-07-06-repo-max-clean-context-externalization`). No es un estreno del CLI.
 
 ---
 

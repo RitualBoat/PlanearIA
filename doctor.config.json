@@ -4,6 +4,14 @@
     "overrides": [
       {
         "files": [".venv/**", "**/.venv/**", "**/site-packages/**", "**/__pycache__/**"]
+      },
+      {
+        "files": [
+          "dist/**",
+          "**/dist/**",
+          ".claude/worktrees/**",
+          "context/referencias-opensource/**"
+        ]
       }
     ]
   }

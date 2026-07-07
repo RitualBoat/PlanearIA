@@ -23,9 +23,12 @@ jest.mock("@react-navigation/native", () => ({
 jest.mock("../../sync/config/apiConfig", () => ({
   API_CONFIG: {
     baseUrl: "https://backend.test",
-    apiSecret: "test-secret",
     timeout: 15000,
   },
+}));
+
+jest.mock("../../services/auth/authService", () => ({
+  getAccessToken: jest.fn(() => Promise.resolve("jwt-test")),
 }));
 
 jest.mock("../../context/PlaneacionesContext", () => ({
@@ -105,10 +108,11 @@ describe("useCrearPlaneacionViewModel", () => {
       expect.objectContaining({
         method: "POST",
         headers: expect.objectContaining({
-          "X-API-Key": "test-secret",
+          Authorization: "Bearer jwt-test",
         }),
       })
     );
+    expect(mockFetch.mock.calls[0][1].headers).not.toHaveProperty("X-API-Key");
 
     expect(result.current.iaError).toBe("");
     expect(result.current.planeacionGeneradaIA).not.toBeNull();

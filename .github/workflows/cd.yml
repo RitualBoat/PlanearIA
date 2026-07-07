@@ -62,15 +62,10 @@ jobs:
       - name: Validate Android app environment
         env:
           EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL || 'https://backend-eight-chi-54.vercel.app' }}
-          EXPO_PUBLIC_API_SECRET: ${{ secrets.EXPO_PUBLIC_API_SECRET }}
           EXPO_PUBLIC_ALLOW_NATIVE_LOCALHOST: "false"
         run: |
           if [ -z "$EXPO_PUBLIC_API_URL" ]; then
             echo "EXPO_PUBLIC_API_URL is required to build the standalone APK."
-            exit 1
-          fi
-          if [ -z "$EXPO_PUBLIC_API_SECRET" ]; then
-            echo "EXPO_PUBLIC_API_SECRET is required as a GitHub Actions secret to build the standalone APK."
             exit 1
           fi
       - name: Generate Android project
@@ -81,7 +76,6 @@ jobs:
       - name: Build standalone release APK
         env:
           EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL || 'https://backend-eight-chi-54.vercel.app' }}
-          EXPO_PUBLIC_API_SECRET: ${{ secrets.EXPO_PUBLIC_API_SECRET }}
           EXPO_PUBLIC_ALLOW_NATIVE_LOCALHOST: "false"
         run: npm run build:android:release:ci
       - name: Package standalone Android APK

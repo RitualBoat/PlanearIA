@@ -37,7 +37,6 @@ jest.mock("@react-native-community/netinfo", () => ({
 jest.mock("../../sync/config/apiConfig", () => ({
   API_CONFIG: {
     baseUrl: "https://test.api.com",
-    apiSecret: "test-secret",
     timeout: 5000,
   },
   SYNC_CONFIG: {

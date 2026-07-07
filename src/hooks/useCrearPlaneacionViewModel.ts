@@ -627,11 +627,6 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
       return;
     }
 
-    if (!API_CONFIG.apiSecret) {
-      setIaError("Falta configurar EXPO_PUBLIC_API_SECRET para usar la generacion con IA.");
-      return;
-    }
-
     setIaError("");
     setIsGeneratingIA(true);
 
@@ -644,7 +639,6 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-Key": API_CONFIG.apiSecret,
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({

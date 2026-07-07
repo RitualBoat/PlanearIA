@@ -269,7 +269,7 @@ const requestCopiloto = async <T extends CopilotoResultado>(
   payload: CopilotoRequest
 ): Promise<CopilotoResponse<T>> => {
   if (!isAPIConfigured()) {
-    return buildHeuristicResponse<T>(payload, "falta configurar EXPO_PUBLIC_API_SECRET o backend IA");
+    return buildHeuristicResponse<T>(payload, "falta configurar EXPO_PUBLIC_API_URL o backend IA");
   }
 
   let lastError: unknown;

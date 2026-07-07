@@ -13,7 +13,6 @@ export const apiRequest = async (
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
-    "X-API-Key": API_CONFIG.apiSecret,
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };

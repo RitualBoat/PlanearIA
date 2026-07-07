@@ -15,7 +15,7 @@ if (!API_SECRET) {
  * backend and already carries the userId used for isolation, so it is strictly
  * stronger auth than the shared API key. The X-API-Key check stays as optional
  * legacy for routes/clients that send only the key. This prevents a stale or
- * mismatched EXPO_PUBLIC_API_SECRET from silently blocking all sync while the
+ * mismatched public client API key from silently blocking all sync while the
  * user is genuinely logged in.
  */
 function validateAuth(req) {

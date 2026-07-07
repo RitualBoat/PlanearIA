@@ -41,7 +41,6 @@ global.fetch = mockFetch as unknown as typeof fetch;
 jest.mock("../../sync/config/apiConfig", () => ({
   API_CONFIG: {
     baseUrl: "https://test.api.com",
-    apiSecret: "test-secret",
     timeout: 5000,
   },
   SYNC_CONFIG: {

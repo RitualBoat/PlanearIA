@@ -5,6 +5,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import type { EstadisticasGrupo } from "./grupoReportesService";
 import type { EstadisticasAlumno } from "./alumnoReportesService";
 import { COLORS } from "../../types";
+import { escapeHtml, openHtmlForPrint } from "../utils/htmlEscape";
 
 interface ExportParams {
   grupoNombre: string;
@@ -25,7 +26,7 @@ interface AlumnoExportParams {
   calificaciones: CalificacionResumen[];
 }
 
-const buildReportHtml = ({ grupoNombre, periodo, estadisticas }: ExportParams): string => {
+export const buildReportHtml = ({ grupoNombre, periodo, estadisticas }: ExportParams): string => {
   return `
     <!doctype html>
     <html>
@@ -46,7 +47,7 @@ const buildReportHtml = ({ grupoNombre, periodo, estadisticas }: ExportParams): 
       </head>
       <body>
         <h1>Reportes del Grupo</h1>
-        <div class="subtitle">${grupoNombre} • Periodo: ${periodo}</div>
+        <div class="subtitle">${escapeHtml(grupoNombre)} &middot; Periodo: ${escapeHtml(periodo)}</div>
 
         <div class="grid">
           <div class="card">
@@ -85,13 +86,7 @@ export const exportarReporteGrupoPDF = async (params: ExportParams): Promise<boo
   const html = buildReportHtml(params);
 
   if (Platform.OS === "web") {
-    const win = window.open("", "_blank");
-    if (!win) return false;
-    win.document.write(html);
-    win.document.close();
-    win.focus();
-    win.print();
-    return true;
+    return openHtmlForPrint(html);
   }
 
   const { uri } = await Print.printToFileAsync({ html });
@@ -108,7 +103,7 @@ export const exportarReporteGrupoPDF = async (params: ExportParams): Promise<boo
   return true;
 };
 
-const buildAlumnoReportHtml = ({
+export const buildAlumnoReportHtml = ({
   alumnoNombre,
   periodo,
   estadisticas,
@@ -119,9 +114,9 @@ const buildAlumnoReportHtml = ({
     .map(
       (item) => `
       <tr>
-        <td>${item.periodo}</td>
+        <td>${escapeHtml(item.periodo)}</td>
         <td>${item.promedio.toFixed(1)}</td>
-        <td>${item.estado}</td>
+        <td>${escapeHtml(item.estado)}</td>
       </tr>
     `
     )
@@ -150,7 +145,7 @@ const buildAlumnoReportHtml = ({
       </head>
       <body>
         <h1>Reporte del Alumno</h1>
-        <div class="subtitle">${alumnoNombre} • Periodo: ${periodo}</div>
+        <div class="subtitle">${escapeHtml(alumnoNombre)} &middot; Periodo: ${escapeHtml(periodo)}</div>
 
         <div class="grid">
           <div class="card">
@@ -195,13 +190,7 @@ const exportarReporteAlumnoPDF = async (params: AlumnoExportParams): Promise<boo
   const html = buildAlumnoReportHtml(params);
 
   if (Platform.OS === "web") {
-    const win = window.open("", "_blank");
-    if (!win) return false;
-    win.document.write(html);
-    win.document.close();
-    win.focus();
-    win.print();
-    return true;
+    return openHtmlForPrint(html);
   }
 
   const { uri } = await Print.printToFileAsync({ html });
@@ -229,7 +218,7 @@ const buildAlumnoReportSvg = ({
   <rect width="1200" height="630" fill=COLORS.background />
   <rect x="36" y="36" width="1128" height="558" rx="22" fill=COLORS.surface />
   <text x="72" y="98" font-family="Arial" font-size="44" font-weight="700" fill=COLORS.primaryDark>Reporte del Alumno</text>
-  <text x="72" y="140" font-family="Arial" font-size="24" fill="#60748F">${alumnoNombre} • ${periodo}</text>
+  <text x="72" y="140" font-family="Arial" font-size="24" fill="#60748F">${escapeHtml(alumnoNombre)} &middot; ${escapeHtml(periodo)}</text>
 
   <rect x="72" y="184" width="240" height="150" rx="14" fill=COLORS.backgroundSoft stroke=COLORS.borderLight />
   <text x="92" y="224" font-family="Arial" font-size="20" fill=COLORS.textTertiary>Promedio</text>
@@ -247,10 +236,10 @@ const buildAlumnoReportSvg = ({
   <text x="884" y="224" font-family="Arial" font-size="20" fill=COLORS.textTertiary>No entregadas</text>
   <text x="884" y="292" font-family="Arial" font-size="56" font-weight="700" fill=COLORS.text>${p(estadisticas.indiceNoEntregadas)}%</text>
 
-  <text x="72" y="404" font-family="Arial" font-size="24" font-weight="700" fill=COLORS.textDark>Distribución de entregas</text>
-  <text x="72" y="448" font-family="Arial" font-size="22" fill=COLORS.primaryDark>• A tiempo: ${p(estadisticas.indiceEntregasATiempo)}%</text>
-  <text x="72" y="488" font-family="Arial" font-size="22" fill=COLORS.amber>• Tarde: ${p(estadisticas.indiceEntregasTarde)}%</text>
-  <text x="72" y="528" font-family="Arial" font-size="22" fill=COLORS.error>• No entregadas: ${p(estadisticas.indiceNoEntregadas)}%</text>
+  <text x="72" y="404" font-family="Arial" font-size="24" font-weight="700" fill=COLORS.textDark>Distribucion de entregas</text>
+  <text x="72" y="448" font-family="Arial" font-size="22" fill=COLORS.primaryDark>- A tiempo: ${p(estadisticas.indiceEntregasATiempo)}%</text>
+  <text x="72" y="488" font-family="Arial" font-size="22" fill=COLORS.amber>- Tarde: ${p(estadisticas.indiceEntregasTarde)}%</text>
+  <text x="72" y="528" font-family="Arial" font-size="22" fill=COLORS.error>- No entregadas: ${p(estadisticas.indiceNoEntregadas)}%</text>
 </svg>`;
 };
 

@@ -10,7 +10,6 @@ import {
 jest.mock("../../sync/config/apiConfig", () => ({
   API_CONFIG: {
     baseUrl: "",
-    apiSecret: "",
     timeout: 1000,
   },
   SYNC_CONFIG: { debugMode: false },

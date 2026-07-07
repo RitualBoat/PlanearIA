@@ -31,8 +31,10 @@ const EJES_ARTICULADORES = [
 const normalizeList = (value: string): string[] => {
   return value
     .split(/\n|,/)
-    .map((item) => item.trim())
-    .filter(Boolean);
+    .flatMap((item) => {
+      const text = item.trim();
+      return text ? [text] : [];
+    });
 };
 
 export const SeccionCurricular: React.FC<SeccionCurricularProps> = ({

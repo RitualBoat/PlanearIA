@@ -9,14 +9,19 @@ import {
 
 export const toStringArray = (value: unknown): string[] => {
   if (Array.isArray(value)) {
-    return value.map((item) => String(item).trim()).filter(Boolean);
+    return value.flatMap((item) => {
+      const text = String(item).trim();
+      return text ? [text] : [];
+    });
   }
 
   if (typeof value === "string") {
     return value
       .split("\n")
-      .map((item) => item.trim())
-      .filter(Boolean);
+      .flatMap((item) => {
+        const text = item.trim();
+        return text ? [text] : [];
+      });
   }
 
   return [];

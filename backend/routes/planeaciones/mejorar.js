@@ -131,7 +131,7 @@ function normalizeSugerencias(input, planeacion, maxItems) {
   const items = Array.isArray(input) ? input : [];
 
   const normalized = items
-    .map((item) => {
+    .flatMap((item) => {
       const campo = String(item?.campo || "").trim();
       const original = toShortText(item?.original);
       const mejorado = toShortText(item?.mejorado);
@@ -139,18 +139,19 @@ function normalizeSugerencias(input, planeacion, maxItems) {
       const justificacion = toShortText(item?.justificacion);
 
       if (!campo || !original || !mejorado || original === mejorado) {
-        return null;
+        return [];
       }
 
-      return {
-        campo,
-        categoria: validCategories.has(categoria) ? categoria : "redaccion",
-        original,
-        mejorado,
-        justificacion: justificacion || "Mejora sugerida por IA",
-      };
+      return [
+        {
+          campo,
+          categoria: validCategories.has(categoria) ? categoria : "redaccion",
+          original,
+          mejorado,
+          justificacion: justificacion || "Mejora sugerida por IA",
+        },
+      ];
     })
-    .filter(Boolean)
     .slice(0, maxItems);
 
   if (normalized.length > 0) {

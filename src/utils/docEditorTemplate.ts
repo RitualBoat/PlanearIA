@@ -93,12 +93,16 @@ export const buildContenidoRawFromDocumento = (doc: PlaneacionDocumento): string
   const grupos = doc.datosGenerales.grupos.length ? doc.datosGenerales.grupos.join(", ") : "Pendiente";
   const semanas = doc.datosGenerales.semanas.length ? doc.datosGenerales.semanas.join(", ") : "Pendiente";
   const observaciones = doc.observaciones
-    .map((item) => item.texto.trim())
-    .filter(Boolean)
+    .flatMap((item) => {
+      const text = item.texto.trim();
+      return text ? [text] : [];
+    })
     .join(" | ");
   const criterios = doc.evaluacionFinal?.criterios
-    .map((item) => item.descripcion.trim())
-    .filter(Boolean)
+    .flatMap((item) => {
+      const text = item.descripcion.trim();
+      return text ? [text] : [];
+    })
     .join(" | ");
   const firmaDocente = doc.firmas.find((firma) => firma.rol.toLowerCase().includes("docente"))?.nombre || "";
   const competencia = doc.elementosCurriculares.pda || doc.elementosCurriculares.proposito || "Pendiente";

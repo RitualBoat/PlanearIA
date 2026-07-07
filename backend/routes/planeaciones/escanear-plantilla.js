@@ -247,7 +247,12 @@ function normalizeCampos(value) {
         tipo,
         requerido: Boolean(field?.requerido),
         opciones: Array.isArray(field?.opciones)
-          ? field.opciones.map((item) => String(item).trim()).filter(Boolean).slice(0, 20)
+          ? field.opciones
+              .flatMap((item) => {
+                const option = String(item).trim();
+                return option ? [option] : [];
+              })
+              .slice(0, 20)
           : undefined,
         valorDefecto:
           typeof field?.valorDefecto === "string" ? field.valorDefecto.trim().slice(0, 600) : undefined,

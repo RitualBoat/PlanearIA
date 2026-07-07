@@ -116,8 +116,10 @@ function getCorsHeaders(req) {
   const origin = req?.headers?.origin || "";
   const envOrigins = String(process.env.ALLOWED_ORIGINS || "")
     .split(",")
-    .map((value) => value.trim())
-    .filter(Boolean);
+    .flatMap((value) => {
+      const trimmed = value.trim();
+      return trimmed ? [trimmed] : [];
+    });
   const allowedOrigins = envOrigins.length ? envOrigins : ALLOWED_ORIGINS;
   const allowedOrigin = allowedOrigins.some((allowed) => originMatchesAllowed(origin, allowed))
     ? origin

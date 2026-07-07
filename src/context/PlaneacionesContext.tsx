@@ -86,8 +86,10 @@ const splitLines = (value: string | undefined): string[] => {
   if (!value) return [];
   return value
     .split(/\n|;/)
-    .map((item) => item.trim())
-    .filter(Boolean);
+    .flatMap((item) => {
+      const text = item.trim();
+      return text ? [text] : [];
+    });
 };
 
 const stripRichText = (value: string | undefined): string => {
@@ -122,8 +124,7 @@ const ensureSesion = (doc: PlaneacionDocumento, numero: number): Sesion => {
 const toLegacyFromV2 = (doc: PlaneacionDocumento): Planeacion => {
   const sesion1 = doc.sesiones.find((s) => s.numero === 1) ?? doc.sesiones[0];
   const observaciones = (doc.observaciones || [])
-    .map((obs) => obs.texto)
-    .filter(Boolean)
+    .flatMap((obs) => (obs.texto ? [obs.texto] : []))
     .join("\n");
 
   const recursos = Array.isArray(doc.camposNivel?.recursos)

@@ -145,13 +145,18 @@ const linesToHtml = (value?: string | null): string => {
 
 const stringArray = (value: unknown): string[] => {
   if (!Array.isArray(value)) return [];
-  return value.map((item) => String(item ?? "").trim()).filter(Boolean);
+  return value.flatMap((item) => {
+    const text = String(item ?? "").trim();
+    return text ? [text] : [];
+  });
 };
 
 const joinValues = (values: Array<string | undefined | null>, fallback = "Sin dato"): string => {
   const joined = values
-    .map((value) => String(value || "").trim())
-    .filter(Boolean)
+    .flatMap((value) => {
+      const text = String(value || "").trim();
+      return text ? [text] : [];
+    })
     .join(" ");
   return joined || fallback;
 };
@@ -700,8 +705,7 @@ const buildInstrumentoDocx = (
   if (!instrumento || !instrumento.criterios?.length) return [];
 
   const escala = instrumento.escala
-    ?.map((nivel) => nivel.etiqueta)
-    .filter(Boolean)
+    ?.flatMap((nivel) => (nivel.etiqueta ? [nivel.etiqueta] : []))
     .join(", ");
   return [
     heading(title, HeadingLevel.HEADING_3),

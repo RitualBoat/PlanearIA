@@ -89,8 +89,10 @@ const parseToPlainText = (value?: SerializableEditorContent): string => {
   if (typeof node.text === "string") return node.text;
   if (!Array.isArray(node.content)) return "";
   return node.content
-    .map((item) => parseToPlainText(item as SerializableEditorContent))
-    .filter(Boolean)
+    .flatMap((item) => {
+      const text = parseToPlainText(item as SerializableEditorContent);
+      return text ? [text] : [];
+    })
     .join(node.type === "doc" ? "\n" : " ")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
@@ -227,8 +229,10 @@ const blockFromElement = (element: Element): Record<string, unknown> | null => {
     return {
       type: "table",
       content: Array.from(element.querySelectorAll(":scope > tbody > tr, :scope > tr"))
-        .map((row) => blockFromElement(row))
-        .filter(Boolean),
+        .flatMap((row) => {
+          const block = blockFromElement(row);
+          return block ? [block] : [];
+        }),
     };
   }
 
@@ -236,15 +240,19 @@ const blockFromElement = (element: Element): Record<string, unknown> | null => {
     return {
       type: "tableRow",
       content: Array.from(element.children)
-        .map((cell) => blockFromElement(cell))
-        .filter(Boolean),
+        .flatMap((cell) => {
+          const block = blockFromElement(cell);
+          return block ? [block] : [];
+        }),
     };
   }
 
   if (tag === "th" || tag === "td") {
     const content = Array.from(element.children)
-      .map((child) => blockFromElement(child))
-      .filter(Boolean);
+      .flatMap((child) => {
+        const block = blockFromElement(child);
+        return block ? [block] : [];
+      });
     return {
       type: tag === "th" ? "tableHeader" : "tableCell",
       content: content.length ? content : [{ type: "paragraph", content: inlineNodesFromElement(element) }],
@@ -255,8 +263,10 @@ const blockFromElement = (element: Element): Record<string, unknown> | null => {
     return {
       type: tag === "ul" ? "bulletList" : "orderedList",
       content: Array.from(element.children)
-        .map((child) => blockFromElement(child))
-        .filter(Boolean),
+        .flatMap((child) => {
+          const block = blockFromElement(child);
+          return block ? [block] : [];
+        }),
     };
   }
 
@@ -282,8 +292,10 @@ const htmlToTipTapDoc = (html: string): Record<string, unknown> => {
   const container = document.createElement("div");
   container.innerHTML = html;
   const content = Array.from(container.children)
-    .map((child) => blockFromElement(child))
-    .filter(Boolean);
+    .flatMap((child) => {
+      const block = blockFromElement(child);
+      return block ? [block] : [];
+    });
 
   return {
     type: "doc",

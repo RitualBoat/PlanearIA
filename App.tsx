@@ -4,7 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import StackNavigator from "./src/navigation/StackNavigator";
 import { AuthProvider } from "./src/context/AuthContext";
-import { migrateLegacySessionKeys } from "./src/services/auth";
+import { migrateLegacySessionKeys } from "./src/services/auth/legacyMigration";
 import { SyncProvider } from "./src/context/SyncContext";
 import { SyncOfflineBar, SyncNoticeToast } from "./src/components/SyncStatusBanner";
 import { PlaneacionesProvider } from "./src/context/PlaneacionesContext";

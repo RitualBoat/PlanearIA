@@ -1,4 +1,4 @@
-# IHC Discovery Docente - PlanearIA
+﻿# IHC Discovery Docente - PlanearIA
 
 > **Proposito:** paquete de Interaccion Humano-Computadora para el `Plan Maestro: UX/UI y Navegacion Global`.
 > Contiene las proto-personas, mapas de empatia, recorridos de usuario, el guion de entrevistas listo para
@@ -13,9 +13,9 @@
 ## 1. Metodologia
 
 El pipeline IHC de PlanearIA reutiliza el proceso del ejemplo academico del desarrollador
-(`Documentacion/Ejemplo materia IHC/`, app de comida en cine) pero descarta todo su contenido de dominio:
+(ejemplo academico externalizado en respaldo del usuario, app de comida en cine) pero descarta todo su contenido de dominio:
 
-- **Se reutiliza como plantilla/proceso:** borrador de entrevista -> transcripcion -> sintesis;
+- **Se reutiliza como plantilla/proceso cuando el usuario aporta el respaldo externo:** borrador de entrevista -> transcripcion -> sintesis;
   formato de mapa de empatia; formato de personas; formato de historias de usuario; formato de mapa
   de recorrido; cierre de discovery con un prototipo navegable barato (alla HTML, aqui frames de Figma).
 - **Se descarta como evidencia:** personas, motivaciones y journeys del dominio cine/comida.

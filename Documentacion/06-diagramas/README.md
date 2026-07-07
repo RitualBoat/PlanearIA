@@ -1,4 +1,4 @@
-# Diagramas de Arquitectura - PlanearIA
+﻿# Diagramas de Arquitectura - PlanearIA
 
 Diagramas tecnicos en Mermaid generados a partir del codigo real del repositorio
 (backend, `src/sync`, `.github/workflows`, navegacion y estructura de carpetas).
@@ -184,11 +184,11 @@ flowchart LR
     root --> backend["backend/ (serverless)"]
     root --> types["types/ (tipos TS centralizados)"]
     root --> doc["Documentacion/ (00-fundamentos ... 06-diagramas)"]
-    root --> ctx["context/ (ground truth, stitch-results)"]
+    root --> ctx["context/ (indices minimos; ground truth completo externo)"]
     root --> agents[".agents/skills/ (ux-ui, ai-gateway,<br/>sync, testing, accesibilidad, token-efficiency)"]
     root --> gh[".github/workflows/ (ci.yml, cd.yml)"]
     root --> scripts["scripts/ (backend local, smoke, isolation)"]
-    root --> assets["assets/  ·  shared/  ·  dist/"]
+    root --> assets["assets/  Â·  shared/  Â·  dist/"]
 
     src --> screens["screens/ (Views)<br/>classroom, planeaciones, alumnos, grupos,<br/>feed, social, chat, auth, biblioteca, ..."]
     src --> hooks["hooks/ (ViewModels)"]

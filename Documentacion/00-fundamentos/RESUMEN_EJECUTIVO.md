@@ -1,18 +1,18 @@
-# Resumen Ejecutivo Vigente - PlanearIA
+﻿# Resumen Ejecutivo Vigente - PlanearIA
 
 ## Que Es
 
 PlanearIA es una app educativa offline-first para docentes mexicanos. Esta construida con React Native, Expo, TypeScript, backend Node serverless en Vercel y MongoDB Atlas.
 
-La vision vigente es crear una suite docente conectada: el profesor debe poder crear, organizar, asignar, comunicar y dar seguimiento sin cambiar entre herramientas externas.
+La vision vigente es crear una suite docente conectada: el profesor puede crear, organizar, asignar, comunicar y dar seguimiento sin cambiar entre herramientas externas.
 
 ## Vision De Producto
 
-PlanearIA no debe sentirse como una coleccion de modulos sueltos. Debe sentirse como un solo lugar de trabajo docente:
+PlanearIA se presenta como un solo lugar de trabajo docente:
 
 - Inicio / Sistema Operativo Docente.
 - Asistente IA / ChatGPT Docente.
-- Office Docente (Word + Excel).
+- Office Docente: documentos, hojas y presentaciones.
 - Classroom / Clases.
 - Canva / Genially Docente.
 - WhatsApp Docente.
@@ -20,7 +20,7 @@ PlanearIA no debe sentirse como una coleccion de modulos sueltos. Debe sentirse 
 - Reportes.
 - Cuenta, seguridad y accesibilidad.
 
-La IA debe conectar el flujo de dos maneras: sugerencias silenciosas dentro de cada experiencia y un Asistente IA tipo ChatGPT/Gemini para conversar con documentos, recursos, clases y archivos adjuntos. La IA silenciosa tambien puede pedir permiso para mandar una tarea al LLM de PlanearIA en segundo plano, por ejemplo correcciones de un documento. En todos los casos debe pedir confirmacion antes de guardar, asignar, enviar, sobrescribir o modificar datos importantes.
+La IA conecta el flujo con sugerencias silenciosas dentro de cada experiencia y un Asistente IA tipo ChatGPT/Gemini para conversar con documentos, recursos, clases y archivos adjuntos. En todos los casos pide confirmacion antes de guardar, asignar, enviar, sobrescribir o modificar datos importantes.
 
 ## Estado Real Del Proyecto
 
@@ -32,40 +32,21 @@ La IA debe conectar el flujo de dos maneras: sugerencias silenciosas dentro de c
 
 ## Funcionalidad Cerrada O Base
 
-- Planeaciones: Fase 9 cerrada. Existe editor tipo documento, plantillas, import/export, escaner y asistencia IA. En la vision nueva se interpreta como parte de Office Docente.
-- Classroom: cerrado como base funcional. Incluye clases, unidades, materiales, actividades, alumnos, entregas, asistencia, calificaciones y flujo contextual.
-- IA actual: gateway multi-provider OpenAI-compatible en backend, con endpoints de planeaciones/Classroom. La vision nueva agrega un Asistente IA conversacional propio y soporte planificado para proveedores locales como LM Studio via `AI_GATEWAY_PROVIDERS`.
-- Infraestructura local/CI/deploy basico: cerrado.
-- SQLite/storage: cerrado como infraestructura opt-in. AsyncStorage sigue como default productivo.
+- Planeaciones: base funcional de Office Docente.
+- Classroom: base funcional para clases, unidades, materiales, actividades, alumnos, entregas, asistencia y calificaciones.
+- IA actual: gateway multi-provider OpenAI-compatible en backend.
+- Infraestructura local/CI/deploy basico: base vigente.
+- SQLite/storage: infraestructura opt-in; AsyncStorage sigue como default productivo.
 - Sync offline-first: motor global por entidad en `src/sync`, orquestado por `SyncContext`.
 - Backend: router unico serverless, rutas academicas con JWT, `userId`, MongoDB e indices idempotentes.
-- Auth: JWT, refresh tokens, sesiones, SecureStore nativo, AsyncStorage web, modo invitado/dev y roles base ya existen.
-- CD: APK Android standalone en GitHub Actions; no corre por cambios solo de documentacion.
+- Auth: JWT, refresh tokens, sesiones, SecureStore nativo, AsyncStorage web, modo invitado/dev y roles base.
 
 ## Trabajo Activo O Pendiente
 
-- Cerrar formalmente `Auth, Seguridad y Sesion Real`: email real, datos sociales pendientes, validacion manual y tracking GitHub.
-- Crear el `Plan Maestro: UX/UI y Navegacion Global`.
+- Cerrar formalmente Auth, Seguridad y Sesion Real.
+- Ejecutar el Plan Maestro UX/UI y Navegacion Global.
 - Definir sistema visual, navegacion objetivo y arquitectura de experiencias.
-- Decidir como se implementa Office Docente: documentos + hojas/listas + asignacion inteligente a Classroom.
-- Decidir donde vive el Asistente IA: tab, panel lateral, accion flotante, command palette o espacio contextual.
-- Definir plan tecnico de chat IA: historial, adjuntos, solicitudes en segundo plano, permisos, costos, proveedores cloud/locales y fallback.
-- Despues de UX/UI Global, crear subplanes por experiencia o subexperiencia.
-
-## Stack Vigente
-
-- React Native 0.81.5 + Expo 54.
-- TypeScript 5.9.
-- React Navigation 7.
-- Context + hooks ViewModel.
-- AsyncStorage default.
-- Expo SQLite opt-in.
-- Expo SecureStore en nativo para tokens; AsyncStorage en web.
-- Backend Node serverless en `backend/api/index.js` + `backend/routes`.
-- MongoDB Atlas M0.
-- IA gateway multi-provider en backend, extensible a proveedores custom OpenAI-compatible como LM Studio en entorno local.
-- Jest + Testing Library.
-- GitHub Actions CI/CD.
+- Definir el Asistente IA conversacional: historial, adjuntos, tareas en segundo plano, permisos, costos, proveedores y fallback.
 
 ## Reglas De Direccion
 
@@ -78,7 +59,7 @@ La IA debe conectar el flujo de dos maneras: sugerencias silenciosas dentro de c
 - No activar SQLite como default sin plan, validacion y rollback.
 - No borrar claves `@planearia:*` sin migracion controlada.
 - Todo dato multiusuario debe filtrar por `userId`.
-- Todo plan maestro debe seguir `Documentacion/01-planes-maestros/meta_guia_planes.md`.
+- Todo plan maestro sigue `Documentacion/01-planes-maestros/meta_guia_planes.md`.
 
 ## Documentos Vigentes Principales
 
@@ -89,8 +70,8 @@ La IA debe conectar el flujo de dos maneras: sugerencias silenciosas dentro de c
 - `Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md`
 - `Documentacion/01-planes-maestros/meta_guia_planes.md`
 - `Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md`
-- `Documentacion/prompt_mejorado.md`
+- `Documentacion/05-context-engineering/README.md`
 
 ## Documentos Historicos
 
-`Documentacion/99-archivo/` conserva documentos legacy y borradores antiguos. Sirven para historia, no para implementar.
+Los documentos legacy y borradores antiguos viven en respaldo externo del usuario. Sirven para historia si el usuario los aporta, no para implementar.

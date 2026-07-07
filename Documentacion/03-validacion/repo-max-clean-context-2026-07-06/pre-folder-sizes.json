@@ -1,0 +1,98 @@
+[
+    {
+        "Path":  "Documentacion\\99-archivo",
+        "Files":  19,
+        "Tracked":  19,
+        "MB":  0.2
+    },
+    {
+        "Path":  "Documentacion\\Ejemplo materia IHC",
+        "Files":  8,
+        "Tracked":  8,
+        "MB":  2.38
+    },
+    {
+        "Path":  "Documentacion\\01-planes-maestros\\cerrados",
+        "Files":  7,
+        "Tracked":  7,
+        "MB":  0.2
+    },
+    {
+        "Path":  "Documentacion\\03-validacion",
+        "Files":  23,
+        "Tracked":  13,
+        "MB":  0.75
+    },
+    {
+        "Path":  "openspec\\changes\\archive",
+        "Files":  15,
+        "Tracked":  10,
+        "MB":  0.04
+    },
+    {
+        "Path":  "context\\OpenSpec",
+        "Files":  113,
+        "Tracked":  9,
+        "MB":  1.82
+    },
+    {
+        "Path":  "context\\referencias-opensource",
+        "Files":  41,
+        "Tracked":  41,
+        "MB":  0.8
+    },
+    {
+        "Path":  "context\\referencias-app-similares-a-planearia",
+        "Files":  62,
+        "Tracked":  62,
+        "MB":  25.23
+    },
+    {
+        "Path":  "context\\infraestructura-ground-truth",
+        "Files":  67,
+        "Tracked":  67,
+        "MB":  6.09
+    },
+    {
+        "Path":  "context\\planeaciones-reales",
+        "Files":  6,
+        "Tracked":  6,
+        "MB":  1.55
+    },
+    {
+        "Path":  "context\\stitch-results",
+        "Files":  330,
+        "Tracked":  0,
+        "MB":  32.96
+    },
+    {
+        "Path":  "context\\roadmap-context",
+        "Files":  35,
+        "Tracked":  0,
+        "MB":  1.58
+    },
+    {
+        "Path":  "context\\classroom-ground-truth",
+        "Files":  33,
+        "Tracked":  33,
+        "MB":  10.6
+    },
+    {
+        "Path":  "context\\planeaciones-ground-truth",
+        "Files":  36,
+        "Tracked":  36,
+        "MB":  13.27
+    },
+    {
+        "Path":  "context\\excel-ground-truth",
+        "Files":  6,
+        "Tracked":  6,
+        "MB":  0
+    },
+    {
+        "Path":  "context\\chat-ground-truth",
+        "Files":  6,
+        "Tracked":  6,
+        "MB":  0
+    }
+]

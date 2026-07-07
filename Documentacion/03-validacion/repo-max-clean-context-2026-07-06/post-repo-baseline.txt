@@ -1,0 +1,437 @@
+## git status --short --branch
+## codex/repo-ai-friendly-documentation-overhaul
+ M .github/copilot-instructions.md
+M  .gitignore
+ M AGENTS.md
+ M CLAUDE.md
+M  Documentacion/00-fundamentos/IHC_DISCOVERY_DOCENTE.md
+M  Documentacion/00-fundamentos/README.md
+M  Documentacion/00-fundamentos/RESUMEN_EJECUTIVO.md
+M  Documentacion/00-fundamentos/VISION_ACTUAL.md
+M  Documentacion/01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md
+M  Documentacion/01-planes-maestros/README.md
+D  "Documentacion/01-planes-maestros/cerrados/PLANEACIONES_IA_EDITOR_FASE9 (closed).md"
+D  "Documentacion/01-planes-maestros/cerrados/PLAN_CLASSROOM (closed).md"
+D  "Documentacion/01-planes-maestros/cerrados/PLAN_INFRAESTRUCTURA_LOCAL_CI_DEPLOY (closed).md"
+D  "Documentacion/01-planes-maestros/cerrados/PLAN_PASOS_INICIALES (closed).md"
+D  "Documentacion/01-planes-maestros/cerrados/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE (closed).md"
+D  Documentacion/01-planes-maestros/cerrados/README.md
+D  "Documentacion/01-planes-maestros/cerrados/plan_planeaciones (closed).md"
+M  Documentacion/01-planes-maestros/meta_guia_planes.md
+M  Documentacion/02-operacion/GUIA_PRUEBAS.md
+M  Documentacion/03-validacion/README.md
+D  Documentacion/03-validacion/openspec-sdd-cuenta-2026-07-06/README.md
+D  Documentacion/03-validacion/openspec-sdd-cuenta-2026-07-06/capturas/01-desktop-light-medium.png
+D  Documentacion/03-validacion/openspec-sdd-cuenta-2026-07-06/capturas/02-desktop-dark-medium.png
+D  Documentacion/03-validacion/openspec-sdd-cuenta-2026-07-06/capturas/03-desktop-dark-grande.png
+D  Documentacion/03-validacion/openspec-sdd-cuenta-2026-07-06/capturas/04-desktop-dark-daltonismo-none.png
+D  Documentacion/03-validacion/openspec-sdd-cuenta-2026-07-06/capturas/05-desktop-dark-daltonismo-deuteranopia.png
+D  Documentacion/03-validacion/openspec-sdd-cuenta-2026-07-06/capturas/06-mobile-light.png
+D  Documentacion/03-validacion/openspec-sdd-cuenta-2026-07-06/capturas/07-mobile-dark.png
+D  Documentacion/03-validacion/openspec-sdd-cuenta-2026-07-06/capturas/08-tablet-light.png
+D  Documentacion/03-validacion/openspec-sdd-cuenta-2026-07-06/capturas/09-tablet-dark.png
+D  Documentacion/03-validacion/openspec-sdd-smoke-2026-07-04/README.md
+A  Documentacion/03-validacion/repo-max-clean-context-2026-07-06/pre-codegraph-context-files.txt
+A  Documentacion/03-validacion/repo-max-clean-context-2026-07-06/pre-codegraph-explore-ai-gateway.txt
+A  Documentacion/03-validacion/repo-max-clean-context-2026-07-06/pre-codegraph-explore-classroom.txt
+A  Documentacion/03-validacion/repo-max-clean-context-2026-07-06/pre-codegraph-explore-cuenta-accessibility.txt
+A  Documentacion/03-validacion/repo-max-clean-context-2026-07-06/pre-codegraph-explore-external-trap.txt
+A  Documentacion/03-validacion/repo-max-clean-context-2026-07-06/pre-codegraph-explore-sync.txt
+A  Documentacion/03-validacion/repo-max-clean-context-2026-07-06/pre-codegraph-status.txt
+A  Documentacion/03-validacion/repo-max-clean-context-2026-07-06/pre-codegraph-sync.txt
+A  Documentacion/03-validacion/repo-max-clean-context-2026-07-06/pre-folder-sizes.json
+A  Documentacion/03-validacion/repo-max-clean-context-2026-07-06/pre-repo-baseline.txt
+M  Documentacion/04-referencia/README.md
+A  Documentacion/05-context-engineering/README.md
+M  Documentacion/06-diagramas/README.md
+D  Documentacion/99-archivo/05-analisis-ia/INFRAESTRUCTURA_SUGERIDA.md
+D  Documentacion/99-archivo/05-analisis-ia/OPINION_DE_IA_TRAS_LEER_META_GUIA_PLANEACIONES.md
+D  Documentacion/99-archivo/05-analisis-ia/README.md
+D  Documentacion/99-archivo/05-analisis-ia/REVISION-GPT-TRAS-LEER-ARCHIVOS-DOCUMENTACION.md
+D  Documentacion/99-archivo/CHECKLIST_VALIDACION_MANUAL_FASE9_LEGACY.md
+D  Documentacion/99-archivo/DIAGRAMA_NAVEGACION_LEGACY_2025.md
+D  Documentacion/99-archivo/GUIA_PRUEBAS_LEGACY_2025.md
+D  Documentacion/99-archivo/HANDOFF_SIGUIENTE_PLAN_2026-06-11_LEGACY.md
+D  Documentacion/99-archivo/INFRAESTRUCTURA_SUGERIDA_LEGACY_IA.md
+D  Documentacion/99-archivo/MAPA_NAVEGACION_LEGACY_2025.md
+D  Documentacion/99-archivo/OPINION_DE_IA_META_GUIA_LEGACY.md
+D  Documentacion/99-archivo/PLANES_MAESTROS_AUDITADOS_LEGACY.md
+D  "Documentacion/99-archivo/README principal antiguo.md"
+D  Documentacion/99-archivo/README.md
+D  Documentacion/99-archivo/RESUMEN_LEGACY_2025.md
+D  Documentacion/99-archivo/REVISION_GPT_DOCUMENTACION_LEGACY.md
+D  Documentacion/99-archivo/meta_guia_planes_v2_pre-sdd_2026-07.md
+D  Documentacion/99-archivo/prompt_A_mejorar_LEGACY_UX_UI.md
+D  Documentacion/99-archivo/prompt_mejorado_auditoria_uxui_ejecutada_2026-07.md
+D  "Documentacion/Ejemplo materia IHC/Borrador entrevista.pdf"
+D  "Documentacion/Ejemplo materia IHC/Frameworks de UX.pdf"
+D  "Documentacion/Ejemplo materia IHC/Historias de usuario.pdf"
+D  "Documentacion/Ejemplo materia IHC/Mapa de empatia.pdf"
+D  "Documentacion/Ejemplo materia IHC/Mapas de recorrido de usuario.pdf"
+D  "Documentacion/Ejemplo materia IHC/Transcripcion entrevistas.pdf"
+D  "Documentacion/Ejemplo materia IHC/cine_mode_in_seat_ordering.html"
+D  "Documentacion/Ejemplo materia IHC/personas.pdf"
+M  Documentacion/README.md
+ M README.md
+ M backend/README.md
+D  "context/OpenSpec/Capturas/Ciclo De Desarrollo de OpenSpec.jpeg"
+D  "context/OpenSpec/Capturas/Ciclo de Desarrollo de OpenSpec 2.jpeg"
+D  "context/OpenSpec/Capturas/Conceptos que tiene que tener mi frameworkd SDD de OpenSpec.jpeg"
+D  "context/OpenSpec/Capturas/Ejemplo de descripcion de agente.jpeg"
+D  "context/OpenSpec/Capturas/Ejemplo de skills y agents especializados (como se comporta el agente segun el rol).jpeg"
+D  "context/OpenSpec/Capturas/Estructura de carpetas openspec.jpeg"
+D  "context/OpenSpec/Capturas/Historia de usuario antes y despues de usar el enrich us de openspec 2.jpeg"
+D  "context/OpenSpec/Capturas/Historia de usuario antes y despues de usar el enrich us de openspec.jpeg"
+D  "context/OpenSpec/Capturas/WhatsApp Image 2026-07-01 at 4.46.01 PM.jpeg"
+A  context/OpenSpec/README.md
+M  context/README.md
+D  context/chat-ground-truth/01-errores-actuales/README.md
+D  context/chat-ground-truth/02-capturas-actuales-de-la-app/.gitkeep
+D  context/chat-ground-truth/03-referencias-reales/.gitkeep
+D  context/chat-ground-truth/04-flujos-deseados/.gitkeep
+D  context/chat-ground-truth/05-notas-del-desarrollador/README.md
+M  context/chat-ground-truth/README.md
+D  context/classroom-ground-truth/01-errores-actuales/README.md
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/Ejemplo de material que tiene mas de 1 recurso asignado (leccion 1) 2 (esto es lo que pasa cuando abres leccion 1).png"
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/Ejemplo de material que tiene mas de 1 recurso asignado (leccion 1).png"
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/agregar leccion o curso a contenido creado.png"
+D  context/classroom-ground-truth/03-referencias-reales/Classroomio/classroomdev.png
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/contenido dentro de los cursos.png"
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/contenido y asistente.png"
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/creacion de certificados.png"
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/curso creado bienvenida.png"
+D  context/classroom-ground-truth/03-referencias-reales/Classroomio/cursos.png
+D  context/classroom-ground-truth/03-referencias-reales/Classroomio/dashboard.png
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/ejemplo de creacion de examen settings.png"
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/ejemplo de creacion de examen.png"
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/ejercicios subidos.png"
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/home 1.png"
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/opciones de exercise a agregar o crear.png"
+D  context/classroom-ground-truth/03-referencias-reales/Classroomio/people.png
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/recurso (video en este ejemplo) dentro de contenido asignado en seccion introduccion.png"
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/recurso documentos.png"
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/recurso notas.png"
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/recurso presentacion.png"
+D  "context/classroom-ground-truth/03-referencias-reales/Classroomio/setting del curso.png"
+D  context/classroom-ground-truth/03-referencias-reales/Classroomio/web.png
+D  "context/classroom-ground-truth/03-referencias-reales/classroom google/clase, seccion personas.png"
+D  "context/classroom-ground-truth/03-referencias-reales/classroom google/clase, seccion tablon.png"
+D  "context/classroom-ground-truth/03-referencias-reales/classroom google/clase, seccion trabajo en clase.png"
+D  "context/classroom-ground-truth/03-referencias-reales/classroom google/classroom calendario.png"
+D  "context/classroom-ground-truth/03-referencias-reales/classroom google/dashboard classroom.png"
+D  "context/classroom-ground-truth/03-referencias-reales/classroom google/ejemplo de actividad abierta en classroom con titulo, descripcion, ponderacion de 0 a 100, 2 documentos enlazados o asignado, comentarios sobre la clase, comentarios personales y opcion para subir tu trabajo en caso de ser alumno.png"
+D  "context/classroom-ground-truth/03-referencias-reales/classroom google/ejemplo de actividad que tiene aparte 1 recurso (tambien sirve de ejemplo para ver el icono de material y actividad (iconos de libro cerrado y documento))).png"
+D  "context/classroom-ground-truth/03-referencias-reales/classroom google/tareas pendientes, seccion asignado.png"
+D  "context/classroom-ground-truth/03-referencias-reales/classroom google/tareas pendientes, seccion hecho.png"
+D  "context/classroom-ground-truth/03-referencias-reales/classroom google/tareas pendientes, seccion sin entregar.png"
+A  context/classroom-ground-truth/README.md
+D  context/excel-ground-truth/01-errores-actuales/README.md
+D  context/excel-ground-truth/02-capturas-actuales-de-la-app/.gitkeep
+D  context/excel-ground-truth/03-referencias-reales/.gitkeep
+D  context/excel-ground-truth/04-flujos-deseados/.gitkeep
+D  context/excel-ground-truth/05-notas-del-desarrollador/README.md
+M  context/excel-ground-truth/README.md
+D  context/infraestructura-ground-truth/01-estado-actual/.gitkeep
+D  context/infraestructura-ground-truth/01-estado-actual/baseline-2026-06-04.md
+D  context/infraestructura-ground-truth/02-evidencia-local/.gitkeep
+D  context/infraestructura-ground-truth/02-evidencia-local/fase-1-scripts-reproducibles-2026-06-06.md
+D  context/infraestructura-ground-truth/02-evidencia-local/fase-2-env-secrets-perfiles-2026-06-06.md
+D  context/infraestructura-ground-truth/02-evidencia-local/fase-3-backend-local-health-smoke-2026-06-06.md
+D  context/infraestructura-ground-truth/03-evidencia-ci/.gitkeep
+D  context/infraestructura-ground-truth/03-evidencia-ci/fase-4-ci-backend-smoke-2026-06-06.md
+D  "context/infraestructura-ground-truth/03-evidencia-ci/revision manual pasada 2.png"
+D  "context/infraestructura-ground-truth/03-evidencia-ci/revision manual pasada.png"
+D  context/infraestructura-ground-truth/04-evidencia-deploy/.gitkeep
+D  context/infraestructura-ground-truth/04-evidencia-deploy/fase-5-estrategia-low-cost-demo-2026-06-06.md
+D  "context/infraestructura-ground-truth/04-evidencia-deploy/npm run backend check.png"
+D  "context/infraestructura-ground-truth/04-evidencia-deploy/npm run check.png"
+D  "context/infraestructura-ground-truth/04-evidencia-deploy/pagina corriendo en ngrok movil.png"
+D  "context/infraestructura-ground-truth/04-evidencia-deploy/pagina corriendo en ngrok web.png"
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/.gitkeep
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/.gitkeep
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/01-classroom-home-antes.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/02-classroom-grupo-tablon-antes.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/03-classroom-grupo-trabajo-antes.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/04-classroom-grupo-personas-antes.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/05-detalle-grupo-alumnos-antes.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/06-detalle-grupo-tareas-antes.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/07-detalle-grupo-asistencias-calificaciones-antes.png
+D  "context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/08-reporte-grupo-antes copy.png"
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/09-reporte-alumno-antes.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/10-terminal-typecheck-antes.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/11-terminal-test-classroom-antes.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/12-terminal-test-sync-antes.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/13-codigo-classroom-storage-antes.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/14-codigo-detalle-grupo-asyncstorage-antes.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/15-codigo-reportes-grupo-asyncstorage-antes.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/01-capturas-antes/16-codigo-sync-queue-antes.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/.gitkeep
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/01-codigo-classroom-repository-despues.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/02-codigo-read-dataset-despues.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/03-codigo-detalle-grupo-repository-despues.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/04-codigo-reportes-grupo-repository-despues.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/05-codigo-reportes-alumno-repository-despues.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/06-codigo-tests-repository-despues.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/07-package-expo-sqlite-despues.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/08-app-json-plugin-sqlite-despues.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/09-codigo-schema-sqlite-despues.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/10-codigo-adapter-sqlite-despues.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/11-codigo-factory-sqlite-despues.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/12-codigo-migration-snapshot-despues.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/13-codigo-migration-tests-despues.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/14-terminal-classroom-tests-fase3.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/28-terminal-typecheck-fase5.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/29-terminal-classroom-fase5.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/30-terminal-sync-fase5.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/02-capturas-despues/31-terminal-lint-fase5.png
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/fase-6-preparacion-sqlite-2026-06-06.md
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/fixtures/classroom-storage-fixture-minimo.json
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/sqlite-fase-0-baseline-2026-06-10.md
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/sqlite-fase-1-ports-repositories-2026-06-11.md
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/sqlite-fase-2-adapter-2026-06-11.md
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/sqlite-fase-3-migracion-snapshot-2026-06-11.md
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/sqlite-fase-4-sync-queue-2026-06-11.md
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/sqlite-fase-5-validacion-manual-2026-06-11.md
+D  context/infraestructura-ground-truth/05-sqlite-actividad-academica/sqlite-fase-6-limpieza-cierre-2026-06-11.md
+D  context/infraestructura-ground-truth/06-auth-seguridad-sesion/auth-fase-0-auditoria-baseline-2026-06-12.md
+D  context/infraestructura-ground-truth/06-auth-seguridad-sesion/auth-fase-1-roles-permisos-contrato-2026-06-12.md
+D  context/infraestructura-ground-truth/06-auth-seguridad-sesion/auth-fase-2-backend-hardening-2026-06-12.md
+D  context/infraestructura-ground-truth/06-cierre-plan/fase-7-docs-runbooks-cierre-2026-06-06.md
+M  context/infraestructura-ground-truth/README.md
+D  "context/planeaciones-ground-truth/01-plantilla-default/PDF PLANTILLA.pdf"
+D  context/planeaciones-ground-truth/01-plantilla-default/README.md
+D  context/planeaciones-ground-truth/01-plantilla-default/evaluacion.png
+D  context/planeaciones-ground-truth/01-plantilla-default/primerapagina.png
+D  context/planeaciones-ground-truth/01-plantilla-default/tablas-rubricas.png
+D  "context/planeaciones-ground-truth/01-plantilla-default/word plantilla.docx"
+D  context/planeaciones-ground-truth/02-logos-e-imagenes/README.md
+D  context/planeaciones-ground-truth/02-logos-e-imagenes/logo1.png
+D  context/planeaciones-ground-truth/02-logos-e-imagenes/logo2.PNG
+D  context/planeaciones-ground-truth/02-logos-e-imagenes/logo3.png
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/Experiencia deseada 1 (genially).png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/Experiencia deseada 1.2 (genially).png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/Experiencia deseada 2 (google docs).png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/Experiencia deseada 3 (canva).png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/bottom toolbar genially.png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/editor de docs en movil (canva).png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/left side toolbar (menu home) genially.png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/left side toolbar (modo edicion) genially.png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/modo pantalla completa (canva).png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/modo pantalla completa (genially).png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/modo pantalla completa movil (genially).png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/selector de plantillas movil (canva).png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/selector de plantillas movil (genially).png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/selector de plantillas movil (modal de confirmacion genially).png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/selector plantillas web (canva 2do ejemplo).png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/selector plantillas web (genially).png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/selector plantillas web canva.png"
+D  "context/planeaciones-ground-truth/03-word-docs-referencias/top toolbar googledocs.png"
+D  "context/planeaciones-ground-truth/04-errores-actuales/Escaner de escaner de plantillas web.png"
+D  context/planeaciones-ground-truth/04-errores-actuales/README.md
+D  "context/planeaciones-ground-truth/04-errores-actuales/escaner de planeaciones movil.png"
+D  "context/planeaciones-ground-truth/05-menu-plantillas/01 flujo actual hub.png"
+D  "context/planeaciones-ground-truth/05-menu-plantillas/02 flujo actual al dar clic en el simbolo de +.png"
+D  "context/planeaciones-ground-truth/05-menu-plantillas/03 flujo actual al seleccionar planeacion.png"
+D  "context/planeaciones-ground-truth/05-menu-plantillas/04 flujo actual al tocar el boton abrir en doceditor.png"
+D  context/planeaciones-ground-truth/05-menu-plantillas/README.md
+A  context/planeaciones-ground-truth/README.md
+D  "context/planeaciones-reales/MATEDISCRETA/INSTRUMENTACI\303\223N- Mate Disctretas I.pdf"
+D  context/planeaciones-reales/MATEDISCRETA/Matediscretas.md
+A  context/planeaciones-reales/README.md
+D  "context/planeaciones-reales/semana 33 y 34 primero/Semana 33 y 34   PRIMERO.pdf"
+D  "context/planeaciones-reales/semana 33 y 34 primero/primero.md"
+D  "context/planeaciones-reales/semana 33 y 34 segundo/Semana 33 y 34 SEGUNDO.pdf"
+D  "context/planeaciones-reales/semana 33 y 34 segundo/segundo.md"
+A  context/referencias-app-similares-a-planearia/README.md
+D  "context/referencias-app-similares-a-planearia/app.comenio.ai/Planeacion generada con IA a partir de texto, numero de sesiones y demas (el texto se fue generando hasta terminar).png"
+D  context/referencias-app-similares-a-planearia/app.comenio.ai/chatbotDeAyuda.png
+D  "context/referencias-app-similares-a-planearia/app.comenio.ai/seleccion de herramientas o estilo de planeacion antes de irse a la generacion de la planeacion con IA.png"
+D  "context/referencias-app-similares-a-planearia/teachy/01 flujo creacion de planeacion.png"
+D  "context/referencias-app-similares-a-planearia/teachy/02 flujo creacion de planeacion.png"
+D  "context/referencias-app-similares-a-planearia/teachy/02.1 flujo creacion de planeacion.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.1 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.2 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.2.1 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.2.2 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.2.3 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.3 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.3.1 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.4 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.4.1 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.5 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.5.1 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.5.10 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.5.11 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.5.2 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.5.3 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.5.4 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.5.5 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.5.6 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.5.7 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.5.8 flujo de creacion de planeaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/03.5.9 flujo de creacion de planeaciones.png"
+D  context/referencias-app-similares-a-planearia/teachy/Homepage.png
+D  "context/referencias-app-similares-a-planearia/teachy/Planificaci\303\263n Lengua Extranjera - Ingl\303\251s - Secundaria 1\302\272 Grado.docx"
+D  "context/referencias-app-similares-a-planearia/teachy/abrir clases, asignar materiales a clases (recursos como examenes, diapositivas, trabajos, documentos, etc), opcion de abrir y ver la clase o eliminarla.png"
+D  "context/referencias-app-similares-a-planearia/teachy/asignar planeacion a grupo.png"
+D  "context/referencias-app-similares-a-planearia/teachy/boton expandir clases continuacion.png"
+D  "context/referencias-app-similares-a-planearia/teachy/boton expandir clases.png"
+D  "context/referencias-app-similares-a-planearia/teachy/boton gestionar dentro de la pantalla de grupo de estudiantes creado.png"
+D  "context/referencias-app-similares-a-planearia/teachy/boton replanificar continuacion.png"
+D  "context/referencias-app-similares-a-planearia/teachy/boton replanificar.png"
+D  "context/referencias-app-similares-a-planearia/teachy/clases y temas faciles de mover solamente arrastrando en la vista de calendario de tu planeacion.png"
+D  "context/referencias-app-similares-a-planearia/teachy/creacion de recursos (examenes).png"
+D  "context/referencias-app-similares-a-planearia/teachy/cuota acabada.png"
+D  "context/referencias-app-similares-a-planearia/teachy/edicion de perfil propio.png"
+D  "context/referencias-app-similares-a-planearia/teachy/modal de bienvenida al seleccionar opcion de planificar clases.png"
+D  "context/referencias-app-similares-a-planearia/teachy/modal que sale cuando das clic en el boton de mis planificaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/pantalla al editar recurso como el banco de preguntas o examen.png"
+D  "context/referencias-app-similares-a-planearia/teachy/pantalla al editar recursos, apartado de crear con IA.png"
+D  "context/referencias-app-similares-a-planearia/teachy/pantalla comunidad o red social, mas publicaciones.png"
+D  "context/referencias-app-similares-a-planearia/teachy/pantalla de grupo de estudiantes ya creado, aqui se ve que se separan los recursos en 2, actividades (examenes,trabajos,proyectos,entregables) y recursos (documentos, notas de voz, mapas del tiempo, pdf, etc)).png"
+D  "context/referencias-app-similares-a-planearia/teachy/pantalla de grupo de estudiantes ya creado, modal que sale al quere asignar un recurso, actividad, nota de voz u otro.png"
+D  "context/referencias-app-similares-a-planearia/teachy/pantalla de mis recursos.png"
+D  "context/referencias-app-similares-a-planearia/teachy/pantalla grupo de estudiantes ya creado.png"
+D  "context/referencias-app-similares-a-planearia/teachy/pantalla grupo de estudiantes.png"
+D  "context/referencias-app-similares-a-planearia/teachy/pantalla red social o comunidad ejemplo.png"
+D  "context/referencias-app-similares-a-planearia/teachy/pantalla red social o comunidad, modal al querer a\303\261adir clase.png"
+D  "context/referencias-app-similares-a-planearia/teachy/pantalla red social o comunidad, modal al querer a\303\261adir materiales.png"
+D  "context/referencias-app-similares-a-planearia/teachy/pantalla red social o comunidad, publicaciones de otros docentes.png"
+D  "context/referencias-app-similares-a-planearia/teachy/pantalla red social o comunidad.png"
+D  "context/referencias-app-similares-a-planearia/teachy/perfil de otro profesor continuacion.png"
+D  "context/referencias-app-similares-a-planearia/teachy/perfil de otro profesor.png"
+D  "context/referencias-app-similares-a-planearia/teachy/plan mensual.png"
+D  "context/referencias-app-similares-a-planearia/teachy/planificacion creada con vista de calendario.png"
+D  "context/referencias-app-similares-a-planearia/teachy/primeros pasos modal.png"
+D  "context/referencias-app-similares-a-planearia/teachy/word creado, generado y descargado de mi planeacion (tiene mas paginas, para verlo completo acceder al archivo word).png"
+D  "context/referencias-opensource/Como crear dise\303\261os ux-ui/10 Caso l\303\255mite.pdf"
+D  "context/referencias-opensource/Como crear dise\303\261os ux-ui/12 Wireframes en Diseno UX.pdf"
+M  context/referencias-opensource/README.md
+D  context/referencias-opensource/classroomio-classroom/ARCHITECTURE_PATHS.md
+D  context/referencias-opensource/classroomio-classroom/FUENTE.md
+D  context/referencias-opensource/classroomio-classroom/LICENSE-AGPL-3.0.txt
+D  context/referencias-opensource/classroomio-classroom/README_ORIGINAL.md
+D  context/referencias-opensource/classroomio-classroom/manifests/package.json
+D  context/referencias-opensource/classroomio-classroom/manifests/pnpm-workspace.yaml
+D  context/referencias-opensource/edrys-classroom-extra/ARCHITECTURE_PATHS.md
+D  context/referencias-opensource/edrys-classroom-extra/FUENTE.md
+D  context/referencias-opensource/edrys-classroom-extra/LICENSE-MPL-2.0.txt
+D  context/referencias-opensource/edrys-classroom-extra/README_ORIGINAL.md
+D  context/referencias-opensource/jaaz-ai-local/ARCHITECTURE_PATHS.md
+D  context/referencias-opensource/jaaz-ai-local/FUENTE.md
+D  context/referencias-opensource/jaaz-ai-local/LICENSE-JAAZ-CUSTOM.txt
+D  context/referencias-opensource/kalvi-classroom/ARCHITECTURE_PATHS.md
+D  context/referencias-opensource/kalvi-classroom/FUENTE.md
+D  context/referencias-opensource/kalvi-classroom/LICENSE-AGPL-3.0.txt
+D  context/referencias-opensource/kalvi-classroom/README_ORIGINAL.md
+D  context/referencias-opensource/kalvi-classroom/manifests/docker-compose.yml
+D  context/referencias-opensource/loomic-ia/ARCHITECTURE_PATHS.md
+D  context/referencias-opensource/loomic-ia/FUENTE.md
+D  context/referencias-opensource/loomic-ia/NO_LICENSE_NOTICE.md
+D  context/referencias-opensource/openwordwriter-word/ARCHITECTURE_PATHS.md
+D  context/referencias-opensource/openwordwriter-word/FUENTE.md
+D  context/referencias-opensource/openwordwriter-word/LICENSE-GPL-2.0.txt
+D  context/referencias-opensource/openwordwriter-word/README_ORIGINAL.md
+D  context/referencias-opensource/rishah-canvas/ARCHITECTURE_PATHS.md
+D  context/referencias-opensource/rishah-canvas/FUENTE.md
+D  context/referencias-opensource/rishah-canvas/LICENSE-APACHE-2.0.txt
+D  context/referencias-opensource/rishah-canvas/README_ORIGINAL.md
+D  context/referencias-opensource/rishah-canvas/manifests/package.json
+D  context/referencias-opensource/rishah-canvas/source/src-tauri/Cargo.toml
+D  context/referencias-opensource/rishah-canvas/source/src/App.tsx
+D  context/referencias-opensource/rishah-canvas/source/src/components/tldraw/IconButton.tsx
+D  context/referencias-opensource/rishah-canvas/source/src/components/tldraw/customStylePanel.tsx
+D  context/referencias-opensource/rishah-canvas/source/src/components/tldraw/shapeButtons.tsx
+D  context/referencias-opensource/rishah-canvas/source/src/utils/settingsManager.ts
+D  context/referencias-opensource/webdesk-legacy-classroom/ARCHITECTURE_PATHS.md
+D  context/referencias-opensource/webdesk-legacy-classroom/FUENTE.md
+D  context/referencias-opensource/webdesk-legacy-classroom/NO_LICENSE_NOTICE.md
+D  context/referencias-opensource/yft-canva/ARCHITECTURE_PATHS.md
+D  context/referencias-opensource/yft-canva/FUENTE.md
+D  context/referencias-opensource/yft-canva/LICENSE-MIT.txt
+D  context/referencias-opensource/yft-canva/README_ORIGINAL.md
+D  context/referencias-opensource/yft-canva/manifests/package.json
+D  context/referencias-opensource/yft-canva/source/src/components/FileExport/ExportImage.vue
+D  context/referencias-opensource/yft-canva/source/src/components/FileExport/ExportPDF.vue
+D  context/referencias-opensource/yft-canva/source/src/components/FileExport/ExportSVG.vue
+D  context/referencias-opensource/yft-canva/source/src/components/FileExport/index.vue
+D  context/referencias-opensource/yft-canva/source/src/configs/alignLine.ts
+D  context/referencias-opensource/yft-canva/source/src/configs/canvas.ts
+D  context/referencias-opensource/yft-canva/source/src/configs/contextMenu.ts
+D  context/referencias-opensource/yft-canva/source/src/configs/hotkey.ts
+D  context/referencias-opensource/yft-canva/source/src/configs/scale.ts
+D  context/referencias-opensource/yft-canva/source/src/configs/shape.ts
+D  context/referencias-opensource/yft-canva/source/src/configs/size.ts
+D  context/referencias-opensource/yft-canva/source/src/configs/texts.ts
+D  context/referencias-opensource/yft-canva/source/src/hooks/useAddTemplateElement.ts
+D  context/referencias-opensource/yft-canva/source/src/hooks/useCanvasEvent.ts
+D  context/referencias-opensource/yft-canva/source/src/hooks/useCanvasExport.ts
+D  context/referencias-opensource/yft-canva/source/src/hooks/useCanvasHotkey.ts
+D  context/referencias-opensource/yft-canva/source/src/hooks/useCanvasScale.ts
+D  context/referencias-opensource/yft-canva/source/src/hooks/useCanvasZindex.ts
+D  context/referencias-opensource/yft-canva/source/src/hooks/useHandleElement.ts
+D  context/referencias-opensource/yft-canva/source/src/hooks/useHandleTemplate.ts
+D  context/referencias-opensource/yft-canva/source/src/hooks/useHistorySnapshot.ts
+D  context/referencias-opensource/yft-canva/source/src/hooks/useLoadTemplates.ts
+D  context/referencias-opensource/yft-canva/source/src/store/index.ts
+D  context/referencias-opensource/yft-canva/source/src/store/modules/fabric.ts
+D  context/referencias-opensource/yft-canva/source/src/store/modules/keyboard.ts
+D  context/referencias-opensource/yft-canva/source/src/store/modules/main.ts
+D  context/referencias-opensource/yft-canva/source/src/store/modules/snapshot.ts
+D  context/referencias-opensource/yft-canva/source/src/store/modules/template.ts
+D  context/referencias-opensource/yft-canva/source/src/types/canvas.ts
+D  context/referencias-opensource/yft-canva/source/src/types/elements.ts
+D  context/referencias-opensource/yft-canva/source/src/types/history.ts
+D  context/referencias-opensource/yft-canva/source/src/types/templates.ts
+D  context/referencias-opensource/yft-canva/source/src/utils/clipboard.ts
+D  context/referencias-opensource/yft-canva/source/src/utils/download.ts
+D  context/referencias-opensource/yft-canva/source/src/utils/element.ts
+D  context/referencias-opensource/yft-canva/source/src/utils/geometry.ts
+D  context/referencias-opensource/yft-canva/source/src/utils/image.ts
+D  context/referencias-opensource/yft-canva/source/src/utils/local.ts
+D  context/referencias-opensource/yft-canva/source/src/utils/objectTransforms.ts
+D  context/referencias-opensource/yft-canva/source/src/utils/storage.ts
+D  context/referencias-opensource/yft-canva/source/src/views/Editor/CanvasLeft/Menu/components/TemplatePool.vue
+D  context/referencias-opensource/yft-canva/source/src/views/Editor/CanvasRight/LayerStylePanel/index.vue
+D  openspec/changes/archive/2026-07-04-verify-settings-accessibility-controls/.openspec.yaml
+D  openspec/changes/archive/2026-07-04-verify-settings-accessibility-controls/design.md
+D  openspec/changes/archive/2026-07-04-verify-settings-accessibility-controls/proposal.md
+D  openspec/changes/archive/2026-07-04-verify-settings-accessibility-controls/specs/settings-accessibility-preferences/spec.md
+D  openspec/changes/archive/2026-07-04-verify-settings-accessibility-controls/tasks.md
+D  openspec/changes/archive/2026-07-06-apply-cuenta-runtime-accessibility/design.md
+D  openspec/changes/archive/2026-07-06-apply-cuenta-runtime-accessibility/proposal.md
+D  openspec/changes/archive/2026-07-06-apply-cuenta-runtime-accessibility/specs/settings-accessibility-preferences/spec.md
+D  openspec/changes/archive/2026-07-06-apply-cuenta-runtime-accessibility/tasks.md
+R  openspec/changes/archive/2026-07-06-apply-cuenta-runtime-accessibility/.openspec.yaml -> openspec/changes/repo-max-clean-context-externalization/.openspec.yaml
+A  openspec/changes/repo-max-clean-context-externalization/design.md
+A  openspec/changes/repo-max-clean-context-externalization/proposal.md
+A  openspec/changes/repo-max-clean-context-externalization/specs/ai-friendly-repository-context/spec.md
+A  openspec/changes/repo-max-clean-context-externalization/tasks.md
+M  openspec/config.yaml
+A  openspec/specs/ai-friendly-repository-context/spec.md
+?? Documentacion/03-validacion/repo-max-clean-context-2026-07-06/post-codegraph-context-files.txt
+?? Documentacion/03-validacion/repo-max-clean-context-2026-07-06/post-codegraph-explore-ai-gateway.txt
+?? Documentacion/03-validacion/repo-max-clean-context-2026-07-06/post-codegraph-explore-classroom.txt
+?? Documentacion/03-validacion/repo-max-clean-context-2026-07-06/post-codegraph-explore-cuenta-accessibility.txt
+?? Documentacion/03-validacion/repo-max-clean-context-2026-07-06/post-codegraph-explore-external-trap.txt
+?? Documentacion/03-validacion/repo-max-clean-context-2026-07-06/post-codegraph-explore-sync.txt
+?? Documentacion/03-validacion/repo-max-clean-context-2026-07-06/post-codegraph-status-before-sync.txt
+?? Documentacion/03-validacion/repo-max-clean-context-2026-07-06/post-codegraph-status.txt
+?? Documentacion/03-validacion/repo-max-clean-context-2026-07-06/post-codegraph-sync.txt
+
+## git ls-files count
+539
+
+## tracked markdown count
+103
+
+## tracked context count
+10
+
+## context filesystem files
+10
+
+## context filesystem bytes
+5688
+

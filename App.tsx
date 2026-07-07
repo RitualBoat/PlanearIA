@@ -4,7 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import StackNavigator from "./src/navigation/StackNavigator";
 import { AuthProvider } from "./src/context/AuthContext";
-import { migrateLegacySessionKeys } from "./src/services/auth/legacyMigration";
+import { migrateLegacySessionKeys } from "./src/services/auth";
 import { SyncProvider } from "./src/context/SyncContext";
 import { SyncOfflineBar, SyncNoticeToast } from "./src/components/SyncStatusBanner";
 import { PlaneacionesProvider } from "./src/context/PlaneacionesContext";
@@ -22,6 +22,7 @@ import { NotificacionesProvider } from "./src/context/NotificacionesContext";
 import { ThemeProvider } from "./src/context/ThemeContext";
 import { FontSizeProvider } from "./src/context/FontSizeContext";
 import { DaltonismoProvider } from "./src/context/DaltonismoContext";
+import { AccessibilityPreferencesProvider } from "./src/context/AccessibilityPreferencesContext";
 import KeyboardDismissFab from "./src/components/KeyboardDismissFab";
 import "./src/locales/i18n";
 
@@ -33,7 +34,9 @@ const AppShell: React.FC<ChildrenProps> = ({ children }) => (
   <SafeAreaProvider>
     <ThemeProvider>
       <FontSizeProvider>
-        <DaltonismoProvider>{children}</DaltonismoProvider>
+        <DaltonismoProvider>
+          <AccessibilityPreferencesProvider>{children}</AccessibilityPreferencesProvider>
+        </DaltonismoProvider>
       </FontSizeProvider>
     </ThemeProvider>
   </SafeAreaProvider>

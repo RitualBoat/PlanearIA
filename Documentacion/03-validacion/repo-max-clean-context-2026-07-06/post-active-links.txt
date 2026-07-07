@@ -1,0 +1,19 @@
+﻿ACTIVE_MARKDOWN_LINKS_CHECKED=0
+ACTIVE_MARKDOWN_BROKEN_LINKS=0
+NOTE=Active docs primarily use literal repo paths, so canonical route existence and deleted-path scans are the reliable checks.
+CANONICAL_PATHS:
+README.md=True
+AGENTS.md=True
+CLAUDE.md=True
+.github/copilot-instructions.md=True
+backend/README.md=True
+Documentacion/README.md=True
+Documentacion/00-fundamentos/ARQUITECTURA.md=True
+Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md=True
+Documentacion/00-fundamentos/IA_CHATBOT_LLM.md=True
+Documentacion/01-planes-maestros/meta_guia_planes.md=True
+Documentacion/05-context-engineering/README.md=True
+context/README.md=True
+openspec/config.yaml=True
+openspec/specs/ai-friendly-repository-context/spec.md=True
+DELETED_PATH_ACTIVE_REFS=0

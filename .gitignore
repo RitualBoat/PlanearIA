@@ -150,3 +150,12 @@ Thumbs.db
 # =============================================================================
 *.tsbuildinfo
 .vercel
+
+# External reference source snapshots are not PlanearIA implementation code.
+context/referencias-opensource/*/source/
+
+# Local externalized context backups - keep outside repo and never commit.
+PLANEARIA_BACKUP_MOVE_OUT_*/
+PlanearIA_Backup*/
+context/stitch-results/
+context/roadmap-context/

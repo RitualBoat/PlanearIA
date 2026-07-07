@@ -4,11 +4,11 @@ import {
   Alert,
   Animated,
   Modal,
-  Pressable,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -23,9 +23,12 @@ import { useAuth, PREFERENCIAS_DEFAULT } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import { useFontSize } from "../../context/FontSizeContext";
 import { useDaltonismo } from "../../context/DaltonismoContext";
+import { useAccessibilityPreferences } from "../../context/AccessibilityPreferencesContext";
 import { changeLanguage } from "../../locales/i18n";
 import { useTranslation } from "react-i18next";
-import { COLORS, getRoleLabel } from "../../../types";
+import { getRoleLabel } from "../../../types";
+
+const TOGGLE_HIT_SLOP = { top: 6, bottom: 6, left: 6, right: 6 };
 
 const FEATURE_HIGHLIGHTS = [
   {
@@ -90,10 +93,24 @@ const CuentaScreen: React.FC = () => {
   const [scrollY] = React.useState(() => new Animated.Value(0));
   const { t, i18n } = useTranslation();
 
-  // Real accessibility contexts
-  const { isDark: darkMode, toggleTheme } = useTheme();
-  const { fontSizeMode: fsModeCtx, setFontSizeMode: setFsModeCtx } = useFontSize();
-  const { daltonismoMode, setDaltonismoMode } = useDaltonismo();
+  // Real accessibility contexts consumed at runtime
+  const { colors, isDark, toggleTheme } = useTheme();
+  const darkMode = isDark;
+  const { scaled, fontSizeMode: fsModeCtx, setFontSizeMode: setFsModeCtx } = useFontSize();
+  const { daltonismoMode, setDaltonismoMode, applyDaltonismo } = useDaltonismo();
+  const {
+    highContrast,
+    voiceReading,
+    reduceMotion,
+    setHighContrast,
+    setVoiceReading,
+    setReduceMotion,
+  } = useAccessibilityPreferences();
+
+  // Runtime theme tokens (daltonism-adjusted). COLORS === lightTheme, so the light
+  // result is identical to the previous static styling; dark repaints the screen.
+  const DT = applyDaltonismo(colors);
+  const styles = getStyles(DT, isDark, scaled, highContrast);
 
   // Map context font size to UI labels
   const fontSizeMode =
@@ -122,11 +139,6 @@ const CuentaScreen: React.FC = () => {
     setDaltonismoMode(map[label] ?? "none");
   };
 
-  // Local UI states for non-persisted preferences
-  const [highContrast, setHighContrast] = React.useState(true);
-  const [voiceReading, setVoiceReading] = React.useState(true);
-  const [reduceMotion, setReduceMotion] = React.useState(true);
-
   // Accordion states
   const [openAccesibilidad, setOpenAccesibilidad] = React.useState(false);
   const [openPreferencias, setOpenPreferencias] = React.useState(false);
@@ -150,6 +162,7 @@ const CuentaScreen: React.FC = () => {
 
   const prefs = { ...PREFERENCIAS_DEFAULT, ...usuario?.preferencias };
 
+  // "Reducir movimiento": when on, the top pill renders statically (no scroll animation).
   const mobilePillOpacity = scrollY.interpolate({
     inputRange: [0, 22, 56],
     outputRange: [1, 0.5, 0],
@@ -206,8 +219,11 @@ const CuentaScreen: React.FC = () => {
   const userRole = isGuest ? "Invitado" : usuario?.rol ? getRoleLabel(usuario.rol) : "Docente";
 
   return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
+    <View style={styles.container} testID="cuenta-root">
+      <StatusBar
+        backgroundColor={DT.background}
+        barStyle={isDark ? "light-content" : "dark-content"}
+      />
 
       <SafeAreaView style={styles.safeArea}>
         <Animated.ScrollView
@@ -220,18 +236,28 @@ const CuentaScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.headerBlock}>
-            <Animated.View
-              style={{
-                opacity: mobilePillOpacity,
-                transform: [{ translateY: mobilePillTranslateY }],
-              }}
-            >
-              <AnimatedTopPill
-                icon="settings"
-                title="Configuracion"
-                subtitle="Accesibilidad, preferencias y cuenta"
-              />
-            </Animated.View>
+            {reduceMotion ? (
+              <View>
+                <AnimatedTopPill
+                  icon="settings"
+                  title="Configuracion"
+                  subtitle="Accesibilidad, preferencias y cuenta"
+                />
+              </View>
+            ) : (
+              <Animated.View
+                style={{
+                  opacity: mobilePillOpacity,
+                  transform: [{ translateY: mobilePillTranslateY }],
+                }}
+              >
+                <AnimatedTopPill
+                  icon="settings"
+                  title="Configuracion"
+                  subtitle="Accesibilidad, preferencias y cuenta"
+                />
+              </Animated.View>
+            )}
           </View>
 
           <View style={styles.aiBanner}>
@@ -243,20 +269,23 @@ const CuentaScreen: React.FC = () => {
             <View style={[styles.leftColumn, wideLayout && styles.leftColumnWide]}>
               {/* ── Accesibilidad ── */}
               <View style={styles.sectionBlock}>
-                <Pressable
-                  style={({ pressed }) => [styles.sectionHeader, pressed && { opacity: 0.82 }]}
+                <TouchableOpacity
+                  style={styles.sectionHeader}
+                  activeOpacity={0.82}
                   onPress={() => setOpenAccesibilidad((prev) => !prev)}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: openAccesibilidad }}
                 >
                   <View style={styles.sectionTitleWrap}>
-                    <MaterialIcons name="accessibility-new" size={20} color={COLORS.primaryDark} />
+                    <MaterialIcons name="accessibility-new" size={20} color={DT.primaryDark} />
                     <Text style={styles.sectionTitle}>Accesibilidad</Text>
                   </View>
                   <MaterialIcons
                     name={openAccesibilidad ? "expand-less" : "expand-more"}
                     size={26}
-                    color={COLORS.textDark}
+                    color={DT.textDark}
                   />
-                </Pressable>
+                </TouchableOpacity>
 
                 {openAccesibilidad ? (
                   <View style={styles.sectionContent}>
@@ -267,21 +296,22 @@ const CuentaScreen: React.FC = () => {
                         {(["Pequeno", "Medio", "Grande"] as const).map((size) => {
                           const active = fontSizeMode === size;
                           return (
-                            <Pressable
+                            <TouchableOpacity
                               key={size}
-                              style={({ pressed }) => [
-                                styles.segmentOption,
-                                active && styles.segmentOptionActive,
-                                pressed && { opacity: 0.85 },
-                              ]}
+                              style={[styles.segmentOption, active && styles.segmentOptionActive]}
                               onPress={() => setFontSizeMode(size)}
+                              activeOpacity={0.85}
+                              hitSlop={{ top: 6, bottom: 6 }}
+                              accessibilityRole="button"
+                              accessibilityState={{ selected: active }}
+                              accessibilityLabel={`Tamano de fuente ${size}`}
                             >
                               <Text
                                 style={[styles.segmentText, active && styles.segmentTextActive]}
                               >
                                 {size}
                               </Text>
-                            </Pressable>
+                            </TouchableOpacity>
                           );
                         })}
                       </View>
@@ -293,18 +323,19 @@ const CuentaScreen: React.FC = () => {
                           <Text style={styles.rowTitle}>Contraste alto</Text>
                           <Text style={styles.rowSubtitle}>Mejora la legibilidad del texto</Text>
                         </View>
-                        <Pressable
-                          style={({ pressed }) => [
-                            styles.toggleTrack,
-                            highContrast && styles.toggleTrackOn,
-                            pressed && { opacity: 0.9 },
-                          ]}
-                          onPress={() => setHighContrast((prev) => !prev)}
+                        <TouchableOpacity
+                          style={[styles.toggleTrack, highContrast && styles.toggleTrackOn]}
+                          onPress={() => setHighContrast(!highContrast)}
+                          activeOpacity={0.9}
+                          hitSlop={TOGGLE_HIT_SLOP}
+                          accessibilityRole="switch"
+                          accessibilityLabel="Contraste alto"
+                          accessibilityState={{ checked: highContrast }}
                         >
                           <View
                             style={[styles.toggleThumb, highContrast && styles.toggleThumbOn]}
                           />
-                        </Pressable>
+                        </TouchableOpacity>
                       </View>
                     </View>
 
@@ -312,14 +343,14 @@ const CuentaScreen: React.FC = () => {
                       <Text style={styles.rowTitle}>Modo Daltonismo</Text>
                       {(["Ninguno", "Deuteranopia", "Protanopia", "Tritanopia"] as const).map(
                         (opt) => (
-                          <Pressable
+                          <TouchableOpacity
                             key={opt}
-                            style={({ pressed }) => [
-                              styles.radioRow,
-                              daltonismo === opt && styles.radioRowActive,
-                              pressed && { opacity: 0.85 },
-                            ]}
+                            style={[styles.radioRow, daltonismo === opt && styles.radioRowActive]}
                             onPress={() => setDaltonismo(opt)}
+                            activeOpacity={0.85}
+                            accessibilityRole="radio"
+                            accessibilityState={{ selected: daltonismo === opt }}
+                            accessibilityLabel={`Modo daltonismo ${opt}`}
                           >
                             <Text
                               style={[
@@ -333,46 +364,51 @@ const CuentaScreen: React.FC = () => {
                               <MaterialIcons
                                 name="check-circle"
                                 size={20}
-                                color={COLORS.primaryDark}
+                                color={DT.primaryDark}
                               />
                             ) : null}
-                          </Pressable>
+                          </TouchableOpacity>
                         )
                       )}
                     </View>
 
                     <View style={styles.surfaceRowCard}>
                       <View style={styles.surfaceRowLeft}>
-                        <MaterialIcons name="record-voice-over" size={20} color="#0A728B" />
-                        <Text style={styles.surfaceRowTitle}>Lectura de voz</Text>
+                        <MaterialIcons name="record-voice-over" size={20} color={DT.teal} />
+                        <View style={styles.surfaceRowTextWrap}>
+                          <Text style={styles.surfaceRowTitle}>Lectura de voz</Text>
+                          <Text style={styles.surfaceRowSoon}>Proximamente</Text>
+                        </View>
                       </View>
-                      <Pressable
-                        style={({ pressed }) => [
-                          styles.toggleTrack,
-                          voiceReading && styles.toggleTrackOn,
-                          pressed && { opacity: 0.9 },
-                        ]}
-                        onPress={() => setVoiceReading((prev) => !prev)}
+                      <TouchableOpacity
+                        style={[styles.toggleTrack, voiceReading && styles.toggleTrackOn]}
+                        onPress={() => setVoiceReading(!voiceReading)}
+                        activeOpacity={0.9}
+                        hitSlop={TOGGLE_HIT_SLOP}
+                        accessibilityRole="switch"
+                        accessibilityLabel="Lectura de voz (proximamente)"
+                        accessibilityState={{ checked: voiceReading }}
                       >
                         <View style={[styles.toggleThumb, voiceReading && styles.toggleThumbOn]} />
-                      </Pressable>
+                      </TouchableOpacity>
                     </View>
 
                     <View style={styles.surfaceRowCard}>
                       <View style={styles.surfaceRowLeft}>
-                        <MaterialIcons name="motion-photos-off" size={20} color="#0A728B" />
+                        <MaterialIcons name="motion-photos-off" size={20} color={DT.teal} />
                         <Text style={styles.surfaceRowTitle}>Reducir movimiento</Text>
                       </View>
-                      <Pressable
-                        style={({ pressed }) => [
-                          styles.toggleTrack,
-                          reduceMotion && styles.toggleTrackOn,
-                          pressed && { opacity: 0.9 },
-                        ]}
-                        onPress={() => setReduceMotion((prev) => !prev)}
+                      <TouchableOpacity
+                        style={[styles.toggleTrack, reduceMotion && styles.toggleTrackOn]}
+                        onPress={() => setReduceMotion(!reduceMotion)}
+                        activeOpacity={0.9}
+                        hitSlop={TOGGLE_HIT_SLOP}
+                        accessibilityRole="switch"
+                        accessibilityLabel="Reducir movimiento"
+                        accessibilityState={{ checked: reduceMotion }}
                       >
                         <View style={[styles.toggleThumb, reduceMotion && styles.toggleThumbOn]} />
-                      </Pressable>
+                      </TouchableOpacity>
                     </View>
                   </View>
                 ) : null}
@@ -380,27 +416,30 @@ const CuentaScreen: React.FC = () => {
 
               {/* ── Preferencias de app ── */}
               <View style={styles.sectionBlock}>
-                <Pressable
-                  style={({ pressed }) => [styles.sectionHeader, pressed && { opacity: 0.82 }]}
+                <TouchableOpacity
+                  style={styles.sectionHeader}
+                  activeOpacity={0.82}
                   onPress={() => setOpenPreferencias((prev) => !prev)}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: openPreferencias }}
                 >
                   <View style={styles.sectionTitleWrap}>
-                    <MaterialIcons name="tune" size={20} color={COLORS.primaryDark} />
+                    <MaterialIcons name="tune" size={20} color={DT.primaryDark} />
                     <Text style={styles.sectionTitle}>Preferencias de app</Text>
                   </View>
                   <MaterialIcons
                     name={openPreferencias ? "expand-less" : "expand-more"}
                     size={26}
-                    color={COLORS.textDark}
+                    color={DT.textDark}
                   />
-                </Pressable>
+                </TouchableOpacity>
 
                 {openPreferencias ? (
                   <View style={styles.sectionContent}>
                     <View style={styles.surfaceCard}>
                       <View style={styles.preferenceRow}>
                         <View style={styles.prefIconWrap}>
-                          <MaterialIcons name="dark-mode" size={19} color={COLORS.textDark} />
+                          <MaterialIcons name="dark-mode" size={19} color={DT.textDark} />
                         </View>
                         <View style={styles.prefTextWrap}>
                           <Text style={styles.prefTitle}>Modo oscuro</Text>
@@ -408,32 +447,33 @@ const CuentaScreen: React.FC = () => {
                             {darkMode ? "Actualmente activado" : "Actualmente desactivado"}
                           </Text>
                         </View>
-                        <Pressable
-                          style={({ pressed }) => [
-                            styles.toggleTrack,
-                            darkMode && styles.toggleTrackOn,
-                            pressed && { opacity: 0.9 },
-                          ]}
+                        <TouchableOpacity
+                          style={[styles.toggleTrack, darkMode && styles.toggleTrackOn]}
                           onPress={toggleTheme}
+                          activeOpacity={0.9}
+                          hitSlop={TOGGLE_HIT_SLOP}
+                          accessibilityRole="switch"
+                          accessibilityLabel="Modo oscuro"
+                          accessibilityState={{ checked: darkMode }}
                         >
                           <View style={[styles.toggleThumb, darkMode && styles.toggleThumbOn]} />
-                        </Pressable>
+                        </TouchableOpacity>
                       </View>
 
                       <View style={styles.rowDivider} />
 
-                      <Pressable
-                        style={({ pressed }) => [
-                          styles.preferenceRow,
-                          pressed && { opacity: 0.82 },
-                        ]}
+                      <TouchableOpacity
+                        style={styles.preferenceRow}
+                        activeOpacity={0.82}
                         onPress={() => {
                           const nextLang = i18n.language === "es" ? "en" : "es";
                           changeLanguage(nextLang);
                         }}
+                        accessibilityRole="button"
+                        accessibilityLabel="Cambiar idioma"
                       >
                         <View style={styles.prefIconWrap}>
-                          <MaterialIcons name="translate" size={19} color={COLORS.textDark} />
+                          <MaterialIcons name="translate" size={19} color={DT.textDark} />
                         </View>
                         <View style={styles.prefTextWrap}>
                           <Text style={styles.prefTitle}>Idioma</Text>
@@ -441,8 +481,8 @@ const CuentaScreen: React.FC = () => {
                             {i18n.language === "es" ? "Español (México)" : "English"}
                           </Text>
                         </View>
-                        <MaterialIcons name="chevron-right" size={22} color="#6A7890" />
-                      </Pressable>
+                        <MaterialIcons name="chevron-right" size={22} color={DT.textMuted} />
+                      </TouchableOpacity>
 
                       {!isGuest && (
                         <>
@@ -450,21 +490,25 @@ const CuentaScreen: React.FC = () => {
 
                           <View style={styles.preferenceRow}>
                             <View style={styles.prefIconWrap}>
-                              <MaterialIcons name="lightbulb" size={19} color={COLORS.textDark} />
+                              <MaterialIcons name="lightbulb" size={19} color={DT.textDark} />
                             </View>
                             <View style={styles.prefTextWrap}>
                               <Text style={styles.prefTitle}>Recibir recomendaciones</Text>
                               <Text style={styles.prefSubtitle}>Sugerencias de la IA</Text>
                             </View>
-                            <Pressable
-                              style={({ pressed }) => [
+                            <TouchableOpacity
+                              style={[
                                 styles.toggleTrack,
                                 prefs.recibirRecomendaciones && styles.toggleTrackOn,
-                                pressed && { opacity: 0.9 },
                               ]}
                               onPress={() =>
                                 togglePref("recibirRecomendaciones", !prefs.recibirRecomendaciones)
                               }
+                              activeOpacity={0.9}
+                              hitSlop={TOGGLE_HIT_SLOP}
+                              accessibilityRole="switch"
+                              accessibilityLabel="Recibir recomendaciones"
+                              accessibilityState={{ checked: !!prefs.recibirRecomendaciones }}
                             >
                               <View
                                 style={[
@@ -472,26 +516,30 @@ const CuentaScreen: React.FC = () => {
                                   prefs.recibirRecomendaciones && styles.toggleThumbOn,
                                 ]}
                               />
-                            </Pressable>
+                            </TouchableOpacity>
                           </View>
 
                           <View style={styles.rowDivider} />
 
                           <View style={styles.preferenceRow}>
                             <View style={styles.prefIconWrap}>
-                              <MaterialIcons name="bar-chart" size={19} color={COLORS.textDark} />
+                              <MaterialIcons name="bar-chart" size={19} color={DT.textDark} />
                             </View>
                             <View style={styles.prefTextWrap}>
                               <Text style={styles.prefTitle}>Compartir datos de uso</Text>
                               <Text style={styles.prefSubtitle}>Ayuda a mejorar la app</Text>
                             </View>
-                            <Pressable
-                              style={({ pressed }) => [
+                            <TouchableOpacity
+                              style={[
                                 styles.toggleTrack,
                                 prefs.compartirDatos && styles.toggleTrackOn,
-                                pressed && { opacity: 0.9 },
                               ]}
                               onPress={() => togglePref("compartirDatos", !prefs.compartirDatos)}
+                              activeOpacity={0.9}
+                              hitSlop={TOGGLE_HIT_SLOP}
+                              accessibilityRole="switch"
+                              accessibilityLabel="Compartir datos de uso"
+                              accessibilityState={{ checked: !!prefs.compartirDatos }}
                             >
                               <View
                                 style={[
@@ -499,14 +547,14 @@ const CuentaScreen: React.FC = () => {
                                   prefs.compartirDatos && styles.toggleThumbOn,
                                 ]}
                               />
-                            </Pressable>
+                            </TouchableOpacity>
                           </View>
 
                           <View style={styles.rowDivider} />
 
                           <View style={styles.preferenceRow}>
                             <View style={styles.prefIconWrap}>
-                              <MaterialIcons name="shield" size={19} color={COLORS.textDark} />
+                              <MaterialIcons name="shield" size={19} color={DT.textDark} />
                             </View>
                             <View style={styles.prefTextWrap}>
                               <Text style={styles.prefTitle}>Contenido para adultos</Text>
@@ -514,13 +562,17 @@ const CuentaScreen: React.FC = () => {
                                 {prefs.contenidoAdulto ? "Activado" : "Desactivado"}
                               </Text>
                             </View>
-                            <Pressable
-                              style={({ pressed }) => [
+                            <TouchableOpacity
+                              style={[
                                 styles.toggleTrack,
                                 prefs.contenidoAdulto && styles.toggleTrackOn,
-                                pressed && { opacity: 0.9 },
                               ]}
                               onPress={() => togglePref("contenidoAdulto", !prefs.contenidoAdulto)}
+                              activeOpacity={0.9}
+                              hitSlop={TOGGLE_HIT_SLOP}
+                              accessibilityRole="switch"
+                              accessibilityLabel="Contenido para adultos"
+                              accessibilityState={{ checked: !!prefs.contenidoAdulto }}
                             >
                               <View
                                 style={[
@@ -528,7 +580,7 @@ const CuentaScreen: React.FC = () => {
                                   prefs.contenidoAdulto && styles.toggleThumbOn,
                                 ]}
                               />
-                            </Pressable>
+                            </TouchableOpacity>
                           </View>
 
                           <View style={styles.rowDivider} />
@@ -538,7 +590,7 @@ const CuentaScreen: React.FC = () => {
                               <MaterialIcons
                                 name="notifications"
                                 size={19}
-                                color={COLORS.textDark}
+                                color={DT.textDark}
                               />
                             </View>
                             <View style={styles.prefTextWrap}>
@@ -547,13 +599,17 @@ const CuentaScreen: React.FC = () => {
                                 {prefs.notificaciones ? "Activadas" : "Desactivadas"}
                               </Text>
                             </View>
-                            <Pressable
-                              style={({ pressed }) => [
+                            <TouchableOpacity
+                              style={[
                                 styles.toggleTrack,
                                 prefs.notificaciones && styles.toggleTrackOn,
-                                pressed && { opacity: 0.9 },
                               ]}
                               onPress={() => togglePref("notificaciones", !prefs.notificaciones)}
+                              activeOpacity={0.9}
+                              hitSlop={TOGGLE_HIT_SLOP}
+                              accessibilityRole="switch"
+                              accessibilityLabel="Notificaciones push"
+                              accessibilityState={{ checked: !!prefs.notificaciones }}
                             >
                               <View
                                 style={[
@@ -561,7 +617,7 @@ const CuentaScreen: React.FC = () => {
                                   prefs.notificaciones && styles.toggleThumbOn,
                                 ]}
                               />
-                            </Pressable>
+                            </TouchableOpacity>
                           </View>
                         </>
                       )}
@@ -572,27 +628,30 @@ const CuentaScreen: React.FC = () => {
 
               {/* ── Cuenta y seguridad ── */}
               <View style={styles.sectionBlock}>
-                <Pressable
-                  style={({ pressed }) => [styles.sectionHeader, pressed && { opacity: 0.82 }]}
+                <TouchableOpacity
+                  style={styles.sectionHeader}
+                  activeOpacity={0.82}
                   onPress={() => setOpenCuenta((prev) => !prev)}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: openCuenta }}
                 >
                   <View style={styles.sectionTitleWrap}>
-                    <MaterialIcons name="manage-accounts" size={20} color={COLORS.primaryDark} />
+                    <MaterialIcons name="manage-accounts" size={20} color={DT.primaryDark} />
                     <Text style={styles.sectionTitle}>Cuenta y seguridad</Text>
                   </View>
                   <MaterialIcons
                     name={openCuenta ? "expand-less" : "expand-more"}
                     size={26}
-                    color={COLORS.textDark}
+                    color={DT.textDark}
                   />
-                </Pressable>
+                </TouchableOpacity>
 
                 {openCuenta ? (
                   <View style={styles.sectionContent}>
                     <View style={styles.profileCard}>
                       <View style={styles.identityCard}>
                         <View style={styles.avatarPlaceholder}>
-                          <MaterialIcons name="person" size={26} color="#587096" />
+                          <MaterialIcons name="person" size={26} color={DT.textSecondary} />
                         </View>
                         <View style={styles.identityTextWrap}>
                           <Text style={styles.identityName}>{userName}</Text>
@@ -601,122 +660,94 @@ const CuentaScreen: React.FC = () => {
                       </View>
 
                       {!isGuest && (
-                        <Pressable
-                          style={({ pressed }) => [
-                            styles.primaryAction,
-                            pressed && { opacity: 0.6 },
-                          ]}
-                          onPress={handleEditarPerfil}
-                        >
-                          <MaterialIcons name="person" size={18} color={COLORS.surface} />
+                        <TouchableOpacity style={styles.primaryAction} onPress={handleEditarPerfil}>
+                          <MaterialIcons name="person" size={18} color={DT.textOnPrimary} />
                           <Text style={styles.primaryActionText}>Cuenta y perfil</Text>
-                        </Pressable>
+                        </TouchableOpacity>
                       )}
 
                       {!isGuest && (
-                        <Pressable
-                          style={({ pressed }) => [
-                            styles.secondaryAction,
-                            pressed && { opacity: 0.6 },
-                          ]}
+                        <TouchableOpacity
+                          style={styles.secondaryAction}
                           onPress={handleCambiarContrasena}
                         >
-                          <MaterialIcons name="lock" size={18} color={COLORS.textDark} />
+                          <MaterialIcons name="lock" size={18} color={DT.textDark} />
                           <Text style={styles.secondaryActionText}>Cambiar contrasena</Text>
-                        </Pressable>
+                        </TouchableOpacity>
                       )}
 
                       {can("cambiar_roles") && (
-                        <Pressable
-                          style={({ pressed }) => [
-                            styles.secondaryAction,
-                            pressed && { opacity: 0.6 },
-                          ]}
+                        <TouchableOpacity
+                          style={styles.secondaryAction}
                           onPress={() => (navigation as any).navigate("AdminRoles")}
                         >
                           <MaterialIcons
                             name="admin-panel-settings"
                             size={18}
-                            color={COLORS.textDark}
+                            color={DT.textDark}
                           />
                           <Text style={styles.secondaryActionText}>Administrar roles</Text>
-                        </Pressable>
+                        </TouchableOpacity>
                       )}
 
                       {!isGuest && (
-                        <Pressable
-                          style={({ pressed }) => [
-                            styles.secondaryAction,
-                            pressed && { opacity: 0.82 },
-                          ]}
+                        <TouchableOpacity
+                          style={styles.secondaryAction}
                           onPress={() =>
                             Alert.alert(
                               "Próximamente",
                               "Esta función se implementará en una próxima actualización."
                             )
                           }
+                          activeOpacity={0.82}
                         >
                           <MaterialIcons
                             name="workspace-premium"
                             size={18}
-                            color={COLORS.textDark}
+                            color={DT.textDark}
                           />
                           <Text style={styles.secondaryActionText}>Suscripcion y plan</Text>
-                        </Pressable>
+                        </TouchableOpacity>
                       )}
 
                       {!isGuest && (
-                        <Pressable
-                          style={({ pressed }) => [
-                            styles.secondaryAction,
-                            pressed && { opacity: 0.82 },
-                          ]}
+                        <TouchableOpacity
+                          style={styles.secondaryAction}
                           onPress={() => (navigation as any).navigate("SesionesActivas")}
+                          activeOpacity={0.82}
                         >
-                          <MaterialIcons name="devices" size={18} color={COLORS.textDark} />
+                          <MaterialIcons name="devices" size={18} color={DT.textDark} />
                           <Text style={styles.secondaryActionText}>Sesiones iniciadas</Text>
-                        </Pressable>
+                        </TouchableOpacity>
                       )}
 
-                      <Pressable
-                        style={({ pressed }) => [
-                          styles.secondaryAction,
-                          pressed && { opacity: 0.6 },
-                        ]}
+                      <TouchableOpacity
+                        style={styles.secondaryAction}
                         onPress={() => (navigation as any).navigate("Terminos")}
                       >
-                        <MaterialIcons name="policy" size={18} color={COLORS.textDark} />
+                        <MaterialIcons name="policy" size={18} color={DT.textDark} />
                         <Text style={styles.secondaryActionText}>Privacidad y terminos</Text>
-                      </Pressable>
+                      </TouchableOpacity>
 
                       {!isGuest && (
-                        <Pressable
-                          style={({ pressed }) => [
-                            styles.secondaryAction,
-                            pressed && { opacity: 0.6 },
-                          ]}
-                          onPress={onPressEliminar}
-                        >
-                          <MaterialIcons name="delete" size={18} color={COLORS.danger} />
-                          <Text style={[styles.secondaryActionText, { color: COLORS.danger }]}>
+                        <TouchableOpacity style={styles.secondaryAction} onPress={onPressEliminar}>
+                          <MaterialIcons name="delete" size={18} color={DT.danger} />
+                          <Text style={[styles.secondaryActionText, { color: DT.danger }]}>
                             Eliminar cuenta
                           </Text>
-                        </Pressable>
+                        </TouchableOpacity>
                       )}
 
-                      <Pressable
-                        style={({ pressed }) => [styles.logoutButton, pressed && { opacity: 0.6 }]}
-                        onPress={handleCerrarSesion}
-                      >
+                      <TouchableOpacity style={styles.logoutButton} onPress={handleCerrarSesion}>
                         <MaterialIcons
                           name={isGuest ? "login" : "logout"}
                           size={18}
-                          color={COLORS.surface}
+                          color={DT.textOnPrimary}
                         />
                         <Text style={styles.logoutButtonText}>
                           {isGuest ? "Iniciar sesion" : "Cerrar sesion"}
                         </Text>
-                      </Pressable>
+                      </TouchableOpacity>
                     </View>
                   </View>
                 ) : null}
@@ -786,7 +817,7 @@ const CuentaScreen: React.FC = () => {
           <View style={styles.modalOverlay}>
             <View style={styles.modalCard}>
               <View style={styles.modalIconCircle}>
-                <MaterialIcons name="warning" size={32} color="#C62828" />
+                <MaterialIcons name="warning" size={32} color={DT.error} />
               </View>
               <Text style={styles.modalTitle}>Eliminar cuenta</Text>
               <Text style={styles.modalSubtitle}>
@@ -796,7 +827,7 @@ const CuentaScreen: React.FC = () => {
 
               {deleteError ? (
                 <View style={styles.modalError}>
-                  <MaterialIcons name="error-outline" size={16} color={COLORS.error} />
+                  <MaterialIcons name="error-outline" size={16} color={DT.error} />
                   <Text style={styles.modalErrorText}>{deleteError}</Text>
                 </View>
               ) : null}
@@ -804,7 +835,7 @@ const CuentaScreen: React.FC = () => {
               <TextInput
                 style={styles.modalInput}
                 placeholder="Tu contraseña"
-                placeholderTextColor={COLORS.textTertiary}
+                placeholderTextColor={DT.textTertiary}
                 secureTextEntry
                 value={deletePassword}
                 onChangeText={setDeletePassword}
@@ -812,29 +843,26 @@ const CuentaScreen: React.FC = () => {
                 autoCapitalize="none"
               />
 
-              <Pressable
-                style={({ pressed }) => [
-                  styles.deleteBtn,
-                  deleteLoading && { opacity: 0.6 },
-                  pressed && { opacity: 0.85 },
-                ]}
+              <TouchableOpacity
+                style={[styles.deleteBtn, deleteLoading && { opacity: 0.6 }]}
                 onPress={confirmarEliminacion}
                 disabled={deleteLoading}
+                activeOpacity={0.85}
               >
                 {deleteLoading ? (
-                  <ActivityIndicator color={COLORS.surface} size="small" />
+                  <ActivityIndicator color={DT.textOnPrimary} size="small" />
                 ) : (
                   <Text style={styles.deleteBtnText}>Eliminar mi cuenta</Text>
                 )}
-              </Pressable>
+              </TouchableOpacity>
 
-              <Pressable
-                style={({ pressed }) => [styles.modalCancelBtn, pressed && { opacity: 0.6 }]}
+              <TouchableOpacity
+                style={styles.modalCancelBtn}
                 onPress={() => setShowDeleteModal(false)}
                 disabled={deleteLoading}
               >
                 <Text style={styles.modalCancelText}>Cancelar</Text>
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </View>
         </Modal>
@@ -843,566 +871,586 @@ const CuentaScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  scroller: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingTop: 54,
-    paddingBottom: isWeb() ? 28 : 110,
-    gap: 14,
-    width: "100%",
-    alignSelf: "center",
-    maxWidth: 1220,
-  },
-  headerBlock: {
-    marginBottom: 2,
-  },
-  aiBanner: {
-    borderRadius: 20,
-    paddingHorizontal: 18,
-    paddingVertical: 18,
-    backgroundColor: COLORS.bannerBg,
-    minHeight: 130,
-    justifyContent: "flex-end",
-  },
-  aiBannerKicker: {
-    fontSize: 12,
-    fontWeight: "800",
-    letterSpacing: 1.1,
-    color: COLORS.bannerAccent,
-  },
-  aiBannerTitle: {
-    marginTop: 4,
-    fontSize: 24,
-    lineHeight: 30,
-    fontWeight: "800",
-    color: COLORS.surface,
-  },
-  layoutGrid: {
-    gap: 12,
-  },
-  layoutGridWide: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-  },
-  leftColumn: {
-    gap: 12,
-  },
-  leftColumnWide: {
-    flex: 1,
-    minWidth: 640,
-    maxWidth: 860,
-  },
-  rightColumn: {
-    width: 330,
-  },
-  sectionBlock: {
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: "#DFE7F2",
-    backgroundColor: COLORS.surfaceSecondary,
-    overflow: "hidden",
-  },
-  sectionHeader: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  sectionTitleWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  sectionTitle: {
-    fontSize: 25,
-    fontWeight: "800",
-    color: "#132741",
-  },
-  sectionContent: {
-    paddingHorizontal: 12,
-    paddingBottom: 12,
-    gap: 10,
-  },
-  surfaceCard: {
-    borderRadius: 16,
-    backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 14,
-    gap: 9,
-  },
-  blockKicker: {
-    fontSize: 12,
-    fontWeight: "800",
-    color: "#50627C",
-    letterSpacing: 1.2,
-  },
-  blockTitle: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: COLORS.text,
-  },
-  segmentedBar: {
-    borderRadius: 999,
-    backgroundColor: COLORS.progressTrack,
-    padding: 5,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  segmentOption: {
-    flex: 1,
-    borderRadius: 999,
-    paddingVertical: 9,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  segmentOptionActive: {
-    backgroundColor: COLORS.toggleActive,
-    boxShadow: "0px 8px 16px rgba(13, 97, 178, 0.24)",
-  },
-  segmentText: {
-    fontSize: 16,
-    color: "#354A66",
-    fontWeight: "600",
-  },
-  segmentTextActive: {
-    color: COLORS.surface,
-    fontWeight: "800",
-  },
-  rowBetween: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-  rowTextWrap: {
-    flex: 1,
-    gap: 2,
-  },
-  rowTitle: {
-    fontSize: 21,
-    fontWeight: "700",
-    color: COLORS.text,
-    lineHeight: 26,
-  },
-  rowSubtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    lineHeight: 19,
-  },
-  toggleTrack: {
-    width: 56,
-    height: 32,
-    borderRadius: 999,
-    backgroundColor: "#D9E1ED",
-    padding: 3,
-    justifyContent: "center",
-  },
-  toggleTrackOn: {
-    backgroundColor: COLORS.toggleActive,
-  },
-  toggleThumb: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: COLORS.surface,
-  },
-  toggleThumbOn: {
-    alignSelf: "flex-end",
-  },
-  radioRow: {
-    borderRadius: 13,
-    borderWidth: 1,
-    borderColor: COLORS.borderStrong,
-    backgroundColor: COLORS.backgroundSoft,
-    paddingHorizontal: 13,
-    paddingVertical: 11,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  radioRowActive: {
-    borderColor: "#9DC3E8",
-    backgroundColor: "#F1F8FF",
-  },
-  radioText: {
-    fontSize: 20,
-    color: COLORS.textSecondary,
-    fontWeight: "500",
-  },
-  radioTextActive: {
-    color: COLORS.toggleActive,
-    fontWeight: "700",
-  },
-  surfaceRowCard: {
-    borderRadius: 16,
-    backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-  surfaceRowLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 9,
-    flex: 1,
-  },
-  surfaceRowTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: COLORS.text,
-  },
-  preferenceRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  prefIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: COLORS.skeleton,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  prefTextWrap: {
-    flex: 1,
-    gap: 1,
-  },
-  prefTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: COLORS.text,
-  },
-  prefSubtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  rowDivider: {
-    height: 1,
-    backgroundColor: "#E4ECF6",
-    marginVertical: 4,
-  },
-  profileCard: {
-    borderRadius: 16,
-    backgroundColor: COLORS.progressTrack,
-    borderWidth: 1,
-    borderColor: "#DEE7F2",
-    padding: 12,
-    gap: 9,
-  },
-  identityCard: {
-    borderRadius: 14,
-    backgroundColor: COLORS.surface,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  avatarPlaceholder: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: "#D9E4F3",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  identityTextWrap: {
-    flex: 1,
-  },
-  identityName: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: "#18273E",
-    lineHeight: 26,
-  },
-  identityRole: {
-    marginTop: 1,
-    fontSize: 15,
-    color: COLORS.textSecondary,
-  },
-  primaryAction: {
-    borderRadius: 13,
-    backgroundColor: "#0F76C9",
-    paddingVertical: 12,
-    paddingHorizontal: 13,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 9,
-  },
-  primaryActionText: {
-    color: COLORS.surface,
-    fontSize: 17,
-    fontWeight: "700",
-  },
-  secondaryAction: {
-    borderRadius: 12,
-    backgroundColor: "#EDF2F9",
-    paddingVertical: 12,
-    paddingHorizontal: 13,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 9,
-  },
-  secondaryActionText: {
-    color: "#31435E",
-    fontSize: 17,
-    fontWeight: "600",
-  },
-  logoutButton: {
-    borderRadius: 13,
-    backgroundColor: COLORS.danger,
-    paddingVertical: 12,
-    paddingHorizontal: 13,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 9,
-  },
-  logoutButtonText: {
-    color: COLORS.surface,
-    fontSize: 17,
-    fontWeight: "700",
-  },
-  // Promo & Reviews
-  promoSection: {
-    gap: 10,
-    marginTop: 6,
-  },
-  promoBanner: {
-    borderRadius: 16,
-    padding: 24,
-    backgroundColor: "#D5C4A1",
-    marginBottom: 4,
-  },
-  promoBannerText: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#3E2C1A",
-    lineHeight: 24,
-  },
-  promoKicker: {
-    fontSize: 12,
-    fontWeight: "800",
-    letterSpacing: 1.2,
-    color: "#50627C",
-    paddingHorizontal: 4,
-  },
-  promoTitle: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: COLORS.text,
-    paddingHorizontal: 4,
-    marginBottom: 2,
-  },
-  featureCard: {
-    borderRadius: 16,
-    backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  featureIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  featureTextWrap: {
-    flex: 1,
-    gap: 3,
-  },
-  featureTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: COLORS.text,
-  },
-  featureDesc: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    lineHeight: 18,
-  },
-  reviewCard: {
-    borderRadius: 16,
-    backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 14,
-    gap: 10,
-  },
-  reviewHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  reviewAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#D9E4F3",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  reviewAvatarText: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "#587096",
-  },
-  reviewMeta: {
-    flex: 1,
-    gap: 1,
-  },
-  reviewName: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: COLORS.text,
-  },
-  reviewRole: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  reviewText: {
-    fontSize: 14,
-    color: "#4A5B73",
-    lineHeight: 20,
-    fontStyle: "italic",
-  },
-  footerText: {
-    marginTop: 10,
-    textAlign: "center",
-    fontSize: 15,
-    color: "#8B99AE",
-  },
-  webCard: {
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "#E1E9F3",
-    backgroundColor: COLORS.surface,
-    padding: 14,
-    gap: 10,
-  },
-  webCardTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: COLORS.textDark,
-  },
-  webSummaryText: {
-    fontSize: 14,
-    color: "#566A84",
-    lineHeight: 20,
-  },
-  // Modal styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 24,
-  },
-  modalCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 20,
-    padding: 28,
-    width: "100%",
-    maxWidth: 400,
-    alignItems: "center",
-  },
-  modalIconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: "#FFEBEE",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: COLORS.text,
-    marginBottom: 8,
-  },
-  modalSubtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: "center",
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  modalError: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: "#FFEBEE",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 12,
-    width: "100%",
-  },
-  modalErrorText: {
-    fontSize: 13,
-    color: COLORS.error,
-    flex: 1,
-  },
-  modalInput: {
-    borderWidth: 1.5,
-    borderColor: COLORS.borderLight,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: COLORS.text,
-    backgroundColor: COLORS.backgroundSoft,
-    width: "100%",
-    marginBottom: 16,
-  },
-  deleteBtn: {
-    backgroundColor: "#C62828",
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-    width: "100%",
-    marginBottom: 10,
-  },
-  deleteBtnText: {
-    color: COLORS.surface,
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  modalCancelBtn: {
-    paddingVertical: 12,
-    alignItems: "center",
-    width: "100%",
-  },
-  modalCancelText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: COLORS.textSecondary,
-  },
-});
+const getStyles = (
+  DT: any,
+  isDark: boolean,
+  scaled: (baseSize: number) => number,
+  highContrast: boolean
+) => {
+  // "Contraste alto": refuerza texto secundario y bordes usando solo tokens del tema.
+  const subtleText = highContrast ? DT.text : DT.textSecondary;
+  const cardBorder = highContrast ? DT.borderStrong : DT.border;
+
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: DT.background,
+    },
+    safeArea: {
+      flex: 1,
+    },
+    scroller: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingHorizontal: 16,
+      paddingTop: 54,
+      paddingBottom: isWeb() ? 28 : 110,
+      gap: 14,
+      width: "100%",
+      alignSelf: "center",
+      maxWidth: 1220,
+    },
+    headerBlock: {
+      marginBottom: 2,
+    },
+    aiBanner: {
+      borderRadius: 20,
+      paddingHorizontal: 18,
+      paddingVertical: 18,
+      backgroundColor: DT.bannerBg,
+      minHeight: 130,
+      justifyContent: "flex-end",
+    },
+    aiBannerKicker: {
+      fontSize: scaled(12),
+      fontWeight: "800",
+      letterSpacing: 1.1,
+      color: DT.bannerAccent,
+    },
+    aiBannerTitle: {
+      marginTop: 4,
+      fontSize: scaled(24),
+      lineHeight: scaled(30),
+      fontWeight: "800",
+      color: DT.textOnPrimary,
+    },
+    layoutGrid: {
+      gap: 12,
+    },
+    layoutGridWide: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+    },
+    leftColumn: {
+      gap: 12,
+    },
+    leftColumnWide: {
+      flex: 1,
+      minWidth: 640,
+      maxWidth: 860,
+    },
+    rightColumn: {
+      width: 330,
+    },
+    sectionBlock: {
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: cardBorder,
+      backgroundColor: DT.surfaceSecondary,
+      overflow: "hidden",
+    },
+    sectionHeader: {
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    sectionTitleWrap: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    sectionTitle: {
+      fontSize: scaled(25),
+      fontWeight: "800",
+      color: DT.text,
+    },
+    sectionContent: {
+      paddingHorizontal: 12,
+      paddingBottom: 12,
+      gap: 10,
+    },
+    surfaceCard: {
+      borderRadius: 16,
+      backgroundColor: DT.surface,
+      borderWidth: 1,
+      borderColor: cardBorder,
+      padding: 14,
+      gap: 9,
+    },
+    blockKicker: {
+      fontSize: scaled(12),
+      fontWeight: "800",
+      color: subtleText,
+      letterSpacing: 1.2,
+    },
+    blockTitle: {
+      fontSize: scaled(24),
+      fontWeight: "700",
+      color: DT.text,
+    },
+    segmentedBar: {
+      borderRadius: 999,
+      backgroundColor: DT.progressTrack,
+      padding: 5,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+    },
+    segmentOption: {
+      flex: 1,
+      borderRadius: 999,
+      paddingVertical: 9,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    segmentOptionActive: {
+      backgroundColor: DT.toggleActive,
+      boxShadow: "0px 8px 16px rgba(13, 97, 178, 0.24)",
+    },
+    segmentText: {
+      fontSize: scaled(16),
+      color: subtleText,
+      fontWeight: "600",
+    },
+    segmentTextActive: {
+      color: DT.textOnPrimary,
+      fontWeight: "800",
+    },
+    rowBetween: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 10,
+    },
+    rowTextWrap: {
+      flex: 1,
+      gap: 2,
+    },
+    rowTitle: {
+      fontSize: scaled(21),
+      fontWeight: "700",
+      color: DT.text,
+      lineHeight: scaled(26),
+    },
+    rowSubtitle: {
+      fontSize: scaled(14),
+      color: subtleText,
+      lineHeight: scaled(19),
+    },
+    toggleTrack: {
+      width: 56,
+      height: 32,
+      borderRadius: 999,
+      backgroundColor: DT.borderStrong,
+      padding: 3,
+      justifyContent: "center",
+    },
+    toggleTrackOn: {
+      backgroundColor: DT.toggleActive,
+    },
+    toggleThumb: {
+      width: 26,
+      height: 26,
+      borderRadius: 13,
+      backgroundColor: DT.surface,
+    },
+    toggleThumbOn: {
+      alignSelf: "flex-end",
+    },
+    radioRow: {
+      borderRadius: 13,
+      borderWidth: 1,
+      borderColor: DT.borderStrong,
+      backgroundColor: DT.backgroundSoft,
+      paddingHorizontal: 13,
+      paddingVertical: 11,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    radioRowActive: {
+      borderColor: DT.primary,
+      backgroundColor: DT.primaryTint,
+    },
+    radioText: {
+      fontSize: scaled(20),
+      color: subtleText,
+      fontWeight: "500",
+    },
+    radioTextActive: {
+      color: DT.toggleActive,
+      fontWeight: "700",
+    },
+    surfaceRowCard: {
+      borderRadius: 16,
+      backgroundColor: DT.surface,
+      borderWidth: 1,
+      borderColor: cardBorder,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 10,
+    },
+    surfaceRowLeft: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 9,
+      flex: 1,
+    },
+    surfaceRowTextWrap: {
+      flex: 1,
+      gap: 1,
+    },
+    surfaceRowTitle: {
+      fontSize: scaled(20),
+      fontWeight: "700",
+      color: DT.text,
+    },
+    surfaceRowSoon: {
+      fontSize: scaled(13),
+      color: subtleText,
+      fontWeight: "600",
+    },
+    preferenceRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
+    prefIconWrap: {
+      width: 48,
+      height: 48,
+      borderRadius: 12,
+      backgroundColor: DT.skeleton,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    prefTextWrap: {
+      flex: 1,
+      gap: 1,
+    },
+    prefTitle: {
+      fontSize: scaled(20),
+      fontWeight: "700",
+      color: DT.text,
+    },
+    prefSubtitle: {
+      fontSize: scaled(14),
+      color: subtleText,
+    },
+    rowDivider: {
+      height: 1,
+      backgroundColor: DT.divider,
+      marginVertical: 4,
+    },
+    profileCard: {
+      borderRadius: 16,
+      backgroundColor: DT.progressTrack,
+      borderWidth: 1,
+      borderColor: cardBorder,
+      padding: 12,
+      gap: 9,
+    },
+    identityCard: {
+      borderRadius: 14,
+      backgroundColor: DT.surface,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
+    avatarPlaceholder: {
+      width: 46,
+      height: 46,
+      borderRadius: 23,
+      backgroundColor: DT.surfaceTertiary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    identityTextWrap: {
+      flex: 1,
+    },
+    identityName: {
+      fontSize: scaled(22),
+      fontWeight: "800",
+      color: DT.text,
+      lineHeight: scaled(26),
+    },
+    identityRole: {
+      marginTop: 1,
+      fontSize: scaled(15),
+      color: subtleText,
+    },
+    primaryAction: {
+      borderRadius: 13,
+      backgroundColor: DT.primary,
+      paddingVertical: 12,
+      paddingHorizontal: 13,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 9,
+    },
+    primaryActionText: {
+      color: DT.textOnPrimary,
+      fontSize: scaled(17),
+      fontWeight: "700",
+    },
+    secondaryAction: {
+      borderRadius: 12,
+      backgroundColor: DT.surfaceSecondary,
+      paddingVertical: 12,
+      paddingHorizontal: 13,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 9,
+    },
+    secondaryActionText: {
+      color: DT.textDark,
+      fontSize: scaled(17),
+      fontWeight: "600",
+    },
+    logoutButton: {
+      borderRadius: 13,
+      backgroundColor: DT.danger,
+      paddingVertical: 12,
+      paddingHorizontal: 13,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 9,
+    },
+    logoutButtonText: {
+      color: DT.textOnPrimary,
+      fontSize: scaled(17),
+      fontWeight: "700",
+    },
+    // Promo & Reviews
+    promoSection: {
+      gap: 10,
+      marginTop: 6,
+    },
+    promoBanner: {
+      borderRadius: 16,
+      padding: 24,
+      backgroundColor: "#D5C4A1",
+      marginBottom: 4,
+    },
+    promoBannerText: {
+      fontSize: scaled(18),
+      fontWeight: "800",
+      color: "#3E2C1A",
+      lineHeight: scaled(24),
+    },
+    promoKicker: {
+      fontSize: scaled(12),
+      fontWeight: "800",
+      letterSpacing: 1.2,
+      color: subtleText,
+      paddingHorizontal: 4,
+    },
+    promoTitle: {
+      fontSize: scaled(22),
+      fontWeight: "800",
+      color: DT.text,
+      paddingHorizontal: 4,
+      marginBottom: 2,
+    },
+    featureCard: {
+      borderRadius: 16,
+      backgroundColor: DT.surface,
+      borderWidth: 1,
+      borderColor: cardBorder,
+      padding: 14,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    featureIconWrap: {
+      width: 48,
+      height: 48,
+      borderRadius: 14,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    featureTextWrap: {
+      flex: 1,
+      gap: 3,
+    },
+    featureTitle: {
+      fontSize: scaled(17),
+      fontWeight: "700",
+      color: DT.text,
+    },
+    featureDesc: {
+      fontSize: scaled(13),
+      color: subtleText,
+      lineHeight: scaled(18),
+    },
+    reviewCard: {
+      borderRadius: 16,
+      backgroundColor: DT.surface,
+      borderWidth: 1,
+      borderColor: cardBorder,
+      padding: 14,
+      gap: 10,
+    },
+    reviewHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
+    reviewAvatar: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: DT.surfaceTertiary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    reviewAvatarText: {
+      fontSize: scaled(16),
+      fontWeight: "800",
+      color: DT.textSecondary,
+    },
+    reviewMeta: {
+      flex: 1,
+      gap: 1,
+    },
+    reviewName: {
+      fontSize: scaled(15),
+      fontWeight: "700",
+      color: DT.text,
+    },
+    reviewRole: {
+      fontSize: scaled(12),
+      color: subtleText,
+    },
+    reviewText: {
+      fontSize: scaled(14),
+      color: subtleText,
+      lineHeight: scaled(20),
+      fontStyle: "italic",
+    },
+    footerText: {
+      marginTop: 10,
+      textAlign: "center",
+      fontSize: scaled(15),
+      color: DT.textMuted,
+    },
+    webCard: {
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: cardBorder,
+      backgroundColor: DT.surface,
+      padding: 14,
+      gap: 10,
+    },
+    webCardTitle: {
+      fontSize: scaled(15),
+      fontWeight: "700",
+      color: DT.textDark,
+    },
+    webSummaryText: {
+      fontSize: scaled(14),
+      color: subtleText,
+      lineHeight: scaled(20),
+    },
+    // Modal styles
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: DT.overlay,
+      justifyContent: "center",
+      alignItems: "center",
+      paddingHorizontal: 24,
+    },
+    modalCard: {
+      backgroundColor: DT.surface,
+      borderRadius: 20,
+      padding: 28,
+      width: "100%",
+      maxWidth: 400,
+      alignItems: "center",
+    },
+    modalIconCircle: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: DT.errorTint,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 16,
+    },
+    modalTitle: {
+      fontSize: scaled(20),
+      fontWeight: "800",
+      color: DT.text,
+      marginBottom: 8,
+    },
+    modalSubtitle: {
+      fontSize: scaled(14),
+      color: subtleText,
+      textAlign: "center",
+      lineHeight: scaled(20),
+      marginBottom: 16,
+    },
+    modalError: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      backgroundColor: DT.errorTint,
+      borderRadius: 10,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      marginBottom: 12,
+      width: "100%",
+    },
+    modalErrorText: {
+      fontSize: scaled(13),
+      color: DT.error,
+      flex: 1,
+    },
+    modalInput: {
+      borderWidth: 1.5,
+      borderColor: DT.borderLight,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      fontSize: scaled(16),
+      color: DT.text,
+      backgroundColor: DT.backgroundSoft,
+      width: "100%",
+      marginBottom: 16,
+    },
+    deleteBtn: {
+      backgroundColor: DT.error,
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: "center",
+      width: "100%",
+      marginBottom: 10,
+    },
+    deleteBtnText: {
+      color: DT.textOnPrimary,
+      fontSize: scaled(16),
+      fontWeight: "700",
+    },
+    modalCancelBtn: {
+      paddingVertical: 12,
+      alignItems: "center",
+      width: "100%",
+    },
+    modalCancelText: {
+      fontSize: scaled(16),
+      fontWeight: "600",
+      color: subtleText,
+    },
+  });
+};
 
 export default CuentaScreen;

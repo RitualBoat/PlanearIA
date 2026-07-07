@@ -2,9 +2,9 @@
 
 ## Filosofia Principal: Un Solo Lugar Para Todo El Trabajo Docente
 
-PlanearIA debe convertirse en una plataforma donde el profesor pueda hacer, conectar y asignar su trabajo diario sin brincar entre pestanas, aplicaciones, programas, carpetas, chats y archivos sueltos.
+PlanearIA es una plataforma donde el profesor puede hacer, conectar y asignar su trabajo diario sin brincar entre pestanas, aplicaciones, programas, carpetas, chats y archivos sueltos.
 
-La meta no es tener muchos modulos separados. La meta es que todas las cargas de trabajo del docente vivan en un mismo flujo:
+La meta es que todas las cargas de trabajo del docente vivan en un mismo flujo conectado:
 
 - Escribir planeaciones.
 - Editar documentos.
@@ -343,7 +343,7 @@ La comunicacion debe sentirse como WhatsApp profesional, no como red social pesa
 
 Decision 2026-07: Feed y Social se funden en esta unica experiencia, disenada desde cero. Las pantallas
 legacy de feed/posts/retos sirven solo como inventario tecnico, no como referencia de diseno. El feed
-publico deja de ser la entrada de la app; una comunidad/muro puede reevaluarse en el futuro como
+publico queda fuera de la entrada principal de la app; una comunidad/muro puede reevaluarse en el futuro como
 superficie secundaria.
 
 Debe permitir:

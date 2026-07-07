@@ -58,6 +58,32 @@ Reglas:
 - Playwright debe dejar capturas o evidencia cuando hay UI.
 - `planearia-sqlite` y MongoDB MCP no sustituyen tests de sync ni `backend:check`.
 
+## MCP Por Paso Del Protocolo De Interaccion Guiada
+
+Este doc es la referencia canonica de MCP-por-flujo. El estandar de ejecucion con el desarrollador (las
+paradas de aprobacion y el gate visual obligatorio) vive en
+`Documentacion/01-planes-maestros/meta_guia_planes.md` seccion 2.5. Mapa rapido:
+
+| Paso | MCP | Regla |
+| --- | --- | --- |
+| 0 Creacion (US en GitHub Projects) | `github` | Crear issue + item del board; parar y esperar OK. |
+| 1 Enrich (criterios en el issue) | `github` + `codegraph` | Enriquecer; verificar el codigo real; parar y esperar OK. |
+| 2 Propose | `codegraph` + `context7` + `figma` | Impacto/flujos, APIs recientes, ground truth visual. |
+| 2 Apply | `codegraph` | Editar con blast radius; el codigo gana sobre el diagnostico previo. |
+| 3 QA UI | `playwright` (+ `expo`) | Levantar web, esperar bundler, navegar, capturar por breakpoint, adjuntar al issue. |
+| 3 QA datos | `planearia-sqlite` / MongoDB opt-in | Diagnostico read-only de cola offline / aislamiento por `userId`. |
+
+### Gate visual con Playwright (obligatorio si el change toca una pantalla)
+
+1. Levantar el servidor web primero: `expo start --web` (o `npm run web`), idealmente en background.
+2. **Esperar** a que el bundler responda (HTTP 200 en el puerto, tipicamente `http://localhost:8081`) ANTES
+   de navegar. Navegar antes produce `ERR_CONNECTION_REFUSED`: no es un fallo del MCP, es que el server no
+   estaba listo.
+3. Navegar con Playwright, alternar los estados relevantes (tema claro/oscuro, tamano de fuente, daltonismo,
+   toggles) y capturar antes/despues por breakpoint (movil <768, tablet 768-1279, web >=1280).
+4. Guardar la evidencia en `Documentacion/03-validacion/<change>/` y adjuntar el reporte al issue.
+5. Declarar el gate "N/A" no es una opcion valida por defecto cuando hay pantalla visible.
+
 ## MCP PlanearIA SQLite
 
 Servidor local:

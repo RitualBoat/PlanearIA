@@ -1,7 +1,0 @@
-﻿packages:
-  - apps/*
-  - packages/*
-  - packages/course-app/src/*
-onlyBuiltDependencies:
-  - esbuild
-  - '@tailwindcss/oxide'

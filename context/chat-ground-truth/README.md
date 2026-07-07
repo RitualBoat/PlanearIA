@@ -1,18 +1,7 @@
-# Ground Truth - Chat / WhatsApp Profesional
+﻿# Chat Ground Truth
 
-Usar esta carpeta para preparar el futuro plan de mensajeria tipo WhatsApp profesional.
+> Estado: indice minimo. Material completo vive en respaldo externo.
+> Uso: orientar AsistePLAN/ConectaPLAN cuando una historia requiera referencias de chat.
+> No usar para: exponer conversaciones reales o datos sensibles.
 
-Referencias faltantes por aportar:
-
-- Capturas actuales del chat de PlanearIA.
-- Capturas reales de WhatsApp/WhatsApp Web o experiencias similares.
-- URLs de repos GitHub open source de chat/mensajeria.
-
-Estructura:
-
-- `01-errores-actuales/README.md`
-- `02-capturas-actuales-de-la-app/`
-- `03-referencias-reales/`
-- `04-flujos-deseados/`
-- `05-notas-del-desarrollador/README.md`
-
+Cualquier ejemplo real de chat debe revisarse por privacidad antes de usarse en prompts, docs o evidencia.

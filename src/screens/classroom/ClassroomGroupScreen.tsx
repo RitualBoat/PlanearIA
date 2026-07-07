@@ -4,12 +4,12 @@ import {
   Alert,
   Modal,
   Platform,
+  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -52,7 +52,13 @@ const formatDate = (value?: Date | string): string => {
 
 const formatAiProgress = (response: ClassroomAiResponse<ResumirProgresoResultado>): string => {
   const { hallazgos, mensaje, resumen } = response.resultado;
-  return [mensaje, "", resumen, "", ...hallazgos.map((item) => `- ${item.prioridad}/${item.tipo}: ${item.descripcion}`)].join("\n");
+  return [
+    mensaje,
+    "",
+    resumen,
+    "",
+    ...hallazgos.map((item) => `- ${item.prioridad}/${item.tipo}: ${item.descripcion}`),
+  ].join("\n");
 };
 
 const ClassroomGroupScreen: React.FC = () => {
@@ -99,7 +105,7 @@ const ClassroomGroupScreen: React.FC = () => {
         .filter((actividad) => actividad.estado !== "finalizada")
         .sort((a, b) => new Date(a.fechaEntrega).getTime() - new Date(b.fechaEntrega).getTime())
         .slice(0, 4),
-    [actividades],
+    [actividades]
   );
   const aiContext = React.useMemo(
     () => ({
@@ -133,7 +139,7 @@ const ClassroomGroupScreen: React.FC = () => {
         calificada: entrega.calificada,
       })),
     }),
-    [actividades, alumnos, entregas, grupoId, materiales, materia, model?.resumen, nombre, periodo],
+    [actividades, alumnos, entregas, grupoId, materiales, materia, model?.resumen, nombre, periodo]
   );
 
   const showMessage = React.useCallback((title: string, message: string) => {
@@ -150,7 +156,7 @@ const ClassroomGroupScreen: React.FC = () => {
       setPromptValue(fallback);
       setPrompt({ title, message, onSubmit });
     },
-    [],
+    []
   );
 
   const closePrompt = React.useCallback(() => {
@@ -173,11 +179,16 @@ const ClassroomGroupScreen: React.FC = () => {
 
   const handleRenameUnidad = React.useCallback(
     (section: ClassroomContentSection) => {
-      askText("Renombrar seccion", "Escribe el nuevo nombre de la seccion.", section.nombre, (value) => {
-        void renombrarUnidad(section.id, value);
-      });
+      askText(
+        "Renombrar seccion",
+        "Escribe el nuevo nombre de la seccion.",
+        section.nombre,
+        (value) => {
+          void renombrarUnidad(section.id, value);
+        }
+      );
     },
-    [askText, renombrarUnidad],
+    [askText, renombrarUnidad]
   );
 
   const handleDeleteUnidad = React.useCallback(
@@ -193,7 +204,7 @@ const ClassroomGroupScreen: React.FC = () => {
         { text: "Eliminar", style: "destructive", onPress: () => void eliminarUnidad(section.id) },
       ]);
     },
-    [eliminarUnidad],
+    [eliminarUnidad]
   );
 
   const handleCreateForSection = React.useCallback(
@@ -204,7 +215,7 @@ const ClassroomGroupScreen: React.FC = () => {
         unidadNombre: section.nombre,
       });
     },
-    [grupoId, navigation],
+    [grupoId, navigation]
   );
 
   const handleOpenContentItem = React.useCallback(
@@ -216,7 +227,7 @@ const ClassroomGroupScreen: React.FC = () => {
       const recurso = item.raw as Recurso;
       navigation.navigate("DetalleRecursoClassroom", { recursoId: recurso.id, grupoId });
     },
-    [grupoId, navigation],
+    [grupoId, navigation]
   );
 
   const handleRemoveAlumno = React.useCallback(
@@ -234,11 +245,12 @@ const ClassroomGroupScreen: React.FC = () => {
         {
           text: "Quitar",
           style: "destructive",
-          onPress: () => void actualizarAlumno(alumno.id, { grupoId: undefined }).then(() => reload()),
+          onPress: () =>
+            void actualizarAlumno(alumno.id, { grupoId: undefined }).then(() => reload()),
         },
       ]);
     },
-    [actualizarAlumno, nombre, reload],
+    [actualizarAlumno, nombre, reload]
   );
 
   const runAiSummary = React.useCallback(async () => {
@@ -247,7 +259,10 @@ const ClassroomGroupScreen: React.FC = () => {
     try {
       const response = await resumirProgresoClassroom(aiContext);
       setAiWarning(response.usage?.warning ?? null);
-      showMessage("Resumen IA", `${formatAiProgress(response)}\n\nEsto no sustituye la revision docente.`);
+      showMessage(
+        "Resumen IA",
+        `${formatAiProgress(response)}\n\nEsto no sustituye la revision docente.`
+      );
     } finally {
       setAiLoading(false);
     }
@@ -262,31 +277,46 @@ const ClassroomGroupScreen: React.FC = () => {
         showsVerticalScrollIndicator={Platform.OS === "web"}
       >
         <View style={[styles.banner, isCompact ? styles.bannerCompact : null]}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Pressable
+            style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
+            onPress={() => navigation.goBack()}
+          >
             <MaterialIcons name="arrow-back" size={22} color="#0F172A" />
-          </TouchableOpacity>
+          </Pressable>
           <View style={styles.bannerCopy}>
             <Text style={styles.eyebrow}>Classroom</Text>
             <Text style={[styles.title, isCompact ? styles.titleCompact : null]}>{nombre}</Text>
-            <Text style={styles.subtitle}>{materia} - {periodo}</Text>
+            <Text style={styles.subtitle}>
+              {materia} - {periodo}
+            </Text>
           </View>
           <View style={[styles.headerActions, isCompact ? styles.headerActionsCompact : null]}>
-            <TouchableOpacity style={styles.headerAction} onPress={runAiSummary} disabled={aiLoading}>
+            <Pressable
+              style={({ pressed }) => [styles.headerAction, pressed && { opacity: 0.6 }]}
+              onPress={runAiSummary}
+              disabled={aiLoading}
+            >
               <MaterialIcons name="psychology" size={18} color="#1E7D4F" />
               <Text style={styles.headerActionText}>{aiLoading ? "IA..." : "IA"}</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
 
         <View style={styles.tabsBar}>
           {CLASSROOM_TABS.map((tab) => (
-            <TouchableOpacity
+            <Pressable
               key={tab.key}
-              style={[styles.tabPill, activeTab === tab.key ? styles.tabPillActive : null]}
+              style={({ pressed }) => [
+                styles.tabPill,
+                activeTab === tab.key ? styles.tabPillActive : null,
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={() => setActiveTab(tab.key)}
             >
-              <Text style={[styles.tabText, activeTab === tab.key ? styles.tabTextActive : null]}>{tab.label}</Text>
-            </TouchableOpacity>
+              <Text style={[styles.tabText, activeTab === tab.key ? styles.tabTextActive : null]}>
+                {tab.label}
+              </Text>
+            </Pressable>
           ))}
         </View>
 
@@ -308,7 +338,9 @@ const ClassroomGroupScreen: React.FC = () => {
           <View style={styles.emptyCard}>
             <MaterialIcons name="search-off" size={34} color={COLORS.primary} />
             <Text style={styles.emptyTitle}>No encontramos este grupo</Text>
-            <Text style={styles.emptyText}>Puede haberse eliminado o estar pendiente de sincronizacion.</Text>
+            <Text style={styles.emptyText}>
+              Puede haberse eliminado o estar pendiente de sincronizacion.
+            </Text>
           </View>
         ) : null}
 
@@ -362,12 +394,18 @@ const ClassroomGroupScreen: React.FC = () => {
               onSubmitEditing={submitPrompt}
             />
             <View style={styles.promptActions}>
-              <TouchableOpacity style={styles.promptCancel} onPress={closePrompt}>
+              <Pressable
+                style={({ pressed }) => [styles.promptCancel, pressed && { opacity: 0.6 }]}
+                onPress={closePrompt}
+              >
                 <Text style={styles.promptCancelText}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.promptConfirm} onPress={submitPrompt}>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [styles.promptConfirm, pressed && { opacity: 0.6 }]}
+                onPress={submitPrompt}
+              >
                 <Text style={styles.promptConfirmText}>Guardar</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         </View>
@@ -400,12 +438,17 @@ const ClassStream: React.FC<{
     </View>
 
     <View style={[styles.streamMain, isCompact ? styles.streamMainCompact : null]}>
-      <TouchableOpacity style={styles.announceCard} onPress={onCreateActivity}>
+      <Pressable
+        style={({ pressed }) => [styles.announceCard, pressed && { opacity: 0.6 }]}
+        onPress={onCreateActivity}
+      >
         <View style={styles.teacherAvatar}>
           <MaterialIcons name="person" size={20} color="#FFFFFF" />
         </View>
-        <Text style={styles.announceText}>Publica un archivo, enlace o actividad evaluable en Trabajo de clase</Text>
-      </TouchableOpacity>
+        <Text style={styles.announceText}>
+          Publica un archivo, enlace o actividad evaluable en Trabajo de clase
+        </Text>
+      </Pressable>
 
       {aiWarning ? (
         <View style={styles.aiWarningBox}>
@@ -418,28 +461,46 @@ const ClassStream: React.FC<{
         <View style={styles.emptyCard}>
           <MaterialIcons name="dynamic-feed" size={30} color={COLORS.primary} />
           <Text style={styles.emptyTitle}>Aun no hay publicaciones</Text>
-          <Text style={styles.emptyText}>Agrega contenido desde Trabajo de clase para llenar el tablon.</Text>
+          <Text style={styles.emptyText}>
+            Agrega contenido desde Trabajo de clase para llenar el tablon.
+          </Text>
         </View>
       ) : (
-        feedItems.map((item) => <StreamPost key={item.id} item={item} onPress={() => onOpenItem(item)} />)
+        feedItems.map((item) => (
+          <StreamPost key={item.id} item={item} onPress={() => onOpenItem(item)} />
+        ))
       )}
     </View>
   </View>
 );
 
-const StreamPost: React.FC<{ item: ClassroomContentItem; onPress: () => void }> = ({ item, onPress }) => (
-  <TouchableOpacity style={styles.streamPost} onPress={onPress}>
+const StreamPost: React.FC<{ item: ClassroomContentItem; onPress: () => void }> = ({
+  item,
+  onPress,
+}) => (
+  <Pressable
+    style={({ pressed }) => [styles.streamPost, pressed && { opacity: 0.6 }]}
+    onPress={onPress}
+  >
     <View style={styles.postAvatar}>
-      <MaterialIcons name={item.kind === "actividad" ? "assignment" : "description"} size={20} color={COLORS.primary} />
+      <MaterialIcons
+        name={item.kind === "actividad" ? "assignment" : "description"}
+        size={20}
+        color={COLORS.primary}
+      />
     </View>
     <View style={styles.postCopy}>
-      <Text style={styles.postMeta}>Profesor publico {item.kind === "actividad" ? "una actividad" : "un material"}</Text>
+      <Text style={styles.postMeta}>
+        Profesor publico {item.kind === "actividad" ? "una actividad" : "un material"}
+      </Text>
       <Text style={styles.postTitle}>{item.titulo}</Text>
-      <Text style={styles.postDescription} numberOfLines={2}>{item.descripcion || item.tipo}</Text>
+      <Text style={styles.postDescription} numberOfLines={2}>
+        {item.descripcion || item.tipo}
+      </Text>
       <Text style={styles.postDate}>{formatDate(item.fecha)}</Text>
     </View>
     <MaterialIcons name="more-vert" size={22} color="#64748B" />
-  </TouchableOpacity>
+  </Pressable>
 );
 
 const CourseworkTab: React.FC<{
@@ -461,17 +522,22 @@ const CourseworkTab: React.FC<{
 }) => (
   <View style={styles.coursework}>
     <View style={styles.courseworkToolbar}>
-      <TouchableOpacity style={styles.primaryAction} onPress={onCreateUnidad}>
+      <Pressable
+        style={({ pressed }) => [styles.primaryAction, pressed && { opacity: 0.6 }]}
+        onPress={onCreateUnidad}
+      >
         <MaterialIcons name="topic" size={18} color="#FFFFFF" />
         <Text style={styles.primaryActionText}>Crear seccion</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
 
     {sections.length === 0 ? (
       <View style={styles.emptyCard}>
         <MaterialIcons name="topic" size={30} color={COLORS.primary} />
         <Text style={styles.emptyTitle}>Aun no hay secciones</Text>
-        <Text style={styles.emptyText}>Crea una unidad para empezar a asignar materiales o actividades.</Text>
+        <Text style={styles.emptyText}>
+          Crea una unidad para empezar a asignar materiales o actividades.
+        </Text>
       </View>
     ) : null}
 
@@ -499,25 +565,41 @@ const CourseSection: React.FC<{
 }> = ({ onAddContent, onDelete, onOpenItem, onRename, onToggle, section }) => (
   <View style={styles.sectionCard}>
     <View style={styles.sectionHeader}>
-      <TouchableOpacity style={styles.sectionTitleWrap} onPress={onToggle}>
-        <MaterialIcons name={section.colapsada ? "keyboard-arrow-down" : "keyboard-arrow-up"} size={24} color="#1F2937" />
+      <Pressable
+        style={({ pressed }) => [styles.sectionTitleWrap, pressed && { opacity: 0.6 }]}
+        onPress={onToggle}
+      >
+        <MaterialIcons
+          name={section.colapsada ? "keyboard-arrow-down" : "keyboard-arrow-up"}
+          size={24}
+          color="#1F2937"
+        />
         <View>
           <Text style={styles.unitTitle}>{section.nombre}</Text>
           <Text style={styles.unitMeta}>
             {section.actividadesCount} actividades - {section.materialesCount} materiales
           </Text>
         </View>
-      </TouchableOpacity>
+      </Pressable>
       <View style={styles.sectionActions}>
-        <TouchableOpacity style={styles.iconButton} onPress={onAddContent}>
+        <Pressable
+          style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+          onPress={onAddContent}
+        >
           <MaterialIcons name="add" size={22} color={COLORS.primary} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton} onPress={onRename}>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+          onPress={onRename}
+        >
           <MaterialIcons name="edit" size={20} color="#64748B" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton} onPress={onDelete}>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+          onPress={onDelete}
+        >
           <MaterialIcons name="delete-outline" size={20} color="#B91C1C" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
 
@@ -526,26 +608,40 @@ const CourseSection: React.FC<{
         {section.items.length === 0 ? (
           <Text style={styles.emptyTextLeft}>No hay contenido en esta seccion.</Text>
         ) : (
-          section.items.map((item) => <CourseContentRow key={item.id} item={item} onPress={() => onOpenItem(item)} />)
+          section.items.map((item) => (
+            <CourseContentRow key={item.id} item={item} onPress={() => onOpenItem(item)} />
+          ))
         )}
       </View>
     ) : null}
   </View>
 );
 
-const CourseContentRow: React.FC<{ item: ClassroomContentItem; onPress: () => void }> = ({ item, onPress }) => (
-  <TouchableOpacity style={styles.contentRow} onPress={onPress}>
+const CourseContentRow: React.FC<{ item: ClassroomContentItem; onPress: () => void }> = ({
+  item,
+  onPress,
+}) => (
+  <Pressable
+    style={({ pressed }) => [styles.contentRow, pressed && { opacity: 0.6 }]}
+    onPress={onPress}
+  >
     <View style={styles.contentIcon}>
-      <MaterialIcons name={item.icon as keyof typeof MaterialIcons.glyphMap} size={22} color={COLORS.primary} />
+      <MaterialIcons
+        name={item.icon as keyof typeof MaterialIcons.glyphMap}
+        size={22}
+        color={COLORS.primary}
+      />
     </View>
     <View style={styles.contentCopy}>
       <Text style={styles.contentTitle}>{item.titulo}</Text>
       <Text style={styles.contentMeta}>
-        {item.kind === "actividad" ? `Fecha de entrega: ${formatDate(item.fechaEntrega)}` : item.tipo}
+        {item.kind === "actividad"
+          ? `Fecha de entrega: ${formatDate(item.fechaEntrega)}`
+          : item.tipo}
       </Text>
     </View>
     <MaterialIcons name="chevron-right" size={22} color="#94A3B8" />
-  </TouchableOpacity>
+  </Pressable>
 );
 
 const PeopleTab: React.FC<{
@@ -575,24 +671,27 @@ const PeopleTab: React.FC<{
         <Text style={styles.feedCount}>{alumnos.length} alumnos</Text>
       </View>
       <View style={styles.inlineActions}>
-        <TouchableOpacity style={styles.secondaryAction} onPress={() => navigation.navigate("CrearAlumno", { grupoId })}>
+        <Pressable
+          style={({ pressed }) => [styles.secondaryAction, pressed && { opacity: 0.6 }]}
+          onPress={() => navigation.navigate("CrearAlumno", { grupoId })}
+        >
           <MaterialIcons name="person-add" size={18} color={COLORS.primary} />
           <Text style={styles.secondaryActionText}>Agregar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.secondaryAction}
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.secondaryAction, pressed && { opacity: 0.6 }]}
           onPress={() => navigation.navigate("ImportarAlumnos", { grupoId, grupoNombre })}
         >
           <MaterialIcons name="upload-file" size={18} color={COLORS.primary} />
           <Text style={styles.secondaryActionText}>Importar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.secondaryAction}
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.secondaryAction, pressed && { opacity: 0.6 }]}
           onPress={() => navigation.navigate("ExportarAlumnos", { grupoId, grupoNombre })}
         >
           <MaterialIcons name="download" size={18} color={COLORS.primary} />
           <Text style={styles.secondaryActionText}>Exportar</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {alumnos.length === 0 ? (
@@ -601,18 +700,25 @@ const PeopleTab: React.FC<{
         alumnos.map((alumno) => (
           <View key={alumno.id} style={styles.personRow}>
             <View style={styles.personAvatar}>
-              <Text style={styles.personAvatarText}>{(alumno.nombre?.[0] ?? "A").toUpperCase()}</Text>
+              <Text style={styles.personAvatarText}>
+                {(alumno.nombre?.[0] ?? "A").toUpperCase()}
+              </Text>
             </View>
-            <TouchableOpacity
-              style={styles.personCopy}
+            <Pressable
+              style={({ pressed }) => [styles.personCopy, pressed && { opacity: 0.6 }]}
               onPress={() => navigation.navigate("DetalleAlumno", { alumnoId: alumno.id })}
             >
               <Text style={styles.personName}>{`${alumno.nombre} ${alumno.apellidos}`.trim()}</Text>
-              <Text style={styles.personMeta}>{alumno.numeroControl} - {alumno.estado}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton} onPress={() => onRemoveAlumno(alumno)}>
+              <Text style={styles.personMeta}>
+                {alumno.numeroControl} - {alumno.estado}
+              </Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+              onPress={() => onRemoveAlumno(alumno)}
+            >
               <MaterialIcons name="person-remove" size={20} color="#B91C1C" />
-            </TouchableOpacity>
+            </Pressable>
           </View>
         ))
       )}

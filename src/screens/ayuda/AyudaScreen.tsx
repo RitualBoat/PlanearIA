@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   Platform,
   StatusBar,
@@ -33,14 +33,17 @@ function FAQAccordionItem({ pregunta, respuesta, colors, styles }: FAQItemProps)
 
   return (
     <View style={styles.faqCard}>
-      <TouchableOpacity style={styles.faqHeader} onPress={toggle} activeOpacity={0.7}>
+      <Pressable
+        style={({ pressed }) => [styles.faqHeader, pressed && { opacity: 0.7 }]}
+        onPress={toggle}
+      >
         <Text style={styles.faqQuestion}>{pregunta}</Text>
         <MaterialIcons
           name={expanded ? "expand-less" : "expand-more"}
           size={24}
           color={colors.primary}
         />
-      </TouchableOpacity>
+      </Pressable>
       {expanded && (
         <View style={styles.faqBody}>
           <Text style={styles.faqAnswer}>{respuesta}</Text>
@@ -87,17 +90,19 @@ export const AyudaScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
-      <StatusBar backgroundColor={colors.surfaceContainerLowest} barStyle={isDark ? "light-content" : "dark-content"} />
+      <StatusBar
+        backgroundColor={colors.surfaceContainerLowest}
+        barStyle={isDark ? "light-content" : "dark-content"}
+      />
 
       {/* Header Fijo */}
       <View style={styles.headerBar}>
-        <TouchableOpacity
-          style={styles.backButton}
+        <Pressable
+          style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}
           onPress={() => navigation.goBack()}
-          activeOpacity={0.7}
         >
           <MaterialIcons name="arrow-back" size={24} color={colors.primary} />
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.headerTitle}>Centro de Ayuda</Text>
         <View style={{ width: 40 }} />
       </View>
@@ -135,12 +140,11 @@ export const AyudaScreen: React.FC = () => {
         {/* Sección de Canales de Soporte */}
         <View style={styles.sectionBlock}>
           <Text style={styles.sectionTitle}>CANALES DE SOPORTE</Text>
-          
+
           <View style={styles.supportChannels}>
             {/* Tarjeta de Chatbot */}
-            <TouchableOpacity
-              style={styles.supportCard}
-              activeOpacity={0.8}
+            <Pressable
+              style={({ pressed }) => [styles.supportCard, pressed && { opacity: 0.8 }]}
               onPress={() => {
                 navigation.navigate("MainTabs", { screen: "SocialTab" });
               }}
@@ -155,7 +159,7 @@ export const AyudaScreen: React.FC = () => {
                 </Text>
               </View>
               <MaterialIcons name="chevron-right" size={20} color={colors.textMuted} />
-            </TouchableOpacity>
+            </Pressable>
 
             {/* Tarjeta de Correo */}
             <View style={styles.supportCard}>

@@ -15,7 +15,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { isAPIConfigured } from "../config/apiConfig";
 import { apiRequest } from "../../utils/apiClient";
-import { getAccessToken } from "../../services/auth";
+import { getAccessToken } from "../../services/auth/authService";
 import {
   enqueueOperation,
   flushQueue,

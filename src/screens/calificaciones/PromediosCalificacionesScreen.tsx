@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Platform, Pressable, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RouteProp } from "@react-navigation/native";
@@ -103,9 +103,12 @@ const PromediosCalificacionesScreen: React.FC<Props> = ({ navigation, route }) =
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Pressable
+          onPress={() => navigation.goBack()}
+          style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
+        >
           <MaterialIcons name="arrow-back" size={24} color="white" />
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.headerTitle}>Promedios del Grupo</Text>
         <View style={{ width: 32 }} />
       </View>
@@ -153,9 +156,13 @@ const PromediosCalificacionesScreen: React.FC<Props> = ({ navigation, route }) =
         {/* Filter Pills */}
         <View style={styles.filterRow}>
           {filtros.map((f) => (
-            <TouchableOpacity
+            <Pressable
               key={f.key}
-              style={[styles.filterPill, filtro === f.key && styles.filterPillActive]}
+              style={({ pressed }) => [
+                styles.filterPill,
+                filtro === f.key && styles.filterPillActive,
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={() => setFiltro(f.key)}
             >
               <Text
@@ -163,7 +170,7 @@ const PromediosCalificacionesScreen: React.FC<Props> = ({ navigation, route }) =
               >
                 {f.label} ({f.count})
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
 

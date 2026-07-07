@@ -1,10 +1,10 @@
 import { useTheme } from "../../context/ThemeContext";
 import React, { useRef, useEffect, useState } from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   FlatList,
   TextInput,
   Modal,
@@ -126,26 +126,28 @@ const MessageBubble: React.FC<{
             {!isOwn && (
               <View style={{ gap: 8 }}>
                 {onAddToLibrary && (
-                  <TouchableOpacity
-                    style={styles.addToLibraryBtn}
+                  <Pressable
+                    style={({ pressed }) => [styles.addToLibraryBtn, pressed && { opacity: 0.7 }]}
                     onPress={() => onAddToLibrary(mensaje)}
-                    activeOpacity={0.7}
                   >
                     <MaterialIcons name="library-add" size={16} color="#FFFFFF" />
                     <Text style={styles.addToLibraryText}>Añadir a mi biblioteca</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 )}
                 {onAssignToGroup && (
-                  <TouchableOpacity
-                    style={[styles.addToLibraryBtn, { backgroundColor: DT.surfaceContainer }]}
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.addToLibraryBtn,
+                      { backgroundColor: DT.surfaceContainer },
+                      pressed && { opacity: 0.7 },
+                    ]}
                     onPress={() => onAssignToGroup(mensaje)}
-                    activeOpacity={0.7}
                   >
                     <MaterialIcons name="groups" size={16} color={DT.primary} />
                     <Text style={[styles.addToLibraryText, { color: DT.primary }]}>
                       Asignar a Grupo
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 )}
               </View>
             )}
@@ -188,29 +190,31 @@ const MessageBubble: React.FC<{
             {!isOwn && (
               <View style={{ gap: 8 }}>
                 {onAddToLibrary && (
-                  <TouchableOpacity
-                    style={styles.addToLibraryBtnRecurso}
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.addToLibraryBtnRecurso,
+                      pressed && { opacity: 0.7 },
+                    ]}
                     onPress={() => onAddToLibrary(mensaje)}
-                    activeOpacity={0.7}
                   >
                     <MaterialIcons name="library-add" size={16} color="#FFFFFF" />
                     <Text style={styles.addToLibraryText}>Añadir a mi biblioteca</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 )}
                 {onAssignToGroup && (
-                  <TouchableOpacity
-                    style={[
+                  <Pressable
+                    style={({ pressed }) => [
                       styles.addToLibraryBtnRecurso,
                       { backgroundColor: DT.surfaceContainer },
+                      pressed && { opacity: 0.7 },
                     ]}
                     onPress={() => onAssignToGroup(mensaje)}
-                    activeOpacity={0.7}
                   >
                     <MaterialIcons name="groups" size={16} color="#7C3AED" />
                     <Text style={[styles.addToLibraryText, { color: "#7C3AED" }]}>
                       Asignar a Grupo
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 )}
               </View>
             )}
@@ -241,9 +245,12 @@ const MessageBubble: React.FC<{
             <View style={styles.errorRow}>
               <MaterialIcons name="error-outline" size={12} color="rgba(255,255,255,0.7)" />
               <Text style={styles.errorText}>Error al enviar</Text>
-              <TouchableOpacity onPress={() => onRetry?.(mensaje.id)}>
+              <Pressable
+                style={({ pressed }) => pressed && { opacity: 0.6 }}
+                onPress={() => onRetry?.(mensaje.id)}
+              >
                 <Text style={styles.retryText}>Reintentar</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           ) : (
             <>
@@ -285,45 +292,56 @@ const AttachModal: React.FC<{
   const styles = getStyles(DT, isDark);
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <TouchableOpacity style={styles.attachOverlay} activeOpacity={1} onPress={onClose}>
+      <Pressable style={styles.attachOverlay} onPress={onClose}>
         <View style={styles.attachSheet}>
           <View style={styles.handleBar} />
           <Text style={styles.attachTitle}>Compartir</Text>
           <View style={styles.attachGrid}>
-            <TouchableOpacity
-              style={styles.attachOption}
+            <Pressable
+              style={({ pressed }) => [styles.attachOption, pressed && { opacity: 0.7 }]}
               onPress={onPlaneacion}
-              activeOpacity={0.7}
             >
               <View style={[styles.attachIconCircle, { backgroundColor: DT.primaryTint }]}>
                 <MaterialIcons name="auto-stories" size={24} color={DT.primary} />
               </View>
               <Text style={styles.attachLabel}>Planeación</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.attachOption} onPress={onArchivo} activeOpacity={0.7}>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.attachOption, pressed && { opacity: 0.7 }]}
+              onPress={onArchivo}
+            >
               <View style={[styles.attachIconCircle, { backgroundColor: "#E7F9F3" }]}>
                 <MaterialIcons name="upload-file" size={24} color={DT.success} />
               </View>
               <Text style={styles.attachLabel}>Archivo</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.attachOption} onPress={onFoto} activeOpacity={0.7}>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.attachOption, pressed && { opacity: 0.7 }]}
+              onPress={onFoto}
+            >
               <View style={[styles.attachIconCircle, { backgroundColor: DT.warningTint }]}>
                 <MaterialIcons name="photo-camera" size={24} color={DT.warning} />
               </View>
               <Text style={styles.attachLabel}>Foto</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.attachOption} onPress={onRecurso} activeOpacity={0.7}>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.attachOption, pressed && { opacity: 0.7 }]}
+              onPress={onRecurso}
+            >
               <View style={[styles.attachIconCircle, { backgroundColor: "#F3E8FF" }]}>
                 <MaterialIcons name="library-books" size={24} color="#7C3AED" />
               </View>
               <Text style={styles.attachLabel}>Recurso</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
-          <TouchableOpacity style={styles.attachCancelBtn} onPress={onClose} activeOpacity={0.7}>
+          <Pressable
+            style={({ pressed }) => [styles.attachCancelBtn, pressed && { opacity: 0.7 }]}
+            onPress={onClose}
+          >
             <Text style={styles.attachCancelText}>Cancelar</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </Modal>
   );
 };
@@ -343,7 +361,7 @@ const PickerModal: React.FC<{
   const styles = getStyles(DT, isDark);
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <TouchableOpacity style={styles.attachOverlay} activeOpacity={1} onPress={onClose}>
+      <Pressable style={styles.attachOverlay} onPress={onClose}>
         <View style={styles.pickerSheet}>
           <View style={styles.handleBar} />
           <Text style={styles.attachTitle}>{title}</Text>
@@ -357,10 +375,9 @@ const PickerModal: React.FC<{
               keyExtractor={(item) => String(item.id)}
               style={styles.pickerList}
               renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.pickerItem}
+                <Pressable
+                  style={({ pressed }) => [styles.pickerItem, pressed && { opacity: 0.7 }]}
                   onPress={() => onSelect(item.id)}
-                  activeOpacity={0.7}
                 >
                   <View style={[styles.pickerIconCircle, { backgroundColor: `${iconColor}20` }]}>
                     <MaterialIcons name={icon as any} size={20} color={iconColor} />
@@ -374,15 +391,18 @@ const PickerModal: React.FC<{
                     </Text>
                   </View>
                   <MaterialIcons name="chevron-right" size={20} color={DT.textMuted} />
-                </TouchableOpacity>
+                </Pressable>
               )}
             />
           )}
-          <TouchableOpacity style={styles.attachCancelBtn} onPress={onClose} activeOpacity={0.7}>
+          <Pressable
+            style={({ pressed }) => [styles.attachCancelBtn, pressed && { opacity: 0.7 }]}
+            onPress={onClose}
+          >
             <Text style={styles.attachCancelText}>Cancelar</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </Modal>
   );
 };
@@ -542,9 +562,9 @@ const ConversacionScreen: React.FC = () => {
         <View style={styles.emptyConvContainer}>
           <MaterialIcons name="chat-bubble-outline" size={64} color="#c0c7d4" />
           <Text style={styles.emptyConvText}>Conversación no encontrada</Text>
-          <TouchableOpacity onPress={vm.onGoBack}>
+          <Pressable style={({ pressed }) => pressed && { opacity: 0.6 }} onPress={vm.onGoBack}>
             <Text style={styles.emptyConvLink}>Volver</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </SafeAreaView>
     );
@@ -561,9 +581,12 @@ const ConversacionScreen: React.FC = () => {
       >
         {/* Header */}
         <View style={styles.chatHeader}>
-          <TouchableOpacity style={styles.chatHeaderBtn} onPress={vm.onGoBack} activeOpacity={0.7}>
+          <Pressable
+            style={({ pressed }) => [styles.chatHeaderBtn, pressed && { opacity: 0.7 }]}
+            onPress={vm.onGoBack}
+          >
             <MaterialIcons name="arrow-back" size={24} color={DT.text} />
-          </TouchableOpacity>
+          </Pressable>
           <View
             style={[
               styles.chatHeaderAvatar,
@@ -587,9 +610,9 @@ const ConversacionScreen: React.FC = () => {
               <Text style={styles.chatHeaderOfflineText}>Desconectado</Text>
             )}
           </View>
-          <TouchableOpacity style={styles.chatHeaderBtn} activeOpacity={0.7}>
+          <Pressable style={({ pressed }) => [styles.chatHeaderBtn, pressed && { opacity: 0.7 }]}>
             <MaterialIcons name="more-vert" size={22} color={DT.textSecondary} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {/* Messages */}
@@ -623,13 +646,12 @@ const ConversacionScreen: React.FC = () => {
 
         {/* Input Bar */}
         <View style={styles.inputBar}>
-          <TouchableOpacity
-            style={styles.inputAttachBtn}
+          <Pressable
+            style={({ pressed }) => [styles.inputAttachBtn, pressed && { opacity: 0.7 }]}
             onPress={vm.onAdjuntar}
-            activeOpacity={0.7}
           >
             <MaterialIcons name="attach-file" size={22} color={DT.textSecondary} />
-          </TouchableOpacity>
+          </Pressable>
           <TextInput
             style={styles.inputField}
             placeholder="Escribe un mensaje..."
@@ -640,17 +662,17 @@ const ConversacionScreen: React.FC = () => {
             maxLength={2000}
             onSubmitEditing={canSend ? vm.onEnviarMensaje : undefined}
           />
-          <TouchableOpacity
-            style={[
+          <Pressable
+            style={({ pressed }) => [
               styles.inputSendBtn,
               canSend ? styles.inputSendBtnActive : styles.inputSendBtnDisabled,
+              pressed && { opacity: canSend ? 0.7 : 1 },
             ]}
             onPress={canSend ? vm.onEnviarMensaje : undefined}
-            activeOpacity={canSend ? 0.7 : 1}
             disabled={!canSend}
           >
             <MaterialIcons name="send" size={20} color={canSend ? "#FFFFFF" : "#c0c7d4"} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {/* Attach Modal */}

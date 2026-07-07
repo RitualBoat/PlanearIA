@@ -1,10 +1,10 @@
 import { useTheme } from "../../context/ThemeContext";
 import React from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   FlatList,
   TextInput,
   RefreshControl,
@@ -49,7 +49,6 @@ const getThemeTokens = (colors: any) => ({
   textMuted: colors.textMuted,
 });
 
-
 const AVATAR_COLORS: Record<string, string> = {
   MH: "#4A90D9",
   JR: "#E67E22",
@@ -79,8 +78,6 @@ const FILTROS: { key: FiltroChat; label: string }[] = [
   { key: "con_archivos", label: "Con archivos" },
 ];
 
-
-
 // ─── Conversation Item ───
 const ConversacionItem: React.FC<{
   item: Conversacion;
@@ -97,11 +94,14 @@ const ConversacionItem: React.FC<{
   const isFile = item.ultimoMensajeTipo === "archivo" || item.ultimoMensajeTipo === "planeacion";
 
   return (
-    <TouchableOpacity
-      style={[styles.convItem, hasUnread && styles.convItemUnread]}
+    <Pressable
+      style={({ pressed }) => [
+        styles.convItem,
+        hasUnread && styles.convItemUnread,
+        pressed && { opacity: 0.7 },
+      ]}
       onPress={() => onPress(item)}
       onLongPress={() => onLongPress(item)}
-      activeOpacity={0.7}
     >
       <View style={styles.convAvatarWrap}>
         <View style={[styles.convAvatar, { backgroundColor: color }]}>
@@ -138,7 +138,7 @@ const ConversacionItem: React.FC<{
           )}
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -148,23 +148,23 @@ const EmptyState: React.FC<{ searchActive: boolean }> = ({ searchActive }) => {
   const DT = getThemeTokens(colors);
   const styles = getStyles(DT, isDark);
   return (
-  <View style={styles.emptyContainer}>
-    <View style={styles.emptyIconCircle}>
-      <MaterialIcons
-        name={searchActive ? "search-off" : "chat-bubble-outline"}
-        size={48}
-        color="#c0c7d4"
-      />
+    <View style={styles.emptyContainer}>
+      <View style={styles.emptyIconCircle}>
+        <MaterialIcons
+          name={searchActive ? "search-off" : "chat-bubble-outline"}
+          size={48}
+          color="#c0c7d4"
+        />
+      </View>
+      <Text style={styles.emptyTitle}>
+        {searchActive ? "Sin resultados" : "Aún no tienes conversaciones"}
+      </Text>
+      <Text style={styles.emptySubtitle}>
+        {searchActive
+          ? "Intenta con otro nombre"
+          : "Envía un mensaje a uno de tus contactos para comenzar a colaborar"}
+      </Text>
     </View>
-    <Text style={styles.emptyTitle}>
-      {searchActive ? "Sin resultados" : "Aún no tienes conversaciones"}
-    </Text>
-    <Text style={styles.emptySubtitle}>
-      {searchActive
-        ? "Intenta con otro nombre"
-        : "Envía un mensaje a uno de tus contactos para comenzar a colaborar"}
-    </Text>
-  </View>
   );
 };
 
@@ -179,26 +179,32 @@ const DeleteModal: React.FC<{
   const DT = getThemeTokens(colors);
   const styles = getStyles(DT, isDark);
   return (
-  <Modal visible={visible} transparent animationType="fade">
-    <View style={styles.overlay}>
-      <View style={styles.deleteModal}>
-        <View style={styles.deleteIconCircle}>
-          <MaterialIcons name="delete-outline" size={28} color={DT.error} />
+    <Modal visible={visible} transparent animationType="fade">
+      <View style={styles.overlay}>
+        <View style={styles.deleteModal}>
+          <View style={styles.deleteIconCircle}>
+            <MaterialIcons name="delete-outline" size={28} color={DT.error} />
+          </View>
+          <Text style={styles.deleteTitle}>¿Eliminar conversación?</Text>
+          <Text style={styles.deleteSubtitle}>
+            Se eliminará el historial de mensajes con {nombre}. Esta acción no se puede deshacer.
+          </Text>
+          <Pressable
+            style={({ pressed }) => [styles.deleteBtnPrimary, pressed && { opacity: 0.8 }]}
+            onPress={onConfirm}
+          >
+            <MaterialIcons name="delete" size={18} color="#FFFFFF" />
+            <Text style={styles.deleteBtnPrimaryText}>Eliminar</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.deleteBtnSecondary, pressed && { opacity: 0.7 }]}
+            onPress={onCancel}
+          >
+            <Text style={styles.deleteBtnSecondaryText}>Cancelar</Text>
+          </Pressable>
         </View>
-        <Text style={styles.deleteTitle}>¿Eliminar conversación?</Text>
-        <Text style={styles.deleteSubtitle}>
-          Se eliminará el historial de mensajes con {nombre}. Esta acción no se puede deshacer.
-        </Text>
-        <TouchableOpacity style={styles.deleteBtnPrimary} onPress={onConfirm} activeOpacity={0.8}>
-          <MaterialIcons name="delete" size={18} color="#FFFFFF" />
-          <Text style={styles.deleteBtnPrimaryText}>Eliminar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.deleteBtnSecondary} onPress={onCancel} activeOpacity={0.7}>
-          <Text style={styles.deleteBtnSecondaryText}>Cancelar</Text>
-        </TouchableOpacity>
       </View>
-    </View>
-  </Modal>
+    </Modal>
   );
 };
 
@@ -225,9 +231,12 @@ const ChatScreen: React.FC = () => {
         <View style={styles.header}>
           <View style={{ width: 40 }} />
           <Text style={styles.headerTitle}>Mensajes</Text>
-          <TouchableOpacity style={styles.headerBtn} onPress={vm.onNuevoChat} activeOpacity={0.7}>
+          <Pressable
+            style={({ pressed }) => [styles.headerBtn, pressed && { opacity: 0.7 }]}
+            onPress={vm.onNuevoChat}
+          >
             <MaterialIcons name="edit" size={22} color={DT.primary} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {/* Search */}
@@ -249,16 +258,19 @@ const ChatScreen: React.FC = () => {
           contentContainerStyle={styles.filtersRow}
         >
           {FILTROS.map((f) => (
-            <TouchableOpacity
+            <Pressable
               key={f.key}
-              style={[styles.chip, vm.filtroActivo === f.key && styles.chipActive]}
+              style={({ pressed }) => [
+                styles.chip,
+                vm.filtroActivo === f.key && styles.chipActive,
+                pressed && { opacity: 0.7 },
+              ]}
               onPress={() => vm.setFiltroActivo(f.key)}
-              activeOpacity={0.7}
             >
               <Text style={[styles.chipText, vm.filtroActivo === f.key && styles.chipTextActive]}>
                 {f.label}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </ScrollView>
 
@@ -294,287 +306,290 @@ const ChatScreen: React.FC = () => {
 export default ChatScreen;
 
 // ─── Styles ───
-const getStyles = (DT: any, isDark: boolean) => StyleSheet.create({
-  cardShadow: Platform.select({
-    web: { boxShadow: isDark ? "0px 2px 8px rgba(0,0,0,0.2)" : "0px 2px 8px rgba(0,72,132,0.04)" } as any,
-    default: {
-      shadowColor: isDark ? "#000000" : "#004884",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: isDark ? 0.2 : 0.04,
-      shadowRadius: 8,
-      elevation: 1,
+const getStyles = (DT: any, isDark: boolean) =>
+  StyleSheet.create({
+    cardShadow: Platform.select({
+      web: {
+        boxShadow: isDark ? "0px 2px 8px rgba(0,0,0,0.2)" : "0px 2px 8px rgba(0,72,132,0.04)",
+      } as any,
+      default: {
+        shadowColor: isDark ? "#000000" : "#004884",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: isDark ? 0.2 : 0.04,
+        shadowRadius: 8,
+        elevation: 1,
+      },
+    }),
+    safeArea: {
+      flex: 1,
+      backgroundColor: DT.surface,
     },
-  }),
-  safeArea: {
-    flex: 1,
-    backgroundColor: DT.surface,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: DT.background,
-  },
-  // Header
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: DT.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: DT.border,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: DT.text,
-    flex: 1,
-    textAlign: "center",
-  },
-  headerBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: DT.primaryTint,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  // Search
-  searchWrap: {
-    marginHorizontal: 16,
-    marginTop: 12,
-    marginBottom: 8,
-    position: "relative",
-  },
-  searchIcon: {
-    position: "absolute",
-    left: 12,
-    top: 12,
-    zIndex: 1,
-  },
-  searchInput: {
-    backgroundColor: DT.surfaceContainerLow,
-    borderRadius: 14,
-    height: 44,
-    paddingLeft: 40,
-    paddingRight: 16,
-    fontSize: 15,
-    color: DT.text,
-  },
-  // Filters
-  filtersRow: {
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-    gap: 8,
-    flexDirection: "row",
-  },
-  chip: {
-    backgroundColor: DT.surfaceContainer,
-    borderRadius: 999,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    height: 32,
-    justifyContent: "center",
-  },
-  chipActive: {
-    backgroundColor: DT.primary,
-  },
-  chipText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: DT.textSecondary,
-  },
-  chipTextActive: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-  },
-  // List
-  listContent: {
-    paddingBottom: 100,
-  },
-  // Conversation Item
-  convItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    backgroundColor: DT.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: DT.border,
-  },
-  convItemUnread: {
-    backgroundColor: "rgba(234, 244, 255, 0.3)",
-  },
-  convAvatarWrap: {
-    position: "relative",
-    marginRight: 12,
-  },
-  convAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  convAvatarText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#FFFFFF",
-  },
-  onlineDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 999,
-    backgroundColor: DT.success,
-    borderWidth: 2,
-    borderColor: DT.surface,
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-  },
-  convInfo: {
-    flex: 1,
-  },
-  convTopRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 4,
-  },
-  convName: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: DT.text,
-    flex: 1,
-    marginRight: 8,
-  },
-  convNameBold: {
-    fontWeight: "700",
-  },
-  convTimestamp: {
-    fontSize: 11,
-    color: DT.textMuted,
-  },
-  convBottomRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  convMsgRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-    marginRight: 8,
-  },
-  convLastMsg: {
-    fontSize: 13,
-    color: DT.textSecondary,
-    flex: 1,
-  },
-  unreadBadge: {
-    width: 20,
-    height: 20,
-    borderRadius: 999,
-    backgroundColor: DT.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  unreadBadgeText: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#FFFFFF",
-  },
-  // Empty State
-  emptyContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 80,
-    paddingHorizontal: 40,
-  },
-  emptyIconCircle: {
-    width: 96,
-    height: 96,
-    borderRadius: 999,
-    backgroundColor: DT.surfaceContainer,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: DT.text,
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    fontSize: 15,
-    color: DT.textSecondary,
-    textAlign: "center",
-    maxWidth: 280,
-  },
-  // Delete Modal
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(19, 30, 49, 0.42)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  deleteModal: {
-    backgroundColor: DT.surface,
-    borderRadius: 20,
-    maxWidth: 320,
-    width: "85%",
-    padding: 24,
-    alignItems: "center",
-  },
-  deleteIconCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 999,
-    backgroundColor: DT.errorTint,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  deleteTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: DT.text,
-    textAlign: "center",
-    marginTop: 16,
-  },
-  deleteSubtitle: {
-    fontSize: 14,
-    color: DT.textSecondary,
-    textAlign: "center",
-    marginTop: 8,
-  },
-  deleteBtnPrimary: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: DT.error,
-    height: 44,
-    borderRadius: 12,
-    width: "100%",
-    marginTop: 20,
-    gap: 8,
-  },
-  deleteBtnPrimaryText: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#FFFFFF",
-  },
-  deleteBtnSecondary: {
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    marginTop: 10,
-  },
-  deleteBtnSecondaryText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: DT.textSecondary,
-  },
-});
+    container: {
+      flex: 1,
+      backgroundColor: DT.background,
+    },
+    // Header
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      backgroundColor: DT.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: DT.border,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: DT.text,
+      flex: 1,
+      textAlign: "center",
+    },
+    headerBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 10,
+      backgroundColor: DT.primaryTint,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    // Search
+    searchWrap: {
+      marginHorizontal: 16,
+      marginTop: 12,
+      marginBottom: 8,
+      position: "relative",
+    },
+    searchIcon: {
+      position: "absolute",
+      left: 12,
+      top: 12,
+      zIndex: 1,
+    },
+    searchInput: {
+      backgroundColor: DT.surfaceContainerLow,
+      borderRadius: 14,
+      height: 44,
+      paddingLeft: 40,
+      paddingRight: 16,
+      fontSize: 15,
+      color: DT.text,
+    },
+    // Filters
+    filtersRow: {
+      paddingHorizontal: 16,
+      paddingBottom: 8,
+      gap: 8,
+      flexDirection: "row",
+    },
+    chip: {
+      backgroundColor: DT.surfaceContainer,
+      borderRadius: 999,
+      paddingVertical: 6,
+      paddingHorizontal: 14,
+      height: 32,
+      justifyContent: "center",
+    },
+    chipActive: {
+      backgroundColor: DT.primary,
+    },
+    chipText: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: DT.textSecondary,
+    },
+    chipTextActive: {
+      color: "#FFFFFF",
+      fontWeight: "700",
+    },
+    // List
+    listContent: {
+      paddingBottom: 100,
+    },
+    // Conversation Item
+    convItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 14,
+      paddingHorizontal: 16,
+      backgroundColor: DT.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: DT.border,
+    },
+    convItemUnread: {
+      backgroundColor: "rgba(234, 244, 255, 0.3)",
+    },
+    convAvatarWrap: {
+      position: "relative",
+      marginRight: 12,
+    },
+    convAvatar: {
+      width: 48,
+      height: 48,
+      borderRadius: 999,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    convAvatarText: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: "#FFFFFF",
+    },
+    onlineDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 999,
+      backgroundColor: DT.success,
+      borderWidth: 2,
+      borderColor: DT.surface,
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+    },
+    convInfo: {
+      flex: 1,
+    },
+    convTopRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 4,
+    },
+    convName: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: DT.text,
+      flex: 1,
+      marginRight: 8,
+    },
+    convNameBold: {
+      fontWeight: "700",
+    },
+    convTimestamp: {
+      fontSize: 11,
+      color: DT.textMuted,
+    },
+    convBottomRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    convMsgRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      flex: 1,
+      marginRight: 8,
+    },
+    convLastMsg: {
+      fontSize: 13,
+      color: DT.textSecondary,
+      flex: 1,
+    },
+    unreadBadge: {
+      width: 20,
+      height: 20,
+      borderRadius: 999,
+      backgroundColor: DT.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    unreadBadgeText: {
+      fontSize: 11,
+      fontWeight: "700",
+      color: "#FFFFFF",
+    },
+    // Empty State
+    emptyContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingTop: 80,
+      paddingHorizontal: 40,
+    },
+    emptyIconCircle: {
+      width: 96,
+      height: 96,
+      borderRadius: 999,
+      backgroundColor: DT.surfaceContainer,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 16,
+    },
+    emptyTitle: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: DT.text,
+      textAlign: "center",
+      marginBottom: 8,
+    },
+    emptySubtitle: {
+      fontSize: 15,
+      color: DT.textSecondary,
+      textAlign: "center",
+      maxWidth: 280,
+    },
+    // Delete Modal
+    overlay: {
+      flex: 1,
+      backgroundColor: "rgba(19, 30, 49, 0.42)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    deleteModal: {
+      backgroundColor: DT.surface,
+      borderRadius: 20,
+      maxWidth: 320,
+      width: "85%",
+      padding: 24,
+      alignItems: "center",
+    },
+    deleteIconCircle: {
+      width: 56,
+      height: 56,
+      borderRadius: 999,
+      backgroundColor: DT.errorTint,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    deleteTitle: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: DT.text,
+      textAlign: "center",
+      marginTop: 16,
+    },
+    deleteSubtitle: {
+      fontSize: 14,
+      color: DT.textSecondary,
+      textAlign: "center",
+      marginTop: 8,
+    },
+    deleteBtnPrimary: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: DT.error,
+      height: 44,
+      borderRadius: 12,
+      width: "100%",
+      marginTop: 20,
+      gap: 8,
+    },
+    deleteBtnPrimaryText: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: "#FFFFFF",
+    },
+    deleteBtnSecondary: {
+      height: 40,
+      justifyContent: "center",
+      alignItems: "center",
+      width: "100%",
+      marginTop: 10,
+    },
+    deleteBtnSecondaryText: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: DT.textSecondary,
+    },
+  });

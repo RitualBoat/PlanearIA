@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, ViewStyle } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import { COLORS } from "../../types";
@@ -43,16 +43,15 @@ const ScreenBackButton: React.FC<ScreenBackButtonProps> = ({
   }
 
   return (
-    <TouchableOpacity
-      style={[styles.button, style]}
+    <Pressable
+      style={({ pressed }) => [styles.button, style, pressed && styles.pressed]}
       onPress={handlePress}
       accessibilityRole="button"
       accessibilityLabel="Volver"
       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-      activeOpacity={0.7}
     >
       <MaterialIcons name="arrow-back" size={size} color={color} />
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -63,6 +62,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+  },
+  // Replaces TouchableOpacity activeOpacity={0.7} press feedback.
+  pressed: {
+    opacity: 0.7,
   },
 });
 

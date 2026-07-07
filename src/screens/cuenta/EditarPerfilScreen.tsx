@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from "react";
 import {
+  Pressable,
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
@@ -86,9 +86,9 @@ const EditarPerfilScreen: React.FC = () => {
       >
         {/* Header bar */}
         <View style={styles.headerBar}>
-          <TouchableOpacity
+          <Pressable
             onPress={handleCancel}
-            style={styles.headerAction}
+            style={({ pressed }) => [styles.headerAction, pressed && { opacity: 0.6 }]}
             accessibilityRole="button"
             accessibilityLabel="Cancelar"
           >
@@ -96,12 +96,12 @@ const EditarPerfilScreen: React.FC = () => {
             <Text style={[styles.headerActionText, { color: colors.onSurfaceVariant }]}>
               Cancelar
             </Text>
-          </TouchableOpacity>
+          </Pressable>
           <Text style={[styles.headerTitle, { color: colors.onSurface }]}>Editar Perfil</Text>
-          <TouchableOpacity
+          <Pressable
             onPress={vm.handleGuardar}
             disabled={vm.isLoading || !vm.isDirty}
-            style={styles.headerAction}
+            style={({ pressed }) => [styles.headerAction, pressed && { opacity: 0.6 }]}
             accessibilityRole="button"
             accessibilityLabel="Guardar"
           >
@@ -117,7 +117,7 @@ const EditarPerfilScreen: React.FC = () => {
                 Guardar
               </Text>
             )}
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <ScrollView
@@ -134,8 +134,8 @@ const EditarPerfilScreen: React.FC = () => {
                 end={{ x: 1, y: 1 }}
                 style={styles.coverGradient}
               />
-              <TouchableOpacity
-                style={styles.changeCoverBtn}
+              <Pressable
+                style={({ pressed }) => [styles.changeCoverBtn, pressed && { opacity: 0.6 }]}
                 onPress={() => handlePhotoAction("cover")}
                 accessibilityRole="button"
                 accessibilityLabel="Cambiar portada"
@@ -144,7 +144,7 @@ const EditarPerfilScreen: React.FC = () => {
                 <Text style={[styles.changeCoverText, { color: colors.onSurface }]}>
                   Cambiar portada
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             {/* Avatar overlapping cover */}
@@ -152,14 +152,14 @@ const EditarPerfilScreen: React.FC = () => {
               <View style={[styles.avatarCircle, { borderColor: colors.background }]}>
                 <Text style={styles.avatarText}>{initials}</Text>
               </View>
-              <TouchableOpacity
-                style={styles.avatarEditBtn}
+              <Pressable
+                style={({ pressed }) => [styles.avatarEditBtn, pressed && { opacity: 0.6 }]}
                 onPress={() => setShowPhotoPicker(true)}
                 accessibilityRole="button"
                 accessibilityLabel="Cambiar foto de perfil"
               >
                 <MaterialIcons name="add-a-photo" size={14} color="#FFFFFF" />
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             {/* Form */}
@@ -273,14 +273,15 @@ const EditarPerfilScreen: React.FC = () => {
 
               {/* País */}
               <Text style={[styles.label, { color: colors.onSurfaceVariant }]}>PAÍS</Text>
-              <TouchableOpacity
-                style={[
+              <Pressable
+                style={({ pressed }) => [
                   styles.input,
                   styles.selectField,
                   {
                     borderColor: colors.outlineVariant,
                     backgroundColor: colors.surfaceContainerLowest,
                   },
+                  pressed && { opacity: 0.6 },
                 ]}
                 onPress={() => setShowCountryPicker(!showCountryPicker)}
                 accessibilityRole="button"
@@ -293,7 +294,7 @@ const EditarPerfilScreen: React.FC = () => {
                   size={22}
                   color={colors.onSurfaceVariant}
                 />
-              </TouchableOpacity>
+              </Pressable>
               {showCountryPicker && (
                 <View
                   style={[
@@ -305,11 +306,12 @@ const EditarPerfilScreen: React.FC = () => {
                   ]}
                 >
                   {COUNTRIES.map((c) => (
-                    <TouchableOpacity
+                    <Pressable
                       key={c.name}
-                      style={[
+                      style={({ pressed }) => [
                         styles.countryItem,
                         vm.pais === c.name && { backgroundColor: `${colors.primary}10` },
+                        pressed && { opacity: 0.6 },
                       ]}
                       onPress={() => {
                         vm.setPais(c.name);
@@ -323,18 +325,21 @@ const EditarPerfilScreen: React.FC = () => {
                       {vm.pais === c.name && (
                         <MaterialIcons name="check" size={18} color={colors.primary} />
                       )}
-                    </TouchableOpacity>
+                    </Pressable>
                   ))}
                 </View>
               )}
             </View>
 
             {/* Submit button */}
-            <TouchableOpacity
-              style={[styles.submitBtn, (!vm.isDirty || vm.isLoading) && styles.submitBtnDisabled]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.submitBtn,
+                (!vm.isDirty || vm.isLoading) && styles.submitBtnDisabled,
+                pressed && { opacity: 0.85 },
+              ]}
               onPress={vm.handleGuardar}
               disabled={vm.isLoading || !vm.isDirty}
-              activeOpacity={0.85}
               accessibilityRole="button"
               accessibilityLabel="Actualizar Perfil"
             >
@@ -350,7 +355,7 @@ const EditarPerfilScreen: React.FC = () => {
                   <Text style={styles.submitText}>Actualizar Perfil</Text>
                 )}
               </LinearGradient>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

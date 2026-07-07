@@ -12,7 +12,6 @@ const { getUserFromToken } = require("./auth");
 const usage = new Map();
 const DEFAULT_MAX = parseInt(process.env.AI_MAX_REQUESTS_PER_ACTION || "10", 10);
 const DEV_MAX = parseInt(process.env.AI_DEV_MAX_REQUESTS_PER_ACTION || "100", 10);
-const DEV_TOKEN = process.env.AI_DEV_TOKEN || "dev-token-local-testing-only";
 const WINDOW_MS = parseInt(process.env.AI_LIMIT_WINDOW_MS || String(24 * 60 * 60 * 1000), 10);
 
 function isTruthy(value) {
@@ -27,11 +26,16 @@ function getBearerToken(req) {
   return String(req.headers["authorization"] || "").replace(/^Bearer\s+/i, "").trim();
 }
 
+function getDevToken() {
+  return process.env.AI_DEV_TOKEN;
+}
+
 function isDevRequest(req) {
   if (!isDevModeEnabled()) return false;
 
   const bearerToken = getBearerToken(req);
-  if (bearerToken && bearerToken === DEV_TOKEN) return true;
+  const devToken = getDevToken();
+  if (devToken && bearerToken && bearerToken === devToken) return true;
 
   const tokenUser = getUserFromToken(req);
   const email = String(tokenUser?.email || "").toLowerCase();

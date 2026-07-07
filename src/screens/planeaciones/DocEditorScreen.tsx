@@ -23,18 +23,21 @@ import { useTheme } from "../../context/ThemeContext";
 import { useEditorMode } from "../../hooks/useEditorMode";
 import { useDocEditorViewModel, type DocSectionId } from "../../hooks/useDocEditorViewModel";
 import { useCopiloto } from "../../hooks/useCopiloto";
-import { AIToolbar, EditorToolbar, SectionNavigator } from "../../components/editor";
-import type { AIActionType, AIToolbarResult } from "../../components/editor";
-import { RichTextEditor } from "../../components/editor";
 import {
-  SeccionCurricular,
-  SeccionDatosGenerales,
-  SeccionEvaluacion,
-  SeccionFirmas,
-  SeccionInfoInstitucional,
-  SeccionObservaciones,
-  SeccionSesiones,
-} from "../../components/editor/sections";
+  AIToolbar,
+  type AIActionType,
+  type AIToolbarResult,
+} from "../../components/editor/AIToolbar";
+import { EditorToolbar } from "../../components/editor/EditorToolbar";
+import { SectionNavigator } from "../../components/editor/SectionNavigator";
+import { RichTextEditor } from "../../components/editor/RichTextEditor";
+import { SeccionCurricular } from "../../components/editor/sections/SeccionCurricular";
+import { SeccionDatosGenerales } from "../../components/editor/sections/SeccionDatosGenerales";
+import { SeccionEvaluacion } from "../../components/editor/sections/SeccionEvaluacion";
+import { SeccionFirmas } from "../../components/editor/sections/SeccionFirmas";
+import { SeccionInfoInstitucional } from "../../components/editor/sections/SeccionInfoInstitucional";
+import { SeccionObservaciones } from "../../components/editor/sections/SeccionObservaciones";
+import { SeccionSesiones } from "../../components/editor/sections/SeccionSesiones";
 import type { ActividadesCopiloto } from "../../services/copilotoService";
 import type { InstrumentoEvaluacion } from "../../../types/planeacionV2";
 import { setGlobalKeyboardDismissHandler } from "../../utils/keyboardDismissController";
@@ -101,7 +104,9 @@ const stripRichText = (value?: string): string => {
   const trimmed = value.trim();
   if (trimmed.startsWith("{")) {
     try {
-      const json = JSON.parse(trimmed) as { content?: Array<{ content?: Array<{ text?: string }> }> };
+      const json = JSON.parse(trimmed) as {
+        content?: Array<{ content?: Array<{ text?: string }> }>;
+      };
       return (json.content || [])
         .flatMap((node) => node.content || [])
         .map((node) => node.text || "")
@@ -111,7 +116,10 @@ const stripRichText = (value?: string): string => {
       return value;
     }
   }
-  return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return value
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 };
 
 const normalizeEditorInitialContent = (value?: string): string | Record<string, unknown> => {
@@ -154,7 +162,10 @@ const getImageSize = (uri: string): Promise<{ width: number; height: number }> =
     Image.getSize(uri, (width, height) => resolve({ width, height }), reject);
   });
 
-const buildSectionText = (sectionId: DocSectionId, vm: ReturnType<typeof useDocEditorViewModel>): string => {
+const buildSectionText = (
+  sectionId: DocSectionId,
+  vm: ReturnType<typeof useDocEditorViewModel>
+): string => {
   const doc = vm.documento;
   if (sectionId === "curricular") {
     return [
@@ -168,7 +179,11 @@ const buildSectionText = (sectionId: DocSectionId, vm: ReturnType<typeof useDocE
   }
   if (sectionId === "sesiones") {
     return doc.sesiones
-      .map((sesion) => [sesion.inicio, sesion.desarrollo, sesion.cierre, sesion.tarea].map(stripRichText).join("\n"))
+      .map((sesion) =>
+        [sesion.inicio, sesion.desarrollo, sesion.cierre, sesion.tarea]
+          .map(stripRichText)
+          .join("\n")
+      )
       .join("\n\n");
   }
   if (sectionId === "evaluacion") {
@@ -263,10 +278,14 @@ const DocEditorScreen: React.FC = () => {
         return;
       }
 
-      Alert.alert("Cambios sin guardar", "Guarda la planeacion antes de salir o descarta los cambios.", [
-        { text: "Seguir editando", style: "cancel" },
-        { text: "Salir sin guardar", style: "destructive", onPress: continueNavigation },
-      ]);
+      Alert.alert(
+        "Cambios sin guardar",
+        "Guarda la planeacion antes de salir o descarta los cambios.",
+        [
+          { text: "Seguir editando", style: "cancel" },
+          { text: "Salir sin guardar", style: "destructive", onPress: continueNavigation },
+        ]
+      );
     });
 
     return unsubscribe;
@@ -290,7 +309,10 @@ const DocEditorScreen: React.FC = () => {
         if (!salir) showSaveFeedback("Planeacion guardada correctamente.");
       } catch (caught) {
         skipUnsavedPromptRef.current = false;
-        showMessage("No se pudo guardar", caught instanceof Error ? caught.message : "Intenta nuevamente.");
+        showMessage(
+          "No se pudo guardar",
+          caught instanceof Error ? caught.message : "Intenta nuevamente."
+        );
       }
     },
     [showSaveFeedback, vm]
@@ -359,7 +381,10 @@ const DocEditorScreen: React.FC = () => {
           plantillaLogos: nextSlots,
         });
       } catch (caught) {
-        showMessage("Logo no valido", caught instanceof Error ? caught.message : "No se pudo cargar el logo.");
+        showMessage(
+          "Logo no valido",
+          caught instanceof Error ? caught.message : "No se pudo cargar el logo."
+        );
       }
     },
     [logoSlots, vm]
@@ -367,7 +392,9 @@ const DocEditorScreen: React.FC = () => {
 
   const handleAIAction = async (action: AIActionType): Promise<AIToolbarResult> => {
     if (action === "sugerir") {
-      const targetSession = vm.documento.sesiones.find((sesion) => sesion.tipo === "regular") || vm.documento.sesiones[0];
+      const targetSession =
+        vm.documento.sesiones.find((sesion) => sesion.tipo === "regular") ||
+        vm.documento.sesiones[0];
       const response = await copiloto.sugerirActividades(vm.documento, targetSession);
       const { actividades } = response.resultado;
       return {
@@ -452,7 +479,8 @@ const DocEditorScreen: React.FC = () => {
 
     if (payload.kind === "actividades") {
       const targetId =
-        vm.documento.sesiones.find((sesion) => sesion.tipo === "regular")?.id || vm.documento.sesiones[0]?.id;
+        vm.documento.sesiones.find((sesion) => sesion.tipo === "regular")?.id ||
+        vm.documento.sesiones[0]?.id;
       if (!targetId) return;
       vm.setSesiones(
         vm.documento.sesiones.map((sesion) =>
@@ -499,7 +527,9 @@ const DocEditorScreen: React.FC = () => {
         if (!targetId) return;
         vm.setSesiones(
           vm.documento.sesiones.map((sesion) =>
-            sesion.id === targetId ? { ...sesion, desarrollo: toRichTextString(payload.texto) } : sesion
+            sesion.id === targetId
+              ? { ...sesion, desarrollo: toRichTextString(payload.texto) }
+              : sesion
           )
         );
       }
@@ -593,7 +623,9 @@ const DocEditorScreen: React.FC = () => {
     }
 
     if (sectionId === "observaciones") {
-      return <SeccionObservaciones value={vm.documento.observaciones} onChange={vm.setObservaciones} />;
+      return (
+        <SeccionObservaciones value={vm.documento.observaciones} onChange={vm.setObservaciones} />
+      );
     }
 
     return (
@@ -613,8 +645,9 @@ const DocEditorScreen: React.FC = () => {
     );
   }
 
-  const contentSections =
-    isMobileMode ? [vm.activeSectionId] : (vm.sectionsProgress.map((item) => item.id) as DocSectionId[]);
+  const contentSections = isMobileMode
+    ? [vm.activeSectionId]
+    : (vm.sectionsProgress.map((item) => item.id) as DocSectionId[]);
   const currentPagePreset = PAGE_PRESETS[pageFormat];
   const pageWidth = isWeb
     ? Math.min(currentPagePreset.width, Math.max(320, viewportWidth - (isFullscreenDoc ? 72 : 220)))
@@ -698,7 +731,9 @@ const DocEditorScreen: React.FC = () => {
             disabled={vm.isSaving}
           >
             <MaterialIcons name="exit-to-app" size={17} color={colors.onSurfaceVariant} />
-            <Text style={[styles.saveExitButtonText, { color: colors.onSurfaceVariant }]}>Guardar y salir</Text>
+            <Text style={[styles.saveExitButtonText, { color: colors.onSurfaceVariant }]}>
+              Guardar y salir
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -720,7 +755,11 @@ const DocEditorScreen: React.FC = () => {
 
       {!isFullscreenDoc ? (
         <View style={styles.toolbarStack}>
-          <EditorToolbar editor={activeInlineEditor} mode={editorMode.mode} disabled={vm.isSaving} />
+          <EditorToolbar
+            editor={activeInlineEditor}
+            mode={editorMode.mode}
+            disabled={vm.isSaving}
+          />
           <AIToolbar
             mode={editorMode.mode}
             disabled={vm.isSaving || copiloto.isLoading}
@@ -772,297 +811,313 @@ const DocEditorScreen: React.FC = () => {
         enabled={!isWeb && isMobileMode}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-      <View style={[styles.body, isWeb && styles.webBody, isFullscreenDoc && styles.fullscreenBody]}>
-        {isMobileMode ? (
-          <View style={styles.mobileViewTabs}>
-            <Pressable
-              style={[
-                styles.mobileViewTab,
-                mobileView === "documento" && {
-                  backgroundColor: colors.primary,
-                  borderColor: colors.primary,
-                },
-              ]}
-              onPress={() => setMobileView("documento")}
-            >
-              <Text
-                style={[
-                  styles.mobileViewTabText,
-                  {
-                    color:
-                      mobileView === "documento"
-                        ? colors.surface
-                        : colors.onSurfaceVariant,
-                  },
-                ]}
-              >
-                Documento
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[
-                styles.mobileViewTab,
-                mobileView === "formulario" && {
-                  backgroundColor: colors.primary,
-                  borderColor: colors.primary,
-                },
-              ]}
-              onPress={() => setMobileView("formulario")}
-            >
-              <Text
-                style={[
-                  styles.mobileViewTabText,
-                  {
-                    color:
-                      mobileView === "formulario"
-                        ? colors.surface
-                        : colors.onSurfaceVariant,
-                  },
-                ]}
-              >
-                Formulario
-              </Text>
-            </Pressable>
-          </View>
-        ) : null}
-        {!isMobileMode ? (
-          <View style={styles.desktopViewTabs}>
-            {(["mixto", "documento", "formulario"] as const).map((item) => {
-              const active = desktopView === item;
-              const label = item === "mixto" ? "Mixto" : item === "documento" ? "Documento" : "Formulario";
-              return (
-                <Pressable
-                  key={item}
-                  style={[
-                    styles.desktopViewTab,
-                    {
-                      borderColor: active ? colors.primary : colors.borderLight,
-                      backgroundColor: active ? colors.primary : colors.surfaceContainerLow,
-                    },
-                  ]}
-                  onPress={() => setDesktopView(item)}
-                >
-                  <Text
-                    style={[
-                      styles.desktopViewTabText,
-                      { color: active ? colors.surface : colors.onSurfaceVariant },
-                    ]}
-                  >
-                    {label}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        ) : null}
-        <ScrollView
-          contentContainerStyle={[
-            styles.scrollContent,
-            isWeb && styles.webScrollContent,
-            isFullscreenDoc && styles.fullscreenScrollContent,
-          ]}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={isFullscreenDoc || isWeb}
-          style={[styles.scrollView, isWeb && styles.webScrollView]}
-          nestedScrollEnabled
+        <View
+          style={[styles.body, isWeb && styles.webBody, isFullscreenDoc && styles.fullscreenBody]}
         >
-          {showDocumentCanvas ? (
-            <View
-              style={[
-                styles.documentCard,
-                isFullscreenDoc && styles.fullscreenDocumentCard,
-                {
-                  borderColor: colors.borderLight,
-                  backgroundColor: colors.surfaceContainerLowest,
-                },
-              ]}
-            >
-              <View style={styles.documentHeader}>
-                <View>
-                  <Text style={[styles.documentTitle, { color: colors.onSurface }]}>Documento</Text>
-                  <Text style={[styles.documentSubtitle, { color: colors.onSurfaceVariant }]}>
-                    Edicion principal tipo Word/Docs.
-                  </Text>
-                </View>
-                <Pressable
-                  style={[
-                    styles.syncButton,
-                    {
-                      borderColor: colors.borderLight,
-                      backgroundColor: colors.surfaceContainerLow,
-                    },
-                  ]}
-                  onPress={vm.regenerarContenidoRawDesdeCampos}
-                >
-                  <MaterialIcons name="sync" size={15} color={colors.onSurfaceVariant} />
-                  <Text style={[styles.syncButtonText, { color: colors.onSurfaceVariant }]}>
-                    Sincronizar plantilla
-                  </Text>
-                </Pressable>
-              </View>
-              <View style={styles.documentControlsRow}>
-                <View style={styles.pageFormatRow}>
-                  {(Object.keys(PAGE_PRESETS) as PageFormat[]).map((item) => {
-                    const active = pageFormat === item;
-                    return (
-                      <Pressable
-                        key={item}
-                        style={[
-                          styles.pageFormatChip,
-                          {
-                            borderColor: active ? colors.primary : colors.borderLight,
-                            backgroundColor: active ? colors.primary : colors.surfaceContainerLow,
-                          },
-                        ]}
-                        onPress={() => setPageFormat(item)}
-                      >
-                        <Text
-                          style={[
-                            styles.pageFormatText,
-                            { color: active ? colors.surface : colors.onSurfaceVariant },
-                          ]}
-                        >
-                          {PAGE_PRESETS[item].label}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-                <Pressable
-                  style={[
-                    styles.fullscreenToggle,
-                    {
-                      borderColor: colors.borderLight,
-                      backgroundColor: colors.surfaceContainerLow,
-                    },
-                  ]}
-                  onPress={() => setIsFullscreenDoc((prev) => !prev)}
-                >
-                  <MaterialIcons
-                    name={isFullscreenDoc ? "fullscreen-exit" : "fullscreen"}
-                    size={16}
-                    color={colors.onSurfaceVariant}
-                  />
-                  <Text style={[styles.fullscreenToggleText, { color: colors.onSurfaceVariant }]}>
-                    {isFullscreenDoc ? "Salir pantalla completa" : "Pantalla completa"}
-                  </Text>
-                </Pressable>
-              </View>
-              <View
+          {isMobileMode ? (
+            <View style={styles.mobileViewTabs}>
+              <Pressable
                 style={[
-                  styles.documentWorkspace,
-                  {
-                    backgroundColor: colors.surfaceContainerLow,
+                  styles.mobileViewTab,
+                  mobileView === "documento" && {
+                    backgroundColor: colors.primary,
+                    borderColor: colors.primary,
                   },
                 ]}
+                onPress={() => setMobileView("documento")}
               >
-                <View
+                <Text
                   style={[
-                    styles.documentPage,
+                    styles.mobileViewTabText,
                     {
-                      borderColor: colors.borderLight,
-                      backgroundColor: colors.surface,
-                      minHeight: currentPagePreset.minHeight,
-                      width: pageWidth,
-                      maxWidth: isWeb ? currentPagePreset.width : 820,
+                      color: mobileView === "documento" ? colors.surface : colors.onSurfaceVariant,
                     },
                   ]}
                 >
-                  <View style={styles.logoHeader}>
-                    {logoSlots.map((slot) => (
-                      <View key={slot.id} style={styles.logoSlot}>
-                        {slot.uri ? (
-                          <Image source={{ uri: slot.uri }} style={styles.logoImage} resizeMode="contain" />
-                        ) : (
-                          <View style={[styles.logoPlaceholder, { borderColor: colors.borderLight }]}>
-                            <Text style={[styles.logoPlaceholderText, { color: colors.onSurfaceVariant }]}>
-                              {slot.label}
-                            </Text>
-                          </View>
-                        )}
-                      </View>
-                    ))}
-                  </View>
-                  <RichTextEditor
-                    mode={editorMode.mode}
-                    minHeight={Math.max(460, currentPagePreset.minHeight - 84)}
-                    initialContent={normalizeEditorInitialContent(vm.documento.contenidoRaw)}
-                    onEditorReady={setActiveInlineEditor}
-                    onChange={handleEditorContentChange}
-                  />
-                </View>
-              </View>
+                  Documento
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[
+                  styles.mobileViewTab,
+                  mobileView === "formulario" && {
+                    backgroundColor: colors.primary,
+                    borderColor: colors.primary,
+                  },
+                ]}
+                onPress={() => setMobileView("formulario")}
+              >
+                <Text
+                  style={[
+                    styles.mobileViewTabText,
+                    {
+                      color: mobileView === "formulario" ? colors.surface : colors.onSurfaceVariant,
+                    },
+                  ]}
+                >
+                  Formulario
+                </Text>
+              </Pressable>
             </View>
           ) : null}
-
-          {showStructuredFields ? (
-            <View style={styles.formSection}>
+          {!isMobileMode ? (
+            <View style={styles.desktopViewTabs}>
+              {(["mixto", "documento", "formulario"] as const).map((item) => {
+                const active = desktopView === item;
+                const label =
+                  item === "mixto" ? "Mixto" : item === "documento" ? "Documento" : "Formulario";
+                return (
+                  <Pressable
+                    key={item}
+                    style={[
+                      styles.desktopViewTab,
+                      {
+                        borderColor: active ? colors.primary : colors.borderLight,
+                        backgroundColor: active ? colors.primary : colors.surfaceContainerLow,
+                      },
+                    ]}
+                    onPress={() => setDesktopView(item)}
+                  >
+                    <Text
+                      style={[
+                        styles.desktopViewTabText,
+                        { color: active ? colors.surface : colors.onSurfaceVariant },
+                      ]}
+                    >
+                      {label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          ) : null}
+          <ScrollView
+            contentContainerStyle={[
+              styles.scrollContent,
+              isWeb && styles.webScrollContent,
+              isFullscreenDoc && styles.fullscreenScrollContent,
+            ]}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={isFullscreenDoc || isWeb}
+            style={[styles.scrollView, isWeb && styles.webScrollView]}
+            nestedScrollEnabled
+          >
+            {showDocumentCanvas ? (
               <View
                 style={[
-                  styles.logoPanel,
+                  styles.documentCard,
+                  isFullscreenDoc && styles.fullscreenDocumentCard,
                   {
                     borderColor: colors.borderLight,
                     backgroundColor: colors.surfaceContainerLowest,
                   },
                 ]}
               >
-                <Text style={[styles.logoPanelTitle, { color: colors.onSurface }]}>Logos del documento</Text>
-                <Text style={[styles.logoPanelText, { color: colors.onSurfaceVariant }]}>
-                  PNG/JPG, maximo 2 MB y 1500 px por lado.
-                </Text>
-                <View style={styles.logoControlsRow}>
-                  {logoSlots.map((slot) => (
-                    <View
-                      key={slot.id}
-                      style={[
-                        styles.logoControlCard,
-                        {
-                          borderColor: colors.borderLight,
-                          backgroundColor: colors.surfaceContainerLow,
-                        },
-                      ]}
-                    >
-                      <Text style={[styles.logoControlTitle, { color: colors.onSurface }]}>{slot.label}</Text>
-                      <Text style={[styles.logoControlMeta, { color: colors.onSurfaceVariant }]}>
-                        {slot.nombre || "Sin imagen"}
-                      </Text>
-                      <Pressable
-                        style={[
-                          styles.logoReplaceButton,
-                          {
-                            borderColor: colors.borderLight,
-                            backgroundColor: colors.surfaceContainerLowest,
-                          },
-                        ]}
-                        onPress={() => {
-                          void replaceLogo(slot.id);
-                        }}
-                      >
-                        <MaterialIcons name="image" size={16} color={colors.onSurfaceVariant} />
-                        <Text style={[styles.logoReplaceText, { color: colors.onSurfaceVariant }]}>
-                          Reemplazar
-                        </Text>
-                      </Pressable>
+                <View style={styles.documentHeader}>
+                  <View>
+                    <Text style={[styles.documentTitle, { color: colors.onSurface }]}>
+                      Documento
+                    </Text>
+                    <Text style={[styles.documentSubtitle, { color: colors.onSurfaceVariant }]}>
+                      Edicion principal tipo Word/Docs.
+                    </Text>
+                  </View>
+                  <Pressable
+                    style={[
+                      styles.syncButton,
+                      {
+                        borderColor: colors.borderLight,
+                        backgroundColor: colors.surfaceContainerLow,
+                      },
+                    ]}
+                    onPress={vm.regenerarContenidoRawDesdeCampos}
+                  >
+                    <MaterialIcons name="sync" size={15} color={colors.onSurfaceVariant} />
+                    <Text style={[styles.syncButtonText, { color: colors.onSurfaceVariant }]}>
+                      Sincronizar plantilla
+                    </Text>
+                  </Pressable>
+                </View>
+                <View style={styles.documentControlsRow}>
+                  <View style={styles.pageFormatRow}>
+                    {(Object.keys(PAGE_PRESETS) as PageFormat[]).map((item) => {
+                      const active = pageFormat === item;
+                      return (
+                        <Pressable
+                          key={item}
+                          style={[
+                            styles.pageFormatChip,
+                            {
+                              borderColor: active ? colors.primary : colors.borderLight,
+                              backgroundColor: active ? colors.primary : colors.surfaceContainerLow,
+                            },
+                          ]}
+                          onPress={() => setPageFormat(item)}
+                        >
+                          <Text
+                            style={[
+                              styles.pageFormatText,
+                              { color: active ? colors.surface : colors.onSurfaceVariant },
+                            ]}
+                          >
+                            {PAGE_PRESETS[item].label}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                  <Pressable
+                    style={[
+                      styles.fullscreenToggle,
+                      {
+                        borderColor: colors.borderLight,
+                        backgroundColor: colors.surfaceContainerLow,
+                      },
+                    ]}
+                    onPress={() => setIsFullscreenDoc((prev) => !prev)}
+                  >
+                    <MaterialIcons
+                      name={isFullscreenDoc ? "fullscreen-exit" : "fullscreen"}
+                      size={16}
+                      color={colors.onSurfaceVariant}
+                    />
+                    <Text style={[styles.fullscreenToggleText, { color: colors.onSurfaceVariant }]}>
+                      {isFullscreenDoc ? "Salir pantalla completa" : "Pantalla completa"}
+                    </Text>
+                  </Pressable>
+                </View>
+                <View
+                  style={[
+                    styles.documentWorkspace,
+                    {
+                      backgroundColor: colors.surfaceContainerLow,
+                    },
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.documentPage,
+                      {
+                        borderColor: colors.borderLight,
+                        backgroundColor: colors.surface,
+                        minHeight: currentPagePreset.minHeight,
+                        width: pageWidth,
+                        maxWidth: isWeb ? currentPagePreset.width : 820,
+                      },
+                    ]}
+                  >
+                    <View style={styles.logoHeader}>
+                      {logoSlots.map((slot) => (
+                        <View key={slot.id} style={styles.logoSlot}>
+                          {slot.uri ? (
+                            <Image
+                              source={{ uri: slot.uri }}
+                              style={styles.logoImage}
+                              resizeMode="contain"
+                            />
+                          ) : (
+                            <View
+                              style={[styles.logoPlaceholder, { borderColor: colors.borderLight }]}
+                            >
+                              <Text
+                                style={[
+                                  styles.logoPlaceholderText,
+                                  { color: colors.onSurfaceVariant },
+                                ]}
+                              >
+                                {slot.label}
+                              </Text>
+                            </View>
+                          )}
+                        </View>
+                      ))}
                     </View>
-                  ))}
+                    <RichTextEditor
+                      mode={editorMode.mode}
+                      minHeight={Math.max(460, currentPagePreset.minHeight - 84)}
+                      initialContent={normalizeEditorInitialContent(vm.documento.contenidoRaw)}
+                      onEditorReady={setActiveInlineEditor}
+                      onChange={handleEditorContentChange}
+                    />
+                  </View>
                 </View>
               </View>
-              <SectionNavigator
-                sections={sections}
-                activeSectionId={vm.activeSectionId}
-                onSectionChange={(sectionId) => vm.setActiveSectionId(sectionId as DocSectionId)}
-                mode={editorMode.mode}
-              />
-              {contentSections.map((sectionId) => (
-                <View key={sectionId} style={styles.sectionBlock}>
-                  {renderSection(sectionId)}
+            ) : null}
+
+            {showStructuredFields ? (
+              <View style={styles.formSection}>
+                <View
+                  style={[
+                    styles.logoPanel,
+                    {
+                      borderColor: colors.borderLight,
+                      backgroundColor: colors.surfaceContainerLowest,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.logoPanelTitle, { color: colors.onSurface }]}>
+                    Logos del documento
+                  </Text>
+                  <Text style={[styles.logoPanelText, { color: colors.onSurfaceVariant }]}>
+                    PNG/JPG, maximo 2 MB y 1500 px por lado.
+                  </Text>
+                  <View style={styles.logoControlsRow}>
+                    {logoSlots.map((slot) => (
+                      <View
+                        key={slot.id}
+                        style={[
+                          styles.logoControlCard,
+                          {
+                            borderColor: colors.borderLight,
+                            backgroundColor: colors.surfaceContainerLow,
+                          },
+                        ]}
+                      >
+                        <Text style={[styles.logoControlTitle, { color: colors.onSurface }]}>
+                          {slot.label}
+                        </Text>
+                        <Text style={[styles.logoControlMeta, { color: colors.onSurfaceVariant }]}>
+                          {slot.nombre || "Sin imagen"}
+                        </Text>
+                        <Pressable
+                          style={[
+                            styles.logoReplaceButton,
+                            {
+                              borderColor: colors.borderLight,
+                              backgroundColor: colors.surfaceContainerLowest,
+                            },
+                          ]}
+                          onPress={() => {
+                            void replaceLogo(slot.id);
+                          }}
+                        >
+                          <MaterialIcons name="image" size={16} color={colors.onSurfaceVariant} />
+                          <Text
+                            style={[styles.logoReplaceText, { color: colors.onSurfaceVariant }]}
+                          >
+                            Reemplazar
+                          </Text>
+                        </Pressable>
+                      </View>
+                    ))}
+                  </View>
                 </View>
-              ))}
-            </View>
-          ) : null}
-          <View style={{ height: 28 }} />
-        </ScrollView>
-      </View>
+                <SectionNavigator
+                  sections={sections}
+                  activeSectionId={vm.activeSectionId}
+                  onSectionChange={(sectionId) => vm.setActiveSectionId(sectionId as DocSectionId)}
+                  mode={editorMode.mode}
+                />
+                {contentSections.map((sectionId) => (
+                  <View key={sectionId} style={styles.sectionBlock}>
+                    {renderSection(sectionId)}
+                  </View>
+                ))}
+              </View>
+            ) : null}
+            <View style={{ height: 28 }} />
+          </ScrollView>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -1427,5 +1482,3 @@ const styles = StyleSheet.create({
 });
 
 export default DocEditorScreen;
-
-

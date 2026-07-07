@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RouteProp } from "@react-navigation/native";
@@ -158,9 +158,12 @@ const HistorialAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
         <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.headerRow}>
-            <TouchableOpacity style={styles.headerIconBtn} onPress={() => navigation.goBack()}>
+            <Pressable
+              style={({ pressed }) => [styles.headerIconBtn, pressed && { opacity: 0.6 }]}
+              onPress={() => navigation.goBack()}
+            >
               <MaterialIcons name="arrow-back" size={22} color={COLORS.text} />
-            </TouchableOpacity>
+            </Pressable>
             <Text style={styles.headerTitle}>Historial de Asistencia</Text>
           </View>
 
@@ -192,10 +195,13 @@ const HistorialAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
               </Text>
             </View>
 
-            <TouchableOpacity style={styles.startButton} onPress={handleNavigateRegistrar}>
+            <Pressable
+              style={({ pressed }) => [styles.startButton, pressed && { opacity: 0.6 }]}
+              onPress={handleNavigateRegistrar}
+            >
               <MaterialIcons name="add" size={20} color={COLORS.surface} />
               <Text style={styles.startButtonText}>Iniciar Pase de Lista</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </SafeAreaView>
       </View>
@@ -209,9 +215,12 @@ const HistorialAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
         <View style={styles.headerRow}>
-          <TouchableOpacity style={styles.headerIconBtn} onPress={() => navigation.goBack()}>
+          <Pressable
+            style={({ pressed }) => [styles.headerIconBtn, pressed && { opacity: 0.6 }]}
+            onPress={() => navigation.goBack()}
+          >
             <MaterialIcons name="arrow-back" size={22} color={COLORS.text} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerTitle}>Historial de Asistencia</Text>
         </View>
 
@@ -236,9 +245,13 @@ const HistorialAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
           {/* Filter Pills */}
           <View style={styles.filtrosRow}>
             {filtros.map((f) => (
-              <TouchableOpacity
+              <Pressable
                 key={f.id}
-                style={[styles.filtroPill, filtro === f.id && styles.filtroPillActive]}
+                style={({ pressed }) => [
+                  styles.filtroPill,
+                  filtro === f.id && styles.filtroPillActive,
+                  pressed && { opacity: 0.6 },
+                ]}
                 onPress={() => setFiltro(f.id)}
               >
                 <Text
@@ -246,7 +259,7 @@ const HistorialAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
                 >
                   {f.label}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </View>
 
@@ -294,11 +307,10 @@ const HistorialAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
 
           {/* Session Cards */}
           {sesionesFiltradas.map((sesion) => (
-            <TouchableOpacity
+            <Pressable
               key={sesion.fecha}
-              style={styles.sesionCard}
+              style={({ pressed }) => [styles.sesionCard, pressed && { opacity: 0.7 }]}
               onPress={() => handleSesionPress(sesion.fecha)}
-              activeOpacity={0.7}
             >
               {/* Date Badge */}
               <View style={styles.fechaBadge}>
@@ -331,7 +343,7 @@ const HistorialAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
               </View>
 
               <MaterialIcons name="chevron-right" size={24} color={COLORS.textMuted} />
-            </TouchableOpacity>
+            </Pressable>
           ))}
 
           {sesionesFiltradas.length === 0 && (

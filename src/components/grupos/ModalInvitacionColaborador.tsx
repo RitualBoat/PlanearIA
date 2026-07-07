@@ -1,5 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
+import {
+  Pressable,
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  TextInput,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+} from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS } from "../../../types";
 import type { RolGrupo } from "../../../types";
@@ -11,7 +22,12 @@ interface Props {
   grupoNombre: string;
 }
 
-export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, onInvite, grupoNombre }) => {
+export const ModalInvitacionColaborador: React.FC<Props> = ({
+  visible,
+  onClose,
+  onInvite,
+  grupoNombre,
+}) => {
   const [email, setEmail] = useState("");
   const [rol, setRol] = useState<RolGrupo>("co-docente");
   const [loading, setLoading] = useState(false);
@@ -19,7 +35,7 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
 
   const handleInvite = async () => {
     if (!email.trim() || !email.includes("@")) return;
-    
+
     setLoading(true);
     try {
       await onInvite(email.trim(), rol);
@@ -42,42 +58,48 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
     <View style={styles.successContainer}>
       <MaterialIcons name="check-circle" size={64} color={COLORS.success} />
       <Text style={styles.successTitle}>¡Invitación Enviada!</Text>
-      <Text style={styles.successText}>Se ha enviado un correo a {email} para unirse a {grupoNombre}.</Text>
+      <Text style={styles.successText}>
+        Se ha enviado un correo a {email} para unirse a {grupoNombre}.
+      </Text>
     </View>
   );
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <KeyboardAvoidingView 
-        style={styles.overlay} 
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <KeyboardAvoidingView
+        style={styles.overlay}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <TouchableOpacity style={styles.backdrop} onPress={onClose} activeOpacity={1} />
-        
+        <Pressable style={styles.backdrop} onPress={onClose} />
+
         <View style={styles.sheet}>
           <View style={styles.dragHandleContainer}>
             <View style={styles.dragHandle} />
           </View>
-          
+
           <View style={styles.header}>
             <Text style={styles.title}>Invitar Colaborador</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Pressable
+              onPress={onClose}
+              style={({ pressed }) => [styles.closeButton, pressed && { opacity: 0.6 }]}
+            >
               <MaterialIcons name="close" size={20} color={COLORS.textSecondary} />
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
-          {success ? renderSuccess() : (
+          {success ? (
+            renderSuccess()
+          ) : (
             <ScrollView style={styles.content} keyboardShouldPersistTaps="handled">
-              
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>CORREO ELECTRÓNICO</Text>
                 <View style={styles.searchContainer}>
-                  <MaterialIcons name="search" size={20} color={COLORS.textSecondary} style={styles.searchIcon} />
+                  <MaterialIcons
+                    name="search"
+                    size={20}
+                    color={COLORS.textSecondary}
+                    style={styles.searchIcon}
+                  />
                   <TextInput
                     style={styles.input}
                     placeholder="ejemplo@escuela.edu"
@@ -93,21 +115,35 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>ROL DEL COLABORADOR</Text>
                 <View style={styles.rolesContainer}>
-                  <TouchableOpacity 
-                    style={[styles.roleButton, rol === "co-docente" && styles.roleButtonActive]}
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.roleButton,
+                      rol === "co-docente" && styles.roleButtonActive,
+                      pressed && { opacity: 0.6 },
+                    ]}
                     onPress={() => setRol("co-docente")}
                   >
-                    <Text style={[styles.roleText, rol === "co-docente" && styles.roleTextActive]}>Co-docente</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={[styles.roleButton, rol === "ponente_invitado" && styles.roleButtonActive]}
+                    <Text style={[styles.roleText, rol === "co-docente" && styles.roleTextActive]}>
+                      Co-docente
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.roleButton,
+                      rol === "ponente_invitado" && styles.roleButtonActive,
+                      pressed && { opacity: 0.6 },
+                    ]}
                     onPress={() => setRol("ponente_invitado")}
                   >
-                    <Text style={[styles.roleText, rol === "ponente_invitado" && styles.roleTextActive]}>Ponente</Text>
-                  </TouchableOpacity>
+                    <Text
+                      style={[styles.roleText, rol === "ponente_invitado" && styles.roleTextActive]}
+                    >
+                      Ponente
+                    </Text>
+                  </Pressable>
                 </View>
                 <Text style={styles.roleDescription}>
-                  {rol === "co-docente" 
+                  {rol === "co-docente"
                     ? "Los co-docentes pueden editar planeaciones y gestionar recursos del grupo."
                     : "Los ponentes invitados solo pueden ver las planeaciones y subir sus propios recursos."}
                 </Text>
@@ -118,11 +154,17 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
                   <MaterialIcons name="person-add" size={24} color={COLORS.primary} />
                 </View>
                 <Text style={styles.emptyStateText}>Ingresa el correo del docente</Text>
-                <Text style={styles.emptyStateSubtext}>Se le notificará para que acepte la invitación</Text>
+                <Text style={styles.emptyStateSubtext}>
+                  Se le notificará para que acepte la invitación
+                </Text>
               </View>
 
-              <TouchableOpacity 
-                style={[styles.inviteButton, (!email.includes("@") || loading) && styles.inviteButtonDisabled]}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.inviteButton,
+                  (!email.includes("@") || loading) && styles.inviteButtonDisabled,
+                  pressed && { opacity: 0.6 },
+                ]}
                 onPress={handleInvite}
                 disabled={!email.includes("@") || loading}
               >
@@ -130,11 +172,16 @@ export const ModalInvitacionColaborador: React.FC<Props> = ({ visible, onClose, 
                   <ActivityIndicator color={COLORS.textOnPrimary} />
                 ) : (
                   <>
-                    <MaterialIcons name="person-add" size={20} color={COLORS.textOnPrimary} style={{ marginRight: 8 }} />
+                    <MaterialIcons
+                      name="person-add"
+                      size={20}
+                      color={COLORS.textOnPrimary}
+                      style={{ marginRight: 8 }}
+                    />
                     <Text style={styles.inviteButtonText}>Enviar Invitación</Text>
                   </>
                 )}
-              </TouchableOpacity>
+              </Pressable>
             </ScrollView>
           )}
         </View>

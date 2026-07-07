@@ -4,11 +4,11 @@ import {
   Alert,
   Animated,
   Modal,
+  Pressable,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -243,9 +243,8 @@ const CuentaScreen: React.FC = () => {
             <View style={[styles.leftColumn, wideLayout && styles.leftColumnWide]}>
               {/* ── Accesibilidad ── */}
               <View style={styles.sectionBlock}>
-                <TouchableOpacity
-                  style={styles.sectionHeader}
-                  activeOpacity={0.82}
+                <Pressable
+                  style={({ pressed }) => [styles.sectionHeader, pressed && { opacity: 0.82 }]}
                   onPress={() => setOpenAccesibilidad((prev) => !prev)}
                 >
                   <View style={styles.sectionTitleWrap}>
@@ -257,7 +256,7 @@ const CuentaScreen: React.FC = () => {
                     size={26}
                     color={COLORS.textDark}
                   />
-                </TouchableOpacity>
+                </Pressable>
 
                 {openAccesibilidad ? (
                   <View style={styles.sectionContent}>
@@ -268,18 +267,21 @@ const CuentaScreen: React.FC = () => {
                         {(["Pequeno", "Medio", "Grande"] as const).map((size) => {
                           const active = fontSizeMode === size;
                           return (
-                            <TouchableOpacity
+                            <Pressable
                               key={size}
-                              style={[styles.segmentOption, active && styles.segmentOptionActive]}
+                              style={({ pressed }) => [
+                                styles.segmentOption,
+                                active && styles.segmentOptionActive,
+                                pressed && { opacity: 0.85 },
+                              ]}
                               onPress={() => setFontSizeMode(size)}
-                              activeOpacity={0.85}
                             >
                               <Text
                                 style={[styles.segmentText, active && styles.segmentTextActive]}
                               >
                                 {size}
                               </Text>
-                            </TouchableOpacity>
+                            </Pressable>
                           );
                         })}
                       </View>
@@ -291,15 +293,18 @@ const CuentaScreen: React.FC = () => {
                           <Text style={styles.rowTitle}>Contraste alto</Text>
                           <Text style={styles.rowSubtitle}>Mejora la legibilidad del texto</Text>
                         </View>
-                        <TouchableOpacity
-                          style={[styles.toggleTrack, highContrast && styles.toggleTrackOn]}
+                        <Pressable
+                          style={({ pressed }) => [
+                            styles.toggleTrack,
+                            highContrast && styles.toggleTrackOn,
+                            pressed && { opacity: 0.9 },
+                          ]}
                           onPress={() => setHighContrast((prev) => !prev)}
-                          activeOpacity={0.9}
                         >
                           <View
                             style={[styles.toggleThumb, highContrast && styles.toggleThumbOn]}
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </View>
                     </View>
 
@@ -307,11 +312,14 @@ const CuentaScreen: React.FC = () => {
                       <Text style={styles.rowTitle}>Modo Daltonismo</Text>
                       {(["Ninguno", "Deuteranopia", "Protanopia", "Tritanopia"] as const).map(
                         (opt) => (
-                          <TouchableOpacity
+                          <Pressable
                             key={opt}
-                            style={[styles.radioRow, daltonismo === opt && styles.radioRowActive]}
+                            style={({ pressed }) => [
+                              styles.radioRow,
+                              daltonismo === opt && styles.radioRowActive,
+                              pressed && { opacity: 0.85 },
+                            ]}
                             onPress={() => setDaltonismo(opt)}
-                            activeOpacity={0.85}
                           >
                             <Text
                               style={[
@@ -328,7 +336,7 @@ const CuentaScreen: React.FC = () => {
                                 color={COLORS.primaryDark}
                               />
                             ) : null}
-                          </TouchableOpacity>
+                          </Pressable>
                         )
                       )}
                     </View>
@@ -338,13 +346,16 @@ const CuentaScreen: React.FC = () => {
                         <MaterialIcons name="record-voice-over" size={20} color="#0A728B" />
                         <Text style={styles.surfaceRowTitle}>Lectura de voz</Text>
                       </View>
-                      <TouchableOpacity
-                        style={[styles.toggleTrack, voiceReading && styles.toggleTrackOn]}
+                      <Pressable
+                        style={({ pressed }) => [
+                          styles.toggleTrack,
+                          voiceReading && styles.toggleTrackOn,
+                          pressed && { opacity: 0.9 },
+                        ]}
                         onPress={() => setVoiceReading((prev) => !prev)}
-                        activeOpacity={0.9}
                       >
                         <View style={[styles.toggleThumb, voiceReading && styles.toggleThumbOn]} />
-                      </TouchableOpacity>
+                      </Pressable>
                     </View>
 
                     <View style={styles.surfaceRowCard}>
@@ -352,13 +363,16 @@ const CuentaScreen: React.FC = () => {
                         <MaterialIcons name="motion-photos-off" size={20} color="#0A728B" />
                         <Text style={styles.surfaceRowTitle}>Reducir movimiento</Text>
                       </View>
-                      <TouchableOpacity
-                        style={[styles.toggleTrack, reduceMotion && styles.toggleTrackOn]}
+                      <Pressable
+                        style={({ pressed }) => [
+                          styles.toggleTrack,
+                          reduceMotion && styles.toggleTrackOn,
+                          pressed && { opacity: 0.9 },
+                        ]}
                         onPress={() => setReduceMotion((prev) => !prev)}
-                        activeOpacity={0.9}
                       >
                         <View style={[styles.toggleThumb, reduceMotion && styles.toggleThumbOn]} />
-                      </TouchableOpacity>
+                      </Pressable>
                     </View>
                   </View>
                 ) : null}
@@ -366,9 +380,8 @@ const CuentaScreen: React.FC = () => {
 
               {/* ── Preferencias de app ── */}
               <View style={styles.sectionBlock}>
-                <TouchableOpacity
-                  style={styles.sectionHeader}
-                  activeOpacity={0.82}
+                <Pressable
+                  style={({ pressed }) => [styles.sectionHeader, pressed && { opacity: 0.82 }]}
                   onPress={() => setOpenPreferencias((prev) => !prev)}
                 >
                   <View style={styles.sectionTitleWrap}>
@@ -380,7 +393,7 @@ const CuentaScreen: React.FC = () => {
                     size={26}
                     color={COLORS.textDark}
                   />
-                </TouchableOpacity>
+                </Pressable>
 
                 {openPreferencias ? (
                   <View style={styles.sectionContent}>
@@ -395,20 +408,25 @@ const CuentaScreen: React.FC = () => {
                             {darkMode ? "Actualmente activado" : "Actualmente desactivado"}
                           </Text>
                         </View>
-                        <TouchableOpacity
-                          style={[styles.toggleTrack, darkMode && styles.toggleTrackOn]}
+                        <Pressable
+                          style={({ pressed }) => [
+                            styles.toggleTrack,
+                            darkMode && styles.toggleTrackOn,
+                            pressed && { opacity: 0.9 },
+                          ]}
                           onPress={toggleTheme}
-                          activeOpacity={0.9}
                         >
                           <View style={[styles.toggleThumb, darkMode && styles.toggleThumbOn]} />
-                        </TouchableOpacity>
+                        </Pressable>
                       </View>
 
                       <View style={styles.rowDivider} />
 
-                      <TouchableOpacity
-                        style={styles.preferenceRow}
-                        activeOpacity={0.82}
+                      <Pressable
+                        style={({ pressed }) => [
+                          styles.preferenceRow,
+                          pressed && { opacity: 0.82 },
+                        ]}
                         onPress={() => {
                           const nextLang = i18n.language === "es" ? "en" : "es";
                           changeLanguage(nextLang);
@@ -424,7 +442,7 @@ const CuentaScreen: React.FC = () => {
                           </Text>
                         </View>
                         <MaterialIcons name="chevron-right" size={22} color="#6A7890" />
-                      </TouchableOpacity>
+                      </Pressable>
 
                       {!isGuest && (
                         <>
@@ -438,15 +456,15 @@ const CuentaScreen: React.FC = () => {
                               <Text style={styles.prefTitle}>Recibir recomendaciones</Text>
                               <Text style={styles.prefSubtitle}>Sugerencias de la IA</Text>
                             </View>
-                            <TouchableOpacity
-                              style={[
+                            <Pressable
+                              style={({ pressed }) => [
                                 styles.toggleTrack,
                                 prefs.recibirRecomendaciones && styles.toggleTrackOn,
+                                pressed && { opacity: 0.9 },
                               ]}
                               onPress={() =>
                                 togglePref("recibirRecomendaciones", !prefs.recibirRecomendaciones)
                               }
-                              activeOpacity={0.9}
                             >
                               <View
                                 style={[
@@ -454,7 +472,7 @@ const CuentaScreen: React.FC = () => {
                                   prefs.recibirRecomendaciones && styles.toggleThumbOn,
                                 ]}
                               />
-                            </TouchableOpacity>
+                            </Pressable>
                           </View>
 
                           <View style={styles.rowDivider} />
@@ -467,13 +485,13 @@ const CuentaScreen: React.FC = () => {
                               <Text style={styles.prefTitle}>Compartir datos de uso</Text>
                               <Text style={styles.prefSubtitle}>Ayuda a mejorar la app</Text>
                             </View>
-                            <TouchableOpacity
-                              style={[
+                            <Pressable
+                              style={({ pressed }) => [
                                 styles.toggleTrack,
                                 prefs.compartirDatos && styles.toggleTrackOn,
+                                pressed && { opacity: 0.9 },
                               ]}
                               onPress={() => togglePref("compartirDatos", !prefs.compartirDatos)}
-                              activeOpacity={0.9}
                             >
                               <View
                                 style={[
@@ -481,7 +499,7 @@ const CuentaScreen: React.FC = () => {
                                   prefs.compartirDatos && styles.toggleThumbOn,
                                 ]}
                               />
-                            </TouchableOpacity>
+                            </Pressable>
                           </View>
 
                           <View style={styles.rowDivider} />
@@ -496,13 +514,13 @@ const CuentaScreen: React.FC = () => {
                                 {prefs.contenidoAdulto ? "Activado" : "Desactivado"}
                               </Text>
                             </View>
-                            <TouchableOpacity
-                              style={[
+                            <Pressable
+                              style={({ pressed }) => [
                                 styles.toggleTrack,
                                 prefs.contenidoAdulto && styles.toggleTrackOn,
+                                pressed && { opacity: 0.9 },
                               ]}
                               onPress={() => togglePref("contenidoAdulto", !prefs.contenidoAdulto)}
-                              activeOpacity={0.9}
                             >
                               <View
                                 style={[
@@ -510,7 +528,7 @@ const CuentaScreen: React.FC = () => {
                                   prefs.contenidoAdulto && styles.toggleThumbOn,
                                 ]}
                               />
-                            </TouchableOpacity>
+                            </Pressable>
                           </View>
 
                           <View style={styles.rowDivider} />
@@ -529,13 +547,13 @@ const CuentaScreen: React.FC = () => {
                                 {prefs.notificaciones ? "Activadas" : "Desactivadas"}
                               </Text>
                             </View>
-                            <TouchableOpacity
-                              style={[
+                            <Pressable
+                              style={({ pressed }) => [
                                 styles.toggleTrack,
                                 prefs.notificaciones && styles.toggleTrackOn,
+                                pressed && { opacity: 0.9 },
                               ]}
                               onPress={() => togglePref("notificaciones", !prefs.notificaciones)}
-                              activeOpacity={0.9}
                             >
                               <View
                                 style={[
@@ -543,7 +561,7 @@ const CuentaScreen: React.FC = () => {
                                   prefs.notificaciones && styles.toggleThumbOn,
                                 ]}
                               />
-                            </TouchableOpacity>
+                            </Pressable>
                           </View>
                         </>
                       )}
@@ -554,9 +572,8 @@ const CuentaScreen: React.FC = () => {
 
               {/* ── Cuenta y seguridad ── */}
               <View style={styles.sectionBlock}>
-                <TouchableOpacity
-                  style={styles.sectionHeader}
-                  activeOpacity={0.82}
+                <Pressable
+                  style={({ pressed }) => [styles.sectionHeader, pressed && { opacity: 0.82 }]}
                   onPress={() => setOpenCuenta((prev) => !prev)}
                 >
                   <View style={styles.sectionTitleWrap}>
@@ -568,7 +585,7 @@ const CuentaScreen: React.FC = () => {
                     size={26}
                     color={COLORS.textDark}
                   />
-                </TouchableOpacity>
+                </Pressable>
 
                 {openCuenta ? (
                   <View style={styles.sectionContent}>
@@ -584,25 +601,37 @@ const CuentaScreen: React.FC = () => {
                       </View>
 
                       {!isGuest && (
-                        <TouchableOpacity style={styles.primaryAction} onPress={handleEditarPerfil}>
+                        <Pressable
+                          style={({ pressed }) => [
+                            styles.primaryAction,
+                            pressed && { opacity: 0.6 },
+                          ]}
+                          onPress={handleEditarPerfil}
+                        >
                           <MaterialIcons name="person" size={18} color={COLORS.surface} />
                           <Text style={styles.primaryActionText}>Cuenta y perfil</Text>
-                        </TouchableOpacity>
+                        </Pressable>
                       )}
 
                       {!isGuest && (
-                        <TouchableOpacity
-                          style={styles.secondaryAction}
+                        <Pressable
+                          style={({ pressed }) => [
+                            styles.secondaryAction,
+                            pressed && { opacity: 0.6 },
+                          ]}
                           onPress={handleCambiarContrasena}
                         >
                           <MaterialIcons name="lock" size={18} color={COLORS.textDark} />
                           <Text style={styles.secondaryActionText}>Cambiar contrasena</Text>
-                        </TouchableOpacity>
+                        </Pressable>
                       )}
 
                       {can("cambiar_roles") && (
-                        <TouchableOpacity
-                          style={styles.secondaryAction}
+                        <Pressable
+                          style={({ pressed }) => [
+                            styles.secondaryAction,
+                            pressed && { opacity: 0.6 },
+                          ]}
                           onPress={() => (navigation as any).navigate("AdminRoles")}
                         >
                           <MaterialIcons
@@ -611,19 +640,21 @@ const CuentaScreen: React.FC = () => {
                             color={COLORS.textDark}
                           />
                           <Text style={styles.secondaryActionText}>Administrar roles</Text>
-                        </TouchableOpacity>
+                        </Pressable>
                       )}
 
                       {!isGuest && (
-                        <TouchableOpacity
-                          style={styles.secondaryAction}
+                        <Pressable
+                          style={({ pressed }) => [
+                            styles.secondaryAction,
+                            pressed && { opacity: 0.82 },
+                          ]}
                           onPress={() =>
                             Alert.alert(
                               "Próximamente",
                               "Esta función se implementará en una próxima actualización."
                             )
                           }
-                          activeOpacity={0.82}
                         >
                           <MaterialIcons
                             name="workspace-premium"
@@ -631,38 +662,52 @@ const CuentaScreen: React.FC = () => {
                             color={COLORS.textDark}
                           />
                           <Text style={styles.secondaryActionText}>Suscripcion y plan</Text>
-                        </TouchableOpacity>
+                        </Pressable>
                       )}
 
                       {!isGuest && (
-                        <TouchableOpacity
-                          style={styles.secondaryAction}
+                        <Pressable
+                          style={({ pressed }) => [
+                            styles.secondaryAction,
+                            pressed && { opacity: 0.82 },
+                          ]}
                           onPress={() => (navigation as any).navigate("SesionesActivas")}
-                          activeOpacity={0.82}
                         >
                           <MaterialIcons name="devices" size={18} color={COLORS.textDark} />
                           <Text style={styles.secondaryActionText}>Sesiones iniciadas</Text>
-                        </TouchableOpacity>
+                        </Pressable>
                       )}
 
-                      <TouchableOpacity
-                        style={styles.secondaryAction}
+                      <Pressable
+                        style={({ pressed }) => [
+                          styles.secondaryAction,
+                          pressed && { opacity: 0.6 },
+                        ]}
                         onPress={() => (navigation as any).navigate("Terminos")}
                       >
                         <MaterialIcons name="policy" size={18} color={COLORS.textDark} />
                         <Text style={styles.secondaryActionText}>Privacidad y terminos</Text>
-                      </TouchableOpacity>
+                      </Pressable>
 
                       {!isGuest && (
-                        <TouchableOpacity style={styles.secondaryAction} onPress={onPressEliminar}>
+                        <Pressable
+                          style={({ pressed }) => [
+                            styles.secondaryAction,
+                            pressed && { opacity: 0.6 },
+                          ]}
+                          onPress={onPressEliminar}
+                        >
                           <MaterialIcons name="delete" size={18} color={COLORS.danger} />
                           <Text style={[styles.secondaryActionText, { color: COLORS.danger }]}>
                             Eliminar cuenta
                           </Text>
-                        </TouchableOpacity>
+                        </Pressable>
                       )}
 
-                      <TouchableOpacity style={styles.logoutButton} onPress={handleCerrarSesion}>
+                      <Pressable
+                        style={({ pressed }) => [styles.logoutButton, pressed && { opacity: 0.6 }]}
+                        onPress={handleCerrarSesion}
+                      >
                         <MaterialIcons
                           name={isGuest ? "login" : "logout"}
                           size={18}
@@ -671,7 +716,7 @@ const CuentaScreen: React.FC = () => {
                         <Text style={styles.logoutButtonText}>
                           {isGuest ? "Iniciar sesion" : "Cerrar sesion"}
                         </Text>
-                      </TouchableOpacity>
+                      </Pressable>
                     </View>
                   </View>
                 ) : null}
@@ -767,26 +812,29 @@ const CuentaScreen: React.FC = () => {
                 autoCapitalize="none"
               />
 
-              <TouchableOpacity
-                style={[styles.deleteBtn, deleteLoading && { opacity: 0.6 }]}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.deleteBtn,
+                  deleteLoading && { opacity: 0.6 },
+                  pressed && { opacity: 0.85 },
+                ]}
                 onPress={confirmarEliminacion}
                 disabled={deleteLoading}
-                activeOpacity={0.85}
               >
                 {deleteLoading ? (
                   <ActivityIndicator color={COLORS.surface} size="small" />
                 ) : (
                   <Text style={styles.deleteBtnText}>Eliminar mi cuenta</Text>
                 )}
-              </TouchableOpacity>
+              </Pressable>
 
-              <TouchableOpacity
-                style={styles.modalCancelBtn}
+              <Pressable
+                style={({ pressed }) => [styles.modalCancelBtn, pressed && { opacity: 0.6 }]}
                 onPress={() => setShowDeleteModal(false)}
                 disabled={deleteLoading}
               >
                 <Text style={styles.modalCancelText}>Cancelar</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         </Modal>

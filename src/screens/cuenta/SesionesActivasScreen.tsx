@@ -2,10 +2,10 @@ import React from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Pressable,
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -39,12 +39,14 @@ const SesionesActivasScreen: React.FC = () => {
             <Text style={styles.deviceText} numberOfLines={1}>
               {item.userAgent || "Dispositivo desconocido"}
             </Text>
-            <Text style={styles.metaText}>Activa desde {formatFecha(item.lastUsedAt || item.createdAt)}</Text>
+            <Text style={styles.metaText}>
+              Activa desde {formatFecha(item.lastUsedAt || item.createdAt)}
+            </Text>
             {item.current ? <Text style={styles.currentBadge}>Sesión actual</Text> : null}
           </View>
           {item.current ? null : (
-            <TouchableOpacity
-              style={styles.revokeBtn}
+            <Pressable
+              style={({ pressed }) => [styles.revokeBtn, pressed && { opacity: 0.6 }]}
               onPress={() => revocar(item.id)}
               disabled={isRevoking}
             >
@@ -53,7 +55,7 @@ const SesionesActivasScreen: React.FC = () => {
               ) : (
                 <Text style={styles.revokeText}>Cerrar</Text>
               )}
-            </TouchableOpacity>
+            </Pressable>
           )}
         </View>
       </View>
@@ -65,13 +67,19 @@ const SesionesActivasScreen: React.FC = () => {
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
 
       <View style={styles.header}>
-        <TouchableOpacity onPress={goBack} style={styles.backBtn}>
+        <Pressable
+          onPress={goBack}
+          style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.6 }]}
+        >
           <MaterialIcons name="arrow-back" size={24} color={COLORS.text} />
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.headerTitle}>Sesiones iniciadas</Text>
-        <TouchableOpacity onPress={refetch} style={styles.backBtn}>
+        <Pressable
+          onPress={refetch}
+          style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.6 }]}
+        >
           <MaterialIcons name="refresh" size={24} color={COLORS.primary} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {isLoading ? (
@@ -83,9 +91,12 @@ const SesionesActivasScreen: React.FC = () => {
         <View style={styles.center}>
           <MaterialIcons name="error-outline" size={44} color={COLORS.textTertiary} />
           <Text style={styles.emptyText}>{error}</Text>
-          <TouchableOpacity style={styles.retryBtn} onPress={refetch}>
+          <Pressable
+            style={({ pressed }) => [styles.retryBtn, pressed && { opacity: 0.6 }]}
+            onPress={refetch}
+          >
             <Text style={styles.retryText}>Reintentar</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       ) : sesiones.length === 0 ? (
         <View style={styles.center}>
@@ -100,8 +111,8 @@ const SesionesActivasScreen: React.FC = () => {
           contentContainerStyle={styles.list}
           ListFooterComponent={
             otras > 0 ? (
-              <TouchableOpacity
-                style={styles.closeAllBtn}
+              <Pressable
+                style={({ pressed }) => [styles.closeAllBtn, pressed && { opacity: 0.6 }]}
                 onPress={cerrarOtras}
                 disabled={revokingId === "__all__"}
               >
@@ -110,7 +121,7 @@ const SesionesActivasScreen: React.FC = () => {
                 ) : (
                   <Text style={styles.closeAllText}>Cerrar las demás sesiones</Text>
                 )}
-              </TouchableOpacity>
+              </Pressable>
             ) : null
           }
         />
@@ -136,7 +147,12 @@ const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: "center", alignItems: "center", gap: 12, padding: 24 },
   loadingText: { fontSize: FONT_SIZES.medium, color: COLORS.textSecondary },
   emptyText: { fontSize: FONT_SIZES.medium, color: COLORS.textTertiary, textAlign: "center" },
-  retryBtn: { paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10, backgroundColor: COLORS.primary },
+  retryBtn: {
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: COLORS.primary,
+  },
   retryText: { color: COLORS.surface, fontWeight: "600" },
   list: { padding: 16, gap: 10 },
   card: {

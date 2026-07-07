@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Modal,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { Modal, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export interface ConfirmDialogProps {
@@ -43,51 +35,47 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       statusBarTranslucent
       onRequestClose={onCancel}
     >
-      <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button">
-        <View style={styles.overlay}>
-          <TouchableWithoutFeedback>
-            <View style={styles.card}>
-              {icon && (
-                <View
-                  style={[
-                    styles.iconCircle,
-                    { backgroundColor: destructive ? "#ffdad6" : "#d4e3ff" },
-                  ]}
-                >
-                  <MaterialIcons
-                    name={icon as any}
-                    size={28}
-                    color={iconColor || (destructive ? "#ba1a1a" : "#005da8")}
-                  />
-                </View>
-              )}
-              <Text style={styles.title}>{title}</Text>
-              <Text style={styles.message}>{message}</Text>
-              <View style={styles.actions}>
-                <TouchableOpacity
-                  style={styles.cancelBtn}
-                  onPress={onCancel}
-                  accessibilityRole="button"
-                  accessibilityLabel={cancelLabel}
-                >
-                  <Text style={styles.cancelText}>{cancelLabel}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.confirmBtn,
-                    destructive ? { backgroundColor: "#ba1a1a" } : { backgroundColor: "#005da8" },
-                  ]}
-                  onPress={onConfirm}
-                  accessibilityRole="button"
-                  accessibilityLabel={confirmLabel}
-                >
-                  <Text style={styles.confirmText}>{confirmLabel}</Text>
-                </TouchableOpacity>
-              </View>
+      <Pressable style={styles.overlay} onPress={onCancel} accessibilityRole="button">
+        {/* Card claims the touch responder so taps inside it never reach the
+            backdrop's onPress (the old inner TouchableWithoutFeedback role). */}
+        <View style={styles.card} onStartShouldSetResponder={() => true}>
+          {icon && (
+            <View
+              style={[styles.iconCircle, { backgroundColor: destructive ? "#ffdad6" : "#d4e3ff" }]}
+            >
+              <MaterialIcons
+                name={icon as any}
+                size={28}
+                color={iconColor || (destructive ? "#ba1a1a" : "#005da8")}
+              />
             </View>
-          </TouchableWithoutFeedback>
+          )}
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.message}>{message}</Text>
+          <View style={styles.actions}>
+            <Pressable
+              style={({ pressed }) => [styles.cancelBtn, pressed && styles.pressed]}
+              onPress={onCancel}
+              accessibilityRole="button"
+              accessibilityLabel={cancelLabel}
+            >
+              <Text style={styles.cancelText}>{cancelLabel}</Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [
+                styles.confirmBtn,
+                destructive ? { backgroundColor: "#ba1a1a" } : { backgroundColor: "#005da8" },
+                pressed && styles.pressed,
+              ]}
+              onPress={onConfirm}
+              accessibilityRole="button"
+              accessibilityLabel={confirmLabel}
+            >
+              <Text style={styles.confirmText}>{confirmLabel}</Text>
+            </Pressable>
+          </View>
         </View>
-      </TouchableWithoutFeedback>
+      </Pressable>
     </Modal>
   );
 };
@@ -174,6 +162,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: "#FFFFFF",
+  },
+  // Replaces the default TouchableOpacity press dim on the action buttons.
+  pressed: {
+    opacity: 0.6,
   },
 });
 

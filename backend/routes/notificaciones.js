@@ -19,6 +19,35 @@ const {
 } = require("../lib/auth");
 
 const COLLECTION = "notificaciones";
+const NOTIFICACION_ALLOWED_FIELDS = [
+  "id",
+  "usuarioId",
+  "titulo",
+  "mensaje",
+  "tipo",
+  "leida",
+  "fechaCreacion",
+  "syncStatus",
+];
+
+function pickNotificacionInput(body) {
+  const notificacion = {};
+  if (!body || typeof body !== "object") return notificacion;
+
+  for (const field of NOTIFICACION_ALLOWED_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(body, field)) {
+      notificacion[field] = body[field];
+    }
+  }
+
+  return notificacion;
+}
+
+function buildScopedNotificacion(body, tokenUserId) {
+  const notificacion = pickNotificacionInput(body);
+  if (tokenUserId) notificacion.usuarioId = tokenUserId;
+  return notificacion;
+}
 
 module.exports = async (req, res) => {
   applyCors(req, res);
@@ -107,9 +136,7 @@ async function handleGet(req, res, collection, tokenUserId) {
  * POST — Crear notificación
  */
 async function handlePost(req, res, collection, tokenUserId) {
-  const notificacion = { ...req.body };
-  // Scoped requests can only create notifications they own.
-  if (tokenUserId) notificacion.usuarioId = tokenUserId;
+  const notificacion = buildScopedNotificacion(req.body, tokenUserId);
 
   if (!notificacion || !notificacion.id || !notificacion.usuarioId) {
     return errorResponse(
@@ -124,19 +151,20 @@ async function handlePost(req, res, collection, tokenUserId) {
     return errorResponse(res, 403, "No autorizado");
   }
   if (existing) {
+    const now = new Date().toISOString();
+    notificacion.syncedAt = now;
     await collection.updateOne(
       { id: notificacion.id },
-      { $set: { ...notificacion, syncedAt: new Date().toISOString() } }
+      { $set: notificacion }
     );
     return successResponse(res, { action: "updated", id: notificacion.id });
   }
 
-  const doc = {
-    ...notificacion,
-    leida: notificacion.leida ?? false,
-    syncedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-  };
+  const now = new Date().toISOString();
+  const doc = notificacion;
+  doc.leida = notificacion.leida ?? false;
+  doc.syncedAt = now;
+  doc.createdAt = now;
 
   await collection.insertOne(doc);
   return successResponse(res, { action: "created", id: notificacion.id }, 201);
@@ -183,12 +211,12 @@ async function handlePut(req, res, collection, tokenUserId) {
   const result = await collection.updateOne(
     { id: body.id },
     {
-      $set: {
-        ...body,
-        ...(tokenUserId ? { usuarioId: tokenUserId } : {}),
-        leida: true,
-        syncedAt: new Date().toISOString(),
-      },
+      $set: (() => {
+        const update = buildScopedNotificacion(body, tokenUserId);
+        update.leida = true;
+        update.syncedAt = new Date().toISOString();
+        return update;
+      })(),
     },
     { upsert: true }
   );

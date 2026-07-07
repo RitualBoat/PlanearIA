@@ -1,0 +1,10 @@
+{
+  "$schema": "https://react.doctor/schema/config.json",
+  "ignore": {
+    "overrides": [
+      {
+        "files": [".venv/**", "**/.venv/**", "**/site-packages/**", "**/__pycache__/**"]
+      }
+    ]
+  }
+}

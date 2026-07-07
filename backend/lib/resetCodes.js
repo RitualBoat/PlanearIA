@@ -4,7 +4,11 @@ const RESET_CODE_TTL_MS = parseInt(process.env.AUTH_RESET_CODE_TTL_MS || String(
 const RESET_CODE_MAX_ATTEMPTS = parseInt(process.env.AUTH_RESET_CODE_MAX_ATTEMPTS || "5", 10);
 
 function getResetCodeSecret() {
-  return process.env.AUTH_RESET_CODE_SECRET || process.env.JWT_SECRET || process.env.API_SECRET || "dev-reset-secret";
+  if (process.env.AUTH_RESET_CODE_SECRET) return process.env.AUTH_RESET_CODE_SECRET;
+  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
+  if (process.env.API_SECRET) return process.env.API_SECRET;
+
+  throw new Error("AUTH_RESET_CODE_SECRET, JWT_SECRET or API_SECRET is required for reset code hashing");
 }
 
 function createResetCode() {

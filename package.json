@@ -38,7 +38,8 @@
     "mcp:github": "node --no-warnings scripts/mcpGithubFromGh.mjs",
     "sqlite:inspect": "node --no-warnings scripts/planeariaSqliteInspect.mjs",
     "mcp:sqlite": "node --no-warnings scripts/mcpPlaneariaSqlite.mjs",
-    "mcp:mongodb:readonly": "npx -y mongodb-mcp-server@latest --readOnly --indexCheck --telemetry disabled"
+    "mcp:mongodb:readonly": "npx -y mongodb-mcp-server@latest --readOnly --indexCheck --telemetry disabled",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
     "@10play/tentap-editor": "^1.0.1",
@@ -59,6 +60,7 @@
     "expo-document-picker": "~14.0.8",
     "expo-file-system": "~19.0.22",
     "expo-font": "~14.0.11",
+    "expo-image": "~3.0.11",
     "expo-linear-gradient": "~15.0.8",
     "expo-localization": "~17.0.8",
     "expo-notifications": "~0.32.17",

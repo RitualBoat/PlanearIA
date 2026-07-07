@@ -1,9 +1,9 @@
 import React from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   StatusBar,
   TextInput,
   ScrollView,
@@ -46,19 +46,26 @@ const EditorPlantillaScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => !vm.isSaving && navigation.goBack()} activeOpacity={0.7}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.7 }}
+            onPress={() => !vm.isSaving && navigation.goBack()}
+          >
             <MaterialIcons name="close" size={24} color={COLORS.text} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerTitle}>
             {vm.isEditMode ? "Editar Plantilla" : "Nueva Plantilla"}
           </Text>
-          <TouchableOpacity onPress={vm.handleGuardar} disabled={vm.isSaving} activeOpacity={0.7}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.7 }}
+            onPress={vm.handleGuardar}
+            disabled={vm.isSaving}
+          >
             <MaterialIcons
               name="check"
               size={26}
               color={vm.isSaving ? COLORS.textTertiary : COLORS.primary}
             />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <KeyboardAvoidingView
@@ -80,14 +87,14 @@ const EditorPlantillaScreen: React.FC = () => {
               {TIPO_OPTIONS.map((opt) => {
                 const isActive = vm.tipo === opt.id;
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     key={opt.id}
-                    style={[
+                    style={({ pressed }) => [
                       styles.tipoPill,
                       isActive && { backgroundColor: `${opt.color}18`, borderColor: opt.color },
+                      pressed && { opacity: 0.8 },
                     ]}
                     onPress={() => vm.setTipo(opt.id)}
-                    activeOpacity={0.8}
                   >
                     <MaterialIcons
                       name={opt.icon as any}
@@ -102,7 +109,7 @@ const EditorPlantillaScreen: React.FC = () => {
                     >
                       {opt.label}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 );
               })}
             </ScrollView>
@@ -143,9 +150,12 @@ const EditorPlantillaScreen: React.FC = () => {
                   placeholderTextColor={COLORS.textTertiary}
                   returnKeyType="done"
                 />
-                <TouchableOpacity style={styles.addTagBtn} onPress={vm.addTag} activeOpacity={0.8}>
+                <Pressable
+                  style={({ pressed }) => [styles.addTagBtn, pressed && { opacity: 0.8 }]}
+                  onPress={vm.addTag}
+                >
                   <MaterialIcons name="add" size={20} color="#FFFFFF" />
-                </TouchableOpacity>
+                </Pressable>
               </View>
               {vm.tags.length > 0 && (
                 <View style={styles.tagsContainer}>
@@ -154,9 +164,12 @@ const EditorPlantillaScreen: React.FC = () => {
                     .map((tag) => (
                       <View key={tag} style={styles.tagChip}>
                         <Text style={styles.tagChipText}>{tag}</Text>
-                        <TouchableOpacity onPress={() => vm.removeTag(tag)}>
+                        <Pressable
+                          style={({ pressed }) => pressed && { opacity: 0.6 }}
+                          onPress={() => vm.removeTag(tag)}
+                        >
                           <MaterialIcons name="close" size={14} color={COLORS.textSecondary} />
-                        </TouchableOpacity>
+                        </Pressable>
                       </View>
                     ))}
                 </View>
@@ -182,9 +195,12 @@ const EditorPlantillaScreen: React.FC = () => {
               {/* Sections */}
               <View style={styles.fieldRow}>
                 <Text style={styles.fieldLabel}>Secciones</Text>
-                <TouchableOpacity onPress={vm.addSeccion} activeOpacity={0.7}>
+                <Pressable
+                  style={({ pressed }) => pressed && { opacity: 0.7 }}
+                  onPress={vm.addSeccion}
+                >
                   <MaterialIcons name="add-circle-outline" size={22} color={COLORS.primary} />
-                </TouchableOpacity>
+                </Pressable>
               </View>
               {(vm.contenido.secciones || []).map((sec, i) => (
                 <View key={i} style={styles.seccionRow}>
@@ -195,9 +211,12 @@ const EditorPlantillaScreen: React.FC = () => {
                     onChangeText={(v) => vm.updateSeccion(i, v)}
                     placeholderTextColor={COLORS.textTertiary}
                   />
-                  <TouchableOpacity onPress={() => vm.removeSeccion(i)} style={{ marginLeft: 8 }}>
+                  <Pressable
+                    onPress={() => vm.removeSeccion(i)}
+                    style={({ pressed }) => [{ marginLeft: 8 }, pressed && { opacity: 0.6 }]}
+                  >
                     <MaterialIcons name="remove-circle-outline" size={22} color={COLORS.error} />
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               ))}
 
@@ -227,22 +246,24 @@ const EditorPlantillaScreen: React.FC = () => {
 
             {/* Bottom actions */}
             <View style={styles.actionsRow}>
-              <TouchableOpacity
-                style={styles.btnSecondary}
+              <Pressable
+                style={({ pressed }) => [styles.btnSecondary, pressed && { opacity: 0.8 }]}
                 onPress={vm.handleGuardarBorrador}
                 disabled={vm.isSaving}
-                activeOpacity={0.8}
               >
                 <MaterialIcons name="save-alt" size={18} color={COLORS.primary} />
                 <Text style={styles.btnSecondaryText}>
                   {vm.isSaving ? "Guardando..." : "Guardar borrador"}
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.btnPrimary, vm.isSaving && styles.btnDisabled]}
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.btnPrimary,
+                  vm.isSaving && styles.btnDisabled,
+                  pressed && { opacity: 0.8 },
+                ]}
                 onPress={vm.handleGuardar}
                 disabled={vm.isSaving}
-                activeOpacity={0.8}
               >
                 <MaterialIcons name="check-circle" size={18} color="#FFFFFF" />
                 <Text style={styles.btnPrimaryText}>
@@ -252,7 +273,7 @@ const EditorPlantillaScreen: React.FC = () => {
                       ? "Guardar cambios"
                       : "Crear plantilla"}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>

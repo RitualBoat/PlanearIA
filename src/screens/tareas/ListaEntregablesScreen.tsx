@@ -1,13 +1,5 @@
 import React, { useState, useMemo } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  StatusBar,
-  FlatList,
-} from "react-native";
+import { Pressable, View, Text, StyleSheet, TextInput, StatusBar, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
@@ -124,18 +116,17 @@ const ListaEntregablesScreen: React.FC = () => {
     const grupoNombre = gruposMap[item.grupoId as number] ?? `Grupo ${item.grupoId}`;
 
     return (
-      <TouchableOpacity
-        style={styles.entregableCard}
+      <Pressable
+        style={({ pressed }) => [styles.entregableCard, pressed && { opacity: 0.7 }]}
         onPress={() => handleEntregablePress(item)}
-        activeOpacity={0.7}
       >
         <View style={styles.cardHeader}>
           <View style={[styles.iconContainer, { backgroundColor: icon.bg }]}>
             <MaterialIcons name={icon.name as any} size={22} color={icon.color} />
           </View>
-          <TouchableOpacity style={styles.moreButton}>
+          <Pressable style={({ pressed }) => [styles.moreButton, pressed && { opacity: 0.6 }]}>
             <MaterialIcons name="more-vert" size={22} color={COLORS.textSecondary} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <Text style={styles.cardTitle}>{item.titulo}</Text>
@@ -161,7 +152,7 @@ const ListaEntregablesScreen: React.FC = () => {
           </View>
           <MaterialIcons name="chevron-right" size={22} color={COLORS.textSecondary} />
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 
@@ -180,10 +171,13 @@ const ListaEntregablesScreen: React.FC = () => {
         automatizada con IA.
       </Text>
 
-      <TouchableOpacity style={styles.emptyButton} onPress={handleCrearEntregable}>
+      <Pressable
+        style={({ pressed }) => [styles.emptyButton, pressed && { opacity: 0.6 }]}
+        onPress={handleCrearEntregable}
+      >
         <Text style={styles.emptyButtonText}>Crear Primer Entregable</Text>
         <MaterialIcons name="add" size={20} color="white" />
-      </TouchableOpacity>
+      </Pressable>
 
       {/* Feature cards */}
       <View style={styles.featuresList}>
@@ -229,13 +223,19 @@ const ListaEntregablesScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
+            onPress={() => navigation.goBack()}
+          >
             <MaterialIcons name="menu" size={24} color="white" />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerTitle}>Entregables</Text>
-          <TouchableOpacity style={styles.addButton} onPress={handleCrearEntregable}>
+          <Pressable
+            style={({ pressed }) => [styles.addButton, pressed && { opacity: 0.6 }]}
+            onPress={handleCrearEntregable}
+          >
             <MaterialIcons name="add-circle" size={28} color="white" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {entregables.length > 0 ? (
@@ -273,9 +273,13 @@ const ListaEntregablesScreen: React.FC = () => {
                 {/* Filtros */}
                 <View style={styles.filtrosContainer}>
                   {filtros.map((f) => (
-                    <TouchableOpacity
+                    <Pressable
                       key={f.key}
-                      style={[styles.filtroPill, filtroTipo === f.key && styles.filtroPillActive]}
+                      style={({ pressed }) => [
+                        styles.filtroPill,
+                        filtroTipo === f.key && styles.filtroPillActive,
+                        pressed && { opacity: 0.6 },
+                      ]}
                       onPress={() => setFiltroTipo(f.key)}
                     >
                       <Text
@@ -286,7 +290,7 @@ const ListaEntregablesScreen: React.FC = () => {
                       >
                         {f.label}
                       </Text>
-                    </TouchableOpacity>
+                    </Pressable>
                   ))}
                 </View>
               </View>

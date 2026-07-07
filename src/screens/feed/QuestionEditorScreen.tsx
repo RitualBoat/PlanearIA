@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   TextInput,
   Platform,
@@ -151,9 +151,12 @@ const QuestionEditorScreen: React.FC<QuestionEditorScreenProps> = ({ route, navi
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation?.goBack()} style={styles.headerIconBtn}>
+          <Pressable
+            onPress={() => navigation?.goBack()}
+            style={({ pressed }) => [styles.headerIconBtn, pressed && { opacity: 0.6 }]}
+          >
             <MaterialIcons name="arrow-back" size={24} color={colors.onSurfaceVariant} />
-          </TouchableOpacity>
+          </Pressable>
           <View style={styles.headerCenter}>
             <Text style={[styles.headerTitle, { color: "#004580" }]}>
               Preguntas (0/{maxQuestions})
@@ -162,9 +165,12 @@ const QuestionEditorScreen: React.FC<QuestionEditorScreenProps> = ({ route, navi
               {retoTitle}
             </Text>
           </View>
-          <TouchableOpacity onPress={handleDone} style={styles.headerDoneBtn}>
+          <Pressable
+            onPress={handleDone}
+            style={({ pressed }) => [styles.headerDoneBtn, pressed && { opacity: 0.6 }]}
+          >
             <Text style={[styles.headerDoneText, { color: "#004580" }]}>Listo</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.emptyContainer}>
@@ -208,13 +214,17 @@ const QuestionEditorScreen: React.FC<QuestionEditorScreenProps> = ({ route, navi
             académico.
           </Text>
 
-          <TouchableOpacity
-            style={[styles.emptyBtn, { backgroundColor: "#004580" }]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.emptyBtn,
+              { backgroundColor: "#004580" },
+              pressed && { opacity: 0.6 },
+            ]}
             onPress={handleAddQuestion}
           >
             <MaterialIcons name="add" size={22} color="#FFF" />
             <Text style={styles.emptyBtnText}>Crear primera pregunta</Text>
-          </TouchableOpacity>
+          </Pressable>
 
           <View style={styles.emptyHelp}>
             <MaterialIcons name="help-outline" size={14} color={`${colors.onSurfaceVariant}60`} />
@@ -231,9 +241,12 @@ const QuestionEditorScreen: React.FC<QuestionEditorScreenProps> = ({ route, navi
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation?.goBack()} style={styles.headerIconBtn}>
+        <Pressable
+          onPress={() => navigation?.goBack()}
+          style={({ pressed }) => [styles.headerIconBtn, pressed && { opacity: 0.6 }]}
+        >
           <MaterialIcons name="arrow-back" size={24} color={colors.onSurfaceVariant} />
-        </TouchableOpacity>
+        </Pressable>
         <View style={styles.headerCenter}>
           <Text style={[styles.headerTitle, { color: "#004580" }]}>
             Preguntas ({questions.length}/{maxQuestions})
@@ -242,9 +255,12 @@ const QuestionEditorScreen: React.FC<QuestionEditorScreenProps> = ({ route, navi
             {retoTitle}
           </Text>
         </View>
-        <TouchableOpacity onPress={handleDone} style={styles.headerDoneBtn}>
+        <Pressable
+          onPress={handleDone}
+          style={({ pressed }) => [styles.headerDoneBtn, pressed && { opacity: 0.6 }]}
+        >
           <Text style={[styles.headerDoneText, { color: "#004580" }]}>Listo</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Question list */}
@@ -272,12 +288,18 @@ const QuestionEditorScreen: React.FC<QuestionEditorScreenProps> = ({ route, navi
               </View>
               <View style={styles.qActions}>
                 <MaterialIcons name="drag-indicator" size={18} color={colors.outlineVariant} />
-                <TouchableOpacity onPress={() => handleDuplicateQuestion(q.id)}>
+                <Pressable
+                  style={({ pressed }) => pressed && { opacity: 0.6 }}
+                  onPress={() => handleDuplicateQuestion(q.id)}
+                >
                   <MaterialIcons name="content-copy" size={18} color={colors.outlineVariant} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDeleteQuestion(q.id)}>
+                </Pressable>
+                <Pressable
+                  style={({ pressed }) => pressed && { opacity: 0.6 }}
+                  onPress={() => handleDeleteQuestion(q.id)}
+                >
                   <MaterialIcons name="delete" size={18} color="#ba1a1a" />
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
 
@@ -298,9 +320,9 @@ const QuestionEditorScreen: React.FC<QuestionEditorScreenProps> = ({ route, navi
                 {q.options.map((opt, oi) => {
                   const isCorrect = opt.isCorrect;
                   return (
-                    <TouchableOpacity
+                    <Pressable
                       key={opt.id}
-                      style={[
+                      style={({ pressed }) => [
                         styles.optionRow,
                         {
                           backgroundColor: isCorrect
@@ -309,6 +331,7 @@ const QuestionEditorScreen: React.FC<QuestionEditorScreenProps> = ({ route, navi
                           borderWidth: isCorrect ? 2 : 0,
                           borderColor: isCorrect ? "#1b6d24" : "transparent",
                         },
+                        pressed && { opacity: 0.6 },
                       ]}
                       onPress={() => setCorrectOption(q.id, opt.id)}
                     >
@@ -337,7 +360,7 @@ const QuestionEditorScreen: React.FC<QuestionEditorScreenProps> = ({ route, navi
                         onChangeText={(t) => updateOption(q.id, opt.id, { text: t })}
                       />
                       {isCorrect && <MaterialIcons name="check-circle" size={20} color="#1b6d24" />}
-                    </TouchableOpacity>
+                    </Pressable>
                   );
                 })}
               </View>
@@ -349,9 +372,9 @@ const QuestionEditorScreen: React.FC<QuestionEditorScreenProps> = ({ route, navi
                   const optId = q.options[ti]?.id;
                   const isCorrect = q.options[ti]?.isCorrect;
                   return (
-                    <TouchableOpacity
+                    <Pressable
                       key={label}
-                      style={[
+                      style={({ pressed }) => [
                         styles.tfOption,
                         {
                           backgroundColor: isCorrect
@@ -360,6 +383,7 @@ const QuestionEditorScreen: React.FC<QuestionEditorScreenProps> = ({ route, navi
                           borderWidth: isCorrect ? 2 : 0,
                           borderColor: isCorrect ? "#1b6d24" : "transparent",
                         },
+                        pressed && { opacity: 0.6 },
                       ]}
                       onPress={() => optId && setCorrectOption(q.id, optId)}
                     >
@@ -379,7 +403,7 @@ const QuestionEditorScreen: React.FC<QuestionEditorScreenProps> = ({ route, navi
                       >
                         {label}
                       </Text>
-                    </TouchableOpacity>
+                    </Pressable>
                   );
                 })}
               </View>
@@ -404,13 +428,17 @@ const QuestionEditorScreen: React.FC<QuestionEditorScreenProps> = ({ route, navi
 
       {/* FAB */}
       <View style={styles.fabContainer}>
-        <TouchableOpacity
-          style={[styles.fab, { backgroundColor: "#004580" }]}
+        <Pressable
+          style={({ pressed }) => [
+            styles.fab,
+            { backgroundColor: "#004580" },
+            pressed && { opacity: 0.6 },
+          ]}
           onPress={handleAddQuestion}
         >
           <MaterialIcons name="add" size={24} color="#FFF" />
           <Text style={styles.fabText}>Añadir pregunta</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </SafeAreaView>
   );

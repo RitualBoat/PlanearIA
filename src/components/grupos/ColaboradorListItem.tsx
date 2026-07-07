@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { Pressable, View, Text, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS } from "../../../types";
 import type { GrupoMiembro, RolGrupo } from "../../../types";
@@ -25,10 +26,14 @@ export const ColaboradorListItem: React.FC<Props> = ({ miembro, onMenuPress }) =
 
   const getRoleLabel = (rol: RolGrupo) => {
     switch (rol) {
-      case "titular": return "Titular";
-      case "co-docente": return "Co-docente";
-      case "ponente_invitado": return "Ponente Invitado";
-      default: return rol;
+      case "titular":
+        return "Titular";
+      case "co-docente":
+        return "Co-docente";
+      case "ponente_invitado":
+        return "Ponente Invitado";
+      default:
+        return rol;
     }
   };
 
@@ -37,7 +42,7 @@ export const ColaboradorListItem: React.FC<Props> = ({ miembro, onMenuPress }) =
   return (
     <View style={styles.card}>
       <View style={styles.leftBorder} />
-      
+
       {miembro.avatar ? (
         <Image source={{ uri: miembro.avatar }} style={styles.avatar} />
       ) : (
@@ -47,7 +52,9 @@ export const ColaboradorListItem: React.FC<Props> = ({ miembro, onMenuPress }) =
       )}
 
       <View style={styles.content}>
-        <Text style={styles.name} numberOfLines={1}>{miembro.nombre}</Text>
+        <Text style={styles.name} numberOfLines={1}>
+          {miembro.nombre}
+        </Text>
         <View style={styles.badgesContainer}>
           <View style={[styles.badge, { backgroundColor: badgeStyle.backgroundColor }]}>
             <Text style={[styles.badgeText, { color: badgeStyle.color }]}>
@@ -62,13 +69,13 @@ export const ColaboradorListItem: React.FC<Props> = ({ miembro, onMenuPress }) =
         </View>
       </View>
 
-      <TouchableOpacity 
-        style={styles.menuButton} 
+      <Pressable
+        style={({ pressed }) => [styles.menuButton, pressed && { opacity: 0.6 }]}
         onPress={onMenuPress}
         accessibilityLabel="Opciones"
       >
         <MaterialIcons name="more-vert" size={24} color={COLORS.textSecondary} />
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

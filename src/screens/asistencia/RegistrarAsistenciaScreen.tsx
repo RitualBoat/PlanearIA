@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Alert, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Platform, Pressable, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RouteProp } from "@react-navigation/native";
@@ -245,8 +245,12 @@ const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
           </View>
         </View>
         <View style={styles.estadoBtns}>
-          <TouchableOpacity
-            style={[styles.estadoBtn, estado === "presente" && styles.estadoBtnPresente]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.estadoBtn,
+              estado === "presente" && styles.estadoBtnPresente,
+              pressed && { opacity: 0.6 },
+            ]}
             onPress={() => toggleEstado(alumno.id, "presente")}
           >
             <MaterialIcons
@@ -254,9 +258,13 @@ const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
               size={28}
               color={estado === "presente" ? COLORS.surface : COLORS.textMuted}
             />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.estadoBtn, estado === "retardo" && styles.estadoBtnRetardo]}
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.estadoBtn,
+              estado === "retardo" && styles.estadoBtnRetardo,
+              pressed && { opacity: 0.6 },
+            ]}
             onPress={() => toggleEstado(alumno.id, "retardo")}
           >
             <MaterialIcons
@@ -264,9 +272,13 @@ const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
               size={28}
               color={estado === "retardo" ? COLORS.surface : COLORS.textMuted}
             />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.estadoBtn, estado === "ausente" && styles.estadoBtnFalta]}
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.estadoBtn,
+              estado === "ausente" && styles.estadoBtnFalta,
+              pressed && { opacity: 0.6 },
+            ]}
             onPress={() => toggleEstado(alumno.id, "ausente")}
           >
             <MaterialIcons
@@ -274,7 +286,7 @@ const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
               size={28}
               color={estado === "ausente" ? COLORS.surface : COLORS.textMuted}
             />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     );
@@ -286,17 +298,24 @@ const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
         <View style={styles.headerRow}>
-          <TouchableOpacity style={styles.headerIconButton} onPress={() => navigation.goBack()}>
+          <Pressable
+            style={({ pressed }) => [styles.headerIconButton, pressed && { opacity: 0.6 }]}
+            onPress={() => navigation.goBack()}
+          >
             <MaterialIcons name="arrow-back" size={22} color={COLORS.text} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerTitle}>Registrar Asistencia</Text>
           {existingRecords.length > 0 && (
-            <TouchableOpacity
-              style={[styles.headerIconButton, { marginLeft: "auto" }]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.headerIconButton,
+                { marginLeft: "auto" },
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={handleEliminarAsistencia}
             >
               <MaterialIcons name="delete-outline" size={22} color={COLORS.danger} />
-            </TouchableOpacity>
+            </Pressable>
           )}
         </View>
 
@@ -316,9 +335,12 @@ const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
 
           {/* Date Selector */}
           <View style={styles.dateRow}>
-            <TouchableOpacity onPress={handleFechaAnterior} style={styles.dateArrow}>
+            <Pressable
+              onPress={handleFechaAnterior}
+              style={({ pressed }) => [styles.dateArrow, pressed && { opacity: 0.6 }]}
+            >
               <MaterialIcons name="chevron-left" size={24} color={COLORS.textSecondary} />
-            </TouchableOpacity>
+            </Pressable>
             <View style={styles.datePill}>
               <MaterialIcons name="event" size={18} color={COLORS.textSecondary} />
               <Text style={styles.dateText}>
@@ -326,12 +348,18 @@ const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
                 {formatFechaDisplay(fecha)}
               </Text>
             </View>
-            <TouchableOpacity onPress={handleFechaSiguiente} style={styles.dateArrow}>
+            <Pressable
+              onPress={handleFechaSiguiente}
+              style={({ pressed }) => [styles.dateArrow, pressed && { opacity: 0.6 }]}
+            >
               <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleCambiarFecha}>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => pressed && { opacity: 0.6 }}
+              onPress={handleCambiarFecha}
+            >
               <Text style={styles.cambiarText}>CAMBIAR</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {/* List Header */}
@@ -381,8 +409,12 @@ const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
             </View>
           </View>
 
-          <TouchableOpacity
-            style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.saveButton,
+              isSaving && styles.saveButtonDisabled,
+              pressed && { opacity: 0.6 },
+            ]}
             onPress={() => void handleGuardar()}
             disabled={isSaving}
           >
@@ -390,7 +422,7 @@ const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
             <Text style={styles.saveButtonText}>
               {isSaving ? "Guardando..." : "Guardar Asistencia"}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </SafeAreaView>
     </View>

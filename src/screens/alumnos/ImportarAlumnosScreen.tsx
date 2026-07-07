@@ -3,10 +3,10 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  Pressable,
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -35,7 +35,7 @@ type UiState = "idle" | "processing" | "preview" | "success" | "error";
 
 const ImportarAlumnosScreen: React.FC<ImportarAlumnosScreenProps> = ({ navigation }) => {
   const route = useRoute<Route>();
-  const { alumnos, agregarAlumno } = useAlumnos();
+  const { alumnos, agregarAlumnos } = useAlumnos();
   const grupoId = route.params?.grupoId;
   const grupoNombre = route.params?.grupoNombre;
   const [uiState, setUiState] = useState<UiState>("idle");
@@ -107,10 +107,10 @@ const ImportarAlumnosScreen: React.FC<ImportarAlumnosScreenProps> = ({ navigatio
       setIsImporting(true);
       const baseId = Math.max(0, ...alumnos.map((item) => item.id || 0)) + 1;
 
-      for (let i = 0; i < result.validRows.length; i += 1) {
-        const alumno = buildAlumnoFromDraft(result.validRows[i], baseId + i, grupoId);
-        await agregarAlumno(alumno);
-      }
+      const nuevosAlumnos = result.validRows.map((row, index) =>
+        buildAlumnoFromDraft(row, baseId + index, grupoId)
+      );
+      await agregarAlumnos(nuevosAlumnos);
 
       setUiState("success");
     } catch {
@@ -129,38 +129,15 @@ const ImportarAlumnosScreen: React.FC<ImportarAlumnosScreenProps> = ({ navigatio
   };
 
   const renderIdle = () => (
-    <View style={styles.card}>
-      <View style={styles.heroIconWrap}>
-        <MaterialIcons name="upload-file" size={34} color={COLORS.primary} />
-      </View>
-      <Text style={styles.cardTitle}>Subir listado de alumnos</Text>
-      <Text style={styles.cardText}>
-        {grupoId
-          ? `Sube CSV o Excel para importar alumnos directamente a ${grupoNombre ?? "este grupo"}.`
-          : "Aun no has seleccionado archivo. Sube CSV o Excel para importar alumnos."}
-      </Text>
-
-      <TouchableOpacity style={styles.primaryButton} onPress={() => void handleSelectFile()}>
-        <MaterialIcons name="file-upload" size={18} color={COLORS.surface} />
-        <Text style={styles.primaryButtonText}>Seleccionar archivo</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.linkButton} onPress={handleDownloadTemplate}>
-        <MaterialIcons name="download" size={16} color={COLORS.primary} />
-        <Text style={styles.linkButtonText}>Descargar plantilla</Text>
-      </TouchableOpacity>
-    </View>
+    <ImportIdleCard
+      grupoId={grupoId}
+      grupoNombre={grupoNombre}
+      onSelectFile={handleSelectFile}
+      onDownloadTemplate={handleDownloadTemplate}
+    />
   );
 
-  const renderProcessing = () => (
-    <View style={styles.card}>
-      <ActivityIndicator size="large" color={COLORS.primary} />
-      <Text style={styles.cardTitle}>Procesando archivo y validando datos...</Text>
-      <View style={styles.progressTrack}>
-        <View style={styles.progressFill} />
-      </View>
-    </View>
-  );
+  const renderProcessing = () => <ImportProcessingCard />;
 
   const renderPreview = () => (
     <>
@@ -171,9 +148,12 @@ const ImportarAlumnosScreen: React.FC<ImportarAlumnosScreenProps> = ({ navigatio
         <View style={{ flex: 1 }}>
           <Text style={styles.fileName}>{result?.fileName}</Text>
         </View>
-        <TouchableOpacity onPress={() => void handleSelectFile()}>
+        <Pressable
+          style={({ pressed }) => pressed && { opacity: 0.6 }}
+          onPress={() => void handleSelectFile()}
+        >
           <Text style={styles.changeFileText}>Cambiar archivo</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <Text style={styles.previewTitle}>Vista previa</Text>
@@ -217,22 +197,28 @@ const ImportarAlumnosScreen: React.FC<ImportarAlumnosScreenProps> = ({ navigatio
 
       <View style={styles.actionsCard}>
         <View style={styles.actionsRow}>
-          <TouchableOpacity style={styles.cancelButton} onPress={resetFlow}>
+          <Pressable
+            style={({ pressed }) => [styles.cancelButton, pressed && { opacity: 0.6 }]}
+            onPress={resetFlow}
+          >
             <Text style={styles.cancelButtonText}>Cancelar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.importButton}
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.importButton, pressed && { opacity: 0.6 }]}
             onPress={() => void handleImportValidRows()}
             disabled={isImporting || validCount === 0}
           >
             <Text style={styles.importButtonText}>
               {isImporting ? "Importando..." : "Importar alumnos válidos"}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
-        <TouchableOpacity style={styles.linkButton} onPress={handleDownloadTemplate}>
+        <Pressable
+          style={({ pressed }) => [styles.linkButton, pressed && { opacity: 0.6 }]}
+          onPress={handleDownloadTemplate}
+        >
           <Text style={styles.linkButtonText}>Descargar plantilla</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </>
   );
@@ -248,8 +234,8 @@ const ImportarAlumnosScreen: React.FC<ImportarAlumnosScreenProps> = ({ navigatio
         {grupoId ? ` en ${grupoNombre ?? "este grupo"}` : ""}.
       </Text>
 
-      <TouchableOpacity
-        style={styles.primaryButton}
+      <Pressable
+        style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.6 }]}
         onPress={() => {
           if (grupoId) {
             navigation.navigate("ClassroomGroup", { grupoId, grupoNombre });
@@ -259,12 +245,17 @@ const ImportarAlumnosScreen: React.FC<ImportarAlumnosScreenProps> = ({ navigatio
           navigation.navigate("ListaAlumnos");
         }}
       >
-        <Text style={styles.primaryButtonText}>{grupoId ? "Volver a la clase" : "Ir a mis alumnos"}</Text>
-      </TouchableOpacity>
+        <Text style={styles.primaryButtonText}>
+          {grupoId ? "Volver a la clase" : "Ir a mis alumnos"}
+        </Text>
+      </Pressable>
 
-      <TouchableOpacity style={styles.secondaryButton} onPress={resetFlow}>
+      <Pressable
+        style={({ pressed }) => [styles.secondaryButton, pressed && { opacity: 0.6 }]}
+        onPress={resetFlow}
+      >
         <Text style={styles.secondaryButtonText}>Importar más alumnos</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 
@@ -278,12 +269,18 @@ const ImportarAlumnosScreen: React.FC<ImportarAlumnosScreenProps> = ({ navigatio
         {errorMessage || "El formato no es soportado o el archivo está dañado."}
       </Text>
 
-      <TouchableOpacity style={styles.primaryButton} onPress={() => void handleSelectFile()}>
+      <Pressable
+        style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.6 }]}
+        onPress={() => void handleSelectFile()}
+      >
         <Text style={styles.primaryButtonText}>Reintentar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.cancelButton} onPress={resetFlow}>
+      </Pressable>
+      <Pressable
+        style={({ pressed }) => [styles.cancelButton, pressed && { opacity: 0.6 }]}
+        onPress={resetFlow}
+      >
         <Text style={styles.cancelButtonText}>Cancelar</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 
@@ -293,9 +290,12 @@ const ImportarAlumnosScreen: React.FC<ImportarAlumnosScreenProps> = ({ navigatio
       <SafeAreaView style={styles.safeArea}>
         <WebScrollView style={styles.content}>
           <View style={styles.headerRow}>
-            <TouchableOpacity style={styles.headerIconButton} onPress={() => navigation.goBack()}>
+            <Pressable
+              style={({ pressed }) => [styles.headerIconButton, pressed && { opacity: 0.6 }]}
+              onPress={() => navigation.goBack()}
+            >
               <MaterialIcons name="arrow-back" size={22} color={COLORS.primary} />
-            </TouchableOpacity>
+            </Pressable>
             <Text style={styles.headerTitle}>Importar Alumnos</Text>
           </View>
 
@@ -314,6 +314,58 @@ const ImportarAlumnosScreen: React.FC<ImportarAlumnosScreenProps> = ({ navigatio
     </View>
   );
 };
+
+interface ImportIdleCardProps {
+  grupoId?: number;
+  grupoNombre?: string;
+  onSelectFile: () => void;
+  onDownloadTemplate: () => void;
+}
+
+const ImportIdleCard: React.FC<ImportIdleCardProps> = ({
+  grupoId,
+  grupoNombre,
+  onSelectFile,
+  onDownloadTemplate,
+}) => (
+  <View style={styles.card}>
+    <View style={styles.heroIconWrap}>
+      <MaterialIcons name="upload-file" size={34} color={COLORS.primary} />
+    </View>
+    <Text style={styles.cardTitle}>Subir listado de alumnos</Text>
+    <Text style={styles.cardText}>
+      {grupoId
+        ? `Sube CSV o Excel para importar alumnos directamente a ${grupoNombre ?? "este grupo"}.`
+        : "Aun no has seleccionado archivo. Sube CSV o Excel para importar alumnos."}
+    </Text>
+
+    <Pressable
+      style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.6 }]}
+      onPress={() => void onSelectFile()}
+    >
+      <MaterialIcons name="file-upload" size={18} color={COLORS.surface} />
+      <Text style={styles.primaryButtonText}>Seleccionar archivo</Text>
+    </Pressable>
+
+    <Pressable
+      style={({ pressed }) => [styles.linkButton, pressed && { opacity: 0.6 }]}
+      onPress={onDownloadTemplate}
+    >
+      <MaterialIcons name="download" size={16} color={COLORS.primary} />
+      <Text style={styles.linkButtonText}>Descargar plantilla</Text>
+    </Pressable>
+  </View>
+);
+
+const ImportProcessingCard: React.FC = () => (
+  <View style={styles.card}>
+    <ActivityIndicator size="large" color={COLORS.primary} />
+    <Text style={styles.cardTitle}>Procesando archivo y validando datos...</Text>
+    <View style={styles.progressTrack}>
+      <View style={styles.progressFill} />
+    </View>
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },

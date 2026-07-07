@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   FlatList,
   ScrollView,
   StyleSheet,
@@ -195,9 +194,9 @@ const CategoryPill: React.FC<{
   );
 
   return (
-    <TouchableOpacity
+    <Pressable
+      style={({ pressed }) => pressed && { opacity: 0.7 }}
       onPress={onPress}
-      activeOpacity={0.7}
       accessibilityRole="button"
       accessibilityState={{ selected: active }}
       accessibilityLabel={`Filtrar por ${label}`}
@@ -214,7 +213,7 @@ const CategoryPill: React.FC<{
       ) : (
         <View style={[styles.pill, styles.pillInactive]}>{inner}</View>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -223,10 +222,9 @@ const DraftCard: React.FC<{ item: ContenidoItem; onPress: () => void }> = ({ ite
   const colors = CAT_COLORS[item.tipo] || { text: DT.primary, bg: DT.primaryFixed };
 
   return (
-    <TouchableOpacity
-      style={styles.draftCard}
+    <Pressable
+      style={({ pressed }) => [styles.draftCard, pressed && { opacity: 0.8 }]}
       onPress={onPress}
-      activeOpacity={0.8}
       accessibilityLabel={`Borrador: ${item.titulo}`}
     >
       <View style={styles.draftHeader}>
@@ -256,7 +254,7 @@ const DraftCard: React.FC<{ item: ContenidoItem; onPress: () => void }> = ({ ite
           />
         </View>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -276,8 +274,8 @@ const ContentItemCard: React.FC<{
     : CAT_ICONS[item.tipo] || "description";
 
   return (
-    <TouchableOpacity
-      style={[
+    <Pressable
+      style={({ pressed }) => [
         styles.contentCard,
         isDesktop && { borderLeftWidth: 4, borderLeftColor: catColors.text },
         selectionMode &&
@@ -286,9 +284,9 @@ const ContentItemCard: React.FC<{
             borderColor: catColors.text,
             borderWidth: 1,
           },
+        pressed && { opacity: 0.85 },
       ]}
       onPress={selectionMode ? onToggleSelect : onPress}
-      activeOpacity={0.85}
       accessibilityLabel={item.titulo}
     >
       {selectionMode && (
@@ -316,16 +314,16 @@ const ContentItemCard: React.FC<{
         </Text>
       </View>
       {!selectionMode && (
-        <TouchableOpacity
-          style={styles.contentMenu}
+        <Pressable
+          style={({ pressed }) => [styles.contentMenu, pressed && { opacity: 0.6 }]}
           onPress={onMenuPress}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           accessibilityLabel="Más opciones"
         >
           <MaterialIcons name="more-vert" size={20} color={DT.onSurfaceVariant} />
-        </TouchableOpacity>
+        </Pressable>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -650,16 +648,23 @@ const ContenidoScreen: React.FC = () => {
             </Text>
           </View>
           {vm.filtrosActivos > 0 && (
-            <TouchableOpacity onPress={vm.limpiarFiltros}>
+            <Pressable
+              style={({ pressed }) => pressed && { opacity: 0.6 }}
+              onPress={vm.limpiarFiltros}
+            >
               <Text style={styles.clearFilters}>LIMPIAR FILTROS</Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterChipsRow}>
           {FILTER_TIPOS.map((f) => (
-            <TouchableOpacity
+            <Pressable
               key={f.key}
-              style={[styles.filterChip, vm.filtroTipo === f.key && styles.filterChipActive]}
+              style={({ pressed }) => [
+                styles.filterChip,
+                vm.filtroTipo === f.key && styles.filterChipActive,
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={() => vm.setFiltroTipo(vm.filtroTipo === f.key ? "" : f.key)}
             >
               <Text
@@ -678,12 +683,16 @@ const ContenidoScreen: React.FC = () => {
                   style={{ marginLeft: 4 }}
                 />
               )}
-            </TouchableOpacity>
+            </Pressable>
           ))}
           {FILTER_FECHAS.map((f) => (
-            <TouchableOpacity
+            <Pressable
               key={f.key}
-              style={[styles.filterChip, vm.filtroFecha === f.key && styles.filterChipActive]}
+              style={({ pressed }) => [
+                styles.filterChip,
+                vm.filtroFecha === f.key && styles.filterChipActive,
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={() => vm.setFiltroFecha(vm.filtroFecha === f.key ? "" : f.key)}
             >
               <Text
@@ -702,12 +711,16 @@ const ContenidoScreen: React.FC = () => {
                   style={{ marginLeft: 4 }}
                 />
               )}
-            </TouchableOpacity>
+            </Pressable>
           ))}
           {FILTER_ESTADOS.map((f) => (
-            <TouchableOpacity
+            <Pressable
               key={f.key}
-              style={[styles.filterChip, vm.filtroEstado === f.key && styles.filterChipActive]}
+              style={({ pressed }) => [
+                styles.filterChip,
+                vm.filtroEstado === f.key && styles.filterChipActive,
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={() => vm.setFiltroEstado(vm.filtroEstado === f.key ? "" : f.key)}
             >
               <Text
@@ -726,7 +739,7 @@ const ContenidoScreen: React.FC = () => {
                   style={{ marginLeft: 4 }}
                 />
               )}
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </ScrollView>
       </View>
@@ -744,9 +757,12 @@ const ContenidoScreen: React.FC = () => {
       <View style={styles.section}>
         <View style={styles.sectionHeaderRow}>
           <Text style={styles.sectionTitle}>Borradores</Text>
-          <TouchableOpacity onPress={() => vm.setFiltroEstado("borrador")}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
+            onPress={() => vm.setFiltroEstado("borrador")}
+          >
             <Text style={styles.seeAll}>Ver todos</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
         <ScrollView
           horizontal
@@ -772,7 +788,10 @@ const ContenidoScreen: React.FC = () => {
       </View>
       <Text style={styles.errorTitle}>No se pudo cargar tu contenido</Text>
       <Text style={styles.errorSubtitle}>Revisa tu conexión a internet e intenta de nuevo</Text>
-      <TouchableOpacity style={styles.errorRetry} onPress={vm.retryLoad}>
+      <Pressable
+        style={({ pressed }) => [styles.errorRetry, pressed && { opacity: 0.6 }]}
+        onPress={vm.retryLoad}
+      >
         <LinearGradient
           colors={["#004580", "#005da8"]}
           start={{ x: 0, y: 0 }}
@@ -781,7 +800,7 @@ const ContenidoScreen: React.FC = () => {
         >
           <Text style={styles.errorRetryText}>Reintentar</Text>
         </LinearGradient>
-      </TouchableOpacity>
+      </Pressable>
       <Text style={styles.errorFooter}>
         SI EL PROBLEMA PERSISTE, TUS DATOS LOCALES ESTÁN SEGUROS
       </Text>
@@ -799,8 +818,8 @@ const ContenidoScreen: React.FC = () => {
       <Text style={styles.emptySubtitle}>
         Crea tu primera planeación, sube un recurso o explora las plantillas para comenzar
       </Text>
-      <TouchableOpacity
-        style={styles.emptyPrimary}
+      <Pressable
+        style={({ pressed }) => [styles.emptyPrimary, pressed && { opacity: 0.6 }]}
         onPress={() => navigation.navigate("CrearPlaneacion")}
       >
         <LinearGradient
@@ -812,17 +831,20 @@ const ContenidoScreen: React.FC = () => {
           <MaterialIcons name="add-circle" size={20} color={DT.onPrimary} />
           <Text style={styles.emptyPrimaryText}>Crear planeación</Text>
         </LinearGradient>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.emptySecondary}
+      </Pressable>
+      <Pressable
+        style={({ pressed }) => [styles.emptySecondary, pressed && { opacity: 0.6 }]}
         onPress={() => navigation.navigate("CrearRecurso")}
       >
         <MaterialIcons name="upload-file" size={20} color={DT.onSurface} />
         <Text style={styles.emptySecondaryText}>Subir recurso</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("BibliotecaPlantillas")}>
+      </Pressable>
+      <Pressable
+        style={({ pressed }) => pressed && { opacity: 0.6 }}
+        onPress={() => navigation.navigate("BibliotecaPlantillas")}
+      >
         <Text style={styles.emptyLink}>Ver plantillas</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 
@@ -885,13 +907,14 @@ const ContenidoScreen: React.FC = () => {
                   </Text>
                   <Text style={styles.sheetSubtitle}>{menuItem.subtitulo}</Text>
                 </View>
-                <TouchableOpacity
+                <Pressable
+                  style={({ pressed }) => pressed && { opacity: 0.6 }}
                   onPress={() => setMenuItem(null)}
                   hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                   accessibilityLabel="Cerrar menú"
                 >
                   <MaterialIcons name="close" size={22} color={DT.onSurfaceVariant} />
-                </TouchableOpacity>
+                </Pressable>
               </View>
               <View style={styles.sheetDivider} />
               {[
@@ -905,18 +928,18 @@ const ContenidoScreen: React.FC = () => {
                 },
                 { key: "enviar_chat", icon: "send" as const, label: "Enviar por chat" },
               ].map((opt) => (
-                <TouchableOpacity
+                <Pressable
                   key={opt.key}
-                  style={styles.sheetOption}
+                  style={({ pressed }) => [styles.sheetOption, pressed && { opacity: 0.6 }]}
                   onPress={() => handleMenuAction(opt.key)}
                 >
                   <MaterialIcons name={opt.icon} size={22} color={DT.onSurface} />
                   <Text style={styles.sheetOptionText}>{opt.label}</Text>
-                </TouchableOpacity>
+                </Pressable>
               ))}
               <View style={styles.sheetDivider} />
-              <TouchableOpacity
-                style={styles.sheetOption}
+              <Pressable
+                style={({ pressed }) => [styles.sheetOption, pressed && { opacity: 0.6 }]}
                 onPress={() => handleMenuAction("exportar")}
               >
                 <MaterialIcons name="file-download" size={22} color={DT.onSurface} />
@@ -924,22 +947,22 @@ const ContenidoScreen: React.FC = () => {
                   <Text style={styles.sheetOptionText}>Exportar</Text>
                   <Text style={styles.sheetOptionSubtext}>PDF, DOCX, PPTX</Text>
                 </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.sheetOption}
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [styles.sheetOption, pressed && { opacity: 0.6 }]}
                 onPress={() => handleMenuAction("compartir")}
               >
                 <MaterialIcons name="share" size={22} color={DT.onSurface} />
                 <Text style={styles.sheetOptionText}>Compartir</Text>
-              </TouchableOpacity>
+              </Pressable>
               <View style={styles.sheetDivider} />
-              <TouchableOpacity
-                style={styles.sheetOption}
+              <Pressable
+                style={({ pressed }) => [styles.sheetOption, pressed && { opacity: 0.6 }]}
                 onPress={() => handleMenuAction("eliminar")}
               >
                 <MaterialIcons name="delete" size={22} color={DT.error} />
                 <Text style={[styles.sheetOptionText, { color: DT.error }]}>Eliminar</Text>
-              </TouchableOpacity>
+              </Pressable>
             </>
           )}
         </Pressable>
@@ -966,12 +989,18 @@ const ContenidoScreen: React.FC = () => {
             Se eliminará &quot;{deleteConfirm?.titulo}&quot;. Esta acción no se puede deshacer.
           </Text>
           <View style={styles.deleteActions}>
-            <TouchableOpacity style={styles.deleteCancel} onPress={() => setDeleteConfirm(null)}>
+            <Pressable
+              style={({ pressed }) => [styles.deleteCancel, pressed && { opacity: 0.6 }]}
+              onPress={() => setDeleteConfirm(null)}
+            >
               <Text style={styles.deleteCancelText}>Cancelar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.deleteConfirmBtn} onPress={confirmDelete}>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.deleteConfirmBtn, pressed && { opacity: 0.6 }]}
+              onPress={confirmDelete}
+            >
               <Text style={styles.deleteConfirmText}>Eliminar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </View>
@@ -987,9 +1016,13 @@ const ContenidoScreen: React.FC = () => {
         const icon =
           cat.key === "todo" ? ("apps" as const) : CAT_ICONS[cat.key] || ("description" as const);
         return (
-          <TouchableOpacity
+          <Pressable
             key={cat.key}
-            style={[styles.sidebarItem, active && styles.sidebarItemActive]}
+            style={({ pressed }) => [
+              styles.sidebarItem,
+              active && styles.sidebarItemActive,
+              pressed && { opacity: 0.6 },
+            ]}
             onPress={() => vm.setCategoriaActiva(cat.key)}
           >
             <MaterialIcons
@@ -1001,7 +1034,7 @@ const ContenidoScreen: React.FC = () => {
               {cat.label}
             </Text>
             <Text style={styles.sidebarCount}>{vm.conteos[cat.key]}</Text>
-          </TouchableOpacity>
+          </Pressable>
         );
       })}
     </View>
@@ -1049,9 +1082,12 @@ const ContenidoScreen: React.FC = () => {
           returnKeyType="search"
         />
         {vm.searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => vm.setSearchQuery("")}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
+            onPress={() => vm.setSearchQuery("")}
+          >
             <MaterialIcons name="close" size={20} color={DT.onSurfaceVariant} />
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
       {/* Category pills (mobile/tablet) */}
@@ -1074,7 +1110,10 @@ const ContenidoScreen: React.FC = () => {
       )}
       {/* ─── Filter toggle button ─── */}
       <View style={styles.filterToggleRow}>
-        <TouchableOpacity style={styles.filterToggle} onPress={() => setShowFilters(!showFilters)}>
+        <Pressable
+          style={({ pressed }) => [styles.filterToggle, pressed && { opacity: 0.6 }]}
+          onPress={() => setShowFilters(!showFilters)}
+        >
           <MaterialIcons name="tune" size={18} color={DT.onSurfaceVariant} />
           <Text style={styles.filterToggleText}>Filtros</Text>
           {vm.filtrosActivos > 0 && (
@@ -1082,7 +1121,7 @@ const ContenidoScreen: React.FC = () => {
               <Text style={styles.filterBadgeText}>{vm.filtrosActivos}</Text>
             </View>
           )}
-        </TouchableOpacity>
+        </Pressable>
         {vm.filtrosActivos > 0 && (
           <Text style={styles.filterResultCount}>Mostrando {vm.items.length} resultados</Text>
         )}
@@ -1139,12 +1178,13 @@ const ContenidoScreen: React.FC = () => {
       <View style={styles.header}>
         {isSelectionMode ? (
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-            <TouchableOpacity
+            <Pressable
+              style={({ pressed }) => pressed && { opacity: 0.6 }}
               onPress={() => navigation.goBack()}
               accessibilityLabel="Cancelar asignación"
             >
               <MaterialIcons name="close" size={24} color={DT.onSurfaceVariant} />
-            </TouchableOpacity>
+            </Pressable>
             <View>
               <Text style={styles.headerTitle}>Seleccionar para Grupo</Text>
               <Text style={styles.headerSubtitle}>{vm.totalItems} elementos disponibles</Text>
@@ -1200,22 +1240,29 @@ const ContenidoScreen: React.FC = () => {
             {selectedIds.length}{" "}
             {selectedIds.length === 1 ? "elemento seleccionado" : "elementos seleccionados"}
           </Text>
-          <TouchableOpacity
-            style={[styles.selectionBarBtn, selectedIds.length === 0 && { opacity: 0.5 }]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.selectionBarBtn,
+              selectedIds.length === 0 && { opacity: 0.5 },
+              pressed && { opacity: 0.6 },
+            ]}
             disabled={selectedIds.length === 0 || isAssigning}
             onPress={handleConfirmSelection}
           >
             <Text style={styles.selectionBarBtnText}>
               {isAssigning ? "Asignando..." : "Asignar a Grupo"}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       ) : (
         !showEmpty && (
-          <TouchableOpacity
-            style={[styles.fabWrap, isDesktop && styles.fabWrapDesktop]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.fabWrap,
+              isDesktop && styles.fabWrapDesktop,
+              pressed && { opacity: 0.85 },
+            ]}
             onPress={handleCreatePress}
-            activeOpacity={0.85}
             accessibilityLabel="Crear nuevo contenido"
           >
             <LinearGradient
@@ -1226,7 +1273,7 @@ const ContenidoScreen: React.FC = () => {
             >
               <MaterialIcons name="add" size={28} color={DT.onPrimary} />
             </LinearGradient>
-          </TouchableOpacity>
+          </Pressable>
         )
       )}
 

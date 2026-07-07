@@ -3,11 +3,11 @@ import {
   Alert,
   FlatList,
   Platform,
+  Pressable,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -115,9 +115,13 @@ const ListaAlumnosScreen: React.FC = () => {
             <Text style={styles.mobileName}>{nombreCompleto}</Text>
             <Text style={styles.mobileControl}>#{item.numeroControl}</Text>
           </View>
-          <TouchableOpacity testID={`delete-menu-${item.id}`} onPress={() => confirmDelete(item)}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
+            testID={`delete-menu-${item.id}`}
+            onPress={() => confirmDelete(item)}
+          >
             <MaterialIcons name="more-vert" size={20} color="#6B7E98" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <Text style={styles.mobileMeta}>• {item.carrera}</Text>
@@ -126,22 +130,22 @@ const ListaAlumnosScreen: React.FC = () => {
         </Text>
 
         <View style={styles.mobileActionsRow}>
-          <TouchableOpacity
+          <Pressable
             testID={`view-${item.id}`}
             onPress={() => navigation.navigate("DetalleAlumno", { alumnoId: item.id })}
-            style={styles.mobileActionBtn}
+            style={({ pressed }) => [styles.mobileActionBtn, pressed && { opacity: 0.6 }]}
           >
             <Text style={styles.mobileActionText}>VER</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </Pressable>
+          <Pressable
             testID={`edit-${item.id}`}
             onPress={() =>
               navigation.navigate("CrearAlumno", { modo: "editar", alumnoId: item.id })
             }
-            style={styles.mobileActionBtn}
+            style={({ pressed }) => [styles.mobileActionBtn, pressed && { opacity: 0.6 }]}
           >
             <Text style={styles.mobileActionText}>EDITAR</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     );
@@ -162,13 +166,13 @@ const ListaAlumnosScreen: React.FC = () => {
           <Text style={styles.emptyText}>
             Comienza a organizar tu clase anadiendo tus estudiantes para planificar sus lecciones.
           </Text>
-          <TouchableOpacity
-            style={styles.emptyPrimaryBtn}
+          <Pressable
+            style={({ pressed }) => [styles.emptyPrimaryBtn, pressed && { opacity: 0.6 }]}
             onPress={() => navigation.navigate("CrearAlumno")}
           >
             <MaterialIcons name="add-circle" size={18} color={COLORS.surface} />
             <Text style={styles.emptyPrimaryBtnText}>Crear primer alumno</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       );
     }
@@ -189,13 +193,12 @@ const ListaAlumnosScreen: React.FC = () => {
             </View>
           }
         />
-        <TouchableOpacity
-          style={styles.fabButton}
+        <Pressable
+          style={({ pressed }) => [styles.fabButton, pressed && { opacity: 0.9 }]}
           onPress={() => navigation.navigate("CrearAlumno")}
-          activeOpacity={0.9}
         >
           <MaterialIcons name="person-add" size={24} color={COLORS.surface} />
-        </TouchableOpacity>
+        </Pressable>
       </>
     );
   };
@@ -226,13 +229,13 @@ const ListaAlumnosScreen: React.FC = () => {
                 Agrega a tus primeros alumnos para gestionar su progreso.
               </Text>
               <View style={styles.webEmptyActions}>
-                <TouchableOpacity
-                  style={styles.webPrimaryBtn}
+                <Pressable
+                  style={({ pressed }) => [styles.webPrimaryBtn, pressed && { opacity: 0.6 }]}
                   onPress={() => navigation.navigate("CrearAlumno")}
                 >
                   <MaterialIcons name="person-add" size={16} color={COLORS.surface} />
                   <Text style={styles.webPrimaryBtnText}>Registrar primer alumno</Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
           </View>
@@ -247,13 +250,13 @@ const ListaAlumnosScreen: React.FC = () => {
             <Text style={styles.webTitle}>Lista de Alumnos</Text>
             <Text style={styles.webSubtitle}>Gestion academica y seguimiento de matricula</Text>
           </View>
-          <TouchableOpacity
-            style={styles.webPrimaryBtn}
+          <Pressable
+            style={({ pressed }) => [styles.webPrimaryBtn, pressed && { opacity: 0.6 }]}
             onPress={() => navigation.navigate("CrearAlumno")}
           >
             <MaterialIcons name="add" size={18} color={COLORS.surface} />
             <Text style={styles.webPrimaryBtnText}>Nuevo Alumno</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.webFiltersRow}>
@@ -275,8 +278,8 @@ const ListaAlumnosScreen: React.FC = () => {
             onChange={setFiltroEscuela}
             mobile={false}
           />
-          <TouchableOpacity
-            style={styles.webClearBtn}
+          <Pressable
+            style={({ pressed }) => [styles.webClearBtn, pressed && { opacity: 0.6 }]}
             onPress={() => {
               setFiltroCarrera("Carrera");
               setFiltroGrupo("Grupo");
@@ -284,7 +287,7 @@ const ListaAlumnosScreen: React.FC = () => {
             }}
           >
             <Text style={styles.webClearBtnText}>Limpiar filtros</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.tableCard}>
@@ -311,26 +314,26 @@ const ListaAlumnosScreen: React.FC = () => {
                 <Text style={[styles.tableCell, styles.colGrupo]}>{grupoLabel}</Text>
                 <Text style={[styles.tableCell, styles.colEscuela]}>{escuela}</Text>
                 <View style={[styles.tableActions, styles.colAcciones]}>
-                  <TouchableOpacity
-                    style={styles.tableActionBtn}
+                  <Pressable
+                    style={({ pressed }) => [styles.tableActionBtn, pressed && { opacity: 0.6 }]}
                     onPress={() => navigation.navigate("DetalleAlumno", { alumnoId: item.id })}
                   >
                     <Text style={styles.tableActionText}>Ver</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.tableActionBtn}
+                  </Pressable>
+                  <Pressable
+                    style={({ pressed }) => [styles.tableActionBtn, pressed && { opacity: 0.6 }]}
                     onPress={() =>
                       navigation.navigate("CrearAlumno", { modo: "editar", alumnoId: item.id })
                     }
                   >
                     <Text style={styles.tableActionText}>Editar</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.tableActionBtn}
+                  </Pressable>
+                  <Pressable
+                    style={({ pressed }) => [styles.tableActionBtn, pressed && { opacity: 0.6 }]}
                     onPress={() => confirmDelete(item)}
                   >
                     <Text style={styles.tableActionDanger}>Eliminar</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               </View>
             );
@@ -360,13 +363,19 @@ const ListaAlumnosScreen: React.FC = () => {
         ) : (
           <View style={{ flex: 1 }}>
             <View style={styles.headerMobile}>
-              <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Pressable
+                style={({ pressed }) => pressed && { opacity: 0.6 }}
+                onPress={() => navigation.goBack()}
+              >
                 <MaterialIcons name="menu" size={24} color="#3D4F67" />
-              </TouchableOpacity>
+              </Pressable>
               <Text style={styles.mobileTitle}>Students</Text>
-              <TouchableOpacity onPress={() => setSearchQuery("")}>
+              <Pressable
+                style={({ pressed }) => pressed && { opacity: 0.6 }}
+                onPress={() => setSearchQuery("")}
+              >
                 <MaterialIcons name="search" size={22} color="#3D4F67" />
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             <View style={styles.mobileSearchWrap}>
@@ -424,16 +433,17 @@ const FilterSelect: React.FC<{
   };
 
   return (
-    <TouchableOpacity
-      style={[
+    <Pressable
+      style={({ pressed }) => [
         mobile ? styles.mobileFilterChip : styles.webFilterSelect,
         value !== options[0] && styles.filterActive,
+        pressed && { opacity: 0.6 },
       ]}
       onPress={pick}
     >
       <Text style={mobile ? styles.mobileFilterText : styles.webFilterText}>{value}</Text>
       <MaterialIcons name="expand-more" size={18} color="#70829B" />
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

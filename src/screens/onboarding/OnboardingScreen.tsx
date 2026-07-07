@@ -1,10 +1,10 @@
 import React, { useRef, useState, useCallback, useMemo } from "react";
 import {
+  Pressable,
   View,
   Text,
   FlatList,
   Image,
-  TouchableOpacity,
   StyleSheet,
   ViewToken,
   Platform,
@@ -170,14 +170,14 @@ const OnboardingScreen: React.FC = () => {
               <Text style={styles.headerTitle}>PlanearIA</Text>
             </View>
             {!isLastSlide && (
-              <TouchableOpacity
+              <Pressable
                 onPress={handleSkip}
-                style={styles.skipBtn}
+                style={({ pressed }) => [styles.skipBtn, pressed && { opacity: 0.6 }]}
                 accessibilityRole="button"
                 accessibilityLabel="Saltar introducción"
               >
                 <Text style={styles.skipText}>Saltar</Text>
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
 
@@ -206,30 +206,34 @@ const OnboardingScreen: React.FC = () => {
             {/* Dot Indicators */}
             <View style={styles.dotsContainer}>
               {SLIDES.map((slide, index) => (
-                <TouchableOpacity
+                <Pressable
                   key={slide.id}
                   onPress={() => {
                     flatListRef.current?.scrollToIndex({ index, animated: true });
                   }}
                   accessibilityRole="button"
                   accessibilityLabel={`Ir a diapositiva ${index + 1}`}
-                  style={[
+                  style={({ pressed }) => [
                     styles.dot,
                     index === currentIndex
                       ? { backgroundColor: slide.color, width: 24 }
                       : { backgroundColor: "#E2E8F0", width: 10 },
+                    pressed && { opacity: 0.6 },
                   ]}
                 />
               ))}
             </View>
 
             {/* Action Button with gradient */}
-            <TouchableOpacity
+            <Pressable
               onPress={handleNext}
-              activeOpacity={0.85}
               accessibilityRole="button"
               accessibilityLabel={isLastSlide ? "Comenzar a usar la app" : "Siguiente diapositiva"}
-              style={[styles.actionBtnOuter, isDesktop && styles.actionBtnDesktop]}
+              style={({ pressed }) => [
+                styles.actionBtnOuter,
+                isDesktop && styles.actionBtnDesktop,
+                pressed && { opacity: 0.85 },
+              ]}
             >
               <LinearGradient
                 colors={activeSlide?.gradientColors ?? ["#1D4ED8", "#3B82F6"]}
@@ -245,7 +249,7 @@ const OnboardingScreen: React.FC = () => {
                   style={{ marginLeft: 8 }}
                 />
               </LinearGradient>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </View>
@@ -285,8 +289,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingVertical: 16,
   },
-  headerGlass: {    backgroundColor: "rgba(255,255,255,0.8)",
-  },
+  headerGlass: { backgroundColor: "rgba(255,255,255,0.8)" },
   headerLeft: {
     flexDirection: "row",
     alignItems: "center",
@@ -415,4 +418,3 @@ const styles = StyleSheet.create({
 });
 
 export default OnboardingScreen;
-

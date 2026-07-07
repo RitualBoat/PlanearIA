@@ -1,6 +1,13 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { Animated, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useCallback } from "react";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Animated, {
+  Easing,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 export type ToastType = "success" | "error" | "info" | "share";
 
@@ -38,39 +45,43 @@ const Toast: React.FC<ToastProps> = ({
   dismissible = true,
   onDismiss,
 }) => {
-  const [translateY] = useState(() => new Animated.Value(80));
-  const [opacity] = useState(() => new Animated.Value(0));
+  const translateY = useSharedValue(80);
+  const opacity = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+    opacity: opacity.value,
+  }));
 
   const hide = useCallback(() => {
-    Animated.parallel([
-      Animated.timing(translateY, {
-        toValue: 80,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-    ]).start(() => onDismiss());
+    translateY.value = withTiming(80, {
+      duration: 250,
+      easing: Easing.out(Easing.cubic),
+    });
+    opacity.value = withTiming(
+      0,
+      {
+        duration: 200,
+        easing: Easing.out(Easing.cubic),
+      },
+      (finished) => {
+        if (finished) runOnJS(onDismiss)();
+      }
+    );
   }, [translateY, opacity, onDismiss]);
 
   useEffect(() => {
     if (visible) {
-      Animated.parallel([
-        Animated.spring(translateY, {
-          toValue: 0,
-          tension: 80,
-          friction: 10,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      translateY.value = 80;
+      opacity.value = 0;
+      translateY.value = withTiming(0, {
+        duration: 250,
+        easing: Easing.out(Easing.cubic),
+      });
+      opacity.value = withTiming(1, {
+        duration: 200,
+        easing: Easing.out(Easing.cubic),
+      });
 
       const ms = duration ?? DEFAULT_DURATION[type];
       const timer = setTimeout(hide, ms);
@@ -84,7 +95,7 @@ const Toast: React.FC<ToastProps> = ({
 
   return (
     <Animated.View
-      style={[styles.container, { transform: [{ translateY }], opacity }]}
+      style={[styles.container, animatedStyle]}
       accessibilityRole="alert"
       accessibilityLiveRegion="assertive"
     >
@@ -94,14 +105,15 @@ const Toast: React.FC<ToastProps> = ({
           {message}
         </Text>
         {dismissible && (
-          <TouchableOpacity
+          <Pressable
             onPress={hide}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             accessibilityRole="button"
             accessibilityLabel="Cerrar notificación"
+            style={({ pressed }) => pressed && styles.pressed}
           >
             <MaterialIcons name="close" size={18} color="#424750" />
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
     </Animated.View>
@@ -147,6 +159,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#181c20",
     lineHeight: 20,
+  },
+  // Replaces the default TouchableOpacity press dim (see PRESSED_OPACITY note).
+  pressed: {
+    opacity: 0.6,
   },
 });
 

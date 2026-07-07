@@ -2,11 +2,11 @@ import React from "react";
 import {
   Alert,
   Platform,
+  Pressable,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -91,13 +91,16 @@ const NotasAlumnoScreen: React.FC = () => {
 
   const renderMobileHeader = () => (
     <View style={styles.header}>
-      <TouchableOpacity style={styles.headerIconButton} onPress={goBack}>
+      <Pressable
+        style={({ pressed }) => [styles.headerIconButton, pressed && { opacity: 0.6 }]}
+        onPress={goBack}
+      >
         <MaterialIcons name="arrow-back" size={24} color="#245EA9" />
-      </TouchableOpacity>
+      </Pressable>
       <Text style={styles.headerTitle}>Personal Notes</Text>
-      <TouchableOpacity style={styles.headerIconButton}>
+      <Pressable style={({ pressed }) => [styles.headerIconButton, pressed && { opacity: 0.6 }]}>
         <MaterialIcons name="more-vert" size={24} color="#536785" />
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 
@@ -126,9 +129,13 @@ const NotasAlumnoScreen: React.FC = () => {
       {isDesktop ? (
         <View style={styles.categoriesRowDesktop}>
           {categorias.map((item) => (
-            <TouchableOpacity
+            <Pressable
               key={item.key}
-              style={[styles.categoryChip, categoria === item.key && styles.categoryChipActive]}
+              style={({ pressed }) => [
+                styles.categoryChip,
+                categoria === item.key && styles.categoryChipActive,
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={() => setCategoria(item.key)}
             >
               <Text
@@ -139,7 +146,7 @@ const NotasAlumnoScreen: React.FC = () => {
               >
                 {item.label}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
       ) : null}
@@ -162,19 +169,26 @@ const NotasAlumnoScreen: React.FC = () => {
 
         <View style={styles.editorActionsRow}>
           {notaEnEdicionId ? (
-            <TouchableOpacity style={styles.cancelButton} onPress={cancelarEdicion}>
+            <Pressable
+              style={({ pressed }) => [styles.cancelButton, pressed && { opacity: 0.6 }]}
+              onPress={cancelarEdicion}
+            >
               <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
+            </Pressable>
           ) : null}
 
-          <TouchableOpacity
-            style={[styles.saveButton, guardando && styles.saveButtonDisabled]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.saveButton,
+              guardando && styles.saveButtonDisabled,
+              pressed && { opacity: 0.6 },
+            ]}
             onPress={() => void guardarNota()}
             disabled={guardando}
           >
             <Text style={styles.saveButtonText}>{guardando ? "Guardando..." : "Guardar Nota"}</Text>
             <MaterialIcons name="arrow-forward" size={18} color={COLORS.surface} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </View>
@@ -184,9 +198,13 @@ const NotasAlumnoScreen: React.FC = () => {
     <>
       <View style={styles.filtersRow}>
         {filtros.map((item) => (
-          <TouchableOpacity
+          <Pressable
             key={item.key}
-            style={[styles.filterChip, filtro === item.key && styles.filterChipActive]}
+            style={({ pressed }) => [
+              styles.filterChip,
+              filtro === item.key && styles.filterChipActive,
+              pressed && { opacity: 0.6 },
+            ]}
             onPress={() => setFiltro(item.key)}
           >
             <Text
@@ -194,7 +212,7 @@ const NotasAlumnoScreen: React.FC = () => {
             >
               {item.label}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
 
@@ -215,12 +233,18 @@ const NotasAlumnoScreen: React.FC = () => {
               </View>
 
               <View style={styles.noteActionsRow}>
-                <TouchableOpacity onPress={() => iniciarEdicion(Number(nota.id))}>
+                <Pressable
+                  style={({ pressed }) => pressed && { opacity: 0.6 }}
+                  onPress={() => iniciarEdicion(Number(nota.id))}
+                >
                   <MaterialIcons name="edit" size={18} color="#8F98A6" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleEliminar(Number(nota.id))}>
+                </Pressable>
+                <Pressable
+                  style={({ pressed }) => pressed && { opacity: 0.6 }}
+                  onPress={() => handleEliminar(Number(nota.id))}
+                >
                   <MaterialIcons name="delete" size={18} color="#A7AFBC" />
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
 
@@ -267,10 +291,13 @@ const NotasAlumnoScreen: React.FC = () => {
       <Text style={styles.centerStateText}>
         Captura observaciones importantes, progresos y reflexiones personalizadas.
       </Text>
-      <TouchableOpacity style={styles.startButton} onPress={() => setNotaDraft(" ")}>
+      <Pressable
+        style={({ pressed }) => [styles.startButton, pressed && { opacity: 0.6 }]}
+        onPress={() => setNotaDraft(" ")}
+      >
         <MaterialIcons name="add" size={18} color={COLORS.surface} />
         <Text style={styles.startButtonText}>Empezar a escribir</Text>
-      </TouchableOpacity>
+      </Pressable>
       <View style={styles.ideaCard}>
         <MaterialIcons name="lightbulb" size={18} color="#0C8BB0" />
         <View style={{ flex: 1 }}>
@@ -293,10 +320,13 @@ const NotasAlumnoScreen: React.FC = () => {
         <Text style={styles.centerStateText}>
           Hubo un problema de conexión con el servidor. Verifica tu red e inténtalo de nuevo.
         </Text>
-        <TouchableOpacity style={styles.retryButton} onPress={() => void recargar()}>
+        <Pressable
+          style={({ pressed }) => [styles.retryButton, pressed && { opacity: 0.6 }]}
+          onPress={() => void recargar()}
+        >
           <MaterialIcons name="refresh" size={18} color={COLORS.surface} />
           <Text style={styles.retryButtonText}>Reintentar</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <Text style={styles.errorCode}>CÓDIGO DE ERROR: {errorCodigo}</Text>
@@ -327,10 +357,10 @@ const NotasAlumnoScreen: React.FC = () => {
     <View style={styles.desktopLayout}>
       <View style={styles.desktopSidebar}>
         <Text style={styles.desktopBrand}>The Atelier</Text>
-        <TouchableOpacity style={styles.desktopNewButton}>
+        <Pressable style={({ pressed }) => [styles.desktopNewButton, pressed && { opacity: 0.6 }]}>
           <MaterialIcons name="add" size={18} color={COLORS.surface} />
           <Text style={styles.desktopNewButtonText}>New Entry</Text>
-        </TouchableOpacity>
+        </Pressable>
         <DesktopMenu label="Dashboard" icon="dashboard" />
         <DesktopMenu label="Lesson Plans" icon="menu-book" />
         <DesktopMenu label="Resource Library" icon="folder" />
@@ -343,9 +373,11 @@ const NotasAlumnoScreen: React.FC = () => {
           <Text style={styles.desktopTitle}>Student Notes</Text>
           <Text style={styles.desktopSubTitle}>Class 10-A</Text>
           <Text style={styles.desktopSubTitle}>Semester 2</Text>
-          <TouchableOpacity style={styles.desktopExportButton}>
+          <Pressable
+            style={({ pressed }) => [styles.desktopExportButton, pressed && { opacity: 0.6 }]}
+          >
             <Text style={styles.desktopExportButtonText}>Export PDF</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <Text style={styles.desktopStudentName}>{alumnoNombre}</Text>
@@ -433,14 +465,20 @@ const DesktopMenu: React.FC<{ label: string; icon: string; active?: boolean }> =
   icon,
   active,
 }) => (
-  <TouchableOpacity style={[styles.desktopMenuItem, active && styles.desktopMenuItemActive]}>
+  <Pressable
+    style={({ pressed }) => [
+      styles.desktopMenuItem,
+      active && styles.desktopMenuItemActive,
+      pressed && { opacity: 0.6 },
+    ]}
+  >
     <MaterialIcons
       name={icon as never}
       size={18}
       color={active ? COLORS.primaryDark : COLORS.textSecondary}
     />
     <Text style={[styles.desktopMenuText, active && styles.desktopMenuTextActive]}>{label}</Text>
-  </TouchableOpacity>
+  </Pressable>
 );
 
 const styles = StyleSheet.create({

@@ -1,9 +1,9 @@
 import React from "react";
 import {
+  Pressable,
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   StyleSheet,
   Image,
   KeyboardAvoidingView,
@@ -73,46 +73,54 @@ const LoginScreen: React.FC = () => {
               editable={!isLoading}
             />
             {/* Boton de iniciar sesion */}
-            <TouchableOpacity
-              style={[styles.loginButton, { opacity: isLoading ? 0.6 : 1 }]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.loginButton,
+                { opacity: isLoading ? 0.6 : 1 },
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={handleLogin}
               disabled={isLoading}
             >
               <Text style={styles.loginButtonText}>
                 {isLoading ? "Cargando..." : "Iniciar Sesión"}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
           {/* Enlaces adicionales */}
           <View style={styles.linksContainer}>
-            <TouchableOpacity onPress={handleForgotPassword}>
+            <Pressable
+              style={({ pressed }) => pressed && { opacity: 0.6 }}
+              onPress={handleForgotPassword}
+            >
               <Text style={styles.linkText}>¿Olvidaste tu contraseña?</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleRegister}>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => pressed && { opacity: 0.6 }}
+              onPress={handleRegister}
+            >
               <Text style={styles.link}>Registrate</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {/* Entrar como invitado */}
-          <TouchableOpacity
-            style={styles.guestButton}
+          <Pressable
+            style={({ pressed }) => [styles.guestButton, pressed && { opacity: 0.7 }]}
             onPress={handleEntrarComoInvitado}
             disabled={isLoading}
-            activeOpacity={0.7}
           >
             <Text style={styles.guestButtonText}>Entrar como invitado</Text>
-          </TouchableOpacity>
+          </Pressable>
 
           {/* Modo desarrollador — solo visible en __DEV__ */}
           {isDevMode && (
-            <TouchableOpacity
-              style={styles.devButton}
+            <Pressable
+              style={({ pressed }) => [styles.devButton, pressed && { opacity: 0.7 }]}
               onPress={handleLoginDesarrollador}
               disabled={isLoading}
-              activeOpacity={0.7}
             >
               <Text style={styles.devButtonText}>🛠 Dev Login (Admin)</Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
         </View>
       </View>

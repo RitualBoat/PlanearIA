@@ -1,13 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Platform,
-  Alert,
-} from "react-native";
+import { Pressable, View, Text, StyleSheet, ScrollView, Platform, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -212,9 +204,9 @@ const RetoResolucionScreen: React.FC<RetoResolucionScreenProps> = ({ route, navi
               {question.options.map((opt, oi) => {
                 const isSelected = selectedOption === opt.id;
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     key={opt.id}
-                    style={[
+                    style={({ pressed }) => [
                       styles.optionBtn,
                       {
                         backgroundColor: isSelected
@@ -223,9 +215,9 @@ const RetoResolucionScreen: React.FC<RetoResolucionScreenProps> = ({ route, navi
                         borderWidth: isSelected ? 2 : 1,
                         borderColor: isSelected ? colors.primary : colors.outlineVariant,
                       },
+                      pressed && { opacity: 0.8 },
                     ]}
                     onPress={() => handleSelectOption(opt.id)}
-                    activeOpacity={0.8}
                   >
                     <View
                       style={[
@@ -257,7 +249,7 @@ const RetoResolucionScreen: React.FC<RetoResolucionScreenProps> = ({ route, navi
                     >
                       {opt.text}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 );
               })}
             </View>
@@ -275,8 +267,12 @@ const RetoResolucionScreen: React.FC<RetoResolucionScreenProps> = ({ route, navi
           },
         ]}
       >
-        <TouchableOpacity
-          style={[styles.prevBtn, { backgroundColor: colors.surfaceContainerHigh }]}
+        <Pressable
+          style={({ pressed }) => [
+            styles.prevBtn,
+            { backgroundColor: colors.surfaceContainerHigh },
+            pressed && { opacity: 0.6 },
+          ]}
           onPress={handlePrev}
           disabled={currentIndex === 0}
         >
@@ -293,7 +289,7 @@ const RetoResolucionScreen: React.FC<RetoResolucionScreenProps> = ({ route, navi
           >
             Anterior
           </Text>
-        </TouchableOpacity>
+        </Pressable>
 
         <LinearGradient
           colors={["#004580", "#005da8"]}
@@ -301,12 +297,15 @@ const RetoResolucionScreen: React.FC<RetoResolucionScreenProps> = ({ route, navi
           end={{ x: 1, y: 1 }}
           style={styles.nextBtnGradient}
         >
-          <TouchableOpacity style={styles.nextBtn} onPress={handleNext} activeOpacity={0.9}>
+          <Pressable
+            style={({ pressed }) => [styles.nextBtn, pressed && { opacity: 0.9 }]}
+            onPress={handleNext}
+          >
             <Text style={styles.nextBtnText}>
               {currentIndex === totalQuestions - 1 ? "Enviar" : "Siguiente"}
             </Text>
             <MaterialIcons name="arrow-forward" size={16} color="#FFF" />
-          </TouchableOpacity>
+          </Pressable>
         </LinearGradient>
       </View>
     </SafeAreaView>

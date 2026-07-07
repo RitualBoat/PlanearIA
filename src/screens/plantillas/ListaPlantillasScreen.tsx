@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   StatusBar,
   TextInput,
@@ -99,19 +99,21 @@ const ListaPlantillasScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.7 }}
+            onPress={() => navigation.goBack()}
+          >
             <MaterialIcons name="arrow-back" size={24} color={COLORS.text} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerTitle} numberOfLines={1}>
             {headerTitle}
           </Text>
-          <TouchableOpacity
-            style={styles.fabSmall}
+          <Pressable
+            style={({ pressed }) => [styles.fabSmall, pressed && { opacity: 0.8 }]}
             onPress={() => navigation.navigate("EditorPlantilla")}
-            activeOpacity={0.8}
           >
             <MaterialIcons name="add" size={22} color="#FFFFFF" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {/* Search bar */}
@@ -126,9 +128,9 @@ const ListaPlantillasScreen: React.FC = () => {
               placeholderTextColor={COLORS.textTertiary}
             />
           </View>
-          <TouchableOpacity style={styles.filterBtn} activeOpacity={0.7}>
+          <Pressable style={({ pressed }) => [styles.filterBtn, pressed && { opacity: 0.7 }]}>
             <MaterialIcons name="tune" size={20} color={COLORS.textSecondary} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {/* Filter chips */}
@@ -140,11 +142,14 @@ const ListaPlantillasScreen: React.FC = () => {
           {FILTER_OPTIONS.map((f) => {
             const isActive = vm.filtroCategoria === f.id;
             return (
-              <TouchableOpacity
+              <Pressable
                 key={f.id}
-                style={[styles.chip, isActive && styles.chipActive]}
+                style={({ pressed }) => [
+                  styles.chip,
+                  isActive && styles.chipActive,
+                  pressed && { opacity: 0.8 },
+                ]}
                 onPress={() => vm.setFiltroCategoria(f.id)}
-                activeOpacity={0.8}
               >
                 {isActive && f.id === "todos" && (
                   <MaterialIcons
@@ -155,7 +160,7 @@ const ListaPlantillasScreen: React.FC = () => {
                   />
                 )}
                 <Text style={[styles.chipText, isActive && styles.chipTextActive]}>{f.label}</Text>
-              </TouchableOpacity>
+              </Pressable>
             );
           })}
         </ScrollView>
@@ -177,22 +182,21 @@ const ListaPlantillasScreen: React.FC = () => {
               <Text style={styles.emptySubtitle}>
                 Crea tu primera plantilla personalizada o explora las del sistema
               </Text>
-              <TouchableOpacity
-                style={styles.emptyButton}
+              <Pressable
+                style={({ pressed }) => [styles.emptyButton, pressed && { opacity: 0.8 }]}
                 onPress={() => navigation.navigate("EditorPlantilla")}
-                activeOpacity={0.8}
               >
                 <Text style={styles.emptyButtonText}>+ Crear plantilla</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           ) : (
             <>
               {/* Section header */}
               <View style={styles.recientesHeader}>
                 <Text style={styles.recientesLabel}>RECIENTES</Text>
-                <TouchableOpacity>
+                <Pressable style={({ pressed }) => pressed && { opacity: 0.6 }}>
                   <Text style={styles.verTodo}>Ver todo</Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
 
               {vm.plantillasFiltradas.map((plantilla) => {
@@ -242,13 +246,12 @@ const ListaPlantillasScreen: React.FC = () => {
                       </View>
 
                       {/* Usar button */}
-                      <TouchableOpacity
-                        style={styles.usarBtn}
+                      <Pressable
+                        style={({ pressed }) => [styles.usarBtn, pressed && { opacity: 0.8 }]}
                         onPress={() => handleUsar(plantilla)}
-                        activeOpacity={0.8}
                       >
                         <Text style={styles.usarBtnText}>Usar</Text>
-                      </TouchableOpacity>
+                      </Pressable>
                     </View>
                   </View>
                 );
@@ -261,9 +264,11 @@ const ListaPlantillasScreen: React.FC = () => {
                 <Text style={styles.promoSubtitle}>
                   Carga tu PDF y deja que nuestra IA cree el examen perfecto.
                 </Text>
-                <TouchableOpacity style={styles.promoButton} activeOpacity={0.8}>
+                <Pressable
+                  style={({ pressed }) => [styles.promoButton, pressed && { opacity: 0.8 }]}
+                >
                   <Text style={styles.promoButtonText}>PROBAR AHORA</Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </>
           )}

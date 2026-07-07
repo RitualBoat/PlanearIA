@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, StatusBar, Alert } from "react-native";
+import { Pressable, View, Text, StyleSheet, StatusBar, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -83,9 +83,12 @@ const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({ navigation, rou
         <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Pressable
+              style={({ pressed }) => pressed && { opacity: 0.6 }}
+              onPress={() => navigation.goBack()}
+            >
               <MaterialIcons name="arrow-back" size={24} color="white" />
-            </TouchableOpacity>
+            </Pressable>
             <Text style={styles.headerTitle}>Detalle</Text>
             <View style={{ width: 24 }} />
           </View>
@@ -108,13 +111,16 @@ const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({ navigation, rou
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
+            onPress={() => navigation.goBack()}
+          >
             <MaterialIcons name="arrow-back" size={24} color="white" />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerTitle}>Detalle de Entregable</Text>
-          <TouchableOpacity onPress={handleEditar}>
+          <Pressable style={({ pressed }) => pressed && { opacity: 0.6 }} onPress={handleEditar}>
             <MaterialIcons name="edit" size={24} color="white" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <WebScrollView style={styles.content}>
@@ -220,24 +226,30 @@ const DetalleTareaScreen: React.FC<DetalleTareaScreenProps> = ({ navigation, rou
 
           {/* Action buttons */}
           <View style={styles.actionsRow}>
-            <TouchableOpacity style={styles.editButton} onPress={handleEditar}>
+            <Pressable
+              style={({ pressed }) => [styles.editButton, pressed && { opacity: 0.6 }]}
+              onPress={handleEditar}
+            >
               <MaterialIcons name="edit" size={20} color="white" />
               <Text style={styles.editButtonText}>Editar</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
-              style={styles.calificarButton}
+            <Pressable
+              style={({ pressed }) => [styles.calificarButton, pressed && { opacity: 0.6 }]}
               onPress={() => navigation.navigate("CalificarEntregas", { tareaId, grupoId })}
             >
               <MaterialIcons name="rate-review" size={20} color="white" />
               <Text style={styles.calificarButtonText}>Calificar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
-          <TouchableOpacity style={styles.deleteButton} onPress={handleEliminar}>
+          <Pressable
+            style={({ pressed }) => [styles.deleteButton, pressed && { opacity: 0.6 }]}
+            onPress={handleEliminar}
+          >
             <MaterialIcons name="delete-outline" size={20} color="#D32F2F" />
             <Text style={styles.deleteButtonText}>Eliminar entregable</Text>
-          </TouchableOpacity>
+          </Pressable>
         </WebScrollView>
       </SafeAreaView>
     </View>

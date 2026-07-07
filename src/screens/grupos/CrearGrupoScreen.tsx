@@ -1,9 +1,9 @@
 import React from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   StatusBar,
   TextInput,
@@ -98,17 +98,18 @@ const CrearGrupoScreen: React.FC = () => {
               <Text style={styles.syncText}>{syncLabel}</Text>
             </View>
 
-            <TouchableOpacity
-              style={[
+            <Pressable
+              style={({ pressed }) => [
                 styles.syncButton,
                 (!isOnline || syncStatus === "syncing") && styles.syncButtonDisabled,
+                pressed && { opacity: 0.6 },
               ]}
               onPress={() => void sincronizarGrupos()}
               disabled={!isOnline || syncStatus === "syncing"}
             >
               <MaterialIcons name="sync" size={16} color={COLORS.primary} />
               <Text style={styles.syncButtonText}>Sincronizar ahora</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {/* Formulario */}
@@ -142,9 +143,13 @@ const CrearGrupoScreen: React.FC = () => {
               <Text style={styles.label}>Carrera *</Text>
               <View style={styles.carreraContainer}>
                 {(["ISC", "IGE", "ARQ", "ITICS"] as Carrera[]).map((c) => (
-                  <TouchableOpacity
+                  <Pressable
                     key={c}
-                    style={[styles.carreraButton, carrera === c && styles.carreraButtonActive]}
+                    style={({ pressed }) => [
+                      styles.carreraButton,
+                      carrera === c && styles.carreraButtonActive,
+                      pressed && { opacity: 0.6 },
+                    ]}
                     onPress={() => setCarrera(c)}
                   >
                     <Text
@@ -155,7 +160,7 @@ const CrearGrupoScreen: React.FC = () => {
                     >
                       {c}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 ))}
               </View>
             </View>
@@ -200,25 +205,27 @@ const CrearGrupoScreen: React.FC = () => {
             {/* Botones de acción */}
             {validationError ? <Text style={styles.errorText}>{validationError}</Text> : null}
 
-            <TouchableOpacity
-              style={[styles.submitButton, isSaving && styles.submitButtonDisabled]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.submitButton,
+                isSaving && styles.submitButtonDisabled,
+                pressed && { opacity: 0.8 },
+              ]}
               onPress={() => void handleCrearGrupo()}
               disabled={isSaving}
-              activeOpacity={0.8}
             >
               <MaterialIcons name="check-circle" size={24} color="white" />
               <Text style={styles.submitButtonText}>
                 {isSaving ? "Guardando..." : modo === "editar" ? "Guardar cambios" : "Crear Grupo"}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
-              style={styles.cancelButton}
+            <Pressable
+              style={({ pressed }) => [styles.cancelButton, pressed && { opacity: 0.8 }]}
               onPress={handleCancelar}
-              activeOpacity={0.8}
             >
               <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </ScrollView>
       </SafeAreaView>

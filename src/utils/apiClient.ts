@@ -1,5 +1,5 @@
 import { API_CONFIG } from "../sync/config/apiConfig";
-import { getAccessToken } from "../services/auth";
+import { getAccessToken } from "../services/auth/authService";
 
 /**
  * Unified HTTP client for backend API calls.

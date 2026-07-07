@@ -17,7 +17,8 @@ jest.mock("../../sync/config/apiConfig", () => ({
   isAPIConfigured: () => false,
 }));
 
-jest.mock("../../services/auth", () => ({
+// entitySync imports getAccessToken directly from authService (no barrel).
+jest.mock("../../services/auth/authService", () => ({
   getAccessToken: jest.fn().mockResolvedValue(null),
 }));
 

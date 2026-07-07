@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   TextInput,
   StatusBar,
   ScrollView,
@@ -128,16 +128,24 @@ const CrearRecursoScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
+            onPress={() => navigation.goBack()}
+          >
             <MaterialIcons name="arrow-back" size={24} color={COLORS.text} />
-          </TouchableOpacity>
+          </Pressable>
           <View style={styles.headerTitleWrap}>
-            <Text style={styles.headerTitle}>{vm.isEditMode ? "Editar material" : "Nuevo material"}</Text>
+            <Text style={styles.headerTitle}>
+              {vm.isEditMode ? "Editar material" : "Nuevo material"}
+            </Text>
             {grupoId ? <Text style={styles.headerSubtitle}>Se guardara en Classroom</Text> : null}
           </View>
-          <TouchableOpacity onPress={() => void handleSaved()}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
+            onPress={() => void handleSaved()}
+          >
             <MaterialIcons name="save" size={24} color={COLORS.primary} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <ScrollView
@@ -154,9 +162,13 @@ const CrearRecursoScreen: React.FC = () => {
             contentContainerStyle={styles.tipoPillsContainer}
           >
             {vm.tipoOptions.map((opt) => (
-              <TouchableOpacity
+              <Pressable
                 key={opt.key}
-                style={[styles.tipoPill, vm.tipo === opt.key && styles.tipoPillActive]}
+                style={({ pressed }) => [
+                  styles.tipoPill,
+                  vm.tipo === opt.key && styles.tipoPillActive,
+                  pressed && { opacity: 0.6 },
+                ]}
                 onPress={() => vm.setTipo(opt.key)}
               >
                 <MaterialIcons
@@ -169,7 +181,7 @@ const CrearRecursoScreen: React.FC = () => {
                 >
                   {opt.label}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </ScrollView>
 
@@ -204,9 +216,12 @@ const CrearRecursoScreen: React.FC = () => {
               {vm.tags.map((tag, index) => (
                 <View key={`${tag}-${index}`} style={styles.tagChip}>
                   <Text style={styles.tagChipText}>{tag}</Text>
-                  <TouchableOpacity onPress={() => vm.removeTag(index)}>
+                  <Pressable
+                    style={({ pressed }) => pressed && { opacity: 0.6 }}
+                    onPress={() => vm.removeTag(index)}
+                  >
                     <MaterialIcons name="close" size={16} color={COLORS.primary} />
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               ))}
               <View style={styles.tagInputRow}>
@@ -228,9 +243,13 @@ const CrearRecursoScreen: React.FC = () => {
             <Text style={styles.label}>ORIGEN DEL CONTENIDO</Text>
             <View style={styles.origenCardsRow}>
               {ORIGEN_OPTIONS.map((opt) => (
-                <TouchableOpacity
+                <Pressable
                   key={opt.key}
-                  style={[styles.origenCard, vm.origen === opt.key && styles.origenCardActive]}
+                  style={({ pressed }) => [
+                    styles.origenCard,
+                    vm.origen === opt.key && styles.origenCardActive,
+                    pressed && { opacity: 0.6 },
+                  ]}
                   onPress={() => vm.setOrigen(opt.key)}
                 >
                   <MaterialIcons
@@ -246,7 +265,7 @@ const CrearRecursoScreen: React.FC = () => {
                   >
                     {opt.label}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               ))}
             </View>
           </View>
@@ -268,12 +287,18 @@ const CrearRecursoScreen: React.FC = () => {
                 <Text style={styles.uploadedSize}>{vm.uploadedFile.size} · Subido con éxito</Text>
               </View>
               <MaterialIcons name="check-circle" size={24} color={COLORS.success} />
-              <TouchableOpacity onPress={() => void vm.handleSelectFile()}>
+              <Pressable
+                style={({ pressed }) => pressed && { opacity: 0.6 }}
+                onPress={() => void vm.handleSelectFile()}
+              >
                 <Text style={styles.changeLink}>CAMBIAR</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           ) : (
-            <TouchableOpacity style={styles.uploadArea} onPress={() => void vm.handleSelectFile()}>
+            <Pressable
+              style={({ pressed }) => [styles.uploadArea, pressed && { opacity: 0.6 }]}
+              onPress={() => void vm.handleSelectFile()}
+            >
               <View style={styles.uploadIconCircle}>
                 <MaterialIcons name="cloud-upload" size={28} color={COLORS.primary} />
               </View>
@@ -284,7 +309,7 @@ const CrearRecursoScreen: React.FC = () => {
               <View style={styles.uploadButton}>
                 <Text style={styles.uploadButtonText}>Seleccionar Archivo</Text>
               </View>
-            </TouchableOpacity>
+            </Pressable>
           )}
 
           {/* AI suggestion card (show when origen is "ia" or tipo is "examen") */}
@@ -295,21 +320,28 @@ const CrearRecursoScreen: React.FC = () => {
                 <Text style={styles.aiCardText}>
                   ¿Quieres que la IA genere preguntas para este examen?
                 </Text>
-                <TouchableOpacity style={styles.aiButton}>
+                <Pressable style={({ pressed }) => [styles.aiButton, pressed && { opacity: 0.6 }]}>
                   <Text style={styles.aiButtonText}>Generar con IA</Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
           )}
 
           {/* Bottom buttons */}
           <View style={styles.bottomButtons}>
-            <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
+            <Pressable
+              style={({ pressed }) => [styles.cancelButton, pressed && { opacity: 0.6 }]}
+              onPress={() => navigation.goBack()}
+            >
               <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
-              style={[styles.saveButton, vm.isSaving && styles.saveButtonDisabled]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.saveButton,
+                vm.isSaving && styles.saveButtonDisabled,
+                pressed && { opacity: 0.6 },
+              ]}
               disabled={vm.isSaving}
               onPress={() => {
                 void handleSaved();
@@ -318,15 +350,18 @@ const CrearRecursoScreen: React.FC = () => {
               <Text style={styles.saveButtonText}>
                 {vm.isSaving ? "Guardando..." : "Guardar Recurso"}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {/* Delete button (edit mode) */}
           {vm.isEditMode && (
-            <TouchableOpacity style={styles.deleteButton} onPress={vm.handleEliminar}>
+            <Pressable
+              style={({ pressed }) => [styles.deleteButton, pressed && { opacity: 0.6 }]}
+              onPress={vm.handleEliminar}
+            >
               <MaterialIcons name="delete-outline" size={20} color="#D32F2F" />
               <Text style={styles.deleteButtonText}>Eliminar recurso</Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
         </ScrollView>
       </SafeAreaView>

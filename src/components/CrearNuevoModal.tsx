@@ -2,7 +2,6 @@ import React, { useCallback } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
   Modal,
   Pressable,
   StyleSheet,
@@ -37,7 +36,11 @@ interface CrearNuevoModalProps {
   onNavigate: (screen: string, params?: Record<string, unknown>) => void;
 }
 
-export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({ visible, onClose, onNavigate }) => {
+export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({
+  visible,
+  onClose,
+  onNavigate,
+}) => {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 900;
 
@@ -58,9 +61,18 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({ visible, onClo
   }
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose} statusBarTranslucent>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={handleClose}
+      statusBarTranslucent
+    >
       <Pressable style={styles.overlay} onPress={handleClose}>
-        <Pressable style={[styles.sheet, isDesktop && styles.sheetDesktop]} onPress={(e) => e.stopPropagation()}>
+        <Pressable
+          style={[styles.sheet, isDesktop && styles.sheetDesktop]}
+          onPress={(e) => e.stopPropagation()}
+        >
           {!isDesktop && (
             <View style={styles.handleContainer}>
               <View style={styles.handle} />
@@ -69,9 +81,13 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({ visible, onClo
 
           <View style={styles.header}>
             <Text style={styles.headerTitle}>Crear nuevo</Text>
-            <TouchableOpacity style={styles.closeBtn} onPress={handleClose} accessibilityLabel="Cerrar">
+            <Pressable
+              style={({ pressed }) => [styles.closeBtn, pressed && { opacity: 0.6 }]}
+              onPress={handleClose}
+              accessibilityLabel="Cerrar"
+            >
               <MaterialIcons name="close" size={20} color={DT.onSurfaceVariant} />
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           <ScrollView
@@ -83,10 +99,9 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({ visible, onClo
           >
             <Text style={styles.sectionLabel}>PLANEACIONES</Text>
             <View style={styles.sectionGap}>
-              <TouchableOpacity
-                style={styles.optionRow}
+              <Pressable
+                style={({ pressed }) => [styles.optionRow, pressed && { opacity: 0.7 }]}
                 onPress={() => handleDirectNav("CrearPlaneacion")}
-                activeOpacity={0.7}
                 accessibilityLabel="Planeacion"
               >
                 <View style={[styles.optionIconLg, { backgroundColor: DT.primaryContainer }]}>
@@ -101,12 +116,11 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({ visible, onClo
                   </Text>
                 </View>
                 <MaterialIcons name="chevron-right" size={22} color={DT.outlineVariant} />
-              </TouchableOpacity>
+              </Pressable>
 
-              <TouchableOpacity
-                style={styles.optionRow}
+              <Pressable
+                style={({ pressed }) => [styles.optionRow, pressed && { opacity: 0.7 }]}
                 onPress={() => handleDirectNav("EscanerPlantilla")}
-                activeOpacity={0.7}
                 accessibilityLabel="Escanear plantilla"
               >
                 <View style={[styles.optionIconLg, { backgroundColor: DT.primaryFixed }]}>
@@ -120,15 +134,14 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({ visible, onClo
                       : "Crea una plantilla desde Word o PDF."}
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             <Text style={[styles.sectionLabel, { marginTop: 24 }]}>CONTENIDO</Text>
             <View style={styles.sectionGap}>
-              <TouchableOpacity
-                style={styles.optionRow}
+              <Pressable
+                style={({ pressed }) => [styles.optionRow, pressed && { opacity: 0.7 }]}
                 onPress={() => handleDirectNav("CrearRecurso")}
-                activeOpacity={0.7}
                 accessibilityLabel="Recurso"
               >
                 <View style={[styles.optionIconLg, { backgroundColor: "rgba(160,244,153,0.3)" }]}>
@@ -137,15 +150,16 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({ visible, onClo
                 <View style={styles.optionText}>
                   <Text style={styles.optionTitle}>Recurso</Text>
                   <Text style={styles.optionSubtitle}>
-                    {isDesktop ? "Sube documentos, videos o enlaces para tus alumnos." : "Sube archivos o multimedia."}
+                    {isDesktop
+                      ? "Sube documentos, videos o enlaces para tus alumnos."
+                      : "Sube archivos o multimedia."}
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
 
-              <TouchableOpacity
-                style={styles.optionRow}
+              <Pressable
+                style={({ pressed }) => [styles.optionRow, pressed && { opacity: 0.7 }]}
                 onPress={() => handleDirectNav("ListaEntregables")}
-                activeOpacity={0.7}
                 accessibilityLabel="Entregable"
               >
                 <View style={[styles.optionIconLg, { backgroundColor: DT.tertiaryFixed }]}>
@@ -154,15 +168,16 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({ visible, onClo
                 <View style={styles.optionText}>
                   <Text style={styles.optionTitle}>Entregable</Text>
                   <Text style={styles.optionSubtitle}>
-                    {isDesktop ? "Crea actividades de evaluacion y tareas." : "Define tareas y criterios."}
+                    {isDesktop
+                      ? "Crea actividades de evaluacion y tareas."
+                      : "Define tareas y criterios."}
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
 
-              <TouchableOpacity
-                style={styles.optionRow}
+              <Pressable
+                style={({ pressed }) => [styles.optionRow, pressed && { opacity: 0.7 }]}
                 onPress={() => handleDirectNav("EditorPlantilla")}
-                activeOpacity={0.7}
                 accessibilityLabel="Plantilla"
               >
                 <View style={[styles.optionIconLg, { backgroundColor: DT.purpleBg }]}>
@@ -171,21 +186,22 @@ export const CrearNuevoModal: React.FC<CrearNuevoModalProps> = ({ visible, onClo
                 <View style={styles.optionText}>
                   <Text style={styles.optionTitle}>Plantilla</Text>
                   <Text style={styles.optionSubtitle}>
-                    {isDesktop ? "Guarda formatos reutilizables para tus recursos." : "Guarda este formato para uso futuro."}
+                    {isDesktop
+                      ? "Guarda formatos reutilizables para tus recursos."
+                      : "Guarda este formato para uso futuro."}
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
-            <TouchableOpacity
-              style={styles.importBtn}
+            <Pressable
+              style={({ pressed }) => [styles.importBtn, pressed && { opacity: 0.7 }]}
               onPress={() => handleDirectNav("ImportarPlaneacion")}
-              activeOpacity={0.7}
               accessibilityLabel="Importar desde archivo"
             >
               <MaterialIcons name="file-upload" size={20} color={DT.primary} />
               <Text style={styles.importText}>Importar desde archivo</Text>
-            </TouchableOpacity>
+            </Pressable>
           </ScrollView>
         </Pressable>
       </Pressable>

@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Modal,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { Modal, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export interface PhotoPickerOption {
@@ -32,45 +24,43 @@ const PhotoPickerModal: React.FC<PhotoPickerModalProps> = ({ visible, options, o
       statusBarTranslucent
       onRequestClose={onClose}
     >
-      <TouchableWithoutFeedback onPress={onClose} accessibilityRole="button">
-        <View style={styles.overlay}>
-          <TouchableWithoutFeedback>
-            <View style={styles.sheet}>
-              <View style={styles.handle} />
-              <Text style={styles.title}>Cambiar foto</Text>
-              {options.map((opt, i) => (
-                <TouchableOpacity
-                  key={i}
-                  style={styles.option}
-                  onPress={() => {
-                    opt.onPress();
-                    onClose();
-                  }}
-                  accessibilityRole="button"
-                  accessibilityLabel={opt.label}
-                >
-                  <MaterialIcons
-                    name={opt.icon as any}
-                    size={22}
-                    color={opt.destructive ? "#ba1a1a" : "#181c20"}
-                  />
-                  <Text style={[styles.optionText, opt.destructive && { color: "#ba1a1a" }]}>
-                    {opt.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-              <TouchableOpacity
-                style={styles.cancelBtn}
-                onPress={onClose}
-                accessibilityRole="button"
-                accessibilityLabel="Cerrar"
-              >
-                <Text style={styles.cancelText}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableWithoutFeedback>
+      <Pressable style={styles.overlay} onPress={onClose} accessibilityRole="button">
+        {/* Sheet claims the touch responder so taps inside it never reach the
+            backdrop's onPress (the old inner TouchableWithoutFeedback role). */}
+        <View style={styles.sheet} onStartShouldSetResponder={() => true}>
+          <View style={styles.handle} />
+          <Text style={styles.title}>Cambiar foto</Text>
+          {options.map((opt, i) => (
+            <Pressable
+              key={i}
+              style={({ pressed }) => [styles.option, pressed && { opacity: 0.6 }]}
+              onPress={() => {
+                opt.onPress();
+                onClose();
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={opt.label}
+            >
+              <MaterialIcons
+                name={opt.icon as any}
+                size={22}
+                color={opt.destructive ? "#ba1a1a" : "#181c20"}
+              />
+              <Text style={[styles.optionText, opt.destructive && { color: "#ba1a1a" }]}>
+                {opt.label}
+              </Text>
+            </Pressable>
+          ))}
+          <Pressable
+            style={({ pressed }) => [styles.cancelBtn, pressed && { opacity: 0.6 }]}
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel="Cerrar"
+          >
+            <Text style={styles.cancelText}>Cancelar</Text>
+          </Pressable>
         </View>
-      </TouchableWithoutFeedback>
+      </Pressable>
     </Modal>
   );
 };

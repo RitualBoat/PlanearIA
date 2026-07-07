@@ -1,9 +1,9 @@
 import React, { useState, useRef } from "react";
 import {
+  Pressable,
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
@@ -69,9 +69,12 @@ const RecuperarContrasenaScreen: React.FC = () => {
       >
         {/* Header bar */}
         <View style={styles.headerBar}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBackBtn}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={({ pressed }) => [styles.headerBackBtn, pressed && { opacity: 0.6 }]}
+          >
             <MaterialIcons name="arrow-back" size={24} color={COLORS.text} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerTitle}>PlanearIA</Text>
           <View style={{ width: 32 }} />
         </View>
@@ -128,18 +131,21 @@ const RecuperarContrasenaScreen: React.FC = () => {
                   autoCorrect={false}
                   editable={!vm.isLoading}
                 />
-                <TouchableOpacity
-                  style={[styles.primaryButton, vm.isLoading && styles.primaryButtonDisabled]}
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.primaryButton,
+                    vm.isLoading && styles.primaryButtonDisabled,
+                    pressed && { opacity: 0.85 },
+                  ]}
                   onPress={vm.handleEnviarCodigo}
                   disabled={vm.isLoading}
-                  activeOpacity={0.85}
                 >
                   {vm.isLoading ? (
                     <ActivityIndicator color={COLORS.surface} size="small" />
                   ) : (
                     <Text style={styles.primaryButtonText}>Enviar código</Text>
                   )}
-                </TouchableOpacity>
+                </Pressable>
               </View>
             )}
 
@@ -166,26 +172,28 @@ const RecuperarContrasenaScreen: React.FC = () => {
                     />
                   ))}
                 </View>
-                <TouchableOpacity
-                  style={[styles.primaryButton, vm.isLoading && styles.primaryButtonDisabled]}
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.primaryButton,
+                    vm.isLoading && styles.primaryButtonDisabled,
+                    pressed && { opacity: 0.85 },
+                  ]}
                   onPress={vm.handleVerificarCodigo}
                   disabled={vm.isLoading}
-                  activeOpacity={0.85}
                 >
                   <Text style={styles.primaryButtonText}>Verificar código</Text>
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity
-                  style={styles.resendButton}
+                <Pressable
+                  style={({ pressed }) => [styles.resendButton, pressed && { opacity: 0.7 }]}
                   onPress={vm.handleEnviarCodigo}
                   disabled={vm.isLoading}
-                  activeOpacity={0.7}
                 >
                   <Text style={styles.resendText}>
                     ¿No recibiste el código?{" "}
                     <Text style={{ color: COLORS.primary, fontWeight: "600" }}>Reenviar</Text>
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             )}
 
@@ -204,8 +212,8 @@ const RecuperarContrasenaScreen: React.FC = () => {
                     autoCapitalize="none"
                     editable={!vm.isLoading}
                   />
-                  <TouchableOpacity
-                    style={styles.eyeButton}
+                  <Pressable
+                    style={({ pressed }) => [styles.eyeButton, pressed && { opacity: 0.6 }]}
                     onPress={() => setShowNewPassword(!showNewPassword)}
                   >
                     <MaterialIcons
@@ -213,7 +221,7 @@ const RecuperarContrasenaScreen: React.FC = () => {
                       size={22}
                       color={COLORS.textTertiary}
                     />
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
                 <Text style={styles.label}>CONFIRMAR CONTRASEÑA</Text>
                 <View style={styles.passwordWrapper}>
@@ -227,8 +235,8 @@ const RecuperarContrasenaScreen: React.FC = () => {
                     autoCapitalize="none"
                     editable={!vm.isLoading}
                   />
-                  <TouchableOpacity
-                    style={styles.eyeButton}
+                  <Pressable
+                    style={({ pressed }) => [styles.eyeButton, pressed && { opacity: 0.6 }]}
                     onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
                     <MaterialIcons
@@ -236,20 +244,23 @@ const RecuperarContrasenaScreen: React.FC = () => {
                       size={22}
                       color={COLORS.textTertiary}
                     />
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
-                <TouchableOpacity
-                  style={[styles.primaryButton, vm.isLoading && styles.primaryButtonDisabled]}
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.primaryButton,
+                    vm.isLoading && styles.primaryButtonDisabled,
+                    pressed && { opacity: 0.85 },
+                  ]}
                   onPress={vm.handleResetear}
                   disabled={vm.isLoading}
-                  activeOpacity={0.85}
                 >
                   {vm.isLoading ? (
                     <ActivityIndicator color={COLORS.surface} size="small" />
                   ) : (
                     <Text style={styles.primaryButtonText}>Cambiar contraseña</Text>
                   )}
-                </TouchableOpacity>
+                </Pressable>
 
                 <View style={styles.infoNote}>
                   <MaterialIcons name="info-outline" size={16} color={COLORS.textSecondary} />
@@ -262,14 +273,14 @@ const RecuperarContrasenaScreen: React.FC = () => {
             )}
 
             {/* Footer link */}
-            <TouchableOpacity
-              style={styles.footerLink}
+            <Pressable
+              style={({ pressed }) => [styles.footerLink, pressed && { opacity: 0.6 }]}
               onPress={() => vm.step === "email" && vm.handleVolver()}
             >
               <Text style={styles.footerLinkText}>
                 <Text style={styles.footerLinkAccent}>Volver a inicio de sesión</Text>
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

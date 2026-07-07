@@ -7,5 +7,6 @@ module.exports = function (api) {
       // This polyfill rewrites it so the release build succeeds.
       ['babel-preset-expo', { unstable_transformImportMeta: true }],
     ],
+    plugins: ['react-native-reanimated/plugin'],
   };
 };

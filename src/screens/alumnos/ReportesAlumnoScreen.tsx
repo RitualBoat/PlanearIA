@@ -2,10 +2,10 @@ import React from "react";
 import {
   Alert,
   Platform,
+  Pressable,
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -148,12 +148,15 @@ const ReportesAlumnoScreen: React.FC = () => {
         <Text style={styles.centerStateText}>
           Hubo un problema al conectar con el servidor de reportes escolares.
         </Text>
-        <TouchableOpacity style={styles.retryMainButton} onPress={() => void recargar()}>
+        <Pressable
+          style={({ pressed }) => [styles.retryMainButton, pressed && { opacity: 0.6 }]}
+          onPress={() => void recargar()}
+        >
           <Text style={styles.retryMainButtonText}>Reintentar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={goBack}>
+        </Pressable>
+        <Pressable style={({ pressed }) => pressed && { opacity: 0.6 }} onPress={goBack}>
           <Text style={styles.secondaryLink}>Volver al detalle</Text>
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.errorCode}>CÓDIGO: {errorCodigo}</Text>
       </View>
     </View>
@@ -169,10 +172,13 @@ const ReportesAlumnoScreen: React.FC = () => {
         {alumnoNombre.split(" ")[0]} aún no tiene actividades evaluadas en este periodo para generar
         estadísticas.
       </Text>
-      <TouchableOpacity style={styles.retryMainButton} onPress={goBack}>
+      <Pressable
+        style={({ pressed }) => [styles.retryMainButton, pressed && { opacity: 0.6 }]}
+        onPress={goBack}
+      >
         <MaterialIcons name="post-add" size={18} color={COLORS.surface} />
         <Text style={styles.retryMainButtonText}>Registrar primera calificación</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 
@@ -180,15 +186,19 @@ const ReportesAlumnoScreen: React.FC = () => {
     <>
       <View style={styles.periodsRow}>
         {periodos.map((item) => (
-          <TouchableOpacity
+          <Pressable
             key={item}
             onPress={() => setPeriodo(item)}
-            style={[styles.periodChip, periodo === item && styles.periodChipActive]}
+            style={({ pressed }) => [
+              styles.periodChip,
+              periodo === item && styles.periodChipActive,
+              pressed && { opacity: 0.6 },
+            ]}
           >
             <Text style={[styles.periodChipText, periodo === item && styles.periodChipTextActive]}>
               {item === "Personalizado" ? "Perso" : item}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
 
@@ -302,15 +312,21 @@ const ReportesAlumnoScreen: React.FC = () => {
 
       <View style={styles.mainDesktop}>
         <View style={styles.headerDesktop}>
-          <TouchableOpacity onPress={goBack} style={styles.iconButton}>
+          <Pressable
+            onPress={goBack}
+            style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+          >
             <MaterialIcons name="arrow-back" size={22} color={COLORS.textDark} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.titleDesktop}>Progreso del Alumno</Text>
           <View style={{ flex: 1 }} />
           <Text style={styles.cycleText}>Ciclo Escolar 2023 - 2024</Text>
-          <TouchableOpacity onPress={handleExportar} style={styles.iconButton}>
+          <Pressable
+            onPress={handleExportar}
+            style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+          >
             <MaterialIcons name="calendar-today" size={20} color={COLORS.primaryDark} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {estado === "loading" ? (
@@ -323,9 +339,12 @@ const ReportesAlumnoScreen: React.FC = () => {
         {estado === "error" ? (
           <View style={styles.desktopStateCard}>
             <Text style={styles.centerStateTitle}>No se pudieron cargar las estadísticas</Text>
-            <TouchableOpacity style={styles.retryMainButton} onPress={() => void recargar()}>
+            <Pressable
+              style={({ pressed }) => [styles.retryMainButton, pressed && { opacity: 0.6 }]}
+              onPress={() => void recargar()}
+            >
               <Text style={styles.retryMainButtonText}>Reintentar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         ) : null}
 
@@ -477,18 +496,24 @@ const ReportesAlumnoScreen: React.FC = () => {
       <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={goBack} style={styles.iconButton}>
+          <Pressable
+            onPress={goBack}
+            style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+          >
             <MaterialIcons name="arrow-back" size={22} color={COLORS.textDark} />
-          </TouchableOpacity>
+          </Pressable>
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>Estadísticas del alumno</Text>
             <Text style={styles.subtitle}>
               {alumnoNombre} • {grupoNombre}
             </Text>
           </View>
-          <TouchableOpacity onPress={handleExportar} style={styles.iconButton}>
+          <Pressable
+            onPress={handleExportar}
+            style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+          >
             <MaterialIcons name="calendar-today" size={20} color={COLORS.primaryDark} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <WebScrollView style={styles.content} contentContainerStyle={styles.mobileContentContainer}>

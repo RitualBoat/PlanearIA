@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS } from "../../types";
 
@@ -33,19 +33,22 @@ const CarreraSelector: React.FC<CarreraSelectorProps> = ({
           {CARRERA_OPTIONS.map((option) => {
             const selected = value === option;
             return (
-              <TouchableOpacity
+              <Pressable
                 key={option}
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
                 accessibilityLabel={`Seleccionar carrera ${option}`}
-                activeOpacity={0.85}
-                style={[styles.optionButton, selected && styles.optionButtonActive]}
+                style={({ pressed }) => [
+                  styles.optionButton,
+                  selected && styles.optionButtonActive,
+                  pressed && { opacity: 0.85 },
+                ]}
                 onPress={() => onChange(option)}
               >
                 <Text style={[styles.optionText, selected && styles.optionTextActive]}>
                   {option}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             );
           })}
         </View>

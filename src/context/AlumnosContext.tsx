@@ -6,15 +6,17 @@ import { onSyncEvent } from "../sync/services/syncEvents";
 import { generateNumericId } from "../utils/generateId";
 
 const ALUMNOS_STORAGE_KEY = SYNC_ENTITIES.alumnos.storageKey;
+type AlumnoDraft = Omit<Alumno, "id"> & { id?: number };
 
 interface AlumnosContextData {
   alumnos: Alumno[];
   isLoading: boolean;
   error: string | null;
   reloadAlumnos: () => Promise<void>;
-  agregarAlumno: (
-    alumno: Omit<Alumno, "id"> & { id?: number }
-  ) => Promise<{ alumno: Alumno; syncOk: boolean }>;
+  agregarAlumno: (alumno: AlumnoDraft) => Promise<{ alumno: Alumno; syncOk: boolean }>;
+  agregarAlumnos: (
+    nuevosAlumnos: AlumnoDraft[]
+  ) => Promise<{ alumnos: Alumno[]; syncOk: boolean }>;
   actualizarAlumno: (id: number, cambios: Partial<Alumno>) => Promise<{ syncOk: boolean }>;
   eliminarAlumno: (id: number) => Promise<void>;
   obtenerAlumno: (id: number) => Alumno | undefined;
@@ -75,9 +77,7 @@ export const AlumnosProvider: React.FC<AlumnosProviderProps> = ({ children }) =>
   }, []);
 
   const agregarAlumno = useCallback(
-    async (
-      alumno: Omit<Alumno, "id"> & { id?: number }
-    ): Promise<{ alumno: Alumno; syncOk: boolean }> => {
+    async (alumno: AlumnoDraft): Promise<{ alumno: Alumno; syncOk: boolean }> => {
       const nuevoAlumno: Alumno = {
         ...alumno,
         id: alumno.id ?? generateNumericId(),
@@ -86,6 +86,31 @@ export const AlumnosProvider: React.FC<AlumnosProviderProps> = ({ children }) =>
       await persist([...alumnos, nuevoAlumno]);
       const syncOk = await queueEntityOperation(SYNC_ENTITIES.alumnos, "create", nuevoAlumno);
       return { alumno: nuevoAlumno, syncOk };
+    },
+    [alumnos, persist]
+  );
+
+  const agregarAlumnos = useCallback(
+    async (nuevosAlumnos: AlumnoDraft[]): Promise<{ alumnos: Alumno[]; syncOk: boolean }> => {
+      if (nuevosAlumnos.length === 0) return { alumnos: [], syncOk: true };
+
+      const usedIds = new Set(alumnos.map((alumno) => alumno.id));
+      const alumnosConId = nuevosAlumnos.map((alumno) => {
+        let id = alumno.id ?? generateNumericId();
+        while (usedIds.has(id)) id = generateNumericId();
+        usedIds.add(id);
+        return { ...alumno, id } as Alumno;
+      });
+
+      await persist([...alumnos, ...alumnosConId]);
+      const syncResults = await Promise.all(
+        alumnosConId.map((alumno) => queueEntityOperation(SYNC_ENTITIES.alumnos, "create", alumno))
+      );
+
+      return {
+        alumnos: alumnosConId,
+        syncOk: syncResults.every(Boolean),
+      };
     },
     [alumnos, persist]
   );
@@ -125,12 +150,14 @@ export const AlumnosProvider: React.FC<AlumnosProviderProps> = ({ children }) =>
       error,
       reloadAlumnos,
       agregarAlumno,
+      agregarAlumnos,
       actualizarAlumno,
       eliminarAlumno,
       obtenerAlumno,
     }),
     [
       agregarAlumno,
+      agregarAlumnos,
       alumnos,
       actualizarAlumno,
       eliminarAlumno,

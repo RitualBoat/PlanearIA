@@ -8,7 +8,7 @@ import { API_CONFIG } from "../sync/config/apiConfig";
 import { useAuth } from "../context/AuthContext";
 import { usePlaneaciones } from "../context/PlaneacionesContext";
 import { mapResponseToPlaneacion } from "../utils/planeacionMapper";
-import { getAccessToken } from "../services/auth";
+import { getAccessToken } from "../services/auth/authService";
 import {
   buildDocumentoFromPlantilla,
   listPlantillasDocumento,

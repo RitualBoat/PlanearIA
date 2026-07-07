@@ -58,6 +58,20 @@ const getInitials = (alumno: Alumno): string => {
   return `${first}${last}`.toUpperCase();
 };
 
+const buildCalificacionesInput = (
+  alumnosDelGrupo: Alumno[],
+  calificacionesMap: Record<number, Calificacion>,
+  parcialActivo: ParcialKey
+): Record<number, string> =>
+  alumnosDelGrupo.reduce<Record<number, string>>((acc, alumno) => {
+    const existing = calificacionesMap[alumno.id];
+    const val = existing?.[parcialActivo];
+    if (val !== undefined && val !== null) {
+      acc[alumno.id] = String(val);
+    }
+    return acc;
+  }, {});
+
 const CapturarCalificacionesScreen: React.FC<Props> = ({ navigation, route }) => {
   const { grupoId } = route.params;
   const { grupos } = useGrupos();
@@ -66,7 +80,9 @@ const CapturarCalificacionesScreen: React.FC<Props> = ({ navigation, route }) =>
     useCalificaciones();
 
   const [parcialActivo, setParcialActivo] = useState<ParcialKey>("parcial1");
-  const [calificacionesInput, setCalificacionesInput] = useState<Record<number, string>>({});
+  const [calificacionesDrafts, setCalificacionesDrafts] = useState<
+    Record<string, Record<number, string>>
+  >({});
   const [isSaving, setIsSaving] = useState(false);
 
   const grupo = useMemo(() => grupos.find((g) => g.id === grupoId), [grupos, grupoId]);
@@ -91,26 +107,38 @@ const CapturarCalificacionesScreen: React.FC<Props> = ({ navigation, route }) =>
     return map;
   }, [calificacionesExistentes]);
 
-  // Initialize inputs from existing data when parcial changes
-  React.useEffect(() => {
-    const loaded: Record<number, string> = {};
-    alumnosDelGrupo.forEach((alumno) => {
-      const existing = calificacionesMap[alumno.id];
-      if (existing) {
-        const val = existing[parcialActivo];
-        if (val !== undefined && val !== null) {
-          loaded[alumno.id] = String(val);
-        }
-      }
-    });
-    setCalificacionesInput(loaded);
-  }, [parcialActivo, calificacionesMap, alumnosDelGrupo]);
+  const inputSourceKey = useMemo(
+    () =>
+      JSON.stringify([
+        grupoId,
+        parcialActivo,
+        alumnosDelGrupo.map((alumno) => alumno.id).sort((a, b) => a - b),
+        calificacionesExistentes
+          .map((c) => [c.id, c.alumnoId, c[parcialActivo]])
+          .sort((a, b) => Number(a[0]) - Number(b[0])),
+      ]),
+    [alumnosDelGrupo, calificacionesExistentes, grupoId, parcialActivo]
+  );
+  const loadedCalificacionesInput = useMemo(
+    () => buildCalificacionesInput(alumnosDelGrupo, calificacionesMap, parcialActivo),
+    [alumnosDelGrupo, calificacionesMap, parcialActivo]
+  );
+  const calificacionesInput = calificacionesDrafts[inputSourceKey] ?? loadedCalificacionesInput;
 
-  const updateCalificacion = useCallback((alumnoId: number, value: string) => {
-    // Allow empty, digits, and one decimal point
-    if (value !== "" && !/^\d{0,3}(\.\d{0,1})?$/.test(value)) return;
-    setCalificacionesInput((prev) => ({ ...prev, [alumnoId]: value }));
-  }, []);
+  const updateCalificacion = useCallback(
+    (alumnoId: number, value: string) => {
+      // Allow empty, digits, and one decimal point
+      if (value !== "" && !/^\d{0,3}(\.\d{0,1})?$/.test(value)) return;
+      setCalificacionesDrafts((prev) => ({
+        ...prev,
+        [inputSourceKey]: {
+          ...(prev[inputSourceKey] ?? loadedCalificacionesInput),
+          [alumnoId]: value,
+        },
+      }));
+    },
+    [inputSourceKey, loadedCalificacionesInput]
+  );
 
   const getCalificacionValue = useCallback(
     (alumnoId: number): string => calificacionesInput[alumnoId] ?? "",
@@ -244,13 +272,13 @@ const CapturarCalificacionesScreen: React.FC<Props> = ({ navigation, route }) =>
             for (const id of existentesIds) {
               await eliminarCalificacion(id);
             }
-            setCalificacionesInput({});
+            setCalificacionesDrafts((prev) => ({ ...prev, [inputSourceKey]: {} }));
             Alert.alert("Eliminado", "Se eliminaron las calificaciones del grupo.");
           },
         },
       ]
     );
-  }, [alumnosDelGrupo, calificacionesMap, eliminarCalificacion]);
+  }, [alumnosDelGrupo, calificacionesMap, eliminarCalificacion, inputSourceKey]);
 
   const getGradeColor = (alumnoId: number) => {
     const val = getCalificacionNumeric(alumnoId);

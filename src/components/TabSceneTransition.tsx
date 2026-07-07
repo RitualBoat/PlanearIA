@@ -10,26 +10,42 @@ interface TabSceneTransitionProps {
 const TabSceneTransition: React.FC<TabSceneTransitionProps> = ({ children, style }) => {
   const navigation = React.useContext(NavigationContext);
   const [progress] = React.useState(() => new Animated.Value(1));
+  const transitionAnimationRef = React.useRef<Animated.CompositeAnimation | null>(null);
 
   const runAnimation = React.useCallback(() => {
+    transitionAnimationRef.current?.stop();
     progress.setValue(0);
-    Animated.timing(progress, {
+    const animation = Animated.timing(progress, {
       toValue: 1,
       duration: 260,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
-    }).start();
+    });
+
+    transitionAnimationRef.current = animation;
+    animation.start(() => {
+      if (transitionAnimationRef.current === animation) {
+        transitionAnimationRef.current = null;
+      }
+    });
   }, [progress]);
 
   React.useEffect(() => {
     runAnimation();
 
     if (!navigation) {
-      return;
+      return () => {
+        transitionAnimationRef.current?.stop();
+        transitionAnimationRef.current = null;
+      };
     }
 
     const unsubscribeFocus = navigation.addListener("focus", runAnimation);
-    return unsubscribeFocus;
+    return () => {
+      unsubscribeFocus();
+      transitionAnimationRef.current?.stop();
+      transitionAnimationRef.current = null;
+    };
   }, [navigation, runAnimation]);
 
   const opacity = progress.interpolate({

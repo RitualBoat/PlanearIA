@@ -41,12 +41,14 @@ const AnimatedTopPill: React.FC<AnimatedTopPillProps> = ({
   const navigation = React.useContext(NavigationContext);
   const [ringShift] = React.useState(() => new Animated.Value(0));
   const [ringOpacity] = React.useState(() => new Animated.Value(0));
+  const glowAnimationRef = React.useRef<Animated.CompositeAnimation | null>(null);
 
   const runGlow = React.useCallback(() => {
+    glowAnimationRef.current?.stop();
     ringShift.setValue(0);
     ringOpacity.setValue(0.95);
 
-    Animated.parallel([
+    const animation = Animated.parallel([
       Animated.timing(ringShift, {
         toValue: 1,
         duration: 1400,
@@ -60,18 +62,32 @@ const AnimatedTopPill: React.FC<AnimatedTopPillProps> = ({
         easing: Easing.out(Easing.cubic),
         useNativeDriver: false,
       }),
-    ]).start();
+    ]);
+
+    glowAnimationRef.current = animation;
+    animation.start(() => {
+      if (glowAnimationRef.current === animation) {
+        glowAnimationRef.current = null;
+      }
+    });
   }, [ringOpacity, ringShift]);
 
   React.useEffect(() => {
     runGlow();
 
     if (!navigation) {
-      return;
+      return () => {
+        glowAnimationRef.current?.stop();
+        glowAnimationRef.current = null;
+      };
     }
 
     const unsubscribeFocus = navigation.addListener("focus", runGlow);
-    return unsubscribeFocus;
+    return () => {
+      unsubscribeFocus();
+      glowAnimationRef.current?.stop();
+      glowAnimationRef.current = null;
+    };
   }, [navigation, runGlow]);
 
   const borderColor = ringShift.interpolate({

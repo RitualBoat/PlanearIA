@@ -288,7 +288,9 @@ const DocEditorScreen: React.FC = () => {
       );
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+    };
   }, [isWeb, navigation, vm.isDirty]);
 
   const showSaveFeedback = useCallback((message: string) => {

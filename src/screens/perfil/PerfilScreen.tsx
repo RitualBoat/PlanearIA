@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Pressable,
   View,
@@ -95,12 +95,15 @@ const PerfilScreen: React.FC = () => {
       })
     : null;
 
-  const stats = [
-    { icon: "description", value: planeaciones.length, label: "PLANEACIONES" },
-    { icon: "groups", value: grupos.length, label: "GRUPOS" },
-    { icon: "library-books", value: recursos.length, label: "RECURSOS" },
-    { icon: "assignment", value: 0, label: "ENTREGABLES" },
-  ];
+  const stats = useMemo(
+    () => [
+      { icon: "description", value: planeaciones.length, label: "PLANEACIONES" },
+      { icon: "groups", value: grupos.length, label: "GRUPOS" },
+      { icon: "library-books", value: recursos.length, label: "RECURSOS" },
+      { icon: "assignment", value: 0, label: "ENTREGABLES" },
+    ],
+    [grupos.length, planeaciones.length, recursos.length]
+  );
 
   const showToastMessage = useCallback((config: ToastConfig) => {
     setToast(config);

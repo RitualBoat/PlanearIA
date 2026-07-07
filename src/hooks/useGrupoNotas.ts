@@ -1,28 +1,60 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo } from "react";
 import type { Grupo } from "../../types";
+
+type NotasEstado = "sin-cambios" | "cambios-sin-guardar" | "guardando" | "guardado" | "error";
+
+interface GrupoNotasDraft {
+  grupoNotas: string;
+  savedGrupoNotas: string;
+  notasActualizadoEn: string | null;
+  notasEstado: NotasEstado;
+  notasError: string;
+}
 
 export interface UseGrupoNotasResult {
   grupoNotas: string;
   notasUltimaEdicion: string;
-  notasEstado: "sin-cambios" | "cambios-sin-guardar" | "guardando" | "guardado" | "error";
+  notasEstado: NotasEstado;
   notasError: string;
   setGrupoNotas: (value: string) => void;
   guardarNotasGrupo: () => Promise<void>;
   descartarCambiosNotas: () => void;
 }
 
+const createNotasDraft = (
+  savedGrupoNotas: string,
+  notasActualizadoEn: string | null,
+  notasEstado: NotasEstado = "sin-cambios",
+  notasError = ""
+): GrupoNotasDraft => ({
+  grupoNotas: savedGrupoNotas,
+  savedGrupoNotas,
+  notasActualizadoEn,
+  notasEstado,
+  notasError,
+});
+
 export const useGrupoNotas = (
   grupoId: number,
   grupo: Partial<Grupo> | undefined,
   actualizarGrupo: (id: number, data: Partial<Grupo>) => Promise<void>
 ): UseGrupoNotasResult => {
-  const [savedGrupoNotas, setSavedGrupoNotas] = useState("");
-  const [grupoNotas, setGrupoNotasState] = useState("");
-  const [notasActualizadoEn, setNotasActualizadoEn] = useState<string | null>(null);
-  const [notasEstado, setNotasEstado] = useState<
-    "sin-cambios" | "cambios-sin-guardar" | "guardando" | "guardado" | "error"
-  >("sin-cambios");
-  const [notasError, setNotasError] = useState("");
+  const source = useMemo(() => {
+    const savedGrupoNotas = typeof grupo?.notasPersonales === "string" ? grupo.notasPersonales : "";
+    const notasActualizadoEn =
+      typeof grupo?.notasActualizadoEn === "string" ? grupo.notasActualizadoEn : null;
+
+    return {
+      key: JSON.stringify([grupo?.id ?? grupoId, savedGrupoNotas, notasActualizadoEn]),
+      savedGrupoNotas,
+      notasActualizadoEn,
+    };
+  }, [grupo?.id, grupo?.notasActualizadoEn, grupo?.notasPersonales, grupoId]);
+
+  const [draftsBySource, setDraftsBySource] = useState<Record<string, GrupoNotasDraft>>({});
+  const draft =
+    draftsBySource[source.key] ?? createNotasDraft(source.savedGrupoNotas, source.notasActualizadoEn);
+  const { grupoNotas, savedGrupoNotas, notasActualizadoEn, notasEstado, notasError } = draft;
 
   const notasUltimaEdicion = useMemo(() => {
     if (!notasActualizadoEn) return "Sin ediciones";
@@ -39,42 +71,42 @@ export const useGrupoNotas = (
     });
   }, [notasActualizadoEn]);
 
-  useEffect(() => {
-    const notasGuardadas = typeof grupo?.notasPersonales === "string" ? grupo.notasPersonales : "";
-    const notasActualizadas =
-      typeof grupo?.notasActualizadoEn === "string" ? grupo.notasActualizadoEn : null;
-
-    setSavedGrupoNotas(notasGuardadas);
-    setGrupoNotasState(notasGuardadas);
-    setNotasActualizadoEn(notasActualizadas);
-    setNotasEstado("sin-cambios");
-    setNotasError("");
-  }, [grupo?.id, grupo?.notasPersonales, grupo?.notasActualizadoEn]);
-
   const setGrupoNotas = useCallback(
     (value: string) => {
-      setGrupoNotasState(value);
-      setNotasEstado(value === savedGrupoNotas ? "sin-cambios" : "cambios-sin-guardar");
-      setNotasError("");
+      setDraftsBySource((prev) => ({
+        ...prev,
+        [source.key]: {
+          ...draft,
+          grupoNotas: value,
+          notasEstado: value === savedGrupoNotas ? "sin-cambios" : "cambios-sin-guardar",
+          notasError: "",
+        },
+      }));
     },
-    [savedGrupoNotas]
+    [draft, savedGrupoNotas, source.key]
   );
 
   const descartarCambiosNotas = useCallback(() => {
-    setGrupoNotasState(savedGrupoNotas);
-    setNotasEstado("sin-cambios");
-    setNotasError("");
-  }, [savedGrupoNotas]);
+    setDraftsBySource((prev) => ({
+      ...prev,
+      [source.key]: createNotasDraft(savedGrupoNotas, notasActualizadoEn),
+    }));
+  }, [notasActualizadoEn, savedGrupoNotas, source.key]);
 
   const guardarNotasGrupo = useCallback(async () => {
     if (grupoNotas === savedGrupoNotas) {
-      setNotasEstado("sin-cambios");
+      setDraftsBySource((prev) => ({
+        ...prev,
+        [source.key]: { ...draft, notasEstado: "sin-cambios", notasError: "" },
+      }));
       return;
     }
 
     try {
-      setNotasEstado("guardando");
-      setNotasError("");
+      setDraftsBySource((prev) => ({
+        ...prev,
+        [source.key]: { ...draft, notasEstado: "guardando", notasError: "" },
+      }));
       const nowIso = new Date().toISOString();
 
       await actualizarGrupo(grupoId, {
@@ -82,14 +114,27 @@ export const useGrupoNotas = (
         notasActualizadoEn: nowIso,
       });
 
-      setSavedGrupoNotas(grupoNotas);
-      setNotasActualizadoEn(nowIso);
-      setNotasEstado("guardado");
+      setDraftsBySource((prev) => ({
+        ...prev,
+        [source.key]: {
+          grupoNotas,
+          savedGrupoNotas: grupoNotas,
+          notasActualizadoEn: nowIso,
+          notasEstado: "guardado",
+          notasError: "",
+        },
+      }));
     } catch {
-      setNotasEstado("error");
-      setNotasError("No se pudieron guardar las notas. Intenta nuevamente.");
+      setDraftsBySource((prev) => ({
+        ...prev,
+        [source.key]: {
+          ...draft,
+          notasEstado: "error",
+          notasError: "No se pudieron guardar las notas. Intenta nuevamente.",
+        },
+      }));
     }
-  }, [actualizarGrupo, grupoId, grupoNotas, savedGrupoNotas]);
+  }, [actualizarGrupo, draft, grupoId, grupoNotas, savedGrupoNotas, source.key]);
 
   return {
     grupoNotas,

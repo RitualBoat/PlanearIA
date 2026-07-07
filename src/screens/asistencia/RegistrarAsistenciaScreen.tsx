@@ -9,7 +9,7 @@ import { useAlumnos } from "../../context/AlumnosContext";
 import { useAsistencias } from "../../context/AsistenciaContext";
 import { useGrupos } from "../../hooks/useGrupos";
 import { COLORS } from "../../../types";
-import type { Alumno } from "../../../types";
+import type { Alumno, Asistencia } from "../../../types";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
 
 type EstadoAsistencia = "presente" | "retardo" | "ausente";
@@ -49,6 +49,14 @@ const normalizeFecha = (d: Date): string => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
+const buildEstadosFromRecords = (records: Asistencia[]): Record<number, EstadoAsistencia> =>
+  records.reduce<Record<number, EstadoAsistencia>>((acc, r) => {
+    if (r.estado === "presente" || r.estado === "retardo" || r.estado === "ausente") {
+      acc[r.alumnoId] = r.estado;
+    }
+    return acc;
+  }, {});
+
 const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
   const { grupoId } = route.params;
   const { grupos } = useGrupos();
@@ -57,7 +65,9 @@ const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
     useAsistencias();
 
   const [fecha, setFecha] = useState(new Date());
-  const [estados, setEstados] = useState<Record<number, EstadoAsistencia>>({});
+  const [estadosDrafts, setEstadosDrafts] = useState<Record<string, Record<number, EstadoAsistencia>>>(
+    {}
+  );
   const [isSaving, setIsSaving] = useState(false);
 
   const grupo = useMemo(() => grupos.find((g) => g.id === grupoId), [grupos, grupoId]);
@@ -74,31 +84,35 @@ const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
     [grupoId, fechaStr, obtenerAsistenciasPorGrupoYFecha]
   );
 
-  // Initialize estados from existing records
-  React.useEffect(() => {
-    if (existingRecords.length > 0) {
-      const loaded: Record<number, EstadoAsistencia> = {};
-      existingRecords.forEach((r) => {
-        if (r.estado === "presente" || r.estado === "retardo" || r.estado === "ausente") {
-          loaded[r.alumnoId] = r.estado;
-        }
-      });
-      setEstados(loaded);
-    } else {
-      setEstados({});
-    }
-  }, [existingRecords.length, fechaStr]);
+  const estadosSourceKey = useMemo(
+    () =>
+      JSON.stringify([
+        grupoId,
+        fechaStr,
+        existingRecords
+          .map((r) => [r.id, r.alumnoId, r.estado])
+          .sort((a, b) => Number(a[0]) - Number(b[0])),
+      ]),
+    [existingRecords, fechaStr, grupoId]
+  );
+  const loadedEstados = useMemo(() => buildEstadosFromRecords(existingRecords), [existingRecords]);
+  const estados = estadosDrafts[estadosSourceKey] ?? loadedEstados;
 
-  const toggleEstado = useCallback((alumnoId: number, estado: EstadoAsistencia) => {
-    setEstados((prev) => {
-      if (prev[alumnoId] === estado) {
-        const next = { ...prev };
-        delete next[alumnoId];
-        return next;
-      }
-      return { ...prev, [alumnoId]: estado };
-    });
-  }, []);
+  const toggleEstado = useCallback(
+    (alumnoId: number, estado: EstadoAsistencia) => {
+      setEstadosDrafts((prev) => {
+        const current = prev[estadosSourceKey] ?? loadedEstados;
+        const next = { ...current };
+        if (next[alumnoId] === estado) {
+          delete next[alumnoId];
+        } else {
+          next[alumnoId] = estado;
+        }
+        return { ...prev, [estadosSourceKey]: next };
+      });
+    },
+    [estadosSourceKey, loadedEstados]
+  );
 
   const marcados = useMemo(() => Object.keys(estados).length, [estados]);
   const presentes = useMemo(
@@ -197,7 +211,7 @@ const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
     const doDelete = async () => {
       try {
         await Promise.all(existingRecords.map((r) => eliminarAsistencia(r.id)));
-        setEstados({});
+        setEstadosDrafts((prev) => ({ ...prev, [estadosSourceKey]: {} }));
         const msg = "Registro de asistencia eliminado.";
         if (Platform.OS === "web") {
           window.alert(msg);
@@ -226,7 +240,7 @@ const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
-  const renderAlumnoRow = (alumno: Alumno, index: number) => {
+  const renderAlumnoRow = (alumno: Alumno) => {
     const estado = estados[alumno.id];
     return (
       <View key={alumno.id} style={styles.alumnoRow}>
@@ -382,7 +396,7 @@ const RegistrarAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
               <Text style={styles.emptySubtext}>Agrega alumnos desde el detalle del grupo.</Text>
             </View>
           ) : (
-            alumnosDelGrupo.map((alumno, index) => renderAlumnoRow(alumno, index))
+            alumnosDelGrupo.map((alumno) => renderAlumnoRow(alumno))
           )}
 
           {/* Spacer for bottom bar */}

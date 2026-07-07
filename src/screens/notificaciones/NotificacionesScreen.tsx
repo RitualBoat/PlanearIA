@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   FlatList,
   Platform,
   StatusBar,
@@ -25,13 +25,9 @@ export const NotificacionesScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const { colors, isDark } = useTheme();
   const styles = getStyles(colors, isDark);
-  
-  const {
-    notificaciones,
-    marcarComoLeida,
-    marcarTodasComoLeidas,
-    eliminarNotificacion,
-  } = useNotificaciones();
+
+  const { notificaciones, marcarComoLeida, marcarTodasComoLeidas, eliminarNotificacion } =
+    useNotificaciones();
 
   const [activeFilter, setActiveFilter] = useState<FilterType>("todas");
 
@@ -43,7 +39,11 @@ export const NotificacionesScreen: React.FC = () => {
   const getNotificationIconInfo = (tipo: TipoNotificacion) => {
     switch (tipo) {
       case "solicitud":
-        return { name: "person-add" as const, color: colors.primaryContainer, bg: colors.primaryTint };
+        return {
+          name: "person-add" as const,
+          color: colors.primaryContainer,
+          bg: colors.primaryTint,
+        };
       case "mensaje":
         return { name: "chat" as const, color: colors.success, bg: colors.successTint };
       case "tarea":
@@ -72,7 +72,7 @@ export const NotificacionesScreen: React.FC = () => {
     if (!n.leida) {
       await marcarComoLeida(n.id);
     }
-    
+
     // Redirigir según el tipo de notificación
     if (n.tipo === "solicitud") {
       navigation.navigate("MainTabs", { screen: "SocialTab" });
@@ -87,16 +87,10 @@ export const NotificacionesScreen: React.FC = () => {
   const renderItem = ({ item }: { item: Notificacion }) => {
     const iconInfo = getNotificationIconInfo(item.tipo);
     return (
-      <View
-        style={[
-          styles.notificationCard,
-          !item.leida && styles.unreadCard,
-        ]}
-      >
-        <TouchableOpacity
-          style={styles.cardContent}
+      <View style={[styles.notificationCard, !item.leida && styles.unreadCard]}>
+        <Pressable
+          style={({ pressed }) => [styles.cardContent, pressed && { opacity: 0.8 }]}
           onPress={() => handleNotificationPress(item)}
-          activeOpacity={0.8}
         >
           <View style={[styles.iconContainer, { backgroundColor: iconInfo.bg }]}>
             <MaterialIcons name={iconInfo.name} size={22} color={iconInfo.color} />
@@ -112,22 +106,22 @@ export const NotificacionesScreen: React.FC = () => {
               {item.mensaje}
             </Text>
           </View>
-        </TouchableOpacity>
+        </Pressable>
         <View style={styles.actionsContainer}>
           {!item.leida && (
-            <TouchableOpacity
-              style={styles.actionBtn}
+            <Pressable
+              style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.6 }]}
               onPress={() => marcarComoLeida(item.id)}
             >
               <MaterialIcons name="done" size={18} color={colors.success} />
-            </TouchableOpacity>
+            </Pressable>
           )}
-          <TouchableOpacity
-            style={styles.actionBtn}
+          <Pressable
+            style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.6 }]}
             onPress={() => eliminarNotificacion(item.id)}
           >
             <MaterialIcons name="delete-outline" size={18} color={colors.error} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     );
@@ -135,17 +129,19 @@ export const NotificacionesScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
-      <StatusBar backgroundColor={colors.surfaceContainerLowest} barStyle={isDark ? "light-content" : "dark-content"} />
+      <StatusBar
+        backgroundColor={colors.surfaceContainerLowest}
+        barStyle={isDark ? "light-content" : "dark-content"}
+      />
 
       {/* Header Fijo con Botón de Regresar */}
       <View style={styles.headerBar}>
-        <TouchableOpacity
-          style={styles.backButton}
+        <Pressable
+          style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}
           onPress={() => navigation.goBack()}
-          activeOpacity={0.7}
         >
           <MaterialIcons name="arrow-back" size={24} color={colors.primary} />
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.headerTitle}>Notificaciones</Text>
         <View style={{ width: 40 }} />
       </View>
@@ -160,21 +156,29 @@ export const NotificacionesScreen: React.FC = () => {
         {/* Barra de Filtros y Acción de Limpiar */}
         <View style={styles.filterRow}>
           <View style={styles.pillsContainer}>
-            <TouchableOpacity
-              style={[styles.pill, activeFilter === "todas" && styles.pillActive]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.pill,
+                activeFilter === "todas" && styles.pillActive,
+                pressed && { opacity: 0.7 },
+              ]}
               onPress={() => setActiveFilter("todas")}
-              activeOpacity={0.7}
             >
               <Text style={[styles.pillText, activeFilter === "todas" && styles.pillTextActive]}>
                 Todas
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.pill, activeFilter === "no_leidas" && styles.pillActive]}
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [
+                styles.pill,
+                activeFilter === "no_leidas" && styles.pillActive,
+                pressed && { opacity: 0.7 },
+              ]}
               onPress={() => setActiveFilter("no_leidas")}
-              activeOpacity={0.7}
             >
-              <Text style={[styles.pillText, activeFilter === "no_leidas" && styles.pillTextActive]}>
+              <Text
+                style={[styles.pillText, activeFilter === "no_leidas" && styles.pillTextActive]}
+              >
                 Sin leer
               </Text>
               {notificaciones.filter((n) => !n.leida).length > 0 && (
@@ -184,18 +188,17 @@ export const NotificacionesScreen: React.FC = () => {
                   </Text>
                 </View>
               )}
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {notificaciones.some((n) => !n.leida) && (
-            <TouchableOpacity
-              style={styles.markAllBtn}
+            <Pressable
+              style={({ pressed }) => [styles.markAllBtn, pressed && { opacity: 0.7 }]}
               onPress={marcarTodasComoLeidas}
-              activeOpacity={0.7}
             >
               <MaterialIcons name="done-all" size={16} color={colors.primaryContainer} />
               <Text style={styles.markAllText}>Leídas</Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
         </View>
 

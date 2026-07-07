@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Platform, Pressable } from "react-native";
+import { View, Text, StyleSheet, Modal, Platform, Pressable } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTheme } from "../context/ThemeContext";
 
@@ -98,14 +98,13 @@ const PostOptionsSheet: React.FC<PostOptionsSheetProps> = ({
               const textColor = opt.destructive ? colors.error : colors.onSurface;
 
               return (
-                <TouchableOpacity
+                <Pressable
                   key={idx}
-                  style={styles.optionRow}
+                  style={({ pressed }) => [styles.optionRow, pressed && { opacity: 0.7 }]}
                   onPress={() => {
                     opt.onPress?.();
                     onClose();
                   }}
-                  activeOpacity={0.7}
                 >
                   <View style={styles.optionLeft}>
                     <View style={[styles.optionIconBox, { backgroundColor: iconBgColor }]}>
@@ -116,19 +115,23 @@ const PostOptionsSheet: React.FC<PostOptionsSheetProps> = ({
                   {!opt.destructive && (
                     <MaterialIcons name="chevron-right" size={18} color={colors.outlineVariant} />
                   )}
-                </TouchableOpacity>
+                </Pressable>
               );
             })}
           </View>
 
           {/* Dismiss */}
           <View style={styles.dismissContainer}>
-            <TouchableOpacity
-              style={[styles.dismissBtn, { backgroundColor: colors.surfaceContainerHigh }]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.dismissBtn,
+                { backgroundColor: colors.surfaceContainerHigh },
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={onClose}
             >
               <Text style={[styles.dismissText, { color: colors.onSurface }]}>Cancelar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {/* Safe area bottom */}

@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from "react";
 import {
   View,
-  TouchableOpacity,
   Modal,
   Pressable,
   Text,
@@ -58,9 +57,8 @@ const FloatingActionIcons: React.FC = () => {
     <>
       <View style={[styles.wrap, { top: topOffset, right: rightOffset }]} pointerEvents="box-none">
         <View style={styles.row}>
-          <TouchableOpacity
-            style={styles.iconBtn}
-            activeOpacity={0.85}
+          <Pressable
+            style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.85 }]}
             onPress={() => navigation.navigate("Notificaciones")}
             accessibilityRole="button"
             accessibilityLabel="Abrir notificaciones"
@@ -73,19 +71,17 @@ const FloatingActionIcons: React.FC = () => {
                 </View>
               )}
             </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.iconBtn}
-            activeOpacity={0.85}
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.85 }]}
             onPress={() => navigation.navigate("Ayuda")}
             accessibilityRole="button"
             accessibilityLabel="Abrir centro de ayuda"
           >
             <MaterialIcons name="help-outline" size={20} color={COLORS.textDark} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.avatarBtn}
-            activeOpacity={0.85}
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.avatarBtn, pressed && { opacity: 0.85 }]}
             onPress={openMenu}
             accessibilityRole="button"
             accessibilityLabel="Abrir menú de cuenta"
@@ -93,7 +89,7 @@ const FloatingActionIcons: React.FC = () => {
             <View style={styles.avatarCircle}>
               <MaterialIcons name="person" size={16} color={COLORS.surface} />
             </View>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
 

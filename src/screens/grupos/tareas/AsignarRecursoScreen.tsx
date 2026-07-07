@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   StatusBar,
   ActivityIndicator,
   Modal,
@@ -213,18 +213,21 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
               </Text>
             </View>
 
-            <TouchableOpacity style={styles.primaryAction} onPress={() => navigation.goBack()}>
+            <Pressable
+              style={({ pressed }) => [styles.primaryAction, pressed && { opacity: 0.6 }]}
+              onPress={() => navigation.goBack()}
+            >
               <Text style={styles.primaryActionText}>Volver al detalle</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
-              style={styles.secondaryAction}
+            <Pressable
+              style={({ pressed }) => [styles.secondaryAction, pressed && { opacity: 0.6 }]}
               onPress={() => {
                 setSuccessState(false);
               }}
             >
               <Text style={styles.secondaryActionText}>Ver elementos asignados</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </SafeAreaView>
       </View>
@@ -254,15 +257,21 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
           </View>
 
           <View style={styles.actionStack}>
-            <TouchableOpacity style={styles.primaryAction} onPress={() => openModal("entregable")}>
+            <Pressable
+              style={({ pressed }) => [styles.primaryAction, pressed && { opacity: 0.6 }]}
+              onPress={() => openModal("entregable")}
+            >
               <MaterialIcons name="playlist-add-check" size={20} color={COLORS.surface} />
               <Text style={styles.primaryActionText}>Asignar entregable</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity style={styles.secondaryAction} onPress={() => openModal("recurso")}>
+            <Pressable
+              style={({ pressed }) => [styles.secondaryAction, pressed && { opacity: 0.6 }]}
+              onPress={() => openModal("recurso")}
+            >
               <MaterialIcons name="note-add" size={20} color={COLORS.primary} />
               <Text style={styles.secondaryActionText}>Asignar recurso</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {error ? (
@@ -298,13 +307,13 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
                         {item.subtipo || "General"}
                       </Text>
                     </View>
-                    <TouchableOpacity
+                    <Pressable
                       onPress={() => setConfirmRemoveItem(item)}
                       disabled={isSaving}
-                      style={styles.removeButton}
+                      style={({ pressed }) => [styles.removeButton, pressed && { opacity: 0.6 }]}
                     >
                       <MaterialIcons name="delete-outline" size={20} color="#6E7E96" />
-                    </TouchableOpacity>
+                    </Pressable>
                   </View>
                 ))
               : null}
@@ -317,13 +326,13 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
               <Text style={styles.emptyStateText}>
                 Aún no has añadido materiales para este grupo.
               </Text>
-              <TouchableOpacity
-                style={styles.emptyStateButton}
+              <Pressable
+                style={({ pressed }) => [styles.emptyStateButton, pressed && { opacity: 0.6 }]}
                 onPress={() => openModal("recurso")}
               >
                 <MaterialIcons name="add-circle-outline" size={18} color={COLORS.primaryDark} />
                 <Text style={styles.emptyStateButtonText}>Asignar primer recurso</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           ) : null}
 
@@ -342,9 +351,12 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
                 <Text style={styles.modalTitle}>
                   {selectedType === "recurso" ? "Asignar Recursos" : "Asignar Entregables"}
                 </Text>
-                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Pressable
+                  style={({ pressed }) => pressed && { opacity: 0.6 }}
+                  onPress={() => setModalVisible(false)}
+                >
                   <MaterialIcons name="close" size={24} color="#60758E" />
-                </TouchableOpacity>
+                </Pressable>
               </View>
 
               <View style={styles.searchBox}>
@@ -365,9 +377,13 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
                   availableByType.map((item) => {
                     const selected = selectedIds.includes(item.id);
                     return (
-                      <TouchableOpacity
+                      <Pressable
                         key={`${item.tipo}-${item.id}`}
-                        style={[styles.modalItem, selected && styles.modalItemSelected]}
+                        style={({ pressed }) => [
+                          styles.modalItem,
+                          selected && styles.modalItemSelected,
+                          pressed && { opacity: 0.6 },
+                        ]}
                         onPress={() => toggleItem(item.id)}
                       >
                         <View style={styles.itemIconWrap}>
@@ -386,7 +402,7 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
                           size={22}
                           color={selected ? COLORS.primary : "#9FB0C7"}
                         />
-                      </TouchableOpacity>
+                      </Pressable>
                     );
                   })
                 )}
@@ -394,22 +410,32 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
 
               <View style={styles.selectionRow}>
                 <Text style={styles.selectionText}>{selectedIds.length} seleccionados</Text>
-                <TouchableOpacity onPress={() => setSelectedIds([])}>
+                <Pressable
+                  style={({ pressed }) => pressed && { opacity: 0.6 }}
+                  onPress={() => setSelectedIds([])}
+                >
                   <Text style={styles.clearText}>Limpiar selección</Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
 
-              <TouchableOpacity
-                style={[styles.primaryAction, selectedIds.length === 0 && styles.disabledAction]}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.primaryAction,
+                  selectedIds.length === 0 && styles.disabledAction,
+                  pressed && { opacity: 0.6 },
+                ]}
                 onPress={openConfirmAssign}
                 disabled={selectedIds.length === 0}
               >
                 <Text style={styles.primaryActionText}>Asignar seleccionados</Text>
-              </TouchableOpacity>
+              </Pressable>
 
-              <TouchableOpacity style={styles.secondaryAction} onPress={goCreateNew}>
+              <Pressable
+                style={({ pressed }) => [styles.secondaryAction, pressed && { opacity: 0.6 }]}
+                onPress={goCreateNew}
+              >
                 <Text style={styles.secondaryActionText}>Crear nuevo</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         </Modal>
@@ -422,21 +448,21 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
               <Text style={styles.confirmText}>
                 ¿Desea agregar {selectedIds.length} elemento(s) al grupo {grupoId}?
               </Text>
-              <TouchableOpacity
-                style={styles.primaryAction}
+              <Pressable
+                style={({ pressed }) => [styles.primaryAction, pressed && { opacity: 0.6 }]}
                 onPress={() => void confirmAssign()}
                 disabled={isSaving}
               >
                 <Text style={styles.primaryActionText}>
                   {isSaving ? "Asignando..." : "Confirmar asignación"}
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.secondaryAction}
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [styles.secondaryAction, pressed && { opacity: 0.6 }]}
                 onPress={() => setConfirmVisible(false)}
               >
                 <Text style={styles.secondaryActionText}>Cancelar</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         </Modal>
@@ -449,19 +475,19 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
               <Text style={styles.confirmText}>
                 El elemento seguirá en el sistema y solo se desvinculará del grupo.
               </Text>
-              <TouchableOpacity
-                style={styles.primaryAction}
+              <Pressable
+                style={({ pressed }) => [styles.primaryAction, pressed && { opacity: 0.6 }]}
                 onPress={() => void confirmRemove()}
                 disabled={isSaving}
               >
                 <Text style={styles.primaryActionText}>Quitar del grupo</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.secondaryAction}
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [styles.secondaryAction, pressed && { opacity: 0.6 }]}
                 onPress={() => setConfirmRemoveItem(null)}
               >
                 <Text style={styles.secondaryActionText}>Cancelar</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         </Modal>

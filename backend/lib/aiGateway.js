@@ -7,6 +7,7 @@
  */
 
 const DEFAULT_TIMEOUT_MS = parseInt(process.env.OPENAI_TIMEOUT_MS || "25000", 10);
+const SERVER_ENV = process.env;
 
 function normalizeBaseUrl(value) {
   return String(value || "").replace(/\/+$/g, "");
@@ -27,15 +28,20 @@ function safeJsonParse(value, fallback) {
   }
 }
 
+function readServerEnv(name) {
+  if (!name) return undefined;
+  return SERVER_ENV[name];
+}
+
 function providerFromEnv(id, env) {
-  const apiKey = process.env[env.apiKey];
-  const model = cleanConfigValue(process.env[env.model] || env.defaultModel);
+  const apiKey = readServerEnv(env.apiKey);
+  const model = cleanConfigValue(readServerEnv(env.model) || env.defaultModel);
   if (!apiKey || !model) return null;
 
   return {
     id,
     label: env.label || id,
-    baseUrl: normalizeBaseUrl(process.env[env.baseUrl] || env.defaultBaseUrl),
+    baseUrl: normalizeBaseUrl(readServerEnv(env.baseUrl) || env.defaultBaseUrl),
     apiKey,
     model,
     headers: env.headers || {},
@@ -46,20 +52,21 @@ function getConfiguredProviders() {
   const customProviders = safeJsonParse(process.env.AI_GATEWAY_PROVIDERS || "[]", []);
   const parsedCustomProviders = Array.isArray(customProviders)
     ? customProviders
-        .map((item, index) => {
-          const apiKey = item?.apiKey || (item?.apiKeyEnv ? process.env[item.apiKeyEnv] : "");
-          const model = cleanConfigValue(item?.model || (item?.modelEnv ? process.env[item.modelEnv] : ""));
-          if (!item?.baseUrl || !apiKey || !model) return null;
-          return {
-            id: item.id || `custom_${index + 1}`,
-            label: item.label || item.id || `custom_${index + 1}`,
-            baseUrl: normalizeBaseUrl(item.baseUrl),
-            apiKey,
-            model,
-            headers: item.headers || {},
-          };
+        .flatMap((item, index) => {
+          const apiKey = item?.apiKey || readServerEnv(item?.apiKeyEnv) || "";
+          const model = cleanConfigValue(item?.model || readServerEnv(item?.modelEnv) || "");
+          if (!item?.baseUrl || !apiKey || !model) return [];
+          return [
+            {
+              id: item.id || `custom_${index + 1}`,
+              label: item.label || item.id || `custom_${index + 1}`,
+              baseUrl: normalizeBaseUrl(item.baseUrl),
+              apiKey,
+              model,
+              headers: item.headers || {},
+            },
+          ];
         })
-        .filter(Boolean)
     : [];
 
   const builtInProviders = [
@@ -95,7 +102,7 @@ function getConfiguredProviders() {
       baseUrl: "TOGETHER_BASE_URL",
       defaultBaseUrl: "https://api.together.xyz/v1",
     }),
-  ].filter(Boolean);
+  ].flatMap((provider) => (provider ? [provider] : []));
 
   return [...parsedCustomProviders, ...builtInProviders];
 }

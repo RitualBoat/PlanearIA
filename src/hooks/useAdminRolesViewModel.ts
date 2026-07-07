@@ -29,7 +29,6 @@ export function useAdminRolesViewModel(enabled: boolean = true) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-Key": API_CONFIG.apiSecret,
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ action: "listar_usuarios" }),
@@ -60,7 +59,6 @@ export function useAdminRolesViewModel(enabled: boolean = true) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-API-Key": API_CONFIG.apiSecret,
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ action: "cambiar_rol", targetUserId, nuevoRol }),

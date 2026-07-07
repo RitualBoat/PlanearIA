@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from "react-native";
+import { Pressable, View, Text, StyleSheet, ScrollView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -86,12 +86,16 @@ const RetoResultadoScreen: React.FC<RetoResultadoScreenProps> = ({ route, naviga
       {/* Header */}
       <View style={[styles.header, { backgroundColor: `${colors.background}CC` }]}>
         <Text style={[styles.headerTitle, { color: colors.primary }]}>Resultado</Text>
-        <TouchableOpacity
-          style={[styles.closeBtn, { backgroundColor: "transparent" }]}
+        <Pressable
+          style={({ pressed }) => [
+            styles.closeBtn,
+            { backgroundColor: "transparent" },
+            pressed && { opacity: 0.6 },
+          ]}
           onPress={() => navigation?.goBack()}
         >
           <MaterialIcons name="close" size={24} color={colors.onSurface} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
@@ -188,23 +192,23 @@ const RetoResultadoScreen: React.FC<RetoResultadoScreenProps> = ({ route, naviga
           end={{ x: 1, y: 1 }}
           style={styles.footerPrimaryBtn}
         >
-          <TouchableOpacity
-            style={styles.footerBtnInner}
+          <Pressable
+            style={({ pressed }) => [styles.footerBtnInner, pressed && { opacity: 0.9 }]}
             onPress={() => navigation?.goBack()}
-            activeOpacity={0.9}
           >
             <Text style={styles.footerPrimaryText}>Volver al feed</Text>
-          </TouchableOpacity>
+          </Pressable>
         </LinearGradient>
 
-        <TouchableOpacity
-          style={[
+        <Pressable
+          style={({ pressed }) => [
             styles.footerSecondaryBtn,
             {
               backgroundColor: colors.surfaceContainerLowest,
               borderColor: `${colors.primary}10`,
               borderWidth: 2,
             },
+            pressed && { opacity: 0.6 },
           ]}
           onPress={() => {
             /* stub */
@@ -213,10 +217,10 @@ const RetoResultadoScreen: React.FC<RetoResultadoScreenProps> = ({ route, naviga
           <Text style={[styles.footerSecondaryText, { color: colors.primary }]}>
             Guardar en biblioteca
           </Text>
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
-          style={styles.footerTextBtn}
+        <Pressable
+          style={({ pressed }) => [styles.footerTextBtn, pressed && { opacity: 0.6 }]}
           onPress={() => {
             /* stub */
           }}
@@ -225,7 +229,7 @@ const RetoResultadoScreen: React.FC<RetoResultadoScreenProps> = ({ route, naviga
           <Text style={[styles.footerTextBtnLabel, { color: `${colors.primary}70` }]}>
             Compartir
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </SafeAreaView>
   );

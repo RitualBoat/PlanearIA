@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Pressable, View, Text, StyleSheet } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -29,13 +29,20 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ currentScreen, showBackButt
 
   return (
     <View style={styles.headerBar}>
-      <TouchableOpacity style={styles.iconButton} onPress={handleBack} disabled={!showBackButton}>
+      <Pressable
+        style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+        onPress={handleBack}
+        disabled={!showBackButton}
+      >
         {showBackButton && <MaterialIcons name="arrow-back" size={24} color="white" />}
-      </TouchableOpacity>
+      </Pressable>
       <Text style={styles.headerTitle}>{currentScreen}</Text>
-      <TouchableOpacity style={styles.iconButton} onPress={handleMenu}>
+      <Pressable
+        style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+        onPress={handleMenu}
+      >
         <MaterialIcons name="home" size={24} color="white" />
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

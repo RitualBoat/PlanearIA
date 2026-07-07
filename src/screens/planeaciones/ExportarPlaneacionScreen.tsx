@@ -1,9 +1,9 @@
 import React from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   StatusBar,
   ScrollView,
   Switch,
@@ -200,18 +200,23 @@ const ExportarPlaneacionScreen: React.FC = () => {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.headerRow}>
-            <TouchableOpacity style={styles.headerIconButton} onPress={() => navigation.goBack()}>
+            <Pressable
+              style={({ pressed }) => [styles.headerIconButton, pressed && { opacity: 0.6 }]}
+              onPress={() => navigation.goBack()}
+            >
               <MaterialIcons name="arrow-back" size={24} color={COLORS.primary} />
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={styles.headerTitleWrap}>
               <Text style={styles.headerTitle}>Exportar PlaneaciÃ³n</Text>
               <Text style={styles.headerSubtitle}>Genera y comparte en distintos formatos</Text>
             </View>
 
-            <TouchableOpacity style={styles.headerIconButton}>
+            <Pressable
+              style={({ pressed }) => [styles.headerIconButton, pressed && { opacity: 0.6 }]}
+            >
               <MaterialIcons name="more-vert" size={22} color={COLORS.textTertiary} />
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           <View style={[styles.mainLayout, wideLayout && styles.mainLayoutWide]}>
@@ -222,11 +227,14 @@ const ExportarPlaneacionScreen: React.FC = () => {
                 {(["pdf", "docx"] as ExportFormat[]).map((format) => {
                   const active = selectedFormat === format;
                   return (
-                    <TouchableOpacity
+                    <Pressable
                       key={format}
-                      style={[styles.formatOption, active && styles.formatOptionActive]}
+                      style={({ pressed }) => [
+                        styles.formatOption,
+                        active && styles.formatOptionActive,
+                        pressed && { opacity: 0.85 },
+                      ]}
                       onPress={() => setSelectedFormat(format)}
-                      activeOpacity={0.85}
                     >
                       <View style={styles.formatOptionLeft}>
                         <View style={[styles.radio, active && styles.radioActive]} />
@@ -239,7 +247,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
                           {formatLabel[format]}
                         </Text>
                       </View>
-                    </TouchableOpacity>
+                    </Pressable>
                   );
                 })}
               </View>
@@ -367,19 +375,28 @@ const ExportarPlaneacionScreen: React.FC = () => {
           </View>
 
           <View style={[styles.footerActions, wideLayout && styles.footerActionsWide]}>
-            <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
+            <Pressable
+              style={({ pressed }) => [styles.cancelButton, pressed && { opacity: 0.6 }]}
+              onPress={() => navigation.goBack()}
+            >
               <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity style={styles.shareButton} onPress={handleCompartir}>
+            <Pressable
+              style={({ pressed }) => [styles.shareButton, pressed && { opacity: 0.6 }]}
+              onPress={handleCompartir}
+            >
               <MaterialIcons name="share" size={20} color={COLORS.textSecondary} />
               <Text style={styles.shareButtonText}>Compartir</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity style={styles.exportButton} onPress={handleExportar}>
+            <Pressable
+              style={({ pressed }) => [styles.exportButton, pressed && { opacity: 0.6 }]}
+              onPress={handleExportar}
+            >
               <MaterialIcons name="download" size={20} color={COLORS.surface} />
               <Text style={styles.exportButtonText}>Exportar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -431,13 +448,19 @@ const ExportarPlaneacionScreen: React.FC = () => {
               </View>
             </View>
 
-            <TouchableOpacity style={styles.openButton} onPress={handleOpenFile}>
+            <Pressable
+              style={({ pressed }) => [styles.openButton, pressed && { opacity: 0.6 }]}
+              onPress={handleOpenFile}
+            >
               <Text style={styles.openButtonText}>Abrir archivo</Text>
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={styles.successActionsRow}>
-              <TouchableOpacity
-                style={styles.successSecondaryButton}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.successSecondaryButton,
+                  pressed && { opacity: 0.6 },
+                ]}
                 onPress={() => {
                   setShowSuccess(false);
                   void handleCompartir();
@@ -445,9 +468,12 @@ const ExportarPlaneacionScreen: React.FC = () => {
               >
                 <MaterialIcons name="share" size={18} color={COLORS.textSecondary} />
                 <Text style={styles.successSecondaryButtonText}>Compartir</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.successSecondaryButton}
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.successSecondaryButton,
+                  pressed && { opacity: 0.6 },
+                ]}
                 onPress={() => {
                   setShowSuccess(false);
                   navigation.navigate("ListaPlaneaciones");
@@ -455,7 +481,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
               >
                 <MaterialIcons name="home" size={18} color={COLORS.textSecondary} />
                 <Text style={styles.successSecondaryButtonText}>Volver al inicio</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         </View>

@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   StatusBar,
   ScrollView,
   Alert,
@@ -190,27 +190,25 @@ const ImportarPlaneacionScreen: React.FC = () => {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.headerRow}>
-            <TouchableOpacity
-              style={styles.headerIconButton}
+            <Pressable
+              style={({ pressed }) => [styles.headerIconButton, pressed && { opacity: 0.8 }]}
               onPress={() => navigation.goBack()}
               accessibilityLabel="Regresar"
-              activeOpacity={0.8}
             >
               <MaterialIcons name="arrow-back" size={24} color={COLORS.primary} />
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={styles.headerTitleWrap}>
               <Text style={styles.headerTitle}>Importar Planeación</Text>
               <Text style={styles.headerSubtitle}>Importa desde PDF o DOCX</Text>
             </View>
 
-            <TouchableOpacity
-              style={styles.headerIconButton}
+            <Pressable
+              style={({ pressed }) => [styles.headerIconButton, pressed && { opacity: 0.8 }]}
               onPress={showPendingMessage}
-              activeOpacity={0.8}
             >
               <MaterialIcons name="more-vert" size={22} color={COLORS.textTertiary} />
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           <View style={[styles.mainLayout, wideLayout && styles.mainLayoutWide]}>
@@ -226,14 +224,13 @@ const ImportarPlaneacionScreen: React.FC = () => {
                   <Text style={styles.uploadSubtitle}>Formatos permitidos: PDF, DOCX</Text>
                 </View>
 
-                <TouchableOpacity
-                  style={styles.primaryButton}
+                <Pressable
+                  style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.9 }]}
                   onPress={handleSelectFile}
-                  activeOpacity={0.9}
                 >
                   <MaterialIcons name="add" size={20} color={COLORS.surface} />
                   <Text style={styles.primaryButtonText}>Seleccionar archivo</Text>
-                </TouchableOpacity>
+                </Pressable>
 
                 {selectedFileName ? (
                   <View style={styles.selectedFileCard}>
@@ -272,7 +269,13 @@ const ImportarPlaneacionScreen: React.FC = () => {
                         isProcessing ? "sync" : selectedFileName ? "check-circle" : "hourglass-top"
                       }
                       size={22}
-                      color={isProcessing ? COLORS.primary : selectedFileName ? "#0BA5A5" : COLORS.textTertiary}
+                      color={
+                        isProcessing
+                          ? COLORS.primary
+                          : selectedFileName
+                            ? "#0BA5A5"
+                            : COLORS.textTertiary
+                      }
                     />
                   </View>
                   <View style={styles.stateTextWrap}>
@@ -342,7 +345,11 @@ const ImportarPlaneacionScreen: React.FC = () => {
                 </View>
 
                 <View style={styles.structureTitleRow}>
-                  <MaterialIcons name="format-list-bulleted" size={18} color={COLORS.textTertiary} />
+                  <MaterialIcons
+                    name="format-list-bulleted"
+                    size={18}
+                    color={COLORS.textTertiary}
+                  />
                   <Text style={styles.structureTitle}>Estructura de Actividades</Text>
                 </View>
 
@@ -388,26 +395,25 @@ const ImportarPlaneacionScreen: React.FC = () => {
           </View>
 
           <View style={[styles.footerActions, wideLayout && styles.footerActionsWide]}>
-            <TouchableOpacity
-              style={[
+            <Pressable
+              style={({ pressed }) => [
                 styles.primaryButtonLarge,
                 (!selectedFileName || isProcessing) && styles.primaryButtonLargeDisabled,
+                pressed && { opacity: 0.9 },
               ]}
               onPress={handleImportarYContinuar}
               disabled={!selectedFileName || isProcessing}
-              activeOpacity={0.9}
             >
               <MaterialIcons name="save-alt" size={22} color={COLORS.surface} />
               <Text style={styles.primaryButtonLargeText}>Importar y continuar</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
-              style={styles.cancelButton}
+            <Pressable
+              style={({ pressed }) => [styles.cancelButton, pressed && { opacity: 0.8 }]}
               onPress={() => navigation.goBack()}
-              activeOpacity={0.8}
             >
               <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -821,4 +827,3 @@ const styles = StyleSheet.create({
 });
 
 export default ImportarPlaneacionScreen;
-

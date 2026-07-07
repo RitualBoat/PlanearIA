@@ -3,10 +3,10 @@ import {
   ActivityIndicator,
   Animated,
   Platform,
+  Pressable,
   RefreshControl,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -31,8 +31,16 @@ const COVER_COLORS = ["#1E7D4F", "#2563EB", "#0F766E", "#B45309", "#4338CA"];
 
 const ClassroomHomeScreen: React.FC = () => {
   const navigation = useNavigation<Navigation>();
-  const { classrooms, isLoading, error, isEmpty, totalAlumnos, totalGrupos, totalPendientes, reload } =
-    useClassroomHomeViewModel();
+  const {
+    classrooms,
+    isLoading,
+    error,
+    isEmpty,
+    totalAlumnos,
+    totalGrupos,
+    totalPendientes,
+    reload,
+  } = useClassroomHomeViewModel();
   const [activeTab, setActiveTab] = useState<HomeTab>("cursos");
   const [scrollY] = React.useState(() => new Animated.Value(0));
   const allPendientes = classrooms.flatMap((item) =>
@@ -40,7 +48,7 @@ const ClassroomHomeScreen: React.FC = () => {
       ...pendiente,
       grupoNombre: item.grupo.nombre,
       materia: item.grupo.materia,
-    })),
+    }))
   );
 
   const mobilePillOpacity = scrollY.interpolate({
@@ -82,14 +90,20 @@ const ClassroomHomeScreen: React.FC = () => {
         </View>
 
         <View style={styles.heroActions}>
-          <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("CrearGrupo", { returnToClassroom: true })}>
+          <Pressable
+            style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.6 }]}
+            onPress={() => navigation.navigate("CrearGrupo", { returnToClassroom: true })}
+          >
             <MaterialIcons name="add" size={20} color="#FFFFFF" />
             <Text style={styles.primaryButtonText}>Crear clase</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate("ImportarGrupos")}>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.secondaryButton, pressed && { opacity: 0.6 }]}
+            onPress={() => navigation.navigate("ImportarGrupos")}
+          >
             <MaterialIcons name="upload-file" size={20} color={COLORS.primary} />
             <Text style={styles.secondaryButtonText}>Importar</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.kpiGrid}>
@@ -100,9 +114,13 @@ const ClassroomHomeScreen: React.FC = () => {
 
         <View style={styles.tabsBar}>
           {HOME_TABS.map((tab) => (
-            <TouchableOpacity
+            <Pressable
               key={tab.key}
-              style={[styles.tabButton, activeTab === tab.key ? styles.tabButtonActive : null]}
+              style={({ pressed }) => [
+                styles.tabButton,
+                activeTab === tab.key ? styles.tabButtonActive : null,
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={() => setActiveTab(tab.key)}
             >
               <MaterialIcons
@@ -110,8 +128,10 @@ const ClassroomHomeScreen: React.FC = () => {
                 size={18}
                 color={activeTab === tab.key ? COLORS.primary : "#64748B"}
               />
-              <Text style={[styles.tabText, activeTab === tab.key ? styles.tabTextActive : null]}>{tab.label}</Text>
-            </TouchableOpacity>
+              <Text style={[styles.tabText, activeTab === tab.key ? styles.tabTextActive : null]}>
+                {tab.label}
+              </Text>
+            </Pressable>
           ))}
         </View>
 
@@ -120,9 +140,12 @@ const ClassroomHomeScreen: React.FC = () => {
             <MaterialIcons name="cloud-off" size={24} color="#B45309" />
             <Text style={styles.statusTitle}>Modo local activo</Text>
             <Text style={styles.statusText}>{error}</Text>
-            <TouchableOpacity style={styles.statusButton} onPress={() => void reload()}>
+            <Pressable
+              style={({ pressed }) => [styles.statusButton, pressed && { opacity: 0.6 }]}
+              onPress={() => void reload()}
+            >
               <Text style={styles.statusButtonText}>Reintentar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         ) : null}
 
@@ -142,15 +165,18 @@ const ClassroomHomeScreen: React.FC = () => {
               el flujo actual.
             </Text>
             <View style={styles.emptyActions}>
-              <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("CrearGrupo", { returnToClassroom: true })}>
+              <Pressable
+                style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.6 }]}
+                onPress={() => navigation.navigate("CrearGrupo", { returnToClassroom: true })}
+              >
                 <Text style={styles.primaryButtonText}>Crear grupo</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.secondaryButton}
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [styles.secondaryButton, pressed && { opacity: 0.6 }]}
                 onPress={() => navigation.navigate("ImportarGrupos")}
               >
                 <Text style={styles.secondaryButtonText}>Importar</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         ) : null}
@@ -159,14 +185,16 @@ const ClassroomHomeScreen: React.FC = () => {
           <>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Clases activas</Text>
-              <Text style={styles.sectionCaption}>Abre una clase para ver tablon, trabajo de clase y personas.</Text>
+              <Text style={styles.sectionCaption}>
+                Abre una clase para ver tablon, trabajo de clase y personas.
+              </Text>
             </View>
 
             <View style={styles.classGrid}>
               {classrooms.map((item, index) => (
-                <TouchableOpacity
+                <Pressable
                   key={item.grupo.id}
-                  style={styles.classCard}
+                  style={({ pressed }) => [styles.classCard, pressed && { opacity: 0.6 }]}
                   onPress={() =>
                     navigation.navigate("ClassroomGroup", {
                       grupoId: item.grupo.id,
@@ -175,10 +203,14 @@ const ClassroomHomeScreen: React.FC = () => {
                   }
                 >
                   <View style={[styles.classCover, { backgroundColor: getCoverColor(index) }]}>
-                    <Text style={styles.classCoverTitle} numberOfLines={2}>{item.grupo.nombre}</Text>
+                    <Text style={styles.classCoverTitle} numberOfLines={2}>
+                      {item.grupo.nombre}
+                    </Text>
                     <Text style={styles.classCoverSubtitle}>{item.grupo.materia}</Text>
                     <View style={styles.avatarBubble}>
-                      <Text style={styles.avatarBubbleText}>{item.grupo.nombre.slice(0, 1).toUpperCase()}</Text>
+                      <Text style={styles.avatarBubbleText}>
+                        {item.grupo.nombre.slice(0, 1).toUpperCase()}
+                      </Text>
                     </View>
                   </View>
                   <View style={styles.classBody}>
@@ -189,7 +221,7 @@ const ClassroomHomeScreen: React.FC = () => {
                       <MiniMetric label="Materiales" value={item.resumen.totalMateriales} />
                     </View>
                   </View>
-                </TouchableOpacity>
+                </Pressable>
               ))}
             </View>
           </>
@@ -200,7 +232,10 @@ const ClassroomHomeScreen: React.FC = () => {
             emptyText="No hay fechas proximas."
             items={allPendientes
               .filter((item) => item.fechaLimite)
-              .sort((a, b) => new Date(a.fechaLimite ?? "").getTime() - new Date(b.fechaLimite ?? "").getTime())
+              .sort(
+                (a, b) =>
+                  new Date(a.fechaLimite ?? "").getTime() - new Date(b.fechaLimite ?? "").getTime()
+              )
               .map((item) => ({
                 id: item.id,
                 title: item.titulo,
@@ -226,11 +261,11 @@ const ClassroomHomeScreen: React.FC = () => {
   );
 };
 
-const KpiCard: React.FC<{ label: string; value: string; icon: keyof typeof MaterialIcons.glyphMap }> = ({
-  icon,
-  label,
-  value,
-}) => (
+const KpiCard: React.FC<{
+  label: string;
+  value: string;
+  icon: keyof typeof MaterialIcons.glyphMap;
+}> = ({ icon, label, value }) => (
   <View style={styles.kpiCard}>
     <MaterialIcons name={icon} size={22} color={COLORS.primary} />
     <Text style={styles.kpiValue}>{value}</Text>
@@ -659,4 +694,3 @@ const styles = StyleSheet.create({
 });
 
 export default ClassroomHomeScreen;
-

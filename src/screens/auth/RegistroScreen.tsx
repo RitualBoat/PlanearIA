@@ -1,9 +1,9 @@
 import React from "react";
 import {
+  Pressable,
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
@@ -32,9 +32,12 @@ const RegistroScreen: React.FC = () => {
       >
         {/* Header bar */}
         <View style={styles.headerBar}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
+          >
             <MaterialIcons name="arrow-back" size={24} color={COLORS.text} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerTitle}>PlanearIA</Text>
           <View style={{ width: 32 }} />
         </View>
@@ -131,10 +134,9 @@ const RegistroScreen: React.FC = () => {
               )}
 
               {/* Términos */}
-              <TouchableOpacity
-                style={styles.checkboxRow}
+              <Pressable
+                style={({ pressed }) => [styles.checkboxRow, pressed && { opacity: 0.7 }]}
                 onPress={() => updateField("aceptaTerminos", !formData.aceptaTerminos)}
-                activeOpacity={0.7}
               >
                 <MaterialIcons
                   name={formData.aceptaTerminos ? "check-box" : "check-box-outline-blank"}
@@ -150,30 +152,36 @@ const RegistroScreen: React.FC = () => {
                     términos y condiciones
                   </Text>
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
               {errors.aceptaTerminos && (
                 <Text style={styles.errorText}>{errors.aceptaTerminos}</Text>
               )}
 
               {/* Botón Registro */}
-              <TouchableOpacity
-                style={[styles.registerButton, { opacity: isLoading ? 0.6 : 1 }]}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.registerButton,
+                  { opacity: isLoading ? 0.6 : 1 },
+                  pressed && { opacity: 0.8 },
+                ]}
                 onPress={handleRegistro}
                 disabled={isLoading}
-                activeOpacity={0.8}
               >
                 <Text style={styles.registerButtonText}>
                   {isLoading ? "Creando cuenta..." : "Crear cuenta"}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             {/* Link a login */}
             <View style={styles.linksContainer}>
               <Text style={styles.linkLabel}>¿Ya tienes cuenta?</Text>
-              <TouchableOpacity onPress={handleIrALogin}>
+              <Pressable
+                style={({ pressed }) => pressed && { opacity: 0.6 }}
+                onPress={handleIrALogin}
+              >
                 <Text style={styles.link}>Inicia sesión</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         </WebScrollView>

@@ -3,11 +3,11 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  Pressable,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -176,15 +176,21 @@ const CrearAlumnoScreen: React.FC = () => {
 
               <FieldReadonly label="Correo institucional" value={email || "No definido"} />
 
-              <TouchableOpacity style={styles.primaryActionBtn} onPress={handlePrimaryAfterSuccess}>
+              <Pressable
+                style={({ pressed }) => [styles.primaryActionBtn, pressed && { opacity: 0.6 }]}
+                onPress={handlePrimaryAfterSuccess}
+              >
                 <MaterialIcons name="person" size={18} color={COLORS.surface} />
                 <Text style={styles.primaryActionBtnText}>Volver al detalle</Text>
-              </TouchableOpacity>
+              </Pressable>
 
-              <TouchableOpacity style={styles.secondaryActionBtn} onPress={handleRegisterAnother}>
+              <Pressable
+                style={({ pressed }) => [styles.secondaryActionBtn, pressed && { opacity: 0.6 }]}
+                onPress={handleRegisterAnother}
+              >
                 <MaterialIcons name="person-add" size={18} color={COLORS.primary} />
                 <Text style={styles.secondaryActionBtnText}>Registrar otro</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             {isCreateMode ? (
@@ -239,17 +245,20 @@ const CrearAlumnoScreen: React.FC = () => {
                 cambios actuales.
               </Text>
 
-              <TouchableOpacity
-                style={styles.primaryActionBtn}
+              <Pressable
+                style={({ pressed }) => [styles.primaryActionBtn, pressed && { opacity: 0.6 }]}
                 onPress={() => void handleGuardar()}
               >
                 <MaterialIcons name="refresh" size={18} color={COLORS.surface} />
                 <Text style={styles.primaryActionBtnText}>Reintentar</Text>
-              </TouchableOpacity>
+              </Pressable>
 
-              <TouchableOpacity style={styles.linkButton} onPress={handleCancelar}>
+              <Pressable
+                style={({ pressed }) => [styles.linkButton, pressed && { opacity: 0.6 }]}
+                onPress={handleCancelar}
+              >
                 <Text style={styles.linkButtonText}>Cancelar</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </WebScrollView>
         </SafeAreaView>
@@ -262,9 +271,12 @@ const CrearAlumnoScreen: React.FC = () => {
       <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.headerBar}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBackBtn}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={({ pressed }) => [styles.headerBackBtn, pressed && { opacity: 0.6 }]}
+          >
             <MaterialIcons name="arrow-back" size={22} color="#1C72BA" />
-          </TouchableOpacity>
+          </Pressable>
           <View style={styles.headerCopyWrap}>
             <Text style={styles.headerTitle}>
               {isCreateMode ? "Crear alumno" : "Editar Alumno"}
@@ -347,8 +359,12 @@ const CrearAlumnoScreen: React.FC = () => {
               />
               <FormField label="Telefono" value={telefono} onChangeText={setTelefono} />
 
-              <TouchableOpacity
-                style={[styles.saveButton, (!canSubmit || isSaving) && styles.saveButtonDisabled]}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.saveButton,
+                  (!canSubmit || isSaving) && styles.saveButtonDisabled,
+                  pressed && { opacity: 0.6 },
+                ]}
                 disabled={!canSubmit || isSaving}
                 onPress={() => void handleGuardar()}
               >
@@ -365,11 +381,14 @@ const CrearAlumnoScreen: React.FC = () => {
                     </Text>
                   </>
                 )}
-              </TouchableOpacity>
+              </Pressable>
 
-              <TouchableOpacity style={styles.cancelAction} onPress={handleCancelar}>
+              <Pressable
+                style={({ pressed }) => [styles.cancelAction, pressed && { opacity: 0.6 }]}
+                onPress={handleCancelar}
+              >
                 <Text style={styles.cancelActionText}>Cancelar</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </WebScrollView>
 
@@ -444,14 +463,14 @@ const SuggestionRow: React.FC<{
   title: string;
   subtitle: string;
 }> = ({ icon, title, subtitle }) => (
-  <TouchableOpacity style={styles.suggestionRow}>
+  <Pressable style={({ pressed }) => [styles.suggestionRow, pressed && { opacity: 0.6 }]}>
     <MaterialIcons name={icon} size={20} color="#2E74B5" />
     <View style={{ flex: 1 }}>
       <Text style={styles.suggestionTitle}>{title}</Text>
       <Text style={styles.suggestionSubtitle}>{subtitle}</Text>
     </View>
     <MaterialIcons name="chevron-right" size={20} color="#7B8EA8" />
-  </TouchableOpacity>
+  </Pressable>
 );
 
 const styles = StyleSheet.create({

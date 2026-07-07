@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   useWindowDimensions,
   Platform,
@@ -164,7 +164,11 @@ const PerfilScreen: React.FC = () => {
   if (isLoading) {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top"]}>
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.header}>
             <ShimmerBlock width={40} height={40} borderRadius={20} />
             <ShimmerBlock width={120} height={20} />
@@ -224,12 +228,16 @@ const PerfilScreen: React.FC = () => {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top"]}>
         <View style={styles.header}>
-          <TouchableOpacity
+          <Pressable
             onPress={() => navigation.goBack()}
-            style={[styles.headerBtn, { backgroundColor: colors.surfaceContainerLow }]}
+            style={({ pressed }) => [
+              styles.headerBtn,
+              { backgroundColor: colors.surfaceContainerLow },
+              pressed && { opacity: 0.6 },
+            ]}
           >
             <MaterialIcons name="arrow-back" size={24} color={colors.onSurface} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={[styles.headerTitle, { color: colors.primary }]}>Mi Perfil</Text>
           <View style={{ width: 40 }} />
         </View>
@@ -248,14 +256,18 @@ const PerfilScreen: React.FC = () => {
           <Text style={[styles.errorMessage, { color: colors.onSurfaceVariant }]}>
             Revisa tu conexión e intenta de nuevo.
           </Text>
-          <TouchableOpacity
-            style={[styles.retryBtn, { borderColor: colors.primary }]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.retryBtn,
+              { borderColor: colors.primary },
+              pressed && { opacity: 0.6 },
+            ]}
             onPress={handleRetry}
             accessibilityRole="button"
             accessibilityLabel="Reintentar"
           >
             <Text style={[styles.retryBtnText, { color: colors.primary }]}>Reintentar</Text>
-          </TouchableOpacity>
+          </Pressable>
           <Text style={[styles.errorCode, { color: colors.onSurfaceVariant }]}>(503)</Text>
         </View>
       </SafeAreaView>
@@ -266,15 +278,23 @@ const PerfilScreen: React.FC = () => {
   if (isGuest) {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top"]}>
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity
+            <Pressable
               onPress={() => navigation.goBack()}
-              style={[styles.headerBtn, { backgroundColor: colors.surfaceContainerLow }]}
+              style={({ pressed }) => [
+                styles.headerBtn,
+                { backgroundColor: colors.surfaceContainerLow },
+                pressed && { opacity: 0.6 },
+              ]}
             >
               <MaterialIcons name="arrow-back" size={24} color={colors.onSurface} />
-            </TouchableOpacity>
+            </Pressable>
             <Text style={[styles.headerTitle, { color: colors.primary }]}>Mi Perfil</Text>
             <View style={{ width: 40 }} />
           </View>
@@ -353,17 +373,20 @@ const PerfilScreen: React.FC = () => {
               Crea una cuenta para guardar tu progreso, sincronizar tus datos y acceder a todas las
               funciones.
             </Text>
-            <TouchableOpacity
-              style={styles.guestCTABtn}
+            <Pressable
+              style={({ pressed }) => [styles.guestCTABtn, pressed && { opacity: 0.6 }]}
               onPress={() => navigation.navigate("Registro")}
             >
               <Text style={[styles.guestCTABtnText, { color: colors.primary }]}>
                 Crear cuenta gratis
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => pressed && { opacity: 0.6 }}
+              onPress={() => navigation.navigate("Login")}
+            >
               <Text style={styles.guestLoginLink}>Ya tengo cuenta → Iniciar sesión</Text>
-            </TouchableOpacity>
+            </Pressable>
           </LinearGradient>
 
           {/* Empty activity */}
@@ -397,19 +420,27 @@ const PerfilScreen: React.FC = () => {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity
+          <Pressable
             onPress={() => navigation.goBack()}
-            style={[styles.headerBtn, { backgroundColor: colors.surfaceContainerLow }]}
+            style={({ pressed }) => [
+              styles.headerBtn,
+              { backgroundColor: colors.surfaceContainerLow },
+              pressed && { opacity: 0.6 },
+            ]}
           >
             <MaterialIcons name="arrow-back" size={24} color={colors.onSurface} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={[styles.headerTitle, { color: colors.primary }]}>Mi Perfil</Text>
-          <TouchableOpacity
+          <Pressable
             onPress={() => navigation.navigate("Cuenta")}
-            style={[styles.headerBtn, { backgroundColor: colors.surfaceContainerLow }]}
+            style={({ pressed }) => [
+              styles.headerBtn,
+              { backgroundColor: colors.surfaceContainerLow },
+              pressed && { opacity: 0.6 },
+            ]}
           >
             <MaterialIcons name="settings" size={24} color={colors.onSurfaceVariant} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {/* Hero gradient banner */}
@@ -444,11 +475,14 @@ const PerfilScreen: React.FC = () => {
           {usuario?.biografia ? (
             <Text style={[styles.userBio, { color: colors.onSurface }]}>{usuario.biografia}</Text>
           ) : isNewUser ? (
-            <TouchableOpacity onPress={() => navigation.navigate("EditarPerfil")}>
+            <Pressable
+              style={({ pressed }) => pressed && { opacity: 0.6 }}
+              onPress={() => navigation.navigate("EditarPerfil")}
+            >
               <Text style={[styles.addBioPrompt, { color: colors.primary }]}>
                 Agrega una biografía
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           ) : null}
           {memberSince && (
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 4 }}>
@@ -465,13 +499,12 @@ const PerfilScreen: React.FC = () => {
         {/* Bento Stats Grid */}
         <View style={[styles.statsGrid, isDesktop && styles.statsGridDesktop]}>
           {stats.map((s, i) => (
-            <TouchableOpacity
+            <Pressable
               key={i}
-              activeOpacity={0.7}
               onPress={() => handleStatPress(i)}
               accessibilityRole="button"
               accessibilityLabel={`${s.label}: ${s.value}`}
-              style={[
+              style={({ pressed }) => [
                 styles.statCard,
                 { backgroundColor: colors.surfaceContainerLowest },
                 Platform.select({
@@ -484,32 +517,34 @@ const PerfilScreen: React.FC = () => {
                     elevation: 2,
                   },
                 }),
+                pressed && { opacity: 0.7 },
               ]}
             >
               <MaterialIcons name={s.icon as any} size={20} color="#004580" />
               <Text style={[styles.statNumber, { color: colors.onSurface }]}>{s.value}</Text>
               <Text style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>{s.label}</Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
 
         {/* Action buttons */}
         <View style={styles.actionsSection}>
-          <TouchableOpacity
-            style={[
+          <Pressable
+            style={({ pressed }) => [
               styles.editBtn,
               {
                 borderColor: colors.outlineVariant,
                 backgroundColor: colors.surfaceContainerLowest,
               },
+              pressed && { opacity: 0.6 },
             ]}
             onPress={() => navigation.navigate("EditarPerfil")}
           >
             <MaterialIcons name="edit" size={18} color={colors.primary} />
             <Text style={[styles.editBtnText, { color: colors.primary }]}>Editar perfil</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.shareRow}
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.shareRow, pressed && { opacity: 0.6 }]}
             onPress={handleShare}
             accessibilityRole="button"
             accessibilityLabel="Compartir perfil"
@@ -518,7 +553,7 @@ const PerfilScreen: React.FC = () => {
             <Text style={{ color: colors.onSurfaceVariant, fontWeight: "600", fontSize: 14 }}>
               Compartir perfil
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {/* New user CTA */}
@@ -899,4 +934,3 @@ const styles = StyleSheet.create({
 });
 
 export default PerfilScreen;
-

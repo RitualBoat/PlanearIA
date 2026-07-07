@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Platform, Pressable, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute, type RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
@@ -83,9 +83,12 @@ const ExportarAlumnosScreen: React.FC<ExportarAlumnosScreenProps> = ({ navigatio
         <SafeAreaView style={styles.safeArea}>
           <WebScrollView style={styles.content}>
             <View style={styles.headerRow}>
-              <TouchableOpacity style={styles.headerIconButton} onPress={() => navigation.goBack()}>
+              <Pressable
+                style={({ pressed }) => [styles.headerIconButton, pressed && { opacity: 0.6 }]}
+                onPress={() => navigation.goBack()}
+              >
                 <MaterialIcons name="arrow-back" size={22} color={COLORS.primary} />
-              </TouchableOpacity>
+              </Pressable>
               <Text style={styles.headerTitle}>Exportar Alumnos</Text>
             </View>
 
@@ -99,18 +102,21 @@ const ExportarAlumnosScreen: React.FC<ExportarAlumnosScreenProps> = ({ navigatio
                 {selectedFormat === "excel" ? "Excel" : "PDF"}.
               </Text>
 
-              <TouchableOpacity
-                style={styles.primaryButton}
+              <Pressable
+                style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.6 }]}
                 onPress={() => {
                   setExported(false);
                 }}
               >
                 <Text style={styles.primaryButtonText}>Exportar de nuevo</Text>
-              </TouchableOpacity>
+              </Pressable>
 
-              <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.goBack()}>
+              <Pressable
+                style={({ pressed }) => [styles.secondaryButton, pressed && { opacity: 0.6 }]}
+                onPress={() => navigation.goBack()}
+              >
                 <Text style={styles.secondaryButtonText}>Volver</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </WebScrollView>
         </SafeAreaView>
@@ -124,9 +130,12 @@ const ExportarAlumnosScreen: React.FC<ExportarAlumnosScreenProps> = ({ navigatio
       <SafeAreaView style={styles.safeArea}>
         <WebScrollView style={styles.content}>
           <View style={styles.headerRow}>
-            <TouchableOpacity style={styles.headerIconButton} onPress={() => navigation.goBack()}>
+            <Pressable
+              style={({ pressed }) => [styles.headerIconButton, pressed && { opacity: 0.6 }]}
+              onPress={() => navigation.goBack()}
+            >
               <MaterialIcons name="arrow-back" size={22} color={COLORS.primary} />
-            </TouchableOpacity>
+            </Pressable>
             <Text style={styles.headerTitle}>Exportar Alumnos</Text>
           </View>
 
@@ -140,8 +149,7 @@ const ExportarAlumnosScreen: React.FC<ExportarAlumnosScreenProps> = ({ navigatio
           <View style={styles.statsCard}>
             <MaterialIcons name="people" size={24} color={COLORS.primary} />
             <Text style={styles.statsText}>
-              {alumnosExportables.length}{" "}
-              {alumnosExportables.length === 1 ? "alumno" : "alumnos"}{" "}
+              {alumnosExportables.length} {alumnosExportables.length === 1 ? "alumno" : "alumnos"}{" "}
               {grupoId ? "en esta clase" : "registrados"}
             </Text>
           </View>
@@ -149,14 +157,14 @@ const ExportarAlumnosScreen: React.FC<ExportarAlumnosScreenProps> = ({ navigatio
           <Text style={styles.sectionTitle}>Formato de exportación</Text>
 
           {formatOptions.map((option) => (
-            <TouchableOpacity
+            <Pressable
               key={option.key}
-              style={[
+              style={({ pressed }) => [
                 styles.formatCard,
                 selectedFormat === option.key && styles.formatCardSelected,
+                pressed && { opacity: 0.85 },
               ]}
               onPress={() => setSelectedFormat(option.key)}
-              activeOpacity={0.85}
             >
               <View style={styles.formatRow}>
                 <View
@@ -179,11 +187,15 @@ const ExportarAlumnosScreen: React.FC<ExportarAlumnosScreenProps> = ({ navigatio
                   {selectedFormat === option.key && <View style={styles.radioDot} />}
                 </View>
               </View>
-            </TouchableOpacity>
+            </Pressable>
           ))}
 
-          <TouchableOpacity
-            style={[styles.primaryButton, isExporting && styles.buttonDisabled]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.primaryButton,
+              isExporting && styles.buttonDisabled,
+              pressed && { opacity: 0.6 },
+            ]}
             onPress={() => void handleExport()}
             disabled={isExporting}
           >
@@ -191,7 +203,7 @@ const ExportarAlumnosScreen: React.FC<ExportarAlumnosScreenProps> = ({ navigatio
             <Text style={styles.primaryButtonText}>
               {isExporting ? "Generando archivo..." : "Exportar alumnos"}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </WebScrollView>
       </SafeAreaView>
     </View>

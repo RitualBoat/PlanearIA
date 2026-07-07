@@ -1,9 +1,9 @@
 import React from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   StatusBar,
   TextInput,
   ActivityIndicator,
@@ -129,14 +129,14 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
               <Text style={styles.syncText}>{syncLabel}</Text>
             </View>
 
-            <TouchableOpacity
-              style={styles.syncButton}
+            <Pressable
+              style={({ pressed }) => [styles.syncButton, pressed && { opacity: 0.6 }]}
               onPress={() => void sincronizarGrupos()}
               disabled={!isOnline || syncStatus === "syncing"}
             >
               <MaterialIcons name="sync" size={16} color={COLORS.primary} />
               <Text style={styles.syncButtonText}>Sincronizar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           <View style={styles.searchContainer}>
@@ -155,11 +155,14 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
           contentContainerStyle={[styles.scrollContent, wideLayout && styles.scrollContentWide]}
         >
           {gruposFiltrados.map((grupo) => (
-            <TouchableOpacity
+            <Pressable
               key={grupo.id}
-              style={[styles.grupoCard, wideLayout && styles.grupoCardWide]}
+              style={({ pressed }) => [
+                styles.grupoCard,
+                wideLayout && styles.grupoCardWide,
+                pressed && { opacity: 0.9 },
+              ]}
               onPress={() => handleGrupoPress(grupo)}
-              activeOpacity={0.9}
             >
               <View style={styles.grupoHeader}>
                 <View style={styles.grupoIconContainer}>
@@ -203,7 +206,7 @@ const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => 
                   </Text>
                 </View>
               </View>
-            </TouchableOpacity>
+            </Pressable>
           ))}
 
           {gruposFiltrados.length === 0 && (

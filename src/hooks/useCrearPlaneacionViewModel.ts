@@ -8,7 +8,7 @@ import { API_CONFIG } from "../sync/config/apiConfig";
 import { useAuth } from "../context/AuthContext";
 import { usePlaneaciones } from "../context/PlaneacionesContext";
 import { mapResponseToPlaneacion } from "../utils/planeacionMapper";
-import { getAccessToken } from "../services/auth";
+import { getAccessToken } from "../services/auth/authService";
 import {
   buildDocumentoFromPlantilla,
   listPlantillasDocumento,
@@ -627,11 +627,6 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
       return;
     }
 
-    if (!API_CONFIG.apiSecret) {
-      setIaError("Falta configurar EXPO_PUBLIC_API_SECRET para usar la generacion con IA.");
-      return;
-    }
-
     setIaError("");
     setIsGeneratingIA(true);
 
@@ -644,7 +639,6 @@ export const useCrearPlaneacionViewModel = (): CrearPlaneacionViewModel => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-Key": API_CONFIG.apiSecret,
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({

@@ -137,7 +137,7 @@ describe("CreatePostModal", () => {
   });
 
   it("llama onClose al presionar cerrar", () => {
-    const { getByText, UNSAFE_getAllByType } = render(
+    const { getByLabelText } = render(
       <CreatePostModal
         visible={true}
         onClose={mockOnClose}
@@ -146,12 +146,8 @@ describe("CreatePostModal", () => {
       />
     );
 
-    // The close button is a TouchableOpacity before "Crear Publicación"
-    // We find all touchables and press the first one in the header (close icon)
-    const TouchableOpacity = require("react-native").TouchableOpacity;
-    const touchables = UNSAFE_getAllByType(TouchableOpacity);
-    // First touchable in header is the close button
-    fireEvent.press(touchables[0]);
+    // The icon-only header close button is labelled for accessibility.
+    fireEvent.press(getByLabelText("Cerrar"));
 
     expect(mockOnClose).toHaveBeenCalled();
   });

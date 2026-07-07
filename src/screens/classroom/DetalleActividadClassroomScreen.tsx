@@ -3,11 +3,11 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -58,7 +58,7 @@ const DetalleActividadClassroomScreen: React.FC = () => {
   const tarea = obtenerEntregablePorId(tareaId);
   const alumnosGrupo = React.useMemo(
     () => alumnos.filter((alumno) => alumno.grupoId === grupoId),
-    [alumnos, grupoId],
+    [alumnos, grupoId]
   );
   const [entregas, setEntregas] = React.useState<EntregaTarea[]>([]);
   const [drafts, setDrafts] = React.useState<Record<string, DraftCalificacion>>({});
@@ -112,7 +112,7 @@ const DetalleActividadClassroomScreen: React.FC = () => {
 
   const totalEntregadas = React.useMemo(
     () => entregas.filter((entrega) => isEntregaCalificable(entrega)).length,
-    [entregas],
+    [entregas]
   );
 
   const updateDraft = React.useCallback(
@@ -126,13 +126,16 @@ const DetalleActividadClassroomScreen: React.FC = () => {
         },
       }));
     },
-    [],
+    []
   );
 
   const handleGuardarCalificacion = React.useCallback(
     async (alumno: Alumno, entrega?: EntregaTarea) => {
       if (!tarea || !entrega || !isEntregaCalificable(entrega)) {
-        showMessage("Entrega pendiente", "Solo puedes calificar cuando el alumno ya marco la actividad como entregada.");
+        showMessage(
+          "Entrega pendiente",
+          "Solo puedes calificar cuando el alumno ya marco la actividad como entregada."
+        );
         return;
       }
 
@@ -167,12 +170,13 @@ const DetalleActividadClassroomScreen: React.FC = () => {
         setIsSaving(null);
       }
     },
-    [drafts, showMessage, tarea, tareaId],
+    [drafts, showMessage, tarea, tareaId]
   );
 
   const handleFinalizarActividad = React.useCallback(() => {
     if (!tarea) return;
-    const message = "La actividad se marcara como finalizada. Podras seguir revisando sus entregas desde esta pantalla.";
+    const message =
+      "La actividad se marcara como finalizada. Podras seguir revisando sus entregas desde esta pantalla.";
     const finish = async () => {
       await actualizarEntregable(tarea.id, { estado: "finalizada" });
       showMessage("Actividad finalizada", "El trabajo quedo cerrado en Classroom.");
@@ -195,10 +199,15 @@ const DetalleActividadClassroomScreen: React.FC = () => {
         <View style={styles.centerBox}>
           <MaterialIcons name="assignment-late" size={42} color={COLORS.primary} />
           <Text style={styles.emptyTitle}>No encontramos esta actividad</Text>
-          <Text style={styles.emptyText}>Puede haberse eliminado o estar pendiente de recarga local.</Text>
-          <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.emptyText}>
+            Puede haberse eliminado o estar pendiente de recarga local.
+          </Text>
+          <Pressable
+            style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.6 }]}
+            onPress={() => navigation.goBack()}
+          >
             <Text style={styles.primaryButtonText}>Volver</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </SafeAreaView>
     );
@@ -212,18 +221,22 @@ const DetalleActividadClassroomScreen: React.FC = () => {
         showsVerticalScrollIndicator={Platform.OS === "web"}
       >
         <View style={[styles.header, isCompact ? styles.headerCompact : null]}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Pressable
+            style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
+            onPress={() => navigation.goBack()}
+          >
             <MaterialIcons name="arrow-back" size={22} color="#0F172A" />
-          </TouchableOpacity>
+          </Pressable>
           <View style={styles.headerCopy}>
             <Text style={styles.eyebrow}>Trabajo de clase</Text>
             <Text style={styles.title}>{tarea.titulo}</Text>
             <Text style={styles.subtitle}>
-              {tarea.tipo} - Entrega: {formatDate(tarea.fechaEntrega)} - Valor: {tarea.calificacionMaxima ?? tarea.valor ?? 100}
+              {tarea.tipo} - Entrega: {formatDate(tarea.fechaEntrega)} - Valor:{" "}
+              {tarea.calificacionMaxima ?? tarea.valor ?? 100}
             </Text>
           </View>
-          <TouchableOpacity
-            style={styles.secondaryButton}
+          <Pressable
+            style={({ pressed }) => [styles.secondaryButton, pressed && { opacity: 0.6 }]}
             onPress={() =>
               navigation.navigate("AgregarContenidoClassroom", {
                 grupoId,
@@ -236,14 +249,16 @@ const DetalleActividadClassroomScreen: React.FC = () => {
           >
             <MaterialIcons name="edit" size={18} color={COLORS.primary} />
             <Text style={styles.secondaryButtonText}>Editar</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={[styles.grid, isCompact ? styles.gridCompact : null]}>
           <View style={styles.mainColumn}>
             <View style={styles.card}>
               <Text style={styles.cardTitle}>Instrucciones</Text>
-              <Text style={styles.bodyText}>{tarea.instrucciones || tarea.descripcion || "Sin instrucciones."}</Text>
+              <Text style={styles.bodyText}>
+                {tarea.instrucciones || tarea.descripcion || "Sin instrucciones."}
+              </Text>
               {tarea.recursosNecesarios?.length ? (
                 <View style={styles.resourceList}>
                   {tarea.recursosNecesarios.map((recurso, index) => (
@@ -260,7 +275,9 @@ const DetalleActividadClassroomScreen: React.FC = () => {
               <View style={styles.cardHeader}>
                 <View>
                   <Text style={styles.cardTitle}>Entregas y calificaciones</Text>
-                  <Text style={styles.cardSubtitle}>La calificacion solo se habilita si el alumno entrego.</Text>
+                  <Text style={styles.cardSubtitle}>
+                    La calificacion solo se habilita si el alumno entrego.
+                  </Text>
                 </View>
                 {isLoading ? <ActivityIndicator color={COLORS.primary} /> : null}
               </View>
@@ -269,34 +286,57 @@ const DetalleActividadClassroomScreen: React.FC = () => {
                 <View style={styles.emptyInline}>
                   <MaterialIcons name="groups" size={28} color={COLORS.primary} />
                   <Text style={styles.emptyTitle}>No hay alumnos inscritos</Text>
-                  <Text style={styles.emptyText}>Agrega alumnos desde la pestana Personas para recibir entregas.</Text>
+                  <Text style={styles.emptyText}>
+                    Agrega alumnos desde la pestana Personas para recibir entregas.
+                  </Text>
                 </View>
               ) : null}
 
               {alumnosGrupo.map((alumno) => {
                 const entrega = entregasByAlumno.get(alumno.id);
                 const canGrade = isEntregaCalificable(entrega);
-                const draft = drafts[String(alumno.id)] ?? { calificacion: "", retroalimentacion: "" };
+                const draft = drafts[String(alumno.id)] ?? {
+                  calificacion: "",
+                  retroalimentacion: "",
+                };
 
                 return (
                   <View key={alumno.id} style={styles.submissionRow}>
                     <View style={styles.studentHeader}>
                       <View style={styles.avatar}>
-                        <Text style={styles.avatarText}>{(alumno.nombre?.[0] ?? "A").toUpperCase()}</Text>
+                        <Text style={styles.avatarText}>
+                          {(alumno.nombre?.[0] ?? "A").toUpperCase()}
+                        </Text>
                       </View>
                       <View style={styles.studentCopy}>
-                        <Text style={styles.studentName}>{`${alumno.nombre} ${alumno.apellidos}`.trim()}</Text>
-                        <Text style={styles.studentMeta}>{entrega ? resolveEntregaLabel(entrega) : "Pendiente de entrega"}</Text>
+                        <Text style={styles.studentName}>
+                          {`${alumno.nombre} ${alumno.apellidos}`.trim()}
+                        </Text>
+                        <Text style={styles.studentMeta}>
+                          {entrega ? resolveEntregaLabel(entrega) : "Pendiente de entrega"}
+                        </Text>
                       </View>
-                      <View style={[styles.statusBadge, canGrade ? styles.statusReady : styles.statusPending]}>
-                        <Text style={[styles.statusText, canGrade ? styles.statusTextReady : styles.statusTextPending]}>
+                      <View
+                        style={[
+                          styles.statusBadge,
+                          canGrade ? styles.statusReady : styles.statusPending,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.statusText,
+                            canGrade ? styles.statusTextReady : styles.statusTextPending,
+                          ]}
+                        >
                           {canGrade ? "Entregado" : "Pendiente"}
                         </Text>
                       </View>
                     </View>
 
                     {entrega?.comentarioAlumno ? (
-                      <Text style={styles.commentText}>Comentario del alumno: {entrega.comentarioAlumno}</Text>
+                      <Text style={styles.commentText}>
+                        Comentario del alumno: {entrega.comentarioAlumno}
+                      </Text>
                     ) : null}
 
                     {canGrade ? (
@@ -320,22 +360,32 @@ const DetalleActividadClassroomScreen: React.FC = () => {
                             placeholder="Comentario para el alumno"
                             placeholderTextColor="#94A3B8"
                             value={draft.retroalimentacion}
-                            onChangeText={(value) => updateDraft(alumno.id, "retroalimentacion", value)}
+                            onChangeText={(value) =>
+                              updateDraft(alumno.id, "retroalimentacion", value)
+                            }
                           />
                         </View>
-                        <TouchableOpacity
-                          style={[styles.saveButton, isSaving === alumno.id ? styles.buttonDisabled : null]}
+                        <Pressable
+                          style={({ pressed }) => [
+                            styles.saveButton,
+                            isSaving === alumno.id ? styles.buttonDisabled : null,
+                            pressed && { opacity: 0.6 },
+                          ]}
                           disabled={isSaving === alumno.id}
                           onPress={() => void handleGuardarCalificacion(alumno, entrega)}
                         >
                           <MaterialIcons name="save" size={18} color="#FFFFFF" />
-                          <Text style={styles.saveButtonText}>{isSaving === alumno.id ? "Guardando..." : "Guardar"}</Text>
-                        </TouchableOpacity>
+                          <Text style={styles.saveButtonText}>
+                            {isSaving === alumno.id ? "Guardando..." : "Guardar"}
+                          </Text>
+                        </Pressable>
                       </View>
                     ) : (
                       <View style={styles.lockedBox}>
                         <MaterialIcons name="lock-clock" size={18} color="#64748B" />
-                        <Text style={styles.lockedText}>Aun no se puede calificar porque no existe entrega del alumno.</Text>
+                        <Text style={styles.lockedText}>
+                          Aun no se puede calificar porque no existe entrega del alumno.
+                        </Text>
                       </View>
                     )}
                   </View>
@@ -347,15 +397,20 @@ const DetalleActividadClassroomScreen: React.FC = () => {
           <View style={[styles.sideColumn, isCompact ? styles.sideColumnCompact : null]}>
             <View style={styles.sideCard}>
               <Text style={styles.sideLabel}>Resumen</Text>
-              <Text style={styles.sideMetric}>{totalEntregadas}/{alumnosGrupo.length}</Text>
+              <Text style={styles.sideMetric}>
+                {totalEntregadas}/{alumnosGrupo.length}
+              </Text>
               <Text style={styles.sideText}>entregas recibidas</Text>
             </View>
             <View style={styles.sideCard}>
               <Text style={styles.sideLabel}>Estado</Text>
               <Text style={styles.sideText}>{tarea.estado}</Text>
-              <TouchableOpacity style={styles.outlineButton} onPress={handleFinalizarActividad}>
+              <Pressable
+                style={({ pressed }) => [styles.outlineButton, pressed && { opacity: 0.6 }]}
+                onPress={handleFinalizarActividad}
+              >
                 <Text style={styles.outlineButtonText}>Finalizar actividad</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         </View>
@@ -365,7 +420,8 @@ const DetalleActividadClassroomScreen: React.FC = () => {
 };
 
 function resolveEntregaLabel(entrega: EntregaTarea): string {
-  if (entrega.estado === "calificada") return `Calificada${entrega.calificacion != null ? ` - ${entrega.calificacion}` : ""}`;
+  if (entrega.estado === "calificada")
+    return `Calificada${entrega.calificacion != null ? ` - ${entrega.calificacion}` : ""}`;
   if (entrega.estado === "tarde") return `Entregada tarde - ${formatDate(entrega.fechaEntrega)}`;
   if (entrega.estado === "entregada") return `Entregada - ${formatDate(entrega.fechaEntrega)}`;
   return "Pendiente de entrega";

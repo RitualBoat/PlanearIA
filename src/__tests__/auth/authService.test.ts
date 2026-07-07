@@ -7,7 +7,6 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
 jest.mock("../../sync/config/apiConfig", () => ({
   API_CONFIG: {
     baseUrl: "https://test.api.com",
-    apiSecret: "test-secret",
     timeout: 5000,
   },
   isAPIConfigured: jest.fn(() => true),

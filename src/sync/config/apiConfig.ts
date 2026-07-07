@@ -13,7 +13,6 @@ import logger from "../../utils/logger";
 // CONFIGURACION DE LA API
 // =====================================
 
-const API_SECRET_FROM_ENV = process.env.EXPO_PUBLIC_API_SECRET?.trim() ?? "";
 const API_BASE_URL_FROM_ENV = process.env.EXPO_PUBLIC_API_URL?.trim() ?? "";
 const FALLBACK_API_BASE_URL = "";
 const LOCALHOST_API_PATTERN = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?/i;
@@ -34,13 +33,6 @@ export const API_CONFIG = {
    * Producción: https://tu-proyecto.vercel.app
    */
   baseUrl: API_BASE_URL_FROM_ENV || FALLBACK_API_BASE_URL,
-
-  /**
-   * Clave secreta para autenticación
-   * Debe coincidir con API_SECRET en Vercel.
-   * Se configura en variable de entorno: EXPO_PUBLIC_API_SECRET
-   */
-  apiSecret: API_SECRET_FROM_ENV,
 
   /**
    * Timeout para requests (ms)
@@ -149,7 +141,6 @@ export const isAPIConfigured = (): boolean => {
   return (
     API_CONFIG.baseUrl !== "" &&
     !API_CONFIG.baseUrl.includes("tu-proyecto") &&
-    API_CONFIG.apiSecret !== "" &&
     (!isNativeLocalhostAPI() || ALLOW_NATIVE_LOCALHOST)
   );
 };

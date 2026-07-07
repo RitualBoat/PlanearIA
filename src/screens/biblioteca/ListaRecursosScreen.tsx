@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   StatusBar,
   TextInput,
@@ -138,17 +137,19 @@ const ListaRecursosScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.7 }}
+            onPress={() => navigation.goBack()}
+          >
             <MaterialIcons name="arrow-back" size={24} color={COLORS.text} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerTitle}>Mis Recursos</Text>
-          <TouchableOpacity
-            style={styles.fabSmall}
+          <Pressable
+            style={({ pressed }) => [styles.fabSmall, pressed && { opacity: 0.8 }]}
             onPress={() => navigation.navigate("CrearRecurso")}
-            activeOpacity={0.8}
           >
             <MaterialIcons name="add" size={22} color="#FFFFFF" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {/* Search bar */}
@@ -163,9 +164,9 @@ const ListaRecursosScreen: React.FC = () => {
               placeholderTextColor={COLORS.textTertiary}
             />
           </View>
-          <TouchableOpacity style={styles.filterBtn} activeOpacity={0.7}>
+          <Pressable style={({ pressed }) => [styles.filterBtn, pressed && { opacity: 0.7 }]}>
             <MaterialIcons name="tune" size={20} color={COLORS.textSecondary} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {/* Filter chips */}
@@ -177,11 +178,14 @@ const ListaRecursosScreen: React.FC = () => {
           {FILTER_OPTIONS.map((f) => {
             const isActive = vm.filtroTipo === f.id;
             return (
-              <TouchableOpacity
+              <Pressable
                 key={f.id}
-                style={[styles.chip, isActive && styles.chipActive]}
+                style={({ pressed }) => [
+                  styles.chip,
+                  isActive && styles.chipActive,
+                  pressed && { opacity: 0.8 },
+                ]}
                 onPress={() => vm.setFiltroTipo(f.id)}
-                activeOpacity={0.8}
               >
                 {isActive && f.id === "todos" && (
                   <MaterialIcons
@@ -192,7 +196,7 @@ const ListaRecursosScreen: React.FC = () => {
                   />
                 )}
                 <Text style={[styles.chipText, isActive && styles.chipTextActive]}>{f.label}</Text>
-              </TouchableOpacity>
+              </Pressable>
             );
           })}
         </ScrollView>
@@ -213,23 +217,25 @@ const ListaRecursosScreen: React.FC = () => {
                 Crea tu primer {tipoLabel ? tipoLabel.toLowerCase() : "recurso"} o importa uno desde
                 tu dispositivo
               </Text>
-              <TouchableOpacity
-                style={styles.emptyButton}
+              <Pressable
+                style={({ pressed }) => [styles.emptyButton, pressed && { opacity: 0.8 }]}
                 onPress={() => navigation.navigate("CrearRecurso")}
-                activeOpacity={0.8}
               >
                 <Text style={styles.emptyButtonText}>
                   + Crear {tipoLabel ? tipoLabel.toLowerCase() : "recurso"}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           ) : (
             <>
               {vm.recursosFiltrados.map((recurso) => (
-                <TouchableOpacity
+                <Pressable
                   key={recurso.id}
-                  style={[styles.recursoCard, wideLayout && styles.recursoCardWide]}
-                  activeOpacity={0.9}
+                  style={({ pressed }) => [
+                    styles.recursoCard,
+                    wideLayout && styles.recursoCardWide,
+                    pressed && { opacity: 0.9 },
+                  ]}
                   onPress={() => handleEditar(recurso)}
                 >
                   <View style={styles.recursoRow}>
@@ -291,14 +297,15 @@ const ListaRecursosScreen: React.FC = () => {
                       </View>
                     </View>
 
-                    <TouchableOpacity
+                    <Pressable
+                      style={({ pressed }) => pressed && { opacity: 0.6 }}
                       onPress={() => setMenuRecurso(recurso)}
                       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
                       <MaterialIcons name="more-vert" size={20} color={COLORS.textTertiary} />
-                    </TouchableOpacity>
+                    </Pressable>
                   </View>
-                </TouchableOpacity>
+                </Pressable>
               ))}
 
               {/* AI promo card */}
@@ -307,9 +314,11 @@ const ListaRecursosScreen: React.FC = () => {
                 <Text style={styles.promoSubtitle}>
                   Convierte cualquier texto en un examen interactivo en segundos.
                 </Text>
-                <TouchableOpacity style={styles.promoButton} activeOpacity={0.8}>
+                <Pressable
+                  style={({ pressed }) => [styles.promoButton, pressed && { opacity: 0.8 }]}
+                >
                   <Text style={styles.promoButtonText}>Probar Generador</Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </>
           )}
@@ -335,53 +344,61 @@ const ListaRecursosScreen: React.FC = () => {
                   <Text style={styles.sheetBadgeText}>{vm.getLabelByTipo(menuRecurso.tipo)}</Text>
                 </View>
               )}
-              <TouchableOpacity onPress={() => setMenuRecurso(null)}>
+              <Pressable
+                style={({ pressed }) => pressed && { opacity: 0.6 }}
+                onPress={() => setMenuRecurso(null)}
+              >
                 <MaterialIcons name="close" size={22} color={COLORS.textSecondary} />
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             {/* Menu items */}
-            <TouchableOpacity
-              style={styles.menuItem}
+            <Pressable
+              style={({ pressed }) => [styles.menuItem, pressed && { opacity: 0.6 }]}
               onPress={() => menuRecurso && handleEditar(menuRecurso)}
             >
               <MaterialIcons name="edit" size={22} color={COLORS.text} />
               <Text style={styles.menuItemText}>Editar recurso</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
-              style={styles.menuItem}
+            <Pressable
+              style={({ pressed }) => [styles.menuItem, pressed && { opacity: 0.6 }]}
               onPress={() => menuRecurso && handleDuplicar(menuRecurso)}
             >
               <MaterialIcons name="content-copy" size={22} color={COLORS.text} />
               <Text style={styles.menuItemText}>Duplicar recurso</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity style={styles.menuItem} onPress={handleAsignar}>
+            <Pressable
+              style={({ pressed }) => [styles.menuItem, pressed && { opacity: 0.6 }]}
+              onPress={handleAsignar}
+            >
               <MaterialIcons name="assignment-turned-in" size={22} color={COLORS.text} />
               <Text style={styles.menuItemText}>Asignar a entregable</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity style={styles.menuItem} onPress={() => void handleCompartir()}>
+            <Pressable
+              style={({ pressed }) => [styles.menuItem, pressed && { opacity: 0.6 }]}
+              onPress={() => void handleCompartir()}
+            >
               <MaterialIcons name="share" size={22} color={COLORS.text} />
               <Text style={styles.menuItemText}>Compartir</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
-              style={styles.menuItem}
+            <Pressable
+              style={({ pressed }) => [styles.menuItem, pressed && { opacity: 0.6 }]}
               onPress={() => menuRecurso && handleEliminar(menuRecurso)}
             >
               <MaterialIcons name="delete-outline" size={22} color={COLORS.error} />
               <Text style={[styles.menuItemText, { color: COLORS.error }]}>Eliminar recurso</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
-              style={styles.cancelButton}
+            <Pressable
+              style={({ pressed }) => [styles.cancelButton, pressed && { opacity: 0.8 }]}
               onPress={() => setMenuRecurso(null)}
-              activeOpacity={0.8}
             >
               <Text style={styles.cancelText}>Cancelar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </Pressable>
         </Pressable>
       </Modal>

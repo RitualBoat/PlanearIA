@@ -1,9 +1,9 @@
 import React from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   StatusBar,
   Modal,
@@ -125,10 +125,13 @@ const TabContent: React.FC<{
           <View style={styles.tabContent}>
             <Text style={styles.tabTitle}>Lista de Alumnos</Text>
             <Text style={styles.tabDescription}>Alumnos vinculados al grupo seleccionado.</Text>
-            <TouchableOpacity style={styles.actionButton} onPress={openAddStudentsModal}>
+            <Pressable
+              style={({ pressed }) => [styles.actionButton, pressed && { opacity: 0.6 }]}
+              onPress={openAddStudentsModal}
+            >
               <MaterialIcons name="person-add" size={24} color="white" />
               <Text style={styles.actionButtonText}>Agregar Alumno</Text>
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={styles.listaContainer}>
               {alumnos.length === 0 ? (
@@ -143,13 +146,16 @@ const TabContent: React.FC<{
                       >{`${alumno.nombre} ${alumno.apellidos}`}</Text>
                       <Text style={styles.alumnoControl}>ID: {alumno.numeroControl}</Text>
                     </View>
-                    <TouchableOpacity
-                      style={styles.removeAlumnoButton}
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.removeAlumnoButton,
+                        pressed && { opacity: 0.6 },
+                      ]}
                       onPress={() => openRemoveStudentModal(alumno)}
                     >
                       <MaterialIcons name="person-remove" size={16} color={COLORS.error} />
                       <Text style={styles.removeAlumnoButtonText}>Quitar</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                   </View>
                 ))
               )}
@@ -164,18 +170,25 @@ const TabContent: React.FC<{
             <Text style={styles.tabDescription}>
               Registra y consulta las calificaciones de tus alumnos
             </Text>
-            <TouchableOpacity style={styles.actionButton} onPress={navigateCapturarCalificaciones}>
+            <Pressable
+              style={({ pressed }) => [styles.actionButton, pressed && { opacity: 0.6 }]}
+              onPress={navigateCapturarCalificaciones}
+            >
               <MaterialIcons name="edit-note" size={24} color="white" />
               <Text style={styles.actionButtonText}>Registrar Calificaciones</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: COLORS.primaryDark, marginTop: 8 }]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.actionButton,
+                { backgroundColor: COLORS.primaryDark, marginTop: 8 },
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={navigatePromediosCalificaciones}
             >
               <MaterialIcons name="bar-chart" size={24} color="white" />
               <Text style={styles.actionButtonText}>Ver Promedios</Text>
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={styles.statsContainer}>
               <View style={styles.statCard}>
@@ -212,18 +225,25 @@ const TabContent: React.FC<{
             <Text style={styles.tabDescription}>
               Lleva el registro de asistencia de tus alumnos
             </Text>
-            <TouchableOpacity style={styles.actionButton} onPress={navigateRegistrarAsistencia}>
+            <Pressable
+              style={({ pressed }) => [styles.actionButton, pressed && { opacity: 0.6 }]}
+              onPress={navigateRegistrarAsistencia}
+            >
               <MaterialIcons name="checklist" size={24} color="white" />
               <Text style={styles.actionButtonText}>Pasar Lista</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: COLORS.primaryDark, marginTop: 8 }]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.actionButton,
+                { backgroundColor: COLORS.primaryDark, marginTop: 8 },
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={navigateHistorialAsistencia}
             >
               <MaterialIcons name="history" size={24} color="white" />
               <Text style={styles.actionButtonText}>Ver Historial</Text>
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={styles.statsContainer}>
               <View style={styles.statCard}>
@@ -254,14 +274,29 @@ const TabContent: React.FC<{
             <Text style={styles.tabTitle}>Recursos Asignados</Text>
             <Text style={styles.tabDescription}>Recursos asociados al grupo seleccionado.</Text>
             <View style={styles.actionButtonsRow}>
-              <TouchableOpacity style={[styles.actionButton, styles.actionButtonHalf]} onPress={navigateAsignarRecurso}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.actionButton,
+                  styles.actionButtonHalf,
+                  pressed && { opacity: 0.6 },
+                ]}
+                onPress={navigateAsignarRecurso}
+              >
                 <MaterialIcons name="file-copy" size={24} color="white" />
                 <Text style={styles.actionButtonText}>Pantalla Asignar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.actionButton, styles.actionButtonHalf, styles.actionButtonSecondary]} onPress={navigateAsignarDeBiblioteca}>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.actionButton,
+                  styles.actionButtonHalf,
+                  styles.actionButtonSecondary,
+                  pressed && { opacity: 0.6 },
+                ]}
+                onPress={navigateAsignarDeBiblioteca}
+              >
                 <MaterialIcons name="library-books" size={24} color="white" />
                 <Text style={styles.actionButtonText}>De Biblioteca</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             <View style={styles.listaContainer}>
@@ -305,21 +340,30 @@ const TabContent: React.FC<{
 
             {/* Botones de acción */}
             <View style={styles.actionButtonsRow}>
-              <TouchableOpacity
-                style={[styles.actionButton, styles.actionButtonHalf]}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.actionButton,
+                  styles.actionButtonHalf,
+                  pressed && { opacity: 0.6 },
+                ]}
                 onPress={navigateCrearTarea}
               >
                 <MaterialIcons name="add" size={20} color="white" />
                 <Text style={styles.actionButtonText}>Nueva Tarea</Text>
-              </TouchableOpacity>
+              </Pressable>
 
-              <TouchableOpacity
-                style={[styles.actionButton, styles.actionButtonHalf, styles.actionButtonSecondary]}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.actionButton,
+                  styles.actionButtonHalf,
+                  styles.actionButtonSecondary,
+                  pressed && { opacity: 0.6 },
+                ]}
                 onPress={navigateAsignarRecurso}
               >
                 <MaterialIcons name="file-copy" size={20} color="white" />
                 <Text style={styles.actionButtonText}>Asignar Examen</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             <View style={styles.listaContainer}>
@@ -328,9 +372,9 @@ const TabContent: React.FC<{
                 <Text style={styles.emptyText}>No hay tareas asignadas a este grupo.</Text>
               ) : (
                 tareas.map((tarea) => (
-                  <TouchableOpacity
+                  <Pressable
                     key={String(tarea.id)}
-                    style={styles.tareaItem}
+                    style={({ pressed }) => [styles.tareaItem, pressed && { opacity: 0.6 }]}
                     onPress={() => navigateDetalleTarea(tarea.id)}
                   >
                     <View style={styles.tareaHeader}>
@@ -345,7 +389,7 @@ const TabContent: React.FC<{
                       </View>
                       <MaterialIcons name="chevron-right" size={24} color={COLORS.textSecondary} />
                     </View>
-                  </TouchableOpacity>
+                  </Pressable>
                 ))
               )}
             </View>
@@ -451,13 +495,16 @@ const TabContent: React.FC<{
             </View>
 
             <View style={styles.openReportButtonContainer}>
-              <TouchableOpacity style={styles.openReportButton} onPress={navigateReportesGrupo}>
+              <Pressable
+                style={({ pressed }) => [styles.openReportButton, pressed && { opacity: 0.6 }]}
+                onPress={navigateReportesGrupo}
+              >
                 <MaterialIcons name="insights" size={18} color={COLORS.surface} />
                 <Text style={styles.openReportButtonText}>Abrir reporte completo</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
-          );
+        );
       }
 
       case "notas":
@@ -530,18 +577,22 @@ const TabContent: React.FC<{
 
               <View style={styles.notesActionsRow}>
                 {notasEstado === "cambios-sin-guardar" ? (
-                  <TouchableOpacity
-                    style={styles.notesDiscardButton}
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.notesDiscardButton,
+                      pressed && { opacity: 0.6 },
+                    ]}
                     onPress={descartarCambiosNotas}
                   >
                     <Text style={styles.notesDiscardButtonText}>Descartar cambios</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 ) : null}
 
-                <TouchableOpacity
-                  style={[
+                <Pressable
+                  style={({ pressed }) => [
                     styles.notesSaveButton,
                     notasEstado !== "cambios-sin-guardar" && styles.notesSaveButtonDisabled,
+                    pressed && { opacity: 0.6 },
                   ]}
                   onPress={() => void guardarNotasGrupo()}
                   disabled={notasEstado !== "cambios-sin-guardar"}
@@ -549,7 +600,7 @@ const TabContent: React.FC<{
                   <Text style={styles.notesSaveButtonText}>
                     {notasEstado === "guardando" ? "Guardando..." : "Guardar notas"}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
 
@@ -567,10 +618,13 @@ const TabContent: React.FC<{
             <Text style={styles.tabDescription}>
               Gestiona los docentes y asistentes con acceso a la planificación de este grupo.
             </Text>
-            <TouchableOpacity style={styles.actionButton} onPress={openInvitacionModal}>
+            <Pressable
+              style={({ pressed }) => [styles.actionButton, pressed && { opacity: 0.6 }]}
+              onPress={openInvitacionModal}
+            >
               <MaterialIcons name="person-add" size={24} color="white" />
               <Text style={styles.actionButtonText}>Invitar Docente</Text>
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={styles.listaContainer}>
               {miembros.length === 0 ? (
@@ -741,18 +795,27 @@ const DetalleGrupoScreen: React.FC = () => {
           <Text style={styles.grupoNombre}>{grupoNombre}</Text>
           <Text style={styles.grupoId}>ID: {grupoId}</Text>
           <View style={styles.headerActions}>
-            <TouchableOpacity style={styles.editarButton} onPress={navigateEditarGrupo}>
+            <Pressable
+              style={({ pressed }) => [styles.editarButton, pressed && { opacity: 0.6 }]}
+              onPress={navigateEditarGrupo}
+            >
               <MaterialIcons name="edit" size={16} color={COLORS.primary} />
               <Text style={styles.editarButtonText}>Editar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.exportarButton} onPress={handleExport}>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.exportarButton, pressed && { opacity: 0.6 }]}
+              onPress={handleExport}
+            >
               <MaterialIcons name="file-download" size={16} color="#0E7A56" />
               <Text style={styles.exportarButtonText}>Exportar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.eliminarButton} onPress={openDeleteModal}>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.eliminarButton, pressed && { opacity: 0.6 }]}
+              onPress={openDeleteModal}
+            >
               <MaterialIcons name="delete-outline" size={16} color={COLORS.error} />
               <Text style={styles.eliminarButtonText}>Eliminar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
 
@@ -764,9 +827,13 @@ const DetalleGrupoScreen: React.FC = () => {
           contentContainerStyle={styles.tabsContent}
         >
           {tabs.map((tab) => (
-            <TouchableOpacity
+            <Pressable
               key={tab.id}
-              style={[styles.tab, activeTab === tab.id && styles.activeTab]}
+              style={({ pressed }) => [
+                styles.tab,
+                activeTab === tab.id && styles.activeTab,
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={() => setActiveTab(tab.id)}
             >
               <MaterialIcons
@@ -777,7 +844,7 @@ const DetalleGrupoScreen: React.FC = () => {
               <Text style={[styles.tabLabel, activeTab === tab.id && styles.activeTabLabel]}>
                 {tab.label}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </ScrollView>
 
@@ -859,15 +926,15 @@ const DetalleGrupoScreen: React.FC = () => {
               ) : null}
 
               <View style={styles.modalActions}>
-                <TouchableOpacity
-                  style={styles.cancelModalButton}
+                <Pressable
+                  style={({ pressed }) => [styles.cancelModalButton, pressed && { opacity: 0.6 }]}
                   onPress={closeRemoveStudentModal}
                   disabled={isUnlinkingStudent}
                 >
                   <Text style={styles.cancelModalButtonText}>Cancelar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.deleteModalButton}
+                </Pressable>
+                <Pressable
+                  style={({ pressed }) => [styles.deleteModalButton, pressed && { opacity: 0.6 }]}
                   onPress={() => void confirmRemoveStudentFromGroup()}
                   disabled={isUnlinkingStudent}
                 >
@@ -876,19 +943,19 @@ const DetalleGrupoScreen: React.FC = () => {
                   ) : (
                     <Text style={styles.deleteModalButtonText}>Quitar</Text>
                   )}
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
           </View>
         </Modal>
 
-        <ModalInvitacionColaborador 
+        <ModalInvitacionColaborador
           visible={invitacionModalVisible}
           onClose={closeInvitacionModal}
           onInvite={invitarDocente}
           grupoNombre={grupoNombre}
         />
-        
+
         <MenuContextualColaborador
           visible={contextualMenuVisible}
           colaborador={colaboradorSeleccionado}
@@ -930,9 +997,13 @@ const DetalleGrupoScreen: React.FC = () => {
                       availableStudents.map((student) => {
                         const selected = selectedStudentIds.includes(student.id);
                         return (
-                          <TouchableOpacity
+                          <Pressable
                             key={String(student.id)}
-                            style={[styles.studentRow, selected && styles.studentRowSelected]}
+                            style={({ pressed }) => [
+                              styles.studentRow,
+                              selected && styles.studentRowSelected,
+                              pressed && { opacity: 0.6 },
+                            ]}
                             onPress={() => toggleStudentSelection(student.id)}
                           >
                             <View style={styles.studentAvatar}>
@@ -949,7 +1020,7 @@ const DetalleGrupoScreen: React.FC = () => {
                               size={22}
                               color={selected ? COLORS.primary : "#A8B8CF"}
                             />
-                          </TouchableOpacity>
+                          </Pressable>
                         );
                       })
                     )}
@@ -989,15 +1060,18 @@ const DetalleGrupoScreen: React.FC = () => {
               ) : null}
 
               <View style={styles.modalActions}>
-                <TouchableOpacity
-                  style={styles.cancelModalButton}
+                <Pressable
+                  style={({ pressed }) => [styles.cancelModalButton, pressed && { opacity: 0.6 }]}
                   onPress={createStudentMode ? closeCreateStudentMode : closeAddStudentsModal}
                 >
                   <Text style={styles.cancelModalButtonText}>Cancelar</Text>
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity
-                  style={styles.secondaryModalButton}
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.secondaryModalButton,
+                    pressed && { opacity: 0.6 },
+                  ]}
                   onPress={
                     createStudentMode ? () => void createAndAddStudent() : openCreateStudentMode
                   }
@@ -1005,11 +1079,14 @@ const DetalleGrupoScreen: React.FC = () => {
                   <Text style={styles.secondaryModalButtonText}>
                     {createStudentMode ? "Crear y agregar" : "Nuevo ingreso"}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
 
                 {!createStudentMode ? (
-                  <TouchableOpacity
-                    style={styles.primaryModalButton}
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.primaryModalButton,
+                      pressed && { opacity: 0.6 },
+                    ]}
                     onPress={() => void confirmAddSelectedStudents()}
                     disabled={isLinkingStudents}
                   >
@@ -1018,7 +1095,7 @@ const DetalleGrupoScreen: React.FC = () => {
                         ? "Agregando..."
                         : `Agregar seleccionados (${selectedStudentIds.length})`}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 ) : null}
               </View>
             </View>
@@ -1040,9 +1117,12 @@ const DetalleGrupoScreen: React.FC = () => {
               <Text style={styles.successText}>
                 Alumnos agregados correctamente. Total actual del grupo: {createdAndAddedCount}
               </Text>
-              <TouchableOpacity style={styles.primaryModalButton} onPress={closeAddStudentsSuccess}>
+              <Pressable
+                style={({ pressed }) => [styles.primaryModalButton, pressed && { opacity: 0.6 }]}
+                onPress={closeAddStudentsSuccess}
+              >
                 <Text style={styles.primaryModalButtonText}>Volver al detalle del grupo</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         </Modal>
@@ -1075,10 +1155,13 @@ const DetalleGrupoScreen: React.FC = () => {
                 </View>
               </View>
 
-              <TouchableOpacity
-                style={[styles.confirmRow, deleteError ? styles.confirmRowError : undefined]}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.confirmRow,
+                  deleteError ? styles.confirmRowError : undefined,
+                  pressed && { opacity: 0.8 },
+                ]}
                 onPress={toggleDeleteConfirmed}
-                activeOpacity={0.8}
               >
                 <View style={[styles.checkbox, deleteConfirmed && styles.checkboxActive]}>
                   {deleteConfirmed && (
@@ -1088,23 +1171,24 @@ const DetalleGrupoScreen: React.FC = () => {
                 <Text style={styles.confirmText}>
                   Confirmo que entiendo que esta acción no se puede deshacer.
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
 
               {deleteError ? <Text style={styles.deleteErrorText}>{deleteError}</Text> : null}
 
               <View style={styles.modalActions}>
-                <TouchableOpacity
-                  style={styles.cancelModalButton}
+                <Pressable
+                  style={({ pressed }) => [styles.cancelModalButton, pressed && { opacity: 0.6 }]}
                   onPress={closeDeleteModal}
                   disabled={isDeleting}
                 >
                   <Text style={styles.cancelModalButtonText}>Cancelar</Text>
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity
-                  style={[
+                <Pressable
+                  style={({ pressed }) => [
                     styles.deleteModalButton,
                     (!deleteConfirmed || isDeleting) && styles.deleteModalButtonDisabled,
+                    pressed && { opacity: 0.6 },
                   ]}
                   onPress={() => void confirmDeleteGrupo()}
                   disabled={!deleteConfirmed || isDeleting}
@@ -1117,7 +1201,7 @@ const DetalleGrupoScreen: React.FC = () => {
                   <Text style={styles.deleteModalButtonText}>
                     {isDeleting ? "Eliminando..." : "Eliminar grupo definitivamente"}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
           </View>
@@ -1932,4 +2016,3 @@ const styles = StyleSheet.create({
 });
 
 export default DetalleGrupoScreen;
-

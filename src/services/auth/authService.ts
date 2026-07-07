@@ -68,25 +68,16 @@ async function authFetch(
     };
   }
 
-  if (!API_CONFIG.apiSecret) {
-    return {
-      success: false,
-      error:
-        "Falta configurar EXPO_PUBLIC_API_SECRET en el frontend. Debe coincidir con API_SECRET del backend.",
-    };
-  }
-
   if (!isAPIConfigured()) {
     return {
       success: false,
       error:
-        "La API no esta configurada correctamente para este entorno. Revisa EXPO_PUBLIC_API_URL y EXPO_PUBLIC_API_SECRET.",
+        "La API no esta configurada correctamente para este entorno. Revisa EXPO_PUBLIC_API_URL.",
     };
   }
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    "X-API-Key": API_CONFIG.apiSecret,
   };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;

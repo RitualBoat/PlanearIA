@@ -2,11 +2,11 @@ import React, { useCallback, useMemo, useState } from "react";
 import {
   Alert,
   Platform,
+  Pressable,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -265,13 +265,19 @@ const CapturarCalificacionesScreen: React.FC<Props> = ({ navigation, route }) =>
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Pressable
+          onPress={() => navigation.goBack()}
+          style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
+        >
           <MaterialIcons name="arrow-back" size={24} color="white" />
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.headerTitle}>Registro de Calificaciones</Text>
-        <TouchableOpacity onPress={handleEliminar} style={styles.trashButton}>
+        <Pressable
+          onPress={handleEliminar}
+          style={({ pressed }) => [styles.trashButton, pressed && { opacity: 0.6 }]}
+        >
           <MaterialIcons name="delete-outline" size={24} color="white" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <WebScrollView style={styles.scrollView}>
@@ -304,9 +310,13 @@ const CapturarCalificacionesScreen: React.FC<Props> = ({ navigation, route }) =>
           </View>
           <View style={styles.parcialSelector}>
             {PARCIALES.map((p) => (
-              <TouchableOpacity
+              <Pressable
                 key={p.key}
-                style={[styles.parcialPill, parcialActivo === p.key && styles.parcialPillActive]}
+                style={({ pressed }) => [
+                  styles.parcialPill,
+                  parcialActivo === p.key && styles.parcialPillActive,
+                  pressed && { opacity: 0.6 },
+                ]}
                 onPress={() => setParcialActivo(p.key)}
               >
                 <Text
@@ -317,7 +327,7 @@ const CapturarCalificacionesScreen: React.FC<Props> = ({ navigation, route }) =>
                 >
                   {p.label}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </View>
         </View>
@@ -332,8 +342,8 @@ const CapturarCalificacionesScreen: React.FC<Props> = ({ navigation, route }) =>
             <Text style={styles.emptySubtitle}>
               Agrega alumnos al grupo para poder registrar sus calificaciones
             </Text>
-            <TouchableOpacity
-              style={styles.emptyButton}
+            <Pressable
+              style={({ pressed }) => [styles.emptyButton, pressed && { opacity: 0.6 }]}
               onPress={() =>
                 navigation.navigate("DetalleGrupo", {
                   grupoId,
@@ -343,7 +353,7 @@ const CapturarCalificacionesScreen: React.FC<Props> = ({ navigation, route }) =>
             >
               <MaterialIcons name="people" size={18} color={COLORS.primary} />
               <Text style={styles.emptyButtonText}>Ir a Gestión de Alumnos</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         ) : (
           <View style={styles.studentList}>
@@ -395,8 +405,12 @@ const CapturarCalificacionesScreen: React.FC<Props> = ({ navigation, route }) =>
               {stats.calificados}/{stats.totalAlumnos} calificados
             </Text>
           </View>
-          <TouchableOpacity
-            style={[styles.guardarButton, isSaving && styles.guardarButtonDisabled]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.guardarButton,
+              isSaving && styles.guardarButtonDisabled,
+              pressed && { opacity: 0.6 },
+            ]}
             onPress={handleGuardar}
             disabled={isSaving}
           >
@@ -404,7 +418,7 @@ const CapturarCalificacionesScreen: React.FC<Props> = ({ navigation, route }) =>
             <Text style={styles.guardarButtonText}>
               {isSaving ? "Guardando..." : "Guardar Calificaciones"}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>

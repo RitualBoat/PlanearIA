@@ -2,11 +2,10 @@ import React from "react";
 import {
   Modal,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -53,14 +52,15 @@ const ExpandedStatsModal: React.FC<ExpandedStatsModalProps> = ({ visible, data, 
             {data.title} ({data.count})
           </Text>
         </View>
-        <TouchableOpacity
+        <Pressable
+          style={({ pressed }) => pressed && { opacity: 0.6 }}
           onPress={onClose}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           accessibilityRole="button"
           accessibilityLabel="Cerrar"
         >
           <MaterialIcons name="close" size={22} color="#424750" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Quick stats summary */}
@@ -131,10 +131,13 @@ const ExpandedStatsModal: React.FC<ExpandedStatsModalProps> = ({ visible, data, 
 
       {/* Footer */}
       {data.items.length > 0 && (
-        <TouchableOpacity style={styles.footerBtn} onPress={onClose}>
+        <Pressable
+          style={({ pressed }) => [styles.footerBtn, pressed && { opacity: 0.6 }]}
+          onPress={onClose}
+        >
           <Text style={styles.footerBtnText}>Ver todas</Text>
           <MaterialIcons name="arrow-forward" size={16} color="#005da8" />
-        </TouchableOpacity>
+        </Pressable>
       )}
     </View>
   );
@@ -147,11 +150,15 @@ const ExpandedStatsModal: React.FC<ExpandedStatsModalProps> = ({ visible, data, 
       statusBarTranslucent
       onRequestClose={onClose}
     >
-      <TouchableWithoutFeedback onPress={onClose} accessibilityRole="button">
-        <View style={[styles.overlay, isDesktop && styles.overlayDesktop]}>
-          <TouchableWithoutFeedback>{content}</TouchableWithoutFeedback>
-        </View>
-      </TouchableWithoutFeedback>
+      <Pressable
+        style={[styles.overlay, isDesktop && styles.overlayDesktop]}
+        onPress={onClose}
+        accessibilityRole="button"
+      >
+        {/* Wrapper claims the touch responder so taps on the card never reach
+            the backdrop's onPress (the old inner TouchableWithoutFeedback role). */}
+        <View onStartShouldSetResponder={() => true}>{content}</View>
+      </Pressable>
     </Modal>
   );
 };

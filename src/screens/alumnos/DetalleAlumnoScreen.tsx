@@ -1,5 +1,5 @@
 import React from "react";
-import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
@@ -28,9 +28,12 @@ const DetalleAlumnoScreen: React.FC = () => {
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.emptyWrap}>
             <Text style={styles.emptyTitle}>Alumno no encontrado</Text>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Pressable
+              style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
+              onPress={() => navigation.goBack()}
+            >
               <Text style={styles.backButtonText}>Volver</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </SafeAreaView>
       </View>
@@ -56,16 +59,16 @@ const DetalleAlumnoScreen: React.FC = () => {
             <Row label="Grupo" value={String(alumno.grupoId || "Sin grupo")} />
           </View>
 
-          <TouchableOpacity
-            style={styles.placeholderButton}
+          <Pressable
+            style={({ pressed }) => [styles.placeholderButton, pressed && { opacity: 0.6 }]}
             onPress={() => navigation.navigate("CrearAlumno", { modo: "editar", alumnoId })}
           >
             <MaterialIcons name="edit" size={16} color={COLORS.primary} />
             <Text style={styles.placeholderButtonText}>Editar alumno</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
-            style={styles.placeholderButton}
+          <Pressable
+            style={({ pressed }) => [styles.placeholderButton, pressed && { opacity: 0.6 }]}
             onPress={() =>
               navigation.navigate("ReportesAlumno", {
                 alumnoId,
@@ -75,10 +78,10 @@ const DetalleAlumnoScreen: React.FC = () => {
           >
             <MaterialIcons name="insights" size={16} color={COLORS.primary} />
             <Text style={styles.placeholderButtonText}>Ver reporte</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
-            style={styles.placeholderButton}
+          <Pressable
+            style={({ pressed }) => [styles.placeholderButton, pressed && { opacity: 0.6 }]}
             onPress={() =>
               navigation.navigate("NotasAlumno", {
                 alumnoId,
@@ -88,7 +91,7 @@ const DetalleAlumnoScreen: React.FC = () => {
           >
             <MaterialIcons name="chat" size={16} color={COLORS.primary} />
             <Text style={styles.placeholderButtonText}>Notas personales</Text>
-          </TouchableOpacity>
+          </Pressable>
         </WebScrollView>
       </SafeAreaView>
     </View>

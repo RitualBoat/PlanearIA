@@ -12,17 +12,44 @@ jest.mock("../../utils/apiClient", () => ({
   apiRequest: jest.fn(),
 }));
 
+jest.mock("../../services/pdfTextExtractor", () => ({
+  extractTextFromPdf: jest.fn(),
+}));
+
 import {
   buildPlaneacionFromImportDraft,
+  extractRawTextFromImportedFile,
   scanPlantillaFromRawText,
 } from "../../services/planeacionImportService";
 import { apiRequest } from "../../utils/apiClient";
 import { isAPIConfigured } from "../../sync/config/apiConfig";
+import { extractTextFromPdf } from "../../services/pdfTextExtractor";
 import { NivelAcademico } from "../../../types/planeacionV2";
 
 describe("planeacionImportService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it("extrae texto de PDF usando el extractor dedicado", async () => {
+    const arrayBuffer = new ArrayBuffer(8);
+    (global as typeof globalThis & { fetch: jest.Mock }).fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => arrayBuffer,
+    });
+    (extractTextFromPdf as jest.Mock).mockResolvedValue(
+      "Asignatura: Matematicas\nTema: Fracciones\nPrimaria"
+    );
+
+    const result = await extractRawTextFromImportedFile({
+      name: "planeacion_fracciones.pdf",
+      uri: "file://planeacion_fracciones.pdf",
+    } as any);
+
+    expect(extractTextFromPdf).toHaveBeenCalledWith(arrayBuffer);
+    expect(result.extension).toBe("pdf");
+    expect(result.rawText).toContain("Matematicas");
+    expect(result.fallbackSubject).toBe("planeacion fracciones");
   });
 
   it("mapea un draft importado a un PlaneacionDocumento V2 valido", () => {

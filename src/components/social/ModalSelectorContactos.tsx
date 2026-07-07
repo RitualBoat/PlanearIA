@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Modal, TouchableOpacity, FlatList, Image, TextInput } from "react-native";
+import { Pressable, View, Text, StyleSheet, Modal, FlatList, TextInput } from "react-native";
+import { Image } from "expo-image";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS } from "../../../types";
 import { useContactos } from "../../context/ContactosContext";
@@ -15,22 +16,24 @@ export const ModalSelectorContactos: React.FC<Props> = ({ visible, onClose, onSe
   const { contactos } = useContactos();
   const [search, setSearch] = useState("");
 
-  const filteredContactos = contactos.filter((c) =>
-    c.estado === "aceptada" &&
-    c.nombre.toLowerCase().includes(search.toLowerCase())
+  const filteredContactos = contactos.filter(
+    (c) => c.estado === "aceptada" && c.nombre.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <TouchableOpacity style={styles.backdrop} onPress={onClose} activeOpacity={1} />
-        
+        <Pressable style={styles.backdrop} onPress={onClose} />
+
         <View style={styles.sheet}>
           <View style={styles.header}>
             <Text style={styles.title}>Seleccionar contacto</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Pressable
+              onPress={onClose}
+              style={({ pressed }) => [styles.closeButton, pressed && { opacity: 0.6 }]}
+            >
               <MaterialIcons name="close" size={24} color={COLORS.textSecondary} />
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           <View style={styles.searchContainer}>
@@ -48,8 +51,8 @@ export const ModalSelectorContactos: React.FC<Props> = ({ visible, onClose, onSe
             keyExtractor={(item) => item.id.toString()}
             style={styles.list}
             renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.contactItem}
+              <Pressable
+                style={({ pressed }) => [styles.contactItem, pressed && { opacity: 0.6 }]}
                 onPress={() => {
                   onSelect(item);
                   onClose();
@@ -66,7 +69,7 @@ export const ModalSelectorContactos: React.FC<Props> = ({ visible, onClose, onSe
                   <Text style={styles.contactName}>{item.nombre}</Text>
                 </View>
                 <MaterialIcons name="send" size={20} color={COLORS.primary} />
-              </TouchableOpacity>
+              </Pressable>
             )}
             ListEmptyComponent={() => (
               <View style={styles.emptyContainer}>

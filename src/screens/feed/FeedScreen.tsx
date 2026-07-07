@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   FlatList,
   RefreshControl,
   useWindowDimensions,
@@ -147,8 +147,12 @@ const FeedScreen: React.FC = () => {
           <View style={[styles.createAvatar, { backgroundColor: colors.primary }]}>
             <Text style={styles.createAvatarText}>{initials}</Text>
           </View>
-          <TouchableOpacity
-            style={[styles.createInput, { backgroundColor: colors.surfaceContainerLow }]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.createInput,
+              { backgroundColor: colors.surfaceContainerLow },
+              pressed && { opacity: 0.6 },
+            ]}
             onPress={vm.handleOpenCreateModal}
           >
             <Text
@@ -156,19 +160,31 @@ const FeedScreen: React.FC = () => {
             >
               ¿Qué quieres compartir hoy?
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
         <View style={styles.createBarActions}>
-          <TouchableOpacity style={styles.createBarBtn} onPress={vm.handleOpenCreateModal}>
+          <Pressable
+            style={({ pressed }) => [styles.createBarBtn, pressed && { opacity: 0.6 }]}
+            onPress={vm.handleOpenCreateModal}
+          >
             <MaterialIcons name="image" size={20} color={colors.onSurfaceVariant} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.createBarBtn} onPress={vm.handleOpenCreateModal}>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.createBarBtn, pressed && { opacity: 0.6 }]}
+            onPress={vm.handleOpenCreateModal}
+          >
             <MaterialIcons name="attach-file" size={20} color={colors.onSurfaceVariant} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.createBarBtn} onPress={vm.handleOpenCreateModal}>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.createBarBtn, pressed && { opacity: 0.6 }]}
+            onPress={vm.handleOpenCreateModal}
+          >
             <MaterialIcons name="mood" size={20} color={colors.onSurfaceVariant} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={vm.handleOpenCreateModal}>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
+            onPress={vm.handleOpenCreateModal}
+          >
             <LinearGradient
               colors={[colors.primary, colors.primaryContainer]}
               start={{ x: 0, y: 0 }}
@@ -177,7 +193,7 @@ const FeedScreen: React.FC = () => {
             >
               <Text style={styles.publishSmallBtnText}>Publicar</Text>
             </LinearGradient>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     );
@@ -278,14 +294,17 @@ const FeedScreen: React.FC = () => {
       <Text style={[styles.emptyDesc, { color: colors.onSurfaceVariant }]}>
         Revisa tu conexión e intenta de nuevo
       </Text>
-      <TouchableOpacity
+      <Pressable
         onPress={vm.handleRefresh}
-        activeOpacity={0.85}
-        style={[styles.retryBtn, { borderColor: colors.primaryContainer }]}
+        style={({ pressed }) => [
+          styles.retryBtn,
+          { borderColor: colors.primaryContainer },
+          pressed && { opacity: 0.85 },
+        ]}
       >
         <MaterialIcons name="refresh" size={20} color={colors.primaryContainer} />
         <Text style={[styles.retryBtnText, { color: colors.primaryContainer }]}>Reintentar</Text>
-      </TouchableOpacity>
+      </Pressable>
       <View style={[styles.errorTipContainer, { borderTopColor: `${colors.outlineVariant}30` }]}>
         <Text style={[styles.errorTipText, { color: colors.onSurfaceVariant }]}>
           Si el problema persiste, tus publicaciones guardadas siguen disponibles offline.
@@ -383,10 +402,9 @@ const FeedScreen: React.FC = () => {
       </View>
 
       {/* FAB */}
-      <TouchableOpacity
-        style={styles.fabWrap}
+      <Pressable
+        style={({ pressed }) => [styles.fabWrap, pressed && { opacity: 0.85 }]}
         onPress={vm.handleOpenCreateModal}
-        activeOpacity={0.85}
       >
         <LinearGradient
           colors={[colors.primary, colors.primaryContainer]}
@@ -396,7 +414,7 @@ const FeedScreen: React.FC = () => {
         >
           <MaterialIcons name="add" size={28} color="#FFF" />
         </LinearGradient>
-      </TouchableOpacity>
+      </Pressable>
 
       {/* Create post modal */}
       <CreatePostModal

@@ -62,6 +62,8 @@ En Codex, usar skills del repo:
 
 Reglas:
 
+- Todo change SDD no trivial debe empezar con issue/user story en GitHub y item en `PlanearIA Product OS`
+  antes de enrich, explore o propose. No crear `openspec/changes/<nombre>/` sin ese origen operativo.
 - No implementar cambios de producto no triviales sin change OpenSpec.
 - No marcar `[x]` sin evidencia.
 - UI visible requiere Playwright por breakpoint; el gate visual no es N/A por defecto.

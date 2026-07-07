@@ -3,10 +3,10 @@ import {
   Alert,
   Linking,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -39,11 +39,13 @@ const parseClassroomAttachments = (recurso: Recurso): ClassroomAttachment[] => {
   if (!tag) {
     const fallback = recurso.url || recurso.archivo;
     return fallback
-      ? [{
-          label: recurso.archivo || recurso.url || recurso.titulo,
-          type: recurso.url?.startsWith("http") ? "enlace" : "archivo",
-          uri: fallback,
-        }]
+      ? [
+          {
+            label: recurso.archivo || recurso.url || recurso.titulo,
+            type: recurso.url?.startsWith("http") ? "enlace" : "archivo",
+            uri: fallback,
+          },
+        ]
       : [];
   }
 
@@ -90,10 +92,13 @@ const DetalleRecursoClassroomScreen: React.FC = () => {
   const { grupoId, recursoId } = route.params;
   const { actualizarRecurso, eliminarRecurso, obtenerRecursoPorId } = useRecursos();
   const recurso = obtenerRecursoPorId(recursoId);
-  const attachments = React.useMemo(() => (recurso ? parseClassroomAttachments(recurso) : []), [recurso]);
+  const attachments = React.useMemo(
+    () => (recurso ? parseClassroomAttachments(recurso) : []),
+    [recurso]
+  );
   const visibleTags = React.useMemo(
     () => recurso?.tags?.filter((tag) => !tag.startsWith(ATTACHMENTS_TAG_PREFIX)) ?? [],
-    [recurso?.tags],
+    [recurso?.tags]
   );
 
   const showMessage = React.useCallback((title: string, message: string) => {
@@ -108,7 +113,10 @@ const DetalleRecursoClassroomScreen: React.FC = () => {
     if (!recurso) return;
 
     if (isPlaneacionResource(recurso) && recurso.url) {
-      navigation.navigate("DocEditor", { modo: "editar", planeacionId: recurso.url.replace("planeacion://", "") });
+      navigation.navigate("DocEditor", {
+        modo: "editar",
+        planeacionId: recurso.url.replace("planeacion://", ""),
+      });
       return;
     }
 
@@ -120,7 +128,10 @@ const DetalleRecursoClassroomScreen: React.FC = () => {
 
     const canOpen = await Linking.canOpenURL(target);
     if (!canOpen) {
-      showMessage("No se pudo abrir", "El enlace o archivo no esta disponible en este dispositivo.");
+      showMessage(
+        "No se pudo abrir",
+        "El enlace o archivo no esta disponible en este dispositivo."
+      );
       return;
     }
     await Linking.openURL(target);
@@ -130,12 +141,15 @@ const DetalleRecursoClassroomScreen: React.FC = () => {
     async (attachment: ClassroomAttachment) => {
       const canOpen = await Linking.canOpenURL(attachment.uri);
       if (!canOpen) {
-        showMessage("No se pudo abrir", "El archivo o enlace no esta disponible en este dispositivo.");
+        showMessage(
+          "No se pudo abrir",
+          "El archivo o enlace no esta disponible en este dispositivo."
+        );
         return;
       }
       await Linking.openURL(attachment.uri);
     },
-    [showMessage],
+    [showMessage]
   );
 
   const handleRemoveFromClass = React.useCallback(() => {
@@ -148,7 +162,8 @@ const DetalleRecursoClassroomScreen: React.FC = () => {
         fechaModificacion: new Date(),
       });
       showMessage("Material quitado", "El recurso ya no aparece en esta clase.");
-      const targetGrupoId = grupoId ?? (typeof recurso.grupoId === "number" ? recurso.grupoId : undefined);
+      const targetGrupoId =
+        grupoId ?? (typeof recurso.grupoId === "number" ? recurso.grupoId : undefined);
       if (targetGrupoId) {
         navigation.navigate("ClassroomGroup", { grupoId: targetGrupoId });
       } else {
@@ -169,11 +184,13 @@ const DetalleRecursoClassroomScreen: React.FC = () => {
 
   const handleDelete = React.useCallback(() => {
     if (!recurso || typeof recurso.id !== "number") return;
-    const message = "Esto eliminara el recurso de Biblioteca y de cualquier clase donde este asignado.";
+    const message =
+      "Esto eliminara el recurso de Biblioteca y de cualquier clase donde este asignado.";
     const remove = async () => {
       await eliminarRecurso(recurso.id as number);
       showMessage("Recurso eliminado", "El material fue eliminado correctamente.");
-      const targetGrupoId = grupoId ?? (typeof recurso.grupoId === "number" ? recurso.grupoId : undefined);
+      const targetGrupoId =
+        grupoId ?? (typeof recurso.grupoId === "number" ? recurso.grupoId : undefined);
       if (targetGrupoId) {
         navigation.navigate("ClassroomGroup", { grupoId: targetGrupoId });
       } else {
@@ -198,10 +215,15 @@ const DetalleRecursoClassroomScreen: React.FC = () => {
         <View style={styles.centerBox}>
           <MaterialIcons name="description" size={42} color={COLORS.primary} />
           <Text style={styles.emptyTitle}>No encontramos este recurso</Text>
-          <Text style={styles.emptyText}>Puede haberse eliminado o estar pendiente de recarga local.</Text>
-          <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.emptyText}>
+            Puede haberse eliminado o estar pendiente de recarga local.
+          </Text>
+          <Pressable
+            style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.6 }]}
+            onPress={() => navigation.goBack()}
+          >
             <Text style={styles.primaryButtonText}>Volver</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </SafeAreaView>
     );
@@ -215,16 +237,21 @@ const DetalleRecursoClassroomScreen: React.FC = () => {
         showsVerticalScrollIndicator={Platform.OS === "web"}
       >
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Pressable
+            style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
+            onPress={() => navigation.goBack()}
+          >
             <MaterialIcons name="arrow-back" size={22} color="#0F172A" />
-          </TouchableOpacity>
+          </Pressable>
           <View style={styles.headerCopy}>
             <Text style={styles.eyebrow}>Material</Text>
             <Text style={styles.title}>{recurso.titulo}</Text>
-            <Text style={styles.subtitle}>{recurso.tipo} - Actualizado: {formatDate(recurso.fechaModificacion)}</Text>
+            <Text style={styles.subtitle}>
+              {recurso.tipo} - Actualizado: {formatDate(recurso.fechaModificacion)}
+            </Text>
           </View>
-          <TouchableOpacity
-            style={styles.secondaryButton}
+          <Pressable
+            style={({ pressed }) => [styles.secondaryButton, pressed && { opacity: 0.6 }]}
             onPress={() =>
               navigation.navigate("AgregarContenidoClassroom", {
                 kind: "material",
@@ -237,7 +264,7 @@ const DetalleRecursoClassroomScreen: React.FC = () => {
           >
             <MaterialIcons name="edit" size={18} color={COLORS.primary} />
             <Text style={styles.secondaryButtonText}>Editar</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.viewerCard}>
@@ -245,33 +272,52 @@ const DetalleRecursoClassroomScreen: React.FC = () => {
             <MaterialIcons name={getResourceIcon(recurso.tipo)} size={54} color="#FFFFFF" />
           </View>
           <Text style={styles.viewerTitle}>{resolvePreviewTitle(recurso)}</Text>
-          <Text style={styles.viewerText}>{recurso.descripcion || "Sin descripcion para este material."}</Text>
-          <TouchableOpacity style={styles.openButton} onPress={() => void handleOpen()}>
-            <MaterialIcons name={isPlaneacionResource(recurso) ? "article" : "open-in-new"} size={19} color="#FFFFFF" />
-            <Text style={styles.openButtonText}>{isPlaneacionResource(recurso) ? "Abrir planeacion" : "Abrir recurso"}</Text>
-          </TouchableOpacity>
+          <Text style={styles.viewerText}>
+            {recurso.descripcion || "Sin descripcion para este material."}
+          </Text>
+          <Pressable
+            style={({ pressed }) => [styles.openButton, pressed && { opacity: 0.6 }]}
+            onPress={() => void handleOpen()}
+          >
+            <MaterialIcons
+              name={isPlaneacionResource(recurso) ? "article" : "open-in-new"}
+              size={19}
+              color="#FFFFFF"
+            />
+            <Text style={styles.openButtonText}>
+              {isPlaneacionResource(recurso) ? "Abrir planeacion" : "Abrir recurso"}
+            </Text>
+          </Pressable>
         </View>
 
         {attachments.length ? (
           <View style={styles.sectionCard}>
             <Text style={styles.sectionTitle}>Adjuntos</Text>
-            <Text style={styles.sectionDescription}>Archivos y enlaces publicados en esta seccion de Classroom.</Text>
+            <Text style={styles.sectionDescription}>
+              Archivos y enlaces publicados en esta seccion de Classroom.
+            </Text>
             <View style={styles.attachmentsList}>
               {attachments.map((attachment, index) => (
-                <TouchableOpacity
+                <Pressable
                   key={`${attachment.uri}-${index}`}
-                  style={styles.attachmentRow}
+                  style={({ pressed }) => [styles.attachmentRow, pressed && { opacity: 0.6 }]}
                   onPress={() => void handleOpenAttachment(attachment)}
                 >
                   <View style={styles.attachmentIcon}>
-                    <MaterialIcons name={attachment.type === "enlace" ? "link" : "insert-drive-file"} size={20} color={COLORS.primary} />
+                    <MaterialIcons
+                      name={attachment.type === "enlace" ? "link" : "insert-drive-file"}
+                      size={20}
+                      color={COLORS.primary}
+                    />
                   </View>
                   <View style={styles.attachmentCopy}>
                     <Text style={styles.attachmentTitle}>{attachment.label}</Text>
-                    <Text style={styles.attachmentMeta}>{attachment.type === "enlace" ? attachment.uri : "Archivo adjunto"}</Text>
+                    <Text style={styles.attachmentMeta}>
+                      {attachment.type === "enlace" ? attachment.uri : "Archivo adjunto"}
+                    </Text>
                   </View>
                   <MaterialIcons name="open-in-new" size={18} color="#94A3B8" />
-                </TouchableOpacity>
+                </Pressable>
               ))}
             </View>
           </View>
@@ -281,7 +327,11 @@ const DetalleRecursoClassroomScreen: React.FC = () => {
           <MetaCard label="Tipo" value={recurso.tipo} icon="category" />
           <MetaCard label="Acceso" value={recurso.acceso} icon="lock" />
           <MetaCard label="Origen" value={recurso.origen} icon="source" />
-          <MetaCard label="Formato" value={recurso.formato || "Sin formato"} icon="insert-drive-file" />
+          <MetaCard
+            label="Formato"
+            value={recurso.formato || "Sin formato"}
+            icon="insert-drive-file"
+          />
         </View>
 
         {visibleTags.length ? (
@@ -289,21 +339,29 @@ const DetalleRecursoClassroomScreen: React.FC = () => {
             <Text style={styles.sectionTitle}>Etiquetas</Text>
             <View style={styles.tagsWrap}>
               {visibleTags.map((tag) => (
-                <Text key={tag} style={styles.tag}>{tag}</Text>
+                <Text key={tag} style={styles.tag}>
+                  {tag}
+                </Text>
               ))}
             </View>
           </View>
         ) : null}
 
         <View style={styles.actionsRow}>
-          <TouchableOpacity style={styles.outlineButton} onPress={handleRemoveFromClass}>
+          <Pressable
+            style={({ pressed }) => [styles.outlineButton, pressed && { opacity: 0.6 }]}
+            onPress={handleRemoveFromClass}
+          >
             <MaterialIcons name="folder-off" size={18} color={COLORS.primary} />
             <Text style={styles.outlineButtonText}>Quitar de clase</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dangerButton} onPress={handleDelete}>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.dangerButton, pressed && { opacity: 0.6 }]}
+            onPress={handleDelete}
+          >
             <MaterialIcons name="delete-outline" size={18} color="#B91C1C" />
             <Text style={styles.dangerButtonText}>Eliminar recurso</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>

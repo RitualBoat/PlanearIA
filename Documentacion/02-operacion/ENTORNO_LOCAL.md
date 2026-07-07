@@ -92,9 +92,8 @@ Valores minimos para desarrollo:
 
 ```text
 EXPO_PUBLIC_API_URL=http://localhost:3000
-EXPO_PUBLIC_API_SECRET=el_mismo_valor_que_API_SECRET
 EXPO_PUBLIC_ALLOW_NATIVE_LOCALHOST=false
-API_SECRET=el_mismo_valor_que_EXPO_PUBLIC_API_SECRET
+API_SECRET=un_valor_solo_backend
 MONGODB_URI=tu_uri_de_mongodb
 ```
 

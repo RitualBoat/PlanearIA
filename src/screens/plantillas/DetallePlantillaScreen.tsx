@@ -1,13 +1,5 @@
 import React, { useMemo } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  StatusBar,
-  ScrollView,
-  Alert,
-} from "react-native";
+import { Pressable, View, Text, StyleSheet, StatusBar, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
@@ -70,9 +62,12 @@ const DetallePlantillaScreen: React.FC = () => {
         <StatusBar backgroundColor={COLORS.surface} barStyle="dark-content" />
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Pressable
+              style={({ pressed }) => pressed && { opacity: 0.6 }}
+              onPress={() => navigation.goBack()}
+            >
               <MaterialIcons name="arrow-back" size={24} color={COLORS.text} />
-            </TouchableOpacity>
+            </Pressable>
             <Text style={styles.headerTitle}>Detalle</Text>
             <View style={{ width: 24 }} />
           </View>
@@ -97,15 +92,18 @@ const DetallePlantillaScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.7 }}
+            onPress={() => navigation.goBack()}
+          >
             <MaterialIcons name="arrow-back" size={24} color={COLORS.text} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerTitle} numberOfLines={1}>
             {plantilla.nombre}
           </Text>
-          <TouchableOpacity onPress={handleEditar} activeOpacity={0.7}>
+          <Pressable style={({ pressed }) => pressed && { opacity: 0.7 }} onPress={handleEditar}>
             <MaterialIcons name="edit" size={22} color={COLORS.primary} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <ScrollView
@@ -223,17 +221,23 @@ const DetallePlantillaScreen: React.FC = () => {
 
           {/* Actions */}
           <View style={styles.actionsRow}>
-            <TouchableOpacity style={styles.btnPrimary} onPress={handleEditar} activeOpacity={0.8}>
+            <Pressable
+              style={({ pressed }) => [styles.btnPrimary, pressed && { opacity: 0.8 }]}
+              onPress={handleEditar}
+            >
               <MaterialIcons name="edit" size={18} color="#FFFFFF" />
               <Text style={styles.btnPrimaryText}>Editar plantilla</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {!plantilla.esDelSistema && (
-            <TouchableOpacity style={styles.btnDanger} onPress={handleEliminar} activeOpacity={0.8}>
+            <Pressable
+              style={({ pressed }) => [styles.btnDanger, pressed && { opacity: 0.8 }]}
+              onPress={handleEliminar}
+            >
               <MaterialIcons name="delete-outline" size={18} color={COLORS.error} />
               <Text style={styles.btnDangerText}>Eliminar plantilla</Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
         </ScrollView>
       </SafeAreaView>

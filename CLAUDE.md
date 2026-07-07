@@ -15,7 +15,7 @@ Experiencias objetivo:
 - Office Docente: NotasPLAN, CalcuPLAN y PresentaPLAN.
 - Clases / Classroom.
 - AsistePLAN: ChatGPT/Gemini docente con adjuntos reales.
-- DiseñaPLAN: Canva/Genially docente.
+- Diseï¿½aPLAN: Canva/Genially docente.
 - ConectaPLAN: comunicacion profesional docente.
 - AgendaPLAN, ReportaPLAN, cuenta, seguridad y accesibilidad.
 
@@ -75,6 +75,8 @@ Paso 3 - Audit & QA: evidencia tecnica y visual; adversarial review; archive
 
 Reglas:
 
+- El issue/user story y su item en PlanearIA Product OS son obligatorios antes de enrich, explore o
+  propose para todo change SDD no trivial. Solo un hotfix trivial autorizado explicitamente puede saltarlo.
 - El issue se enriquece antes de proponer.
 - Un change grande a la vez.
 - `proposal.md` define why/what/no objetivos.
@@ -117,7 +119,7 @@ Para paridad alta, usar `context/<modulo>-ground-truth/` y Figma cuando exista:
 - Office: Word/Docs, Excel/Sheets, PowerPoint/Slides.
 - AsistePLAN: ChatGPT/Gemini/NotebookLM.
 - Clases: Google Classroom/Classroomio.
-- DiseñaPLAN: Canva/Genially.
+- Diseï¿½aPLAN: Canva/Genially.
 - ConectaPLAN: WhatsApp profesional.
 
 Referencias open source son inspiracion y analisis; no son codigo de PlanearIA.

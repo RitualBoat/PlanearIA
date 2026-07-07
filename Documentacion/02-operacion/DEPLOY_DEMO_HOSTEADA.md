@@ -265,9 +265,6 @@ En `Environment Variables`, agrega:
 Name: EXPO_PUBLIC_API_URL
 Value: https://TU_BACKEND.vercel.app
 
-Name: EXPO_PUBLIC_API_SECRET
-Value: el mismo valor de API_SECRET del backend
-
 Name: EXPO_PUBLIC_ALLOW_NATIVE_LOCALHOST
 Value: false
 ```
@@ -275,6 +272,7 @@ Value: false
 Importante:
 
 - `EXPO_PUBLIC_API_URL` debe ser la URL del backend, sin `/api/health`.
+- No configures secretos como `EXPO_PUBLIC_*`; Expo los publica en el bundle.
 - Correcto: `https://planearia-api.vercel.app`
 - Incorrecto: `https://planearia-api.vercel.app/api/health`
 
@@ -422,7 +420,6 @@ Revisa en `planearia-web`:
 
 ```text
 EXPO_PUBLIC_API_URL=https://TU_BACKEND.vercel.app
-EXPO_PUBLIC_API_SECRET=igual a API_SECRET
 ```
 
 Despues redeploy frontend.
@@ -645,7 +642,6 @@ Configura estas variables para el environment que estes usando (`Preview` si es 
 
 ```text
 EXPO_PUBLIC_API_URL=https://TU_BACKEND.vercel.app
-EXPO_PUBLIC_API_SECRET=<mismo valor que API_SECRET del backend>
 ```
 
 3. En el proyecto backend revisa que `ALLOWED_ORIGINS` incluya la URL exacta del frontend:
@@ -690,7 +686,7 @@ Vercel tambien queda filtrado por `ignoreCommand`:
 
 ## Advertencia de seguridad
 
-Para esta demo, `EXPO_PUBLIC_API_SECRET` queda dentro del bundle web. Eso significa que no es un secreto real. Sirve para una demo escolar controlada, pero antes de beta publica debes cerrar el plan de Auth/Sesion Real: JWT, roles, permisos, rate limiting y aislamiento por usuario.
+El frontend solo debe recibir configuracion publica, como `EXPO_PUBLIC_API_URL`. Cualquier `API_SECRET` vive en backend/operaciones server-side; si alguna vez se expuso como variable publica, rota ese valor antes de beta publica.
 
 ---
 

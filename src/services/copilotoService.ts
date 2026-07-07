@@ -113,14 +113,24 @@ const readableTextFromUnknown = (value: unknown): string => {
   }
 
   if (Array.isArray(value)) {
-    return value.map(readableTextFromUnknown).filter(Boolean).join(" ");
+    return value
+      .flatMap((item) => {
+        const text = readableTextFromUnknown(item);
+        return text ? [text] : [];
+      })
+      .join(" ");
   }
 
   if (typeof value === "object") {
     const record = value as Record<string, unknown>;
     if (typeof record.text === "string") return record.text;
     if (Array.isArray(record.content)) {
-      return record.content.map(readableTextFromUnknown).filter(Boolean).join(" ");
+      return record.content
+        .flatMap((item) => {
+          const text = readableTextFromUnknown(item);
+          return text ? [text] : [];
+        })
+        .join(" ");
     }
   }
 
@@ -269,7 +279,7 @@ const requestCopiloto = async <T extends CopilotoResultado>(
   payload: CopilotoRequest
 ): Promise<CopilotoResponse<T>> => {
   if (!isAPIConfigured()) {
-    return buildHeuristicResponse<T>(payload, "falta configurar EXPO_PUBLIC_API_SECRET o backend IA");
+    return buildHeuristicResponse<T>(payload, "falta configurar EXPO_PUBLIC_API_URL o backend IA");
   }
 
   let lastError: unknown;

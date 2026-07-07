@@ -1,10 +1,10 @@
 import { useTheme } from "../../context/ThemeContext";
 import React, { useState } from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   TextInput,
   RefreshControl,
@@ -22,7 +22,6 @@ import { Contacto, SolicitudConexion } from "../../../types";
 import { useSocialViewModel, SocialTab } from "../../hooks/useSocialViewModel";
 
 // ─── Design Tokens (Scholarly Atelier) ───
-
 
 // Helper to map dynamic theme colors to the legacy DT token schema
 const getThemeTokens = (colors: any) => ({
@@ -54,7 +53,6 @@ const getThemeTokens = (colors: any) => ({
   textMuted: colors.textMuted,
 });
 
-
 // ─── Helpers ───
 
 const getInitials = (nombre: string, apellidos?: string): string => {
@@ -62,10 +60,6 @@ const getInitials = (nombre: string, apellidos?: string): string => {
   const last = apellidos?.[0] || "";
   return (first + last).toUpperCase() || "?";
 };
-
-
-
-
 
 // ─── Avatar Component ───
 
@@ -80,35 +74,35 @@ const ContactAvatar: React.FC<{
   const DT = getThemeTokens(colors);
   const styles = getStyles(DT, isDark);
   return (
-  <View style={{ position: "relative" }}>
-    <View
-      style={[
-        styles.avatar,
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          backgroundColor: bgColor || DT.primaryContainer,
-        },
-      ]}
-    >
-      <Text style={[styles.avatarText, { fontSize: size * 0.36 }]}>
-        {getInitials(nombre, apellidos)}
-      </Text>
-    </View>
-    {enLinea !== undefined && (
+    <View style={{ position: "relative" }}>
       <View
         style={[
-          styles.onlineDot,
+          styles.avatar,
           {
-            backgroundColor: enLinea ? DT.success : DT.outlineVariant,
-            bottom: 0,
-            right: 0,
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            backgroundColor: bgColor || DT.primaryContainer,
           },
         ]}
-      />
-    )}
-  </View>
+      >
+        <Text style={[styles.avatarText, { fontSize: size * 0.36 }]}>
+          {getInitials(nombre, apellidos)}
+        </Text>
+      </View>
+      {enLinea !== undefined && (
+        <View
+          style={[
+            styles.onlineDot,
+            {
+              backgroundColor: enLinea ? DT.success : DT.outlineVariant,
+              bottom: 0,
+              right: 0,
+            },
+          ]}
+        />
+      )}
+    </View>
   );
 };
 
@@ -123,22 +117,22 @@ const StatsRow: React.FC<{
   const DT = getThemeTokens(colors);
   const styles = getStyles(DT, isDark);
   return (
-  <View style={styles.statsRow}>
-    <View style={[styles.statBadge, { backgroundColor: DT.primaryFixed }]}>
-      <MaterialIcons name="people-outline" size={14} color={DT.primaryContainer} />
-      <Text style={[styles.statBadgeText, { color: DT.primaryContainer }]}>
-        {totalContactos} Contactos
-      </Text>
+    <View style={styles.statsRow}>
+      <View style={[styles.statBadge, { backgroundColor: DT.primaryFixed }]}>
+        <MaterialIcons name="people-outline" size={14} color={DT.primaryContainer} />
+        <Text style={[styles.statBadgeText, { color: DT.primaryContainer }]}>
+          {totalContactos} Contactos
+        </Text>
+      </View>
+      <View style={[styles.statBadge, { backgroundColor: DT.warningTint }]}>
+        <MaterialIcons name="schedule" size={14} color={DT.warning} />
+        <Text style={[styles.statBadgeText, { color: DT.warning }]}>{pendientes} Pendientes</Text>
+      </View>
+      <View style={[styles.statBadge, { backgroundColor: DT.successTint }]}>
+        <MaterialIcons name="chat" size={14} color={DT.success} />
+        <Text style={[styles.statBadgeText, { color: DT.success }]}>{totalGrupos} Mensajes</Text>
+      </View>
     </View>
-    <View style={[styles.statBadge, { backgroundColor: DT.warningTint }]}>
-      <MaterialIcons name="schedule" size={14} color={DT.warning} />
-      <Text style={[styles.statBadgeText, { color: DT.warning }]}>{pendientes} Pendientes</Text>
-    </View>
-    <View style={[styles.statBadge, { backgroundColor: DT.successTint }]}>
-      <MaterialIcons name="chat" size={14} color={DT.success} />
-      <Text style={[styles.statBadgeText, { color: DT.success }]}>{totalGrupos} Mensajes</Text>
-    </View>
-  </View>
   );
 };
 
@@ -161,11 +155,14 @@ const TabBar: React.FC<{
   return (
     <View style={styles.tabBar}>
       {tabs.map((tab) => (
-        <TouchableOpacity
+        <Pressable
           key={tab.key}
-          style={[styles.tab, activeTab === tab.key && styles.tabActive]}
+          style={({ pressed }) => [
+            styles.tab,
+            activeTab === tab.key && styles.tabActive,
+            pressed && { opacity: 0.7 },
+          ]}
           onPress={() => onTabChange(tab.key)}
-          activeOpacity={0.7}
         >
           <MaterialIcons
             name={tab.icon}
@@ -176,7 +173,7 @@ const TabBar: React.FC<{
             {tab.label}
           </Text>
           {tab.key === "solicitudes" && pendientes > 0 && <View style={styles.tabBadge} />}
-        </TouchableOpacity>
+        </Pressable>
       ))}
     </View>
   );
@@ -194,36 +191,38 @@ const ContactCard: React.FC<{
   const DT = getThemeTokens(colors);
   const styles = getStyles(DT, isDark);
   return (
-  <TouchableOpacity
-    style={[styles.contactCard, styles.cardShadow]}
-    onPress={() => onPress(contacto)}
-    activeOpacity={0.85}
-  >
-    <View style={styles.contactCardInner}>
-      <ContactAvatar
-        nombre={contacto.nombre}
-        apellidos={contacto.apellidos}
-        size={44}
-        enLinea={contacto.enLinea}
-      />
-      <View style={styles.contactInfo}>
-        <Text style={styles.contactName}>
-          {contacto.nombre} {contacto.apellidos}
-        </Text>
-        {contacto.institucion ? (
-          <Text style={styles.contactSchool} numberOfLines={1}>
-            {contacto.institucion}
+    <Pressable
+      style={({ pressed }) => [styles.contactCard, styles.cardShadow, pressed && { opacity: 0.85 }]}
+      onPress={() => onPress(contacto)}
+    >
+      <View style={styles.contactCardInner}>
+        <ContactAvatar
+          nombre={contacto.nombre}
+          apellidos={contacto.apellidos}
+          size={44}
+          enLinea={contacto.enLinea}
+        />
+        <View style={styles.contactInfo}>
+          <Text style={styles.contactName}>
+            {contacto.nombre} {contacto.apellidos}
           </Text>
-        ) : null}
-        <Text style={styles.contactMateria} numberOfLines={1}>
-          {contacto.materia || "Docente"}
-        </Text>
+          {contacto.institucion ? (
+            <Text style={styles.contactSchool} numberOfLines={1}>
+              {contacto.institucion}
+            </Text>
+          ) : null}
+          <Text style={styles.contactMateria} numberOfLines={1}>
+            {contacto.materia || "Docente"}
+          </Text>
+        </View>
       </View>
-    </View>
-    <TouchableOpacity style={styles.contactChatBtn} onPress={onChat} activeOpacity={0.7}>
-      <MaterialIcons name="chat" size={18} color={DT.primaryContainer} />
-    </TouchableOpacity>
-  </TouchableOpacity>
+      <Pressable
+        style={({ pressed }) => [styles.contactChatBtn, pressed && { opacity: 0.7 }]}
+        onPress={onChat}
+      >
+        <MaterialIcons name="chat" size={18} color={DT.primaryContainer} />
+      </Pressable>
+    </Pressable>
   );
 };
 
@@ -238,52 +237,50 @@ const SolicitudCard: React.FC<{
   const DT = getThemeTokens(colors);
   const styles = getStyles(DT, isDark);
   return (
-  <View style={[styles.solicitudCard, styles.cardShadow]}>
-    <View style={styles.solicitudHeader}>
-      <ContactAvatar
-        nombre={solicitud.deUsuarioNombre.split(" ")[0] || ""}
-        apellidos={solicitud.deUsuarioNombre.split(" ").slice(1).join(" ")}
-        size={44}
-      />
-      <View style={styles.solicitudInfo}>
-        <Text style={styles.contactName}>{solicitud.deUsuarioNombre}</Text>
-        <Text style={styles.contactMateria}>
-          {solicitud.deUsuarioMateria || solicitud.deUsuarioInstitucion || "Docente"}
-        </Text>
+    <View style={[styles.solicitudCard, styles.cardShadow]}>
+      <View style={styles.solicitudHeader}>
+        <ContactAvatar
+          nombre={solicitud.deUsuarioNombre.split(" ")[0] || ""}
+          apellidos={solicitud.deUsuarioNombre.split(" ").slice(1).join(" ")}
+          size={44}
+        />
+        <View style={styles.solicitudInfo}>
+          <Text style={styles.contactName}>{solicitud.deUsuarioNombre}</Text>
+          <Text style={styles.contactMateria}>
+            {solicitud.deUsuarioMateria || solicitud.deUsuarioInstitucion || "Docente"}
+          </Text>
+        </View>
       </View>
-    </View>
-    {solicitud.mensaje ? (
-      <View style={styles.solicitudMsgBubble}>
-        <MaterialIcons name="format-quote" size={16} color={DT.outlineVariant} />
-        <Text style={styles.solicitudMsgText}>{solicitud.mensaje}</Text>
-      </View>
-    ) : null}
-    <View style={styles.solicitudBtns}>
-      <TouchableOpacity
-        style={styles.btnAceptar}
-        onPress={() => onAceptar(solicitud.id)}
-        activeOpacity={0.85}
-      >
-        <LinearGradient
-          colors={[DT.primaryContainer, "#005da8"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.btnGradient}
+      {solicitud.mensaje ? (
+        <View style={styles.solicitudMsgBubble}>
+          <MaterialIcons name="format-quote" size={16} color={DT.outlineVariant} />
+          <Text style={styles.solicitudMsgText}>{solicitud.mensaje}</Text>
+        </View>
+      ) : null}
+      <View style={styles.solicitudBtns}>
+        <Pressable
+          style={({ pressed }) => [styles.btnAceptar, pressed && { opacity: 0.85 }]}
+          onPress={() => onAceptar(solicitud.id)}
         >
-          <MaterialIcons name="check" size={16} color="#FFF" />
-          <Text style={styles.btnAceptarText}>Aceptar</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.btnRechazar}
-        onPress={() => onRechazar(solicitud.id)}
-        activeOpacity={0.7}
-      >
-        <MaterialIcons name="close" size={16} color={DT.textMuted} />
-        <Text style={styles.btnRechazarText}>Rechazar</Text>
-      </TouchableOpacity>
+          <LinearGradient
+            colors={[DT.primaryContainer, "#005da8"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.btnGradient}
+          >
+            <MaterialIcons name="check" size={16} color="#FFF" />
+            <Text style={styles.btnAceptarText}>Aceptar</Text>
+          </LinearGradient>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.btnRechazar, pressed && { opacity: 0.7 }]}
+          onPress={() => onRechazar(solicitud.id)}
+        >
+          <MaterialIcons name="close" size={16} color={DT.textMuted} />
+          <Text style={styles.btnRechazarText}>Rechazar</Text>
+        </Pressable>
+      </View>
     </View>
-  </View>
   );
 };
 
@@ -302,9 +299,9 @@ const ProfileBottomSheet: React.FC<{
   if (!contacto) return null;
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <TouchableOpacity style={styles.sheetBackdrop} onPress={onClose} activeOpacity={1}>
+      <Pressable style={styles.sheetBackdrop} onPress={onClose}>
         <View style={styles.sheetContainer}>
-          <TouchableOpacity activeOpacity={1}>
+          <Pressable>
             <View style={styles.sheetHandle} />
             <View style={styles.sheetProfile}>
               <ContactAvatar nombre={contacto.nombre} apellidos={contacto.apellidos} size={72} />
@@ -374,7 +371,7 @@ const ProfileBottomSheet: React.FC<{
             ) : null}
 
             <View style={styles.sheetActions}>
-              <TouchableOpacity onPress={onMessage} activeOpacity={0.85}>
+              <Pressable style={({ pressed }) => pressed && { opacity: 0.85 }} onPress={onMessage}>
                 <LinearGradient
                   colors={[DT.primaryContainer, "#005da8"]}
                   start={{ x: 0, y: 0 }}
@@ -384,21 +381,23 @@ const ProfileBottomSheet: React.FC<{
                   <MaterialIcons name="send" size={18} color="#FFF" />
                   <Text style={styles.sheetPrimaryBtnText}>Enviar mensaje</Text>
                 </LinearGradient>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.sheetDeleteBtn}
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [styles.sheetDeleteBtn, pressed && { opacity: 0.7 }]}
                 onPress={() => onDelete(contacto.id)}
-                activeOpacity={0.7}
               >
                 <Text style={styles.sheetDeleteBtnText}>Bloquear</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.sheetCloseBtn} onPress={onClose} activeOpacity={0.7}>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [styles.sheetCloseBtn, pressed && { opacity: 0.7 }]}
+                onPress={onClose}
+              >
                 <Text style={styles.sheetCloseBtnText}>Cerrar</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </Modal>
   );
 };
@@ -448,16 +447,19 @@ const EmptyState: React.FC<{ tab: SocialTab; onBuscar?: () => void }> = ({ tab, 
       <Text style={styles.emptyTitle}>{cfg.title}</Text>
       <Text style={styles.emptySubtitle}>{cfg.subtitle}</Text>
       {cfg.primaryBtn && (
-        <TouchableOpacity style={styles.emptyPrimaryBtn} onPress={onBuscar} activeOpacity={0.85}>
+        <Pressable
+          style={({ pressed }) => [styles.emptyPrimaryBtn, pressed && { opacity: 0.85 }]}
+          onPress={onBuscar}
+        >
           <MaterialIcons name={cfg.primaryIcon!} size={18} color="#FFF" />
           <Text style={styles.emptyPrimaryBtnText}>{cfg.primaryBtn}</Text>
-        </TouchableOpacity>
+        </Pressable>
       )}
       {cfg.secondaryBtn && (
-        <TouchableOpacity style={styles.emptySecondaryBtn} activeOpacity={0.7}>
+        <Pressable style={({ pressed }) => [styles.emptySecondaryBtn, pressed && { opacity: 0.7 }]}>
           <MaterialIcons name={cfg.secondaryIcon!} size={18} color={DT.onSurface} />
           <Text style={styles.emptySecondaryBtnText}>{cfg.secondaryBtn}</Text>
-        </TouchableOpacity>
+        </Pressable>
       )}
     </View>
   );
@@ -497,9 +499,9 @@ const SocialScreen: React.FC = () => {
         <View style={styles.sectionBlock}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>MIS CONTACTOS</Text>
-            <TouchableOpacity activeOpacity={0.7}>
+            <Pressable style={({ pressed }) => pressed && { opacity: 0.7 }}>
               <Text style={styles.sectionLink}>Ver todos →</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
           <View style={styles.contactList}>
             {vm.contactos.map((contacto) => (
@@ -525,10 +527,13 @@ const SocialScreen: React.FC = () => {
     return (
       <>
         <View style={styles.subTabRow}>
-          <TouchableOpacity
-            style={[styles.subTab, vm.solicitudesSubTab === "recibidas" && styles.subTabActive]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.subTab,
+              vm.solicitudesSubTab === "recibidas" && styles.subTabActive,
+              pressed && { opacity: 0.7 },
+            ]}
             onPress={() => vm.setSolicitudesSubTab("recibidas")}
-            activeOpacity={0.7}
           >
             <Text
               style={[
@@ -543,11 +548,14 @@ const SocialScreen: React.FC = () => {
                 <Text style={styles.subTabBadgeText}>{vm.solicitudesRecibidas.length}</Text>
               </View>
             )}
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.subTab, vm.solicitudesSubTab === "enviadas" && styles.subTabActive]}
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.subTab,
+              vm.solicitudesSubTab === "enviadas" && styles.subTabActive,
+              pressed && { opacity: 0.7 },
+            ]}
             onPress={() => vm.setSolicitudesSubTab("enviadas")}
-            activeOpacity={0.7}
           >
             <Text
               style={[
@@ -562,7 +570,7 @@ const SocialScreen: React.FC = () => {
                 <Text style={styles.subTabBadgeText}>{vm.solicitudesEnviadas.length}</Text>
               </View>
             )}
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {currentList.length === 0 ? (
@@ -596,9 +604,12 @@ const SocialScreen: React.FC = () => {
           onChangeText={vm.setSearchQuery}
         />
         {vm.searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => vm.setSearchQuery("")}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
+            onPress={() => vm.setSearchQuery("")}
+          >
             <MaterialIcons name="close" size={20} color={DT.textMuted} />
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
 
@@ -624,10 +635,12 @@ const SocialScreen: React.FC = () => {
             <Text style={styles.emptySubtitle}>
               Intenta buscar con otro nombre, email o escuela
             </Text>
-            <TouchableOpacity style={styles.emptyInviteBtn} activeOpacity={0.7}>
+            <Pressable
+              style={({ pressed }) => [styles.emptyInviteBtn, pressed && { opacity: 0.7 }]}
+            >
               <MaterialIcons name="link" size={16} color={DT.primaryContainer} />
               <Text style={styles.emptyInviteBtnText}>Invitar por enlace</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         ) : (
           <View style={[styles.searchResults, isDesktop && styles.searchResultsDesktop]}>
@@ -646,7 +659,10 @@ const SocialScreen: React.FC = () => {
                     ) : null}
                     <Text style={styles.contactMateria}>{c.materia || "Docente"}</Text>
                   </View>
-                  <TouchableOpacity onPress={() => vm.handleSelectContacto(c)} activeOpacity={0.85}>
+                  <Pressable
+                    style={({ pressed }) => pressed && { opacity: 0.85 }}
+                    onPress={() => vm.handleSelectContacto(c)}
+                  >
                     <LinearGradient
                       colors={[DT.primaryContainer, "#005da8"]}
                       start={{ x: 0, y: 0 }}
@@ -655,7 +671,7 @@ const SocialScreen: React.FC = () => {
                     >
                       <Text style={styles.connectBtnText}>Conectar</Text>
                     </LinearGradient>
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               </View>
             ))}
@@ -754,516 +770,521 @@ const SocialScreen: React.FC = () => {
 
 // ─── Styles ───
 
-const getStyles = (DT: any, isDark: boolean) => StyleSheet.create({
-  cardShadow: Platform.select({
-    web: { boxShadow: isDark ? "0px 2px 8px rgba(0,0,0,0.2)" : "0px 2px 8px rgba(0,69,128,0.06)" } as any,
-    default: {
-      shadowColor: isDark ? "#000000" : "#004580",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: isDark ? 0.2 : 0.06,
-      shadowRadius: 8,
-      elevation: 2,
-    },
-  }),
-  liftShadow: Platform.select({
-    web: { boxShadow: isDark ? "0px 12px 48px rgba(0,0,0,0.35)" : "0px 12px 48px rgba(0,69,128,0.08)" } as any,
-    default: {
-      shadowColor: isDark ? "#000000" : "#004580",
-      shadowOffset: { width: 0, height: 12 },
-      shadowOpacity: isDark ? 0.35 : 0.08,
-      shadowRadius: 48,
-      elevation: 4,
-    },
-  }),
-  safe: { flex: 1, backgroundColor: DT.surface },
-
-  // ScrollView
-  scrollView: { flex: 1 },
-  scrollContent: { padding: 16, paddingTop: 54, paddingBottom: 110, gap: 14 },
-
-  // Tab Bar
-  tabBar: {
-    flexDirection: "row",
-    padding: 4,
-    backgroundColor: DT.surfaceLow,
-    borderRadius: 14,
-    height: 44,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    gap: 6,
-  },
-  tabActive: {
-    backgroundColor: DT.surfaceLowest,
-    ...Platform.select({
-      web: { boxShadow: "0px 2px 8px rgba(0,72,132,0.08)" } as any,
+const getStyles = (DT: any, isDark: boolean) =>
+  StyleSheet.create({
+    cardShadow: Platform.select({
+      web: {
+        boxShadow: isDark ? "0px 2px 8px rgba(0,0,0,0.2)" : "0px 2px 8px rgba(0,69,128,0.06)",
+      } as any,
       default: {
-        shadowColor: "#004884",
+        shadowColor: isDark ? "#000000" : "#004580",
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
+        shadowOpacity: isDark ? 0.2 : 0.06,
         shadowRadius: 8,
         elevation: 2,
       },
     }),
-  },
-  tabText: { fontSize: 14, fontWeight: "500", color: DT.textMuted },
-  tabTextActive: { color: DT.onSurface, fontWeight: "700" },
-  tabBadge: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: DT.error,
-  },
-
-  // Stats Row (mini-badges)
-  statsRow: { flexDirection: "row", gap: 8 },
-  statBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-  },
-  statBadgeText: {
-    fontSize: 12,
-    fontWeight: "700",
-  },
-
-  // Sections
-  sectionBlock: { gap: 10 },
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  sectionTitle: {
-    fontSize: 13,
-    fontWeight: "800",
-    color: DT.textMuted,
-    letterSpacing: 1.1,
-  },
-  sectionLink: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: DT.primaryContainer,
-  },
-
-  // Contact Card
-  contactList: { gap: 10 },
-  contactCard: {
-    backgroundColor: DT.surfaceLowest,
-    padding: 14,
-    borderRadius: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  contactCardInner: { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
-  contactInfo: { flex: 1 },
-  contactName: { fontSize: 15, fontWeight: "700", color: DT.onSurface },
-  contactSchool: { fontSize: 13, color: DT.textSecondary, marginTop: 1 },
-  contactMateria: { fontSize: 12, fontWeight: "500", color: DT.textMuted, marginTop: 1 },
-  contactChatBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: DT.primaryFixed,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  // Avatar
-  avatar: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarText: { color: "#FFF", fontWeight: "700" },
-  onlineDot: {
-    position: "absolute",
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    borderWidth: 2,
-    borderColor: "#FFF",
-  },
-
-  // Solicitud Card
-  solicitudList: { gap: 10 },
-  solicitudCard: {
-    backgroundColor: DT.surfaceLowest,
-    padding: 14,
-    borderRadius: 14,
-  },
-  solicitudHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 10 },
-  solicitudInfo: { flex: 1 },
-  solicitudMsgBubble: {
-    backgroundColor: DT.surfaceLow,
-    borderTopRightRadius: 10,
-    borderBottomRightRadius: 10,
-    borderBottomLeftRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-    flexDirection: "row",
-    gap: 8,
-    alignItems: "flex-start",
-  },
-  solicitudMsgText: {
-    flex: 1,
-    fontSize: 13,
-    color: DT.textSecondary,
-    fontStyle: "italic",
-    lineHeight: 18,
-  },
-  solicitudBtns: { flexDirection: "row", gap: 8 },
-  btnAceptar: { flex: 1 },
-  btnGradient: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    height: 38,
-    borderRadius: 10,
-  },
-  btnAceptarText: { color: "#FFF", fontWeight: "700", fontSize: 13 },
-  btnRechazar: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 4,
-    backgroundColor: DT.surfaceContainer,
-    height: 38,
-    borderRadius: 10,
-  },
-  btnRechazarText: { color: DT.textMuted, fontWeight: "700", fontSize: 13 },
-
-  // Sub Tabs
-  subTabRow: { flexDirection: "row", gap: 0 },
-  subTab: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    paddingVertical: 9,
-    borderRadius: 10,
-    backgroundColor: DT.surfaceContainer,
-  },
-  subTabActive: {
-    backgroundColor: DT.surfaceLowest,
-    ...Platform.select({
-      web: { boxShadow: "0px 2px 8px rgba(0,72,132,0.08)" } as any,
+    liftShadow: Platform.select({
+      web: {
+        boxShadow: isDark ? "0px 12px 48px rgba(0,0,0,0.35)" : "0px 12px 48px rgba(0,69,128,0.08)",
+      } as any,
       default: {
-        shadowColor: "#004884",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        elevation: 2,
-      },
-    }),
-  },
-  subTabText: { fontWeight: "500", fontSize: 13, color: DT.textMuted },
-  subTabTextActive: { fontWeight: "700", color: DT.onSurface },
-  subTabBadge: {
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: DT.primaryContainer,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 4,
-  },
-  subTabBadgeText: { color: "#FFF", fontSize: 10, fontWeight: "700" },
-
-  // Search Tab
-  searchBarWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: DT.surfaceContainer,
-    borderRadius: 14,
-    height: 48,
-    paddingHorizontal: 14,
-    gap: 8,
-  },
-  searchInput: { flex: 1, fontSize: 15, fontWeight: "500", color: DT.onSurface },
-  filterChipsScroll: { maxHeight: 36 },
-  filterChips: { flexDirection: "row", gap: 8 },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 999,
-    height: 32,
-    backgroundColor: DT.surfaceContainer,
-    justifyContent: "center",
-  },
-  chipActive: { backgroundColor: DT.primaryContainer },
-  chipText: { fontSize: 13, fontWeight: "600", color: DT.textMuted },
-  chipTextActive: { color: "#FFF", fontWeight: "700" },
-
-  // Search Results
-  searchResults: { gap: 10 },
-  searchResultsDesktop: { flexDirection: "row", flexWrap: "wrap" },
-  searchResultCard: {
-    backgroundColor: DT.surfaceLowest,
-    padding: 14,
-    borderRadius: 14,
-  },
-  searchResultHeader: { flexDirection: "row", alignItems: "center", gap: 12 },
-  connectBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
-    height: 34,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  connectBtnText: { color: "#FFF", fontWeight: "700", fontSize: 13 },
-
-  // Empty State
-  emptyState: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 48,
-    gap: 12,
-  },
-  emptyIconWrap: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: DT.surfaceContainer,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 8,
-  },
-  emptyTitle: { fontSize: 22, fontWeight: "700", color: DT.onSurface, textAlign: "center" },
-  emptySubtitle: {
-    fontSize: 15,
-    color: DT.textMuted,
-    textAlign: "center",
-    lineHeight: 22,
-    maxWidth: 280,
-  },
-  emptyPrimaryBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    backgroundColor: DT.primaryContainer,
-    height: 50,
-    borderRadius: 12,
-    width: "100%",
-    maxWidth: 320,
-    marginTop: 8,
-  },
-  emptyPrimaryBtnText: { color: "#FFF", fontSize: 15, fontWeight: "800" },
-  emptySecondaryBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    backgroundColor: DT.surfaceContainer,
-    height: 48,
-    borderRadius: 12,
-    width: "100%",
-    maxWidth: 320,
-  },
-  emptySecondaryBtnText: { color: DT.onSurface, fontSize: 15, fontWeight: "700" },
-  emptyInviteBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    backgroundColor: DT.primaryFixed,
-    height: 44,
-    borderRadius: 10,
-    paddingHorizontal: 20,
-    marginTop: 8,
-  },
-  emptyInviteBtnText: { color: DT.primaryContainer, fontSize: 14, fontWeight: "700" },
-
-  // Skeleton Loading
-  skeletonContent: {
-    paddingHorizontal: 16,
-    paddingTop: 60,
-    gap: 14,
-  },
-  skeletonPill: {
-    width: 160,
-    height: 32,
-    borderRadius: 999,
-    backgroundColor: DT.skeleton,
-    opacity: 0.5,
-  },
-  skeletonTabBar: {
-    width: "100%",
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: DT.skeleton,
-    opacity: 0.5,
-  },
-  skeletonStatsRow: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  skeletonStatBadge: {
-    width: 100,
-    height: 28,
-    borderRadius: 999,
-    backgroundColor: DT.skeleton,
-    opacity: 0.4,
-  },
-  skeletonContactCard: {
-    width: "100%",
-    height: 72,
-    borderRadius: 14,
-    backgroundColor: DT.skeleton,
-    opacity: 0.5,
-  },
-  skeletonMessageCard: {
-    width: "100%",
-    height: 60,
-    borderRadius: 14,
-    backgroundColor: DT.skeleton,
-    opacity: 0.4,
-  },
-
-  // Tip Card
-  tipCard: {
-    flexDirection: "row",
-    gap: 8,
-    backgroundColor: DT.primaryFixed,
-    borderRadius: 12,
-    padding: 12,
-    alignItems: "flex-start",
-  },
-  tipCardText: {
-    flex: 1,
-    fontSize: 13,
-    color: DT.primaryContainer,
-    lineHeight: 18,
-  },
-
-  // Profile Bottom Sheet
-  sheetBackdrop: {
-    flex: 1,
-    backgroundColor: DT.overlay,
-    justifyContent: "flex-end",
-  },
-  sheetContainer: {
-    backgroundColor: DT.surfaceLowest,
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
-    ...Platform.select({
-      web: { boxShadow: "0px -12px 48px rgba(0,69,128,0.12)" } as any,
-      default: {
-        shadowColor: "#004580",
-        shadowOffset: { width: 0, height: -12 },
-        shadowOpacity: 0.12,
+        shadowColor: isDark ? "#000000" : "#004580",
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: isDark ? 0.35 : 0.08,
         shadowRadius: 48,
-        elevation: 10,
+        elevation: 4,
       },
     }),
-  },
-  sheetHandle: {
-    width: 36,
-    height: 4,
-    borderRadius: 999,
-    backgroundColor: DT.outlineVariant,
-    alignSelf: "center",
-    marginTop: 14,
-    marginBottom: 16,
-    opacity: 0.3,
-  },
-  sheetProfile: { alignItems: "center", paddingHorizontal: 24, paddingBottom: 16, gap: 4 },
-  sheetName: { fontSize: 20, fontWeight: "700", color: DT.onSurface, marginTop: 12 },
-  sheetInstitution: { fontSize: 15, fontWeight: "500", color: DT.textSecondary },
-  sheetLevelBadge: {
-    backgroundColor: DT.primaryFixed,
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginTop: 4,
-  },
-  sheetLevelBadgeText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: DT.primaryContainer,
-  },
-  sheetStats: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    backgroundColor: DT.surfaceLow,
-    borderRadius: 14,
-    padding: 16,
-    marginHorizontal: 24,
-    marginBottom: 16,
-  },
-  sheetStatItem: { alignItems: "center" },
-  sheetStatValue: { fontSize: 18, fontWeight: "700", color: DT.onSurface },
-  sheetStatLabel: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: DT.textMuted,
-    marginTop: 2,
-  },
-  sheetStatDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: DT.outlineVariant,
-    opacity: 0.3,
-  },
-  sheetInfoCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    padding: 14,
-    backgroundColor: DT.surfaceLow,
-    borderRadius: 14,
-    marginHorizontal: 24,
-    marginBottom: 8,
-  },
-  sheetInfoIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: DT.surfaceLowest,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  sheetInfoValue: { fontSize: 14, fontWeight: "500", color: DT.onSurface },
-  sheetActions: { padding: 24, gap: 8 },
-  sheetPrimaryBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    height: 48,
-    borderRadius: 12,
-  },
-  sheetPrimaryBtnText: { color: "#FFF", fontWeight: "700", fontSize: 15 },
-  sheetDeleteBtn: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 8,
-    marginTop: 4,
-  },
-  sheetDeleteBtnText: { color: DT.error, fontWeight: "600", fontSize: 13 },
-  sheetCloseBtn: {
-    backgroundColor: DT.surfaceContainer,
-    height: 48,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  sheetCloseBtnText: { color: DT.onSurface, fontWeight: "700", fontSize: 15 },
-});
+    safe: { flex: 1, backgroundColor: DT.surface },
+
+    // ScrollView
+    scrollView: { flex: 1 },
+    scrollContent: { padding: 16, paddingTop: 54, paddingBottom: 110, gap: 14 },
+
+    // Tab Bar
+    tabBar: {
+      flexDirection: "row",
+      padding: 4,
+      backgroundColor: DT.surfaceLow,
+      borderRadius: 14,
+      height: 44,
+    },
+    tab: {
+      flex: 1,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      borderRadius: 10,
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "row",
+      gap: 6,
+    },
+    tabActive: {
+      backgroundColor: DT.surfaceLowest,
+      ...Platform.select({
+        web: { boxShadow: "0px 2px 8px rgba(0,72,132,0.08)" } as any,
+        default: {
+          shadowColor: "#004884",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.08,
+          shadowRadius: 8,
+          elevation: 2,
+        },
+      }),
+    },
+    tabText: { fontSize: 14, fontWeight: "500", color: DT.textMuted },
+    tabTextActive: { color: DT.onSurface, fontWeight: "700" },
+    tabBadge: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: DT.error,
+    },
+
+    // Stats Row (mini-badges)
+    statsRow: { flexDirection: "row", gap: 8 },
+    statBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      borderRadius: 999,
+      paddingHorizontal: 12,
+      paddingVertical: 5,
+    },
+    statBadgeText: {
+      fontSize: 12,
+      fontWeight: "700",
+    },
+
+    // Sections
+    sectionBlock: { gap: 10 },
+    sectionHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    sectionTitle: {
+      fontSize: 13,
+      fontWeight: "800",
+      color: DT.textMuted,
+      letterSpacing: 1.1,
+    },
+    sectionLink: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: DT.primaryContainer,
+    },
+
+    // Contact Card
+    contactList: { gap: 10 },
+    contactCard: {
+      backgroundColor: DT.surfaceLowest,
+      padding: 14,
+      borderRadius: 14,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    contactCardInner: { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
+    contactInfo: { flex: 1 },
+    contactName: { fontSize: 15, fontWeight: "700", color: DT.onSurface },
+    contactSchool: { fontSize: 13, color: DT.textSecondary, marginTop: 1 },
+    contactMateria: { fontSize: 12, fontWeight: "500", color: DT.textMuted, marginTop: 1 },
+    contactChatBtn: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: DT.primaryFixed,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+
+    // Avatar
+    avatar: {
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    avatarText: { color: "#FFF", fontWeight: "700" },
+    onlineDot: {
+      position: "absolute",
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      borderWidth: 2,
+      borderColor: "#FFF",
+    },
+
+    // Solicitud Card
+    solicitudList: { gap: 10 },
+    solicitudCard: {
+      backgroundColor: DT.surfaceLowest,
+      padding: 14,
+      borderRadius: 14,
+    },
+    solicitudHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 10 },
+    solicitudInfo: { flex: 1 },
+    solicitudMsgBubble: {
+      backgroundColor: DT.surfaceLow,
+      borderTopRightRadius: 10,
+      borderBottomRightRadius: 10,
+      borderBottomLeftRadius: 10,
+      padding: 10,
+      marginBottom: 10,
+      flexDirection: "row",
+      gap: 8,
+      alignItems: "flex-start",
+    },
+    solicitudMsgText: {
+      flex: 1,
+      fontSize: 13,
+      color: DT.textSecondary,
+      fontStyle: "italic",
+      lineHeight: 18,
+    },
+    solicitudBtns: { flexDirection: "row", gap: 8 },
+    btnAceptar: { flex: 1 },
+    btnGradient: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      height: 38,
+      borderRadius: 10,
+    },
+    btnAceptarText: { color: "#FFF", fontWeight: "700", fontSize: 13 },
+    btnRechazar: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 4,
+      backgroundColor: DT.surfaceContainer,
+      height: 38,
+      borderRadius: 10,
+    },
+    btnRechazarText: { color: DT.textMuted, fontWeight: "700", fontSize: 13 },
+
+    // Sub Tabs
+    subTabRow: { flexDirection: "row", gap: 0 },
+    subTab: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      paddingVertical: 9,
+      borderRadius: 10,
+      backgroundColor: DT.surfaceContainer,
+    },
+    subTabActive: {
+      backgroundColor: DT.surfaceLowest,
+      ...Platform.select({
+        web: { boxShadow: "0px 2px 8px rgba(0,72,132,0.08)" } as any,
+        default: {
+          shadowColor: "#004884",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.08,
+          shadowRadius: 8,
+          elevation: 2,
+        },
+      }),
+    },
+    subTabText: { fontWeight: "500", fontSize: 13, color: DT.textMuted },
+    subTabTextActive: { fontWeight: "700", color: DT.onSurface },
+    subTabBadge: {
+      minWidth: 18,
+      height: 18,
+      borderRadius: 9,
+      backgroundColor: DT.primaryContainer,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 4,
+    },
+    subTabBadgeText: { color: "#FFF", fontSize: 10, fontWeight: "700" },
+
+    // Search Tab
+    searchBarWrap: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: DT.surfaceContainer,
+      borderRadius: 14,
+      height: 48,
+      paddingHorizontal: 14,
+      gap: 8,
+    },
+    searchInput: { flex: 1, fontSize: 15, fontWeight: "500", color: DT.onSurface },
+    filterChipsScroll: { maxHeight: 36 },
+    filterChips: { flexDirection: "row", gap: 8 },
+    chip: {
+      paddingHorizontal: 14,
+      paddingVertical: 6,
+      borderRadius: 999,
+      height: 32,
+      backgroundColor: DT.surfaceContainer,
+      justifyContent: "center",
+    },
+    chipActive: { backgroundColor: DT.primaryContainer },
+    chipText: { fontSize: 13, fontWeight: "600", color: DT.textMuted },
+    chipTextActive: { color: "#FFF", fontWeight: "700" },
+
+    // Search Results
+    searchResults: { gap: 10 },
+    searchResultsDesktop: { flexDirection: "row", flexWrap: "wrap" },
+    searchResultCard: {
+      backgroundColor: DT.surfaceLowest,
+      padding: 14,
+      borderRadius: 14,
+    },
+    searchResultHeader: { flexDirection: "row", alignItems: "center", gap: 12 },
+    connectBtn: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 10,
+      height: 34,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    connectBtnText: { color: "#FFF", fontWeight: "700", fontSize: 13 },
+
+    // Empty State
+    emptyState: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 48,
+      gap: 12,
+    },
+    emptyIconWrap: {
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      backgroundColor: DT.surfaceContainer,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 8,
+    },
+    emptyTitle: { fontSize: 22, fontWeight: "700", color: DT.onSurface, textAlign: "center" },
+    emptySubtitle: {
+      fontSize: 15,
+      color: DT.textMuted,
+      textAlign: "center",
+      lineHeight: 22,
+      maxWidth: 280,
+    },
+    emptyPrimaryBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      backgroundColor: DT.primaryContainer,
+      height: 50,
+      borderRadius: 12,
+      width: "100%",
+      maxWidth: 320,
+      marginTop: 8,
+    },
+    emptyPrimaryBtnText: { color: "#FFF", fontSize: 15, fontWeight: "800" },
+    emptySecondaryBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      backgroundColor: DT.surfaceContainer,
+      height: 48,
+      borderRadius: 12,
+      width: "100%",
+      maxWidth: 320,
+    },
+    emptySecondaryBtnText: { color: DT.onSurface, fontSize: 15, fontWeight: "700" },
+    emptyInviteBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      backgroundColor: DT.primaryFixed,
+      height: 44,
+      borderRadius: 10,
+      paddingHorizontal: 20,
+      marginTop: 8,
+    },
+    emptyInviteBtnText: { color: DT.primaryContainer, fontSize: 14, fontWeight: "700" },
+
+    // Skeleton Loading
+    skeletonContent: {
+      paddingHorizontal: 16,
+      paddingTop: 60,
+      gap: 14,
+    },
+    skeletonPill: {
+      width: 160,
+      height: 32,
+      borderRadius: 999,
+      backgroundColor: DT.skeleton,
+      opacity: 0.5,
+    },
+    skeletonTabBar: {
+      width: "100%",
+      height: 44,
+      borderRadius: 14,
+      backgroundColor: DT.skeleton,
+      opacity: 0.5,
+    },
+    skeletonStatsRow: {
+      flexDirection: "row",
+      gap: 8,
+    },
+    skeletonStatBadge: {
+      width: 100,
+      height: 28,
+      borderRadius: 999,
+      backgroundColor: DT.skeleton,
+      opacity: 0.4,
+    },
+    skeletonContactCard: {
+      width: "100%",
+      height: 72,
+      borderRadius: 14,
+      backgroundColor: DT.skeleton,
+      opacity: 0.5,
+    },
+    skeletonMessageCard: {
+      width: "100%",
+      height: 60,
+      borderRadius: 14,
+      backgroundColor: DT.skeleton,
+      opacity: 0.4,
+    },
+
+    // Tip Card
+    tipCard: {
+      flexDirection: "row",
+      gap: 8,
+      backgroundColor: DT.primaryFixed,
+      borderRadius: 12,
+      padding: 12,
+      alignItems: "flex-start",
+    },
+    tipCardText: {
+      flex: 1,
+      fontSize: 13,
+      color: DT.primaryContainer,
+      lineHeight: 18,
+    },
+
+    // Profile Bottom Sheet
+    sheetBackdrop: {
+      flex: 1,
+      backgroundColor: DT.overlay,
+      justifyContent: "flex-end",
+    },
+    sheetContainer: {
+      backgroundColor: DT.surfaceLowest,
+      borderTopLeftRadius: 40,
+      borderTopRightRadius: 40,
+      ...Platform.select({
+        web: { boxShadow: "0px -12px 48px rgba(0,69,128,0.12)" } as any,
+        default: {
+          shadowColor: "#004580",
+          shadowOffset: { width: 0, height: -12 },
+          shadowOpacity: 0.12,
+          shadowRadius: 48,
+          elevation: 10,
+        },
+      }),
+    },
+    sheetHandle: {
+      width: 36,
+      height: 4,
+      borderRadius: 999,
+      backgroundColor: DT.outlineVariant,
+      alignSelf: "center",
+      marginTop: 14,
+      marginBottom: 16,
+      opacity: 0.3,
+    },
+    sheetProfile: { alignItems: "center", paddingHorizontal: 24, paddingBottom: 16, gap: 4 },
+    sheetName: { fontSize: 20, fontWeight: "700", color: DT.onSurface, marginTop: 12 },
+    sheetInstitution: { fontSize: 15, fontWeight: "500", color: DT.textSecondary },
+    sheetLevelBadge: {
+      backgroundColor: DT.primaryFixed,
+      borderRadius: 999,
+      paddingHorizontal: 12,
+      paddingVertical: 4,
+      marginTop: 4,
+    },
+    sheetLevelBadgeText: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: DT.primaryContainer,
+    },
+    sheetStats: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-around",
+      backgroundColor: DT.surfaceLow,
+      borderRadius: 14,
+      padding: 16,
+      marginHorizontal: 24,
+      marginBottom: 16,
+    },
+    sheetStatItem: { alignItems: "center" },
+    sheetStatValue: { fontSize: 18, fontWeight: "700", color: DT.onSurface },
+    sheetStatLabel: {
+      fontSize: 11,
+      fontWeight: "600",
+      color: DT.textMuted,
+      marginTop: 2,
+    },
+    sheetStatDivider: {
+      width: 1,
+      height: 28,
+      backgroundColor: DT.outlineVariant,
+      opacity: 0.3,
+    },
+    sheetInfoCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      padding: 14,
+      backgroundColor: DT.surfaceLow,
+      borderRadius: 14,
+      marginHorizontal: 24,
+      marginBottom: 8,
+    },
+    sheetInfoIcon: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: DT.surfaceLowest,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    sheetInfoValue: { fontSize: 14, fontWeight: "500", color: DT.onSurface },
+    sheetActions: { padding: 24, gap: 8 },
+    sheetPrimaryBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      height: 48,
+      borderRadius: 12,
+    },
+    sheetPrimaryBtnText: { color: "#FFF", fontWeight: "700", fontSize: 15 },
+    sheetDeleteBtn: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 8,
+      marginTop: 4,
+    },
+    sheetDeleteBtnText: { color: DT.error, fontWeight: "600", fontSize: 13 },
+    sheetCloseBtn: {
+      backgroundColor: DT.surfaceContainer,
+      height: 48,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    sheetCloseBtnText: { color: DT.onSurface, fontWeight: "700", fontSize: 15 },
+  });
 
 export default SocialScreen;

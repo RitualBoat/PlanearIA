@@ -340,7 +340,12 @@ function normalizeHallazgos(value) {
 }
 
 function normalizeStringList(value, fallback) {
-  const items = Array.isArray(value) ? value.map((item) => text(item, "")).filter(Boolean) : [];
+  const items = Array.isArray(value)
+    ? value.flatMap((item) => {
+        const itemText = text(item, "");
+        return itemText ? [itemText] : [];
+      })
+    : [];
   return items.length ? items.slice(0, 8) : fallback;
 }
 

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   useWindowDimensions,
   FlatList,
@@ -233,28 +232,25 @@ const BibliotecaPlantillasScreen: React.FC = () => {
       <Text style={s.emptySubtitle}>
         Explora la biblioteca del sistema o crea tu primera plantilla personalizada
       </Text>
-      <TouchableOpacity
-        style={s.emptyPrimaryBtn}
+      <Pressable
+        style={({ pressed }) => [s.emptyPrimaryBtn, pressed && { opacity: 0.85 }]}
         onPress={() => navigation.navigate("ListaPlantillas")}
-        activeOpacity={0.85}
       >
         <Text style={s.emptyPrimaryBtnText}>Explorar plantillas del sistema</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={s.emptySecondaryBtn}
+      </Pressable>
+      <Pressable
+        style={({ pressed }) => [s.emptySecondaryBtn, pressed && { opacity: 0.7 }]}
         onPress={() => navigation.navigate("EditorPlantilla")}
-        activeOpacity={0.7}
       >
         <Text style={s.emptySecondaryBtnText}>Crear plantilla</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={s.emptyLink}
+      </Pressable>
+      <Pressable
+        style={({ pressed }) => [s.emptyLink, pressed && { opacity: 0.7 }]}
         onPress={() => navigation.navigate("Ayuda")}
-        activeOpacity={0.7}
       >
         <Text style={s.emptyLinkText}>¿Qué son las plantillas?</Text>
         <MaterialIcons name="arrow-forward" size={18} color={DT.primaryContainer} />
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 
@@ -262,10 +258,9 @@ const BibliotecaPlantillasScreen: React.FC = () => {
   const renderDestacadaCard = ({ item }: { item: Plantilla }) => {
     const catColor = CATEGORY_COLORS[item.tipo] || CATEGORY_COLORS.otro;
     return (
-      <TouchableOpacity
-        style={s.featuredCard}
+      <Pressable
+        style={({ pressed }) => [s.featuredCard, pressed && { opacity: 0.85 }]}
         onPress={() => handlePlantillaPress(item)}
-        activeOpacity={0.85}
       >
         <View style={s.featuredPreview}>
           <MaterialIcons
@@ -297,7 +292,7 @@ const BibliotecaPlantillasScreen: React.FC = () => {
             </Text>
           </View>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 
@@ -305,11 +300,10 @@ const BibliotecaPlantillasScreen: React.FC = () => {
   const renderGridCard = (item: Plantilla) => {
     const catColor = CATEGORY_COLORS[item.tipo] || CATEGORY_COLORS.otro;
     return (
-      <TouchableOpacity
+      <Pressable
         key={item.id}
-        style={s.gridCard}
+        style={({ pressed }) => [s.gridCard, pressed && { opacity: 0.85 }]}
         onPress={() => handlePlantillaPress(item)}
-        activeOpacity={0.85}
       >
         <View style={[s.gridPreview, { backgroundColor: `${catColor.bg}40` }]}>
           <MaterialIcons
@@ -333,7 +327,7 @@ const BibliotecaPlantillasScreen: React.FC = () => {
           </View>
           <MaterialIcons name="add-circle" size={18} color={DT.primaryContainer} />
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 
@@ -361,13 +355,13 @@ const BibliotecaPlantillasScreen: React.FC = () => {
               </View>
             )}
             {isDesktop && (
-              <TouchableOpacity
-                style={s.detCloseBtn}
+              <Pressable
+                style={({ pressed }) => [s.detCloseBtn, pressed && { opacity: 0.6 }]}
                 onPress={() => setDetallePlantilla(null)}
                 accessibilityLabel="Cerrar detalle"
               >
                 <MaterialIcons name="close" size={20} color={DT.onSurfaceVariant} />
-              </TouchableOpacity>
+              </Pressable>
             )}
             <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
               {/* Badges */}
@@ -438,27 +432,32 @@ const BibliotecaPlantillasScreen: React.FC = () => {
                 end={{ x: 1, y: 1 }}
                 style={[s.detPrimaryBtn, isDesktop && { flex: 1 }]}
               >
-                <TouchableOpacity
-                  style={s.detPrimaryBtnInner}
+                <Pressable
+                  style={({ pressed }) => [s.detPrimaryBtnInner, pressed && { opacity: 0.85 }]}
                   onPress={handleUsarPlantilla}
-                  activeOpacity={0.85}
                 >
                   <MaterialIcons name="bolt" size={20} color={DT.onPrimary} />
                   <Text style={s.detPrimaryBtnText}>Usar plantilla</Text>
-                </TouchableOpacity>
+                </Pressable>
               </LinearGradient>
-              <TouchableOpacity
-                style={[s.detSecondaryBtn, isDesktop && { flex: 1 }]}
+              <Pressable
+                style={({ pressed }) => [
+                  s.detSecondaryBtn,
+                  isDesktop && { flex: 1 },
+                  pressed && { opacity: 0.7 },
+                ]}
                 onPress={handleDuplicar}
-                activeOpacity={0.7}
               >
                 <MaterialIcons name="content-copy" size={18} color={DT.onSurface} />
                 <Text style={s.detSecondaryBtnText}>Duplicar y editar</Text>
-              </TouchableOpacity>
+              </Pressable>
               {!detallePlantilla.esDelSistema && (
-                <TouchableOpacity onPress={handleEliminar} activeOpacity={0.7}>
+                <Pressable
+                  style={({ pressed }) => pressed && { opacity: 0.7 }}
+                  onPress={handleEliminar}
+                >
                   <Text style={s.detDeleteText}>Eliminar</Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
             </View>
           </Pressable>
@@ -490,23 +489,21 @@ const BibliotecaPlantillasScreen: React.FC = () => {
               end={{ x: 1, y: 1 }}
               style={s.pillGradient}
             >
-              <TouchableOpacity
+              <Pressable
                 onPress={() => setCategoriaActiva(cat.key)}
-                activeOpacity={0.8}
-                style={s.pillInner}
+                style={({ pressed }) => [s.pillInner, pressed && { opacity: 0.8 }]}
               >
                 <Text style={s.pillTextActive}>{cat.label}</Text>
-              </TouchableOpacity>
+              </Pressable>
             </LinearGradient>
           ) : (
-            <TouchableOpacity
+            <Pressable
               key={cat.key}
-              style={s.pill}
+              style={({ pressed }) => [s.pill, pressed && { opacity: 0.8 }]}
               onPress={() => setCategoriaActiva(cat.key)}
-              activeOpacity={0.8}
             >
               <Text style={s.pillText}>{cat.label}</Text>
-            </TouchableOpacity>
+            </Pressable>
           )
         )}
       </ScrollView>
@@ -517,9 +514,12 @@ const BibliotecaPlantillasScreen: React.FC = () => {
           <Text style={s.sectionOverline}>SELECCIÓN EDITORIAL</Text>
           <View style={s.sectionHeader}>
             <Text style={s.sectionTitle}>Destacadas</Text>
-            <TouchableOpacity onPress={() => navigation.navigate("ListaPlantillas")}>
+            <Pressable
+              style={({ pressed }) => pressed && { opacity: 0.6 }}
+              onPress={() => navigation.navigate("ListaPlantillas")}
+            >
               <Text style={s.sectionLink}>Ver todas</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
           <FlatList
             data={destacadas}
@@ -563,11 +563,14 @@ const BibliotecaPlantillasScreen: React.FC = () => {
       <View style={s.sidebar}>
         <Text style={s.sidebarLabel}>CATEGORÍAS</Text>
         {SIDEBAR_CATS.map((cat) => (
-          <TouchableOpacity
+          <Pressable
             key={cat.key}
-            style={[s.sidebarItem, categoriaActiva === cat.key && s.sidebarItemActive]}
+            style={({ pressed }) => [
+              s.sidebarItem,
+              categoriaActiva === cat.key && s.sidebarItemActive,
+              pressed && { opacity: 0.7 },
+            ]}
             onPress={() => setCategoriaActiva(cat.key)}
-            activeOpacity={0.7}
           >
             <MaterialIcons
               name={cat.icon}
@@ -587,7 +590,7 @@ const BibliotecaPlantillasScreen: React.FC = () => {
             >
               {getCatCount(cat.key)}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
 
@@ -617,20 +620,18 @@ const BibliotecaPlantillasScreen: React.FC = () => {
             </View>
             <Text style={s.heroTitle}>{destacadas[0].nombre}</Text>
             <View style={s.heroActions}>
-              <TouchableOpacity
-                style={s.heroBtn}
+              <Pressable
+                style={({ pressed }) => [s.heroBtn, pressed && { opacity: 0.85 }]}
                 onPress={() => handlePlantillaPress(destacadas[0])}
-                activeOpacity={0.85}
               >
                 <Text style={s.heroBtnText}>Usar plantilla</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={s.heroBtnOutline}
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [s.heroBtnOutline, pressed && { opacity: 0.7 }]}
                 onPress={() => handlePlantillaPress(destacadas[0])}
-                activeOpacity={0.7}
               >
                 <Text style={s.heroBtnOutlineText}>Más detalles</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         )}
@@ -640,17 +641,19 @@ const BibliotecaPlantillasScreen: React.FC = () => {
           <View style={s.sectionBlock}>
             <View style={s.sectionHeader}>
               <Text style={s.sectionTitle}>Plantillas Recientes</Text>
-              <TouchableOpacity onPress={() => navigation.navigate("ListaPlantillas")}>
+              <Pressable
+                style={({ pressed }) => pressed && { opacity: 0.6 }}
+                onPress={() => navigation.navigate("ListaPlantillas")}
+              >
                 <Text style={s.sectionLink}>Ver todas →</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
             <FlatList
               data={recientes}
               renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={s.desktopCard}
+                <Pressable
+                  style={({ pressed }) => [s.desktopCard, pressed && { opacity: 0.85 }]}
                   onPress={() => handlePlantillaPress(item)}
-                  activeOpacity={0.85}
                 >
                   <View style={s.desktopCardImage}>
                     <MaterialIcons
@@ -667,7 +670,7 @@ const BibliotecaPlantillasScreen: React.FC = () => {
                   <Text style={s.desktopCardDesc} numberOfLines={2}>
                     {item.descripcion}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
               keyExtractor={(item) => String(item.id)}
               horizontal
@@ -698,22 +701,22 @@ const BibliotecaPlantillasScreen: React.FC = () => {
       {/* Header */}
       <View style={s.topBar}>
         <View style={s.topBarLeft}>
-          <TouchableOpacity
-            style={s.backBtn}
+          <Pressable
+            style={({ pressed }) => [s.backBtn, pressed && { opacity: 0.6 }]}
             onPress={() => navigation.goBack()}
             accessibilityLabel="Volver"
           >
             <MaterialIcons name="arrow-back" size={24} color={DT.onSurface} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={s.topBarTitle}>Plantillas</Text>
         </View>
-        <TouchableOpacity
-          style={s.backBtn}
+        <Pressable
+          style={({ pressed }) => [s.backBtn, pressed && { opacity: 0.6 }]}
           onPress={handleSearchToggle}
           accessibilityLabel="Buscar"
         >
           <MaterialIcons name="search" size={24} color={DT.onSurfaceVariant} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Search bar (mobile) */}
@@ -729,9 +732,12 @@ const BibliotecaPlantillasScreen: React.FC = () => {
             autoFocus
           />
           {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery("")}>
+            <Pressable
+              style={({ pressed }) => pressed && { opacity: 0.6 }}
+              onPress={() => setSearchQuery("")}
+            >
               <MaterialIcons name="close" size={18} color={DT.onSurfaceVariant} />
-            </TouchableOpacity>
+            </Pressable>
           )}
         </View>
       )}
@@ -753,14 +759,13 @@ const BibliotecaPlantillasScreen: React.FC = () => {
           end={{ x: 1, y: 1 }}
           style={[s.fab, isDesktop && s.fabDesktop]}
         >
-          <TouchableOpacity
+          <Pressable
             onPress={() => navigation.navigate("EditorPlantilla")}
-            activeOpacity={0.85}
             accessibilityLabel="Crear plantilla"
-            style={s.fabInner}
+            style={({ pressed }) => [s.fabInner, pressed && { opacity: 0.85 }]}
           >
             <MaterialIcons name="add" size={28} color={DT.onPrimary} />
-          </TouchableOpacity>
+          </Pressable>
         </LinearGradient>
       )}
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Pressable, StatusBar, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { RouteProp, useRoute } from "@react-navigation/native";
@@ -68,7 +68,9 @@ const CalificarEntregasScreen: React.FC = () => {
                     placeholder="Ej: 9.5"
                     keyboardType="decimal-pad"
                     value={calificaciones[entrega.alumnoId]?.calificacion || ""}
-                    onChangeText={(value) => updateCalificacion(entrega.alumnoId, "calificacion", value)}
+                    onChangeText={(value) =>
+                      updateCalificacion(entrega.alumnoId, "calificacion", value)
+                    }
                     placeholderTextColor={COLORS.textSecondary}
                   />
                 </View>
@@ -81,13 +83,19 @@ const CalificarEntregasScreen: React.FC = () => {
                     multiline
                     numberOfLines={3}
                     value={calificaciones[entrega.alumnoId]?.retroalimentacion || ""}
-                    onChangeText={(value) => updateCalificacion(entrega.alumnoId, "retroalimentacion", value)}
+                    onChangeText={(value) =>
+                      updateCalificacion(entrega.alumnoId, "retroalimentacion", value)
+                    }
                     placeholderTextColor={COLORS.textSecondary}
                   />
                 </View>
 
-                <TouchableOpacity
-                  style={[styles.aiFeedbackButton, isSuggestingFeedback ? styles.buttonDisabled : null]}
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.aiFeedbackButton,
+                    isSuggestingFeedback ? styles.buttonDisabled : null,
+                    pressed && { opacity: 0.6 },
+                  ]}
                   disabled={Boolean(isSuggestingFeedback)}
                   onPress={() => handleSugerirRetroalimentacion(entrega.alumnoId)}
                 >
@@ -97,31 +105,46 @@ const CalificarEntregasScreen: React.FC = () => {
                       ? "Sugiriendo..."
                       : "Sugerir retroalimentacion IA"}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity style={styles.verArchivoButton} disabled={!entrega.archivo}>
+                <Pressable
+                  style={({ pressed }) => [styles.verArchivoButton, pressed && { opacity: 0.6 }]}
+                  disabled={!entrega.archivo}
+                >
                   <MaterialIcons name="attachment" size={20} color={COLORS.primaryLight} />
                   <Text style={styles.verArchivoText}>
                     {entrega.archivo ? "Ver archivo entregado" : "Sin archivo entregado"}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             ))}
           </View>
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={handleCancelar}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                styles.buttonSecondary,
+                pressed && { opacity: 0.6 },
+              ]}
+              onPress={handleCancelar}
+            >
               <Text style={styles.buttonTextSecondary}>Cancelar</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
-              style={[styles.button, styles.buttonPrimary, isSaving ? styles.buttonDisabled : null]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                styles.buttonPrimary,
+                isSaving ? styles.buttonDisabled : null,
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={handleGuardarCalificaciones}
               disabled={isSaving}
             >
               <MaterialIcons name="save" size={20} color="white" />
               <Text style={styles.buttonText}>{isSaving ? "Guardando..." : "Guardar"}</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </WebScrollView>
       </SafeAreaView>

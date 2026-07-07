@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   TextInput,
   Modal,
   ScrollView,
@@ -125,14 +125,22 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
             },
           ]}
         >
-          <TouchableOpacity onPress={onClose} style={styles.headerAction}>
+          <Pressable
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel="Cerrar"
+            style={({ pressed }) => [styles.headerAction, pressed && { opacity: 0.6 }]}
+          >
             <MaterialIcons name="close" size={24} color={colors.onSurfaceVariant} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={[styles.headerTitle, { color: colors.onSurface }]}>Crear Publicación</Text>
-          <TouchableOpacity
+          <Pressable
             onPress={handlePublish}
             disabled={!canPublish}
-            style={{ opacity: canPublish ? 1 : 0.4 }}
+            style={({ pressed }) => [
+              { opacity: canPublish ? 1 : 0.4 },
+              pressed && { opacity: 0.6 },
+            ]}
           >
             <LinearGradient
               colors={[colors.primary, colors.primaryContainer]}
@@ -142,7 +150,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
             >
               <Text style={styles.publishBtnText}>Publicar</Text>
             </LinearGradient>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <ScrollView
@@ -195,14 +203,15 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
             contentContainerStyle={styles.moodRow}
           >
             {MOODS.map((m) => (
-              <TouchableOpacity
+              <Pressable
                 key={m.emoji}
-                style={[
+                style={({ pressed }) => [
                   styles.moodChip,
                   {
                     backgroundColor: selectedMood === m.emoji ? m.bg : colors.surfaceContainerLow,
                     borderColor: selectedMood === m.emoji ? `${m.text}30` : "transparent",
                   },
+                  pressed && { opacity: 0.6 },
                 ]}
                 onPress={() => setSelectedMood((prev) => (prev === m.emoji ? undefined : m.emoji))}
               >
@@ -220,7 +229,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 >
                   {m.label}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </ScrollView>
 
@@ -369,22 +378,34 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
           ]}
         >
           <View style={styles.toolbarIcons}>
-            <TouchableOpacity style={styles.toolbarBtn} onPress={handleAttach}>
+            <Pressable
+              style={({ pressed }) => [styles.toolbarBtn, pressed && { opacity: 0.6 }]}
+              onPress={handleAttach}
+            >
               <MaterialIcons name="image" size={22} color={colors.onSurfaceVariant} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.toolbarBtn} onPress={handleAttach}>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.toolbarBtn, pressed && { opacity: 0.6 }]}
+              onPress={handleAttach}
+            >
               <MaterialIcons name="description" size={22} color={colors.onSurfaceVariant} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.toolbarBtn} onPress={handleAttach}>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.toolbarBtn, pressed && { opacity: 0.6 }]}
+              onPress={handleAttach}
+            >
               <MaterialIcons name="link" size={22} color={colors.onSurfaceVariant} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.toolbarBtn} onPress={() => setIsChallenge((v) => !v)}>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.toolbarBtn, pressed && { opacity: 0.6 }]}
+              onPress={() => setIsChallenge((v) => !v)}
+            >
               <MaterialIcons
                 name="military-tech"
                 size={22}
                 color={isChallenge ? colors.primary : colors.onSurfaceVariant}
               />
-            </TouchableOpacity>
+            </Pressable>
           </View>
           <Text
             style={[

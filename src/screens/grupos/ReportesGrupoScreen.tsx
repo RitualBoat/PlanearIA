@@ -3,10 +3,10 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  Pressable,
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -72,32 +72,42 @@ const ReportesGrupoScreen: React.FC = () => {
       <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={goBack} style={styles.iconButton}>
+          <Pressable
+            onPress={goBack}
+            style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+          >
             <MaterialIcons name="arrow-back" size={22} color={COLORS.textDark} />
-          </TouchableOpacity>
+          </Pressable>
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>Reportes del Grupo</Text>
             <Text style={styles.subtitle}>{grupoNombre} • Marzo 2026</Text>
           </View>
-          <TouchableOpacity onPress={() => void handleExportar()} style={styles.iconButton}>
+          <Pressable
+            onPress={() => void handleExportar()}
+            style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+          >
             <MaterialIcons name="file-download" size={22} color={COLORS.primaryDark} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <WebScrollView style={styles.content}>
           <View style={styles.periodsRow}>
             {periodos.map((item) => (
-              <TouchableOpacity
+              <Pressable
                 key={item}
                 onPress={() => setPeriodo(item)}
-                style={[styles.periodChip, periodo === item && styles.periodChipActive]}
+                style={({ pressed }) => [
+                  styles.periodChip,
+                  periodo === item && styles.periodChipActive,
+                  pressed && { opacity: 0.6 },
+                ]}
               >
                 <Text
                   style={[styles.periodChipText, periodo === item && styles.periodChipTextActive]}
                 >
                   {item}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </View>
 
@@ -118,10 +128,13 @@ const ReportesGrupoScreen: React.FC = () => {
               <Text style={styles.stateText}>
                 No pudimos obtener la información en este momento. Verifica tu conexión.
               </Text>
-              <TouchableOpacity style={styles.retryButton} onPress={() => void recargar()}>
+              <Pressable
+                style={({ pressed }) => [styles.retryButton, pressed && { opacity: 0.6 }]}
+                onPress={() => void recargar()}
+              >
                 <MaterialIcons name="refresh" size={18} color={COLORS.surface} />
                 <Text style={styles.retryButtonText}>Reintentar</Text>
-              </TouchableOpacity>
+              </Pressable>
               <Text style={styles.errorCode}>CÓDIGO: {errorCodigo}</Text>
             </View>
           ) : null}
@@ -135,10 +148,13 @@ const ReportesGrupoScreen: React.FC = () => {
               <Text style={styles.stateText}>
                 Intenta cambiar los filtros para ver actividad del grupo.
               </Text>
-              <TouchableOpacity style={styles.retryButton} onPress={() => setPeriodo("Bimestre")}>
+              <Pressable
+                style={({ pressed }) => [styles.retryButton, pressed && { opacity: 0.6 }]}
+                onPress={() => setPeriodo("Bimestre")}
+              >
                 <MaterialIcons name="filter-alt" size={18} color={COLORS.surface} />
                 <Text style={styles.retryButtonText}>Cambiar filtros</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           ) : null}
 

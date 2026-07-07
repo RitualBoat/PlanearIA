@@ -1,10 +1,10 @@
 import React from "react";
 import {
   Animated,
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   StatusBar,
   ScrollView,
   Image,
@@ -93,13 +93,14 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
 
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.headerBar}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate("MainTabs" as any)}
-            activeOpacity={0.7}
+          <Pressable
+            style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}
+            onPress={() =>
+              navigation.canGoBack() ? navigation.goBack() : navigation.navigate("MainTabs" as any)
+            }
           >
             <MaterialIcons name="arrow-back" size={24} color={COLORS.primary} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerBarTitle}>Recursos</Text>
           <View style={{ width: 40 }} />
         </View>
@@ -141,20 +142,23 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
             {FILTER_CHIPS.map((chip) => {
               const count = getCountByTipo(chip.id);
               return (
-                <TouchableOpacity
+                <Pressable
                   key={chip.id}
-                  style={[styles.chip, chip.id === "todos" && styles.chipActive]}
+                  style={({ pressed }) => [
+                    styles.chip,
+                    chip.id === "todos" && styles.chipActive,
+                    pressed && { opacity: 0.8 },
+                  ]}
                   onPress={() =>
                     navigation.navigate("ListaRecursos", {
                       filtroTipo: chip.id === "todos" ? undefined : chip.id,
                     })
                   }
-                  activeOpacity={0.8}
                 >
                   <Text style={[styles.chipText, chip.id === "todos" && styles.chipTextActive]}>
                     {chip.label} ({count})
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               );
             })}
           </ScrollView>
@@ -165,18 +169,21 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
             {TIPO_CARDS.map((card) => {
               const count = getCountByTipo(card.id);
               return (
-                <TouchableOpacity
+                <Pressable
                   key={card.id}
-                  style={[styles.tipoCard, wideLayout && styles.tipoCardWide]}
+                  style={({ pressed }) => [
+                    styles.tipoCard,
+                    wideLayout && styles.tipoCardWide,
+                    pressed && { opacity: 0.85 },
+                  ]}
                   onPress={() => navigation.navigate("ListaRecursos", { filtroTipo: card.id })}
-                  activeOpacity={0.85}
                 >
                   <View style={[styles.tipoIconCircle, { backgroundColor: card.bgColor }]}>
                     <MaterialIcons name={card.icon as any} size={28} color={card.color} />
                   </View>
                   <Text style={styles.tipoTitle}>{card.title}</Text>
                   <Text style={styles.tipoCount}>{count} RECURSOS</Text>
-                </TouchableOpacity>
+                </Pressable>
               );
             })}
           </View>
@@ -184,10 +191,9 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
           {/* ACCIONES RÁPIDAS */}
           <Text style={styles.sectionLabel}>ACCIONES RÁPIDAS</Text>
 
-          <TouchableOpacity
-            style={styles.actionCard}
+          <Pressable
+            style={({ pressed }) => [styles.actionCard, pressed && { opacity: 0.85 }]}
             onPress={() => navigation.navigate("CrearRecurso")}
-            activeOpacity={0.85}
           >
             <View style={[styles.actionIcon, { backgroundColor: COLORS.primaryTint }]}>
               <MaterialIcons name="add" size={24} color={COLORS.primary} />
@@ -197,12 +203,11 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
               <Text style={styles.actionSubtitle}>Nuevo documento, examen o presentación</Text>
             </View>
             <MaterialIcons name="chevron-right" size={22} color={COLORS.textTertiary} />
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
-            style={styles.actionCard}
+          <Pressable
+            style={({ pressed }) => [styles.actionCard, pressed && { opacity: 0.85 }]}
             onPress={() => navigation.navigate("ListaRecursos")}
-            activeOpacity={0.85}
           >
             <View style={[styles.actionIcon, { backgroundColor: "#F0F4F9" }]}>
               <MaterialIcons name="format-list-bulleted" size={24} color={COLORS.textSecondary} />
@@ -212,7 +217,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
               <Text style={styles.actionSubtitle}>Buscar y gestionar tu biblioteca</Text>
             </View>
             <MaterialIcons name="chevron-right" size={22} color={COLORS.textTertiary} />
-          </TouchableOpacity>
+          </Pressable>
 
           {/* Banner decorativo */}
           <View style={styles.banner}>

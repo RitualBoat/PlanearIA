@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Platform } from "react-native";
+import { Pressable, View, Text, StyleSheet, Modal, Platform } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS } from "../../../types";
 import type { GrupoMiembro, RolGrupo } from "../../../types";
@@ -12,65 +12,76 @@ interface Props {
   onRemove: () => void;
 }
 
-export const MenuContextualColaborador: React.FC<Props> = ({ 
-  visible, 
-  colaborador, 
-  onClose, 
+export const MenuContextualColaborador: React.FC<Props> = ({
+  visible,
+  colaborador,
+  onClose,
   onChangeRole,
-  onRemove 
+  onRemove,
 }) => {
   if (!colaborador) return null;
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <TouchableOpacity style={styles.backdrop} onPress={onClose} activeOpacity={1} />
-        
+        <Pressable style={styles.backdrop} onPress={onClose} />
+
         <View style={styles.sheet}>
           <View style={styles.header}>
             <View>
               <Text style={styles.title}>{colaborador.nombre}</Text>
               <Text style={styles.subtitle}>{colaborador.email}</Text>
             </View>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Pressable
+              onPress={onClose}
+              style={({ pressed }) => [styles.closeButton, pressed && { opacity: 0.6 }]}
+            >
               <MaterialIcons name="close" size={20} color={COLORS.textSecondary} />
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           <View style={styles.content}>
             <Text style={styles.sectionTitle}>CAMBIAR ROL</Text>
-            
-            <TouchableOpacity 
-              style={[styles.roleOption, colaborador.rol === "co-docente" && styles.roleOptionActive]}
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.roleOption,
+                colaborador.rol === "co-docente" && styles.roleOptionActive,
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={() => onChangeRole("co-docente")}
             >
               <View>
                 <Text style={styles.roleTitle}>Co-docente</Text>
                 <Text style={styles.roleDesc}>Puede editar planeaciones y gestionar recursos.</Text>
               </View>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity 
-              style={[styles.roleOption, colaborador.rol === "ponente_invitado" && styles.roleOptionActive]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.roleOption,
+                colaborador.rol === "ponente_invitado" && styles.roleOptionActive,
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={() => onChangeRole("ponente_invitado")}
             >
               <View>
                 <Text style={styles.roleTitle}>Ponente Invitado</Text>
-                <Text style={styles.roleDesc}>Solo puede ver las planeaciones y subir sus propios recursos.</Text>
+                <Text style={styles.roleDesc}>
+                  Solo puede ver las planeaciones y subir sus propios recursos.
+                </Text>
               </View>
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={styles.divider} />
 
-            <TouchableOpacity style={styles.removeButton} onPress={onRemove}>
+            <Pressable
+              style={({ pressed }) => [styles.removeButton, pressed && { opacity: 0.6 }]}
+              onPress={onRemove}
+            >
               <MaterialIcons name="person-remove" size={20} color={COLORS.error} />
               <Text style={styles.removeText}>Eliminar Colaborador</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </View>

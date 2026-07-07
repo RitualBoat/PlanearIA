@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from "react-native";
+import { Pressable, View, Text, StyleSheet, Platform } from "react-native";
+import { Image } from "expo-image";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTheme } from "../context/ThemeContext";
@@ -64,14 +65,21 @@ const PostCard: React.FC<PostCardProps> = ({
   });
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.95}
+    <Pressable
       onPress={() => onPress?.(post)}
-      style={[styles.card, { backgroundColor: colors.surfaceContainerLowest }, cardShadow]}
+      style={({ pressed }) => [
+        styles.card,
+        { backgroundColor: colors.surfaceContainerLowest },
+        cardShadow,
+        pressed && { opacity: 0.95 },
+      ]}
     >
       {/* Author header */}
       <View style={styles.authorRow}>
-        <TouchableOpacity style={styles.authorLeft} onPress={() => onAuthorPress?.(post.autorId)}>
+        <Pressable
+          style={({ pressed }) => [styles.authorLeft, pressed && { opacity: 0.6 }]}
+          onPress={() => onAuthorPress?.(post.autorId)}
+        >
           {post.autorAvatar ? (
             <Image source={{ uri: post.autorAvatar }} style={styles.avatar} />
           ) : (
@@ -87,10 +95,13 @@ const PostCard: React.FC<PostCardProps> = ({
               {timeAgo}
             </Text>
           </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.moreBtn} onPress={() => onOptions?.(post)}>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.moreBtn, pressed && { opacity: 0.6 }]}
+          onPress={() => onOptions?.(post)}
+        >
           <MaterialIcons name="more-horiz" size={20} color={colors.onSurfaceVariant} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Content */}
@@ -123,26 +134,34 @@ const PostCard: React.FC<PostCardProps> = ({
           </View>
           <View style={styles.docActions}>
             {onAddToLibrary && (
-              <TouchableOpacity
-                style={[styles.docActionBtn, { backgroundColor: `${colors.primary}10` }]}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.docActionBtn,
+                  { backgroundColor: `${colors.primary}10` },
+                  pressed && { opacity: 0.6 },
+                ]}
                 onPress={() => onAddToLibrary(post, docAttachment)}
               >
                 <MaterialIcons name="library-add" size={16} color={colors.primary} />
                 <Text style={[styles.docActionText, { color: colors.primary }]}>
                   Añadir a biblioteca
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             )}
             {onDownload && (
-              <TouchableOpacity
-                style={[styles.docActionBtn, { backgroundColor: `${colors.onSurfaceVariant}10` }]}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.docActionBtn,
+                  { backgroundColor: `${colors.onSurfaceVariant}10` },
+                  pressed && { opacity: 0.6 },
+                ]}
                 onPress={() => onDownload(docAttachment)}
               >
                 <MaterialIcons name="file-download" size={16} color={colors.onSurfaceVariant} />
                 <Text style={[styles.docActionText, { color: colors.onSurfaceVariant }]}>
                   Descargar
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
         </View>
@@ -154,7 +173,7 @@ const PostCard: React.FC<PostCardProps> = ({
           <Image
             source={{ uri: imageAttachment.url }}
             style={styles.postImage}
-            resizeMode="cover"
+            contentFit="cover"
           />
         </View>
       )}
@@ -208,28 +227,34 @@ const PostCard: React.FC<PostCardProps> = ({
                   </View>
                 </View>
                 <View style={styles.challengeBtnRow}>
-                  <TouchableOpacity
-                    style={[styles.challengeOutlineBtn, { borderColor: `${colors.primary}20` }]}
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.challengeOutlineBtn,
+                      { borderColor: `${colors.primary}20` },
+                      pressed && { opacity: 0.6 },
+                    ]}
                     onPress={() => onTakeChallenge?.(post)}
                   >
                     <Text style={[styles.challengeOutlineBtnText, { color: colors.primary }]}>
                       Ver mis respuestas
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                   <LinearGradient
                     colors={["#004580", "#005da8"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.challengeGradientBtn}
                   >
-                    <TouchableOpacity
-                      style={styles.challengeGradientInner}
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.challengeGradientInner,
+                        pressed && { opacity: 0.9 },
+                      ]}
                       onPress={() => onTakeChallenge?.(post)}
-                      activeOpacity={0.9}
                     >
                       <MaterialIcons name="refresh" size={16} color="#FFF" />
                       <Text style={styles.challengeBtnText}>Reintentar</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                   </LinearGradient>
                 </View>
               </View>
@@ -265,10 +290,11 @@ const PostCard: React.FC<PostCardProps> = ({
                   </Text>
                 </View>
                 <View style={styles.challengeBtnRow}>
-                  <TouchableOpacity
-                    style={[
+                  <Pressable
+                    style={({ pressed }) => [
                       styles.challengeDisabledBtn,
                       { backgroundColor: `${colors.onSurfaceVariant}08` },
+                      pressed && { opacity: 0.6 },
                     ]}
                     disabled
                   >
@@ -282,15 +308,19 @@ const PostCard: React.FC<PostCardProps> = ({
                     >
                       Cerrado
                     </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.challengeOutlineBtn, { borderColor: `${colors.primary}20` }]}
+                  </Pressable>
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.challengeOutlineBtn,
+                      { borderColor: `${colors.primary}20` },
+                      pressed && { opacity: 0.6 },
+                    ]}
                     onPress={() => onTakeChallenge?.(post)}
                   >
                     <Text style={[styles.challengeOutlineBtnText, { color: colors.primary }]}>
                       Ver resultados
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               </View>
             );
@@ -356,19 +386,22 @@ const PostCard: React.FC<PostCardProps> = ({
                     end={{ x: 1, y: 1 }}
                     style={[styles.challengeGradientBtn, { flex: 1 }]}
                   >
-                    <TouchableOpacity
-                      style={styles.challengeGradientInner}
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.challengeGradientInner,
+                        pressed && { opacity: 0.9 },
+                      ]}
                       onPress={() => onTakeChallenge?.(post)}
-                      activeOpacity={0.9}
                     >
                       <MaterialIcons name="bar-chart" size={16} color="#FFF" />
                       <Text style={styles.challengeBtnText}>Ver estadísticas</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                   </LinearGradient>
-                  <TouchableOpacity
-                    style={[
+                  <Pressable
+                    style={({ pressed }) => [
                       styles.challengeSecondaryBtn,
                       { backgroundColor: `${colors.onSurfaceVariant}08` },
+                      pressed && { opacity: 0.6 },
                     ]}
                     onPress={() => onSaveExam?.(post)}
                   >
@@ -377,7 +410,7 @@ const PostCard: React.FC<PostCardProps> = ({
                     >
                       Editar reto
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               </View>
             );
@@ -400,26 +433,29 @@ const PostCard: React.FC<PostCardProps> = ({
                   end={{ x: 1, y: 1 }}
                   style={[styles.challengeGradientBtn, { flex: 1 }]}
                 >
-                  <TouchableOpacity
-                    style={styles.challengeGradientInner}
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.challengeGradientInner,
+                      pressed && { opacity: 0.9 },
+                    ]}
                     onPress={() => onTakeChallenge?.(post)}
-                    activeOpacity={0.9}
                   >
                     <MaterialIcons name="emoji-events" size={16} color="#FFF" />
                     <Text style={styles.challengeBtnText}>Contestar ahora</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 </LinearGradient>
-                <TouchableOpacity
-                  style={[
+                <Pressable
+                  style={({ pressed }) => [
                     styles.challengeSecondaryBtn,
                     { backgroundColor: `${colors.onSurfaceVariant}08` },
+                    pressed && { opacity: 0.6 },
                   ]}
                   onPress={() => onSaveExam?.(post)}
                 >
                   <Text style={{ color: colors.onSurfaceVariant, fontWeight: "700", fontSize: 13 }}>
                     Guardar examen
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
           );
@@ -429,7 +465,10 @@ const PostCard: React.FC<PostCardProps> = ({
       <View style={[styles.actionBar, { borderTopColor: `${colors.outlineVariant}15` }]}>
         {/* Left group: like, comment, download */}
         <View style={styles.actionGroupLeft}>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => onLike(post.id as number)}>
+          <Pressable
+            style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.6 }]}
+            onPress={() => onLike(post.id as number)}
+          >
             <MaterialIcons
               name={isLiked ? "favorite" : "favorite-border"}
               size={22}
@@ -445,39 +484,51 @@ const PostCard: React.FC<PostCardProps> = ({
                 {post.likes}
               </Text>
             )}
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity style={styles.actionBtn} onPress={() => onComment(post.id as number)}>
+          <Pressable
+            style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.6 }]}
+            onPress={() => onComment(post.id as number)}
+          >
             <MaterialIcons name="chat-bubble-outline" size={22} color={colors.onSurfaceVariant} />
             {post.commentsCount > 0 && (
               <Text style={[styles.actionCount, { color: colors.onSurfaceVariant }]}>
                 {post.commentsCount}
               </Text>
             )}
-          </TouchableOpacity>
+          </Pressable>
 
           {docAttachment && onDownload && (
-            <TouchableOpacity style={styles.actionBtn} onPress={() => onDownload(docAttachment)}>
+            <Pressable
+              style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.6 }]}
+              onPress={() => onDownload(docAttachment)}
+            >
               <MaterialIcons name="download" size={22} color={colors.onSurfaceVariant} />
-            </TouchableOpacity>
+            </Pressable>
           )}
         </View>
 
         {/* Right group: bookmark, share */}
         <View style={styles.actionGroupRight}>
-          <TouchableOpacity onPress={() => onSave(post.id as number)}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
+            onPress={() => onSave(post.id as number)}
+          >
             <MaterialIcons
               name={isSaved ? "bookmark" : "bookmark-border"}
               size={22}
               color={isSaved ? colors.primary : colors.onSurfaceVariant}
             />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => onShare(post.id as number)}>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
+            onPress={() => onShare(post.id as number)}
+          >
             <MaterialIcons name="share" size={22} color={colors.onSurfaceVariant} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

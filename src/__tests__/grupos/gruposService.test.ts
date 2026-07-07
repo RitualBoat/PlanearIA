@@ -10,14 +10,14 @@ import {
 jest.mock("../../sync/config/apiConfig", () => ({
   API_CONFIG: {
     baseUrl: "",
-    apiSecret: "",
     timeout: 1000,
   },
   SYNC_CONFIG: { debugMode: false },
   isAPIConfigured: () => false,
 }));
 
-jest.mock("../../services/auth", () => ({
+// entitySync imports getAccessToken directly from authService (no barrel).
+jest.mock("../../services/auth/authService", () => ({
   getAccessToken: jest.fn().mockResolvedValue(null),
 }));
 

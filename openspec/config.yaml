@@ -63,6 +63,9 @@ rules:
     - Especificar comportamiento responsive desde la pantalla madre compartida por breakpoint (movil <768, tablet 768-1279, web >=1280).
     - Colores y estilos solo desde tokens de src/themes; las pantallas redisenadas consumen el tema en runtime, no el COLORS estatico.
     - Archivos .web.tsx/.native.tsx solo si la interaccion (no el tamano) lo exige, con justificacion escrita.
+    - Cumplir el Estandar de Excelencia Visual (PLAN_UXUI_NAVEGACION_GLOBAL.md seccion 1.9) - checklist anti-slop, micro-interacciones con reanimated, presupuesto de motion/performance para Android gama media, reducir-movimiento respetado.
+    - Animacion/motion solo con react-native-reanimated y gesture-handler; Tailwind, GSAP y Framer Motion estan prohibidos en la app RN (solo se permiten en la landing web, artefacto separado).
+    - Verificar APIs de librerias (reanimated, gesture-handler, tentap, expo-*) en Context7 antes de escribir design/codigo; partir de CodeGraph para inventario y blast radius.
   tasks:
     - Tareas pequenas y revisables, una a la vez.
     - Ninguna tarea se marca completada sin evidencia (salida de typecheck, lint y tests afectados).

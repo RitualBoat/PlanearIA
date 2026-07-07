@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Platform, Pressable } from "react-native";
+import { View, Text, StyleSheet, Modal, Platform, Pressable } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTheme } from "../context/ThemeContext";
@@ -50,9 +50,12 @@ const ReportPostModal: React.FC<ReportPostModalProps> = ({ visible, onClose, onS
             <View style={[styles.headerIcon, { backgroundColor: colors.surfaceContainerLow }]}>
               <MaterialIcons name="flag" size={22} color={colors.primary} />
             </View>
-            <TouchableOpacity onPress={handleClose} style={styles.closeBtn}>
+            <Pressable
+              onPress={handleClose}
+              style={({ pressed }) => [styles.closeBtn, pressed && { opacity: 0.6 }]}
+            >
               <MaterialIcons name="close" size={20} color={colors.onSurfaceVariant} />
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {/* Title */}
@@ -68,9 +71,9 @@ const ReportPostModal: React.FC<ReportPostModalProps> = ({ visible, onClose, onS
             {REPORT_REASONS.map((reason) => {
               const isSelected = selectedReason === reason;
               return (
-                <TouchableOpacity
+                <Pressable
                   key={reason}
-                  style={[
+                  style={({ pressed }) => [
                     styles.optionRow,
                     {
                       backgroundColor: isSelected
@@ -78,9 +81,9 @@ const ReportPostModal: React.FC<ReportPostModalProps> = ({ visible, onClose, onS
                         : colors.surfaceContainerLow,
                       borderColor: isSelected ? `${colors.outlineVariant}50` : "transparent",
                     },
+                    pressed && { opacity: 0.7 },
                   ]}
                   onPress={() => setSelectedReason(reason)}
-                  activeOpacity={0.7}
                 >
                   <View
                     style={[
@@ -94,18 +97,20 @@ const ReportPostModal: React.FC<ReportPostModalProps> = ({ visible, onClose, onS
                     {isSelected && <View style={styles.radioInner} />}
                   </View>
                   <Text style={[styles.optionLabel, { color: colors.onSurface }]}>{reason}</Text>
-                </TouchableOpacity>
+                </Pressable>
               );
             })}
           </View>
 
           {/* Submit button */}
           <View style={styles.submitContainer}>
-            <TouchableOpacity
+            <Pressable
               onPress={handleSubmit}
               disabled={!selectedReason}
-              activeOpacity={0.85}
-              style={{ opacity: selectedReason ? 1 : 0.4 }}
+              style={({ pressed }) => [
+                { opacity: selectedReason ? 1 : 0.4 },
+                pressed && { opacity: 0.85 },
+              ]}
             >
               <LinearGradient
                 colors={[colors.primary, colors.primaryContainer]}
@@ -115,11 +120,14 @@ const ReportPostModal: React.FC<ReportPostModalProps> = ({ visible, onClose, onS
               >
                 <Text style={styles.submitBtnText}>Enviar reporte</Text>
               </LinearGradient>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity onPress={handleClose} style={styles.cancelBtn}>
+            <Pressable
+              onPress={handleClose}
+              style={({ pressed }) => [styles.cancelBtn, pressed && { opacity: 0.6 }]}
+            >
               <Text style={[styles.cancelText, { color: colors.primary }]}>Cancelar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </Pressable>
       </Pressable>

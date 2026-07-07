@@ -11,7 +11,7 @@
  */
 
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "../../types";
@@ -43,23 +43,20 @@ export const SyncOfflineBar: React.FC = () => {
       accessibilityRole="alert"
       accessibilityLabel={message}
     >
-      <MaterialIcons
-        name={iconName}
-        size={16}
-        color={COLORS.textOnPrimary}
-      />
+      <MaterialIcons name={iconName} size={16} color={COLORS.textOnPrimary} />
       <Text style={styles.barText} numberOfLines={2}>
         {message}
       </Text>
       {showServerDown && (
-        <TouchableOpacity
+        <Pressable
+          style={({ pressed }) => pressed && { opacity: 0.6 }}
           onPress={() => void syncNow("manual")}
           accessibilityRole="button"
           accessibilityLabel="Reintentar sincronización"
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           <MaterialIcons name="refresh" size={18} color={COLORS.textOnPrimary} />
-        </TouchableOpacity>
+        </Pressable>
       )}
     </View>
   );
@@ -84,14 +81,14 @@ export const SyncNoticeToast: React.FC = () => {
   if (!notice) return null;
 
   return (
-    <View
-      pointerEvents="box-none"
-      style={[styles.toastWrapper, { bottom: insets.bottom + 28 }]}
-    >
-      <TouchableOpacity
-        activeOpacity={0.9}
+    <View pointerEvents="box-none" style={[styles.toastWrapper, { bottom: insets.bottom + 28 }]}>
+      <Pressable
         onPress={dismissNotice}
-        style={[styles.toast, { backgroundColor: toastColor(notice.kind) }]}
+        style={({ pressed }) => [
+          styles.toast,
+          { backgroundColor: toastColor(notice.kind) },
+          pressed && { opacity: 0.9 },
+        ]}
         accessibilityRole="alert"
         accessibilityLabel={notice.message}
       >
@@ -99,7 +96,7 @@ export const SyncNoticeToast: React.FC = () => {
         <Text style={styles.toastText} numberOfLines={2}>
           {notice.message}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

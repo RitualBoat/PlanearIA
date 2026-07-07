@@ -12,7 +12,8 @@ jest.mock("../../sync/config/apiConfig", () => ({
 }));
 
 // Authenticated session: sync requires a real token.
-jest.mock("../../services/auth", () => ({
+// entitySync imports getAccessToken directly from authService (no barrel).
+jest.mock("../../services/auth/authService", () => ({
   getAccessToken: jest.fn().mockResolvedValue("test-jwt-token"),
 }));
 

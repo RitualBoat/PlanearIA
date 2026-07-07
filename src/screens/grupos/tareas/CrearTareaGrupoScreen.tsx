@@ -1,9 +1,9 @@
 import React from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   TextInput,
   StatusBar,
   Switch,
@@ -36,7 +36,7 @@ const CrearTareaGrupoScreen: React.FC = () => {
     route.params.grupoId,
     route.params.entregableId,
     route.params.unidadId,
-    route.params.returnToClassroom,
+    route.params.returnToClassroom
   );
 
   const isExamen = vm.tipo === "examen";
@@ -55,17 +55,23 @@ const CrearTareaGrupoScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.headerBackButton} onPress={() => navigation.goBack()}>
+          <Pressable
+            style={({ pressed }) => [styles.headerBackButton, pressed && { opacity: 0.6 }]}
+            onPress={() => navigation.goBack()}
+          >
             <MaterialIcons name="arrow-back" size={24} color="white" />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerTitle}>{headerText}</Text>
           <View style={{ flex: 1 }} />
           {vm.isSaving ? (
             <ActivityIndicator color="white" />
           ) : (
-            <TouchableOpacity style={styles.headerSaveButton} onPress={vm.handleGuardar}>
+            <Pressable
+              style={({ pressed }) => [styles.headerSaveButton, pressed && { opacity: 0.6 }]}
+              onPress={vm.handleGuardar}
+            >
               <Text style={styles.headerSaveText}>{saveText}</Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
         </View>
 
@@ -75,9 +81,13 @@ const CrearTareaGrupoScreen: React.FC = () => {
             <Text style={styles.sectionLabel}>TIPO DE ENTREGABLE</Text>
             <View style={styles.tipoContainer}>
               {vm.tipoOptions.map((option) => (
-                <TouchableOpacity
+                <Pressable
                   key={option.value}
-                  style={[styles.tipoPill, vm.tipo === option.value && styles.tipoPillActive]}
+                  style={({ pressed }) => [
+                    styles.tipoPill,
+                    vm.tipo === option.value && styles.tipoPillActive,
+                    pressed && { opacity: 0.6 },
+                  ]}
                   onPress={() =>
                     vm.setTipo(option.value as "tarea" | "examen" | "proyecto" | "investigacion")
                   }
@@ -90,7 +100,7 @@ const CrearTareaGrupoScreen: React.FC = () => {
                   >
                     {option.label}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               ))}
             </View>
 
@@ -155,8 +165,8 @@ const CrearTareaGrupoScreen: React.FC = () => {
               {!isExamen && (
                 <View style={styles.inputGroup}>
                   <Text style={styles.label}>FECHA DE ASIGNACIÓN</Text>
-                  <TouchableOpacity
-                    style={styles.dateInput}
+                  <Pressable
+                    style={({ pressed }) => [styles.dateInput, pressed && { opacity: 0.6 }]}
                     onPress={() => vm.setShowFechaAsignacionPicker(true)}
                   >
                     <MaterialIcons name="event" size={20} color={COLORS.primary} />
@@ -166,14 +176,14 @@ const CrearTareaGrupoScreen: React.FC = () => {
                       {vm.fechaAsignacion || "dd/mm/aaaa"}
                     </Text>
                     <MaterialIcons name="calendar-today" size={20} color={COLORS.textSecondary} />
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               )}
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>{fechaEntregaLabel}</Text>
-                <TouchableOpacity
-                  style={styles.dateInput}
+                <Pressable
+                  style={({ pressed }) => [styles.dateInput, pressed && { opacity: 0.6 }]}
                   onPress={() => vm.setShowFechaEntregaPicker(true)}
                 >
                   <MaterialIcons
@@ -185,7 +195,7 @@ const CrearTareaGrupoScreen: React.FC = () => {
                     {vm.fechaEntrega || "dd/mm/aaaa"}
                   </Text>
                   <MaterialIcons name="calendar-today" size={20} color={COLORS.textSecondary} />
-                </TouchableOpacity>
+                </Pressable>
               </View>
 
               {/* Late submission toggle */}
@@ -215,8 +225,8 @@ const CrearTareaGrupoScreen: React.FC = () => {
               {/* Extended date when toggle is on */}
               {vm.permitirEntregaTardia && (
                 <View style={styles.extendedDateContainer}>
-                  <TouchableOpacity
-                    style={styles.extendedDateRow}
+                  <Pressable
+                    style={({ pressed }) => [styles.extendedDateRow, pressed && { opacity: 0.6 }]}
                     onPress={() => vm.setShowFechaLimitePicker(true)}
                   >
                     <MaterialIcons name="event-busy" size={18} color={COLORS.primary} />
@@ -224,7 +234,7 @@ const CrearTareaGrupoScreen: React.FC = () => {
                     <Text style={styles.extendedDateValue}>
                       {vm.fechaLimiteEntregaTardia || "dd/mm/aaaa"}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               )}
 
@@ -244,8 +254,12 @@ const CrearTareaGrupoScreen: React.FC = () => {
             </View>
 
             {/* Bottom buttons */}
-            <TouchableOpacity
-              style={[styles.saveButton, vm.isSaving && styles.saveButtonDisabled]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.saveButton,
+                vm.isSaving && styles.saveButtonDisabled,
+                pressed && { opacity: 0.6 },
+              ]}
               onPress={vm.handleGuardar}
               disabled={vm.isSaving}
             >
@@ -257,17 +271,23 @@ const CrearTareaGrupoScreen: React.FC = () => {
                   <MaterialIcons name="save" size={20} color="white" />
                 </>
               )}
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity style={styles.cancelButton} onPress={vm.handleCancelar}>
+            <Pressable
+              style={({ pressed }) => [styles.cancelButton, pressed && { opacity: 0.6 }]}
+              onPress={vm.handleCancelar}
+            >
               <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
+            </Pressable>
 
             {vm.isEditMode && (
-              <TouchableOpacity style={styles.deleteButton} onPress={vm.handleEliminar}>
+              <Pressable
+                style={({ pressed }) => [styles.deleteButton, pressed && { opacity: 0.6 }]}
+                onPress={vm.handleEliminar}
+              >
                 <MaterialIcons name="delete" size={20} color={COLORS.error} />
                 <Text style={styles.deleteButtonText}>Eliminar Entregable</Text>
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
         </WebScrollView>
@@ -573,4 +593,3 @@ const styles = StyleSheet.create({
 });
 
 export default CrearTareaGrupoScreen;
-

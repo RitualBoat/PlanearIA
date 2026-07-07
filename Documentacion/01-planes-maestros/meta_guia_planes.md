@@ -1,4 +1,4 @@
-﻿# Meta Guia de Planes Maestros - PlanearIA (v3, SDD con OpenSpec)
+# Meta Guia de Planes Maestros - PlanearIA (v3, SDD con OpenSpec)
 
 > **Proposito:** esta guia define el estandar obligatorio para crear y ejecutar planes maestros en PlanearIA.
 > **Regla central de la v3:** los planes maestros son Blueprint + Backlog de changes OpenSpec.
@@ -67,19 +67,23 @@ Este es el flujo completo para ejecutar UNA entrada del backlog. Los comandos so
 Toma la siguiente entrada `pendiente` de la ola activa cuyo `Depende de:` ya este archivado.
 No abras dos changes grandes a la vez.
 
-### Paso 1 - (Opcional) Crear el issue en GitHub
+### Paso 1 - Crear issue/user story en GitHub Product OS
 
-Si quieres tracking operativo desde el inicio:
+Obligatorio para todo change SDD no trivial: antes de enriquecer, explorar o proponer, crea o identifica
+el issue/user story de GitHub, agregalo al Project `PlanearIA Product OS` y usa ese numero como fuente
+del ciclo. No se debe crear `openspec/changes/<nombre>/` sin este item operativo previo.
 
 ```bash
-gh issue create --title "<nombre-del-change>" --body "<historia del backlog>" --label "change,ux-ui"
+gh issue create --title "<nombre-del-change>" --body "<historia del backlog>" --label "change,ux-ui" --project "PlanearIA Product OS"
 ```
 
-y agregalo al GitHub Project del plan. Tambien puedes crearlo despues del propose, con el scope ya afinado.
+Si `gh issue create --project` falla, crea el issue y agregalo con `gh project item-add`, dejando evidencia
+del comando o del error exacto. Solo un hotfix trivial autorizado explicitamente por el desarrollador puede
+saltar este paso.
 
 ### Paso 2 - Enriquecer la historia: `/enrich-us`
 
-Cuando la historia del backlog esta verde o vaga:
+Enriquece desde el issue/user story creado en el Paso 1:
 
 ```text
 /enrich-us <pega la historia del backlog o el numero de issue>
@@ -87,7 +91,7 @@ Cuando la historia del backlog esta verde o vaga:
 
 Devuelve `## Original` + `## Enriquecida` (descripcion funcional, datos, endpoints, archivos MVVM,
 definition of done, NFRs). Revisala: tu decides que entra. Si la historia del backlog ya es especifica,
-puedes saltarte este paso.
+el enriquecimiento puede ser corto, pero el issue/Product OS sigue siendo obligatorio.
 
 ### Paso 3 - (Opcional) Explorar: `/opsx:explore`
 
@@ -166,14 +170,35 @@ Pasos y paradas:
 - **Paso 0 - Creacion.** Se sugiere la User Story y se crea en GitHub Projects (issue + item del board).
   **PARADA:** se espera OK del desarrollador.
 - **Paso 1 - Enrich.** Se enriquece la historia con criterios de aceptacion observables en el issue (`/enrich-us`).
+  Para changes de UI/IA, el enrich incluye ademas: **estado actual** (que existe en el codigo, via CodeGraph),
+  **riesgos**, **factores de exito medibles** y, si aplica, investigacion breve de patrones vigentes
+  (Context7/web) para no proponer sobre supuestos viejos.
   **PARADA:** se espera OK del desarrollador.
-- **Paso 2 - Propose & Apply.** `/opsx:propose` (spec WHEN/THEN) + `/opsx:apply` (codigo real, tarea a tarea con evidencia).
-- **Paso 3 - Audit & QA.** **OBLIGATORIO** para UI: levantar la app y validar con el MCP de navegador
-  (Playwright), tomando capturas por breakpoint que demuestren cada criterio de aceptacion, y adjuntar el
-  reporte al issue. No se cierra un change de UI solo con tests automaticos.
+- **Paso 2 - Propose & Apply.** `/opsx:propose` (spec WHEN/THEN) + `/opsx:apply` (codigo real, tarea a tarea
+  con evidencia). No temer a la complejidad del `tasks.md`: mejor muchas tareas chicas verificables que pocas
+  gigantes. Toda API de libreria (reanimated, gesture-handler, tentap, expo-*) se verifica en Context7 antes
+  de escribirse (D15 del plan UX/UI): cero APIs alucinadas.
+- **Paso 3 - Audit & QA (bucle iterativo).** **OBLIGATORIO** para UI: levantar la app y validar con el MCP de
+  navegador (Playwright). El bucle es: capturar por breakpoint -> comparar contra el frame de Figma y los
+  criterios de aceptacion -> corregir -> recapturar, **las veces que haga falta**. Criterios de salida (todos):
+  1. Cada criterio de aceptacion demostrado con captura.
+  2. 3 breakpoints validados (movil <768 / tablet 768-1279 / web >=1280) sin layout roto ni scroll muerto.
+  3. Checklist Nielsen sin severidad >=3 abierta, y checklist anti-slop del plan UX/UI (seccion 1.9.3) aprobado.
+  4. Consola del navegador sin errores nuevos.
+  5. Paridad visual contra el ground truth confirmada (las diferencias intencionales se anotan en design.md).
+  Reporte con capturas adjunto al issue. **PROHIBIDO archivar un change de UI sin cumplir los 5 criterios.**
+- **Paso 4 - Cierre.** Tras `/adversarial-review` y `/opsx:archive`: actualizar el backlog del plan maestro,
+  mover el item del Project, actualizar la documentacion afectada (`Documentacion/`, CLAUDE.md/config.yaml si
+  cambiaron reglas) y verificar que CodeGraph este fresco para el siguiente ciclo (el watcher reindexa solo
+  en ~1s; tras renombres/moves masivos, correr una consulta `codegraph_explore` de sanidad).
 
-Override: si el desarrollador dice "hazlo de inicio a fin en automatico", se corren los 4 pasos de corrido
-**sin omitir** la QA real del Paso 3.
+Override: si el desarrollador dice "hazlo de inicio a fin en automatico", se corren los 5 pasos de corrido
+**sin omitir** la QA real del Paso 3 ni el cierre del Paso 4; al final se entrega el paquete de evidencia
+completo (links, capturas, comandos).
+
+Paridad multi-agente: este protocolo aplica igual en Codex/Cursor/VSCode (comandos espejo `$openspec-*` /
+`opsx-*`); los gates no dependen del IDE ni del modelo. Si el agente no tiene acceso a un MCP requerido
+(p.ej. Playwright), lo reporta como bloqueo; no se auto-exime.
 
 Reglas anti-fallo (lecciones del piloto):
 
@@ -183,6 +208,9 @@ Reglas anti-fallo (lecciones del piloto):
 - "Tests verdes" no es "feature lista": la evidencia visual del Paso 3 es parte del Definition of Done.
 - Antes de navegar con Playwright, levantar `expo start --web` y **esperar** a que el bundler responda
   (HTTP 200 en el puerto, tipicamente 8081); navegar antes produce `ERR_CONNECTION_REFUSED`.
+- **Cero trampas con el arnes:** si falta arnes (bundler caido, MCP desconectado, Figma sin autenticar),
+  se arregla o se reporta el bloqueo; esta prohibido simular evidencia, inventar capturas o marcar `[x]`
+  "porque el codigo se ve bien".
 
 ### MCP por paso
 
@@ -192,8 +220,9 @@ Reglas anti-fallo (lecciones del piloto):
 | 1 Enrich | `github` + `codegraph` | Enriquecer con criterios; verificar el codigo real antes de prometer. |
 | 2 Propose | `codegraph`, `context7`, `figma` | Impacto/flujos, APIs recientes, ground truth visual. |
 | 2 Apply | `codegraph` | Editar con blast radius a la vista; el codigo gana sobre el diagnostico previo. |
-| 3 QA (UI) | `playwright` (+ `expo` si hace falta) | Levantar web, navegar, capturar por breakpoint, adjuntar evidencia. |
+| 3 QA (UI) | `playwright` (+ `expo` si hace falta) | Levantar web, navegar, capturar por breakpoint, iterar hasta los 5 criterios de salida. |
 | 3 QA (datos) | `planearia-sqlite` / MongoDB opt-in | Diagnostico read-only de cola offline o aislamiento por `userId`. |
+| 4 Cierre | `github` + `codegraph` | Mover item a Done, actualizar docs y verificar indice fresco para el siguiente ciclo. |
 
 Detalle canonico de MCPs por flujo: `Documentacion/02-operacion/MCP_FLUJOS_PLANEARIA.md`.
 
@@ -280,8 +309,10 @@ npm run backend:check           # si el change toca backend
 
 Ademas, por tipo de change:
 
-- **UI:** capturas por breakpoint (Playwright MCP en web; movil manual o emulador) + checklist Nielsen
-  con severidad 0-4 (`IHC_DISCOVERY_DOCENTE.md` seccion 6).
+- **UI:** bucle iterativo del Protocolo 2.5 Paso 3 (capturas por breakpoint con Playwright MCP; movil manual
+  o emulador) + checklist Nielsen con severidad 0-4 (`IHC_DISCOVERY_DOCENTE.md` seccion 6) + checklist
+  anti-slop y presupuesto de motion/performance del Estandar de Excelencia Visual
+  (`PLAN_UXUI_NAVEGACION_GLOBAL.md` seccion 1.9).
 - **Sync/datos:** validar offline -> reconexion -> cross-device -> servidor caido sin perdida local.
 - **IA:** probar exito, error de proveedor, sin proveedor configurado y limite de uso.
 - **Navegacion:** entrar desde todos los puntos esperados, ejecutar acciones principales y volver sin

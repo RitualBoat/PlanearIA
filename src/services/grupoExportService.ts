@@ -3,6 +3,7 @@ import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system/legacy";
 import * as XLSX from "xlsx";
+import { escapeHtml, openHtmlForPrint } from "../utils/htmlEscape";
 import type { Alumno, Grupo } from "../../types";
 
 export type GrupoExportFormat = "pdf" | "excel";
@@ -19,15 +20,6 @@ export interface GrupoExportData {
 export interface ExportarGrupoArchivoParams extends GrupoExportData {
   formato: GrupoExportFormat;
 }
-
-const escapeHtml = (value: unknown): string => {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-};
 
 const slugify = (value: string): string => {
   return value
@@ -211,13 +203,7 @@ const exportarGrupoPdf = async (data: GrupoExportData): Promise<boolean> => {
   const html = buildGrupoExportHtml(data);
 
   if (Platform.OS === "web") {
-    const win = window.open("", "_blank");
-    if (!win) return false;
-    win.document.write(html);
-    win.document.close();
-    win.focus();
-    win.print();
-    return true;
+    return openHtmlForPrint(html);
   }
 
   const fileBaseName = buildFileBaseName(data.grupo.nombre);

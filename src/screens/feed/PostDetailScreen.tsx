@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import {
+  Pressable,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Image,
   FlatList,
   TextInput,
@@ -56,9 +56,12 @@ const PostDetailScreen: React.FC = () => {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top"]}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBtn}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={({ pressed }) => [styles.headerBtn, pressed && { opacity: 0.6 }]}
+          >
             <MaterialIcons name="arrow-back" size={24} color={colors.primary} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={[styles.headerTitle, { color: colors.onSurface }]}>Publicación</Text>
           <View style={{ width: 40 }} />
         </View>
@@ -120,17 +123,21 @@ const PostDetailScreen: React.FC = () => {
             {item.contenido}
           </Text>
           <View style={styles.commentActions}>
-            <TouchableOpacity style={styles.commentActionBtn}>
+            <Pressable
+              style={({ pressed }) => [styles.commentActionBtn, pressed && { opacity: 0.6 }]}
+            >
               <MaterialIcons name="thumb-up" size={14} color={colors.primary} />
               <Text style={[styles.commentActionText, { color: colors.primary }]}>
                 {item.likes > 0 ? item.likes : "Me gusta"}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.commentActionBtn}>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.commentActionBtn, pressed && { opacity: 0.6 }]}
+            >
               <Text style={[styles.commentReplyText, { color: colors.onSurfaceVariant }]}>
                 RESPONDER
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </View>
@@ -181,8 +188,8 @@ const PostDetailScreen: React.FC = () => {
         ]}
       >
         <View style={styles.actionGroupLeft}>
-          <TouchableOpacity
-            style={styles.actionBtn}
+          <Pressable
+            style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.6 }]}
             onPress={() => toggleLike(post.id as number, userId)}
           >
             <MaterialIcons
@@ -200,33 +207,36 @@ const PostDetailScreen: React.FC = () => {
                 {post.likes}
               </Text>
             )}
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity style={styles.actionBtn}>
+          <Pressable style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.6 }]}>
             <MaterialIcons name="chat-bubble-outline" size={22} color={colors.onSurfaceVariant} />
             {post.commentsCount > 0 && (
               <Text style={[styles.actionCount, { color: colors.onSurfaceVariant }]}>
                 {post.commentsCount}
               </Text>
             )}
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity style={styles.actionBtn}>
+          <Pressable style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.6 }]}>
             <MaterialIcons name="download" size={22} color={colors.onSurfaceVariant} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.actionGroupRight}>
-          <TouchableOpacity onPress={() => toggleSave(post.id as number, userId)}>
+          <Pressable
+            style={({ pressed }) => pressed && { opacity: 0.6 }}
+            onPress={() => toggleSave(post.id as number, userId)}
+          >
             <MaterialIcons
               name={isSaved ? "bookmark" : "bookmark-border"}
               size={22}
               color={isSaved ? colors.primary : colors.onSurfaceVariant}
             />
-          </TouchableOpacity>
-          <TouchableOpacity>
+          </Pressable>
+          <Pressable style={({ pressed }) => pressed && { opacity: 0.6 }}>
             <MaterialIcons name="share" size={22} color={colors.onSurfaceVariant} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
 
@@ -243,13 +253,16 @@ const PostDetailScreen: React.FC = () => {
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top"]}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.background }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBtn}>
+        <Pressable
+          onPress={() => navigation.goBack()}
+          style={({ pressed }) => [styles.headerBtn, pressed && { opacity: 0.6 }]}
+        >
           <MaterialIcons name="arrow-back" size={24} color={colors.primary} />
-        </TouchableOpacity>
+        </Pressable>
         <Text style={[styles.headerTitle, { color: colors.onSurface }]}>Publicación</Text>
-        <TouchableOpacity style={styles.headerBtn}>
+        <Pressable style={({ pressed }) => [styles.headerBtn, pressed && { opacity: 0.6 }]}>
           <MaterialIcons name="more-vert" size={24} color={colors.onSurfaceVariant} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <KeyboardAvoidingView
@@ -320,10 +333,13 @@ const PostDetailScreen: React.FC = () => {
               onChangeText={setCommentText}
               multiline={false}
             />
-            <TouchableOpacity
+            <Pressable
               onPress={handleSendComment}
               disabled={!commentText.trim()}
-              style={{ opacity: commentText.trim() ? 1 : 0.4 }}
+              style={({ pressed }) => [
+                { opacity: commentText.trim() ? 1 : 0.4 },
+                pressed && { opacity: 0.6 },
+              ]}
             >
               <LinearGradient
                 colors={[colors.primary, colors.primaryContainer]}
@@ -333,7 +349,7 @@ const PostDetailScreen: React.FC = () => {
               >
                 <MaterialIcons name="arrow-upward" size={18} color="#FFF" />
               </LinearGradient>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </KeyboardAvoidingView>

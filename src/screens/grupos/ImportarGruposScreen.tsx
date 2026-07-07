@@ -3,10 +3,10 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  Pressable,
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -136,15 +136,21 @@ const ImportarGruposScreen: React.FC<ImportarGruposScreenProps> = ({ navigation 
         Aún no has seleccionado archivo. Sube CSV o Excel para empezar.
       </Text>
 
-      <TouchableOpacity style={styles.primaryButton} onPress={() => void handleSelectFile()}>
+      <Pressable
+        style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.6 }]}
+        onPress={() => void handleSelectFile()}
+      >
         <MaterialIcons name="file-upload" size={18} color={COLORS.surface} />
         <Text style={styles.primaryButtonText}>Seleccionar archivo</Text>
-      </TouchableOpacity>
+      </Pressable>
 
-      <TouchableOpacity style={styles.linkButton} onPress={handleDownloadTemplate}>
+      <Pressable
+        style={({ pressed }) => [styles.linkButton, pressed && { opacity: 0.6 }]}
+        onPress={handleDownloadTemplate}
+      >
         <MaterialIcons name="download" size={16} color={COLORS.primary} />
         <Text style={styles.linkButtonText}>Descargar plantilla</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 
@@ -167,9 +173,12 @@ const ImportarGruposScreen: React.FC<ImportarGruposScreenProps> = ({ navigation 
         <View style={{ flex: 1 }}>
           <Text style={styles.fileName}>{result?.fileName}</Text>
         </View>
-        <TouchableOpacity onPress={() => void handleSelectFile()}>
+        <Pressable
+          style={({ pressed }) => pressed && { opacity: 0.6 }}
+          onPress={() => void handleSelectFile()}
+        >
           <Text style={styles.changeFileText}>Cambiar archivo</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <Text style={styles.previewTitle}>Vista previa</Text>
@@ -213,22 +222,28 @@ const ImportarGruposScreen: React.FC<ImportarGruposScreenProps> = ({ navigation 
 
       <View style={styles.actionsCard}>
         <View style={styles.actionsRow}>
-          <TouchableOpacity style={styles.cancelButton} onPress={resetFlow}>
+          <Pressable
+            style={({ pressed }) => [styles.cancelButton, pressed && { opacity: 0.6 }]}
+            onPress={resetFlow}
+          >
             <Text style={styles.cancelButtonText}>Cancelar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.importButton}
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.importButton, pressed && { opacity: 0.6 }]}
             onPress={() => void handleImportValidRows()}
             disabled={isImporting || validCount === 0}
           >
             <Text style={styles.importButtonText}>
               {isImporting ? "Importando..." : "Importar grupos válidos"}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
-        <TouchableOpacity style={styles.linkButton} onPress={handleDownloadTemplate}>
+        <Pressable
+          style={({ pressed }) => [styles.linkButton, pressed && { opacity: 0.6 }]}
+          onPress={handleDownloadTemplate}
+        >
           <Text style={styles.linkButtonText}>Descargar plantilla</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </>
   );
@@ -243,16 +258,19 @@ const ImportarGruposScreen: React.FC<ImportarGruposScreenProps> = ({ navigation 
         Se han importado {validCount} grupos nuevos correctamente.
       </Text>
 
-      <TouchableOpacity
-        style={styles.primaryButton}
+      <Pressable
+        style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.6 }]}
         onPress={() => navigation.navigate("ListaGrupos")}
       >
         <Text style={styles.primaryButtonText}>Ir a mis grupos</Text>
-      </TouchableOpacity>
+      </Pressable>
 
-      <TouchableOpacity style={styles.secondaryButton} onPress={resetFlow}>
+      <Pressable
+        style={({ pressed }) => [styles.secondaryButton, pressed && { opacity: 0.6 }]}
+        onPress={resetFlow}
+      >
         <Text style={styles.secondaryButtonText}>Ver reporte detallado</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 
@@ -266,12 +284,18 @@ const ImportarGruposScreen: React.FC<ImportarGruposScreenProps> = ({ navigation 
         {errorMessage || "El formato no es soportado o el archivo está dañado."}
       </Text>
 
-      <TouchableOpacity style={styles.primaryButton} onPress={() => void handleSelectFile()}>
+      <Pressable
+        style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.6 }]}
+        onPress={() => void handleSelectFile()}
+      >
         <Text style={styles.primaryButtonText}>Reintentar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.cancelButton} onPress={resetFlow}>
+      </Pressable>
+      <Pressable
+        style={({ pressed }) => [styles.cancelButton, pressed && { opacity: 0.6 }]}
+        onPress={resetFlow}
+      >
         <Text style={styles.cancelButtonText}>Cancelar</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 
@@ -281,9 +305,12 @@ const ImportarGruposScreen: React.FC<ImportarGruposScreenProps> = ({ navigation 
       <SafeAreaView style={styles.safeArea}>
         <WebScrollView style={styles.content}>
           <View style={styles.headerRow}>
-            <TouchableOpacity style={styles.headerIconButton} onPress={() => navigation.goBack()}>
+            <Pressable
+              style={({ pressed }) => [styles.headerIconButton, pressed && { opacity: 0.6 }]}
+              onPress={() => navigation.goBack()}
+            >
               <MaterialIcons name="arrow-back" size={22} color={COLORS.primary} />
-            </TouchableOpacity>
+            </Pressable>
             <Text style={styles.headerTitle}>Importar Grupos</Text>
           </View>
 

@@ -3,6 +3,7 @@ import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system/legacy";
 import * as XLSX from "xlsx";
+import { escapeHtml, openHtmlForPrint } from "../utils/htmlEscape";
 import type { Alumno } from "../../types";
 
 export type AlumnoExportFormat = "pdf" | "excel";
@@ -14,15 +15,6 @@ export interface AlumnoExportData {
 export interface ExportarAlumnosArchivoParams extends AlumnoExportData {
   formato: AlumnoExportFormat;
 }
-
-const escapeHtml = (value: unknown): string => {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-};
 
 const formatDate = (value: Date): string => {
   const year = value.getFullYear();
@@ -170,13 +162,7 @@ const exportarAlumnosPdf = async (data: AlumnoExportData): Promise<boolean> => {
   const html = buildAlumnoExportHtml(data.alumnos);
 
   if (Platform.OS === "web") {
-    const win = window.open("", "_blank");
-    if (!win) return false;
-    win.document.write(html);
-    win.document.close();
-    win.focus();
-    win.print();
-    return true;
+    return openHtmlForPrint(html);
   }
 
   const fileBaseName = buildFileBaseName();

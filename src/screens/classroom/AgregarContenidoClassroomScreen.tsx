@@ -3,12 +3,12 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Switch,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
@@ -60,7 +60,8 @@ const inferRecursoTipo = (file?: UploadedFile, link?: string): Recurso["tipo"] =
   const ext = file?.name.split(".").pop()?.toLowerCase();
   if (mime.startsWith("video/") || ["mp4", "mov", "avi", "mkv"].includes(ext ?? "")) return "video";
   if (mime.startsWith("audio/") || ["mp3", "wav", "m4a", "ogg"].includes(ext ?? "")) return "audio";
-  if (mime.startsWith("image/") || ["png", "jpg", "jpeg", "gif", "webp"].includes(ext ?? "")) return "imagen";
+  if (mime.startsWith("image/") || ["png", "jpg", "jpeg", "gif", "webp"].includes(ext ?? ""))
+    return "imagen";
   if (mime.includes("presentation") || ["ppt", "pptx"].includes(ext ?? "")) return "presentacion";
   return "documento";
 };
@@ -86,16 +87,20 @@ const parseAttachmentsFromTags = (recurso: Recurso): ClassroomAttachment[] => {
   if (!tag) {
     const fallback = recurso.url || recurso.archivo;
     return fallback
-      ? [{
-          label: recurso.archivo || recurso.url || recurso.titulo,
-          type: recurso.url?.startsWith("http") ? "enlace" : "archivo",
-          uri: fallback,
-        }]
+      ? [
+          {
+            label: recurso.archivo || recurso.url || recurso.titulo,
+            type: recurso.url?.startsWith("http") ? "enlace" : "archivo",
+            uri: fallback,
+          },
+        ]
       : [];
   }
 
   try {
-    const parsed = JSON.parse(decodeURIComponent(tag.replace(ATTACHMENTS_TAG_PREFIX, ""))) as unknown;
+    const parsed = JSON.parse(
+      decodeURIComponent(tag.replace(ATTACHMENTS_TAG_PREFIX, ""))
+    ) as unknown;
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(isClassroomAttachment);
   } catch {
@@ -166,7 +171,15 @@ const formatFileSize = (bytes?: number): string => {
 const AgregarContenidoClassroomScreen: React.FC = () => {
   const navigation = useNavigation<Navigation>();
   const route = useRoute<Route>();
-  const { grupoId, kind: initialKind, modo = "crear", recursoId, tareaId, unidadId, unidadNombre } = route.params;
+  const {
+    grupoId,
+    kind: initialKind,
+    modo = "crear",
+    recursoId,
+    tareaId,
+    unidadId,
+    unidadNombre,
+  } = route.params;
   const { actualizarEntregable, crearEntregable, obtenerEntregablePorId } = useEntregables();
   const { actualizarRecurso, crearRecurso, obtenerRecursoPorId } = useRecursos();
   const [kind, setKind] = useState<AssignmentKind>(initialKind ?? "material");
@@ -176,7 +189,9 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
   const [fechaAsignacion, setFechaAsignacion] = useState(formatDateInput(new Date()));
   const [fechaEntrega, setFechaEntrega] = useState(formatDateInput(addDays(new Date(), 7)));
   const [permitirEntregaTardia, setPermitirEntregaTardia] = useState(false);
-  const [fechaLimiteEntregaTardia, setFechaLimiteEntregaTardia] = useState(formatDateInput(addDays(new Date(), 10)));
+  const [fechaLimiteEntregaTardia, setFechaLimiteEntregaTardia] = useState(
+    formatDateInput(addDays(new Date(), 10))
+  );
   const [notas, setNotas] = useState("");
   const [linkDraft, setLinkDraft] = useState("");
   const [links, setLinks] = useState<string[]>([]);
@@ -198,14 +213,20 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
       setFechaAsignacion(formatDateInput(tarea.fechaAsignacion));
       setFechaEntrega(formatDateInput(tarea.fechaEntrega));
       setPermitirEntregaTardia(tarea.permitirEntregaTardia ?? false);
-      setFechaLimiteEntregaTardia(formatDateInput(tarea.fechaLimiteEntregaTardia ?? addDays(new Date(tarea.fechaEntrega), 3)));
+      setFechaLimiteEntregaTardia(
+        formatDateInput(tarea.fechaLimiteEntregaTardia ?? addDays(new Date(tarea.fechaEntrega), 3))
+      );
       setNotas(extractNotasFromInstructions(tarea.instrucciones));
       const attachments = parseTaskAttachments(tarea.recursosNecesarios);
-      setLinks(attachments.filter((attachment) => attachment.type === "enlace").map((attachment) => attachment.uri));
+      setLinks(
+        attachments
+          .filter((attachment) => attachment.type === "enlace")
+          .map((attachment) => attachment.uri)
+      );
       setUploadedFiles(
         attachments
           .filter((attachment) => attachment.type === "archivo")
-          .map((attachment) => ({ name: attachment.label, uri: attachment.uri })),
+          .map((attachment) => ({ name: attachment.label, uri: attachment.uri }))
       );
       return;
     }
@@ -220,9 +241,13 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
       setUploadedFiles(
         attachments
           .filter((attachment) => attachment.type === "archivo")
-          .map((attachment) => ({ name: attachment.label, uri: attachment.uri })),
+          .map((attachment) => ({ name: attachment.label, uri: attachment.uri }))
       );
-      setLinks(attachments.filter((attachment) => attachment.type === "enlace").map((attachment) => attachment.uri));
+      setLinks(
+        attachments
+          .filter((attachment) => attachment.type === "enlace")
+          .map((attachment) => attachment.uri)
+      );
     }
   }, [isEditMode, obtenerEntregablePorId, obtenerRecursoPorId, recursoId, tareaId]);
 
@@ -299,7 +324,10 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
     const parsedEntrega = parseDateInput(fechaEntrega);
     const parsedLimiteTardia = parseDateInput(fechaLimiteEntregaTardia);
     if (kind === "actividad" && (!parsedAsignacion || !parsedEntrega)) {
-      showMessage("Fechas invalidas", "Usa fechas con formato dd/mm/aaaa para asignacion y entrega.");
+      showMessage(
+        "Fechas invalidas",
+        "Usa fechas con formato dd/mm/aaaa para asignacion y entrega."
+      );
       return;
     }
     if (kind === "actividad" && permitirEntregaTardia && !parsedLimiteTardia) {
@@ -325,12 +353,16 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
           fechaEntrega: parsedEntrega ?? addDays(now, 7),
           valor: score,
           instrucciones,
-          recursosNecesarios: attachments.map((attachment) => `${attachment.type}: ${attachment.label}`),
+          recursosNecesarios: attachments.map(
+            (attachment) => `${attachment.type}: ${attachment.label}`
+          ),
           estado: "asignada",
           calificacionMaxima: score,
           profesorId: 1,
           permitirEntregaTardia,
-          fechaLimiteEntregaTardia: permitirEntregaTardia ? (parsedLimiteTardia ?? undefined) : undefined,
+          fechaLimiteEntregaTardia: permitirEntregaTardia
+            ? (parsedLimiteTardia ?? undefined)
+            : undefined,
         };
         if (isEditMode && tareaId) {
           await actualizarEntregable(tareaId, actividad);
@@ -365,7 +397,10 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
         }
       }
 
-      showMessage(isEditMode ? "Contenido actualizado" : "Contenido asignado", `"${cleanTitle}" ya aparece en ${sectionLabel}.`);
+      showMessage(
+        isEditMode ? "Contenido actualizado" : "Contenido asignado",
+        `"${cleanTitle}" ya aparece en ${sectionLabel}.`
+      );
       navigation.navigate("ClassroomGroup", { grupoId });
     } finally {
       setIsSaving(false);
@@ -406,19 +441,38 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
         showsVerticalScrollIndicator={Platform.OS === "web"}
       >
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Pressable
+            style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
+            onPress={() => navigation.goBack()}
+          >
             <MaterialIcons name="arrow-back" size={22} color="#0F172A" />
-          </TouchableOpacity>
+          </Pressable>
           <View style={styles.headerCopy}>
-            <Text style={styles.eyebrow}>{isEditMode ? "Editar en Classroom" : "Asignar a Classroom"}</Text>
+            <Text style={styles.eyebrow}>
+              {isEditMode ? "Editar en Classroom" : "Asignar a Classroom"}
+            </Text>
             <Text style={styles.title}>{sectionLabel}</Text>
-            <Text style={styles.subtitle}>Sube un archivo o comparte un enlace. Canva/Genially se conectara despues.</Text>
+            <Text style={styles.subtitle}>
+              Sube un archivo o comparte un enlace. Canva/Genially se conectara despues.
+            </Text>
           </View>
         </View>
 
         <View style={styles.kindTabs}>
-          <KindButton active={kind === "material"} disabled={isEditMode} icon="menu-book" label="Material" onPress={() => setKind("material")} />
-          <KindButton active={kind === "actividad"} disabled={isEditMode} icon="assignment" label="Actividad evaluable" onPress={() => setKind("actividad")} />
+          <KindButton
+            active={kind === "material"}
+            disabled={isEditMode}
+            icon="menu-book"
+            label="Material"
+            onPress={() => setKind("material")}
+          />
+          <KindButton
+            active={kind === "actividad"}
+            disabled={isEditMode}
+            icon="assignment"
+            label="Actividad evaluable"
+            onPress={() => setKind("actividad")}
+          />
         </View>
 
         <View style={styles.formCard}>
@@ -478,7 +532,9 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
               <View style={styles.toggleRow}>
                 <View style={styles.toggleCopy}>
                   <Text style={styles.toggleTitle}>Permitir entrega tardia</Text>
-                  <Text style={styles.toggleText}>Si se activa, los envios posteriores quedan marcados para revision.</Text>
+                  <Text style={styles.toggleText}>
+                    Si se activa, los envios posteriores quedan marcados para revision.
+                  </Text>
                 </View>
                 <Switch value={permitirEntregaTardia} onValueChange={setPermitirEntregaTardia} />
               </View>
@@ -507,20 +563,27 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
         </View>
 
         <View style={styles.actionGrid}>
-          <TouchableOpacity style={styles.actionCard} onPress={() => void handleSelectFile()}>
+          <Pressable
+            style={({ pressed }) => [styles.actionCard, pressed && { opacity: 0.6 }]}
+            onPress={() => void handleSelectFile()}
+          >
             <View style={styles.actionIcon}>
               <MaterialIcons name="upload-file" size={26} color="#FFFFFF" />
             </View>
             <Text style={styles.actionTitle}>Importar desde dispositivo</Text>
-            <Text style={styles.actionDescription}>PDF, imagen, audio, video, documento o presentacion.</Text>
-          </TouchableOpacity>
+            <Text style={styles.actionDescription}>
+              PDF, imagen, audio, video, documento o presentacion.
+            </Text>
+          </Pressable>
 
           <View style={[styles.actionCard, styles.disabledCard]}>
             <View style={[styles.actionIcon, styles.disabledIcon]}>
               <MaterialIcons name="palette" size={26} color="#64748B" />
             </View>
             <Text style={styles.actionTitle}>Importar desde Canva/Genially</Text>
-            <Text style={styles.actionDescription}>Proximamente: asignar varios recursos creados en el modulo visual.</Text>
+            <Text style={styles.actionDescription}>
+              Proximamente: asignar varios recursos creados en el modulo visual.
+            </Text>
           </View>
         </View>
 
@@ -533,9 +596,14 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
                   <Text style={styles.attachmentTitle}>{file.name}</Text>
                   <Text style={styles.attachmentMeta}>{formatFileSize(file.size)}</Text>
                 </View>
-                <TouchableOpacity onPress={() => setUploadedFiles((prev) => prev.filter((_, itemIndex) => itemIndex !== index))}>
+                <Pressable
+                  style={({ pressed }) => pressed && { opacity: 0.6 }}
+                  onPress={() =>
+                    setUploadedFiles((prev) => prev.filter((_, itemIndex) => itemIndex !== index))
+                  }
+                >
                   <MaterialIcons name="close" size={20} color="#64748B" />
-                </TouchableOpacity>
+                </Pressable>
               </View>
             ))}
           </View>
@@ -553,30 +621,56 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
               value={linkDraft}
               onChangeText={setLinkDraft}
             />
-            <TouchableOpacity style={styles.addLinkButton} onPress={handleAddLink}>
+            <Pressable
+              style={({ pressed }) => [styles.addLinkButton, pressed && { opacity: 0.6 }]}
+              onPress={handleAddLink}
+            >
               <MaterialIcons name="add-link" size={20} color="#FFFFFF" />
-            </TouchableOpacity>
+            </Pressable>
           </View>
           {links.length ? (
             <View style={styles.linkList}>
               {links.map((item, index) => (
                 <View key={item} style={styles.linkPill}>
                   <MaterialIcons name="link" size={16} color={COLORS.primary} />
-                  <Text style={styles.linkText} numberOfLines={1}>{item}</Text>
-                  <TouchableOpacity onPress={() => setLinks((prev) => prev.filter((_, itemIndex) => itemIndex !== index))}>
+                  <Text style={styles.linkText} numberOfLines={1}>
+                    {item}
+                  </Text>
+                  <Pressable
+                    style={({ pressed }) => pressed && { opacity: 0.6 }}
+                    onPress={() =>
+                      setLinks((prev) => prev.filter((_, itemIndex) => itemIndex !== index))
+                    }
+                  >
                     <MaterialIcons name="close" size={16} color="#64748B" />
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               ))}
             </View>
           ) : null}
-          <Text style={styles.helperText}>Puedes agregar varios enlaces y combinarlos con archivos.</Text>
+          <Text style={styles.helperText}>
+            Puedes agregar varios enlaces y combinarlos con archivos.
+          </Text>
         </View>
 
-        <TouchableOpacity style={[styles.saveButton, isSaving ? styles.buttonDisabled : null]} onPress={() => void handleSave()} disabled={isSaving}>
-          {isSaving ? <ActivityIndicator color="#FFFFFF" /> : <MaterialIcons name="check" size={20} color="#FFFFFF" />}
-          <Text style={styles.saveButtonText}>{isSaving ? "Guardando..." : isEditMode ? "Guardar cambios" : "Asignar a la seccion"}</Text>
-        </TouchableOpacity>
+        <Pressable
+          style={({ pressed }) => [
+            styles.saveButton,
+            isSaving ? styles.buttonDisabled : null,
+            pressed && { opacity: 0.6 },
+          ]}
+          onPress={() => void handleSave()}
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <MaterialIcons name="check" size={20} color="#FFFFFF" />
+          )}
+          <Text style={styles.saveButtonText}>
+            {isSaving ? "Guardando..." : isEditMode ? "Guardar cambios" : "Asignar a la seccion"}
+          </Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -589,10 +683,21 @@ const KindButton: React.FC<{
   label: string;
   onPress: () => void;
 }> = ({ active, disabled = false, icon, label, onPress }) => (
-  <TouchableOpacity style={[styles.kindButton, active ? styles.kindButtonActive : null, disabled ? styles.kindButtonDisabled : null]} onPress={onPress} disabled={disabled}>
+  <Pressable
+    style={({ pressed }) => [
+      styles.kindButton,
+      active ? styles.kindButtonActive : null,
+      disabled ? styles.kindButtonDisabled : null,
+      pressed && { opacity: 0.6 },
+    ]}
+    onPress={onPress}
+    disabled={disabled}
+  >
     <MaterialIcons name={icon} size={18} color={active ? COLORS.primary : "#64748B"} />
-    <Text style={[styles.kindButtonText, active ? styles.kindButtonTextActive : null]}>{label}</Text>
-  </TouchableOpacity>
+    <Text style={[styles.kindButtonText, active ? styles.kindButtonTextActive : null]}>
+      {label}
+    </Text>
+  </Pressable>
 );
 
 const webScrollStyle =

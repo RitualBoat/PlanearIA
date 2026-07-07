@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -22,31 +22,42 @@ const TerminosScreen: React.FC = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <Pressable
+          onPress={() => navigation.goBack()}
+          style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.6 }]}
+        >
           <MaterialIcons name="arrow-back" size={24} color={COLORS.text} />
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.headerTitle}>Documentos Legales</Text>
         <View style={styles.backBtn} />
       </View>
 
       {/* Tabs */}
       <View style={styles.tabBar}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === "terminos" && styles.tabActive]}
+        <Pressable
+          style={({ pressed }) => [
+            styles.tab,
+            activeTab === "terminos" && styles.tabActive,
+            pressed && { opacity: 0.6 },
+          ]}
           onPress={() => setActiveTab("terminos")}
         >
           <Text style={[styles.tabText, activeTab === "terminos" && styles.tabTextActive]}>
             Términos y Condiciones
           </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === "privacidad" && styles.tabActive]}
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [
+            styles.tab,
+            activeTab === "privacidad" && styles.tabActive,
+            pressed && { opacity: 0.6 },
+          ]}
           onPress={() => setActiveTab("privacidad")}
         >
           <Text style={[styles.tabText, activeTab === "privacidad" && styles.tabTextActive]}>
             Aviso de Privacidad
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Content */}

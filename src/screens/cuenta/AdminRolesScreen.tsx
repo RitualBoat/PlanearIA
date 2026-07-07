@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Pressable,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
   Modal,
   StatusBar,
@@ -54,9 +54,12 @@ const AdminRolesScreen: React.FC = () => {
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
         <View style={styles.header}>
-          <TouchableOpacity onPress={goBack} style={styles.backBtn}>
+          <Pressable
+            onPress={goBack}
+            style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.6 }]}
+          >
             <MaterialIcons name="arrow-back" size={24} color={COLORS.text} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerTitle}>Administrar Roles</Text>
           <View style={styles.backBtn} />
         </View>
@@ -84,8 +87,12 @@ const AdminRolesScreen: React.FC = () => {
             </Text>
             <Text style={styles.userEmail}>{item.email}</Text>
           </View>
-          <TouchableOpacity
-            style={[styles.rolBadge, { backgroundColor: rolColor(item.rol) + "18" }]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.rolBadge,
+              { backgroundColor: rolColor(item.rol) + "18" },
+              pressed && { opacity: 0.6 },
+            ]}
             onPress={() => setSelectedUser({ id: item.id, nombre: item.nombre })}
             disabled={isUpdating}
           >
@@ -99,7 +106,7 @@ const AdminRolesScreen: React.FC = () => {
                 <MaterialIcons name="arrow-drop-down" size={18} color={rolColor(item.rol)} />
               </>
             )}
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     );
@@ -111,13 +118,19 @@ const AdminRolesScreen: React.FC = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={goBack} style={styles.backBtn}>
+        <Pressable
+          onPress={goBack}
+          style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.6 }]}
+        >
           <MaterialIcons name="arrow-back" size={24} color={COLORS.text} />
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.headerTitle}>Administrar Roles</Text>
-        <TouchableOpacity onPress={refetch} style={styles.backBtn}>
+        <Pressable
+          onPress={refetch}
+          style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.6 }]}
+        >
           <MaterialIcons name="refresh" size={24} color={COLORS.primary} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {isLoading ? (
@@ -141,17 +154,13 @@ const AdminRolesScreen: React.FC = () => {
 
       {/* Role selector modal */}
       <Modal visible={!!selectedUser} transparent animationType="fade">
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setSelectedUser(null)}
-        >
+        <Pressable style={styles.modalOverlay} onPress={() => setSelectedUser(null)}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Cambiar rol de {selectedUser?.nombre}</Text>
             {ROLES.map((r) => (
-              <TouchableOpacity
+              <Pressable
                 key={r.value}
-                style={styles.modalOption}
+                style={({ pressed }) => [styles.modalOption, pressed && { opacity: 0.6 }]}
                 onPress={() => {
                   if (selectedUser) {
                     cambiarRol(selectedUser.id, r.value);
@@ -161,13 +170,16 @@ const AdminRolesScreen: React.FC = () => {
               >
                 <View style={[styles.rolDot, { backgroundColor: rolColor(r.value) }]} />
                 <Text style={styles.modalOptionText}>{r.label}</Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
-            <TouchableOpacity style={styles.modalCancel} onPress={() => setSelectedUser(null)}>
+            <Pressable
+              style={({ pressed }) => [styles.modalCancel, pressed && { opacity: 0.6 }]}
+              onPress={() => setSelectedUser(null)}
+            >
               <Text style={styles.modalCancelText}>Cancelar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
-        </TouchableOpacity>
+        </Pressable>
       </Modal>
     </SafeAreaView>
   );

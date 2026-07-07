@@ -415,21 +415,31 @@ function normalizeEvaluacionV2(value) {
   const tipo = tipos.has(value?.tipo) ? value.tipo : "rubrica";
   const escala = Array.isArray(value?.escala)
     ? value.escala
-        .map((item) => ({
-          etiqueta: fallback(item?.etiqueta, ""),
-          valor: Number.isFinite(Number(item?.valor)) ? Number(item.valor) : undefined,
-        }))
-        .filter((item) => item.etiqueta)
+        .flatMap((item) => {
+          const etiqueta = fallback(item?.etiqueta, "");
+          if (!etiqueta) return [];
+          return [
+            {
+              etiqueta,
+              valor: Number.isFinite(Number(item?.valor)) ? Number(item.valor) : undefined,
+            },
+          ];
+        })
         .slice(0, 6)
     : [];
   const criterios = Array.isArray(value?.criterios)
     ? value.criterios
-        .map((item, index) => ({
-          id: `crit_${Date.now()}_${index}`,
-          descripcion: fallback(item?.descripcion, ""),
-          mejora: fallback(item?.mejora, ""),
-        }))
-        .filter((item) => item.descripcion)
+        .flatMap((item, index) => {
+          const descripcion = fallback(item?.descripcion, "");
+          if (!descripcion) return [];
+          return [
+            {
+              id: `crit_${Date.now()}_${index}`,
+              descripcion,
+              mejora: fallback(item?.mejora, ""),
+            },
+          ];
+        })
         .slice(0, 10)
     : [];
 
@@ -446,11 +456,16 @@ function normalizeObservacionesV2(value) {
   const input = Array.isArray(value) ? value : [];
   const categorias = new Set(["flexibilidad", "usaer", "proyecto", "general"]);
   const normalized = input
-    .map((item) => ({
-      texto: fallback(item?.texto, typeof item === "string" ? item : ""),
-      categoria: categorias.has(item?.categoria) ? item.categoria : "general",
-    }))
-    .filter((item) => item.texto)
+    .flatMap((item) => {
+      const texto = fallback(item?.texto, typeof item === "string" ? item : "");
+      if (!texto) return [];
+      return [
+        {
+          texto,
+          categoria: categorias.has(item?.categoria) ? item.categoria : "general",
+        },
+      ];
+    })
     .slice(0, 12);
   return normalized.length ? normalized : [{ texto: "", categoria: "general" }];
 }
@@ -504,7 +519,10 @@ function toArray(value) {
 
 function toNumberArray(value) {
   if (!Array.isArray(value)) return [];
-  return value.map((item) => Number(item)).filter((item) => Number.isFinite(item));
+  return value.flatMap((item) => {
+    const numero = Number(item);
+    return Number.isFinite(numero) ? [numero] : [];
+  });
 }
 
 function normalizeActividades(value) {

@@ -64,9 +64,11 @@ module.exports = async function handler(req, res) {
     const sessions = db.collection("auth_sessions");
 
     // Crear índices (idempotente)
-    await usuarios.createIndex({ id: 1 }, { unique: true });
-    await usuarios.createIndex({ email: 1 }, { unique: true });
-    await ensureAuthSessionIndexes(sessions);
+    await Promise.all([
+      usuarios.createIndex({ id: 1 }, { unique: true }),
+      usuarios.createIndex({ email: 1 }, { unique: true }),
+      ensureAuthSessionIndexes(sessions),
+    ]);
 
     switch (action) {
       case "registro":

@@ -36,15 +36,16 @@ module.exports = async (req, res) => {
 
     // Crear índices (idempotente)
     const contactosCol = db.collection(CONTACTOS_COLLECTION);
-    await contactosCol.createIndex({ id: 1 }, { unique: true });
-    await contactosCol.createIndex({ usuarioId: 1 });
-    await contactosCol.createIndex({ fechaModificacion: -1 });
-
     const solicitudesCol = db.collection(SOLICITUDES_COLLECTION);
-    await solicitudesCol.createIndex({ id: 1 }, { unique: true });
-    await solicitudesCol.createIndex({ deUsuarioId: 1 });
-    await solicitudesCol.createIndex({ paraUsuarioId: 1 });
-    await solicitudesCol.createIndex({ fechaModificacion: -1 });
+    await Promise.all([
+      contactosCol.createIndex({ id: 1 }, { unique: true }),
+      contactosCol.createIndex({ usuarioId: 1 }),
+      contactosCol.createIndex({ fechaModificacion: -1 }),
+      solicitudesCol.createIndex({ id: 1 }, { unique: true }),
+      solicitudesCol.createIndex({ deUsuarioId: 1 }),
+      solicitudesCol.createIndex({ paraUsuarioId: 1 }),
+      solicitudesCol.createIndex({ fechaModificacion: -1 }),
+    ]);
 
     const tipo = req.query?.tipo;
 

@@ -25,9 +25,13 @@ context: |
   - .claude/rules/backend.md, frontend.md, testing.md — reglas por capa.
 
   Contexto eficiente: para investigar codigo existente durante explore/propose/apply, usar primero
-  CodeGraph MCP o `npm run codegraph:explore -- "<pregunta>"` en preguntas estructurales, flujos,
-  dependencias e impacto. Usar `rg`/lecturas directas cuando el indice no aplique o se necesite contexto
-  exacto no indexado.
+  GitNexus en preguntas estructurales, flujos MVVM, call chains, dependencias, backend/IA, sync/offline
+  e impacto (`npx -y gitnexus@latest query -r PlanearIA "<pregunta>"`, `impact`, `context`, `status`).
+  Usar CodeGraph como secundario/fallback para fuente lineada estilo Read, simbolos puntuales y comprobacion
+  cuando GitNexus sea ambiguo, este stale o no devuelva suficiente contexto editable (`codegraph_explore` o
+  `npm run codegraph:explore -- "<pregunta>"`). No usar ambos por reflejo en la misma pregunta.
+  Usar `rg`/lecturas directas cuando el indice no aplique, para Markdown/docs/assets/generated files, o se
+  necesite contexto exacto no indexado.
 
   Flujo MCP: usar GitHub MCP para issues/Project, Context7 para APIs recientes, Figma como ground truth
   visual, Playwright MCP para validacion visual web y `planearia-sqlite` solo para diagnostico read-only de
@@ -65,7 +69,7 @@ rules:
     - Archivos .web.tsx/.native.tsx solo si la interaccion (no el tamano) lo exige, con justificacion escrita.
     - Cumplir el Estandar de Excelencia Visual (PLAN_UXUI_NAVEGACION_GLOBAL.md seccion 1.9) - checklist anti-slop, micro-interacciones con reanimated, presupuesto de motion/performance para Android gama media, reducir-movimiento respetado.
     - Animacion/motion solo con react-native-reanimated y gesture-handler; Tailwind, GSAP y Framer Motion estan prohibidos en la app RN (solo se permiten en la landing web, artefacto separado).
-    - Verificar APIs de librerias (reanimated, gesture-handler, tentap, expo-*) en Context7 antes de escribir design/codigo; partir de CodeGraph para inventario y blast radius.
+    - Verificar APIs de librerias (reanimated, gesture-handler, tentap, expo-*) en Context7 antes de escribir design/codigo; partir de GitNexus para inventario y blast radius estructural, usando CodeGraph despues solo si hace falta fuente lineada o fallback.
   tasks:
     - Tareas pequenas y revisables, una a la vez.
     - Ninguna tarea se marca completada sin evidencia (salida de typecheck, lint y tests afectados).

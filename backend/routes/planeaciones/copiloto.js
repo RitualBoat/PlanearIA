@@ -311,25 +311,31 @@ function buildFallbackResult(accion, contexto, seleccion, doc) {
 function normalizeEvaluacion(value) {
   const tipos = new Set(["escala_valoracion", "escala_estimativa", "rubrica", "lista_cotejo", "otro"]);
   const tipo = tipos.has(value?.tipo) ? value.tipo : "rubrica";
-  const escala = Array.isArray(value?.escala)
-    ? value.escala
-        .map((item) => ({
-          etiqueta: text(item?.etiqueta, ""),
-          valor: Number.isFinite(Number(item?.valor)) ? Number(item.valor) : undefined,
-        }))
-        .filter((item) => item.etiqueta)
-        .slice(0, 6)
-    : [];
-  const criterios = Array.isArray(value?.criterios)
-    ? value.criterios
-        .map((item, index) => ({
-          id: text(item?.id, `crit_${Date.now()}_${index}`),
-          descripcion: text(item?.descripcion, ""),
-          mejora: text(item?.mejora, ""),
-        }))
-        .filter((item) => item.descripcion)
-        .slice(0, 10)
-    : [];
+  const escala = [];
+  if (Array.isArray(value?.escala)) {
+    for (const item of value.escala) {
+      if (escala.length >= 6) break;
+      const etiqueta = text(item?.etiqueta, "");
+      if (!etiqueta) continue;
+      escala.push({
+        etiqueta,
+        valor: Number.isFinite(Number(item?.valor)) ? Number(item.valor) : undefined,
+      });
+    }
+  }
+  const criterios = [];
+  if (Array.isArray(value?.criterios)) {
+    for (const [index, item] of value.criterios.entries()) {
+      if (criterios.length >= 10) break;
+      const descripcion = text(item?.descripcion, "");
+      if (!descripcion) continue;
+      criterios.push({
+        id: text(item?.id, `crit_${Date.now()}_${index}`),
+        descripcion,
+        mejora: text(item?.mejora, ""),
+      });
+    }
+  }
 
   return {
     tipo,
@@ -342,15 +348,20 @@ function normalizeHallazgos(value) {
   const validTypes = new Set(["fortaleza", "riesgo", "sugerencia"]);
   const validPriority = new Set(["alta", "media", "baja"]);
   const items = Array.isArray(value) ? value : [];
+  const hallazgos = [];
 
-  return items
-    .map((item) => ({
+  for (const item of items) {
+    if (hallazgos.length >= 8) break;
+    const descripcion = text(item?.descripcion, "");
+    if (!descripcion) continue;
+    hallazgos.push({
       tipo: validTypes.has(item?.tipo) ? item.tipo : "sugerencia",
       prioridad: validPriority.has(item?.prioridad) ? item.prioridad : "media",
-      descripcion: text(item?.descripcion, ""),
-    }))
-    .filter((item) => item.descripcion)
-    .slice(0, 8);
+      descripcion,
+    });
+  }
+
+  return hallazgos;
 }
 
 function text(value, fallback) {

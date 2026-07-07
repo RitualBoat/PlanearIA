@@ -49,7 +49,7 @@ herramientas familiares, no en controles nuevos.
 | D12 | IHC | Proto-personas ya definidas; 3-5 entrevistas con prototipo antes de cerrar Ola 2. Checklist Nielsen + severidad 0-4 como gate en adversarial-review. |
 | D13 | Estandar de Excelencia Visual | Toda UI nueva cumple la seccion 1.9: cero diseno generico ("AI slop"), micro-interacciones con fisica spring (reanimated), presupuesto de performance para Android gama media, y vocabulario premium TRADUCIDO al stack RN (no Tailwind/GSAP/Framer en la app). |
 | D14 | Landing web con tratamiento showcase completo | La landing/marketing web es un artefacto separado de la app RN; ahi SI aplican verbatim los patrones Awwwards-tier (hero glassmorphism, parallax, scroll-triggered, magnetic buttons, GSAP/Framer permitidos). Change `landing-web` en Ola 4+. |
-| D15 | Anti-alucinacion de tooling | Toda fase de design/apply que use APIs de librerias (reanimated, gesture-handler, tentap, expo-*) consulta Context7 antes de escribir codigo; toda edicion parte de CodeGraph (`codegraph_explore`) para inventario y blast radius. |
+| D15 | Anti-alucinacion de tooling | Toda fase de design/apply que use APIs de librerias (reanimated, gesture-handler, tentap, expo-*) consulta Context7 antes de escribir codigo; toda edicion parte de GitNexus para inventario/blast radius estructural y usa CodeGraph (`codegraph_explore`) solo si hace falta fuente lineada, simbolos puntuales o fallback. |
 
 ### 1.3 Arquitectura de experiencias (resumen)
 
@@ -181,7 +181,12 @@ Antes de aprobar un frame de Figma o cerrar la validacion visual de un change, l
 #### 1.10.5 Herramientas del estandar (verificadas en este entorno)
 
 - **Figma MCP** (`get_design_context`, `get_screenshot`): traduccion pixel-perfect frame -> tokens/layout. Requiere autenticacion previa.
-- **CodeGraph** (indexado en `.codegraph/`): inventario de simbolos y blast radius ANTES de editar; el indice se refresca solo (~1s), verificar tras renombres masivos.
+- **GitNexus** (indexado en `.gitnexus/`): herramienta primaria para inventario estructural, flujos MVVM,
+  call chains, dependencias, procesos e impacto ANTES de editar. Verificar frescura con
+  `npx -y gitnexus@latest status`; reindexar con
+  `npx -y gitnexus@latest analyze --index-only --name PlanearIA .`.
+- **CodeGraph** (indexado en `.codegraph/`): herramienta secundaria/fallback para fuente lineada estilo Read,
+  simbolos puntuales y comprobacion cuando GitNexus sea ambiguo, stale o no devuelva contexto editable suficiente.
 - **Context7**: docs vigentes de reanimated/gesture-handler/tentap/expo antes de usar sus APIs; cero APIs alucinadas.
 - **Playwright MCP**: bucle de QA visual (seccion 5 de la meta guia v3).
 - **impeccable** (skill instalada, capa de vocabulario/craft por elemento). Herramienta local NO versionada

@@ -42,12 +42,14 @@ module.exports = async (req, res) => {
     const collection = db.collection(COLLECTION);
 
     // Crear índices (idempotente)
-    await collection.createIndex({ id: 1 }, { unique: true });
-    await collection.createIndex({ categoria: 1 });
-    await collection.createIndex({ tipo: 1 });
-    await collection.createIndex({ fechaModificacion: -1 });
-    await collection.createIndex({ esDelSistema: 1 });
-    await collection.createIndex({ userId: 1, fechaModificacion: -1 });
+    await Promise.all([
+      collection.createIndex({ id: 1 }, { unique: true }),
+      collection.createIndex({ categoria: 1 }),
+      collection.createIndex({ tipo: 1 }),
+      collection.createIndex({ fechaModificacion: -1 }),
+      collection.createIndex({ esDelSistema: 1 }),
+      collection.createIndex({ userId: 1, fechaModificacion: -1 }),
+    ]);
 
     switch (req.method) {
       case "GET":

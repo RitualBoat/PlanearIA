@@ -7,7 +7,7 @@
 
 ## Regla Principal
 
-PlanearIA trabaja con contexto dirigido. Una IA no lee todo el repo: identifica el tipo de tarea, lee las fuentes vigentes, verifica codigo real con CodeGraph cuando toca implementacion y ejecuta el cambio con GitHub issue + OpenSpec.
+PlanearIA trabaja con contexto dirigido. Una IA no lee todo el repo: identifica el tipo de tarea, lee las fuentes vigentes, verifica codigo real con GitNexus como herramienta estructural primaria cuando toca implementacion y usa CodeGraph como fallback/fuente lineada cuando hace falta, antes de ejecutar el cambio con GitHub issue + OpenSpec.
 
 ## Ruta Cero Para Cualquier Agente
 
@@ -24,7 +24,7 @@ PlanearIA trabaja con contexto dirigido. Una IA no lee todo el repo: identifica 
 | Ejecutar una User Story | `01-planes-maestros/meta_guia_planes.md`, `02-operacion/MCP_FLUJOS_PLANEARIA.md`, issue GitHub | Issue enriquecido, change OpenSpec, tasks con evidencia |
 | UX/UI visible | `01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md`, `00-fundamentos/IHC_DISCOVERY_DOCENTE.md`, `context/README.md` | Capturas Playwright por breakpoint, checklist Nielsen |
 | Theming/accesibilidad | `openspec/specs/settings-accessibility-preferences/spec.md`, `src/themes/`, contexts de tema/fuente/daltonismo | Tests afectados + QA visual |
-| Sync/offline | `00-fundamentos/FLUJO_SINCRONIZACION.md`, `src/sync/README.md`, CodeGraph | Tests sync/backend, no perdida local |
+| Sync/offline | `00-fundamentos/FLUJO_SINCRONIZACION.md`, `src/sync/README.md`, GitNexus (+ CodeGraph si hace falta fuente lineada) | Tests sync/backend, no perdida local |
 | Backend/auth/datos | `00-fundamentos/ARQUITECTURA.md`, `01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md`, `backend/README.md` | `backend:check`, aislamiento `userId` |
 | IA/LLM | `00-fundamentos/IA_CHATBOT_LLM.md`, `backend/lib/aiGateway.js`, reglas backend | Fallback proveedor, limites, confirmacion docente |
 | Plan Maestro nuevo | `01-planes-maestros/meta_guia_planes.md`, `00-fundamentos/ROADMAP_PLANES_MAESTROS.md` | Blueprint + backlog de changes, no fases tecnicas largas |

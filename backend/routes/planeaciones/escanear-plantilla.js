@@ -216,20 +216,23 @@ function normalizeSecciones(value) {
   if (!Array.isArray(value)) return [];
 
   return value
-    .map((section, index) => {
+    .flatMap((section, index) => {
       const tipo = SECCIONES_VALIDAS.has(section?.tipo) ? section.tipo : "custom";
       const titulo = toShortText(section?.titulo, humanize(tipo));
       const campos = normalizeCampos(section?.campos);
 
-      return {
-        id: slug(section?.id || titulo || `seccion_${index + 1}`),
-        tipo,
-        titulo,
-        visible: section?.visible !== false,
-        campos,
-      };
+      if (!titulo || campos.length === 0) return [];
+
+      return [
+        {
+          id: slug(section?.id || titulo || `seccion_${index + 1}`),
+          tipo,
+          titulo,
+          visible: section?.visible !== false,
+          campos,
+        },
+      ];
     })
-    .filter((section) => section.titulo && section.campos.length > 0)
     .slice(0, 12);
 }
 
@@ -237,28 +240,31 @@ function normalizeCampos(value) {
   if (!Array.isArray(value)) return [];
 
   return value
-    .map((field, index) => {
+    .flatMap((field, index) => {
       const tipo = CAMPOS_VALIDOS.has(field?.tipo) ? field.tipo : "text";
       const etiqueta = toShortText(field?.etiqueta, `Campo ${index + 1}`);
 
-      return {
-        id: slug(field?.id || etiqueta || `campo_${index + 1}`),
-        etiqueta,
-        tipo,
-        requerido: Boolean(field?.requerido),
-        opciones: Array.isArray(field?.opciones)
-          ? field.opciones
-              .flatMap((item) => {
-                const option = String(item).trim();
-                return option ? [option] : [];
-              })
-              .slice(0, 20)
-          : undefined,
-        valorDefecto:
-          typeof field?.valorDefecto === "string" ? field.valorDefecto.trim().slice(0, 600) : undefined,
-      };
+      if (!etiqueta) return [];
+
+      return [
+        {
+          id: slug(field?.id || etiqueta || `campo_${index + 1}`),
+          etiqueta,
+          tipo,
+          requerido: Boolean(field?.requerido),
+          opciones: Array.isArray(field?.opciones)
+            ? field.opciones
+                .flatMap((item) => {
+                  const option = String(item).trim();
+                  return option ? [option] : [];
+                })
+                .slice(0, 20)
+            : undefined,
+          valorDefecto:
+            typeof field?.valorDefecto === "string" ? field.valorDefecto.trim().slice(0, 600) : undefined,
+        },
+      ];
     })
-    .filter((field) => field.etiqueta)
     .slice(0, 30);
 }
 

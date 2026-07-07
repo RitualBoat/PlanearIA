@@ -5,11 +5,11 @@ Define the repository, documentation, context, and validation contract that lets
 
 ## Requirements
 ### Requirement: Agent entrypoints route to the current SDD workflow
-The repository SHALL provide concise entrypoints that route AI agents and human collaborators to the current PlanearIA source of truth hierarchy and OpenSpec SDD workflow.
+The repository SHALL provide concise entrypoints that route AI agents and human collaborators to the current PlanearIA source of truth hierarchy, OpenSpec SDD workflow, and approved code-intelligence policy.
 
 #### Scenario: Codex starts from AGENTS
   **WHEN** Codex starts by reading `AGENTS.md`
-  **THEN** it can identify `CLAUDE.md`, `Documentacion/README.md`, `openspec/config.yaml`, CodeGraph first exploration, GitHub issue tracking, OpenSpec changes, and mandatory evidence gates
+  **THEN** it can identify `CLAUDE.md`, `Documentacion/README.md`, `openspec/config.yaml`, the approved knowledge-graph/tooling policy for structural exploration, GitHub issue tracking, OpenSpec changes, and mandatory evidence gates
 
 #### Scenario: Collaborator starts from README
   **WHEN** a collaborator opens `README.md`
@@ -17,7 +17,7 @@ The repository SHALL provide concise entrypoints that route AI agents and human 
 
 #### Scenario: Lightweight assistant reads Copilot instructions
   **WHEN** GitHub Copilot or a similar assistant reads `.github/copilot-instructions.md`
-  **THEN** it receives the same critical SDD, architecture, validation, no secrets, `src/sync`, `userId`, and `aiGateway` rules as the other front doors
+  **THEN** it receives the same critical SDD, architecture, validation, no secrets, `src/sync`, `userId`, `aiGateway`, and approved code-intelligence policy rules as the other front doors
 
 ### Requirement: Active documentation is current, affirmative, and rule preserving
 Active documentation SHALL describe PlanearIA's current product and architecture in present affirmative language while preserving critical business, security, offline first, and AI rules.
@@ -89,6 +89,11 @@ The repository SHALL prevent structural code exploration from prioritizing exter
 #### Scenario: Agent asks architecture question
   **WHEN** an agent uses CodeGraph for PlanearIA architecture or blast radius
   **THEN** results prioritize `src/`, `backend/`, `types/`, `shared/`, and project config rather than external reference repos
+
+#### Scenario: Approved tool policy changes
+  **WHEN** the project adopts GitNexus, keeps CodeGraph, or defines a dual-tool routing policy
+  **THEN** active entrypoints and SDD docs describe that policy consistently
+  **AND** agents do not rely on stale CodeGraph-only instructions when the approved policy says otherwise
 
 ### Requirement: Documentation validation leaves auditable evidence
 The overhaul SHALL leave a validation report with commands, findings, limitations, and final results for the repo's AI friendly state.

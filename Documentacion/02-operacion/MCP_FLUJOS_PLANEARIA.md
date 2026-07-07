@@ -9,7 +9,8 @@
 
 | MCP | Uso principal | Regla |
 | --- | --- | --- |
-| `codegraph` | Rayos X del codigo: flujos, simbolos, impacto y tests relacionados. | Primero para preguntas estructurales. |
+| `gitnexus` | Mapa estructural del codigo: flujos MVVM, call chains, dependencias, procesos e impacto. | Primario para preguntas estructurales y decisiones SDD de blast radius. |
+| `codegraph` | Fuente lineada estilo Read, simbolos puntuales, impacto y tests relacionados. | Secundario/fallback cuando GitNexus sea ambiguo, stale, no este disponible o haga falta contexto editable lineado. |
 | `context7` | Docs actuales de librerias. | Usar antes de tocar APIs nuevas o dudosas. |
 | `github` | Issues, PRs, Project y `enrich-us`. | Usar para leer/actualizar trabajo, no para reemplazar OpenSpec. |
 | `figma` | Ground truth visual. | Obligatorio cuando la UI tenga diseno de referencia. |
@@ -40,7 +41,8 @@ remotos con OAuth, valida que la configuracion este presente y deja el login al 
 ```text
 Idea / issue
   -> GitHub MCP si viene de issue o Project
-  -> CodeGraph para impacto real
+  -> GitNexus para impacto real y mapa estructural
+  -> CodeGraph si hace falta fuente lineada o fallback
   -> Context7 si toca librerias o APIs recientes
   -> Figma si toca UI con ground truth
   -> OpenSpec propose/design/tasks
@@ -53,7 +55,9 @@ Idea / issue
 Reglas:
 
 - OpenSpec sigue siendo la fuente de decision; los MCPs solo traen evidencia.
-- CodeGraph se usa antes de escribir specs cuando la pregunta sea "donde vive", "que llama a" o "que se rompe".
+- GitNexus se usa antes de escribir specs cuando la pregunta sea "donde vive", "que llama a", "que proceso conecta esto" o "que se rompe".
+- CodeGraph se usa despues cuando se necesita fuente lineada estilo Read, simbolos puntuales, tests relacionados o fallback por ambiguedad/staleness de GitNexus.
+- No usar GitNexus y CodeGraph por reflejo para la misma pregunta; usar el segundo solo si el primero falla, omite un archivo clave o el change pide comparacion de evidencia.
 - Context7 se usa cuando una API pueda haber cambiado.
 - Playwright debe dejar capturas o evidencia cuando hay UI.
 - `planearia-sqlite` y MongoDB MCP no sustituyen tests de sync ni `backend:check`.
@@ -67,11 +71,44 @@ paradas de aprobacion y el gate visual obligatorio) vive en
 | Paso | MCP | Regla |
 | --- | --- | --- |
 | 0 Creacion (US en GitHub Projects) | `github` | Crear issue + item del board; parar y esperar OK. |
-| 1 Enrich (criterios en el issue) | `github` + `codegraph` | Enriquecer; verificar el codigo real; parar y esperar OK. |
-| 2 Propose | `codegraph` + `context7` + `figma` | Impacto/flujos, APIs recientes, ground truth visual. |
-| 2 Apply | `codegraph` | Editar con blast radius; el codigo gana sobre el diagnostico previo. |
+| 1 Enrich (criterios en el issue) | `github` + `gitnexus` (+ `codegraph` fallback) | Enriquecer; verificar mapa estructural/codigo real; parar y esperar OK. |
+| 2 Propose | `gitnexus` + `context7` + `figma` (+ `codegraph` si falta fuente lineada) | Impacto/flujos, APIs recientes, ground truth visual. |
+| 2 Apply | `gitnexus` + `codegraph` focalizado | GitNexus para blast radius; CodeGraph o lectura directa para editar con fuente lineada. |
 | 3 QA UI | `playwright` (+ `expo`) | Levantar web, esperar bundler, navegar, capturar por breakpoint, adjuntar al issue. |
 | 3 QA datos | `planearia-sqlite` / MongoDB opt-in | Diagnostico read-only de cola offline / aislamiento por `userId`. |
+
+## Politica GitNexus + CodeGraph
+
+Decision vigente desde issue #40 / change `evaluate-gitnexus-codegraph-sdd`:
+
+- **GitNexus es primario** para preguntas estructurales: arquitectura, flujos MVVM, call chains,
+  dependencias, backend/IA, sync/offline, procesos e impacto.
+- **CodeGraph es secundario/fallback** para fuente lineada estilo Read, simbolos puntuales, tests relacionados
+  y edicion cuando GitNexus no devuelva suficiente contexto editable.
+- No se llaman ambos por costumbre. El segundo entra solo si el primero falla, omite un archivo clave,
+  queda ambiguo/stale o el change pide comparacion de evidencia.
+- Lecturas directas/`rg` siguen siendo correctas para Markdown, docs, assets, generated files y contexto exacto
+  no indexado.
+
+Comandos GitNexus validados:
+
+```bash
+npx -y gitnexus@latest status
+npx -y gitnexus@latest analyze --index-only --name PlanearIA .
+npx -y gitnexus@latest query -r PlanearIA "<pregunta>"
+npx -y gitnexus@latest impact -r PlanearIA <simbolo>
+npx -y gitnexus@latest context -r PlanearIA <simbolo>
+npx -y gitnexus@latest clean --force
+npx -y gitnexus@latest clean --all --force
+```
+
+Notas:
+
+- Usar `--index-only` para no inyectar secciones en `AGENTS.md`/`CLAUDE.md`, skills ni hooks.
+- `gitnexus setup` no queda habilitado por defecto en este repo; evaluarlo aparte si se quiere MCP persistente.
+- GitNexus genera `.gitnexus/` local y `~/.gitnexus/registry.json`. La carpeta local contiene su propio
+  `.gitignore` con `*`; no commitear indices.
+- Licencia npm verificada: `PolyForm-Noncommercial-1.0.0`. Revisar licenciamiento antes de uso comercial.
 
 ### Gate visual con Playwright (obligatorio si el change toca una pantalla)
 

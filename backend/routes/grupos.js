@@ -62,9 +62,11 @@ module.exports = async (req, res) => {
 };
 
 async function ensureIndexes(collection) {
-  await collection.createIndex({ id: 1 }, { unique: true });
-  await collection.createIndex({ userId: 1, fechaModificacion: -1 });
-  await collection.createIndex({ fechaModificacion: -1 });
+  await Promise.all([
+    collection.createIndex({ id: 1 }, { unique: true }),
+    collection.createIndex({ userId: 1, fechaModificacion: -1 }),
+    collection.createIndex({ fechaModificacion: -1 }),
+  ]);
 }
 
 // Query-string ids llegan como string; los grupos se guardan con id numerico

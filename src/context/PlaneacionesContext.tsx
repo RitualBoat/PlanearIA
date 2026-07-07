@@ -479,9 +479,10 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
         docs = legacyParsed.map((item) => toV2FromLegacy(item, userId));
       }
 
-      docs = docs
-        .map((doc) => ({ ...doc, userId: doc.userId || userId, version: 2 as const }))
-        .filter((doc) => doc.userId === userId);
+      docs = docs.flatMap((doc) => {
+        const normalized = { ...doc, userId: doc.userId || userId, version: 2 as const };
+        return normalized.userId === userId ? [normalized] : [];
+      });
 
       await saveLocal(docs);
       setDocumentos(docs);
@@ -581,9 +582,10 @@ export const PlaneacionesProvider: React.FC<{ children: ReactNode }> = ({ childr
         const remote = Array.isArray(data?.data?.planeaciones)
           ? (data.data.planeaciones as any[]).map(sanitizeServerDoc)
           : [];
-        const normalizedRemote = remote
-          .map((doc) => normalizeInputToV2(doc, userId))
-          .filter((doc) => doc.userId === userId);
+        const normalizedRemote = remote.flatMap((doc) => {
+          const normalized = normalizeInputToV2(doc, userId);
+          return normalized.userId === userId ? [normalized] : [];
+        });
         outcome.pulled = normalizedRemote.length;
         outcome.changed = await applyRemoteList(normalizedRemote);
 

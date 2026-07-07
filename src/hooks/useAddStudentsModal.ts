@@ -51,15 +51,14 @@ export const useAddStudentsModal = (
 
   const availableStudents = useMemo(() => {
     const query = studentSearchQuery.trim().toLowerCase();
-    return allAlumnos
-      .filter((alumno) => alumno.grupoId !== grupoId)
-      .filter((alumno) => {
-        if (!query) return true;
-        return (
-          `${alumno.nombre} ${alumno.apellidos}`.toLowerCase().includes(query) ||
-          alumno.numeroControl.toLowerCase().includes(query)
-        );
-      });
+    return allAlumnos.filter((alumno) => {
+      if (alumno.grupoId === grupoId) return false;
+      if (!query) return true;
+      return (
+        `${alumno.nombre} ${alumno.apellidos}`.toLowerCase().includes(query) ||
+        alumno.numeroControl.toLowerCase().includes(query)
+      );
+    });
   }, [allAlumnos, grupoId, studentSearchQuery]);
 
   const openAddStudentsModal = useCallback(() => {

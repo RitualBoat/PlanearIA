@@ -210,9 +210,11 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
       const calificacionesRaw = dataset.calificaciones;
       const entregasRaw = dataset.entregas;
 
+      const tareasDelGrupo = tareasRaw.filter((tarea) => tarea.grupoId === grupoId);
+
       setAllAlumnos(alumnosRaw);
       setAlumnos(alumnosRaw.filter((alumno) => alumno.grupoId === grupoId));
-      setTareas(tareasRaw.filter((tarea) => tarea.grupoId === grupoId));
+      setTareas(tareasDelGrupo);
       setRecursos(recursosRaw.filter((recurso) => recurso.grupoId === grupoId));
       setAsistencias(asistenciasRaw.filter((asistencia) => asistencia.grupoId === grupoId));
       setCalificaciones(

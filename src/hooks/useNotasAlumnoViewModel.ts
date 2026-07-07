@@ -98,8 +98,7 @@ export const useNotasAlumnoViewModel = (): UseNotasAlumnoViewModel => {
     }
 
     const filtradas = comentarios
-      .filter((item) => item.alumnoId === alumnoId)
-      .map((item) => normalizeNota(item))
+      .flatMap((item) => (item.alumnoId === alumnoId ? [normalizeNota(item)] : []))
       .sort((a, b) => b.fechaDate.getTime() - a.fechaDate.getTime());
 
     setNotasGlobales(comentarios);
@@ -139,8 +138,7 @@ export const useNotasAlumnoViewModel = (): UseNotasAlumnoViewModel => {
       await AsyncStorage.setItem(COMENTARIOS_STORAGE_KEY, JSON.stringify(nextNotasGlobales));
 
       const nextAlumnoNotas = nextNotasGlobales
-        .filter((item) => item.alumnoId === alumnoId)
-        .map((item) => normalizeNota(item))
+        .flatMap((item) => (item.alumnoId === alumnoId ? [normalizeNota(item)] : []))
         .sort((a, b) => b.fechaDate.getTime() - a.fechaDate.getTime());
 
       setNotasGlobales(nextNotasGlobales);

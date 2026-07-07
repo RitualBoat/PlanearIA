@@ -40,9 +40,11 @@ module.exports = async (req, res) => {
     const collection = db.collection(COLLECTION);
 
     // Indices requeridos para alumnos (idempotente)
-    await collection.createIndex({ id: 1 }, { unique: true });
-    await collection.createIndex({ grupoId: 1 });
-    await collection.createIndex({ userId: 1, fechaModificacion: -1 });
+    await Promise.all([
+      collection.createIndex({ id: 1 }, { unique: true }),
+      collection.createIndex({ grupoId: 1 }),
+      collection.createIndex({ userId: 1, fechaModificacion: -1 }),
+    ]);
 
     switch (req.method) {
       case "GET":

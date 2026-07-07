@@ -42,9 +42,11 @@ module.exports = async (req, res) => {
     const { db } = await connectToDatabase();
     const collection = db.collection(COLLECTION);
 
-    await collection.createIndex({ id: 1 }, { unique: true });
-    await collection.createIndex({ userId: 1, fechaModificacion: -1 });
-    await collection.createIndex({ grupoId: 1 });
+    await Promise.all([
+      collection.createIndex({ id: 1 }, { unique: true }),
+      collection.createIndex({ userId: 1, fechaModificacion: -1 }),
+      collection.createIndex({ grupoId: 1 }),
+    ]);
 
     switch (req.method) {
       case "GET":

@@ -102,7 +102,14 @@ Los planes cerrados prueban funcionalidad; no bloquean redisenios UX/UI.
 
 ## MCPs
 
-- CodeGraph: primero para preguntas estructurales de codigo, flujos, dependencias e impacto.
+- GitNexus: primario para preguntas estructurales de codigo, flujos MVVM, call chains, dependencias,
+  backend/IA, sync/offline e impacto. Usar `npx -y gitnexus@latest status` para frescura y
+  `npx -y gitnexus@latest analyze --index-only --name PlanearIA .` para reindexar sin inyectar archivos
+  de agente.
+- CodeGraph: secundario/fallback para fuente lineada estilo Read, simbolos puntuales y comprobacion cuando
+  GitNexus sea ambiguo, este stale o no devuelva suficiente contexto editable.
+- No usar GitNexus y CodeGraph por reflejo en la misma pregunta; usar el segundo solo si el primero falla,
+  omite un archivo clave o el change pide comparacion de evidencia.
 - GitHub: issues, PRs, tracking operativo.
 - Context7: APIs/librerias actuales.
 - Figma: ground truth visual.

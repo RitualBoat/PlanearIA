@@ -170,7 +170,8 @@ Pasos y paradas:
 - **Paso 0 - Creacion.** Se sugiere la User Story y se crea en GitHub Projects (issue + item del board).
   **PARADA:** se espera OK del desarrollador.
 - **Paso 1 - Enrich.** Se enriquece la historia con criterios de aceptacion observables en el issue (`/enrich-us`).
-  Para changes de UI/IA, el enrich incluye ademas: **estado actual** (que existe en el codigo, via CodeGraph),
+  Para changes de UI/IA, el enrich incluye ademas: **estado actual** (que existe en el codigo, via GitNexus
+  como mapa estructural primario y CodeGraph si hace falta fuente lineada),
   **riesgos**, **factores de exito medibles** y, si aplica, investigacion breve de patrones vigentes
   (Context7/web) para no proponer sobre supuestos viejos.
   **PARADA:** se espera OK del desarrollador.
@@ -189,8 +190,9 @@ Pasos y paradas:
   Reporte con capturas adjunto al issue. **PROHIBIDO archivar un change de UI sin cumplir los 5 criterios.**
 - **Paso 4 - Cierre.** Tras `/adversarial-review` y `/opsx:archive`: actualizar el backlog del plan maestro,
   mover el item del Project, actualizar la documentacion afectada (`Documentacion/`, CLAUDE.md/config.yaml si
-  cambiaron reglas) y verificar que CodeGraph este fresco para el siguiente ciclo (el watcher reindexa solo
-  en ~1s; tras renombres/moves masivos, correr una consulta `codegraph_explore` de sanidad).
+  cambiaron reglas) y verificar que GitNexus este fresco para el siguiente ciclo (`gitnexus status`;
+  reindex con `npx -y gitnexus@latest analyze --index-only --name PlanearIA .` si hace falta). Si se necesita
+  fuente lineada o fallback, correr una consulta `codegraph_explore` de sanidad.
 
 Override: si el desarrollador dice "hazlo de inicio a fin en automatico", se corren los 5 pasos de corrido
 **sin omitir** la QA real del Paso 3 ni el cierre del Paso 4; al final se entrega el paquete de evidencia
@@ -217,12 +219,12 @@ Reglas anti-fallo (lecciones del piloto):
 | Paso | MCP principal | Por que |
 | --- | --- | --- |
 | 0 Creacion | `github` (via `gh`/puente local) | Crear issue y agregarlo al Project. |
-| 1 Enrich | `github` + `codegraph` | Enriquecer con criterios; verificar el codigo real antes de prometer. |
-| 2 Propose | `codegraph`, `context7`, `figma` | Impacto/flujos, APIs recientes, ground truth visual. |
-| 2 Apply | `codegraph` | Editar con blast radius a la vista; el codigo gana sobre el diagnostico previo. |
+| 1 Enrich | `github` + `gitnexus` (+ `codegraph` fallback) | Enriquecer con criterios; verificar mapa estructural y codigo real antes de prometer. |
+| 2 Propose | `gitnexus`, `context7`, `figma` (+ `codegraph` si falta fuente lineada) | Impacto/flujos, APIs recientes, ground truth visual. |
+| 2 Apply | `gitnexus` + `codegraph` focalizado | GitNexus para blast radius; CodeGraph o lectura directa para editar con fuente lineada. |
 | 3 QA (UI) | `playwright` (+ `expo` si hace falta) | Levantar web, navegar, capturar por breakpoint, iterar hasta los 5 criterios de salida. |
 | 3 QA (datos) | `planearia-sqlite` / MongoDB opt-in | Diagnostico read-only de cola offline o aislamiento por `userId`. |
-| 4 Cierre | `github` + `codegraph` | Mover item a Done, actualizar docs y verificar indice fresco para el siguiente ciclo. |
+| 4 Cierre | `github` + `gitnexus` (+ `codegraph` fallback) | Mover item a Done, actualizar docs y verificar indices frescos para el siguiente ciclo. |
 
 Detalle canonico de MCPs por flujo: `Documentacion/02-operacion/MCP_FLUJOS_PLANEARIA.md`.
 

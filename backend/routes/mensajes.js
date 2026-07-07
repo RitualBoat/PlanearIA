@@ -37,15 +37,16 @@ module.exports = async (req, res) => {
 
     // Crear índices (idempotente)
     const conversacionesCol = db.collection(CONVERSACIONES_COLLECTION);
-    await conversacionesCol.createIndex({ id: 1 }, { unique: true });
-    await conversacionesCol.createIndex({ participantes: 1 });
-    await conversacionesCol.createIndex({ fechaModificacion: -1 });
-
     const mensajesCol = db.collection(MENSAJES_COLLECTION);
-    await mensajesCol.createIndex({ id: 1 }, { unique: true });
-    await mensajesCol.createIndex({ conversacionId: 1, fechaCreacion: 1 });
-    await mensajesCol.createIndex({ remitenteId: 1 });
-    await mensajesCol.createIndex({ fechaModificacion: -1 });
+    await Promise.all([
+      conversacionesCol.createIndex({ id: 1 }, { unique: true }),
+      conversacionesCol.createIndex({ participantes: 1 }),
+      conversacionesCol.createIndex({ fechaModificacion: -1 }),
+      mensajesCol.createIndex({ id: 1 }, { unique: true }),
+      mensajesCol.createIndex({ conversacionId: 1, fechaCreacion: 1 }),
+      mensajesCol.createIndex({ remitenteId: 1 }),
+      mensajesCol.createIndex({ fechaModificacion: -1 }),
+    ]);
 
     const tipo = req.query?.tipo;
 

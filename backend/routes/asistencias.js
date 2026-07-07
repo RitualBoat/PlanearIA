@@ -39,10 +39,12 @@ module.exports = async (req, res) => {
     const collection = db.collection(COLLECTION);
 
     // Crear índices (idempotente)
-    await collection.createIndex({ id: 1 }, { unique: true });
-    await collection.createIndex({ grupoId: 1, fecha: -1 });
-    await collection.createIndex({ alumnoId: 1 });
-    await collection.createIndex({ userId: 1, fecha: -1 });
+    await Promise.all([
+      collection.createIndex({ id: 1 }, { unique: true }),
+      collection.createIndex({ grupoId: 1, fecha: -1 }),
+      collection.createIndex({ alumnoId: 1 }),
+      collection.createIndex({ userId: 1, fecha: -1 }),
+    ]);
 
     switch (req.method) {
       case "GET":
@@ -117,14 +119,19 @@ async function handlePost(req, res, collection, userId) {
     let created = 0;
     let updated = 0;
 
-    for (const doc of docs) {
-      if (!doc.alumnoId || !doc.grupoId) continue;
+    const results = await Promise.all(
+      docs.map((doc) => {
+        if (!doc.alumnoId || !doc.grupoId) return null;
 
-      const matchKey = { alumnoId: doc.alumnoId, grupoId: doc.grupoId, fecha: doc.fecha };
-      if (userId) matchKey.userId = userId;
+        const matchKey = { alumnoId: doc.alumnoId, grupoId: doc.grupoId, fecha: doc.fecha };
+        if (userId) matchKey.userId = userId;
 
-      const result = await collection.updateOne(matchKey, { $set: doc }, { upsert: true });
+        return collection.updateOne(matchKey, { $set: doc }, { upsert: true });
+      })
+    );
 
+    for (const result of results) {
+      if (!result) continue;
       if (result.upsertedCount > 0) created++;
       else updated++;
     }

@@ -1,10 +1,17 @@
 <!-- CODEGRAPH_START -->
-## CodeGraph
+## Code Intelligence Policy
 
-In repositories indexed by CodeGraph (a `.codegraph/` directory exists at the repo root), reach for it BEFORE grep/find or reading code when you need to understand or locate implementation.
+PlanearIA uses two local code-intelligence tools with strict routing:
 
-- MCP tool when available: `codegraph_explore`.
-- CLI fallback: `npm run codegraph:explore -- "<question>"`.
+- **GitNexus is primary for structural questions**: architecture maps, MVVM screen -> hook/ViewModel -> service flows, call chains, dependency impact, backend/AI gateway paths, sync/offline paths, and SDD blast-radius decisions.
+  - CLI: `npx -y gitnexus@latest query -r PlanearIA "<question>"`
+  - Impact: `npx -y gitnexus@latest impact -r PlanearIA <symbol>`
+  - Freshness: `npx -y gitnexus@latest status`
+  - Reindex: `npx -y gitnexus@latest analyze --index-only --name PlanearIA .`
+- **CodeGraph is secondary/fallback for line-numbered source context** once files/symbols are known, or when GitNexus is unavailable, stale, ambiguous, or does not return enough editable source.
+  - MCP tool when available: `codegraph_explore`.
+  - CLI fallback: `npm run codegraph:explore -- "<question>"`.
+- Do not call both tools by reflex for the same question. Use the second only when the first misses a key file, is stale/ambiguous, or evidence comparison is part of an explicit spike.
 - Use direct reads/`rg` for Markdown docs, assets, generated files, exact full-file editing context, or files outside the index.
 <!-- CODEGRAPH_END -->
 
@@ -71,7 +78,8 @@ Reglas:
 
 ## MCPs Y Herramientas
 
-- `codegraph`: primero para estructura, flujos, dependencias e impacto de codigo.
+- `gitnexus`: primario para estructura, flujos MVVM, call chains, dependencias e impacto de codigo.
+- `codegraph`: secundario/fallback para fuente lineada estilo Read, simbolos puntuales y comprobacion cuando GitNexus sea ambiguo o no este disponible.
 - `github`: issues, PRs y tracking operativo.
 - `context7`: documentacion actual de librerias/APIs.
 - `figma`: ground truth visual cuando exista.

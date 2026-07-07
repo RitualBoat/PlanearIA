@@ -62,13 +62,18 @@ stitch-results
 # Exceptions: shared agent workflows MUST be versioned because they configure the SDD workflow.
 # The generic "skills/" pattern above also matches nested tool skill folders, so re-include the
 # project-owned ones explicitly.
-!.agents/skills/
-!.agents/skills/**
+# NOTE: .agents/ is intentionally NOT re-included. It holds third-party design tools installed via
+# `npx skills add ...` (e.g. impeccable): local, re-installable, and not versioned to keep the repo clean.
 !.codex/config.toml
 !.codex/skills/
 !.codex/skills/**
 !.claude/skills/
 !.claude/skills/**
+
+# Third-party design tool "impeccable" (npx skills add pbakaus/impeccable): the real files live under
+# .agents/ (ignored above); Claude Code sees them through this symlink. Keep it local, do not commit it.
+.claude/skills/impeccable
+.impeccable.md
 
 # Playwright MCP scratch output (page snapshots, traces)
 .playwright-mcp/

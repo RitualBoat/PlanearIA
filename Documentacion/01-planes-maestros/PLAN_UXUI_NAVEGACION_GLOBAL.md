@@ -47,6 +47,9 @@ herramientas familiares, no en controles nuevos.
 | D10 | Plan en formato SDD | Blueprint + backlog de changes OpenSpec; specs se acumulan en `openspec/specs/` como verdad de comportamiento UX. |
 | D11 | Pipeline visual | Stitch/Claude Design divergen -> frame curado en Figma = ground truth oficial -> Figma MCP alimenta implementacion -> Playwright MCP captura y compara por breakpoint. |
 | D12 | IHC | Proto-personas ya definidas; 3-5 entrevistas con prototipo antes de cerrar Ola 2. Checklist Nielsen + severidad 0-4 como gate en adversarial-review. |
+| D13 | Estandar de Excelencia Visual | Toda UI nueva cumple la seccion 1.9: cero diseno generico ("AI slop"), micro-interacciones con fisica spring (reanimated), presupuesto de performance para Android gama media, y vocabulario premium TRADUCIDO al stack RN (no Tailwind/GSAP/Framer en la app). |
+| D14 | Landing web con tratamiento showcase completo | La landing/marketing web es un artefacto separado de la app RN; ahi SI aplican verbatim los patrones Awwwards-tier (hero glassmorphism, parallax, scroll-triggered, magnetic buttons, GSAP/Framer permitidos). Change `landing-web` en Ola 4+. |
+| D15 | Anti-alucinacion de tooling | Toda fase de design/apply que use APIs de librerias (reanimated, gesture-handler, tentap, expo-*) consulta Context7 antes de escribir codigo; toda edicion parte de CodeGraph (`codegraph_explore`) para inventario y blast radius. |
 
 ### 1.3 Arquitectura de experiencias (resumen)
 
@@ -129,7 +132,68 @@ herramientas familiares, no en controles nuevos.
 - No se disena para alumnos/padres (solo docente en este plan).
 - No se implementa email real ni cierre de Auth (plan aparte, activo).
 
-### 1.9 Plan de transicion conceptual
+### 1.9 Estandar de Excelencia Visual (obligatorio para todo change de UI)
+
+Objetivo: que PlanearIA se vea y se sienta de nivel premium/showcase, SIN traicionar la vision
+"familiaridad y calma" ni el presupuesto de hardware de las personas (Maria usa Android gama media).
+La regla de oro: **el wow vive en el pulido (motion, ritmo, detalle), no en layouts exoticos.**
+
+#### 1.10.1 Donde aplica cada nivel de intensidad
+
+| Zona | Intensidad | Por que |
+| --- | --- | --- |
+| Landing web / marketing | Maxima (Awwwards-tier, jaw-dropping) | Es una pagina web DOM; vende el producto. Change `landing-web`. |
+| Onboarding, empty states, transiciones entre experiencias | Alta (momentos memorables) | Primer impacto y momentos de baja frecuencia: pueden ser espectaculares sin estorbar. |
+| Escritorio (dock, tablero) | Media-alta (Bento premium, micro-interacciones) | Se ve a diario: premium pero calmado. |
+| Pantallas de trabajo (editores, listas, calificar) | Sobria (calma, precision, cero distraccion) | Carmen y Maria trabajan aqui horas; la elegancia es ritmo y claridad, no efectos. |
+
+#### 1.10.2 Traduccion del vocabulario premium al stack real (React Native + Expo)
+
+| Concepto pedido | En la app RN se implementa como | Prohibido |
+| --- | --- | --- |
+| Smooth spring physics | `react-native-reanimated` v4 (`withSpring`, config en tokens de movimiento: rigidez/amortiguacion estandar) | GSAP, Framer Motion (DOM-only; rompen la app) |
+| Micro-interactions | Catalogo reanimated: scale 0.97 en Pressable, chip que se desvanece al descartar, checkmark que dibuja, dock tile bounce sutil, pull-to-refresh custom | Animaciones >300ms en acciones frecuentes |
+| Glassmorphism | Superficies translucidas con tokens + `expo-blur` (dep opcional a evaluar en `tokens-completos`) SOLO en overlays/modales/dock; fallback solido en Android de gama baja | Blur en listas largas o superficies grandes (mata FPS) |
+| Bento Box UI | Grid del Escritorio (dock + tarjetas del dia) con radios/elevacion de tokens | Bento generico sin jerarquia de tareas |
+| Spatial UI / profundidad | Escala de elevacion (3 niveles `shadowBlue`) + transiciones de navegacion con profundidad (shared-element donde sea barato) | Parallax pesado en la app (solo landing) |
+| Scroll-triggered animations | `useAnimatedScrollHandler` (reanimated): headers que colapsan, toolbars que se condensan | Librerias de scroll DOM |
+| Magnetic buttons | Solo landing web (hover no existe en touch). En app: feedback haptico + spring en press | Hover-dependencias en la app |
+| Tipografia elegante | Escala tipografica en tokens (`tokens-completos`) con jerarquia intencional; `expo-font` si se adopta una fuente de marca (decision en tokens-completos, licencia libre) | Fuentes por pantalla, tamanos magicos |
+
+#### 1.10.3 Checklist anti-diseno-generico ("zero AI slop") — gate por pantalla
+
+Antes de aprobar un frame de Figma o cerrar la validacion visual de un change, la pantalla debe pasar:
+
+- [ ] No parece plantilla: si le quitas el logo, sigue reconocible como PlanearIA (paleta azul docente, ritmo 4pt, radios propios).
+- [ ] Cero placeholders genericos: nada de lorem ipsum, avatares grises por defecto ni cards vacias sin proposito.
+- [ ] Tipografia con jerarquia intencional (display/title/body/caption de tokens), no todo el mismo peso.
+- [ ] Cada estado (loading/empty/error/offline) esta disenado, no improvisado: skeletons con shimmer sutil, empties accionables con ilustracion o icono con intencion.
+- [ ] Al menos 1 micro-interaccion significativa por pantalla (no decorativa: comunica estado o confirma accion).
+- [ ] Densidad correcta por breakpoint: movil respira, web aprovecha el ancho (nada de columna movil estirada).
+- [ ] Pasa el checklist Nielsen (IHC seccion 6) sin severidad >=3.
+
+#### 1.10.4 Presupuesto de performance y accesibilidad del motion
+
+- 60fps en interacciones sobre Android gama media (el telefono de Maria); animaciones en UI thread (reanimated worklets).
+- Toda animacion respeta "reducir movimiento" del sistema (`AccessibilityInfo.isReduceMotionEnabled`): version estatica equivalente.
+- Blur/gradientes: medir antes de adoptar; si un efecto cuesta jank, se degrada a solido. El efecto nunca es mas importante que el trabajo del docente.
+
+#### 1.10.5 Herramientas del estandar (verificadas en este entorno)
+
+- **Figma MCP** (`get_design_context`, `get_screenshot`): traduccion pixel-perfect frame -> tokens/layout. Requiere autenticacion previa.
+- **CodeGraph** (indexado en `.codegraph/`): inventario de simbolos y blast radius ANTES de editar; el indice se refresca solo (~1s), verificar tras renombres masivos.
+- **Context7**: docs vigentes de reanimated/gesture-handler/tentap/expo antes de usar sus APIs; cero APIs alucinadas.
+- **Playwright MCP**: bucle de QA visual (seccion 5 de la meta guia v3).
+- **impeccable** (skill instalada, capa de vocabulario/craft por elemento). Herramienta local NO versionada
+  (`.agents/` esta en `.gitignore`): reinstalar con `npx skills add pbakaus/impeccable` si falta en una
+  maquina/CI. Setup opcional: `/teach-impeccable` (genera `.impeccable.md`, tambien local). Riesgo Med (Gen/Snyk):
+  revisar antes de uso intensivo.
+- **awwwards** (skill local versionada en `.claude/skills/awwwards/`): capa aspiracional/evaluacion
+  (zona de intensidad + pipeline 9 fases + scoring). Complementa a impeccable; no sustituye los gates.
+- **Higgsfield AI** (MCP conectado): media generativa de paga; usar solo en el change `landing-web`.
+- **Regla:** estas tres alimentan los gates; el checklist anti-slop y la QA Playwright siguen decidiendo. Ver OQ6.
+
+### 1.10 Plan de transicion conceptual
 
 - **Primero fundaciones invisibles (Ola 0):** theming runtime y breakpoints. Sin esto, toda pantalla
   nueva nace con deuda de accesibilidad/responsive.
@@ -266,10 +330,32 @@ herramientas familiares, no en controles nuevos.
 - **Paridad:** alta (patron Docs/Drive). **Ground truth:** frame Figma aprobado.
 - **Depende de:** `app-shell-navegacion`, `componentes-base`, `assign-sheet`. **Estado:** pendiente.
 
+#### Hito de diseno (no es change de codigo): `prototipos-figma-ola2`
+
+Produce el material visual que las entrevistas y los changes de Ola 2-3 necesitan. Sin este hito,
+`escritorio-docente` y `office-home-crear` no tienen ground truth y las entrevistas no tienen estimulo.
+
+- **Entregable A — Prototipo navegable (fidelidad alta):** frames movil + web de (1) Escritorio
+  (dock + tablero, con estado con-datos y empty), (2) modal Crear tipo-primero, (3) Office home
+  (bandeja unificada), (4) NotasPLAN con el chip IA de intencion visible. Conectados como prototipo
+  clickeable en Figma para las entrevistas.
+- **Entregable B — Concept boards (fidelidad media, 1 frame por modulo):** Clases/Classroom redisenado,
+  ConectaPLAN (hilo estilo WhatsApp profesional), DiseñaPLAN (galeria + plantilla), AsistePLAN
+  (chat movil + panel web), Onboarding (3 pantallas con el copy D1.1). Sirven como estimulo de
+  entrevista ("esto viene despues, que opinas?") y fijan el lenguaje visual de la Ola 3-4.
+- **Proceso:** pipeline D11 (Stitch/Claude Design divergen -> curaduria -> Figma como ground truth,
+  generable/editable via `use_figma` del Figma MCP) usando los tokens reales de `src/themes/colors.ts`.
+- **Gate de aprobacion:** cada frame pasa el checklist anti-slop (1.9.3) y el vocabulario traducido
+  (1.9.2) antes de marcarse "aprobado"; los aprobados se registran en `context/<modulo>-ground-truth/`
+  y se referencian desde el design.md del change correspondiente.
+- **Prerequisito operativo:** autenticar el Figma MCP (sesion interactiva, `/mcp`). Stitch se usa via web.
+- **Depende de:** decisiones de shell (puede correr en paralelo a la implementacion de Ola 1).
+
 #### Hito IHC (no es change de codigo): entrevistas con docentes
 
-- Con los frames/prototipo de `escritorio-docente` y `office-home-crear`: aplicar el guion de
-  `IHC_DISCOVERY_DOCENTE.md` seccion 5 a 3-5 docentes. Sintetizar y ajustar backlog de Ola 3.
+- Con el prototipo navegable del hito anterior (`prototipos-figma-ola2`): aplicar el guion de
+  `IHC_DISCOVERY_DOCENTE.md` seccion 5 a 3-5 docentes, incluyendo los concept boards como estimulo
+  de los modulos futuros. Sintetizar y ajustar backlog de Ola 3.
 
 #### Change: `onboarding-suite`
 
@@ -331,18 +417,96 @@ herramientas familiares, no en controles nuevos.
 
 ### Ola 4+: Resto de la suite (activar por prioridad tras Ola 3)
 
-- `cuenta-preferencias`: pantallas de Cuenta/Preferencias/Accesibilidad con el nuevo sistema. **Construye
-  sobre** la spec ya archivada `settings-accessibility-preferences` (no rehacerla); extiende accesibilidad
-  al resto de la app via `theming-runtime`.
-- `conectaplan`: mensajeria profesional desde cero (contactos, hilos, compartir recursos con guardar/asignar
-  del receptor); reusa fontaneria de mensajes/contactos, cero UI legacy.
-- `notificaciones-chrome`: rediseno de la pantalla de Notificaciones y su badge; se decide junto con el
-  destino de `FloatingActionIcons` en `app-shell-navegacion` (puede quedar como parte de ese change si es chico).
-- `agendaplan`: vista semana/mes; cada evento abre su objeto real; recordatorios con expo-notifications.
-- `presentaplan-mvp`: laminas lineales texto-primero con export.
-- `disenaplan-mvp`: plantillas rellenables + bloques simples + export; NO lienzo completo.
-- `reportaplan`: consolidar reportes existentes; alertas de riesgo con dato que las sustente; gamificacion
-  prudente. Activar solo con datos reales suficientes.
+#### Change: `cuenta-preferencias`
+
+- **Historia:** Como docente, controlo mi cuenta, sesiones, privacidad y comodidad visual (tema, fuente,
+  daltonismo) en pantallas que se sienten parte de la misma suite, y lo que ajusto se aplica de verdad
+  en toda la app.
+- **Criterio de aceptacion:** pantallas Cuenta/Preferencias/Accesibilidad con biblioteca y tokens nuevos;
+  los 3 ajustes se propagan (via `theming-runtime`); sesiones activas y roles intactos; verificacion real
+  de accesibilidad (lector de pantalla en acciones principales).
+- **Paridad:** funcional. **Ground truth:** tokens + biblioteca base.
+- **Depende de:** `theming-runtime`, `componentes-base`. **Estado:** pendiente.
+- **Notas:** construye sobre la spec archivada `settings-accessibility-preferences` (no rehacerla).
+
+#### Change: `conectaplan`
+
+- **Historia:** Como docente, converso con colegas como en WhatsApp profesional: contactos, hilos con
+  estados de envio, y comparto una planeacion/recurso que el receptor puede guardar en su biblioteca o
+  asignar a su clase con un toque.
+- **Criterio de aceptacion:** lista de conversaciones + hilo + contactos con la biblioteca nueva; adjuntos
+  de objetos reales via AssignSheet; estados enviando/enviado/entregado/error con reintento offline
+  (cola `src/sync`); empty state accionable ("busca a un colega"); cero UI legacy de feed/social.
+- **Paridad:** alta (WhatsApp profesional). **Ground truth:** frames Figma + `context/chat-ground-truth/`.
+- **Depende de:** `componentes-base`, `assign-sheet`. **Estado:** pendiente.
+- **Notas:** reusa fontaneria de `MensajesContext`/`ContactosContext`; retos/posts quedan fuera del flujo.
+
+#### Change: `agendaplan`
+
+- **Historia:** Como docente, veo mi semana (clases, entregas, recordatorios) y al tocar un evento se abre
+  la clase, el documento o la actividad real, no una ficha muerta.
+- **Criterio de aceptacion:** vistas semana/mes responsivas; cada evento navega a su objeto; recordatorios
+  con `expo-notifications` (permiso + fallback in-app); funciona offline con datos locales; "hoy" del
+  Escritorio y AgendaPLAN muestran lo mismo (una sola fuente).
+- **Paridad:** media. **Ground truth:** concepto Stitch/Figma aprobado.
+- **Depende de:** `escritorio-docente`. **Estado:** pendiente.
+
+#### Change: `presentaplan-mvp`
+
+- **Historia:** Como docente, armo las laminas de mi clase de manana escribiendo texto-primero (titulo +
+  bullets + imagen), las presento desde la app y las exporto a PDF/PPTX.
+- **Criterio de aceptacion:** editor lineal de laminas (sin lienzo libre); rail de miniaturas; modo
+  presentar; export PDF (y PPTX si el costo es razonable); "Asignar a clase" integrado.
+- **Paridad:** alta (patron PowerPoint/Slides simplificado). **Ground truth:** frames Figma del MVP.
+- **Depende de:** `office-home-crear`. **Estado:** pendiente.
+- **Notas:** frontera con DiseñaPLAN (D8): aqui NO hay capas ni lienzo.
+
+#### Change: `disenaplan-mvp`
+
+- **Historia:** Como docente, creo material visual (infografia, actividad imprimible, examen visual)
+  partiendo de una plantilla rellenable con bloques simples, y lo exporto o asigno a mi clase sin salir.
+- **Criterio de aceptacion:** galeria de plantillas por tipo; edicion por bloques (texto/imagen/forma
+  basica, sin lienzo libre completo); export a imagen/PDF; AssignSheet integrado; "convertir desde
+  planeacion" como camino de entrada (IA sugiere estructura, confirmable).
+- **Paridad:** alta (Canva/Genially), version minimal consciente. **Ground truth:** frames Figma del MVP.
+- **Depende de:** `office-home-crear`, `assign-sheet`. **Estado:** pendiente.
+- **Notas:** NO construir lienzo completo (no objetivo 1.8); validar demanda antes de crecer.
+
+#### Change: `reportaplan`
+
+- **Historia:** Como docente, al cierre de semana/unidad veo como van mis grupos (asistencia, entregas,
+  promedios, alumnos en riesgo) y cada alerta muestra el dato que la sustenta; la IA puede redactarme
+  observaciones que yo reviso antes de usar.
+- **Criterio de aceptacion:** resumen + reporte de grupo/alumno consolidados con la biblioteca nueva;
+  estado "datos insuficientes" honesto; alertas de riesgo siempre con evidencia visible; observaciones IA
+  revisables (nunca auto-enviadas); export/compartir via ConectaPLAN.
+- **Paridad:** media. **Ground truth:** concepto Stitch/Figma aprobado.
+- **Depende de:** `classroom-redesign`. **Estado:** pendiente. **Notas:** activar solo con datos reales;
+  gamificacion prudente (rachas/logros discretos), nunca infantilizar.
+
+#### Change: `notificaciones-chrome`
+
+- **Historia:** Como docente, las notificaciones me avisan lo importante (entregas, mensajes, tareas IA
+  terminadas) sin invadir, y el badge/campana vive integrado en el chrome del shell.
+- **Criterio de aceptacion:** pantalla de notificaciones redisenada; badge en TopBar segun decision de
+  `FloatingActionIcons` (OQ2); agrupacion por experiencia; deep link al objeto real.
+- **Paridad:** funcional. **Depende de:** `app-shell-navegacion`. **Estado:** pendiente.
+- **Notas:** puede absorberse dentro de `app-shell-navegacion` si resulta chico.
+
+#### Change: `landing-web`
+
+- **Historia:** Como docente que descubre PlanearIA, llego a una landing web impactante que me muestra la
+  suite (NotasPLAN, CalcuPLAN, PresentaPLAN, DiseñaPLAN, AsistePLAN, Clases, ConectaPLAN) y me lleva a
+  probar la demo.
+- **Criterio de aceptacion:** pagina web separada de la app RN (puede ser estatica en Vercel, costo cero);
+  hero con el mensaje D1.1; secciones por herramienta con capturas/video reales de la app; CTA a demo web;
+  Lighthouse/Core Web Vitals decentes; accesible.
+- **Paridad:** showcase (Awwwards-tier permitido al 100%). **Ground truth:** frames Figma de la landing.
+- **Depende de:** Ola 2 archivada (necesita capturas reales que presumir). **Estado:** pendiente.
+- **Notas:** AQUI aplican verbatim los patrones showcase (D14): tema oscuro + glassmorphism, Spatial UI,
+  parallax, scroll-triggered (GSAP/Framer/Tailwind permitidos: es DOM, no RN), magnetic buttons,
+  Bento Box de features, media generativa (Higgsfield u otra) si el costo lo permite. Las skills de
+  web-quality (accessibility/performance/core-web-vitals) sirven como auditoria de cierre.
 
 ---
 
@@ -359,6 +523,20 @@ Open questions:
   `asistente-ia-base`; minimo: avisar que se envia y a que tipo de proveedor).
 - OQ4: comunidad publica (muro) futura: fuera de este plan; reevaluar tras ConectaPLAN.
 - OQ5: CLI de openspec global no esta en `package.json` (documentado; decidir si se agrega como devDependency).
+- OQ6 (RESUELTO 2026-07-07): herramientas de diseno instaladas/definidas.
+  - **impeccable** (Paul Bakaus, `pbakaus/impeccable`, gratis): instalado via `npx skills add pbakaus/impeccable`
+    en `.agents/skills/impeccable/` con symlink a Claude Code (funciona en este Windows). Es la capa de
+    VOCABULARIO/craft por elemento (tipografia, color, motion, anti-slop). Rating de riesgo del instalador:
+    Med (Gen/Snyk), 0 alertas Socket; contiene `scripts/`, corre con permisos de agente: revisar antes de uso intensivo.
+  - **awwwards**: skill LOCAL creada en `.claude/skills/awwwards/SKILL.md` (archivo real, versionado). Capa
+    ASPIRACIONAL/evaluacion: decide zona de intensidad (1.9.1), aplica el pipeline de 9 fases y puntua estilo
+    Awwwards (Design/Usability/Creativity/Content), sin sobreescribir la seccion 1.9. Complementa a impeccable.
+  - **Higgsfield AI**: MCP HTTP hosteado `https://mcp.higgsfield.ai/mcp`, media generativa de PAGA con OAuth
+    interactivo. NO conectado (esta sesion no puede hacer OAuth). Conectar con
+    `claude mcp add --transport http higgsfield https://mcp.higgsfield.ai/mcp` + autenticar en `/mcp`.
+    Solo aplica al change `landing-web` (Ola 4+); no bloquea nada antes.
+  - Regla de integracion: estas herramientas NO reemplazan los gates de la seccion 1.9 ni del Protocolo 2.5;
+    los alimentan. impeccable/awwwards proponen; el checklist anti-slop y la QA Playwright siguen decidiendo.
 
 Coordinacion con trabajo en vuelo (verificado 2026-07):
 
@@ -368,11 +546,15 @@ Coordinacion con trabajo en vuelo (verificado 2026-07):
   (`alumno/grupo/reportesExportService`), decision de `pdfjs-dist` y config de react-doctor.
 - **No hay colision de archivos con la Ola 0:** react-doctor toca servicios/config/exports; theming y
   breakpoints tocan pantallas y `src/themes`. Son ortogonales.
-- **Aun asi, secuenciar react-doctor ANTES de la Ola 0**, por tres razones: (1) su propia proposal dice
-  que estabiliza seguridad/calidad *antes* de construir la suite encima; (2) arregla riesgos reales
-  (secreto publico en frontend, HTML sin escapar en exports, supply-chain); (3) la Seccion 2
-  (frontera del API secret) se entrelaza con el plan de Auth activo/en cierre, no con UX. Regla
-  "un change grande a la vez" para dev solo. No fusionar seguridad con estilos.
+- **react-doctor CERRADO por completo (2026-07-07):** ambos changes archivados; `openspec list` no reporta
+  changes activos. El arbol de changes queda limpio para arrancar la Ola 0.
+  - `raise-react-doctor-score-baseline`: adversarial PASS CON HUECOS (1 Minor rastreado: consolidar
+    `planeacionExportService` en el helper de escape compartido). Specs: `react-doctor-scan-baseline`,
+    `frontend-public-env-boundary`, `safe-html-export-sinks`, `dependency-risk-decision`.
+  - `fix-react-doctor-top-findings`: adversarial PASS (secretos fail-closed, allowlist + userId en
+    notificaciones sin spread de body, fix de perdida de datos en import con test batch dedicado). Specs:
+    `secure-react-doctor-remediation`, `react-native-react-doctor-remediation`, `alumno-import-integrity`.
+  - Las 7 specs son ahora verdad permanente en `openspec/specs/` (9 en total con las 2 previas).
 - El flujo SDD ya esta probado end-to-end en este repo: `openspec list` responde y hay specs archivadas
   (`ai-friendly-repository-context`, `settings-accessibility-preferences`) + un archive
   (`2026-07-06-repo-max-clean-context-externalization`). No es un estreno del CLI.

@@ -67,19 +67,23 @@ Este es el flujo completo para ejecutar UNA entrada del backlog. Los comandos so
 Toma la siguiente entrada `pendiente` de la ola activa cuyo `Depende de:` ya este archivado.
 No abras dos changes grandes a la vez.
 
-### Paso 1 — (Opcional) Crear el issue en GitHub
+### Paso 1 — Crear el issue/user story en GitHub Product OS
 
-Si quieres tracking operativo desde el inicio:
+Obligatorio para todo change SDD no trivial: antes de enriquecer, explorar o proponer, crea o identifica
+el issue/user story de GitHub, agregalo al Project `PlanearIA Product OS` y usa ese numero como fuente
+del ciclo. No se debe crear `openspec/changes/<nombre>/` sin este item operativo previo.
 
 ```bash
-gh issue create --title "<nombre-del-change>" --body "<historia del backlog>" --label "change,ux-ui"
+gh issue create --title "<nombre-del-change>" --body "<historia del backlog>" --label "change,ux-ui" --project "PlanearIA Product OS"
 ```
 
-y agregalo al GitHub Project del plan. Tambien puedes crearlo despues del propose, con el scope ya afinado.
+Si `gh issue create --project` falla, crea el issue y agregalo con `gh project item-add`, dejando evidencia
+del comando o del error exacto. Solo un hotfix trivial autorizado explicitamente por el desarrollador puede
+saltar este paso.
 
 ### Paso 2 — Enriquecer la historia: `/enrich-us`
 
-Cuando la historia del backlog esta verde o vaga:
+Enriquece desde el issue/user story creado en el Paso 1:
 
 ```text
 /enrich-us <pega la historia del backlog o el numero de issue>
@@ -87,7 +91,7 @@ Cuando la historia del backlog esta verde o vaga:
 
 Devuelve `## Original` + `## Enriquecida` (descripcion funcional, datos, endpoints, archivos MVVM,
 definition of done, NFRs). Revisala: tu decides que entra. Si la historia del backlog ya es especifica,
-puedes saltarte este paso.
+el enriquecimiento puede ser corto, pero el issue/Product OS sigue siendo obligatorio.
 
 ### Paso 3 — (Opcional) Explorar: `/opsx:explore`
 

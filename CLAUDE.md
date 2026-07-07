@@ -156,8 +156,10 @@ PlanearIA uses OpenSpec for product-facing changes. Config: `openspec/config.yam
 
 Workflow (Claude Code slash commands, `opsx` prefix):
 
-1. `/enrich-us <issue-o-idea>` (optional): turn a vague idea or GitHub issue into an
-   implementation-ready story. GitHub issues via `gh`/GitHub MCP, never Jira.
+0. Create or identify the GitHub issue/user story, add it to PlanearIA Product OS, and keep its number in
+   the change context. This is mandatory for every non-trivial SDD change.
+1. `/enrich-us <issue-o-idea>`: turn the GitHub issue or user story into an implementation-ready story.
+   GitHub issues via `gh`/GitHub MCP, never Jira.
 2. `/opsx:explore`: investigate before proposing when scope is unclear.
 3. `/opsx:propose "<idea>"`: create the change (proposal, specs, design, tasks) in `openspec/changes/`.
 4. `/opsx:apply`: implement tasks one at a time; mark `[x]` only with typecheck/lint/test evidence.

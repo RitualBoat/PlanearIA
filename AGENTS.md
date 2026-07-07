@@ -47,6 +47,9 @@ or `/opsx-propose`. Treat skills as the portable source of truth.
 
 Rules:
 
+- Before any non-trivial SDD change reaches `$openspec-propose`, create or identify its GitHub issue/user
+  story, add it to the PlanearIA Product OS Project, and use that issue as the source for enrichment.
+  Do not skip this Product OS step unless the user explicitly authorizes a trivial hotfix outside SDD.
 - Do not implement non-trivial product changes without a proposed OpenSpec change.
 - Mark tasks `[x]` only after evidence: typecheck/lint/tests, and visual validation for UI.
 - Specs archived in `openspec/specs/` are behavioral truth; update them through archive/sync, not by

@@ -1,6 +1,6 @@
 ---
 description: Reglas de frontend RN/MVVM: aplican al editar UI, screens, hooks, context y temas.
-globs: src/**/*.{ts,tsx},App.tsx
+globs: src/**/*.ts,src/**/*.tsx,App.tsx
 alwaysApply: false
 ---
 

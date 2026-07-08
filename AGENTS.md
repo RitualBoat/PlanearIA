@@ -15,6 +15,8 @@ PlanearIA uses two local code-intelligence tools with strict routing:
 - Use direct reads/`rg` for Markdown docs, assets, generated files, exact full-file editing context, or files outside the index.
 <!-- CODEGRAPH_END -->
 
+<!-- GENERADO por scripts/syncAgentHarness.mjs desde .agents/. No editar a mano: correr `npm run agent:harness:sync`. -->
+
 # PlanearIA - Universal Agent Guide
 
 > **Estado:** vigente.

@@ -68,6 +68,17 @@ function preservedBlock(targetRel, start, end) {
   return cur.slice(s, e + end.length).trim() + "\n\n";
 }
 
+const GEN_MARK =
+  "<!-- GENERADO por scripts/syncAgentHarness.mjs desde .agents/. No editar a mano: correr `npm run agent:harness:sync`. -->";
+
+// Cursor .mdc `globs` is a comma-separated list, so a brace group like `{ts,tsx}` (which contains a
+// comma) would be mis-split. Expand a single brace group into separate globs before joining.
+function expandBraces(glob) {
+  const m = glob.match(/^(.*)\{([^}]+)\}(.*)$/);
+  if (!m) return [glob];
+  return m[2].split(",").map((opt) => `${m[1]}${opt.trim()}${m[3]}`);
+}
+
 const RULE_NAMES = ["backend", "frontend", "testing"];
 
 function loadRules() {
@@ -105,13 +116,13 @@ function renderInstructions(outputs) {
 
   outputs.push({
     rel: "CLAUDE.md",
-    content: norm(`${claudeBlock}${claudeHeader}\n\n${core}`),
+    content: norm(`${claudeBlock}${GEN_MARK}\n\n${claudeHeader}\n\n${core}`),
   });
   outputs.push({
     rel: "AGENTS.md",
-    content: norm(`${agentsBlock}${agentsHeader}\n\n${core}\n\n${rulesEmbed(rules)}`),
+    content: norm(`${agentsBlock}${GEN_MARK}\n\n${agentsHeader}\n\n${core}\n\n${rulesEmbed(rules)}`),
   });
-  outputs.push({ rel: ".github/copilot-instructions.md", content: norm(copilot) });
+  outputs.push({ rel: ".github/copilot-instructions.md", content: norm(`${GEN_MARK}\n\n${copilot}`) });
 }
 
 // ---- Rules ------------------------------------------------------------------
@@ -122,10 +133,11 @@ function renderRules(outputs) {
       rel: `.claude/rules/${r.name}.md`,
       content: norm(`---\npaths:\n${claudePaths}\n---\n\n${r.body}`),
     });
+    const cursorGlobs = r.globs.flatMap(expandBraces).join(",");
     outputs.push({
       rel: `.cursor/rules/${r.name}.mdc`,
       content: norm(
-        `---\ndescription: ${r.description}\nglobs: ${r.globs.join(",")}\nalwaysApply: false\n---\n\n${r.body}`,
+        `---\ndescription: ${r.description}\nglobs: ${cursorGlobs}\nalwaysApply: false\n---\n\n${r.body}`,
       ),
     });
   }

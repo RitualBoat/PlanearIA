@@ -1,6 +1,6 @@
 ---
 description: Reglas de testing: aplican al editar o crear tests.
-globs: src/__tests__/**/*.{ts,tsx},**/*.test.{ts,tsx}
+globs: src/__tests__/**/*.ts,src/__tests__/**/*.tsx,**/*.test.ts,**/*.test.tsx
 alwaysApply: false
 ---
 

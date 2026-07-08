@@ -1,3 +1,5 @@
+<!-- GENERADO por scripts/syncAgentHarness.mjs desde .agents/. No editar a mano: correr `npm run agent:harness:sync`. -->
+
 # PlanearIA - Shared Agent Context
 
 > **Estado:** vigente.

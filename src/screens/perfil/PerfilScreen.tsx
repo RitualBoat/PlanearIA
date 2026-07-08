@@ -500,7 +500,7 @@ const PerfilScreen: React.FC = () => {
 
         {/* Bento Stats Grid */}
         <View style={[styles.statsGrid, isDesktop && styles.statsGridDesktop]}>
-          {stats.map((s) => (
+          {stats.map((s, i) => (
             <Pressable
               key={s.label}
               onPress={() => handleStatPress(i)}

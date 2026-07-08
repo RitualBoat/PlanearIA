@@ -205,8 +205,8 @@ const InstrumentoCard: React.FC<InstrumentoCardProps> = ({ title, value, optiona
           </View>
 
           <Text style={[styles.label, { color: colors.onSurfaceVariant }]}>Escala</Text>
-          {instrumento.escala.map((scale) => (
-            <View key={`${title}_${scale}`} style={styles.row}>
+          {instrumento.escala.map((scale, index) => (
+            <View key={`${title}_${index}`} style={styles.row}>
               <TextInput
                 style={[
                   styles.input,

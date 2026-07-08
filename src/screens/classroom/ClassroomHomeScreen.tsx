@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   ActivityIndicator,
   Platform,
@@ -62,12 +62,17 @@ const ClassroomHomeScreen: React.FC = () => {
     transform: [{ translateY: interpolate(scrollY.value, [0, 56], [0, -16]) }],
   }));
 
+  const refreshControl = useMemo(
+    () => <RefreshControl refreshing={isLoading} onRefresh={() => void reload()} />,
+    [isLoading, reload]
+  );
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <Animated.ScrollView
         style={styles.scroller}
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => void reload()} />}
+        refreshControl={refreshControl}
         showsVerticalScrollIndicator={Platform.OS === "web"}
         onScroll={scrollHandler}
         scrollEventThrottle={16}

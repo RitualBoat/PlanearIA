@@ -336,9 +336,9 @@ const PerfilScreen: React.FC = () => {
 
           {/* Stats (all zeros) */}
           <View style={[styles.statsGrid, isDesktop && styles.statsGridDesktop]}>
-            {stats.map((s, i) => (
+            {stats.map((s) => (
               <View
-                key={i}
+                key={s.label}
                 style={[
                   styles.statCard,
                   { backgroundColor: colors.surfaceContainerLowest },

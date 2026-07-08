@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Pressable,
   View,
@@ -101,6 +101,18 @@ const FeedScreen: React.FC = () => {
   const route = useRoute<any>();
 
   const isDesktop = width >= 768;
+
+  const refreshControl = useMemo(
+    () => (
+      <RefreshControl
+        refreshing={vm.isRefreshing}
+        onRefresh={vm.handleRefresh}
+        tintColor={colors.primary}
+        colors={[colors.primary]}
+      />
+    ),
+    [vm.isRefreshing, vm.handleRefresh, colors.primary]
+  );
 
   const [optionsPost, setOptionsPost] = useState<Post | null>(null);
   const [showReportModal, setShowReportModal] = useState(false);
@@ -387,14 +399,7 @@ const FeedScreen: React.FC = () => {
             ]}
             ListHeaderComponent={renderCreateBar}
             ListEmptyComponent={renderEmptyState}
-            refreshControl={
-              <RefreshControl
-                refreshing={vm.isRefreshing}
-                onRefresh={vm.handleRefresh}
-                tintColor={colors.primary}
-                colors={[colors.primary]}
-              />
-            }
+            refreshControl={refreshControl}
             ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
             showsVerticalScrollIndicator={false}
           />

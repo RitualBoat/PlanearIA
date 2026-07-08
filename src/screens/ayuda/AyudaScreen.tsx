@@ -123,9 +123,9 @@ export const AyudaScreen: React.FC = () => {
         <View style={styles.sectionBlock}>
           <Text style={styles.sectionTitle}>PREGUNTAS FRECUENTES</Text>
           <View style={styles.faqList}>
-            {FAQS.map((faq, index) => (
+            {FAQS.map((faq) => (
               <FAQAccordionItem
-                key={index}
+                key={faq.pregunta}
                 pregunta={faq.pregunta}
                 respuesta={faq.respuesta}
                 colors={colors}

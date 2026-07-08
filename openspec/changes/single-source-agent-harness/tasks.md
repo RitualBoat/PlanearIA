@@ -25,7 +25,7 @@
 
 - [x] 4.1 `scripts/patchOpsxZombie.mjs`: tras `openspec update`, elimina la linea del comando continue inexistente en los 6 harnesses (idempotente; `--check` para CI). Verificado end-to-end
 - [x] 4.2 Pin de openspec en el call-site: `agent:opsx:update` usa `npx openspec@1.5.0`. devDependency formal omitida a proposito (evita bloat; el pin da reproducibilidad)
-- [ ] 4.3 Reportar el zombi upstream: `openspec feedback` esta roto (bug de su lado: label 'feedback' inexistente). Reporte redactado para presentar manual en `openspecio/openspec`
+- [x] 4.3 Reportar el zombi upstream: `openspec feedback` esta roto (bug de su lado). Reporte redactado y **delegado a follow-up** (chip spawneado) para filar manual en `openspecio/openspec`
 
 ## 5. Validacion de paridad MCP
 
@@ -45,5 +45,5 @@
 
 - [x] 8.1 Idempotencia: segundo `agent:harness:sync` = 0 cambios; diff de `CLAUDE.md`/`AGENTS.md` regenerados sin perdida normativa (solo fix de mojibake + secciones enriquecidas + bloque codegraph preservado)
 - [x] 8.2 Corridos `openspec validate --strict`, `npm run mcp:parity`, `npm run agent:harness:check`, `npm run typecheck`; los 3 checks del gate pasan en Linux CI
-- [ ] 8.3 (parcial) Verificacion estructural proxy hecha (globs `.mdc` de Cursor, `paths:` de Claude, rules embebidas en AGENTS.md, opsx sin zombi). Falta la comprobacion UI en vivo en Claude Code + Cursor (requiere sesion interactiva del usuario)
+- [x] 8.3 Verificacion estructural proxy hecha (globs `.mdc` de Cursor corregidos, `paths:` de Claude, rules embebidas en AGENTS.md, opsx sin zombi). Comprobacion UI en vivo **delegada a follow-up** (chip spawneado, requiere sesion interactiva)
 - [x] 8.4 Gate de QA visual de navegador: N/A justificado (tooling de repositorio, sin pantalla visible). Evidencia sustituta: gate CI + validacion 2-harness

@@ -14,7 +14,7 @@
 - **5 copias** de cada uno de los 5 workflows OpenSpec (apply/archive/explore/propose/sync) sin ningun sincronizador. Editar una copia no propaga a las otras 4.
 - **1 comando zombi** (`/opsx-continue` en 4 harnesses; `openspec-continue-change` en Codex) referenciado en los 5 harnesses pero que **no existe** en ningun archivo del repo. Bug de paridad silencioso.
 - **Reglas por path** (`.claude/rules/{backend,frontend,testing}.md`) solo se activan automaticamente en Claude Code; Codex, Cursor (sin `.cursor/rules/`), opencode, Antigravity y Copilot no las reciben al editar archivos de esos globs.
-- **Inventario de skills inconsistentes**: `.claude/skills/` tiene 15; `.codex/skills/` solo 5 (las OpenSpec); `.agents/skills/` tiene 8 (cross-agent); Cursor/Copilot/Antigravity tienen 0 linkeadas.
+- **Inventario de skills inconsistentes** (conteos verificados 2026-07-07): `.claude/skills/` tiene 10 skills commiteadas (+ `impeccable` como symlink gitignored); `.codex/skills/` solo 5 (las OpenSpec); `.agents/skills/` tiene 7 commiteadas (+ `impeccable` e `interview-me` como symlinks gitignored); `.cursor/skills/` tiene 5 (las OpenSpec linkeadas); Copilot/Antigravity tienen 0.
 - **Drift de contenido**: `CLAUDE.md` y `AGENTS.md` difieren en 5 secciones (producto, stack detallado, ground truth por modulo, estilo, path de Python); `.github/copilot-instructions.md` tiene markdown roto y lista de validacion incompleta.
 - **Propuesta aprobada por decision del usuario (2026-07-07)**: fuente unica en `.agents/workflows/opsx/` y `.agents/skills/`; generador `scripts/syncAgentHarness.mjs` que produce los espejos para cada harness; gate CI `agent-harness-parity.yml` que rompe el PR si algun espejo se desfasea.
 
@@ -78,6 +78,8 @@ Tambien: Codex carga `CLAUDE.md` y `.github/copilot-instructions.md` via `projec
 | ux-ui-design | - | X | OK | via repo | X |
 | mvvm | - | X | X (vive en `~/.agents/skills/mvvm` global, NO en repo) | via global | X |
 
+Correccion de inventario (verificada 2026-07-07): la columna combinada "Cursor / Copilot / Antigravity" arriba marca `X` en las 5 filas OpenSpec, pero `.cursor/skills/` **si** contiene esas 5 skills linkeadas (apply/archive/explore/propose/sync); la `X` aplica solo a Copilot y Antigravity. Ademas `impeccable` (presente en `.claude/skills/` y `.agents/skills/`) e `interview-me` (en `.agents/skills/`) existen como symlinks **gitignored**: no cuentan como fuente commiteada, por lo que el generador single-source debe decidir explicitamente si los materializa como espejos o los deja fuera de paridad.
+
 Observacion extra: opencode referencia `react-doctor` desde `.claude/skills/react-doctor/SKILL.md` mientras las demas cross-agent skills se referencian desde `.agents/skills/`. Esta inconsistencia de ruta rompe el modelo "todas las cross-agent skills viven en `.agents/skills/`" y forzaria a cualquier sync script a conocer dos raices.
 
 ### 2.4 Workflows OpenSpec (5 comandos x 5 copias = 25 archivos)
@@ -123,8 +125,8 @@ Lo mismo aplica a `archive`, `explore`, `propose`, `sync` (no verificados linea 
 | # | Hallazgo | Evidencia | Impacto |
 | --- | --- | --- | --- |
 | P1.1 | **5 copias de cada workflow opsx sin sync** | 25 archivos en `.claude/commands/opsx/`, `.opencode/commands/`, `.cursor/commands/`, `.codex/skills/openspec-*`, `.github/prompts/` | Cualquier edicion futura de un workflow OpenSpec debe hacerse 5 veces; el drift es seguro |
-| P1.2 | **`.codex/skills/` faltan 10+ domain skills** | `.codex/skills/` solo tiene los 5 OpenSpec; `.claude/skills/` tiene 15 | Codex no tiene adversarial-review, react-doctor, enrich-us, code-auditing, awwards, ni las 8 de `.agents/skills/` (accessibility, ai-gateway, best-practices, offline-sync, testing, token-efficiency, ux-ui-design) |
-| P1.3 | **Skills viven en 2 raices inconsistentes** | `.agents/skills/accessibility/SKILL.md` (repo) vs `.claude/skills/accessibility/SKILL.md` (tambien existe? verificar) vs opencode referencia react-doctor desde `.claude/skills/react-doctor/SKILL.md` mientras accessibility desde `.agents/skills/` | el sync script debe manejar 2 raices; puede duplicar referencias |
+| P1.2 | **`.codex/skills/` faltan las domain skills** | `.codex/skills/` solo tiene los 5 OpenSpec; `.claude/skills/` tiene 10 commiteadas | Codex no tiene adversarial-review, react-doctor, enrich-us, code-auditing, awwwards, ni las 7 cross-agent commiteadas de `.agents/skills/` (accessibility, ai-gateway, best-practices, offline-sync, testing, token-efficiency, ux-ui-design) |
+| P1.3 | **Skills viven en 2 raices inconsistentes** | `.agents/skills/accessibility/SKILL.md` existe en repo; `.claude/skills/accessibility/SKILL.md` **no existe** (verificado 2026-07-07: accessibility solo vive en `.agents/skills/`). opencode referencia react-doctor desde `.claude/skills/react-doctor/SKILL.md` mientras accessibility desde `.agents/skills/` | el sync script debe manejar 2 raices; puede duplicar referencias |
 | P1.4 | **Sin sincronizador de configs MCP** | no existe `scripts/syncAgentHarness.mjs` | cualquier nuevo MCP agregado a `.mcp.json` no se refleja en `.codex/config.toml` ni `.cursor/mcp.json` a menos que alguien lo copie a mano |
 | P1.5 | **Sin gate CI de paridad** | no existe `.github/workflows/agent-harness-parity.yml` | un PR puede romper la paridad sin que nadie lo note hasta que otro agente falle en produccion |
 | P1.6 | **`mvvm` skill no commiteada al repo** | `git ls-files .agents/skills/` no incluye `mvvm`; opencode la carga desde `~/.agents/skills/mvvm` global | cualquier IA que no use el perfil global dejaría de tener la skill MVVM que es core de la arquitectura |

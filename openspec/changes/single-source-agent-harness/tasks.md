@@ -1,44 +1,49 @@
-## 1. Fuente neutral en `.agents/`
+## 1. Fuente neutral en `.agents/` (project-owned)
 
-- [ ] 1.1 Crear `.agents/instructions/` con las secciones neutrales (producto, stack, reglas arquitectonicas, lectura por defecto, OpenSpec SDD, MCP, ground truth, validacion, estilo, python) extraidas de `CLAUDE.md` y `AGENTS.md` sin cambiar el contenido normativo
-- [ ] 1.2 Diffear linea por linea las 5 copias de cada workflow opsx (`apply`/`archive`/`explore`/`propose`/`sync`) y consolidar el cuerpo canonico en `.agents/workflows/opsx/*.md`, eliminando toda referencia al comando continue inexistente
-- [ ] 1.3 Mover las reglas por path a `.agents/rules/{backend,frontend,testing}.md` en formato neutral, con metadata de `globs` para los harnesses que la soporten
-- [ ] 1.4 Crear `.agents/permissions.json` con las denegaciones neutrales (`rm -rf`, lectura de `.env*`, etc.)
+- [x] 1.1 Crear `.agents/instructions/` con `core.md` (cuerpo normativo compartido), `claude-header.md`, `agents-header.md` y `copilot.md` (proyeccion compacta)
+- [x] 1.3 Mover las reglas por path a `.agents/rules/{backend,frontend,testing}.md` en formato neutral con frontmatter `description` + `globs`
+- [x] 1.4 Crear `.agents/permissions.json` con las denegaciones neutrales (`rm -rf`, lectura de `.env*`)
+- [x] 1.5 (reemplaza 1.2) Eliminar `.agents/workflows/opsx/`: los workflows opsx son propiedad del CLI de openspec (grupo 4)
 
 ## 2. Skills parity
 
-- [ ] 2.1 Materializar `impeccable`, `interview-me` y `mvvm` como archivos reales en `.agents/skills/` (copiar `mvvm` desde `~/.agents/skills/mvvm` sin borrar el global)
-- [ ] 2.2 Quitar `impeccable`/`interview-me`/`mvvm` del `.gitignore` y confirmar que quedan trackeadas por git
+- [x] 2.1 Materializar `interview-me` y `mvvm` en `.agents/skills/` (`mvvm` copiada desde `~/.agents/skills/mvvm`). `impeccable` queda local (100+ archivos de terceros, re-instalable) por decision de diseno
+- [x] 2.2 Ajustar `.gitignore`: versionar `.agents/instructions|rules|permissions.json|skills` (interview-me, mvvm); mantener `impeccable` ignorado
 
-## 3. Generador `scripts/syncAgentHarness.mjs`
+## 3. Generador `scripts/syncAgentHarness.mjs` (solo project-owned)
 
-- [ ] 3.1 Definir el registro declarativo `HARNESSES` (fuentes que lee y, por tipo de espejo, ruta destino + funcion de render)
-- [ ] 3.2 Render de instrucciones raiz: `CLAUDE.md` y `AGENTS.md` ricos e identicos en contenido normativo; `.github/copilot-instructions.md` como proyeccion compacta con mapeo documentado
-- [ ] 3.3 Render de los 5 workflows opsx a sus espejos (`.claude/commands/opsx/*`, `.opencode/commands/opsx-*`, `.cursor/commands/opsx-*`, `.codex/skills/openspec-*`, `.github/prompts/opsx-*`) con frontmatter/trigger por harness
-- [ ] 3.4 Render de reglas por path: `.claude/rules/*`, `.cursor/rules/*.mdc` (`globs` + `alwaysApply: false`) y embebido como texto en `AGENTS.md` para harnesses sin path-globs
-- [ ] 3.5 Render de MCP: generar `.codex/config.toml` (seccion `[mcp_servers.*]`, conservando `openaiDeveloperDocs`) y `.cursor/mcp.json` desde `.mcp.json`
-- [ ] 3.6 Render de permisos: generar `.claude/settings.json` desde `.agents/permissions.json`; proyectar denegaciones como texto de guia donde el harness no soporta enforcement
-- [ ] 3.7 Espejar skills a `.claude/skills/` y `.codex/skills/` segun soporte de cada harness
-- [ ] 3.8 Implementar `--write` (deterministico, orden estable, normalizacion EOL) y `--check` (imprime diff y sale con codigo != 0 si algun espejo difiere)
-- [ ] 3.9 Agregar scripts npm `agent:harness:sync` (= `--write`) y `agent:harness:check` (= `--check`) en `package.json`
+- [x] 3.1 Registro de espejos (fuente -> destino + render) para instrucciones, rules, MCP y permisos. No incluye workflows opsx
+- [x] 3.2 Render de instrucciones: `CLAUDE.md`/`AGENTS.md` desde header + `core.md` (+ rules embebidas en AGENTS.md); copilot desde `copilot.md`; bloque `CODEGRAPH_START/END` preservado
+- [x] 3.3 Render de rules: `.claude/rules/*.md` (`paths:`) y `.cursor/rules/*.mdc` (`description`+`globs`+`alwaysApply: false`)
+- [x] 3.4 Render de MCP: `.codex/config.toml` (`[mcp_servers.*]`, conserva `openaiDeveloperDocs`) y `.cursor/mcp.json` desde `.mcp.json`
+- [x] 3.5 Render de permisos: `.claude/settings.json` desde `.agents/permissions.json`
+- [ ] 3.6 (follow-up) Espejar skills project-owned a `.codex/skills/`. Diferido: hoy las skills viven en `.agents/skills/` como fuente unica; el espejado recursivo a Codex es un incremento posterior
+- [x] 3.7 `--write` (deterministico, normaliza EOL) y `--check` (diff + exit != 0). Idempotencia verificada
+- [x] 3.8 Scripts npm `agent:harness:sync` / `agent:harness:check` en `package.json`
 
-## 4. Validacion de paridad MCP
+## 4. Workflows opsx: delegar a openspec + patch + upstream
 
-- [ ] 4.1 Extender `scripts/testMcpServers.mjs` para extraer los nombres `[mcp_servers.<name>]` de `.codex/config.toml` y las claves de `.cursor/mcp.json`, compararlos con `.mcp.json` (Codex puede tener extras) y fallar si falta alguno
+- [x] 4.1 `scripts/patchOpsxZombie.mjs`: tras `openspec update`, elimina la linea del comando continue inexistente en los 6 harnesses (idempotente; `--check` para CI). Verificado end-to-end
+- [ ] 4.2 (parcial) Pin de openspec: hoy pineado en el call-site (`openspec@1.5.0` via npx en el flujo local). Agregar como devDependency exacta queda como follow-up (requiere actualizar lockfile)
+- [ ] 4.3 Reportar el zombi upstream con `openspec feedback`
 
-## 5. Gate CI
+## 5. Validacion de paridad MCP
 
-- [ ] 5.1 Crear `.github/workflows/agent-harness-parity.yml` que corre `agent:harness:check` + `npm run mcp:test` con `continue-on-error: true` (modo suave)
-- [ ] 5.2 Documentar en el workflow y en el doc de operacion la senal de cutover a hard-fail (p. ej. N PRs verdes consecutivos)
+- [x] 5.1 `scripts/testMcpServers.mjs --parity-only`: compara nombres de `.mcp.json` vs `.codex/config.toml` y `.cursor/mcp.json` (Codex puede tener extras). Script npm `mcp:parity`
 
-## 6. Documentacion
+## 6. Gate CI
 
-- [ ] 6.1 Actualizar `Documentacion/02-operacion/AGENTES_IDES_PARIDAD.md`: reescribir seccion 4 (supersede wrapper: CLAUDE.md y AGENTS.md ambos ricos), pasar estado a "vigente" y dejar operativo el procedimiento "como agregar un IDE nuevo"
-- [ ] 6.2 Actualizar `Documentacion/02-operacion/MCP_FLUJOS_PLANEARIA.md` (generador + gate) y verificar que el rebrand no rompe referencias en `Documentacion/05-context-engineering/README.md`
+- [x] 6.1 `.github/workflows/agent-harness-parity.yml` (modo suave): `agent:harness:check` + `mcp:parity` + `agent:opsx:patch:check`. El `openspec update + git diff` completo queda como paso local (`agent:opsx:update`) por fragilidad EOL/version en CI
+- [ ] 6.2 (en el workflow) Documentada la senal de cutover a hard-fail (quitar `continue-on-error`)
 
-## 7. Verificacion y evidencia
+## 7. Documentacion
 
-- [ ] 7.1 Idempotencia: correr `npm run agent:harness:sync` dos veces y confirmar `git diff` vacio tras la segunda
-- [ ] 7.2 Correr `openspec validate --change single-source-agent-harness --strict`, `npm run mcp:test -- --timeout=90000`, `npm run agent:harness:check`, y `npm run typecheck`/`lint` (sanity, aunque el change no toca fuente TS)
-- [ ] 7.3 Validacion manual en Claude Code + Cursor: editar `src/**/*.{ts,tsx}` activa rules de frontend; editar `backend/**/*.js` activa rules de backend; `/opsx:apply` (o equivalente) no sugiere el comando zombi. Adjuntar evidencia al issue #41
-- [ ] 7.4 Gate de QA visual de navegador: N/A justificado (este change es tooling de repositorio y no toca ninguna pantalla visible ni superficie UI; no hay nada que validar por breakpoint). Evidencia sustituta: gate CI verde + la validacion 2-harness de 7.3
+- [ ] 7.1 Actualizar `Documentacion/02-operacion/AGENTES_IDES_PARIDAD.md`: seccion 4 (supersede wrapper; opsx es propiedad del CLI de openspec), estado "vigente", procedimiento "agregar IDE nuevo"
+- [ ] 7.2 Actualizar `Documentacion/02-operacion/MCP_FLUJOS_PLANEARIA.md` y verificar referencias en `Documentacion/05-context-engineering/README.md`
+
+## 8. Verificacion y evidencia
+
+- [x] 8.1 Idempotencia: segundo `agent:harness:sync` = 0 cambios; diff de `CLAUDE.md`/`AGENTS.md` regenerados sin perdida normativa (solo fix de mojibake + secciones enriquecidas + bloque codegraph preservado)
+- [ ] 8.2 Correr `openspec validate --strict`, `npm run mcp:parity`, `npm run agent:harness:check`, `npm run typecheck`
+- [ ] 8.3 Validacion manual en Claude Code + Cursor (rules por path; `/opsx:apply` sin zombi tras patch). Evidencia al issue #41
+- [x] 8.4 Gate de QA visual de navegador: N/A justificado (tooling de repositorio, sin pantalla visible). Evidencia sustituta: gate CI + validacion 2-harness

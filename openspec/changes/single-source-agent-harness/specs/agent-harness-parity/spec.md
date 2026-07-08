@@ -70,27 +70,35 @@ Las reglas de `backend`/`frontend`/`testing` SHALL estar disponibles en todos lo
 - **WHEN** el gate se ejecuta
 - **THEN** verifica que `CLAUDE.md` y `AGENTS.md` incluyen las mismas secciones normativas y falla si uno omite contenido que el otro tiene
 
-### Requirement: Los workflows opsx tienen fuente unica y sin comando zombi
-Los cinco workflows opsx SHALL tener un unico cuerpo canonico en `.agents/workflows/opsx/` y SHALL NOT referenciar un comando continue inexistente; los espejos por harness se generan desde ahi.
+### Requirement: Los workflows opsx se generan por el CLI de openspec y quedan sin comando zombi
+Los cinco workflows opsx en los 6 harnesses SHALL mantenerse via `openspec update` con la version de openspec pineada (no via el generador de este change, que no los posee), y un paso de patch post-update SHALL eliminar la referencia al comando continue inexistente que emiten las plantillas upstream de OpenSpec 1.5.0.
 
-#### Scenario: Sin comando zombi
-- **WHEN** se busca en el repo `opsx:continue`, `opsx-continue` u `openspec-continue-change`
-- **THEN** ningun archivo de harness coincide
+#### Scenario: Sin comando zombi tras update + patch
+- **WHEN** se corre `openspec update` seguido del patch post-update
+- **THEN** ningun archivo de harness referencia `opsx:continue`, `opsx-continue` u `openspec-continue-change`
+
+#### Scenario: Paridad de opsx verificada en CI
+- **WHEN** el gate corre `openspec update` + patch y luego `git diff --exit-code`
+- **THEN** falla si los archivos opsx commiteados difieren de la salida generada+parcheada (drift de version del CLI o edicion manual)
 
 #### Scenario: Guia del estado bloqueado
-- **WHEN** el apply alcanza `state: "blocked"`
+- **WHEN** el apply alcanza `state: "blocked"` (tras el patch)
 - **THEN** la guia es listar los artefactos faltantes, abrir un issue de seguimiento y pausar
 
-### Requirement: Las skills compartidas estan commiteadas y espejadas
-`impeccable`, `interview-me` y `mvvm` SHALL estar commiteadas bajo `.agents/skills/` (no como symlinks gitignored ni solo en el perfil global) y espejadas a los harnesses que soportan skills.
+### Requirement: Las skills compartidas project-owned estan commiteadas y espejadas
+`interview-me` y `mvvm` SHALL estar commiteadas bajo `.agents/skills/` (no solo en el perfil global) y espejadas a los harnesses que soportan skills. `impeccable`, por ser una herramienta de diseno de terceros de 100+ archivos re-instalable via `npx skills add pbakaus/impeccable`, SHALL mantenerse local/gitignored y su paridad se documenta como reinstalacion, no como vendoring (evita bloat y respeta la politica de `.gitignore`).
 
-#### Scenario: Skill descubrible
+#### Scenario: Skill project-owned descubrible
 - **WHEN** un harness con soporte de skills carga el repo
-- **THEN** `mvvm`, `interview-me` e `impeccable` son descubribles desde archivos commiteados del repo
+- **THEN** `mvvm` e `interview-me` son descubribles desde archivos commiteados del repo
 
 #### Scenario: Sin dependencia del perfil global
 - **WHEN** se usa un clon limpio sin el perfil global `~/.agents/`
 - **THEN** `mvvm` sigue presente en el repo
+
+#### Scenario: Skill de terceros por reinstalacion
+- **WHEN** un harness necesita `impeccable` en un clon limpio
+- **THEN** el doc de onboarding indica instalarla con `npx skills add pbakaus/impeccable` (no se versiona)
 
 ### Requirement: Los permisos se declaran una vez y se aplican donde el harness lo soporta
 Las denegaciones de seguridad (por ejemplo `rm -rf`, lectura de `.env*`) SHALL declararse en `.agents/permissions.json` y generarse hacia `.claude/settings.json` y cualquier harness que soporte enforcement.

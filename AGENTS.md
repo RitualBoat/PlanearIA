@@ -15,82 +15,142 @@ PlanearIA uses two local code-intelligence tools with strict routing:
 - Use direct reads/`rg` for Markdown docs, assets, generated files, exact full-file editing context, or files outside the index.
 <!-- CODEGRAPH_END -->
 
-# PlanearIA - Codex Agent Guide
+# PlanearIA - Universal Agent Guide
 
 > **Estado:** vigente.
-> **Uso:** entrada de Codex para trabajar en PlanearIA.
-> **Fuente de verdad:** `CLAUDE.md`, `Documentacion/README.md`, `Documentacion/05-context-engineering/README.md`, `openspec/config.yaml`.
+> **Uso:** entrada universal para cualquier agente/IDE (Codex, Cursor, opencode, Antigravity y otros).
+> **Fuente de verdad:** codigo real, `CLAUDE.md`, `openspec/specs/`, `openspec/config.yaml`, `Documentacion/00-fundamentos/`.
 > **No usar para:** saltarse OpenSpec SDD o cerrar trabajo sin evidencia.
 
-## Lectura Inicial
+## Producto
 
-Para trabajo significativo, leer:
+PlanearIA es una suite docente offline-first para profesores mexicanos. Integra herramientas familiares para crear, organizar, asignar, comunicar y dar seguimiento sin saltar entre pestanas, archivos, chats y plataformas externas.
 
-1. `CLAUDE.md`
-2. `Documentacion/README.md`
-3. `Documentacion/05-context-engineering/README.md`
-4. `Documentacion/00-fundamentos/ARQUITECTURA.md`
-5. `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`
-6. `Documentacion/00-fundamentos/IA_CHATBOT_LLM.md`
-7. `Documentacion/01-planes-maestros/meta_guia_planes.md`
-8. Plan activo, spec o carpeta `context/` relacionada.
+Experiencias objetivo:
 
-## Arquitectura Base
+- Escritorio Docente.
+- Office Docente: NotasPLAN, CalcuPLAN y PresentaPLAN.
+- Clases / Classroom.
+- AsistePLAN: ChatGPT/Gemini docente con adjuntos reales.
+- DisenaPLAN: Canva/Genially docente.
+- ConectaPLAN: comunicacion profesional docente.
+- AgendaPLAN, ReportaPLAN, cuenta, seguridad y accesibilidad.
 
-- PlanearIA es una app React Native + Expo SDK 54 + TypeScript para docentes mexicanos.
-- Arquitectura: monolito modular + MVVM pragmatico.
-- Screens delgadas, hooks como ViewModels, Context para estado compartido, services/repositories para I/O.
-- Datos academicos sincronizables usan `src/sync`.
-- Backend: `backend/api/index.js` + `backend/routes`.
-- IA: `backend/lib/aiGateway.js`; nunca keys ni modelos desde frontend.
-- Multiusuario: toda ruta/entidad academica filtra por `userId`.
-- SQLite es opt-in; AsyncStorage sigue como default.
-- Claves `@planearia:*` se borran solo con migracion, validacion y rollback.
-- Presupuesto bajo/cero; evitar microservicios e infraestructura cara.
+Principio rector: familiaridad primero, conexion nativa despues. La IA propone; el docente decide.
 
-## OpenSpec SDD En Codex
+## Stack
 
-Trabajo formal no trivial sigue este protocolo:
+- React Native 0.81.5 + Expo SDK 54 + TypeScript 5.9.
+- React Navigation 7.
+- React Context + hooks como ViewModels.
+- AsyncStorage como default local.
+- Expo SQLite instalado como opt-in, no default.
+- Expo SecureStore para tokens nativos; AsyncStorage como fallback web.
+- Backend Node serverless en `backend/api/index.js` + `backend/routes`.
+- MongoDB Atlas M0.
+- JWT auth con refresh sessions.
+- IA mediante `backend/lib/aiGateway.js` y `backend/lib/aiUsageLimiter.js`.
+- CI/CD con GitHub Actions y Vercel.
+
+## Reglas Arquitectonicas
+
+- Monolito modular y MVVM pragmatico.
+- Screens delgadas; hooks como ViewModels; Context para estado compartido; services/repositories para I/O.
+- Datos academicos sincronizables usan `src/sync`; no crear clientes HTTP ni colas paralelas.
+- Toda entidad multiusuario filtra por `userId`.
+- IA solo via backend; nunca keys ni URLs privadas de proveedores en frontend.
+- Correcciones IA no sobrescriben originales sin confirmacion; generan copia, borrador, diff o resumen revisable.
+- SQLite sigue opt-in hasta aprobacion explicita con migracion, validacion y rollback.
+- No borrar claves legacy `@planearia:*` sin migracion validada y rollback.
+- Presupuesto bajo/cero; no microservicios ni infraestructura cara sin peticion explicita y tradeoffs.
+- Web/tablet/movil parten de una pantalla madre responsiva; archivos `.web.tsx`/`.native.tsx` requieren justificacion.
+
+## Lectura Por Defecto
+
+1. `Documentacion/README.md`.
+2. `Documentacion/05-context-engineering/README.md`.
+3. `Documentacion/00-fundamentos/RESUMEN_EJECUTIVO.md`.
+4. `Documentacion/00-fundamentos/VISION_ACTUAL.md`.
+5. `Documentacion/00-fundamentos/ARQUITECTURA.md`.
+6. `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`.
+7. `Documentacion/00-fundamentos/IA_CHATBOT_LLM.md`.
+8. `Documentacion/01-planes-maestros/meta_guia_planes.md`.
+9. Plan activo, spec OpenSpec o carpeta `context/` relacionada.
+
+## OpenSpec SDD
+
+PlanearIA usa OpenSpec para cambios de producto no triviales. Config activa: `openspec/config.yaml`.
+
+Flujo formal:
 
 ```text
-Paso 0: crear issue GitHub / item Project
-Paso 1: enrich con criterios observables
-Paso 2: OpenSpec propose + apply
-Paso 3: audit + QA real
+Paso 0 - Creacion: issue GitHub / item Project
+Paso 1 - Enrich: criterios de aceptacion observables
+Paso 2 - Propose & Apply: proposal/design/spec/tasks + implementacion tarea por tarea
+Paso 3 - Audit & QA: evidencia tecnica y visual; adversarial review; archive
 ```
-
-En Codex, usar skills del repo:
-
-- `$openspec-explore` para investigar.
-- `$openspec-propose` para crear proposal/design/spec/tasks.
-- `$openspec-apply-change` para implementar tarea por tarea.
-- `$openspec-sync-specs` cuando aplique.
-- `$openspec-archive-change` para archivar.
 
 Reglas:
 
-- Todo change SDD no trivial debe empezar con issue/user story en GitHub y item en `PlanearIA Product OS`
-  antes de enrich, explore o propose. No crear `openspec/changes/<nombre>/` sin ese origen operativo.
-- No implementar cambios de producto no triviales sin change OpenSpec.
-- No marcar `[x]` sin evidencia.
-- UI visible requiere Playwright por breakpoint; el gate visual no es N/A por defecto.
-- Specs archivadas en `openspec/specs/` son verdad de comportamiento y no se editan a mano.
+- El issue/user story y su item en PlanearIA Product OS son obligatorios antes de enrich, explore o
+  propose para todo change SDD no trivial. Solo un hotfix trivial autorizado explicitamente puede saltarlo.
+- El issue se enriquece antes de proponer.
+- Un change grande a la vez.
+- `proposal.md` define why/what/no objetivos.
+- Specs usan `SHALL` + escenarios WHEN/THEN.
+- `tasks.md` contiene tareas tecnicas pequenas.
+- `[x]` solo con evidencia.
+- UI visible requiere Playwright por breakpoint; navegar solo despues de que `expo start --web` responda HTTP 200.
+- `openspec/specs/` es verdad de comportamiento; se actualiza con archive/sync, no a mano.
 
-## MCPs Y Herramientas
+Skills utiles por agente:
 
-- `gitnexus`: primario para estructura, flujos MVVM, call chains, dependencias e impacto de codigo.
-- `codegraph`: secundario/fallback para fuente lineada estilo Read, simbolos puntuales y comprobacion cuando GitNexus sea ambiguo o no este disponible.
-- `github`: issues, PRs y tracking operativo.
-- `context7`: documentacion actual de librerias/APIs.
-- `figma`: ground truth visual cuando exista.
-- `playwright`: QA visual web obligatoria para UI.
-- `planearia-sqlite`: diagnostico read-only de SQLite local opt-in.
+- Claude: `/opsx:*`, `/enrich-us`, `/adversarial-review`.
+- Codex: `$openspec-explore`, `$openspec-propose`, `$openspec-apply-change`, `$openspec-sync-specs`, `$openspec-archive-change`.
 
-Detalle canonico: `Documentacion/02-operacion/MCP_FLUJOS_PLANEARIA.md`.
+## Planes
+
+- Activo: `Documentacion/01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md`.
+- Activo/en cierre: `Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md`.
+- Cerrados: planeaciones, classroom, pasos iniciales, infraestructura local/CI/deploy, SQLite opt-in.
+- Roadmap: `Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md`.
+
+Los planes cerrados prueban funcionalidad; no bloquean redisenios UX/UI.
+
+## MCPs
+
+- GitNexus: primario para preguntas estructurales de codigo, flujos MVVM, call chains, dependencias,
+  backend/IA, sync/offline e impacto. Usar `npx -y gitnexus@latest status` para frescura y
+  `npx -y gitnexus@latest analyze --index-only --name PlanearIA .` para reindexar sin inyectar archivos
+  de agente.
+- CodeGraph: secundario/fallback para fuente lineada estilo Read, simbolos puntuales y comprobacion cuando
+  GitNexus sea ambiguo, este stale o no devuelva suficiente contexto editable.
+- No usar GitNexus y CodeGraph por reflejo en la misma pregunta; usar el segundo solo si el primero falla,
+  omite un archivo clave o el change pide comparacion de evidencia.
+- GitHub: issues, PRs, tracking operativo.
+- Context7: APIs/librerias actuales.
+- Figma: ground truth visual.
+- Playwright: QA visual web obligatoria para UI.
+- Expo/Vercel: diagnostico operativo.
+- PlanearIA SQLite: inspeccion read-only de SQLite opt-in.
+
+Detalle: `Documentacion/02-operacion/MCP_FLUJOS_PLANEARIA.md`.
+
+## Ground Truth
+
+Para paridad alta, usar `context/<modulo>-ground-truth/` y Figma cuando exista:
+
+- Office: Word/Docs, Excel/Sheets, PowerPoint/Slides.
+- AsistePLAN: ChatGPT/Gemini/NotebookLM.
+- Clases: Google Classroom/Classroomio.
+- DisenaPLAN: Canva/Genially.
+- ConectaPLAN: WhatsApp profesional.
+
+Referencias open source son inspiracion y analisis; no son codigo de PlanearIA.
 
 ## Validacion
 
-Usar el set minimo significativo y ampliar segun riesgo:
+Comandos base:
 
 ```bash
 npm run typecheck
@@ -102,12 +162,81 @@ npm run test:sync
 npm run backend:check
 ```
 
-En Windows, si Jest lo necesita:
+Por tipo:
 
-```bash
---rootDir c:\Users\jarco\dev\PlanearIA
-```
+- UI: Playwright + capturas por breakpoint + checklist Nielsen.
+- Sync/datos: offline -> reconexion -> otro dispositivo/backend -> sin perdida local.
+- IA: exito, proveedor ausente, error temporal, limites, confirmacion docente.
+- Backend/auth: `userId`, JWT, sesiones, rate limit, no secretos.
 
 ## Review
 
-Priorizar bugs, perdida de datos, auth/user isolation, sync, botones muertos, estados loading/empty/error/offline, accesibilidad y evidencia faltante.
+Priorizar en revision: bugs, perdida de datos, auth/aislamiento por `userId`, sync, botones muertos, estados loading/empty/error/offline, accesibilidad y evidencia faltante.
+
+## Estilo
+
+- Espanol aceptado en docs y texto usuario.
+- Sin emojis en codigo, docs, commits ni logs.
+- Lenguaje practico y claro.
+- Comentarios explican por que, no que.
+
+## Python
+
+Ejecutable local:
+
+```text
+C:/Users/jarco/AppData/Local/Programs/Python/Python312/python.exe
+```
+
+## Reglas Por Path (referencia embebida)
+
+Para harnesses sin soporte nativo de path-globs, estas reglas aplican al editar los archivos indicados.
+
+> Globs: backend/**/*.js
+
+# Backend Rules
+
+- Every CRUD endpoint MUST create MongoDB indexes (createIndex is idempotent)
+- All queries MUST filter by userId for data isolation
+- Auth: decode JWT with getUserFromToken from backend/lib/auth.js
+- Headers: Authorization Bearer JWT + Content-Type application/json
+- Rate limiting on critical endpoints: login, register, recovery, sync, bulk create, AI
+- Never store secrets in code or commits; use environment variables
+- Add CORS and security headers (helmet or equivalent)
+- AI provider calls must go through backend/lib/aiGateway.js or a backend wrapper that preserves the same contract
+- Local providers such as LM Studio are allowed only behind the backend gateway and only when the backend can reach them
+- AI correction/background-task endpoints must return reviewable results and must not overwrite user content directly
+
+> Globs: src/**/*.{ts,tsx}, App.tsx
+
+# Frontend Rules
+
+- MVVM: screens are thin views, hooks are ViewModels, Context for shared state
+- Colors from src/themes/colors.ts only; do not invent new palettes
+- Icons: use @expo/vector-icons with direct imports, no barrel exports
+- Preserve ThemeContext, FontSizeContext, and DaltonismoContext in any redesign
+- No direct AsyncStorage reads for new syncable academic data; use ports/repositories compatible with src/sync
+- Always handle: loading, error, empty, and offline states
+- Responsive: start from a shared web/tablet/mobile screen; platform-specific files need justification
+- Current UX vision is a connected teacher suite: Asistente IA, Office Docente, Classroom, Canva/Genially, WhatsApp Docente, Calendar, Reports, Account
+- No skeleton/placeholder screens without clear entry points and exit CTAs
+- Do not copy legacy tab/module structure as the target UX unless the active plan justifies it
+- AI chatbot UI must never call OpenAI/Gemini/LM Studio directly; use backend gateway endpoints and confirm actions before saving/assigning
+- Background AI corrections must show status and produce a reviewable copy, draft, diff or summary before applying changes
+- Motion/animation only via react-native-reanimated + gesture-handler (spring configs from motion tokens); Tailwind/GSAP/Framer Motion are DOM-only and PROHIBITED in the RN app (allowed only in the separate landing-web artifact)
+- Every animation must respect the OS reduce-motion setting and hit 60fps on mid-range Android; degrade effects (blur/gradients) to solid surfaces if they jank
+- New/redesigned UI must pass the Design Excellence standard (PLAN_UXUI_NAVEGACION_GLOBAL.md section 1.9): anti-slop checklist, intentional typography from tokens, at least one meaningful micro-interaction, designed loading/empty/error/offline states
+- Verify library APIs (reanimated, gesture-handler, tentap, expo-*) against Context7 docs before writing them; explore code with GitNexus first (CodeGraph fallback) before editing
+
+> Globs: src/__tests__/**/*.{ts,tsx}, **/*.test.{ts,tsx}
+
+# Testing Rules
+
+- Jest + Testing Library for React Native
+- Every functional code change requires tests
+- Run: npm test -- --testPathPattern="<pattern>"
+- Windows: add --rootDir c:\Users\jarco\dev\PlanearIA
+- Classroom tests: npm run test:classroom -- --runInBand
+- Sync tests: npm run test:sync -- --runInBand
+- Backend smoke: npm run backend:check
+- Fix failing tests before marking tasks complete

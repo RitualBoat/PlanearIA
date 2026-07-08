@@ -59,19 +59,28 @@ skills-lock.json
 roadmap-context
 stitch-results
 
-# Exceptions: shared agent workflows MUST be versioned because they configure the SDD workflow.
-# The generic "skills/" pattern above also matches nested tool skill folders, so re-include the
-# project-owned ones explicitly.
-# NOTE: .agents/ is intentionally NOT re-included. It holds third-party design tools installed via
-# `npx skills add ...` (e.g. impeccable): local, re-installable, and not versioned to keep the repo clean.
+# Exceptions: shared agent config MUST be versioned because it configures the SDD workflow and the
+# single-source harness (change: single-source-agent-harness). The generic "skills/" and ".agents/*"
+# patterns above also match these, so re-include the project-owned ones explicitly.
 !.codex/config.toml
 !.codex/skills/
 !.codex/skills/**
 !.claude/skills/
 !.claude/skills/**
 
-# Third-party design tool "impeccable" (npx skills add pbakaus/impeccable): the real files live under
-# .agents/ (ignored above); Claude Code sees them through this symlink. Keep it local, do not commit it.
+# Project-owned neutral harness source under .agents/ (single-source-agent-harness): instructions,
+# rules, permissions and project skills (interview-me, mvvm) MUST be versioned.
+!.agents/instructions/
+!.agents/instructions/**
+!.agents/rules/
+!.agents/rules/**
+!.agents/permissions.json
+!.agents/skills/
+!.agents/skills/**
+
+# ...but "impeccable" stays local: 100+ third-party files, re-installable via
+# `npx skills add pbakaus/impeccable`. Not vendored (bloat + repo policy). Its parity = documented reinstall.
+.agents/skills/impeccable/
 .claude/skills/impeccable
 .impeccable.md
 

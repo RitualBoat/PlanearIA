@@ -5,6 +5,12 @@
 > **Fuente de verdad:** este doc audita y propone; la implementacion vivira en un change OpenSpec que reemplace este documento por la version "vigente" una vez ejecutado.
 > **No usar para:** ejecutar cambios de harness sin la section "Plan de implementacion" aprobada como change SDD.
 
+> **Actualizacion (Fase 0 + Fase 1), issue #41:**
+> - **Fase 0 (hotfix P0)** resuelta en commit `7af0847`: MCP parity Codex/Cursor, comando zombi, markdown de Copilot.
+> - **Fase 1 (single-source)** en el change OpenSpec `single-source-agent-harness`: generador `scripts/syncAgentHarness.mjs` (fuente `.agents/` -> espejos project-owned de instrucciones, rules, MCP y permisos), validacion `npm run mcp:parity`, y gate `agent-harness-parity.yml` en modo suave.
+> - **Hallazgo clave (corrige el plan):** los workflows opsx **NO** son project-owned. Los genera el CLI de openspec (`openspec update`, con `generatedBy` en el frontmatter); su paridad se mantiene con ese comando + `scripts/patchOpsxZombie.mjs`. El comando zombi es un **bug upstream de OpenSpec 1.5.0**, por eso `openspec update` lo reintroduce y el patch lo vuelve a quitar.
+> - **Correccion de la seccion 4:** `CLAUDE.md` **NO** se reduce a wrapper. `CLAUDE.md` y `AGENTS.md` quedan ambos ricos y generados desde `.agents/instructions/` (verificados en paridad por el gate).
+
 ---
 
 ## 1. Resumen Ejecutivo

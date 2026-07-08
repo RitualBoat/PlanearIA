@@ -3,7 +3,10 @@
     "codegraph": {
       "type": "stdio",
       "command": "codegraph",
-      "args": ["serve", "--mcp"]
+      "args": [
+        "serve",
+        "--mcp"
+      ]
     },
     "figma": {
       "type": "http",
@@ -11,29 +14,50 @@
     },
     "context7": {
       "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"]
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ]
     },
     "github": {
       "type": "stdio",
       "command": "node",
-      "args": ["--no-warnings", "scripts/mcpGithubFromGh.mjs"]
+      "args": [
+        "--no-warnings",
+        "scripts/mcpGithubFromGh.mjs"
+      ]
     },
     "vercel": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.vercel.com"]
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.vercel.com"
+      ]
     },
     "expo": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.expo.dev/mcp"]
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.expo.dev/mcp"
+      ]
     },
     "planearia-sqlite": {
       "type": "stdio",
       "command": "node",
-      "args": ["--no-warnings", "scripts/mcpPlaneariaSqlite.mjs"]
+      "args": [
+        "--no-warnings",
+        "scripts/mcpPlaneariaSqlite.mjs"
+      ]
     },
     "playwright": {
       "command": "cmd",
-      "args": ["/c", "npx", "@playwright/mcp@latest"]
+      "args": [
+        "/c",
+        "npx",
+        "@playwright/mcp@latest"
+      ]
     }
   }
 }

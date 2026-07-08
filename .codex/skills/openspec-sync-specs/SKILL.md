@@ -21,7 +21,7 @@ This is an **agent-driven** operation - you will read delta specs and directly e
 
 1. **If no change name provided, prompt for selection**
 
-   Run `openspec list --json` to get available changes. Ask the user directly to select one.
+   Run `openspec list --json` to get available changes. Use the **AskUserQuestion tool** to let the user select.
 
    Show changes that have delta specs (under `specs/` directory).
 
@@ -57,8 +57,8 @@ This is an **agent-driven** operation - you will read delta specs and directly e
    c. **Apply changes intelligently**:
 
       **ADDED Requirements:**
-      - If requirement doesn't exist in main spec -> add it
-      - If requirement already exists -> update it to match (treat as implicit MODIFIED)
+      - If requirement doesn't exist in main spec → add it
+      - If requirement already exists → update it to match (treat as implicit MODIFIED)
 
       **MODIFIED Requirements:**
       - Find the requirement in main spec

@@ -1,0 +1,7 @@
+{
+  "//": "Fuente neutral de permisos de harness. El generador la traduce al formato de cada harness (p. ej. .claude/settings.json). Donde un harness no soporta enforcement, las denegaciones se proyectan como guia de texto en sus instrucciones.",
+  "deny": {
+    "bash": ["rm -rf *", "rm -rf /"],
+    "read": [".env", ".env.*", "backend/.env", "backend/.env.*"]
+  }
+}

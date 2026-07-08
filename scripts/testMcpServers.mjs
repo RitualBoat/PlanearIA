@@ -1,11 +1,39 @@
 import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
+import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
 
 const DEFAULT_TIMEOUT_MS = 45000;
 const cwd = process.cwd();
 const configPath = path.join(cwd, ".mcp.json");
 const config = JSON.parse(await readFile(configPath, "utf8"));
+
+// Parity check: every server declared in .mcp.json (the universal canon) must also be present in the
+// per-harness MCP configs (.codex/config.toml, .cursor/mcp.json). Codex may declare extra servers.
+function checkConfigParity() {
+  const universal = Object.keys(config.mcpServers ?? {});
+  const codexPath = path.join(cwd, ".codex/config.toml");
+  const cursorPath = path.join(cwd, ".cursor/mcp.json");
+  const codexRaw = existsSync(codexPath) ? readFileSync(codexPath, "utf8") : "";
+  const codexNames = [...codexRaw.matchAll(/^\[mcp_servers\.([^\]]+)\]/gm)].map((m) => m[1]);
+  const cursor = existsSync(cursorPath) ? JSON.parse(readFileSync(cursorPath, "utf8")) : { mcpServers: {} };
+  const cursorNames = Object.keys(cursor.mcpServers ?? {});
+  const missingCodex = universal.filter((n) => !codexNames.includes(n));
+  const missingCursor = universal.filter((n) => !cursorNames.includes(n));
+  return { ok: missingCodex.length === 0 && missingCursor.length === 0, universal, codexNames, cursorNames, missingCodex, missingCursor };
+}
+
+if (process.argv.includes("--parity-only")) {
+  const p = checkConfigParity();
+  console.log(JSON.stringify(p, null, 2));
+  if (!p.ok) {
+    console.error("mcp parity: FAIL - servers missing from a harness config (run `npm run agent:harness:sync`).");
+    process.exit(1);
+  }
+  console.log("mcp parity: OK");
+  process.exit(0);
+}
+
 const requestedServers = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
 const timeoutArg = process.argv.find((arg) => arg.startsWith("--timeout="));
 const timeoutMs = timeoutArg ? Number(timeoutArg.split("=")[1]) : DEFAULT_TIMEOUT_MS;

@@ -36,6 +36,11 @@ npm run mcp:test -- --timeout=90000
 Este tester valida handshake `initialize` y `tools/list` de los servidores stdio/locales. Para servidores HTTP
 remotos con OAuth, valida que la configuracion este presente y deja el login al cliente MCP.
 
+Paridad de configs por harness (change `single-source-agent-harness`, issue #41): `.codex/config.toml` y
+`.cursor/mcp.json` se **generan desde `.mcp.json`** con `scripts/syncAgentHarness.mjs` (`npm run agent:harness:sync`),
+y su paridad de nombres se valida con `npm run mcp:parity`. El gate CI `agent-harness-parity.yml` corre ambos.
+No editar esas configs a mano: se regeneran desde `.mcp.json`.
+
 ## Flujo OpenSpec Recomendado
 
 ```text

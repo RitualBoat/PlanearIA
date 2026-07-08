@@ -283,3 +283,54 @@ Una vez implementado el single source:
 7. Documentar el nuevo IDE en la matriz de cobertura de este archivo (seccion 2) y en `Documentacion/02-operacion/MCP_FLUJOS_PLANEARIA.md`.
 
 Este procedimiento reemplaza cualquier decision ad hoc; cualquier IA futura que entre al repo sin seguirlo trabajara con context drift, lo cual el gate CI detectara.
+
+---
+
+## 11. Estado Vigente Post-Fase 1 (implementacion real)
+
+Implementado en el change OpenSpec `single-source-agent-harness` (issue #41). Dos dominios distintos:
+
+### 11.1 Project-owned (generador propio)
+
+Fuente unica en `.agents/` -> espejos generados por `scripts/syncAgentHarness.mjs`:
+
+- `.agents/instructions/{core,claude-header,agents-header,copilot}.md` -> `CLAUDE.md`, `AGENTS.md` (ambos ricos; `core.md` compartido garantiza contenido normativo identico), `.github/copilot-instructions.md`.
+- `.agents/rules/{backend,frontend,testing}.md` -> `.claude/rules/*.md` (`paths:`), `.cursor/rules/*.mdc` (`globs`+`alwaysApply: false`), y bloque embebido en `AGENTS.md`.
+- `.mcp.json` -> `.codex/config.toml` (`[mcp_servers.*]`) y `.cursor/mcp.json`.
+- `.agents/permissions.json` -> `.claude/settings.json`.
+- `.agents/skills/*` (menos `impeccable`) -> `.codex/skills/*`.
+
+Comandos:
+
+```bash
+npm run agent:harness:sync    # regenera espejos (idempotente, normaliza EOL)
+npm run agent:harness:check   # exit 1 si algun espejo difiere de la fuente
+npm run mcp:parity            # nombres de MCP: .mcp.json vs codex/cursor
+```
+
+El generador preserva el bloque externo `<!-- CODEGRAPH_START/END -->` y NO toca los workflows opsx.
+`impeccable` NO se versiona (100+ archivos de terceros): se reinstala con `npx skills add pbakaus/impeccable`.
+
+### 11.2 opsx (propiedad del CLI de openspec)
+
+Los 30 archivos opsx (`.claude/commands/opsx`, `.claude/skills/openspec-*`, `.codex/skills/openspec-*`, `.cursor/commands/opsx-*`, `.opencode/commands/opsx-*`, `.github/prompts/opsx-*`) los genera `openspec update`, NO el generador. El comando zombi `/opsx:continue` es un bug upstream de OpenSpec 1.5.0 que `openspec update` reintroduce; se limpia con el patch:
+
+```bash
+npm run agent:opsx:update        # npx openspec@1.5.0 update --force + patchOpsxZombie
+npm run agent:opsx:patch:check   # exit 1 si queda alguna referencia al comando zombi
+```
+
+### 11.3 Gate CI
+
+`.github/workflows/agent-harness-parity.yml` (modo suave, `continue-on-error`): corre `agent:harness:check` + `mcp:parity` + `agent:opsx:patch:check`. Cutover a hard-fail = quitar `continue-on-error` una vez estable.
+
+### 11.4 Correccion a la seccion 4
+
+`CLAUDE.md` **NO** se reduce a wrapper: `CLAUDE.md` y `AGENTS.md` quedan ambos ricos y generados desde `.agents/instructions/`.
+
+### 11.5 Agregar un IDE nuevo (actualizado)
+
+1. Si lee `AGENTS.md`: nada extra para instrucciones.
+2. Para MCP/rules/permisos/skills: agregar el render del nuevo espejo en `scripts/syncAgentHarness.mjs`.
+3. Para opsx: agregar el tool a `openspec init --tools` y correr `npm run agent:opsx:update`.
+4. `npm run agent:harness:sync && npm run agent:harness:check` y commitear.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Interview Me"
+  short_description: "Clarify intent before issues and stories"
+  default_prompt: "Use $interview-me to clarify my intent before drafting a user story or GitHub issue."

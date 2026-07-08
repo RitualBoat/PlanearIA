@@ -38,7 +38,7 @@
     "mcp:parity": "node --no-warnings scripts/testMcpServers.mjs --parity-only",
     "agent:harness:sync": "node scripts/syncAgentHarness.mjs --write",
     "agent:harness:check": "node scripts/syncAgentHarness.mjs --check",
-    "agent:opsx:update": "openspec update --force && node scripts/patchOpsxZombie.mjs",
+    "agent:opsx:update": "npx --yes openspec@1.5.0 update --force && node scripts/patchOpsxZombie.mjs",
     "agent:opsx:patch:check": "node scripts/patchOpsxZombie.mjs --check",
     "mcp:github": "node --no-warnings scripts/mcpGithubFromGh.mjs",
     "sqlite:inspect": "node --no-warnings scripts/planeariaSqliteInspect.mjs",

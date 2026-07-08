@@ -9,7 +9,7 @@
 //   node scripts/syncAgentHarness.mjs --write   # regenerate mirrors (idempotent)
 //   node scripts/syncAgentHarness.mjs --check   # exit 1 if any mirror drifts from source
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 
 const ROOT = process.cwd();
@@ -193,6 +193,36 @@ function renderPermissions(outputs) {
   });
 }
 
+// ---- Skills mirror (project-owned domain skills -> Codex) -------------------
+// Codex only discovers skills under .codex/skills/. Mirror the committed .agents/skills/* there,
+// EXCLUDING `impeccable` (local third-party tool) and any `openspec-*` (owned by `openspec update`).
+const SKILL_EXCLUDE = new Set(["impeccable"]);
+
+function walkFiles(absDir, baseRel) {
+  const out = [];
+  for (const entry of readdirSync(absDir)) {
+    const abs = path.join(absDir, entry);
+    const rel = `${baseRel}/${entry}`;
+    if (statSync(abs).isDirectory()) out.push(...walkFiles(abs, rel));
+    else out.push(rel);
+  }
+  return out;
+}
+
+function renderSkills(outputs) {
+  const srcRoot = path.join(ROOT, ".agents/skills");
+  if (!existsSync(srcRoot)) return;
+  for (const name of readdirSync(srcRoot)) {
+    if (SKILL_EXCLUDE.has(name) || name.startsWith("openspec-")) continue;
+    const skillAbs = path.join(srcRoot, name);
+    if (!statSync(skillAbs).isDirectory()) continue;
+    for (const fileRel of walkFiles(skillAbs, `.agents/skills/${name}`)) {
+      const target = fileRel.replace(/^\.agents\/skills\//, ".codex/skills/");
+      outputs.push({ rel: target, content: norm(read(fileRel)) });
+    }
+  }
+}
+
 // ---- Driver -----------------------------------------------------------------
 function build() {
   const outputs = [];
@@ -200,6 +230,7 @@ function build() {
   renderRules(outputs);
   renderMcp(outputs);
   renderPermissions(outputs);
+  renderSkills(outputs);
   return outputs;
 }
 

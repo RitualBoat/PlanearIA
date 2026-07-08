@@ -21,7 +21,7 @@ const TrendMiniChart: React.FC<TrendMiniChartProps> = ({ title, subtitle, color,
       <View style={styles.barsWrap}>
         {normalized.slice(-5).map((value, index) => (
           <View
-            key={`${title}-${index}`}
+            key={`${title}-${value}-${index}`}
             style={[
               styles.bar,
               {

@@ -32,6 +32,13 @@ const ESTADO_LABELS: Record<string, string> = {
   finalizada: "FINALIZADA",
 };
 
+const FILTROS: { key: FiltroTipo; label: string }[] = [
+  { key: "todos", label: "Todos" },
+  { key: "tarea", label: "Tareas" },
+  { key: "examen", label: "Exámenes" },
+  { key: "proyecto", label: "Proyectos" },
+];
+
 const ListaEntregablesScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
   const { entregables } = useEntregables();
@@ -70,12 +77,7 @@ const ListaEntregablesScreen: React.FC = () => {
     return result;
   }, [entregables, filtroTipo, searchQuery, gruposMap]);
 
-  const filtros: { key: FiltroTipo; label: string }[] = [
-    { key: "todos", label: "Todos" },
-    { key: "tarea", label: "Tareas" },
-    { key: "examen", label: "Exámenes" },
-    { key: "proyecto", label: "Proyectos" },
-  ];
+  const filtros = FILTROS;
 
   const formatDate = (date: Date | string) => {
     const d = new Date(date);

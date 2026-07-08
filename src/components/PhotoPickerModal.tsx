@@ -30,9 +30,9 @@ const PhotoPickerModal: React.FC<PhotoPickerModalProps> = ({ visible, options, o
         <View style={styles.sheet} onStartShouldSetResponder={() => true}>
           <View style={styles.handle} />
           <Text style={styles.title}>Cambiar foto</Text>
-          {options.map((opt, i) => (
+          {options.map((opt) => (
             <Pressable
-              key={i}
+              key={opt.label}
               style={({ pressed }) => [styles.option, pressed && { opacity: 0.6 }]}
               onPress={() => {
                 opt.onPress();

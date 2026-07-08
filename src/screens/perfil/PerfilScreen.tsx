@@ -500,9 +500,9 @@ const PerfilScreen: React.FC = () => {
 
         {/* Bento Stats Grid */}
         <View style={[styles.statsGrid, isDesktop && styles.statsGridDesktop]}>
-          {stats.map((s, i) => (
+          {stats.map((s) => (
             <Pressable
-              key={i}
+              key={s.label}
               onPress={() => handleStatPress(i)}
               accessibilityRole="button"
               accessibilityLabel={`${s.label}: ${s.value}`}
@@ -593,8 +593,8 @@ const PerfilScreen: React.FC = () => {
             </View>
           ) : (
             <View style={{ gap: 0 }}>
-              {planeaciones.slice(0, 3).map((p, i) => (
-                <View key={`p-${i}`} style={styles.timelineItem}>
+              {planeaciones.slice(0, 3).map((p) => (
+                <View key={p.id} style={styles.timelineItem}>
                   <View style={[styles.timelineDot, { backgroundColor: colors.primary }]} />
                   <View style={{ flex: 1 }}>
                     <Text style={[styles.timelineTitle, { color: colors.onSurface }]}>
@@ -606,8 +606,8 @@ const PerfilScreen: React.FC = () => {
                   </View>
                 </View>
               ))}
-              {grupos.slice(0, 2).map((g, i) => (
-                <View key={`g-${i}`} style={styles.timelineItem}>
+              {grupos.slice(0, 2).map((g) => (
+                <View key={g.id} style={styles.timelineItem}>
                   <View
                     style={[
                       styles.timelineDot,

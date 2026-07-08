@@ -99,7 +99,7 @@ const PostOptionsSheet: React.FC<PostOptionsSheetProps> = ({
 
               return (
                 <Pressable
-                  key={idx}
+                  key={opt.label}
                   style={({ pressed }) => [styles.optionRow, pressed && { opacity: 0.7 }]}
                   onPress={() => {
                     opt.onPress?.();

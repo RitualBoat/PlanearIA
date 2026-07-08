@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Pressable,
   View,
@@ -47,6 +47,10 @@ const CrearTareaGrupoScreen: React.FC = () => {
 
   const headerText = vm.isEditMode ? "Editar\nEntregable" : "Crear\nEntregable";
   const saveText = vm.isEditMode ? "Guardar Cambios" : "Guardar Entregable";
+
+  const fechaAsignacionValue = useMemo(() => new Date(), [vm.showFechaAsignacionPicker]);
+  const fechaEntregaValue = useMemo(() => new Date(), [vm.showFechaEntregaPicker]);
+  const fechaLimiteValue = useMemo(() => new Date(), [vm.showFechaLimitePicker]);
 
   return (
     <View style={styles.container}>
@@ -295,7 +299,7 @@ const CrearTareaGrupoScreen: React.FC = () => {
         {/* Date Pickers */}
         {DateTimePicker && vm.showFechaAsignacionPicker && (
           <DateTimePicker
-            value={new Date()}
+            value={fechaAsignacionValue}
             mode="date"
             display={Platform.OS === "ios" ? "spinner" : "default"}
             onChange={vm.onFechaAsignacionChange}
@@ -303,7 +307,7 @@ const CrearTareaGrupoScreen: React.FC = () => {
         )}
         {DateTimePicker && vm.showFechaEntregaPicker && (
           <DateTimePicker
-            value={new Date()}
+            value={fechaEntregaValue}
             mode="date"
             display={Platform.OS === "ios" ? "spinner" : "default"}
             onChange={vm.onFechaEntregaChange}
@@ -311,7 +315,7 @@ const CrearTareaGrupoScreen: React.FC = () => {
         )}
         {DateTimePicker && vm.showFechaLimitePicker && (
           <DateTimePicker
-            value={new Date()}
+            value={fechaLimiteValue}
             mode="date"
             display={Platform.OS === "ios" ? "spinner" : "default"}
             onChange={vm.onFechaLimiteChange}

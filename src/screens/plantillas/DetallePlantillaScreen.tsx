@@ -197,7 +197,7 @@ const DetallePlantillaScreen: React.FC = () => {
                 <>
                   <Text style={styles.subLabel}>Secciones</Text>
                   {(contenidoParsed.secciones as string[]).map((s, i) => (
-                    <View key={i} style={styles.seccionItem}>
+                    <View key={`${s}-${i}`} style={styles.seccionItem}>
                       <Text style={styles.seccionBullet}>{i + 1}.</Text>
                       <Text style={styles.cardBody}>{s}</Text>
                     </View>

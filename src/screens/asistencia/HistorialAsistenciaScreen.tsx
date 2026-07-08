@@ -20,6 +20,13 @@ interface Props {
 
 type Filtro = "todos" | "presentes" | "retardos" | "faltas";
 
+const FILTROS: { id: Filtro; label: string }[] = [
+  { id: "todos", label: "Todos" },
+  { id: "presentes", label: "Presentes" },
+  { id: "retardos", label: "Retardos" },
+  { id: "faltas", label: "Faltas" },
+];
+
 interface SesionResumen {
   fecha: string;
   fechaDisplay: string;
@@ -135,12 +142,7 @@ const HistorialAsistenciaScreen: React.FC<Props> = ({ navigation, route }) => {
   const porcentajeAsistencia =
     totalRegistros > 0 ? Math.round((totalPresentes / totalRegistros) * 100) : 0;
 
-  const filtros: { id: Filtro; label: string }[] = [
-    { id: "todos", label: "Todos" },
-    { id: "presentes", label: "Presentes" },
-    { id: "retardos", label: "Retardos" },
-    { id: "faltas", label: "Faltas" },
-  ];
+  const filtros = FILTROS;
 
   const handleNavigateRegistrar = () => {
     navigation.navigate("RegistrarAsistencia", { grupoId });

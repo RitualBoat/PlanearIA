@@ -59,7 +59,7 @@ export const SeccionObservaciones: React.FC<SeccionObservacionesProps> = ({ valu
 
       {list.map((observacion, index) => (
         <View
-          key={`obs_${index}`}
+          key={`obs_${observacion.categoria}_${index}`}
           style={[
             styles.card,
             {

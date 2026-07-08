@@ -95,8 +95,8 @@ const ExpandedStatsModal: React.FC<ExpandedStatsModalProps> = ({ visible, data, 
             <Text style={styles.emptyText}>Sin datos aún</Text>
           </View>
         ) : (
-          data.items.map((item, i) => (
-            <View key={i} style={styles.listItem}>
+          data.items.map((item) => (
+            <View key={item.label} style={styles.listItem}>
               <View style={styles.listDot} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.listLabel}>{item.label}</Text>

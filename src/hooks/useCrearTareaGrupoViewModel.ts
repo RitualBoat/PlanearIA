@@ -17,6 +17,12 @@ export interface TipoOption {
   label: string;
 }
 
+const TIPO_OPTIONS: TipoOption[] = [
+  { value: "tarea", label: "Tarea" },
+  { value: "examen", label: "Examen" },
+  { value: "proyecto", label: "Proyecto" },
+];
+
 export interface CrearTareaGrupoViewModel {
   grupoId: number;
   grupoNombre: string;
@@ -101,11 +107,7 @@ export const useCrearTareaGrupoViewModel = (
   const [showFechaEntregaPicker, setShowFechaEntregaPicker] = useState(false);
   const [showFechaLimitePicker, setShowFechaLimitePicker] = useState(false);
 
-  const tipoOptions: TipoOption[] = [
-    { value: "tarea", label: "Tarea" },
-    { value: "examen", label: "Examen" },
-    { value: "proyecto", label: "Proyecto" },
-  ];
+  const tipoOptions = TIPO_OPTIONS;
 
   // Load existing data in edit mode
   useEffect(() => {

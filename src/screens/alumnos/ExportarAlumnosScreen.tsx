@@ -16,6 +16,21 @@ import {
 type Nav = StackNavigationProp<RootStackParamList, "ExportarAlumnos">;
 type Route = RouteProp<RootStackParamList, "ExportarAlumnos">;
 
+const FORMAT_OPTIONS: { key: AlumnoExportFormat; label: string; icon: string; desc: string }[] = [
+  {
+    key: "excel",
+    label: "Excel (.xlsx)",
+    icon: "table-chart",
+    desc: "Hoja de cálculo editable con datos completos.",
+  },
+  {
+    key: "pdf",
+    label: "PDF",
+    icon: "picture-as-pdf",
+    desc: "Documento listo para imprimir o compartir.",
+  },
+];
+
 interface ExportarAlumnosScreenProps {
   navigation: Nav;
 }
@@ -61,20 +76,7 @@ const ExportarAlumnosScreen: React.FC<ExportarAlumnosScreenProps> = ({ navigatio
     }
   };
 
-  const formatOptions: { key: AlumnoExportFormat; label: string; icon: string; desc: string }[] = [
-    {
-      key: "excel",
-      label: "Excel (.xlsx)",
-      icon: "table-chart",
-      desc: "Hoja de cálculo editable con datos completos.",
-    },
-    {
-      key: "pdf",
-      label: "PDF",
-      icon: "picture-as-pdf",
-      desc: "Documento listo para imprimir o compartir.",
-    },
-  ];
+  const formatOptions = FORMAT_OPTIONS;
 
   if (exported) {
     return (

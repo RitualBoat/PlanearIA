@@ -53,7 +53,7 @@ export const SeccionFirmas: React.FC<SeccionFirmasProps> = ({ value, defaultNomb
 
       {list.map((firma, index) => (
         <View
-          key={`firma_${index}`}
+          key={`firma_${firma.rol}_${index}`}
           style={[
             styles.card,
             {

@@ -37,6 +37,8 @@ function getTimeAgo(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("es-MX", { day: "numeric", month: "short" });
 }
 
+const MOCK_COMMENTS: PostComment[] = [];
+
 const PostDetailScreen: React.FC = () => {
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
@@ -95,7 +97,7 @@ const PostDetailScreen: React.FC = () => {
   };
 
   /* Mock comments for display */
-  const mockComments: PostComment[] = [];
+  const mockComments = MOCK_COMMENTS;
 
   const renderComment = ({ item }: { item: PostComment }) => {
     const commentInitials = item.autorNombre

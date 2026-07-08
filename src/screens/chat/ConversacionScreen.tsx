@@ -23,6 +23,19 @@ import { Mensaje } from "../../../types";
 import type { Planeacion } from "../../../types/planeacionLegacy";
 import type { Recurso } from "../../../types";
 
+const TIPO_LABEL: Record<string, string> = {
+  examen: "Examen",
+  presentacion: "Presentación",
+  mapa_mental: "Mapa Mental",
+  linea_tiempo: "Línea de Tiempo",
+  video: "Video",
+  documento: "Documento",
+  imagen: "Imagen",
+  audio: "Audio",
+  enlace: "Enlace",
+  otro: "Otro",
+};
+
 // ─── Design Tokens ───
 
 // Helper to map dynamic theme colors to the legacy DT token schema
@@ -162,18 +175,7 @@ const MessageBubble: React.FC<{
 
   // Recurso message
   if (mensaje.tipo === "recurso" && mensaje.recurso) {
-    const tipoLabel: Record<string, string> = {
-      examen: "Examen",
-      presentacion: "Presentación",
-      mapa_mental: "Mapa Mental",
-      linea_tiempo: "Línea de Tiempo",
-      video: "Video",
-      documento: "Documento",
-      imagen: "Imagen",
-      audio: "Audio",
-      enlace: "Enlace",
-      otro: "Otro",
-    };
+    const tipoLabel = TIPO_LABEL;
     return (
       <View style={[styles.bubbleWrap, isOwn ? styles.bubbleWrapRight : styles.bubbleWrapLeft]}>
         <View style={styles.recursoBubble}>

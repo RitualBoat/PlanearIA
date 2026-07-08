@@ -205,7 +205,7 @@ const EditorPlantillaScreen: React.FC = () => {
                 </Pressable>
               </View>
               {(vm.contenido.secciones || []).map((sec, i) => (
-                <View key={i} style={styles.seccionRow}>
+                <View key={`${sec}-${i}`} style={styles.seccionRow}>
                   <TextInput
                     style={[styles.input, { flex: 1 }]}
                     placeholder={`Sección ${i + 1}`}

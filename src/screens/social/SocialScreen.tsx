@@ -138,6 +138,12 @@ const StatsRow: React.FC<{
 
 // ─── Tab Bar ───
 
+const SOCIAL_TABS: { key: SocialTab; label: string; icon: keyof typeof MaterialIcons.glyphMap }[] = [
+  { key: "contactos", label: "Contactos", icon: "people" },
+  { key: "solicitudes", label: "Solicitudes", icon: "person-add" },
+  { key: "buscar", label: "Buscar", icon: "search" },
+];
+
 const TabBar: React.FC<{
   activeTab: SocialTab;
   onTabChange: (tab: SocialTab) => void;
@@ -146,11 +152,7 @@ const TabBar: React.FC<{
   const { colors, isDark } = useTheme();
   const DT = getThemeTokens(colors);
   const styles = getStyles(DT, isDark);
-  const tabs: { key: SocialTab; label: string; icon: keyof typeof MaterialIcons.glyphMap }[] = [
-    { key: "contactos", label: "Contactos", icon: "people" },
-    { key: "solicitudes", label: "Solicitudes", icon: "person-add" },
-    { key: "buscar", label: "Buscar", icon: "search" },
-  ];
+  const tabs = SOCIAL_TABS;
 
   return (
     <View style={styles.tabBar}>
@@ -404,40 +406,41 @@ const ProfileBottomSheet: React.FC<{
 
 // ─── Empty State ───
 
+const EMPTY_STATE_CONFIGS = {
+  contactos: {
+    icon: "people-outline" as const,
+    title: "Aún no tienes contactos",
+    subtitle: "Busca y conecta con otros docentes para compartir materiales y colaborar.",
+    primaryBtn: "Buscar docentes",
+    primaryIcon: "search" as const,
+    secondaryBtn: "Invitar por enlace",
+    secondaryIcon: "link" as const,
+  },
+  solicitudes: {
+    icon: "mail-outline" as const,
+    title: "Sin solicitudes pendientes",
+    subtitle: "Cuando otros docentes quieran conectar contigo, sus solicitudes aparecerán aquí.",
+    primaryBtn: null,
+    primaryIcon: null,
+    secondaryBtn: null,
+    secondaryIcon: null,
+  },
+  buscar: {
+    icon: "person-search" as const,
+    title: "Busca compañeros docentes",
+    subtitle: "Usa el buscador para encontrar docentes por nombre, materia o institución.",
+    primaryBtn: null,
+    primaryIcon: null,
+    secondaryBtn: null,
+    secondaryIcon: null,
+  },
+};
+
 const EmptyState: React.FC<{ tab: SocialTab; onBuscar?: () => void }> = ({ tab, onBuscar }) => {
   const { colors, isDark } = useTheme();
   const DT = getThemeTokens(colors);
   const styles = getStyles(DT, isDark);
-  const configs = {
-    contactos: {
-      icon: "people-outline" as const,
-      title: "Aún no tienes contactos",
-      subtitle: "Busca y conecta con otros docentes para compartir materiales y colaborar.",
-      primaryBtn: "Buscar docentes",
-      primaryIcon: "search" as const,
-      secondaryBtn: "Invitar por enlace",
-      secondaryIcon: "link" as const,
-    },
-    solicitudes: {
-      icon: "mail-outline" as const,
-      title: "Sin solicitudes pendientes",
-      subtitle: "Cuando otros docentes quieran conectar contigo, sus solicitudes aparecerán aquí.",
-      primaryBtn: null,
-      primaryIcon: null,
-      secondaryBtn: null,
-      secondaryIcon: null,
-    },
-    buscar: {
-      icon: "person-search" as const,
-      title: "Busca compañeros docentes",
-      subtitle: "Usa el buscador para encontrar docentes por nombre, materia o institución.",
-      primaryBtn: null,
-      primaryIcon: null,
-      secondaryBtn: null,
-      secondaryIcon: null,
-    },
-  };
-  const cfg = configs[tab];
+  const cfg = EMPTY_STATE_CONFIGS[tab];
 
   return (
     <View style={styles.emptyState}>

@@ -40,6 +40,17 @@ export interface Tab {
   icon: string;
 }
 
+const TABS: Tab[] = [
+  { id: "alumnos", label: "Alumnos", icon: "people" },
+  { id: "calificaciones", label: "Calificaciones", icon: "grade" },
+  { id: "asistencias", label: "Asistencias", icon: "event-available" },
+  { id: "recursos", label: "Recursos", icon: "folder" },
+  { id: "tareas", label: "Tareas", icon: "assignment" },
+  { id: "graficas", label: "Gráficas", icon: "analytics" },
+  { id: "notas", label: "Notas", icon: "note-alt" },
+  { id: "colaboradores", label: "Colaboradores", icon: "group-add" },
+];
+
 export interface DetalleGrupoViewModel {
   grupoId: number;
   grupoNombre: string;
@@ -167,16 +178,7 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
   const cantidadAlumnos = grupo?.cantidadAlumnos ?? 0;
   const miembros = grupo?.miembros || [];
 
-  const tabs: Tab[] = [
-    { id: "alumnos", label: "Alumnos", icon: "people" },
-    { id: "calificaciones", label: "Calificaciones", icon: "grade" },
-    { id: "asistencias", label: "Asistencias", icon: "event-available" },
-    { id: "recursos", label: "Recursos", icon: "folder" },
-    { id: "tareas", label: "Tareas", icon: "assignment" },
-    { id: "graficas", label: "Gráficas", icon: "analytics" },
-    { id: "notas", label: "Notas", icon: "note-alt" },
-    { id: "colaboradores", label: "Colaboradores", icon: "group-add" },
-  ];
+  const tabs = TABS;
 
   // --- Notes sub-hook ---
   const notasHook = useGrupoNotas(grupoId, grupo, actualizarGrupo);

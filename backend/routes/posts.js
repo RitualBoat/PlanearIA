@@ -77,14 +77,15 @@ async function handleGet(req, res, collection) {
 
   const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
 
-  const posts = await collection
-    .find(query)
-    .sort({ fechaCreacion: -1 })
-    .skip(skip)
-    .limit(parseInt(limit, 10))
-    .toArray();
-
-  const total = await collection.countDocuments(query);
+  const [posts, total] = await Promise.all([
+    collection
+      .find(query)
+      .sort({ fechaCreacion: -1 })
+      .skip(skip)
+      .limit(parseInt(limit, 10))
+      .toArray(),
+    collection.countDocuments(query),
+  ]);
 
   return successResponse(res, {
     count: posts.length,

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Animated,
   Platform,
   Pressable,
   RefreshControl,
@@ -10,6 +9,7 @@ import {
   View,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Animated, { useSharedValue, useAnimatedScrollHandler, useAnimatedStyle, interpolate } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -42,7 +42,7 @@ const ClassroomHomeScreen: React.FC = () => {
     reload,
   } = useClassroomHomeViewModel();
   const [activeTab, setActiveTab] = useState<HomeTab>("cursos");
-  const [scrollY] = React.useState(() => new Animated.Value(0));
+  const scrollY = useSharedValue(0);
   const allPendientes = classrooms.flatMap((item) =>
     item.pendientes.map((pendiente) => ({
       ...pendiente,
@@ -51,16 +51,16 @@ const ClassroomHomeScreen: React.FC = () => {
     }))
   );
 
-  const mobilePillOpacity = scrollY.interpolate({
-    inputRange: [0, 22, 56],
-    outputRange: [1, 0.55, 0],
-    extrapolate: "clamp",
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
   });
-  const mobilePillTranslateY = scrollY.interpolate({
-    inputRange: [0, 56],
-    outputRange: [0, -16],
-    extrapolate: "clamp",
-  });
+
+  const headerAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollY.value, [0, 22, 56], [1, 0.55, 0]),
+    transform: [{ translateY: interpolate(scrollY.value, [0, 56], [0, -16]) }],
+  }));
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -69,18 +69,11 @@ const ClassroomHomeScreen: React.FC = () => {
         contentContainerStyle={styles.content}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => void reload()} />}
         showsVerticalScrollIndicator={Platform.OS === "web"}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-          useNativeDriver: true,
-        })}
+        onScroll={scrollHandler}
         scrollEventThrottle={16}
       >
         <View style={styles.headerBlock}>
-          <Animated.View
-            style={{
-              opacity: mobilePillOpacity,
-              transform: [{ translateY: mobilePillTranslateY }],
-            }}
-          >
+          <Animated.View style={headerAnimatedStyle}>
             <AnimatedTopPill
               icon="school"
               title="Tus clases"

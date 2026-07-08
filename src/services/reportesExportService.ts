@@ -89,8 +89,10 @@ export const exportarReporteGrupoPDF = async (params: ExportParams): Promise<boo
     return openHtmlForPrint(html);
   }
 
-  const { uri } = await Print.printToFileAsync({ html });
-  const canShare = await Sharing.isAvailableAsync();
+  const [{ uri }, canShare] = await Promise.all([
+    Print.printToFileAsync({ html }),
+    Sharing.isAvailableAsync(),
+  ]);
 
   if (canShare) {
     await Sharing.shareAsync(uri, {
@@ -193,8 +195,10 @@ const exportarReporteAlumnoPDF = async (params: AlumnoExportParams): Promise<boo
     return openHtmlForPrint(html);
   }
 
-  const { uri } = await Print.printToFileAsync({ html });
-  const canShare = await Sharing.isAvailableAsync();
+  const [{ uri }, canShare] = await Promise.all([
+    Print.printToFileAsync({ html }),
+    Sharing.isAvailableAsync(),
+  ]);
 
   if (canShare) {
     await Sharing.shareAsync(uri, {

@@ -116,16 +116,17 @@ async function handleGet(req, res, collection, tokenUserId) {
   if (soloNoLeidas === "true") query.leida = false;
   if (desde) query.fechaCreacion = { $gt: desde };
 
-  const notificaciones = await collection
-    .find(query)
-    .sort({ fechaCreacion: -1 })
-    .limit(parseInt(limit, 10))
-    .toArray();
-
-  const totalNoLeidas = await collection.countDocuments({
-    usuarioId,
-    leida: false,
-  });
+  const [notificaciones, totalNoLeidas] = await Promise.all([
+    collection
+      .find(query)
+      .sort({ fechaCreacion: -1 })
+      .limit(parseInt(limit, 10))
+      .toArray(),
+    collection.countDocuments({
+      usuarioId,
+      leida: false,
+    }),
+  ]);
 
   return successResponse(res, {
     count: notificaciones.length,

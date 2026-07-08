@@ -96,10 +96,10 @@ export const useImportarAlumnosViewModel = (grupoId?: number): ImportarAlumnosVi
       setIsImporting(true);
       const baseId = Math.max(0, ...alumnos.map((item) => item.id || 0)) + 1;
 
-      for (let i = 0; i < result.validRows.length; i += 1) {
-        const alumno = buildAlumnoFromDraft(result.validRows[i], baseId + i, grupoId);
-        await agregarAlumno(alumno);
-      }
+      const nuevosAlumnos = result.validRows.map((row, i) =>
+        buildAlumnoFromDraft(row, baseId + i, grupoId)
+      );
+      await Promise.all(nuevosAlumnos.map((alumno) => agregarAlumno(alumno)));
 
       setUiState("success");
     } catch {

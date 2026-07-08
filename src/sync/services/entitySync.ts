@@ -330,37 +330,40 @@ export const syncAllEntities = async (): Promise<SyncSummary> => {
       return summary;
     }
 
-    const registryOutcomes = await Promise.all(
-      Object.values(SYNC_ENTITIES).map((config) =>
-        syncEntity(config).catch(
-          (): EntitySyncOutcome => ({
-            entity: config.entity,
-            ok: false,
-            changed: false,
-            pushed: 0,
-            pulled: 0,
-            unreachable: true,
-            authError: false,
-          })
+    const [registryOutcomes, customOutcomes] = await Promise.all([
+      Promise.all(
+        Object.values(SYNC_ENTITIES).map((config) =>
+          syncEntity(config).catch(
+            (): EntitySyncOutcome => ({
+              entity: config.entity,
+              ok: false,
+              changed: false,
+              pushed: 0,
+              pulled: 0,
+              unreachable: true,
+              authError: false,
+            })
+          )
         )
-      )
-    );
-
-    const customOutcomes = await Promise.all(
-      Array.from(customTasks.entries()).map(([name, task]) =>
-        task().catch(
-          (): EntitySyncOutcome => ({
-            entity: name,
-            ok: false,
-            changed: false,
-            pushed: 0,
-            pulled: 0,
-            unreachable: true,
-            authError: false,
-          })
-        )
-      )
-    );
+      ),
+      customTasks.size > 0
+        ? Promise.all(
+            Array.from(customTasks.entries()).map(([name, task]) =>
+              task().catch(
+                (): EntitySyncOutcome => ({
+                  entity: name,
+                  ok: false,
+                  changed: false,
+                  pushed: 0,
+                  pulled: 0,
+                  unreachable: true,
+                  authError: false,
+                })
+              )
+            )
+          )
+        : Promise.resolve([] as EntitySyncOutcome[]),
+    ]);
 
     for (const outcome of [...registryOutcomes, ...customOutcomes]) {
       summary.pushed += outcome.pushed;

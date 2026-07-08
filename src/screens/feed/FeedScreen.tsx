@@ -8,8 +8,8 @@ import {
   RefreshControl,
   useWindowDimensions,
   Platform,
-  Animated,
 } from "react-native";
+import Animated, { useSharedValue, withRepeat, withTiming, useAnimatedStyle, interpolateColor } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -29,26 +29,26 @@ const ShimmerBlock: React.FC<{
   borderRadius?: number;
   style?: any;
 }> = ({ width, height, borderRadius = 8, style }) => {
-  const [anim] = useState(() => new Animated.Value(0));
+  const anim = useSharedValue(0);
   const { colors } = useTheme();
+
   useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(anim, { toValue: 1, duration: 750, useNativeDriver: false }),
-        Animated.timing(anim, { toValue: 0, duration: 750, useNativeDriver: false }),
-      ])
-    );
-    loop.start();
-    return () => loop.stop();
+    anim.value = withRepeat(withTiming(1, { duration: 750 }), -1, true);
   }, [anim]);
-  const bg = anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [colors.surfaceContainerHigh, colors.surfaceContainerLow],
-  });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    width: typeof width === "number" ? width : ("100%" as any),
+    height,
+    borderRadius,
+    backgroundColor: interpolateColor(
+      anim.value,
+      [0, 1],
+      [colors.surfaceContainerHigh, colors.surfaceContainerLow]
+    ),
+  }));
+
   return (
-    <Animated.View
-      style={[{ width: width as any, height, borderRadius, backgroundColor: bg }, style]}
-    />
+    <Animated.View style={[animatedStyle, style]} />
   );
 };
 

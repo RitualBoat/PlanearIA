@@ -11,7 +11,6 @@ import {
   Platform,
   StatusBar,
   useWindowDimensions,
-  Animated,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -21,6 +20,8 @@ import {
   useBuscadorPerfilesViewModel,
   DocentePerfil,
 } from "../../hooks/useBuscadorPerfilesViewModel";
+
+const NIVELES = ["Todos", "Preescolar", "Primaria", "Secundaria", "Preparatoria", "Universidad"];
 
 // ─── Design Tokens (Scholarly Atelier) ───
 
@@ -490,8 +491,6 @@ const BuscadorPerfilesScreen: React.FC = () => {
   const isDesktop = width >= 768;
   const navigation = useNavigation();
   const vm = useBuscadorPerfilesViewModel();
-
-  const NIVELES = ["Todos", "Preescolar", "Primaria", "Secundaria", "Preparatoria", "Universidad"];
 
   // ─── Search Bar ───
   const renderSearchBar = () => (

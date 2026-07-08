@@ -1,8 +1,5 @@
-import React from "react";
-import {
-  Animated,
-  Easing,
-  StyleProp,
+import React, { use } from "react";
+import { Animated, Easing, StyleProp,
   StyleSheet,
   Text,
   TextStyle,
@@ -38,7 +35,7 @@ const AnimatedTopPill: React.FC<AnimatedTopPillProps> = ({
   subtitleStyle,
   children,
 }) => {
-  const navigation = React.useContext(NavigationContext);
+  const navigation = use(NavigationContext);
   const [ringShift] = React.useState(() => new Animated.Value(0));
   const [ringOpacity] = React.useState(() => new Animated.Value(0));
   const glowAnimationRef = React.useRef<Animated.CompositeAnimation | null>(null);

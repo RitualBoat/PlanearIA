@@ -8,7 +8,6 @@ import {
   Platform,
   StatusBar,
   useWindowDimensions,
-  LayoutAnimation,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -27,7 +26,6 @@ function FAQAccordionItem({ pregunta, respuesta, colors, styles }: FAQItemProps)
   const [expanded, setExpanded] = useState(false);
 
   const toggle = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpanded(!expanded);
   };
 
@@ -53,40 +51,40 @@ function FAQAccordionItem({ pregunta, respuesta, colors, styles }: FAQItemProps)
   );
 }
 
+const FAQS = [
+  {
+    pregunta: "¿Cómo funciona el asistente de planeación con IA?",
+    respuesta:
+      "El asistente utiliza modelos avanzados de inteligencia artificial para generar secuencias didácticas alineadas con los planes de estudio oficiales. Solo ingresa la materia, el tema central y el nivel escolar para obtener una propuesta pedagógica completa.",
+  },
+  {
+    pregunta: "¿Puedo usar la aplicación sin conexión a Internet?",
+    respuesta:
+      "¡Sí! PlanearIA está diseñada con un motor 'offline-first'. Todos tus cambios se guardan localmente en tu dispositivo y se sincronizarán de forma segura con la nube automáticamente cuando recuperes la conexión.",
+  },
+  {
+    pregunta: "¿Cómo colaboro con otros docentes?",
+    respuesta:
+      "Dirígete a la pestaña 'Social' para buscar perfiles de otros profesores. Puedes enviarles una solicitud de conexión, chatear y compartir recursos didácticos o planeaciones de tu biblioteca directamente desde el chat.",
+  },
+  {
+    pregunta: "¿Cómo exporto mis planeaciones o calificaciones?",
+    respuesta:
+      "Dentro del hub de 'Contenido' o en el panel de 'Grupos', abre el menú contextual de tres puntos en el recurso deseado y selecciona 'Exportar'. Podrás descargarlo en formatos PDF, Word o Excel de forma instantánea.",
+  },
+  {
+    pregunta: "¿Cómo agrego alumnos a mis grupos?",
+    respuesta:
+      "En la pestaña 'Grupos', selecciona el grupo correspondiente y entra a la sección de 'Alumnos'. Desde ahí puedes agregar estudiantes de forma manual, importar una lista CSV o enviarles un código de invitación único.",
+  },
+];
+
 export const AyudaScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
   const navigation = useNavigation<any>();
   const { colors, isDark } = useTheme();
   const styles = getStyles(colors, isDark);
-
-  const faqs = [
-    {
-      pregunta: "¿Cómo funciona el asistente de planeación con IA?",
-      respuesta:
-        "El asistente utiliza modelos avanzados de inteligencia artificial para generar secuencias didácticas alineadas con los planes de estudio oficiales. Solo ingresa la materia, el tema central y el nivel escolar para obtener una propuesta pedagógica completa.",
-    },
-    {
-      pregunta: "¿Puedo usar la aplicación sin conexión a Internet?",
-      respuesta:
-        "¡Sí! PlanearIA está diseñada con un motor 'offline-first'. Todos tus cambios se guardan localmente en tu dispositivo y se sincronizarán de forma segura con la nube automáticamente cuando recuperes la conexión.",
-    },
-    {
-      pregunta: "¿Cómo colaboro con otros docentes?",
-      respuesta:
-        "Dirígete a la pestaña 'Social' para buscar perfiles de otros profesores. Puedes enviarles una solicitud de conexión, chatear y compartir recursos didácticos o planeaciones de tu biblioteca directamente desde el chat.",
-    },
-    {
-      pregunta: "¿Cómo exporto mis planeaciones o calificaciones?",
-      respuesta:
-        "Dentro del hub de 'Contenido' o en el panel de 'Grupos', abre el menú contextual de tres puntos en el recurso deseado y selecciona 'Exportar'. Podrás descargarlo en formatos PDF, Word o Excel de forma instantánea.",
-    },
-    {
-      pregunta: "¿Cómo agrego alumnos a mis grupos?",
-      respuesta:
-        "En la pestaña 'Grupos', selecciona el grupo correspondiente y entra a la sección de 'Alumnos'. Desde ahí puedes agregar estudiantes de forma manual, importar una lista CSV o enviarles un código de invitación único.",
-    },
-  ];
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -125,7 +123,7 @@ export const AyudaScreen: React.FC = () => {
         <View style={styles.sectionBlock}>
           <Text style={styles.sectionTitle}>PREGUNTAS FRECUENTES</Text>
           <View style={styles.faqList}>
-            {faqs.map((faq, index) => (
+            {FAQS.map((faq, index) => (
               <FAQAccordionItem
                 key={index}
                 pregunta={faq.pregunta}

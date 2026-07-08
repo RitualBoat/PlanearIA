@@ -170,13 +170,15 @@ const DetallePlantillaScreen: React.FC = () => {
             <View style={styles.card}>
               <Text style={styles.cardLabel}>ETIQUETAS</Text>
               <View style={styles.tagsContainer}>
-                {plantilla.tags
-                  .filter((t) => t !== "__borrador__")
-                  .map((tag) => (
-                    <View key={tag} style={styles.tagChip}>
-                      <Text style={styles.tagChipText}>{tag}</Text>
-                    </View>
-                  ))}
+                {plantilla.tags.flatMap((tag) =>
+                  tag !== "__borrador__"
+                    ? [
+                        <View key={tag} style={styles.tagChip}>
+                          <Text style={styles.tagChipText}>{tag}</Text>
+                        </View>,
+                      ]
+                    : []
+                )}
               </View>
             </View>
           )}

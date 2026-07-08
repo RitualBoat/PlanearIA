@@ -37,25 +37,37 @@ export const obtenerEntregables = async (): Promise<Tarea[]> => {
 export const listarAsignadosGrupo = async (grupoId: number): Promise<AsignableItem[]> => {
   const [recursos, entregables] = await Promise.all([obtenerRecursos(), obtenerEntregables()]);
 
-  const recursosAsignados: AsignableItem[] = recursos
-    .filter((item) => item.grupoId === grupoId)
-    .map((item) => ({
-      id: item.id,
-      titulo: item.titulo,
-      tipo: "recurso",
-      subtipo: item.tipo,
-      grupoId: item.grupoId,
-    }));
+  const recursosAsignados: AsignableItem[] = recursos.reduce<AsignableItem[]>(
+    (acc, item) => {
+      if (item.grupoId === grupoId) {
+        acc.push({
+          id: item.id,
+          titulo: item.titulo,
+          tipo: "recurso",
+          subtipo: item.tipo,
+          grupoId: item.grupoId,
+        });
+      }
+      return acc;
+    },
+    []
+  );
 
-  const entregablesAsignados: AsignableItem[] = entregables
-    .filter((item) => item.grupoId === grupoId)
-    .map((item) => ({
-      id: item.id,
-      titulo: item.titulo,
-      tipo: "entregable",
-      subtipo: item.tipo,
-      grupoId: item.grupoId,
-    }));
+  const entregablesAsignados: AsignableItem[] = entregables.reduce<AsignableItem[]>(
+    (acc, item) => {
+      if (item.grupoId === grupoId) {
+        acc.push({
+          id: item.id,
+          titulo: item.titulo,
+          tipo: "entregable",
+          subtipo: item.tipo,
+          grupoId: item.grupoId,
+        });
+      }
+      return acc;
+    },
+    []
+  );
 
   return [...entregablesAsignados, ...recursosAsignados];
 };

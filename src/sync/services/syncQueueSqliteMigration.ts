@@ -40,12 +40,17 @@ export async function migrateSyncQueueAsyncStorageToSQLite({
   const snapshot = await buildSyncQueueMigrationSnapshot({ entities, createdAt: migratedAt, getItem });
   let pendingCount = 0;
 
-  for (const entity of entities) {
-    const key = getPendingOpsKey(entity);
-    const ops = snapshot.keys[key] ?? [];
-    pendingCount += ops.length;
-    await target.writePendingOps(entity, ops);
-  }
+  await Promise.all(
+    entities.map(async (entity) => {
+      const key = getPendingOpsKey(entity);
+      const ops = snapshot.keys[key] ?? [];
+      await target.writePendingOps(entity, ops);
+    })
+  );
+  pendingCount = entities.reduce((sum, entity) => {
+    const ops = snapshot.keys[getPendingOpsKey(entity)] ?? [];
+    return sum + ops.length;
+  }, 0);
 
   const failed = snapshot.keys[SYNC_FAILED_OPS_STORAGE_KEY] ?? [];
   await target.writeFailedOps(failed);
@@ -71,9 +76,14 @@ export async function buildSyncQueueMigrationSnapshot({
 }): Promise<SyncQueueMigrationSnapshot> {
   const keys: Record<string, GenericPendingOp[]> = {};
 
-  for (const entity of entities) {
-    const key = getPendingOpsKey(entity);
-    keys[key] = parseOps(await getItem(key));
+  const entries = await Promise.all(
+    entities.map(async (entity) => {
+      const key = getPendingOpsKey(entity);
+      return [key, parseOps(await getItem(key))] as const;
+    })
+  );
+  for (const [key, ops] of entries) {
+    keys[key] = ops;
   }
 
   keys[SYNC_FAILED_OPS_STORAGE_KEY] = parseOps(await getItem(SYNC_FAILED_OPS_STORAGE_KEY));

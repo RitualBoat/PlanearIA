@@ -313,13 +313,17 @@ function normalizeRubrica(value) {
   return {
     titulo: text(value?.titulo, "Rubrica sugerida"),
     criterios: criterios
-      .map((item) => ({
-        criterio: text(item?.criterio, ""),
-        excelente: text(item?.excelente, ""),
-        satisfactorio: text(item?.satisfactorio, ""),
-        enProceso: text(item?.enProceso, ""),
-      }))
-      .filter((item) => item.criterio)
+      .reduce((acc, item) => {
+        const criterio = text(item?.criterio, "");
+        if (!criterio) return acc;
+        acc.push({
+          criterio,
+          excelente: text(item?.excelente, ""),
+          satisfactorio: text(item?.satisfactorio, ""),
+          enProceso: text(item?.enProceso, ""),
+        });
+        return acc;
+      }, [])
       .slice(0, 6),
   };
 }
@@ -330,12 +334,16 @@ function normalizeHallazgos(value) {
   const items = Array.isArray(value) ? value : [];
 
   return items
-    .map((item) => ({
-      tipo: validTypes.has(item?.tipo) ? item.tipo : "sugerencia",
-      prioridad: validPriority.has(item?.prioridad) ? item.prioridad : "media",
-      descripcion: text(item?.descripcion, ""),
-    }))
-    .filter((item) => item.descripcion)
+    .reduce((acc, item) => {
+      const descripcion = text(item?.descripcion, "");
+      if (!descripcion) return acc;
+      acc.push({
+        tipo: validTypes.has(item?.tipo) ? item.tipo : "sugerencia",
+        prioridad: validPriority.has(item?.prioridad) ? item.prioridad : "media",
+        descripcion,
+      });
+      return acc;
+    }, [])
     .slice(0, 8);
 }
 

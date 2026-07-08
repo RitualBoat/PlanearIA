@@ -59,9 +59,9 @@ export class ExpoSQLiteClassroomStorage implements ClassroomStoragePort {
     await this.ensureSchema();
     await this.database.runAsync(`DELETE FROM ${config.table}`, {});
 
-    for (const item of data) {
-      await this.upsertItem(config.table, item as PersistableClassroomItem);
-    }
+    await Promise.all(
+      data.map((item) => this.upsertItem(config.table, item as PersistableClassroomItem))
+    );
   }
 
   async ensureSchema(): Promise<void> {

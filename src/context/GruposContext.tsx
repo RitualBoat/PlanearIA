@@ -111,8 +111,7 @@ export const GruposProvider: React.FC<GruposProviderProps> = ({ children }) => {
   const agregarGrupo = useCallback(
     async (grupo: Partial<Grupo>) => {
       await agregarGrupoServicio(grupo);
-      await loadGrupos();
-      await refreshSyncMeta();
+      await Promise.all([loadGrupos(), refreshSyncMeta()]);
     },
     [loadGrupos, refreshSyncMeta]
   );
@@ -120,8 +119,7 @@ export const GruposProvider: React.FC<GruposProviderProps> = ({ children }) => {
   const actualizarGrupo = useCallback(
     async (id: number, actualizacion: Partial<Grupo>) => {
       await actualizarGrupoServicio(id, actualizacion);
-      await loadGrupos();
-      await refreshSyncMeta();
+      await Promise.all([loadGrupos(), refreshSyncMeta()]);
     },
     [loadGrupos, refreshSyncMeta]
   );
@@ -129,8 +127,7 @@ export const GruposProvider: React.FC<GruposProviderProps> = ({ children }) => {
   const eliminarGrupo = useCallback(
     async (id: number) => {
       await eliminarGrupoServicio(id);
-      await loadGrupos();
-      await refreshSyncMeta();
+      await Promise.all([loadGrupos(), refreshSyncMeta()]);
     },
     [loadGrupos, refreshSyncMeta]
   );
@@ -145,8 +142,7 @@ export const GruposProvider: React.FC<GruposProviderProps> = ({ children }) => {
   const invitarDocenteAGrupo = useCallback(
     async (grupoId: number, colaborador: { usuarioId: string; nombre: string; email: string; avatar?: string; rol: RolGrupo }) => {
       await invitarDocenteAGrupoServicio(grupoId, colaborador);
-      await loadGrupos();
-      await refreshSyncMeta();
+      await Promise.all([loadGrupos(), refreshSyncMeta()]);
     },
     [loadGrupos, refreshSyncMeta]
   );
@@ -154,8 +150,7 @@ export const GruposProvider: React.FC<GruposProviderProps> = ({ children }) => {
   const responderInvitacionGrupo = useCallback(
     async (grupoId: number, usuarioId: string, aceptar: boolean) => {
       await responderInvitacionGrupoServicio(grupoId, usuarioId, aceptar);
-      await loadGrupos();
-      await refreshSyncMeta();
+      await Promise.all([loadGrupos(), refreshSyncMeta()]);
     },
     [loadGrupos, refreshSyncMeta]
   );
@@ -163,8 +158,7 @@ export const GruposProvider: React.FC<GruposProviderProps> = ({ children }) => {
   const cambiarRolDocenteGrupo = useCallback(
     async (grupoId: number, usuarioId: string, nuevoRol: RolGrupo) => {
       await cambiarRolDocenteGrupoServicio(grupoId, usuarioId, nuevoRol);
-      await loadGrupos();
-      await refreshSyncMeta();
+      await Promise.all([loadGrupos(), refreshSyncMeta()]);
     },
     [loadGrupos, refreshSyncMeta]
   );
@@ -172,8 +166,7 @@ export const GruposProvider: React.FC<GruposProviderProps> = ({ children }) => {
   const eliminarDocenteGrupo = useCallback(
     async (grupoId: number, usuarioId: string) => {
       await eliminarDocenteGrupoServicio(grupoId, usuarioId);
-      await loadGrupos();
-      await refreshSyncMeta();
+      await Promise.all([loadGrupos(), refreshSyncMeta()]);
     },
     [loadGrupos, refreshSyncMeta]
   );

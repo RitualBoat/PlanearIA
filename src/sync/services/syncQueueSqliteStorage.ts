@@ -27,12 +27,14 @@ export class SyncQueueSQLiteStorage {
     await this.ensureSchema();
     await this.database.runAsync("DELETE FROM sync_queue WHERE entity = $entity", { $entity: entity });
 
-    for (const op of ops) {
-      await this.database.runAsync(
-        "INSERT OR REPLACE INTO sync_queue (id, entity, operation, payload_json, created_at) VALUES ($id, $entity, $operation, $payload, $createdAt)",
-        bindSyncOp(op, op.createdAt),
-      );
-    }
+    await Promise.all(
+      ops.map((op) =>
+        this.database.runAsync(
+          "INSERT OR REPLACE INTO sync_queue (id, entity, operation, payload_json, created_at) VALUES ($id, $entity, $operation, $payload, $createdAt)",
+          bindSyncOp(op, op.createdAt),
+        )
+      )
+    );
   }
 
   async readPendingOps<T = unknown>(entity: string): Promise<GenericPendingOp<T>[]> {
@@ -48,12 +50,14 @@ export class SyncQueueSQLiteStorage {
     await this.ensureSchema();
     await this.database.runAsync("DELETE FROM failed_sync_ops", {});
 
-    for (const op of ops) {
-      await this.database.runAsync(
-        "INSERT OR REPLACE INTO failed_sync_ops (id, entity, operation, payload_json, failed_at) VALUES ($id, $entity, $operation, $payload, $createdAt)",
-        bindSyncOp(op, op.createdAt),
-      );
-    }
+    await Promise.all(
+      ops.map((op) =>
+        this.database.runAsync(
+          "INSERT OR REPLACE INTO failed_sync_ops (id, entity, operation, payload_json, failed_at) VALUES ($id, $entity, $operation, $payload, $createdAt)",
+          bindSyncOp(op, op.createdAt),
+        )
+      )
+    );
   }
 
   async readFailedOps(): Promise<GenericPendingOp[]> {

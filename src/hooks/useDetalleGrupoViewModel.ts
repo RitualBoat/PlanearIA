@@ -221,7 +221,10 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
         calificacionesRaw.filter((calificacion) => calificacion.grupoId === grupoId)
       );
       const tareasGrupoIds = new Set(
-        tareasRaw.filter((tarea) => tarea.grupoId === grupoId).map((t) => t.id)
+        tareasRaw.reduce<number[]>((acc, tarea) => {
+          if (tarea.grupoId === grupoId) acc.push(tarea.id);
+          return acc;
+        }, [])
       );
       setEntregas(entregasRaw.filter((entrega) => tareasGrupoIds.has(entrega.tareaId)));
       setLastDataRefreshAt(new Date());

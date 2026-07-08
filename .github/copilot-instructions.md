@@ -1,8 +1,8 @@
-# Instrucciones Para GitHub Copilot - PlanearIA
+﻿# Instrucciones Para GitHub Copilot - PlanearIA
 
 > **Estado:** vigente.
 > **Uso:** contexto compacto para asistentes ligeros dentro de GitHub/IDE.
-> **Fuente de verdad:** `CLAUDE.md`, `AGENTS.md`, `Documentacion/README.md`, `openspec/config.yaml`.
+> **Fuente de verdad:** \CLAUDE.md\, \AGENTS.md\, \Documentacion/README.md\, \openspec/config.yaml\.
 > **No usar para:** implementar cambios no triviales sin issue enriquecido y change OpenSpec.
 
 ## Contexto
@@ -13,9 +13,21 @@ Arquitectura:
 
 - Monolito modular.
 - MVVM pragmatico: screens delgadas, hooks ViewModel, Context y services/repositories.
-- Sync academico global en `src/sync`.
-- Backend en `backend/api/index.js` + `backend/routes`.
-- IA por `backend/lib/aiGateway.js`; nunca desde frontend.
+- Sync academico global en \src/sync\.
+- Backend en \ackend/api/index.js\ + \ackend/routes\.
+- IA por \ackend/lib/aiGateway.js\; nunca desde frontend.
+
+## Busqueda De Codigo
+
+PlanearIA tiene dos herramientas de inteligencia de codigo con routing estricto:
+
+- **GitNexus primario**: para preguntas estructurales (MVVM, call chains, dependencias, blast radius, backend/IA, sync/offline). CLI: \
+px -y gitnexus@latest query -r PlanearIA "<pregunta>"\. Impact: \
+px -y gitnexus@latest impact -r PlanearIA <simbolo>\.
+- **CodeGraph fallback**: para fuente lineada estilo Read cuando GitNexus no devuelva suficiente contexto editable, este desactualizado o no este disponible. MCP: \codegraph_explore\. CLI: \
+pm run codegraph:explore -- "<pregunta>"\.
+- No usar ambos por reflejo; usar el segundo solo si el primero falla o es ambiguo.
+- Lectura directa/rg para Markdown, docs, assets o archivos fuera del indice.
 
 ## Flujo De Trabajo
 
@@ -33,12 +45,12 @@ No marcar tareas como completas sin evidencia. UI visible requiere Playwright po
 
 ## Reglas Criticas
 
-- Datos academicos sincronizables usan `src/sync`; no crear colas paralelas.
-- Toda entidad multiusuario filtra por `userId`.
-- IA solo via backend y `aiGateway`.
+- Datos academicos sincronizables usan \src/sync\; no crear colas paralelas.
+- Toda entidad multiusuario filtra por \userId\.
+- IA solo via backend y \iGateway\.
 - Correcciones IA generan copia, borrador, diff o resumen revisable; no sobrescriben originales sin confirmacion.
 - SQLite no es default.
-- No borrar `@planearia:*` sin migracion, validacion y rollback.
+- No borrar \@planearia:*\ sin migracion, validacion y rollback.
 - No guardar secretos en codigo ni commits.
 - Presupuesto bajo/cero: evitar microservicios o servicios caros sin aprobacion.
 - Usar tokens/temas existentes; no inventar paletas por pantalla.
@@ -46,21 +58,21 @@ No marcar tareas como completas sin evidencia. UI visible requiere Playwright po
 
 ## Lectura Recomendada
 
-- `Documentacion/README.md`
-- `Documentacion/05-context-engineering/README.md`
-- `Documentacion/00-fundamentos/ARQUITECTURA.md`
-- `Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md`
-- `Documentacion/00-fundamentos/IA_CHATBOT_LLM.md`
-- `Documentacion/01-planes-maestros/meta_guia_planes.md`
-- Plan/spec/carpeta `context/` relacionada.
+- \Documentacion/README.md\
+- \Documentacion/05-context-engineering/README.md\
+- \Documentacion/00-fundamentos/ARQUITECTURA.md\
+- \Documentacion/00-fundamentos/FLUJO_SINCRONIZACION.md\
+- \Documentacion/00-fundamentos/IA_CHATBOT_LLM.md\
+- \Documentacion/01-planes-maestros/meta_guia_planes.md\
+- Plan/spec/carpeta \context/\ relacionada.
 
 ## Validacion
 
-```bash
+\\\ash
 npm run typecheck
 npm run lint -- --quiet
 npm test -- --runInBand
 npm run backend:check
-```
+\\\
 
-Usar tests focalizados cuando el cambio sea peque�o y ampliar si toca sync, auth, backend, IA o UI compartida.
+Usar tests focalizados cuando el cambio sea pequeño y ampliar si toca sync, auth, backend, IA o UI compartida.

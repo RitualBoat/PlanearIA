@@ -159,19 +159,21 @@ const EditorPlantillaScreen: React.FC = () => {
               </View>
               {vm.tags.length > 0 && (
                 <View style={styles.tagsContainer}>
-                  {vm.tags
-                    .filter((t) => t !== "__borrador__")
-                    .map((tag) => (
-                      <View key={tag} style={styles.tagChip}>
-                        <Text style={styles.tagChipText}>{tag}</Text>
-                        <Pressable
-                          style={({ pressed }) => pressed && { opacity: 0.6 }}
-                          onPress={() => vm.removeTag(tag)}
-                        >
-                          <MaterialIcons name="close" size={14} color={COLORS.textSecondary} />
-                        </Pressable>
-                      </View>
-                    ))}
+                  {vm.tags.flatMap((tag) =>
+                    tag !== "__borrador__"
+                      ? [
+                          <View key={tag} style={styles.tagChip}>
+                            <Text style={styles.tagChipText}>{tag}</Text>
+                            <Pressable
+                              style={({ pressed }) => pressed && { opacity: 0.6 }}
+                              onPress={() => vm.removeTag(tag)}
+                            >
+                              <MaterialIcons name="close" size={14} color={COLORS.textSecondary} />
+                            </Pressable>
+                          </View>,
+                        ]
+                      : []
+                  )}
                 </View>
               )}
             </View>

@@ -111,17 +111,14 @@ export const CalificacionesProvider: React.FC<CalificacionesProviderProps> = ({ 
 
       // The replaced records must also disappear from the backend or the
       // next pull would resurrect them
-      let syncOk = true;
-      for (const reemplazada of reemplazadas) {
-        const ok = await queueEntityOperation(SYNC_ENTITIES.calificaciones, "delete", {
-          id: reemplazada.id,
-        });
-        syncOk = syncOk && ok;
-      }
-      for (const nueva of nuevas) {
-        const ok = await queueEntityOperation(SYNC_ENTITIES.calificaciones, "create", nueva);
-        syncOk = syncOk && ok;
-      }
+      const syncOk = (await Promise.all([
+        ...reemplazadas.map((r) =>
+          queueEntityOperation(SYNC_ENTITIES.calificaciones, "delete", { id: r.id })
+        ),
+        ...nuevas.map((n) =>
+          queueEntityOperation(SYNC_ENTITIES.calificaciones, "create", n)
+        ),
+      ])).every(Boolean);
       return { syncOk };
     },
     [calificaciones, persist]

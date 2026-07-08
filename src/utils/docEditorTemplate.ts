@@ -61,9 +61,13 @@ const parseRichTextToPlain = (value?: string): string => {
       const parsed = JSON.parse(trimmed) as {
         content?: Array<{ type?: string; content?: Array<{ text?: string }> }>;
       };
-      return (parsed.content || [])
-        .flatMap((node) => node.content || [])
-        .map((node) => node.text || "")
+      return (parsed.content || []).reduce<string[]>((acc, node) => {
+        for (const child of node.content || []) {
+          const text = child.text;
+          if (text) acc.push(text);
+        }
+        return acc;
+      }, [])
         .join(" ")
         .replace(/\s+/g, " ")
         .trim();

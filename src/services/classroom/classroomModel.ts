@@ -146,42 +146,51 @@ export function buildClassroomActividadReciente(
 export function buildClassroomPendientes(dataset: ClassroomDataset): ClassroomPendiente[] {
   const grupoId = dataset.grupo.id;
   const tareasPendientes = filterByGrupoId(dataset.actividades, grupoId)
-    .filter((tarea) => tarea.estado !== "finalizada")
-    .map((tarea) => ({
-      id: `pendiente-tarea-${tarea.id}`,
-      grupoId,
-      tipo: "entrega_pendiente" as const,
-      titulo: tarea.titulo,
-      descripcion: tarea.descripcion,
-      prioridad: tarea.estado === "asignada" ? "alta" as const : "media" as const,
-      entidadId: tarea.id,
-      fechaLimite: toIsoDate(tarea.fechaEntrega),
-    }));
+    .reduce<ClassroomPendiente[]>((acc, tarea) => {
+      if (tarea.estado === "finalizada") return acc;
+      acc.push({
+        id: `pendiente-tarea-${tarea.id}`,
+        grupoId,
+        tipo: "entrega_pendiente" as const,
+        titulo: tarea.titulo,
+        descripcion: tarea.descripcion,
+        prioridad: tarea.estado === "asignada" ? "alta" as const : "media" as const,
+        entidadId: tarea.id,
+        fechaLimite: toIsoDate(tarea.fechaEntrega),
+      });
+      return acc;
+    }, []);
 
   const calificacionesPendientes = filterByGrupoId(dataset.calificaciones, grupoId)
-    .filter((calificacion) => calificacion.estado === "pendiente")
-    .map((calificacion) => ({
-      id: `pendiente-calificacion-${calificacion.id}`,
-      grupoId,
-      tipo: "calificacion_pendiente" as const,
-      titulo: "Calificacion pendiente",
-      descripcion: calificacion.observaciones,
-      prioridad: "media" as const,
-      entidadId: calificacion.id,
-    }));
+    .reduce<ClassroomPendiente[]>((acc, calificacion) => {
+      if (calificacion.estado !== "pendiente") return acc;
+      acc.push({
+        id: `pendiente-calificacion-${calificacion.id}`,
+        grupoId,
+        tipo: "calificacion_pendiente" as const,
+        titulo: "Calificacion pendiente",
+        descripcion: calificacion.observaciones,
+        prioridad: "media" as const,
+        entidadId: calificacion.id,
+      });
+      return acc;
+    }, []);
 
   const entregasPendientes = filterEntregasByGrupoId(dataset.entregas, grupoId, dataset.actividades)
-    .filter((entrega) => !entrega.calificada)
-    .map((entrega) => ({
-      id: `pendiente-entrega-${entrega.id}`,
-      grupoId,
-      tipo: "actividad_sin_calificar" as const,
-      titulo: "Entrega sin calificar",
-      descripcion: entrega.comentarioAlumno,
-      prioridad: "alta" as const,
-      entidadId: entrega.id,
-      fechaLimite: toIsoDate(entrega.fechaEntrega),
-    }));
+    .reduce<ClassroomPendiente[]>((acc, entrega) => {
+      if (entrega.calificada) return acc;
+      acc.push({
+        id: `pendiente-entrega-${entrega.id}`,
+        grupoId,
+        tipo: "actividad_sin_calificar" as const,
+        titulo: "Entrega sin calificar",
+        descripcion: entrega.comentarioAlumno,
+        prioridad: "alta" as const,
+        entidadId: entrega.id,
+        fechaLimite: toIsoDate(entrega.fechaEntrega),
+      });
+      return acc;
+    }, []);
 
   return [...tareasPendientes, ...calificacionesPendientes, ...entregasPendientes];
 }
@@ -209,9 +218,11 @@ function calculateAttendancePercentage(asistencias: Asistencia[]): number {
 }
 
 function calculateGroupAverage(calificaciones: Calificacion[]): number {
-  const values = calificaciones
-    .map((calificacion) => Number(calificacion.promedio))
-    .filter((value) => Number.isFinite(value));
+  const values = calificaciones.reduce<number[]>((acc, calificacion) => {
+    const value = Number(calificacion.promedio);
+    if (Number.isFinite(value)) acc.push(value);
+    return acc;
+  }, []);
 
   if (values.length === 0) {
     return 0;
@@ -222,9 +233,11 @@ function calculateGroupAverage(calificaciones: Calificacion[]): number {
 }
 
 function getLatestDate(values: Array<string | Date | undefined>): string | undefined {
-  const timestamps = values
-    .map((value) => new Date(toIsoDate(value)).getTime())
-    .filter((value) => Number.isFinite(value));
+  const timestamps = values.reduce<number[]>((acc, value) => {
+    const timestamp = new Date(toIsoDate(value)).getTime();
+    if (Number.isFinite(timestamp)) acc.push(timestamp);
+    return acc;
+  }, []);
 
   if (timestamps.length === 0) {
     return undefined;

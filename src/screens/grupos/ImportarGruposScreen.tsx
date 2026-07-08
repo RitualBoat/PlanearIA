@@ -105,10 +105,10 @@ const ImportarGruposScreen: React.FC<ImportarGruposScreenProps> = ({ navigation 
       setIsImporting(true);
       const baseId = Math.max(0, ...grupos.map((item) => item.id || 0)) + 1;
 
-      for (let i = 0; i < result.validRows.length; i += 1) {
-        const grupo = buildGrupoFromDraft(result.validRows[i], baseId + i);
-        await agregarNuevoGrupo(grupo);
-      }
+      const nuevosGrupos = result.validRows.map((row, i) =>
+        buildGrupoFromDraft(row, baseId + i)
+      );
+      await Promise.all(nuevosGrupos.map((grupo) => agregarNuevoGrupo(grupo)));
 
       setUiState("success");
     } catch {

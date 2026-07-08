@@ -107,9 +107,13 @@ const stripRichText = (value?: string): string => {
       const json = JSON.parse(trimmed) as {
         content?: Array<{ content?: Array<{ text?: string }> }>;
       };
-      return (json.content || [])
-        .flatMap((node) => node.content || [])
-        .map((node) => node.text || "")
+      return (json.content || []).reduce<string[]>((acc, node) => {
+        for (const child of node.content || []) {
+          const text = child.text;
+          if (text) acc.push(text);
+        }
+        return acc;
+      }, [])
         .join(" ")
         .trim();
     } catch {

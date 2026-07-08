@@ -97,8 +97,11 @@ export async function buildClassroomMigrationSnapshot(
 ): Promise<ClassroomMigrationSnapshot> {
   const keys: Record<string, unknown[]> = {};
 
-  for (const key of ACADEMIC_KEYS) {
-    keys[key] = await sourceStorage.readArray<unknown>(key);
+  const entries = await Promise.all(
+    ACADEMIC_KEYS.map(async (key) => [key, await sourceStorage.readArray<unknown>(key)] as const)
+  );
+  for (const [key, data] of entries) {
+    keys[key] = data;
   }
 
   return {

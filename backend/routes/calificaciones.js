@@ -38,11 +38,13 @@ module.exports = async (req, res) => {
     const { db } = await connectToDatabase();
     const collection = db.collection(COLLECTION);
 
-    // Crear índices (idempotente)
-    await collection.createIndex({ id: 1 }, { unique: true });
-    await collection.createIndex({ alumnoId: 1 });
-    await collection.createIndex({ grupoId: 1 });
-    await collection.createIndex({ userId: 1, fechaRegistro: -1 });
+    // Crear índices (idempotente) — los 4 índices son independientes
+    await Promise.all([
+      collection.createIndex({ id: 1 }, { unique: true }),
+      collection.createIndex({ alumnoId: 1 }),
+      collection.createIndex({ grupoId: 1 }),
+      collection.createIndex({ userId: 1, fechaRegistro: -1 }),
+    ]);
 
     switch (req.method) {
       case "GET":
@@ -105,27 +107,27 @@ async function handlePost(req, res, collection, userId) {
       return errorResponse(res, 400, "Array de registros vacío");
     }
 
-    let created = 0;
-    let updated = 0;
+    const validItems = body.filter((item) => item.alumnoId && item.grupoId);
 
-    for (const item of body) {
-      if (!item.alumnoId || !item.grupoId) continue;
+    const results = await Promise.all(
+      validItems.map(async (item) => {
+        const doc = {
+          ...item,
+          ...(userId ? { userId } : {}),
+          syncedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
 
-      const doc = {
-        ...item,
-        ...(userId ? { userId } : {}),
-        syncedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+        const matchKey = { alumnoId: doc.alumnoId, grupoId: doc.grupoId };
+        if (userId) matchKey.userId = userId;
 
-      const matchKey = { alumnoId: doc.alumnoId, grupoId: doc.grupoId };
-      if (userId) matchKey.userId = userId;
+        const result = await collection.updateOne(matchKey, { $set: doc }, { upsert: true });
+        return result;
+      })
+    );
 
-      const result = await collection.updateOne(matchKey, { $set: doc }, { upsert: true });
-
-      if (result.upsertedCount > 0) created++;
-      else updated++;
-    }
+    const created = results.filter((r) => r.upsertedCount > 0).length;
+    const updated = results.length - created;
 
     return successResponse(res, { action: "bulk", created, updated, total: body.length }, 201);
   }

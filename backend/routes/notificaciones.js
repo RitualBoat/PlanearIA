@@ -63,9 +63,11 @@ module.exports = async (req, res) => {
     const collection = db.collection(COLLECTION);
 
     // Crear índices (idempotente)
-    await collection.createIndex({ id: 1 }, { unique: true });
-    await collection.createIndex({ usuarioId: 1, leida: 1 });
-    await collection.createIndex({ fechaCreacion: -1 });
+    await Promise.all([
+      collection.createIndex({ id: 1 }, { unique: true }),
+      collection.createIndex({ usuarioId: 1, leida: 1 }),
+      collection.createIndex({ fechaCreacion: -1 }),
+    ]);
 
     // When a JWT is present, the owner is derived from the token (usuarioId
     // from the client is ignored) so a user can only touch their own

@@ -269,9 +269,7 @@ const CapturarCalificacionesScreen: React.FC<Props> = ({ navigation, route }) =>
           text: "Eliminar",
           style: "destructive",
           onPress: async () => {
-            for (const id of existentesIds) {
-              await eliminarCalificacion(id);
-            }
+            await Promise.all(existentesIds.map((id) => eliminarCalificacion(id)));
             setCalificacionesDrafts((prev) => ({ ...prev, [inputSourceKey]: {} }));
             Alert.alert("Eliminado", "Se eliminaron las calificaciones del grupo.");
           },

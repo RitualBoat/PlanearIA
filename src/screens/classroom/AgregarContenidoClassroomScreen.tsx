@@ -219,14 +219,16 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
       setNotas(extractNotasFromInstructions(tarea.instrucciones));
       const attachments = parseTaskAttachments(tarea.recursosNecesarios);
       setLinks(
-        attachments
-          .filter((attachment) => attachment.type === "enlace")
-          .map((attachment) => attachment.uri)
+        attachments.reduce<string[]>((acc, attachment) => {
+          if (attachment.type === "enlace") acc.push(attachment.uri);
+          return acc;
+        }, [])
       );
       setUploadedFiles(
-        attachments
-          .filter((attachment) => attachment.type === "archivo")
-          .map((attachment) => ({ name: attachment.label, uri: attachment.uri }))
+        attachments.reduce<{ name: string; uri: string }[]>((acc, attachment) => {
+          if (attachment.type === "archivo") acc.push({ name: attachment.label, uri: attachment.uri });
+          return acc;
+        }, [])
       );
       return;
     }
@@ -239,14 +241,16 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
       setDescripcion(recurso.descripcion || "");
       const attachments = parseAttachmentsFromTags(recurso);
       setUploadedFiles(
-        attachments
-          .filter((attachment) => attachment.type === "archivo")
-          .map((attachment) => ({ name: attachment.label, uri: attachment.uri }))
+        attachments.reduce<{ name: string; uri: string }[]>((acc, attachment) => {
+          if (attachment.type === "archivo") acc.push({ name: attachment.label, uri: attachment.uri });
+          return acc;
+        }, [])
       );
       setLinks(
-        attachments
-          .filter((attachment) => attachment.type === "enlace")
-          .map((attachment) => attachment.uri)
+        attachments.reduce<string[]>((acc, attachment) => {
+          if (attachment.type === "enlace") acc.push(attachment.uri);
+          return acc;
+        }, [])
       );
     }
   }, [isEditMode, obtenerEntregablePorId, obtenerRecursoPorId, recursoId, tareaId]);

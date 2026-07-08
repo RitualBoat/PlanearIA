@@ -55,9 +55,11 @@ module.exports = async (req, res) => {
     const { db } = await connectToDatabase();
     const collection = db.collection(COLLECTION);
 
-    await collection.createIndex({ id: 1, userId: 1 }, { unique: true });
-    await collection.createIndex({ userId: 1, fechaModificacion: -1 });
-    await collection.createIndex({ syncedAt: -1 });
+    await Promise.all([
+      collection.createIndex({ id: 1, userId: 1 }, { unique: true }),
+      collection.createIndex({ userId: 1, fechaModificacion: -1 }),
+      collection.createIndex({ syncedAt: -1 }),
+    ]);
 
     const { deviceId, lastSync, operations = [], mode = "legacy" } = req.body || {};
 
@@ -73,15 +75,14 @@ module.exports = async (req, res) => {
           : undefined,
     };
 
-    for (const op of operations) {
-      try {
-        if (!op || !op.type) continue;
+    const opResults = await Promise.all(
+      operations.map(async (op) => {
+        if (!op || !op.type) return { ok: false };
 
         if ((op.type === "create" || op.type === "update") && op.data?.id) {
           const doc = normalizeDocForV2(op.data, userIdFromToken);
           if (!doc.userId) {
-            result.errors.push(`${op.type} ${op.data.id}: userId requerido`);
-            continue;
+            return { ok: false, error: `${op.type} ${op.data.id}: userId requerido` };
           }
 
           await collection.updateOne(
@@ -95,8 +96,7 @@ module.exports = async (req, res) => {
             },
             { upsert: true }
           );
-          result.uploaded += 1;
-          continue;
+          return { ok: true };
         }
 
         if (op.type === "delete" && op.data?.id) {
@@ -106,11 +106,16 @@ module.exports = async (req, res) => {
             deleteQuery.userId = opUserId;
           }
           await collection.deleteOne(deleteQuery);
-          result.uploaded += 1;
+          return { ok: true };
         }
-      } catch (err) {
-        result.errors.push(`${op?.type || "unknown"} ${op?.data?.id || "sin_id"}: ${err.message}`);
-      }
+
+        return { ok: false };
+      })
+    );
+
+    result.uploaded = opResults.filter((r) => r.ok).length;
+    for (const r of opResults) {
+      if (r.error) result.errors.push(r.error);
     }
 
     const query = {};

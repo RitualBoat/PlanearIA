@@ -7,10 +7,55 @@ project_doc_fallback_filenames = ["CLAUDE.md", ".github/copilot-instructions.md"
 [features]
 goals = true
 
+# --- Codex-specific extra (not in .mcp.json) ---
 [mcp_servers.openaiDeveloperDocs]
 url = "https://developers.openai.com/mcp"
 startup_timeout_sec = 20
 tool_timeout_sec = 60
+
+# --- Parity with .mcp.json (universal MCP source of truth) ---
+# Keep these in sync with .mcp.json until scripts/syncAgentHarness.mjs (Fase 1) generates them.
+
+[mcp_servers.codegraph]
+command = "codegraph"
+args = ["serve", "--mcp"]
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+
+[mcp_servers.figma]
+url = "https://mcp.figma.com/mcp"
+startup_timeout_sec = 20
+tool_timeout_sec = 60
+
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp@latest"]
+startup_timeout_sec = 60
+tool_timeout_sec = 90
+
+[mcp_servers.github]
+command = "node"
+args = ["--no-warnings", "scripts/mcpGithubFromGh.mjs"]
+startup_timeout_sec = 30
+tool_timeout_sec = 90
+
+[mcp_servers.vercel]
+command = "npx"
+args = ["-y", "mcp-remote", "https://mcp.vercel.com"]
+startup_timeout_sec = 60
+tool_timeout_sec = 120
+
+[mcp_servers.expo]
+command = "npx"
+args = ["-y", "mcp-remote", "https://mcp.expo.dev/mcp"]
+startup_timeout_sec = 60
+tool_timeout_sec = 120
+
+[mcp_servers.planearia-sqlite]
+command = "node"
+args = ["--no-warnings", "scripts/mcpPlaneariaSqlite.mjs"]
+startup_timeout_sec = 30
+tool_timeout_sec = 90
 
 [mcp_servers.playwright]
 command = "cmd"

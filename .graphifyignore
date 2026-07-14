@@ -1,0 +1,17 @@
+# Exclusiones para el grafo Graphify (sintaxis .gitignore).
+# node_modules/.venv/.gitnexus/.codegraph/dist/android/.expo ya salen por .gitignore.
+
+# Codigo open-source de referencia: NO es codigo de PlanearIA, contaminaria el grafo.
+context/referencias-opensource/
+context/planeaciones-ground-truth/referencias-opensource/
+
+# Copias de worktrees viejos (leftover de la migracion).
+.claude/worktrees/
+
+# Indices de otras herramientas de code-intelligence.
+.gitnexus/
+.codegraph/
+.playwright-mcp/
+
+# Salida del propio Graphify.
+graphify-out/

@@ -90,6 +90,9 @@ stitch-results
 # CodeGraph MCP local index (generated per machine; never commit the SQLite DB)
 .codegraph/
 
+# Graphify knowledge graph (generated per machine; rebuild with graphify extract)
+graphify-out/
+
 # Local SQLite databases and sidecar files (device/export/debug only)
 *.db
 *.db-shm

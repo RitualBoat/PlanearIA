@@ -107,14 +107,22 @@ Los planes cerrados prueban funcionalidad; no bloquean redisenios UX/UI.
 
 ## MCPs
 
-- GitNexus: primario para preguntas estructurales de codigo, flujos MVVM, call chains, dependencias,
-  backend/IA, sync/offline e impacto. Usar `npx -y gitnexus@latest status` para frescura y
-  `npx -y gitnexus@latest analyze --index-only --name PlanearIA .` para reindexar sin inyectar archivos
-  de agente.
-- CodeGraph: secundario/fallback para fuente lineada estilo Read, simbolos puntuales y comprobacion cuando
-  GitNexus sea ambiguo, este stale o no devuelva suficiente contexto editable.
-- No usar GitNexus y CodeGraph por reflejo en la misma pregunta; usar el segundo solo si el primero falla,
-  omite un archivo clave o el change pide comparacion de evidencia.
+Ruteo de RAGs de conocimiento (IMPLICITO: consulta el RAG correcto de forma directa,
+sin deliberar ni pedir permiso ni releer archivos a mano; asi no se gastan tokens):
+
+- GitNexus: PRIMARIO para casi cualquier consulta estructural de codigo (flujos MVVM, call chains,
+  dependencias, backend/IA, sync/offline, impacto). Es el default de toda IA/agente para entender el codigo.
+  Frescura: `npx -y gitnexus@latest status`; reindex: `npx -y gitnexus@latest analyze --index-only --name PlanearIA .`
+  (siempre con `--index-only` para no inyectar archivos de agente).
+- CodeGraph: FALLBACK cuando GitNexus no da el detalle exacto de UN archivo o simbolo especifico
+  (fuente lineada estilo Read, comprobacion puntual), esta stale o resulta ambiguo. No usar junto a GitNexus
+  por reflejo; solo si el primero falla, omite un archivo clave o el change pide comparacion de evidencia.
+- Graphify: para preguntas ABIERTAS y de alto nivel sobre el proyecto (vision, alcance, contexto,
+  recomendaciones estrategicas: "cual es la vision actual?", "que recomiendas?", "deberia cambiar el alcance
+  o el contexto?") y como apoyo AL ACTUALIZAR documentacion. Grafo de conocimiento sobre codigo + docs.
+  Consulta via MCP `graphify` o CLI: `graphify query "<pregunta>"`, `graphify path "A" "B"`, `graphify explain "X"`.
+  Reconstruir: `npm run graphify:build` (codigo, local, sin API) o `npm run graphify:build:full` (agrega la capa
+  semantica de docs; requiere un backend LLM). No usar Graphify para detalle fino de un simbolo: eso es GitNexus/CodeGraph.
 - GitHub: issues, PRs, tracking operativo.
 - Context7: APIs/librerias actuales.
 - Figma: ground truth visual.

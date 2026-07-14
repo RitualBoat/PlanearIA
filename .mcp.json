@@ -34,6 +34,11 @@
     "playwright": {
       "command": "cmd",
       "args": ["/c", "npx", "@playwright/mcp@latest"]
+    },
+    "graphify": {
+      "type": "stdio",
+      "command": "graphify-mcp",
+      "args": []
     }
   }
 }

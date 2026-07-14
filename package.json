@@ -40,6 +40,8 @@
     "agent:harness:check": "node scripts/syncAgentHarness.mjs --check",
     "agent:opsx:update": "npx --yes openspec@1.5.0 update --force && node scripts/patchOpsxZombie.mjs",
     "agent:opsx:patch:check": "node scripts/patchOpsxZombie.mjs --check",
+    "opsx:finish": "node scripts/opsxFinishChange.mjs",
+    "opsx:finish:dry": "node scripts/opsxFinishChange.mjs --dry-run",
     "mcp:github": "node --no-warnings scripts/mcpGithubFromGh.mjs",
     "sqlite:inspect": "node --no-warnings scripts/planeariaSqliteInspect.mjs",
     "mcp:sqlite": "node --no-warnings scripts/mcpPlaneariaSqlite.mjs",

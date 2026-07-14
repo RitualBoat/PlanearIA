@@ -90,6 +90,7 @@ Paso 0 - Creacion: issue GitHub / item Project
 Paso 1 - Enrich: criterios de aceptacion observables
 Paso 2 - Propose & Apply: proposal/design/spec/tasks + implementacion tarea por tarea
 Paso 3 - Audit & QA: evidencia tecnica y visual; adversarial review; archive
+Paso 4 - Cierre: merge de la rama del change a development, push y borrado de la rama (npm run opsx:finish)
 ```
 
 Reglas:
@@ -104,6 +105,7 @@ Reglas:
 - `[x]` solo con evidencia.
 - UI visible requiere Playwright por breakpoint; navegar solo despues de que `expo start --web` responda HTTP 200.
 - `openspec/specs/` es verdad de comportamiento; se actualiza con archive/sync, no a mano.
+- Tras archivar, cerrar la rama del change con `npm run opsx:finish`: mergea (merge commit) a development, hace push y borra la rama local y remota. Guardas: rehusa en ramas protegidas (main/development) o con arbol sucio, y solo borra si git la ve mergeada. Previsualiza con `npm run opsx:finish:dry`. Asi no se acumulan ramas por change.
 
 Skills utiles por agente:
 

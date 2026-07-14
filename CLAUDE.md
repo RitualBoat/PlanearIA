@@ -171,5 +171,5 @@ Priorizar en revision: bugs, perdida de datos, auth/aislamiento por `userId`, sy
 Ejecutable local:
 
 ```text
-C:/Users/jarco/AppData/Local/Programs/Python/Python312/python.exe
+C:/Users/RitualBoatLaptop/AppData/Local/Programs/Python/Python314/python.exe
 ```

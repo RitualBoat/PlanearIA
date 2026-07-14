@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "expo-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "web"],
+      "port": 8081
+    },
+    {
+      "name": "backend-local",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "backend:dev:local"],
+      "port": 3000
+    }
+  ]
+}

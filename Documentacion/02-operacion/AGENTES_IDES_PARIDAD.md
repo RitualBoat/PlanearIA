@@ -111,7 +111,7 @@ Lo mismo aplica a `archive`, `explore`, `propose`, `sync` (no verificados linea 
 | `npm run test:planeaciones` | OK | OK | X |
 | `npm run test:sync` | OK | OK | X |
 | `npm run backend:check` | OK | OK | OK |
-| Path Windows worktree (`--rootDir c:\Users\jarco\dev\PlanearIA`) | OK (en `testing.md`) | OK | X (rutas hardcodeadas distintas) |
+| Path Windows worktree (`--rootDir C:\Users\RitualBoatLaptop\Documents\Projects\PlanearIA`) | OK (en `testing.md`) | OK | X (rutas hardcodeadas distintas) |
 
 ---
 

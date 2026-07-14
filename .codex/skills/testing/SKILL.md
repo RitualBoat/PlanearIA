@@ -26,7 +26,7 @@ npm run backend:check
 On Windows, add this if Jest scans outside the repo:
 
 ```bash
---rootDir c:\Users\jarco\dev\PlanearIA
+--rootDir C:\Users\RitualBoatLaptop\Documents\Projects\PlanearIA
 ```
 
 ## What To Test

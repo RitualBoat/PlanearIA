@@ -187,7 +187,7 @@ Priorizar en revision: bugs, perdida de datos, auth/aislamiento por `userId`, sy
 Ejecutable local:
 
 ```text
-C:/Users/jarco/AppData/Local/Programs/Python/Python312/python.exe
+C:/Users/RitualBoatLaptop/AppData/Local/Programs/Python/Python314/python.exe
 ```
 
 ## Reglas Por Path (referencia embebida)
@@ -237,7 +237,7 @@ Para harnesses sin soporte nativo de path-globs, estas reglas aplican al editar 
 - Jest + Testing Library for React Native
 - Every functional code change requires tests
 - Run: npm test -- --testPathPattern="<pattern>"
-- Windows: add --rootDir c:\Users\jarco\dev\PlanearIA
+- Windows: add --rootDir C:\Users\RitualBoatLaptop\Documents\Projects\PlanearIA
 - Classroom tests: npm run test:classroom -- --runInBand
 - Sync tests: npm run test:sync -- --runInBand
 - Backend smoke: npm run backend:check

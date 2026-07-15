@@ -100,18 +100,19 @@ Decision vigente desde issue #40 / change `evaluate-gitnexus-codegraph-sdd`:
 Comandos GitNexus validados:
 
 ```bash
-npx -y gitnexus@latest status
-npx -y gitnexus@latest analyze --index-only --name PlanearIA .
-npx -y gitnexus@latest query -r PlanearIA "<pregunta>"
-npx -y gitnexus@latest impact -r PlanearIA <simbolo>
-npx -y gitnexus@latest context -r PlanearIA <simbolo>
-npx -y gitnexus@latest clean --force
-npx -y gitnexus@latest clean --all --force
+npm run gitnexus:diagnose
+npm run gitnexus:repair
+npm run gitnexus:verify
 ```
 
 Notas:
 
 - Usar `--index-only` para no inyectar secciones en `AGENTS.md`/`CLAUDE.md`, skills ni hooks.
+- `gitnexus:verify` es el gate de salud: falla ante diagnostico FTS, query MVVM sin contexto, impact no exacto
+  o cambios no permitidos en instrucciones de agentes. Para una edicion intencional de esas instrucciones,
+  declarar cada path con `--allow-agent-change <path>` y conservar la evidencia.
+- La version aprobada es `1.6.10-rc.23`; el wrapper prepara solo el proceso de Windows con OpenSSL 3 si esta
+  instalado y no persiste variables de entorno ni configuracion global.
 - `gitnexus setup` no queda habilitado por defecto en este repo; evaluarlo aparte si se quiere MCP persistente.
 - GitNexus genera `.gitnexus/` local y `~/.gitnexus/registry.json`. La carpeta local contiene su propio
   `.gitignore` con `*`; no commitear indices.

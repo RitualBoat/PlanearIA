@@ -64,7 +64,7 @@ Paso 0 - Creacion: issue GitHub / item Project
 Paso 1 - Enrich: criterios de aceptacion observables
 Paso 2 - Propose & Apply: proposal/design/spec/tasks + implementacion tarea por tarea
 Paso 3 - Audit & QA: evidencia tecnica y visual; adversarial review; archive
-Paso 4 - Cierre: merge de la rama del change a development, push y borrado de la rama (npm run opsx:finish)
+Paso 4 - Cierre: PR/merge de GitHub hacia development y borrado de la rama (npm run opsx:finish)
 ```
 
 Reglas:
@@ -79,7 +79,7 @@ Reglas:
 - `[x]` solo con evidencia.
 - UI visible requiere Playwright por breakpoint; navegar solo despues de que `expo start --web` responda HTTP 200.
 - `openspec/specs/` es verdad de comportamiento; se actualiza con archive/sync, no a mano.
-- Tras archivar, cerrar la rama del change con `npm run opsx:finish`: mergea (merge commit) a development, hace push y borra la rama local y remota. Guardas: rehusa en ramas protegidas (main/development) o con arbol sucio, y solo borra si git la ve mergeada. Previsualiza con `npm run opsx:finish:dry`. Asi no se acumulan ramas por change.
+- Tras archivar, cerrar la rama del change con `npm run opsx:finish`: publica la rama, crea o reutiliza un PR hacia `development`, espera los checks requeridos y ordena el merge a GitHub. Nunca hace push directo al target protegido; tras confirmar el merge remoto actualiza `development` local y borra la rama local. Previsualiza con `npm run opsx:finish:dry`.
 
 Skills utiles por agente:
 
@@ -102,8 +102,10 @@ sin deliberar ni pedir permiso ni releer archivos a mano; asi no se gastan token
 
 - GitNexus: PRIMARIO para casi cualquier consulta estructural de codigo (flujos MVVM, call chains,
   dependencias, backend/IA, sync/offline, impacto). Es el default de toda IA/agente para entender el codigo.
-  Frescura: `npx -y gitnexus@latest status`; reindex: `npx -y gitnexus@latest analyze --index-only --name PlanearIA .`
-  (siempre con `--index-only` para no inyectar archivos de agente).
+  Frescura: `npm run gitnexus:diagnose`; reparacion local: `npm run gitnexus:repair`; gate de salud:
+  `npm run gitnexus:verify`. La version queda fijada dentro del wrapper y la reparacion usa siempre
+  `--repair-fts --index-only` para no inyectar archivos de agente. CodeGraph entra como fallback si este
+  contrato falla o no entrega el contexto requerido.
 - CodeGraph: FALLBACK cuando GitNexus no da el detalle exacto de UN archivo o simbolo especifico
   (fuente lineada estilo Read, comprobacion puntual), esta stale o resulta ambiguo. No usar junto a GitNexus
   por reflejo; solo si el primero falla, omite un archivo clave o el change pide comparacion de evidencia.

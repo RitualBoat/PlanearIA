@@ -1,122 +1,101 @@
-// Cierre de un change OpenSpec: mergea la rama del change en development, hace
-// push y borra la rama (local y remota). Se ejecuta DESPUES de /opsx:archive,
-// cuando el change ya quedo archivado y commiteado, para que las ramas de
-// trabajo no se acumulen (una rama por change).
+// Cierre de un change OpenSpec mediante PR. development es protegida: este
+// script nunca hace checkout, merge ni push directo sobre el target.
 //
 // Uso:
 //   node scripts/opsxFinishChange.mjs [--target development] [--dry-run] [--keep-remote]
-//
-// Guardas (por que): un merge+borrado equivocado es dificil de revertir, asi que
-// el script se niega a correr desde una rama protegida o con cambios sin commitear,
-// y solo borra la rama si git confirma que quedo 100% mergeada (`branch -d`).
 
-import { execSync } from "node:child_process";
+import { execFileSync } from 'node:child_process';
 
 const args = process.argv.slice(2);
-const has = (f) => args.includes(f);
-const val = (f, d) => (has(f) ? args[args.indexOf(f) + 1] : d);
+const has = (flag) => args.includes(flag);
+const value = (flag, fallback) => (has(flag) ? args[args.indexOf(flag) + 1] : fallback);
+const DRY = has('--dry-run');
+const KEEP_REMOTE = has('--keep-remote');
+const TARGET = value('--target', 'development');
+const PROTECTED = ['main', 'master', 'development'];
 
-const DRY = has("--dry-run");
-const KEEP_REMOTE = has("--keep-remote");
-const TARGET = val("--target", "development");
-const PROTECTED = ["main", "master", "development"];
-
-function git(cmd) {
-  return execSync(`git ${cmd}`, { encoding: "utf8" }).trim();
-}
-function run(cmd) {
+function execute(command, commandArgs, { capture = true } = {}) {
   if (DRY) {
-    console.log(`  [dry-run] git ${cmd}`);
-    return "";
+    console.log(`  [dry-run] ${command} ${commandArgs.join(' ')}`);
+    return '';
   }
-  return execSync(`git ${cmd}`, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] })
-    .toString()
-    .trim();
+
+  const output = execFileSync(command, commandArgs, {
+    encoding: 'utf8',
+    stdio: capture ? ['ignore', 'pipe', 'pipe'] : 'inherit',
+  });
+  return (output ?? '').trim();
 }
-function die(msg) {
-  console.error(`\n[opsx:finish] ABORTADO: ${msg}\n`);
+
+function git(...commandArgs) {
+  return execute('git', commandArgs);
+}
+
+function readGit(...commandArgs) {
+  return execFileSync('git', commandArgs, { encoding: 'utf8' }).trim();
+}
+
+function gh(...commandArgs) {
+  const options = typeof commandArgs.at(-1) === 'object' ? commandArgs.pop() : undefined;
+  return execute('gh', commandArgs, options);
+}
+
+function abort(message) {
+  console.error(`\n[opsx:finish] ABORTADO: ${message}\n`);
   process.exit(1);
 }
-function ok(msg) {
-  console.log(`[opsx:finish] ${msg}`);
+
+function ok(message) {
+  console.log(`[opsx:finish] ${message}`);
 }
 
-// 1) Rama actual: debe ser la rama del change, no una protegida.
-const branch = git("rev-parse --abbrev-ref HEAD");
-if (branch === "HEAD") die("Estas en detached HEAD. Cambia a la rama del change.");
-if (PROTECTED.includes(branch)) {
-  die(`Estas en '${branch}' (rama protegida). Ejecuta esto desde la rama del change, no desde ${PROTECTED.join("/")}.`);
-}
-if (branch === TARGET) die(`La rama actual es el target '${TARGET}'. Nada que cerrar.`);
+const branch = readGit('rev-parse', '--abbrev-ref', 'HEAD');
+if (branch === 'HEAD') abort('Estas en detached HEAD. Cambia a la rama del change.');
+if (PROTECTED.includes(branch)) abort(`Estas en '${branch}', una rama protegida.`);
+if (branch === TARGET) abort(`La rama actual es el target '${TARGET}'. Nada que cerrar.`);
+if (readGit('status', '--porcelain')) abort('Hay cambios sin commitear. Archiva y commitea antes de cerrar.');
 
-// 2) Arbol limpio: el archive ya debio commitearse.
-if (git("status --porcelain")) {
-  die("Hay cambios sin commitear. Corre /opsx:archive y commitea antes de cerrar la rama (git status).");
-}
+console.log(`\n[opsx:finish] Cerrando '${branch}' -> '${TARGET}' mediante PR${DRY ? ' (DRY-RUN)' : ''}\n`);
 
-console.log(`\n[opsx:finish] Cerrando change '${branch}' -> '${TARGET}'${DRY ? "  (DRY-RUN)" : ""}\n`);
+gh('auth', 'status');
+git('fetch', 'origin', '--prune');
+git('push', '-u', 'origin', branch);
 
-// 3) Sincronizar refs y validar que target no diverja del remoto.
-run("fetch origin --prune");
-const remoteTargetExists = (() => {
-  try {
-    git(`rev-parse --verify --quiet refs/remotes/origin/${TARGET}`);
-    return true;
-  } catch {
-    return false;
-  }
-})();
-
-// 4) Pasar a target y ponerlo al dia (solo fast-forward; si diverge, el usuario decide).
-run(`checkout ${TARGET}`);
-if (remoteTargetExists && !DRY) {
-  try {
-    git(`merge --ff-only origin/${TARGET}`);
-  } catch {
-    run(`checkout ${branch}`);
-    die(`'${TARGET}' local diverge de origin/${TARGET}. Reconcilialo a mano (git pull) y reintenta.`);
-  }
-} else if (remoteTargetExists) {
-  console.log(`  [dry-run] git merge --ff-only origin/${TARGET}`);
-}
-
-// 5) Merge de la rama del change (merge commit explicito: deja rastro del change en la historia).
-const mergeMsg = `Merge ${branch} into ${TARGET} (opsx finish)`;
+let pullRequest;
 try {
-  run(`merge --no-ff ${branch} -m "${mergeMsg}"`);
+  pullRequest = JSON.parse(gh('pr', 'view', branch, '--json', 'number,state,url,headRefOid'));
 } catch {
-  run("merge --abort");
-  run(`checkout ${branch}`);
-  die(`Conflicto al mergear '${branch}' en '${TARGET}'. Resuelvelo a mano y reintenta.`);
-}
-ok(`merge OK (${branch} -> ${TARGET})`);
-
-// 6) Push del target.
-run(`push origin ${TARGET}`);
-ok(`push OK (origin/${TARGET})`);
-
-// 7) Borrar la rama del change: local (solo si quedo mergeada) y remota.
-try {
-  run(`branch -d ${branch}`);
-  ok(`rama local '${branch}' borrada`);
-} catch {
-  run(`checkout ${branch}`);
-  die(`No pude borrar '${branch}' con -d (git la ve como no-mergeada). Revisa antes de forzar.`);
-}
-
-const remoteBranchExists = (() => {
-  try {
-    git(`rev-parse --verify --quiet refs/remotes/origin/${branch}`);
-    return true;
-  } catch {
-    return false;
+  const title = `Cierra ${branch} en ${TARGET}`;
+  const body = `Cierre automatizado del change OpenSpec desde \`${branch}\`.\n\n- Merge mediante PR protegido\n- CI requerida antes de merge\n- Limpieza de rama solo tras merge remoto`;
+  const created = gh('pr', 'create', '--base', TARGET, '--head', branch, '--title', title, '--body', body);
+  if (DRY) {
+    ok('PR seria creado; dry-run termina antes de esperar CI.');
+    process.exit(0);
   }
-})();
-if (remoteBranchExists && !KEEP_REMOTE) {
-  run(`push origin --delete ${branch}`);
-  ok(`rama remota 'origin/${branch}' borrada`);
-} else if (remoteBranchExists) {
-  ok(`rama remota 'origin/${branch}' conservada (--keep-remote)`);
+  pullRequest = JSON.parse(gh('pr', 'view', branch, '--json', 'number,state,url,headRefOid'));
+  ok(`PR creado: ${created || pullRequest.url}`);
 }
 
-console.log(`\n[opsx:finish] Listo. '${branch}' cerrada y mergeada en '${TARGET}'.${DRY ? "  (no se ejecuto nada: DRY-RUN)" : ""}\n`);
+if (pullRequest.state !== 'OPEN') abort(`El PR #${pullRequest.number} no esta abierto (${pullRequest.state}).`);
+ok(`esperando checks requeridos del PR #${pullRequest.number}`);
+gh('pr', 'checks', String(pullRequest.number), '--watch', '--fail-fast', { capture: false });
+
+if (DRY) {
+  ok('dry-run termina antes de merge y limpieza.');
+  process.exit(0);
+}
+
+gh('pr', 'merge', String(pullRequest.number), '--merge', '--delete-branch', '--match-head-commit', pullRequest.headRefOid);
+ok(`PR #${pullRequest.number} mergeado por GitHub`);
+
+git('fetch', 'origin', '--prune');
+git('checkout', TARGET);
+git('merge', '--ff-only', `origin/${TARGET}`);
+git('branch', '-d', branch);
+ok(`rama local '${branch}' borrada`);
+
+if (KEEP_REMOTE) {
+  ok(`rama remota conservada (--keep-remote): origin/${branch}`);
+}
+
+console.log(`\n[opsx:finish] Listo. '${branch}' se cerro mediante PR en '${TARGET}'.\n`);

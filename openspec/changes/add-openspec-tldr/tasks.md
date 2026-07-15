@@ -19,4 +19,4 @@
 - [x] 4.1 Ejecutar las pruebas nuevas de TLDR, `npm run test:openspec-cli`, `npm run agent:opsx:patch:check`, `npm run agent:harness:check`, `npm run openspec:validate` y `npm run openspec:check`.
 - [x] 4.2 Ejecutar `npm run typecheck` y `npm run lint -- --quiet`; documentar cualquier fallo preexistente o corregir los introducidos por el change.
 - [x] 4.3 Revisar manualmente un TLDR generado, incluido el de este change, para confirmar los cinco bloques, el lenguaje accesible, encabezados útiles y máximo de 120 palabras por bloque; no convertir esta revisión en regla del checker.
-- [ ] 4.4 Adjuntar al issue #67 y al PR la salida de validación, la evidencia de fixtures y la revisión de rollback; antes de archive confirmar que el TLDR refleja el alcance final y que el directorio lo conservará.
+- [x] 4.4 Adjuntar al issue #67 y al PR la salida de validación, la evidencia de fixtures y la revisión de rollback; antes de archive confirmar que el TLDR refleja el alcance final y que el directorio lo conservará.

@@ -118,6 +118,10 @@ Skills utiles por agente:
 - Activo/en cierre: `Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md`.
 - Cerrados: planeaciones, classroom, pasos iniciales, infraestructura local/CI/deploy, SQLite opt-in.
 - Roadmap: `Documentacion/00-fundamentos/ROADMAP_PLANES_MAESTROS.md`.
+- Cronologia UX/UI e IHC: el gate operativo R1 precede Ola 1; durante Ola 1 avanzan shell, recorridos IHC y preparacion del
+  prototipo Figma navegable; el gate operativo R2 precede la UI visible de Ola 2; las entrevistas con el prototipo ocurren
+  antes de cerrar Ola 2 y sus hallazgos ajustan el backlog antes de Ola 3. La aprobacion Figma y el
+  reclutamiento IHC son gates manuales con evidencia propia.
 
 Los planes cerrados prueban funcionalidad; no bloquean redisenios UX/UI.
 

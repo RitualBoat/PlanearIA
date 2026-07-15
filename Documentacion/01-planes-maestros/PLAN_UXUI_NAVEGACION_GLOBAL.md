@@ -138,7 +138,7 @@ Objetivo: que PlanearIA se vea y se sienta de nivel premium/showcase, SIN traici
 "familiaridad y calma" ni el presupuesto de hardware de las personas (Maria usa Android gama media).
 La regla de oro: **el wow vive en el pulido (motion, ritmo, detalle), no en layouts exoticos.**
 
-#### 1.10.1 Donde aplica cada nivel de intensidad
+#### 1.9.1 Donde aplica cada nivel de intensidad
 
 | Zona | Intensidad | Por que |
 | --- | --- | --- |
@@ -147,7 +147,7 @@ La regla de oro: **el wow vive en el pulido (motion, ritmo, detalle), no en layo
 | Escritorio (dock, tablero) | Media-alta (Bento premium, micro-interacciones) | Se ve a diario: premium pero calmado. |
 | Pantallas de trabajo (editores, listas, calificar) | Sobria (calma, precision, cero distraccion) | Carmen y Maria trabajan aqui horas; la elegancia es ritmo y claridad, no efectos. |
 
-#### 1.10.2 Traduccion del vocabulario premium al stack real (React Native + Expo)
+#### 1.9.2 Traduccion del vocabulario premium al stack real (React Native + Expo)
 
 | Concepto pedido | En la app RN se implementa como | Prohibido |
 | --- | --- | --- |
@@ -160,7 +160,7 @@ La regla de oro: **el wow vive en el pulido (motion, ritmo, detalle), no en layo
 | Magnetic buttons | Solo landing web (hover no existe en touch). En app: feedback haptico + spring en press | Hover-dependencias en la app |
 | Tipografia elegante | Escala tipografica en tokens (`tokens-completos`) con jerarquia intencional; `expo-font` si se adopta una fuente de marca (decision en tokens-completos, licencia libre) | Fuentes por pantalla, tamanos magicos |
 
-#### 1.10.3 Checklist anti-diseno-generico ("zero AI slop") — gate por pantalla
+#### 1.9.3 Checklist anti-diseno-generico ("zero AI slop") — gate por pantalla
 
 Antes de aprobar un frame de Figma o cerrar la validacion visual de un change, la pantalla debe pasar:
 
@@ -172,13 +172,13 @@ Antes de aprobar un frame de Figma o cerrar la validacion visual de un change, l
 - [ ] Densidad correcta por breakpoint: movil respira, web aprovecha el ancho (nada de columna movil estirada).
 - [ ] Pasa el checklist Nielsen (IHC seccion 6) sin severidad >=3.
 
-#### 1.10.4 Presupuesto de performance y accesibilidad del motion
+#### 1.9.4 Presupuesto de performance y accesibilidad del motion
 
 - 60fps en interacciones sobre Android gama media (el telefono de Maria); animaciones en UI thread (reanimated worklets).
 - Toda animacion respeta "reducir movimiento" del sistema (`AccessibilityInfo.isReduceMotionEnabled`): version estatica equivalente.
 - Blur/gradientes: medir antes de adoptar; si un efecto cuesta jank, se degrada a solido. El efecto nunca es mas importante que el trabajo del docente.
 
-#### 1.10.5 Herramientas del estandar (verificadas en este entorno)
+#### 1.9.5 Herramientas del estandar (verificadas en este entorno)
 
 - **Figma MCP** (`get_design_context`, `get_screenshot`): traduccion pixel-perfect frame -> tokens/layout. Requiere autenticacion previa.
 - **GitNexus** (indexado en `.gitnexus/`): herramienta primaria para inventario estructural, flujos MVVM,
@@ -202,10 +202,18 @@ Antes de aprobar un frame de Figma o cerrar la validacion visual de un change, l
 
 - **Primero fundaciones invisibles (Ola 0):** theming runtime y breakpoints. Sin esto, toda pantalla
   nueva nace con deuda de accesibilidad/responsive.
-- **El shell antes que las pantallas (Ola 1):** navegacion nueva apuntando a pantallas viejas.
-  La app cambia de esqueleto sin perder funcionalidad; las pantallas se re-visten una a una despues.
-- **Validar con docentes en la Ola 2:** prototipo Figma de Escritorio + Crear -> entrevistas
-  (guion en `IHC_DISCOVERY_DOCENTE.md`) -> ajustar backlog de Ola 3.
+- **Gate operativo R1 antes de Ola 1:** doctor del harness, DoR/DoD, cronologia IHC y mapa DDD ligero estan listos antes
+  de iniciar trabajo UX/UI de shell.
+- **El shell y el discovery avanzan en paralelo (Ola 1):** la navegacion nueva apunta a pantallas viejas,
+  mientras se actualizan los recorridos IHC y se prepara el prototipo Figma navegable de Escritorio + Crear
+  una vez tomadas las decisiones de shell. La app cambia de esqueleto sin perder funcionalidad; las pantallas
+  se re-visten una a una despues.
+- **Gate operativo R2 antes de UI visible de Ola 2:** los frames Figma aprobados/accesibles, golden journeys, senal limpia
+  de tests y reclutamiento IHC preparado son gates. La aprobacion de Figma y el reclutamiento siguen sus
+  gates manuales; este plan no los da por satisfechos por documentarlos.
+- **Validar con docentes durante Ola 2:** con el prototipo Figma de Escritorio + Crear, aplicar el guion de
+  `IHC_DISCOVERY_DOCENTE.md` antes de cerrar Ola 2 y, cuando sea viable, antes de comprometer las pantallas
+  de mayor costo. Sintetizar los hallazgos antes de iniciar Ola 3.
 - **Prototipable sin backend:** todo lo visual (frames Figma, shell, Escritorio con datos locales,
   office-home, chip IA con heuristica local). **Requiere backend nuevo:** AsistePLAN (conversaciones,
   adjuntos, cola de tareas persistible).
@@ -311,6 +319,43 @@ Antes de aprobar un frame de Figma o cerrar la validacion visual de un change, l
   operacion encolada offline; usado por al menos un flujo real al cerrar.
 - **Paridad:** funcional. **Depende de:** `componentes-base`. **Estado:** pendiente.
 
+### Hitos pre-Ola 2: prototipo Figma e IHC (manuales)
+
+Estos hitos comienzan en paralelo a Ola 1 una vez tomadas las decisiones de shell. Deben quedar listos
+como gates del R2 operativo antes de implementar la UI visible de Ola 2; no son changes de codigo ni se satisfacen
+por modificar este repositorio.
+
+#### Hito de diseno (no es change de codigo): `prototipos-figma-ola2`
+
+Produce el material visual que las entrevistas y los changes de Ola 2-3 necesitan. Sin este hito,
+`escritorio-docente` y `office-home-crear` no tienen ground truth y las entrevistas no tienen estimulo.
+
+- **Entregable A — Prototipo navegable (fidelidad alta):** frames movil + web de (1) Escritorio
+  (dock + tablero, con estado con-datos y empty), (2) modal Crear tipo-primero, (3) Office home
+  (bandeja unificada), (4) NotasPLAN con el chip IA de intencion visible. Conectados como prototipo
+  clickeable en Figma para las entrevistas.
+- **Entregable B — Concept boards (fidelidad media, 1 frame por modulo):** Clases/Classroom redisenado,
+  ConectaPLAN (hilo estilo WhatsApp profesional), DiseñaPLAN (galeria + plantilla), AsistePLAN
+  (chat movil + panel web), Onboarding (3 pantallas con el copy D1.1). Sirven como estimulo de
+  entrevista ("esto viene despues, que opinas?") y fijan el lenguaje visual de la Ola 3-4.
+- **Proceso:** pipeline D11 (Stitch/Claude Design divergen -> curaduria -> Figma como ground truth,
+  generable/editable via `use_figma` del Figma MCP) usando los tokens reales de `src/themes/colors.ts`.
+- **Gate de aprobacion:** cada frame pasa el checklist anti-slop (1.9.3) y el vocabulario traducido
+  (1.9.2) antes de marcarse "aprobado"; los aprobados se registran en `context/<modulo>-ground-truth/`
+  y se referencian desde el design.md del change correspondiente.
+- **Gate manual #46:** la aprobacion de frames y el acceso autenticado al Figma MCP siguen la evidencia
+  de su gate; preparar esta cronologia no los aprueba ni los cierra.
+- **Depende de:** decisiones de shell; puede correr en paralelo a la implementacion de Ola 1.
+
+#### Hito IHC (no es change de codigo): entrevistas con docentes
+
+- Con el prototipo navegable del hito anterior (`prototipos-figma-ola2`), aplicar el guion de
+  `IHC_DISCOVERY_DOCENTE.md` seccion 5 a 3-5 docentes, incluyendo los concept boards como estimulo
+  de los modulos futuros. Las entrevistas ocurren antes de cerrar Ola 2 y, cuando sea viable, antes
+  de comprometer sus pantallas de mayor costo. Sintetizar y ajustar backlog antes de iniciar Ola 3.
+- **Gate manual #47:** reclutamiento, consentimiento, agenda y notas anonimizadas requieren evidencia
+  humana; este plan no permite marcarlos completos por trabajo documental.
+
 ### Ola 2: Nucleo visible (aqui entran las entrevistas IHC)
 
 #### Change: `escritorio-docente`
@@ -334,33 +379,6 @@ Antes de aprobar un frame de Figma o cerrar la validacion visual de un change, l
   visible como camino de adopcion; cero perdida de acceso a planeaciones existentes.
 - **Paridad:** alta (patron Docs/Drive). **Ground truth:** frame Figma aprobado.
 - **Depende de:** `app-shell-navegacion`, `componentes-base`, `assign-sheet`. **Estado:** pendiente.
-
-#### Hito de diseno (no es change de codigo): `prototipos-figma-ola2`
-
-Produce el material visual que las entrevistas y los changes de Ola 2-3 necesitan. Sin este hito,
-`escritorio-docente` y `office-home-crear` no tienen ground truth y las entrevistas no tienen estimulo.
-
-- **Entregable A — Prototipo navegable (fidelidad alta):** frames movil + web de (1) Escritorio
-  (dock + tablero, con estado con-datos y empty), (2) modal Crear tipo-primero, (3) Office home
-  (bandeja unificada), (4) NotasPLAN con el chip IA de intencion visible. Conectados como prototipo
-  clickeable en Figma para las entrevistas.
-- **Entregable B — Concept boards (fidelidad media, 1 frame por modulo):** Clases/Classroom redisenado,
-  ConectaPLAN (hilo estilo WhatsApp profesional), DiseñaPLAN (galeria + plantilla), AsistePLAN
-  (chat movil + panel web), Onboarding (3 pantallas con el copy D1.1). Sirven como estimulo de
-  entrevista ("esto viene despues, que opinas?") y fijan el lenguaje visual de la Ola 3-4.
-- **Proceso:** pipeline D11 (Stitch/Claude Design divergen -> curaduria -> Figma como ground truth,
-  generable/editable via `use_figma` del Figma MCP) usando los tokens reales de `src/themes/colors.ts`.
-- **Gate de aprobacion:** cada frame pasa el checklist anti-slop (1.9.3) y el vocabulario traducido
-  (1.9.2) antes de marcarse "aprobado"; los aprobados se registran en `context/<modulo>-ground-truth/`
-  y se referencian desde el design.md del change correspondiente.
-- **Prerequisito operativo:** autenticar el Figma MCP (sesion interactiva, `/mcp`). Stitch se usa via web.
-- **Depende de:** decisiones de shell (puede correr en paralelo a la implementacion de Ola 1).
-
-#### Hito IHC (no es change de codigo): entrevistas con docentes
-
-- Con el prototipo navegable del hito anterior (`prototipos-figma-ola2`): aplicar el guion de
-  `IHC_DISCOVERY_DOCENTE.md` seccion 5 a 3-5 docentes, incluyendo los concept boards como estimulo
-  de los modulos futuros. Sintetizar y ajustar backlog de Ola 3.
 
 #### Change: `onboarding-suite`
 

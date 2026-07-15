@@ -55,6 +55,11 @@ Contiene blueprint (decisiones D1-D12), backlog de changes por olas (0: fundacio
 2: nucleo visible + entrevistas IHC, 3: experiencias, 4+: resto) y criterio de cierre.
 El piloto natural del flujo OpenSpec es el change `theming-runtime` de la Ola 0.
 
+Cronologia canonica: el gate operativo R1 precede Ola 1; durante Ola 1 se coordinan shell, recorridos IHC y preparacion del
+prototipo Figma navegable; el gate operativo R2 precede la UI visible de Ola 2; las entrevistas con el prototipo ocurren antes
+de cerrar Ola 2 y sus hallazgos ajustan el backlog antes de Ola 3. La aprobacion Figma y el reclutamiento IHC
+son gates manuales con evidencia propia, no tareas que un change documental pueda dar por completas.
+
 ## Secuencia Despues De UX/UI Global
 
 La mayoria de los antiguos "planes futuros" de experiencia (Office, Asistente IA, Classroom redesign,
@@ -74,9 +79,10 @@ Planes que si seguiran siendo documentos propios cuando toquen:
 | --- | --- |
 | Preparacion Operativa SDD/Harness | ACTIVO. Cerrar R0/R1/R2 antes de las olas UX que los consumen; un change OpenSpec a la vez. |
 | UX/UI Global | ACTIVO. Decisiones tomadas: Office = tab/experiencia madre con NotasPLAN/CalcuPLAN/PresentaPLAN; Asistente = tab movil + panel acoplable web; Feed+Social = ConectaPLAN. |
-| Changes Ola 0-1 (fundaciones/shell) | Ya: son prerequisito de toda pantalla nueva. |
-| Changes Ola 2 (Escritorio, Office home) | Tras archivar Ola 1; incluye entrevistas IHC con prototipo. |
-| Changes Ola 3 (NotasPLAN, CalcuPLAN, Clases, AsistePLAN) | Tras Ola 2 y sintesis de entrevistas. |
+| Changes Ola 0 (fundaciones) | Ya: son prerequisito de toda pantalla nueva. |
+| Changes Ola 1 (shell) | Tras el gate operativo R1; el shell, los recorridos IHC y la preparacion del prototipo Figma avanzan en paralelo. |
+| Changes Ola 2 (Escritorio, Office home) | Tras Ola 1 y el gate operativo R2; se implementan contra Figma aprobado y las entrevistas con prototipo se completan antes del cierre de la ola. |
+| Changes Ola 3 (NotasPLAN, CalcuPLAN, Clases, AsistePLAN) | Tras Ola 2 y la sintesis de entrevistas que ajusta el backlog. |
 | Changes Ola 4+ (ConectaPLAN, AgendaPLAN, DiseñaPLAN, ReportaPLAN, Cuenta) | Por prioridad tras Ola 3; ReportaPLAN solo con datos reales suficientes. |
 | Calificacion (plan propio) | Cuando actividades/entregas de Clases sean flujo estable en el nuevo diseno. |
 | SQLite default (plan propio) | Solo tras snapshot, migracion, rollback y validacion manual. |

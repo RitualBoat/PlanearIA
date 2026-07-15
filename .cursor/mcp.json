@@ -58,11 +58,6 @@
         "npx",
         "@playwright/mcp@latest"
       ]
-    },
-    "graphify": {
-      "type": "stdio",
-      "command": "graphify-mcp",
-      "args": []
     }
   }
 }

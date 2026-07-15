@@ -4,6 +4,7 @@ import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
 
 const DEFAULT_TIMEOUT_MS = 45000;
+const FORBIDDEN_ACTIVE_SERVERS = ["graphify"];
 const cwd = process.cwd();
 const configPath = path.join(cwd, ".mcp.json");
 const config = JSON.parse(await readFile(configPath, "utf8"));
@@ -20,14 +21,26 @@ function checkConfigParity() {
   const cursorNames = Object.keys(cursor.mcpServers ?? {});
   const missingCodex = universal.filter((n) => !codexNames.includes(n));
   const missingCursor = universal.filter((n) => !cursorNames.includes(n));
-  return { ok: missingCodex.length === 0 && missingCursor.length === 0, universal, codexNames, cursorNames, missingCodex, missingCursor };
+  const forbiddenUniversal = universal.filter((n) => FORBIDDEN_ACTIVE_SERVERS.includes(n));
+  const forbiddenCodex = codexNames.filter((n) => FORBIDDEN_ACTIVE_SERVERS.includes(n));
+  const forbiddenCursor = cursorNames.filter((n) => FORBIDDEN_ACTIVE_SERVERS.includes(n));
+  const forbidden = [...new Set([...forbiddenUniversal, ...forbiddenCodex, ...forbiddenCursor])];
+  return {
+    ok: missingCodex.length === 0 && missingCursor.length === 0 && forbidden.length === 0,
+    universal,
+    codexNames,
+    cursorNames,
+    missingCodex,
+    missingCursor,
+    forbidden,
+  };
 }
 
 if (process.argv.includes("--parity-only")) {
   const p = checkConfigParity();
   console.log(JSON.stringify(p, null, 2));
   if (!p.ok) {
-    console.error("mcp parity: FAIL - servers missing from a harness config (run `npm run agent:harness:sync`).");
+    console.error("mcp parity: FAIL - a server is missing from a harness config or a manual-only server is active (run `npm run agent:harness:sync`).");
     process.exit(1);
   }
   console.log("mcp parity: OK");
@@ -37,6 +50,13 @@ if (process.argv.includes("--parity-only")) {
 const requestedServers = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
 const timeoutArg = process.argv.find((arg) => arg.startsWith("--timeout="));
 const timeoutMs = timeoutArg ? Number(timeoutArg.split("=")[1]) : DEFAULT_TIMEOUT_MS;
+const parity = checkConfigParity();
+
+if (!parity.ok) {
+  console.error(JSON.stringify(parity, null, 2));
+  console.error("mcp test: FAIL - fix MCP parity or remove manual-only servers from active config.");
+  process.exit(1);
+}
 
 const entries = Object.entries(config.mcpServers ?? {}).filter(([name]) => {
   return requestedServers.length === 0 || requestedServers.includes(name);

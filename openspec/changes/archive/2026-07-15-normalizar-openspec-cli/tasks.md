@@ -19,4 +19,4 @@
 - [x] 4.1 Validar `openspec:check`, `agent:opsx:patch:check`, `agent:harness:check`, paridad MCP y el change en modo estricto.
 - [x] 4.2 Ejecutar typecheck, lint, backend check y tests automatizados; registrar evidencia antes de marcar tareas.
 - [x] 4.3 Realizar revision adversarial del diff y corregir todo hallazgo bloqueante o alto.
-- [ ] 4.4 Publicar PR ligado a #49 y confirmar checks remotos verdes antes de cerrar o archivar el change.
+- [x] 4.4 Publicar PR ligado a #49 y confirmar checks remotos verdes antes de cerrar o archivar el change.

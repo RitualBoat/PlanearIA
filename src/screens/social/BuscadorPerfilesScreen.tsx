@@ -393,8 +393,14 @@ const SkeletonLoading: React.FC = () => {
     <View style={styles.skeletonWrap}>
       <View style={styles.skeletonSearchBar} />
       <View style={styles.skeletonChipsRow}>
-        {[80, 70, 90, 95, 75].map((w, i) => (
-          <View key={i} style={[styles.skeletonChip, { width: w }]} />
+        {[
+          { id: "chip-0", w: 80 },
+          { id: "chip-1", w: 70 },
+          { id: "chip-2", w: 90 },
+          { id: "chip-3", w: 95 },
+          { id: "chip-4", w: 75 },
+        ].map(({ id, w }) => (
+          <View key={id} style={[styles.skeletonChip, { width: w }]} />
         ))}
       </View>
       <View style={styles.skeletonIndicator} />

@@ -201,8 +201,13 @@ const BibliotecaPlantillasScreen: React.FC = () => {
   const renderSkeleton = () => (
     <View style={s.skeletonContainer}>
       <View style={s.skeletonPills}>
-        {[80, 90, 120, 80].map((w, i) => (
-          <View key={i} style={[s.skeletonPill, { width: w, opacity: 1 - i * 0.2 }]} />
+        {[
+          { id: "pill-0", w: 80 },
+          { id: "pill-1", w: 90 },
+          { id: "pill-2", w: 120 },
+          { id: "pill-3", w: 80 },
+        ].map(({ id, w }, i) => (
+          <View key={id} style={[s.skeletonPill, { width: w, opacity: 1 - i * 0.2 }]} />
         ))}
       </View>
       <View style={s.skeletonFeatured}>

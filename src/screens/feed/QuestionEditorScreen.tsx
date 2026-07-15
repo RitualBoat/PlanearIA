@@ -185,9 +185,14 @@ const QuestionEditorScreen: React.FC<QuestionEditorScreenProps> = ({ route, navi
                   { backgroundColor: colors.surfaceContainerLowest },
                 ]}
               >
-                {[1, 0.75, 1, 0.85].map((w, i) => (
+                {[
+                  { id: "ln-0", w: 1 },
+                  { id: "ln-1", w: 0.75 },
+                  { id: "ln-2", w: 1 },
+                  { id: "ln-3", w: 0.85 },
+                ].map(({ id, w }) => (
                   <View
-                    key={i}
+                    key={id}
                     style={{
                       height: 4,
                       width: `${w * 100}%`,

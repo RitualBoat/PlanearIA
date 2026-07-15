@@ -297,9 +297,9 @@ const DetalleRecursoClassroomScreen: React.FC = () => {
               Archivos y enlaces publicados en esta seccion de Classroom.
             </Text>
             <View style={styles.attachmentsList}>
-              {attachments.map((attachment, index) => (
+              {attachments.map((attachment) => (
                 <Pressable
-                  key={`${attachment.uri}-${index}`}
+                  key={attachment.uri}
                   style={({ pressed }) => [styles.attachmentRow, pressed && { opacity: 0.6 }]}
                   onPress={() => void handleOpenAttachment(attachment)}
                 >

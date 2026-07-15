@@ -2,7 +2,7 @@
 // Single source of truth generator for PlanearIA agent/IDE harness config.
 // Reads neutral sources under .agents/ (+ .mcp.json) and emits per-harness mirrors.
 // Scope: PROJECT-OWNED files only (instructions, rules, MCP, permissions).
-// The opsx workflows are owned by the openspec CLI (`openspec update`) + scripts/patchOpsxZombie.mjs,
+// The opsx workflows are owned by the OpenSpec CLI (`npm run agent:opsx:update`) + scripts/patchOpsxWorkflows.mjs,
 // NOT by this generator. See openspec/changes/single-source-agent-harness/design.md (D6).
 //
 // Usage:

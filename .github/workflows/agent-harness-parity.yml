@@ -1,14 +1,14 @@
 name: Agent Harness Parity
 
 # Verifica que los espejos por harness (project-owned) sigan en paridad con la fuente unica en .agents/
-# y con .mcp.json, y que los workflows opsx no arrastren el comando zombi upstream de OpenSpec.
+# y con .mcp.json, y que los workflows opsx usen la CLI local sin el comando zombi upstream.
 #
 # Arranque SUAVE: continue-on-error de momento (alerta, no bloquea). Cutover a hard-fail una vez estable:
 # quitar `continue-on-error: true` de los pasos de checks. Ver design.md D9.
 #
-# Nota: el check completo de opsx (`openspec update --force && node scripts/patchOpsxZombie.mjs &&
-# git diff --exit-code`) se corre en LOCAL (npm run agent:opsx:update) por fragilidad cross-platform de
-# EOL/version; en CI validamos de forma determinista que los archivos commiteados no tengan el zombi.
+# Nota: la regeneracion completa (`npm run agent:opsx:update` seguida de revision de diff) se corre en
+# local por fragilidad cross-platform de EOL. En CI validamos de forma determinista la CLI, los artefactos
+# y que los workflows commiteados no dependan de un binario global ni contengan el comando zombi.
 
 on:
   pull_request:
@@ -37,12 +37,18 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Pinned OpenSpec CLI and artifacts are valid
+        continue-on-error: true
+        run: npm run openspec:check
+      - name: OpenSpec diagnostics report actionable failures
+        continue-on-error: true
+        run: npm run test:openspec-cli
       - name: Generated mirrors in parity with .agents/ source
         continue-on-error: true
         run: npm run agent:harness:check
       - name: MCP server names parity (.mcp.json vs codex/cursor)
         continue-on-error: true
         run: npm run mcp:parity
-      - name: opsx workflows free of the zombie continue command
+      - name: opsx workflows use the pinned CLI and no zombie command
         continue-on-error: true
         run: npm run agent:opsx:patch:check

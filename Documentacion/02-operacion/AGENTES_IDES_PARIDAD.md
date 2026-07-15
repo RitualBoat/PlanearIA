@@ -313,16 +313,17 @@ El generador preserva el bloque externo `<!-- CODEGRAPH_START/END -->` y NO toca
 
 ### 11.2 opsx (propiedad del CLI de openspec)
 
-Los 30 archivos opsx (`.claude/commands/opsx`, `.claude/skills/openspec-*`, `.codex/skills/openspec-*`, `.cursor/commands/opsx-*`, `.opencode/commands/opsx-*`, `.github/prompts/opsx-*`) los genera `openspec update`, NO el generador. El comando zombi `/opsx:continue` es un bug upstream de OpenSpec 1.5.0 que `openspec update` reintroduce; se limpia con el patch:
+Los archivos opsx (`.claude/commands/opsx`, `.claude/skills/openspec-*`, `.codex/skills/openspec-*`, `.cursor/commands/opsx-*`, `.opencode/commands/opsx-*`, `.github/prompts/opsx-*`) los genera la CLI oficial local, NO el generador del harness. OpenSpec 1.6.0 todavia reintroduce el comando zombi `/opsx:continue` y comandos que presuponen un binario global; el patch post-update los normaliza a una pausa accionable y a `npm exec --yes=false -- openspec`:
 
 ```bash
-npm run agent:opsx:update        # npx openspec@1.5.0 update --force + patchOpsxZombie
-npm run agent:opsx:patch:check   # exit 1 si queda alguna referencia al comando zombi
+npm run openspec:check           # version local + config + validacion estricta
+npm run agent:opsx:update        # CLI local fijada + patchOpsxWorkflows
+npm run agent:opsx:patch:check   # exit 1 si queda CLI global o comando zombi
 ```
 
 ### 11.3 Gate CI
 
-`.github/workflows/agent-harness-parity.yml` (modo suave, `continue-on-error`): corre `agent:harness:check` + `mcp:parity` + `agent:opsx:patch:check`. Cutover a hard-fail = quitar `continue-on-error` una vez estable.
+`.github/workflows/agent-harness-parity.yml` (modo suave, `continue-on-error`): corre `openspec:check` + `agent:harness:check` + `mcp:parity` + `agent:opsx:patch:check`. Cutover a hard-fail = quitar `continue-on-error` una vez estable.
 
 ### 11.4 Correccion a la seccion 4
 

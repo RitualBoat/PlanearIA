@@ -115,3 +115,11 @@ All artifacts complete. All tasks complete.
 - Show clear summary of what happened
 - If sync is requested, use openspec-sync-specs approach (agent-driven)
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting
+
+<!-- PLANEARIA_TLDR_WORKFLOW -->
+
+### PlanearIA TLDR convention
+
+Before moving the change, confirm `TLDR.md` remains at `<changeRoot>/TLDR.md` and reflects any material apply changes. Move it with the complete change directory; do not copy it elsewhere or automatically judge its wording, structure, or word count.
+
+<!-- /PLANEARIA_TLDR_WORKFLOW -->

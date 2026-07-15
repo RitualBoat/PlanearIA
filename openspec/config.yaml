@@ -57,6 +57,7 @@ rules:
   proposal:
     - Incluir siempre una seccion de "No objetivos" (fuera de alcance).
     - Referenciar el plan maestro afectado en Documentacion/01-planes-maestros cuando aplique.
+    - "Al completar un change nuevo, crear tambien `TLDR.md` en la raiz del directorio del change. Debe resumir Proposal, Design, Spec y Tasks, mas un resumen integral, en ese orden; cada bloque y el resumen tienen maximo 120 palabras, en espanol accesible y con encabezados que expliquen la funcion real del artefacto. Esta es una regla de instruccion y revision humana: la validacion automatica solo comprueba presencia y ubicacion."
   specs:
     - Escribir requirements como comportamiento observable por el docente (SHALL + escenarios WHEN/THEN), no como detalles de implementacion.
     - Toda pantalla o flujo de UI debe incluir escenarios de loading, empty, error y offline/sync pendiente.

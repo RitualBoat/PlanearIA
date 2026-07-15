@@ -112,6 +112,15 @@ const validation = parseCliJson(
   ),
   "openspec validate",
 );
+const tldrCheck = spawnSync(process.execPath, [path.join(ROOT, "scripts", "checkOpenSpecTldr.mjs")], {
+  cwd: ROOT,
+  encoding: "utf8",
+  env: { ...process.env, CI: "true", NO_COLOR: "1" },
+});
+if (tldrCheck.error || tldrCheck.status !== 0) {
+  const details = [tldrCheck.stdout, tldrCheck.stderr, tldrCheck.error && String(tldrCheck.error)].filter(Boolean).join("\n");
+  fail("la validacion de TLDR fallo", "Crea o mueve cada TLDR.md a la raiz de su change activo y vuelve a ejecutar npm run openspec:check.", details);
+}
 
 const listedCount = Array.isArray(listed) ? listed.length : (listed.changes?.length ?? listed.items?.length ?? 0);
 const validatedCount = validation.summary?.totals?.items ?? validation.items?.length ?? 0;

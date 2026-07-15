@@ -34,6 +34,35 @@ const BARE_CLI =
   /(?<!npm exec --yes=false -- )\bopenspec (?=(?:--version|archive|config|context|doctor|instructions|list|new|show|status|store|update|validate)\b)/g;
 const GLOBAL_ALLOWED_TOOLS = /allowed-tools: Bash\(openspec:\*\)/g;
 const UNGUARDED_ALLOWED_TOOLS = /allowed-tools: Bash\(npm exec -- openspec:\*\)/g;
+const TLDR_START = "<!-- PLANEARIA_TLDR_WORKFLOW -->";
+const TLDR_END = "<!-- /PLANEARIA_TLDR_WORKFLOW -->";
+
+function tldrFlow(relativePath) {
+  const normalized = relativePath.replaceAll("\\", "/").toLowerCase();
+  if (normalized.includes("source-command-opsx-")) return null;
+  if (normalized.includes("openspec-propose") || normalized.includes("opsx-propose") || normalized.endsWith("/opsx/propose.md")) return "propose";
+  if (normalized.includes("openspec-apply-change") || normalized.includes("opsx-apply") || normalized.endsWith("/opsx/apply.md")) return "apply";
+  if (normalized.includes("openspec-archive-change") || normalized.includes("opsx-archive") || normalized.endsWith("/opsx/archive.md")) return "archive";
+  return null;
+}
+
+function tldrBlock(flow) {
+  const instructions = {
+    propose: "Create exactly one `TLDR.md` at the root of the change after proposal, design, specs, and tasks are ready. It must contain, in order, Proposal intention, Design approach, Spec expected behavior, Tasks practical plan, and `Resumen integral del change`. Each block and the final paragraph have at most 120 words in accessible Spanish with headings that explain the artifact's real function. A person reviews those qualities; automation checks only presence and location.",
+    apply: "Read `<changeRoot>/TLDR.md` as supplementary context. Update it before completing affected work when implementation changes scope, affected files, behavior, or expected result; keep its five human-facing blocks. Do not add an automated quality or word-count gate.",
+    archive: "Before moving the change, confirm `TLDR.md` remains at `<changeRoot>/TLDR.md` and reflects any material apply changes. Move it with the complete change directory; do not copy it elsewhere or automatically judge its wording, structure, or word count.",
+  };
+  return `${TLDR_START}\n\n### PlanearIA TLDR convention\n\n${instructions[flow]}\n\n${TLDR_END}`;
+}
+
+function normalizeTldr(value, relativePath) {
+  const flow = tldrFlow(relativePath);
+  if (!flow) return value;
+  const block = tldrBlock(flow);
+  const marker = new RegExp(`${TLDR_START.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?${TLDR_END.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`);
+  if (marker.test(value)) return value.replace(marker, block);
+  return `${value.replace(/\s*$/, "")}\n\n${block}\n`;
+}
 
 function walk(dir) {
   const absoluteDir = path.join(ROOT, dir);
@@ -56,13 +85,13 @@ function hasMatch(pattern, value) {
   return found;
 }
 
-function normalize(value) {
-  return value
+function normalize(value, relativePath) {
+  return normalizeTldr(value
     .replace(ZOMBIE, CANONICAL_BLOCKED)
     .replace(UNGUARDED_ALLOWED_TOOLS, `allowed-tools: Bash(${LOCAL_CLI}:*)`)
     .replace(GLOBAL_ALLOWED_TOOLS, `allowed-tools: Bash(${LOCAL_CLI}:*)`)
     .replace(UNGUARDED_LOCAL_CLI, `${LOCAL_CLI} `)
-    .replace(BARE_CLI, `${LOCAL_CLI} `);
+    .replace(BARE_CLI, `${LOCAL_CLI} `), relativePath);
 }
 
 const files = DIRS.flatMap(walk);
@@ -78,11 +107,13 @@ for (const relativePath of files) {
   if (hasMatch(BARE_CLI, raw)) reasons.push("CLI global no reproducible");
   if (hasMatch(GLOBAL_ALLOWED_TOOLS, raw)) reasons.push("permiso ligado a CLI global");
   if (hasMatch(UNGUARDED_ALLOWED_TOOLS, raw)) reasons.push("permiso permite fallback externo");
+  const flow = tldrFlow(relativePath);
+  if (flow && !raw.replace(/\r\n/g, "\n").includes(tldrBlock(flow))) reasons.push(`guia TLDR de ${flow} ausente o desactualizada`);
   if (reasons.length === 0) continue;
 
   violations.push({ relativePath, reasons });
   if (!CHECK) {
-    writeFileSync(absolutePath, normalize(raw));
+    writeFileSync(absolutePath, normalize(raw, relativePath));
     patched.push(relativePath);
   }
 }

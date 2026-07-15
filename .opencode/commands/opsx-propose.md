@@ -104,3 +104,11 @@ After completing all artifacts, summarize:
 - If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
 - If a change with that name already exists, ask if user wants to continue it or create a new one
 - Verify each artifact file exists after writing before proceeding to next
+
+<!-- PLANEARIA_TLDR_WORKFLOW -->
+
+### PlanearIA TLDR convention
+
+Create exactly one `TLDR.md` at the root of the change after proposal, design, specs, and tasks are ready. It must contain, in order, Proposal intention, Design approach, Spec expected behavior, Tasks practical plan, and `Resumen integral del change`. Each block and the final paragraph have at most 120 words in accessible Spanish with headings that explain the artifact's real function. A person reviews those qualities; automation checks only presence and location.
+
+<!-- /PLANEARIA_TLDR_WORKFLOW -->

@@ -43,8 +43,13 @@
     "mcp:parity": "node --no-warnings scripts/testMcpServers.mjs --parity-only",
     "agent:harness:sync": "node scripts/syncAgentHarness.mjs --write",
     "agent:harness:check": "node scripts/syncAgentHarness.mjs --check",
-    "agent:opsx:update": "npx --yes openspec@1.5.0 update --force && node scripts/patchOpsxZombie.mjs",
-    "agent:opsx:patch:check": "node scripts/patchOpsxZombie.mjs --check",
+    "openspec:version": "openspec --version",
+    "openspec:list": "openspec list --json",
+    "openspec:validate": "openspec validate --all --strict --no-interactive",
+    "openspec:check": "node scripts/checkOpenSpecCli.mjs",
+    "test:openspec-cli": "node scripts/testOpenSpecCli.mjs",
+    "agent:opsx:update": "openspec update --force && node scripts/patchOpsxWorkflows.mjs",
+    "agent:opsx:patch:check": "node scripts/patchOpsxWorkflows.mjs --check",
     "opsx:finish": "node scripts/opsxFinishChange.mjs",
     "opsx:finish:dry": "node scripts/opsxFinishChange.mjs --dry-run",
     "mcp:github": "node --no-warnings scripts/mcpGithubFromGh.mjs",
@@ -99,6 +104,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@fission-ai/openspec": "1.6.0",
     "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "29.5.14",

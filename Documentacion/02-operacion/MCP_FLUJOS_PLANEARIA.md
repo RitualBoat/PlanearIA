@@ -43,6 +43,8 @@ No editar esas configs a mano: se regeneran desde `.mcp.json`.
 
 ## Flujo OpenSpec Recomendado
 
+La CLI se ejecuta desde la dependencia fijada del repo. Usa los comandos de `OPENSPEC_CLI.md` o `npm exec --yes=false -- openspec`; no requiere instalacion global ni permite fallback externo.
+
 ```text
 Idea / issue
   -> GitHub MCP si viene de issue o Project

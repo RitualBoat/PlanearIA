@@ -60,7 +60,7 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
 /**
  * Schedule a local notification to display immediately.
  */
-export async function scheduleLocalNotification(
+async function scheduleLocalNotification(
   titulo: string,
   cuerpo: string,
   data?: Record<string, any>

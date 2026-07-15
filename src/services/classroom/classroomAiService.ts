@@ -266,11 +266,9 @@ export const resumirProgresoClassroom = (contexto: ClassroomAiContexto) =>
 export const sugerirRetroalimentacionClassroom = (contexto: ClassroomAiContexto) =>
   requestClassroomAi<SugerirRetroalimentacionResultado>("sugerir_retroalimentacion", contexto);
 
-export const classroomAiService = {
+const classroomAiService = {
   generarRubricaClassroom,
   resumirProgresoClassroom,
   sugerirActividadClassroom,
   sugerirRetroalimentacionClassroom,
 };
-
-export default classroomAiService;

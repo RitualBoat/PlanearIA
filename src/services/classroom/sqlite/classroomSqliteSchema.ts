@@ -1,7 +1,7 @@
 import { CLASSROOM_STORAGE_KEYS } from "../classroomStorage";
 
 export const PLANEARIA_CLASSROOM_DB_NAME = "planearia_classroom.db";
-export const CLASSROOM_SCHEMA_VERSION = 1;
+const CLASSROOM_SCHEMA_VERSION = 1;
 
 export const CLASSROOM_SQLITE_SCHEMA = `
 PRAGMA foreign_keys = ON;

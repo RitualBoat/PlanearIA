@@ -717,5 +717,4 @@ export {
   ActividadPresencial,
   ConfiguracionCurso,
   Evaluacion,
-  TipoEvaluacion,
 } from "./planeacionLegacy";

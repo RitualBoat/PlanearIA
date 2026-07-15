@@ -16,5 +16,5 @@ export const generateNumericId = (): number => {
   return lastNumericId;
 };
 
-export const generateStringId = (prefix: string): string =>
+const generateStringId = (prefix: string): string =>
   `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;

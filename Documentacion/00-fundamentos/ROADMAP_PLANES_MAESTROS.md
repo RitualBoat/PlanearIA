@@ -16,6 +16,7 @@ Este archivo define orden recomendado, estado y criterios de activacion. No reem
 | Plan | Archivo | Estado |
 | --- | --- | --- |
 | Meta Guia de Planes | `01-planes-maestros/meta_guia_planes.md` | Vigente como instructivo obligatorio (v3, SDD con OpenSpec). |
+| Preparacion Operativa SDD y Harness Solo-Dev | `01-planes-maestros/PLAN_PREPARACION_OPERATIVA_SDD_HARNESS_SOLO_DEV.md` | ACTIVO (2026-07). Prerrequisito transversal just-in-time para UX/UI; corrige toolchain, gobernanza, feedback loops y gates manuales. |
 | UX/UI y Navegacion Global | `01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md` | ACTIVO (2026-07). Blueprint + backlog de changes por olas; primer plan en formato SDD. |
 | Auth, Seguridad y Sesion Real | `01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md` | Activo/en cierre. Automatizable casi completo; faltan email real o decision de diferir, datos sociales, validacion manual y GitHub Product OS. |
 | Planeaciones | `01-planes-maestros/cerrados/plan_planeaciones (closed).md` | Cerrado funcionalmente. En la vision nueva se absorbe en Office Docente. |
@@ -25,6 +26,18 @@ Este archivo define orden recomendado, estado y criterios de activacion. No reem
 | Storage Local SQLite y Migracion Offline | `01-planes-maestros/cerrados/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE (closed).md` | Cerrado como opt-in con rollback. |
 
 ## Siguiente Plan Recomendado
+
+### 0. Preparacion Operativa SDD y Harness Solo-Dev (ACTIVO)
+
+Ejecutar `PLAN_PREPARACION_OPERATIVA_SDD_HARNESS_SOLO_DEV.md` como gate transversal, no como un
+mega-change previo a todo producto. Sus umbrales desbloquean UX/UI just-in-time:
+
+- R0 antes de Ola 0: historial y 93 suites/608 tests verdes, Git/Projects/OpenSpec/code intelligence/CI base.
+- R1 antes de Ola 1: doctor, DoR/DoD, cronologia IHC y mapa DDD ligero.
+- R2 antes de Ola 2 visible: Figma, golden journeys, senal de tests y reclutamiento IHC.
+
+Las autorizaciones y decisiones del usuario siguen
+`02-operacion/GUIA_MANUAL_PREPARACION_SDD_HARNESS.md`.
 
 ### 1. Cierre de Auth
 
@@ -59,6 +72,7 @@ Planes que si seguiran siendo documentos propios cuando toquen:
 
 | Trabajo | Activar cuando |
 | --- | --- |
+| Preparacion Operativa SDD/Harness | ACTIVO. Cerrar R0/R1/R2 antes de las olas UX que los consumen; un change OpenSpec a la vez. |
 | UX/UI Global | ACTIVO. Decisiones tomadas: Office = tab/experiencia madre con NotasPLAN/CalcuPLAN/PresentaPLAN; Asistente = tab movil + panel acoplable web; Feed+Social = ConectaPLAN. |
 | Changes Ola 0-1 (fundaciones/shell) | Ya: son prerequisito de toda pantalla nueva. |
 | Changes Ola 2 (Escritorio, Office home) | Tras archivar Ola 1; incluye entrevistas IHC con prototipo. |
@@ -70,6 +84,8 @@ Planes que si seguiran siendo documentos propios cuando toquen:
 
 ## GitHub Product OS
 
+- Crear el epic de Preparacion Operativa y solo los Gates M + Ola 0 al inicio; agregar Ola 1 como
+  siguiente tanda cuando Ola 0 este en curso/cierre.
 - Mantener epic/fases de Auth hasta cierre formal.
 - Crear el epic de UX/UI Global cuando arranque la Ola 0; un issue por change (solo la ola activa y la
   siguiente), milestones = olas. Mapping completo en `meta_guia_planes.md` v3 seccion 6.
@@ -78,4 +94,4 @@ Planes que si seguiran siendo documentos propios cuando toquen:
 
 ## Version
 
-- Ultima actualizacion: 2026-07-04 (plan UX/UI activo; roadmap migrado al formato SDD/OpenSpec).
+- Ultima actualizacion: 2026-07-14 (plan de preparacion operativa SDD/harness agregado como gate transversal de UX/UI).

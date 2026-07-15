@@ -8,15 +8,17 @@
 ## Lectura Obligatoria
 
 1. `meta_guia_planes.md`: formato SDD y Protocolo de Interaccion Guiada.
-2. `PLAN_UXUI_NAVEGACION_GLOBAL.md`: plan activo de UX/UI y backlog por olas.
-3. `PLAN_AUTH_SEGURIDAD_SESION_REAL.md`: auth, sesiones, roles, secretos, backend multiusuario y `userId`.
-4. `../05-context-engineering/README.md`: rutas de lectura y carbonizacion para IAs.
+2. `PLAN_PREPARACION_OPERATIVA_SDD_HARNESS_SOLO_DEV.md`: gates de toolchain, gobernanza y feedback loops que desbloquean las olas UX/UI.
+3. `PLAN_UXUI_NAVEGACION_GLOBAL.md`: plan activo de UX/UI y backlog por olas.
+4. `PLAN_AUTH_SEGURIDAD_SESION_REAL.md`: auth, sesiones, roles, secretos, backend multiusuario y `userId`.
+5. `../05-context-engineering/README.md`: rutas de lectura y carbonizacion para IAs.
 
 ## Estado
 
 | Plan | Estado |
 | --- | --- |
 | Meta Guia de Planes | Vigente. Instructivo obligatorio. |
+| Preparacion Operativa SDD y Harness Solo-Dev | Activo. Prerrequisito transversal por umbrales R0/R1/R2; no reemplaza UX/UI. |
 | UX/UI y Navegacion Global | Activo. Blueprint + backlog de changes OpenSpec. |
 | Auth, Seguridad y Sesion Real | Activo/en cierre. |
 

@@ -57,30 +57,3 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
   }
 }
 
-/**
- * Schedule a local notification to display immediately.
- */
-export async function scheduleLocalNotification(
-  titulo: string,
-  cuerpo: string,
-  data?: Record<string, any>
-): Promise<string> {
-  if (Platform.OS === "web") {
-    logger.info("Local notification scheduled (web placeholder):", titulo);
-    return "web-notif-id";
-  }
-
-  try {
-    return await Notifications.scheduleNotificationAsync({
-      content: {
-        title: titulo,
-        body: cuerpo,
-        data: data || {},
-      },
-      trigger: null,
-    });
-  } catch (error) {
-    logger.error("Failed to schedule local notification:", error);
-    return "";
-  }
-}

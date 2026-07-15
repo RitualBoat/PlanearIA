@@ -92,7 +92,7 @@ export const obtenerGrupos = async (): Promise<Partial<Grupo>[]> => {
 /**
  * Obtiene un grupo específico por ID
  */
-export const obtenerGrupoPorId = async (id: number): Promise<Partial<Grupo> | null> => {
+const obtenerGrupoPorId = async (id: number): Promise<Partial<Grupo> | null> => {
   try {
     const grupos = await obtenerGrupos();
     return grupos.find((g) => g.id === id) || null;

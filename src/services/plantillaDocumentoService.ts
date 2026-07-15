@@ -59,13 +59,6 @@ export const savePlantillaDocumento = async (
   return normalized;
 };
 
-export const deletePlantillaDocumento = async (id: string, userId: string): Promise<void> => {
-  const raw = await AsyncStorage.getItem(PLANTILLAS_DOCUMENTO_KEY);
-  const current = safeParse(raw);
-  const next = current.filter((plantilla) => !(plantilla.id === id && plantilla.userId === userId));
-  await AsyncStorage.setItem(PLANTILLAS_DOCUMENTO_KEY, JSON.stringify(next));
-};
-
 const mergeDefaultsIntoDoc = (
   base: PlaneacionDocumento,
   defaults?: Partial<PlaneacionDocumento>

@@ -275,8 +275,7 @@ async function runTests() {
   console.log(`   MongoDB Atlas crea las bases de datos y colecciones automáticamente en la primera inserción.`);
   console.log(`   Los índices se crean de dos formas:`);
   console.log(`   - En caliente: Algunos endpoints (como /api/alumnos) los crean al iniciarse.`);
-  console.log(`   - Pre-creación: Puedes ejecutar el script de índices directamente para asegurar optimización:`);
-  console.log(`     ${colors.cyan}node backend/lib/databaseIndexes.js${colors.reset}`);
+  console.log(`   - En los endpoints: cada endpoint crea de forma idempotente los índices que necesita al iniciarse.`);
   console.log(`\n3. ${colors.cyan}Reglas de Validación:${colors.reset} Recomendamos ${colors.red}NO${colors.reset} añadir reglas de validación (JSON Schema)`);
   console.log(`   directamente en MongoDB Atlas. PlanearIA utiliza TypeScript y validación por software en la app y backend.`);
   console.log(`   Poner reglas duras en Atlas dificulta las migraciones de esquemas en el futuro y puede causar`);

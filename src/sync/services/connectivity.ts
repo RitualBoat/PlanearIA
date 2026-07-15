@@ -10,7 +10,6 @@
 
 import { Platform } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
-import { apiRequest } from "../../utils/apiClient";
 
 export const getIsOnline = async (): Promise<boolean> => {
   if (Platform.OS === "web") {
@@ -57,18 +56,4 @@ export const subscribeConnectivity = (
     notify(state.isConnected !== false);
   });
   return unsubscribe;
-};
-
-/**
- * Verifies the backend itself is reachable (the device can be online while
- * Vercel or MongoDB are down). Used to distinguish "you are offline" from
- * "the server is unavailable" in the UI.
- */
-export const checkBackendReachable = async (): Promise<boolean> => {
-  try {
-    const response = await apiRequest("/api/health", { method: "GET" });
-    return response.ok;
-  } catch {
-    return false;
-  }
 };

@@ -26,14 +26,28 @@ Calendario de entregables IHC dentro del plan UX/UI (por olas del backlog):
 | Entregable | Cuando | Alimenta a |
 | --- | --- | --- |
 | Proto-personas + mapas de empatia (este doc) | Ya (antes de Ola 0) | Todos los changes de UI |
-| Recorridos de usuario (este doc) | Durante Ola 1 | Prototipos Figma de Ola 2 |
-| Entrevistas con docentes reales (guion en seccion 5) | Con prototipo en mano, antes de cerrar Ola 2 | Correccion de rumbo del backlog de Ola 3+ |
+| Recorridos de usuario (este doc) | Durante Ola 1, en paralelo a la preparacion del prototipo | Prototipo Figma navegable listo como gate operativo R2 |
+| Entrevistas con docentes reales (guion en seccion 5) | Con prototipo en mano, durante Ola 2 y antes de cerrarla | Correccion de rumbo del backlog antes de Ola 3 |
 | Historias de usuario | Continuo, una por change, via `/enrich-us` | Cada change OpenSpec |
 | Checklist Nielsen + severidad (seccion 6) | Por change de UI, en validacion visual y `/adversarial-review` | Gate pre-archive |
 
 Regla de oro: las entrevistas se hacen **con prototipo enfrente** (frames de Figma de Escritorio + flujo Crear).
 Entrevistar sin nada que mostrar produce respuestas abstractas de poco valor; construir todo sin validar es caro.
 3-5 docentes bastan para detectar la mayoria de los problemas de usabilidad (regla de ~5 usuarios de Nielsen).
+
+### 1.1 Cronologia canonica UX/UI e IHC
+
+1. El gate operativo R1 se cumple antes de iniciar Ola 1 de UX/UI.
+2. Durante Ola 1, las decisiones de shell, los recorridos IHC y la preparacion del prototipo Figma
+   navegable de Escritorio + Crear avanzan en paralelo.
+3. El gate operativo R2 se cumple antes de implementar UI visible de Ola 2: frames Figma aprobados/accesibles, golden
+   journeys, senal de tests limpia y reclutamiento IHC preparado.
+4. Las entrevistas se realizan con ese prototipo durante Ola 2, antes de cerrarla y preferentemente antes
+   de comprometer sus pantallas de mayor costo.
+5. Los hallazgos se sintetizan y ajustan el backlog antes de iniciar Ola 3.
+
+La aprobacion de Figma y el reclutamiento/consentimiento de docentes son gates manuales con evidencia
+propia. Esta guia no los marca como completados por preparar documentos, prototipos o changes OpenSpec.
 
 ---
 

@@ -356,12 +356,10 @@ Propone ajustes al backlog de Ola 2/3, pero no los implementes.
 
 ### 7.1 Graphify
 
-Codex investigara si repararlo es barato y estable. Solo deberas aprobar una de dos opciones:
-
-- mantenerlo como auditoria periodica opcional;
-- retirarlo del MCP activo y conservar GitNexus + CodeGraph.
-
-No necesitas instalarlo manualmente antes del issue correspondiente.
+Decision tomada en el issue #51: Graphify se retira del MCP activo y GitNexus + CodeGraph conservan el
+routing estructural primario/fallback. `graphify-out/` es una salida local opcional y regenerable, no una
+senal de salud. Una auditoria manual futura requiere una instalacion y rebuild explicitos, y no bloquea CI,
+paridad ni el doctor del harness.
 
 ### 7.2 Riesgo xlsx
 

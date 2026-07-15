@@ -21,6 +21,8 @@
 
 No se agregan por defecto Puppeteer, Browserless, Brave Search ni Fetch. Playwright ya cubre navegador local,
 Context7 cubre documentacion actual, y el browsing manual sigue disponible cuando se necesita una fuente exacta.
+Graphify tampoco forma parte del MCP activo: puede usarse como auditoria local opcional con instalacion y
+rebuild explicitos, pero `graphify-out/` no prueba salud y su ausencia no bloquea CI, paridad ni el doctor.
 
 El mismo set queda reflejado en las configs locales del usuario para Claude, Cursor, Codex, Gemini, Kiro,
 VS Code, opencode y Hermes cuando el cliente soporta ese transporte. Figma usa MCP HTTP remoto y requiere

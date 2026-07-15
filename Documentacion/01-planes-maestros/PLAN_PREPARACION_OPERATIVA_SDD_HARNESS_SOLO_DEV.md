@@ -60,7 +60,7 @@ Continuaran en `PLAN_UXUI_NAVEGACION_GLOBAL.md`. Este plan solo aporta prerequis
 | --- | --- | --- |
 | D1 | 2026-07-14 | No crear un unico change para toda la auditoria. Un fallo no debe bloquear ni mezclar veinte correcciones. |
 | D2 | 2026-07-14 | Un change OpenSpec activo a la vez. Un segundo agente puede revisar, pero no implementar otro change grande en paralelo. |
-| D3 | 2026-07-14 | GitNexus es primario para estructura; CodeGraph es fallback lineado; Graphify queda como lente periodica opcional y solo permanece en MCP si su health check es estable. |
+| D3 | 2026-07-14 | GitNexus es primario para estructura y CodeGraph es fallback lineado. La decision del issue #51 retiro Graphify del MCP activo; solo puede evaluarse como auditoria local manual y no bloquea CI, paridad ni doctor. |
 | D4 | 2026-07-14 | Adoptar DDD estrategico ligero, sin microservicios, CQRS ni event sourcing. |
 | D5 | 2026-07-14 | Proteger `development` con PR y CI base, sin exigir aprobacion humana externa a un desarrollador solo. |
 | D6 | 2026-07-14 | Crear issues solo para la ola activa y la siguiente. El backlog futuro permanece en este documento. |
@@ -77,8 +77,8 @@ Estado confirmado al crear este plan:
 - Tras los commits concurrentes locales, Jest retrocedio temporalmente a 29 suites/259 tests fallidos. El incidente se resolvio el 2026-07-14 en `#48`: `development` local/remoto quedo en `6dc6b98`, el historial roto se preservo en una branch de seguridad y volvieron a pasar 93 suites/608 tests.
 - CodeGraph esta fresco y utilizable.
 - GitNexus no puede reindexar por fallo FTS y sus consultas quedaron sin resultados estructurales utiles.
-- Graphify tiene artefactos generados, pero `graphify` y `uv` no estan disponibles en PATH.
-- `mcp:parity` valida nombres, no salud real; `mcp:test` falla en Graphify.
+- Baseline historico: Graphify tenia artefactos generados, pero `graphify` y `uv` no estaban disponibles en PATH. El issue #51 lo retiro del MCP activo; `graphify-out/` queda como salida local opcional, no health check.
+- `mcp:parity` valida el conjunto activo y rechaza Graphify si reaparece; `mcp:test` comprueba solo los servidores MCP activos.
 - OpenSpec funciona mediante `npx @fission-ai/openspec`, pero no esta normalizado como dependencia del repo y un script referencia un paquete/version incorrectos.
 - GitHub CLI no tiene `read:project`/`project`.
 - `development` no esta protegida.
@@ -285,7 +285,7 @@ Crear estos issues al activar el plan. Cada uno es un change OpenSpec independie
 - **Ground truth:** scripts actuales de `package.json`, `.mcp.json` y artefactos `graphify-out`.
 - **Depende de:** nada tecnico; coordinar con `doctor-harness-determinista`.
 - **Evidencia:** decision registrada y smoke real.
-- **Estado:** pendiente.
+- **Estado:** archivado en `openspec/changes/archive/2026-07-15-resolver-graphify-runtime`; Project pasa a `Done` tras el merge.
 - **Labels:** `change`, `infra`, `low-cost`.
 
 #### Change: `doctor-harness-determinista`
@@ -611,7 +611,7 @@ No se crea OpenSpec si no cambia el repositorio.
 | Recuperacion baseline | `#48` | Done; 93 suites/608 tests verdes |
 | OpenSpec reproducible | `#49` | Ready; primer change activo |
 | GitNexus FTS | `#50` | Backlog |
-| Graphify runtime | `#51` | Backlog |
+| Graphify runtime | `#51` | Done tras merge; OpenSpec archivado |
 | Doctor del harness | `#52` | Backlog |
 
 ### Primera tanda
@@ -637,7 +637,7 @@ Ola 2 se crea al cerrar Ola 0. Ola 3 se crea al entrar en Ola 2. Esto mantiene v
 | ID | Pregunta | Responsable | Momento limite |
 | --- | --- | --- | --- |
 | OQ1 | ¿Los cambios locales actuales pertenecen a otro trabajo que debe conservarse? | Usuario | Antes del primer change |
-| OQ2 | ¿Graphify aporta suficiente valor para mantener Python/uv/MCP adicional? | Change `resolver-graphify-runtime` | Antes del doctor final |
+| OQ2 | Cerrada en #51: Graphify no aporta suficiente valor para mantenerse en el MCP activo; queda como auditoria manual opcional. | Change `resolver-graphify-runtime` | Resuelta |
 | OQ3 | ¿Que frames Figma aprueba el usuario como ground truth? | Usuario | Antes de UX/UI Ola 2 |
 | OQ4 | ¿`xlsx` se mantiene con mitigaciones o se reemplaza? | Usuario tras opciones tecnicas | Antes de ampliar importaciones/beta |
 | OQ5 | ¿Que docentes pueden participar sin usar datos sensibles? | Usuario | Antes de cerrar UX/UI Ola 2 |

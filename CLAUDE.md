@@ -119,12 +119,9 @@ sin deliberar ni pedir permiso ni releer archivos a mano; asi no se gastan token
 - CodeGraph: FALLBACK cuando GitNexus no da el detalle exacto de UN archivo o simbolo especifico
   (fuente lineada estilo Read, comprobacion puntual), esta stale o resulta ambiguo. No usar junto a GitNexus
   por reflejo; solo si el primero falla, omite un archivo clave o el change pide comparacion de evidencia.
-- Graphify: para preguntas ABIERTAS y de alto nivel sobre el proyecto (vision, alcance, contexto,
-  recomendaciones estrategicas: "cual es la vision actual?", "que recomiendas?", "deberia cambiar el alcance
-  o el contexto?") y como apoyo AL ACTUALIZAR documentacion. Grafo de conocimiento sobre codigo + docs.
-  Consulta via MCP `graphify` o CLI: `graphify query "<pregunta>"`, `graphify path "A" "B"`, `graphify explain "X"`.
-  Reconstruir: `npm run graphify:build` (codigo, local, sin API) o `npm run graphify:build:full` (agrega la capa
-  semantica de docs; requiere un backend LLM). No usar Graphify para detalle fino de un simbolo: eso es GitNexus/CodeGraph.
+- Graphify queda fuera del MCP activo y de la ruta SDD obligatoria. Puede evaluarse como auditoria manual local
+  de codigo y documentacion solo tras una instalacion y rebuild explicitos; no bloquear doctor, CI ni paridad,
+  y nunca tratar `graphify-out/` como prueba de salud.
 - GitHub: issues, PRs, tracking operativo.
 - Context7: APIs/librerias actuales.
 - Figma: ground truth visual.

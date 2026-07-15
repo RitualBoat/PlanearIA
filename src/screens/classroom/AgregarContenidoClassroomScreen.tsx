@@ -593,8 +593,8 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
 
         {uploadedFiles.length ? (
           <View style={styles.attachmentsStack}>
-            {uploadedFiles.map((file, index) => (
-              <View key={`${file.uri}-${index}`} style={styles.attachmentCard}>
+            {uploadedFiles.map((file) => (
+              <View key={file.uri} style={styles.attachmentCard}>
                 <MaterialIcons name="insert-drive-file" size={22} color={COLORS.primary} />
                 <View style={styles.attachmentCopy}>
                   <Text style={styles.attachmentTitle}>{file.name}</Text>
@@ -603,7 +603,7 @@ const AgregarContenidoClassroomScreen: React.FC = () => {
                 <Pressable
                   style={({ pressed }) => pressed && { opacity: 0.6 }}
                   onPress={() =>
-                    setUploadedFiles((prev) => prev.filter((_, itemIndex) => itemIndex !== index))
+                    setUploadedFiles((prev) => prev.filter((f) => f.uri !== file.uri))
                   }
                 >
                   <MaterialIcons name="close" size={20} color="#64748B" />

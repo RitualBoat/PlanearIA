@@ -55,7 +55,9 @@
     "sqlite:inspect": "node --no-warnings scripts/planeariaSqliteInspect.mjs",
     "mcp:sqlite": "node --no-warnings scripts/mcpPlaneariaSqlite.mjs",
     "mcp:mongodb:readonly": "npx -y mongodb-mcp-server@latest --readOnly --indexCheck --telemetry disabled",
-    "doctor": "npx react-doctor@latest"
+    "doctor": "npx react-doctor@latest",
+    "harness:doctor": "node --no-warnings scripts/harnessDoctor.mjs",
+    "test:harness:doctor": "node scripts/testHarnessDoctor.mjs"
   },
   "dependencies": {
     "@10play/tentap-editor": "^1.0.1",

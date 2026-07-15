@@ -426,3 +426,25 @@ Esto permite continuar durante sesiones largas sin mezclar alcance ni ocultar pu
 - [ ] Apruebe decisiones futuras de costo/riesgo cuando Codex presente alternativas.
 
 Todo lo demas puede ejecutarlo Codex mediante los issues y changes definidos en el plan maestro.
+
+## 10. Doctor determinista del harness
+
+Ejecuta el diagnostico antes de iniciar un change o al investigar una preparacion incompleta:
+
+```powershell
+npm run harness:doctor
+npm run harness:doctor -- --json
+```
+
+El doctor no instala paquetes, no repara indices, no autentica servicios ni actualiza dependencias. Informa cada contrato en orden fijo:
+
+- `PASS`: la comprobacion requerida esta sana.
+- `FAIL`: bloquea la readiness y muestra una recuperacion manual segura.
+- `WARN`: hay una limitacion no bloqueante, por ejemplo un MCP remoto que requiere completar OAuth desde un cliente compatible.
+- `SKIP`: la comprobacion no aplica deliberadamente.
+
+Graphify siempre aparece como `SKIP` con el motivo `retirado/manual`. No es requisito, no se busca en PATH, no se inicia y `graphify-out/` nunca prueba salud. Si reaparece como MCP activo, `mcp:parity` falla y la recuperacion es retirarlo o regenerar los espejos.
+
+El doctor reporta GitNexus como `FAIL` aunque el subproceso retorne cero si su salida indica que no esta en un repositorio, FTS degradado o una consulta estructural inutilizable. La recuperacion sugerida es separada: revisa `npm run gitnexus:diagnose` y decide si procede `npm run gitnexus:repair`; el doctor nunca ejecuta esa reparacion.
+
+La comprobacion Expo usa la CLI local con `npm exec --yes=false -- expo install --check`. Si informa dependencias desalineadas, corrige solo las versiones recomendadas por el SDK instalado en un change separado o aprobado; no ejecutes un upgrade general.

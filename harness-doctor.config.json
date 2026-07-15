@@ -1,0 +1,34 @@
+{
+  "project": {
+    "owner": "RitualBoat",
+    "title": "PlanearIA Product OS"
+  },
+  "checkOrder": [
+    "node-npm",
+    "git-worktree",
+    "openspec",
+    "github-projects",
+    "gitnexus",
+    "codegraph",
+    "harness-parity",
+    "mcp-parity",
+    "mcp-smoke",
+    "expo-compatibility",
+    "graphify"
+  ],
+  "gitNexusFailurePatterns": [
+    "Not a git repository",
+    "FTS indexes missing",
+    "FTS extension unavailable",
+    "full-text search degraded",
+    "query returned no structural context"
+  ],
+  "retiredTools": [
+    {
+      "id": "graphify",
+      "status": "SKIP",
+      "summary": "Graphify retirado/manual; no forma parte del harness activo.",
+      "remediation": null
+    }
+  ]
+}

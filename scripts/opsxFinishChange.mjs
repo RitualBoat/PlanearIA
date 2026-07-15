@@ -91,8 +91,13 @@ ok(`PR #${pullRequest.number} mergeado por GitHub`);
 git('fetch', 'origin', '--prune');
 git('checkout', TARGET);
 git('merge', '--ff-only', `origin/${TARGET}`);
-git('branch', '-d', branch);
-ok(`rama local '${branch}' borrada`);
+try {
+  git('rev-parse', '--verify', '--quiet', `refs/heads/${branch}`);
+  git('branch', '-d', branch);
+  ok(`rama local '${branch}' borrada`);
+} catch {
+  ok(`rama local '${branch}' ya fue borrada por GitHub CLI`);
+}
 
 if (KEEP_REMOTE) {
   ok(`rama remota conservada (--keep-remote): origin/${branch}`);

@@ -57,4 +57,3 @@ export const subscribeConnectivity = (
   });
   return unsubscribe;
 };
-

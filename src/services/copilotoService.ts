@@ -142,7 +142,6 @@ const truncate = (value: unknown = "", max = 240): string => {
   if (normalized.length <= max) return normalized;
   return `${normalized.slice(0, max - 3)}...`;
 };
-
 const localEvaluacion = (documento?: PlaneacionDocumento): InstrumentoEvaluacion => ({
   tipo: "rubrica",
   escala: [
@@ -321,10 +320,9 @@ export const sugerirActividades = async (
       sesionNumero: sesion?.numero,
     }),
     seleccion: [sesion?.inicio, sesion?.desarrollo, sesion?.cierre].filter(Boolean).join("\n"),
-    contenidoDocumento: documento,
+  contenidoDocumento: documento,
   });
 };
-
 export const autocompletarSeccion = async (
   documento: PlaneacionDocumento,
   seccion: string
@@ -368,4 +366,3 @@ export const mejorarTexto = async (
     contenidoDocumento: documento,
   });
 };
-

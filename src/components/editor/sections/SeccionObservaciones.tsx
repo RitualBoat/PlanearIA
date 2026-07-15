@@ -1,7 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useTheme } from "../../../hooks/useTheme";
+import { useTheme } from "../../../context/ThemeContext";
 import type { Observacion } from "../../../../types/planeacionV2";
 
 export interface SeccionObservacionesProps {

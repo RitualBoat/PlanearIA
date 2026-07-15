@@ -1,4 +1,4 @@
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../context/ThemeContext";
 import React, { useState } from "react";
 import {
   Pressable,

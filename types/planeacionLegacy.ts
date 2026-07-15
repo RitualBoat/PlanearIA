@@ -36,7 +36,7 @@ export interface ConfiguracionCurso {
 /**
  * Tipos de evaluación universitaria
  */
-enum TipoEvaluacion {
+export enum TipoEvaluacion {
   EXAMEN = "examen",
   PROYECTO = "proyecto",
   TAREA = "tarea",

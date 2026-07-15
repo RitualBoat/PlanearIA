@@ -3,7 +3,7 @@ import { Pressable, View, Text, StyleSheet, ScrollView, Platform } from "react-n
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../context/ThemeContext";
 
 // Sample data for demo results
 const SAMPLE_RESULTS = [

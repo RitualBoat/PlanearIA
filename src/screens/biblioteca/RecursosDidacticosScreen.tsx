@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Animated,
   Pressable,
   View,
   Text,
@@ -9,7 +10,6 @@ import {
   Image,
   useWindowDimensions,
 } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, useAnimatedScrollHandler, interpolate, Extrapolation } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -65,16 +65,24 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
   const { width } = useWindowDimensions();
   const wideLayout = width >= 920;
   const { recursos } = useRecursos();
-  const scrollY = useSharedValue(0);
-  const mobilePillStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(scrollY.value, [0, 12, 34], [1, 0.45, 0], Extrapolation.CLAMP),
-    transform: [{ translateY: interpolate(scrollY.value, [0, 34], [0, -14], Extrapolation.CLAMP) }],
-  }));
-  const handleScroll = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-    },
+  const [scrollY] = React.useState(() => new Animated.Value(0));
+  const mobilePillOpacity = scrollY.interpolate({
+    inputRange: [0, 12, 34],
+    outputRange: [1, 0.45, 0],
+    extrapolate: "clamp",
   });
+  const mobilePillTranslateY = scrollY.interpolate({
+    inputRange: [0, 34],
+    outputRange: [0, -14],
+    extrapolate: "clamp",
+  });
+  const handleScroll = React.useMemo(
+    () =>
+      Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+        useNativeDriver: true,
+      }),
+    [scrollY]
+  );
 
   const getCountByTipo = (tipo: string) =>
     tipo === "todos" ? recursos.length : recursos.filter((r) => r.tipo === tipo).length;
@@ -104,7 +112,12 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
         >
           {/* Header pill */}
           <View style={styles.headerBlock}>
-            <Animated.View style={mobilePillStyle}>
+            <Animated.View
+              style={{
+                opacity: mobilePillOpacity,
+                transform: [{ translateY: mobilePillTranslateY }],
+              }}
+            >
               <AnimatedTopPill
                 icon="menu-book"
                 title="Recursos"

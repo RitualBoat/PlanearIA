@@ -1,4 +1,4 @@
-import React, { createContext, useState, useCallback, useEffect } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Post, PostMood } from "../../types";
 
@@ -22,7 +22,6 @@ interface PostsContextData {
 }
 
 const PostsContext = createContext<PostsContextData | undefined>(undefined);
-export { PostsContext, type PostsContextData };
 
 export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -147,3 +146,9 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     </PostsContext.Provider>
   );
 };
+
+export function usePosts(): PostsContextData {
+  const ctx = useContext(PostsContext);
+  if (!ctx) throw new Error("usePosts must be used within PostsProvider");
+  return ctx;
+}

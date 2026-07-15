@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { useTheme } from "../../../hooks/useTheme";
+import { useTheme } from "../../../context/ThemeContext";
 import type { EditorMode } from "../../../hooks/useEditorMode";
 import type { DatosGenerales } from "../../../../types/planeacionV2";
 

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useCallback, useEffect } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DaltonismoMode, ColorTokens } from "../themes/types";
 
@@ -49,7 +49,6 @@ interface DaltonismoContextData {
 }
 
 const DaltonismoContext = createContext<DaltonismoContextData | undefined>(undefined);
-export { DaltonismoContext, type DaltonismoContextData };
 
 export const DaltonismoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [daltonismoMode, setModeState] = useState<DaltonismoMode>("none");
@@ -81,3 +80,9 @@ export const DaltonismoProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     </DaltonismoContext.Provider>
   );
 };
+
+export function useDaltonismo(): DaltonismoContextData {
+  const ctx = useContext(DaltonismoContext);
+  if (!ctx) throw new Error("useDaltonismo must be used within DaltonismoProvider");
+  return ctx;
+}

@@ -14,7 +14,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import AnimatedTopPill from "../../components/AnimatedTopPill";
 import { useNotificaciones } from "../../context/NotificacionesContext";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../context/ThemeContext";
 import { Notificacion, TipoNotificacion } from "../../../types";
 
 type FilterType = "todas" | "no_leidas";

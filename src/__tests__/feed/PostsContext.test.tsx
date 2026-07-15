@@ -1,7 +1,6 @@
 import React from "react";
 import { act, renderHook, waitFor } from "@testing-library/react-native";
-import { PostsProvider } from "../../context/PostsContext";
-import { usePosts } from "../../hooks/usePosts";
+import { PostsProvider, usePosts } from "../../context/PostsContext";
 
 const mockGetItem = jest.fn();
 const mockSetItem = jest.fn();

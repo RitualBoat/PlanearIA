@@ -11,7 +11,7 @@ export const getScreenDimensions = () => {
 /**
  * Determina si es una pantalla grande (tablet o web)
  */
-const isLargeScreen = (): boolean => {
+export const isLargeScreen = (): boolean => {
   const { width } = getScreenDimensions();
   return width >= 768;
 };

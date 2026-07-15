@@ -1,12 +1,9 @@
 import React from "react";
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 
-import { DaltonismoProvider } from "../../context/DaltonismoContext";
-import { useDaltonismo } from "../../hooks/useDaltonismo";
-import { FontSizeProvider } from "../../context/FontSizeContext";
-import { useFontSize } from "../../hooks/useFontSize";
-import { ThemeProvider } from "../../context/ThemeContext";
-import { useTheme } from "../../hooks/useTheme";
+import { DaltonismoProvider, useDaltonismo } from "../../context/DaltonismoContext";
+import { FontSizeProvider, useFontSize } from "../../context/FontSizeContext";
+import { ThemeProvider, useTheme } from "../../context/ThemeContext";
 import { darkTheme, lightTheme } from "../../themes/colors";
 
 const mockGetItem = jest.fn();

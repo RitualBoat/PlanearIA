@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../context/ThemeContext";
 import ScreenBackButton from "../../components/ScreenBackButton";
 import { useListaPlaneacionesViewModel } from "../../hooks/useListaPlaneacionesViewModel";
 import type { PlaneacionDocumento } from "../../../types/planeacionV2";

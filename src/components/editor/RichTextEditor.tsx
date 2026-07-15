@@ -15,7 +15,7 @@ import {
   useEditorContent,
   type EditorBridge,
 } from "@10play/tentap-editor";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../context/ThemeContext";
 import type { EditorMode } from "../../hooks/useEditorMode";
 import { TableBridge } from "./bridges/TableBridge";
 

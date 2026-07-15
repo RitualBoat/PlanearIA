@@ -64,7 +64,7 @@ export const subscribeConnectivity = (
  * Vercel or MongoDB are down). Used to distinguish "you are offline" from
  * "the server is unavailable" in the UI.
  */
-const checkBackendReachable = async (): Promise<boolean> => {
+export const checkBackendReachable = async (): Promise<boolean> => {
   try {
     const response = await apiRequest("/api/health", { method: "GET" });
     return response.ok;

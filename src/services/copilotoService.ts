@@ -369,10 +369,12 @@ export const mejorarTexto = async (
   });
 };
 
-const copilotoService = {
+export const copilotoService = {
   sugerirActividades,
   autocompletarSeccion,
   generarEvaluacion,
   revisarAlineamiento,
   mejorarTexto,
 };
+
+export default copilotoService;

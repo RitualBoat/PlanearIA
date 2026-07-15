@@ -3,8 +3,8 @@ import { act, renderHook, waitFor } from "@testing-library/react-native";
 
 import {
   AccessibilityPreferencesProvider,
+  useAccessibilityPreferences,
 } from "../../context/AccessibilityPreferencesContext";
-import { useAccessibilityPreferences } from "../../hooks/useAccessibilityPreferences";
 
 const mockMultiGet = jest.fn();
 const mockSetItem = jest.fn();

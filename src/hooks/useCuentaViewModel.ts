@@ -4,8 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { CommonActions } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
-import { type Usuario } from "../context/AuthContext";
-import { useAuth } from ".//useAuth";
+import { useAuth, type Usuario } from "../context/AuthContext";
 import logger from "../utils/logger";
 
 type Nav = StackNavigationProp<RootStackParamList, "Cuenta">;

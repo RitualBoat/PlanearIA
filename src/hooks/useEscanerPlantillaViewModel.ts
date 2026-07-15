@@ -4,7 +4,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
-import { useAuth } from ".//useAuth";
+import { useAuth } from "../context/AuthContext";
 import {
   extractRawTextFromImportedFile,
   scanPlantillaFromRawText,

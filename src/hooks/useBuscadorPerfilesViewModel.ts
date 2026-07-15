@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useContactos } from "../context/ContactosContext";
-import { useAuth } from ".//useAuth";
+import { useAuth } from "../context/AuthContext";
 import { createInviteLink, copyToClipboard, shareInviteLink } from "../services/inviteLinkService";
 
 // ─── Types ───

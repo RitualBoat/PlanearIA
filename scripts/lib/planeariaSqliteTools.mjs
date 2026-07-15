@@ -346,7 +346,7 @@ function isSafeIdentifier(identifier) {
   return /^[A-Za-z_][A-Za-z0-9_]*$/.test(identifier);
 }
 
-function getWorkspaceRoot() {
+export function getWorkspaceRoot() {
   return WORKSPACE_ROOT;
 }
 

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Animated,
   Modal,
   StatusBar,
   StyleSheet,
@@ -11,7 +12,6 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, useAnimatedScrollHandler, interpolate, Extrapolation } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
@@ -19,12 +19,11 @@ import AnimatedTopPill from "../../components/AnimatedTopPill";
 import { isWeb } from "../../utils/responsive";
 import { useCuentaViewModel } from "../../hooks/useCuentaViewModel";
 import { usePermission } from "../../hooks/usePermission";
-import { PREFERENCIAS_DEFAULT } from "../../context/AuthContext.constants";
-import { useAuth } from "../../hooks/useAuth";
-import { useTheme } from "../../hooks/useTheme";
-import { useFontSize } from "../../hooks/useFontSize";
-import { useDaltonismo } from "../../hooks/useDaltonismo";
-import { useAccessibilityPreferences } from "../../hooks/useAccessibilityPreferences";
+import { useAuth, PREFERENCIAS_DEFAULT } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
+import { useFontSize } from "../../context/FontSizeContext";
+import { useDaltonismo } from "../../context/DaltonismoContext";
+import { useAccessibilityPreferences } from "../../context/AccessibilityPreferencesContext";
 import { changeLanguage } from "../../locales/i18n";
 import { useTranslation } from "react-i18next";
 import { getRoleLabel } from "../../../types";
@@ -91,16 +90,7 @@ const CuentaScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const wideLayout = width >= 1080;
   const navigation = useNavigation();
-  const scrollY = useSharedValue(0);
-  const mobilePillStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(scrollY.value, [0, 22, 56], [1, 0.5, 0], Extrapolation.CLAMP),
-    transform: [{ translateY: interpolate(scrollY.value, [0, 56], [0, -16], Extrapolation.CLAMP) }],
-  }));
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-    },
-  });
+  const [scrollY] = React.useState(() => new Animated.Value(0));
   const { t, i18n } = useTranslation();
 
   // Real accessibility contexts consumed at runtime
@@ -172,6 +162,19 @@ const CuentaScreen: React.FC = () => {
 
   const prefs = { ...PREFERENCIAS_DEFAULT, ...usuario?.preferencias };
 
+  // "Reducir movimiento": when on, the top pill renders statically (no scroll animation).
+  const mobilePillOpacity = scrollY.interpolate({
+    inputRange: [0, 22, 56],
+    outputRange: [1, 0.5, 0],
+    extrapolate: "clamp",
+  });
+
+  const mobilePillTranslateY = scrollY.interpolate({
+    inputRange: [0, 56],
+    outputRange: [0, -16],
+    extrapolate: "clamp",
+  });
+
   const togglePref = (key: string, value: boolean) => {
     actualizarPreferencias({ [key]: value });
   };
@@ -226,7 +229,9 @@ const CuentaScreen: React.FC = () => {
         <Animated.ScrollView
           style={styles.scroller}
           contentContainerStyle={styles.scrollContent}
-          onScroll={scrollHandler}
+          onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+            useNativeDriver: true,
+          })}
           scrollEventThrottle={16}
           showsVerticalScrollIndicator={false}
         >
@@ -240,7 +245,12 @@ const CuentaScreen: React.FC = () => {
                 />
               </View>
             ) : (
-              <Animated.View style={mobilePillStyle}>
+              <Animated.View
+                style={{
+                  opacity: mobilePillOpacity,
+                  transform: [{ translateY: mobilePillTranslateY }],
+                }}
+              >
                 <AnimatedTopPill
                   icon="settings"
                   title="Configuracion"

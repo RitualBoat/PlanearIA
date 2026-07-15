@@ -3,7 +3,7 @@ import { Platform, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
-import { useAuth } from ".//useAuth";
+import { useAuth } from "../context/AuthContext";
 
 type Nav = StackNavigationProp<RootStackParamList, "Registro">;
 

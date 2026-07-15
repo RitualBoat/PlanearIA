@@ -3,7 +3,7 @@ import { Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { onIncomingLink, ParsedInvite } from "../services/inviteLinkService";
 import { useContactos } from "../context/ContactosContext";
-import { useAuth } from ".//useAuth";
+import { useAuth } from "../context/AuthContext";
 
 /**
  * Hook that listens for incoming deep links (invite URLs)

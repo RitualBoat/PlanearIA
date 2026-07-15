@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Alert } from "react-native";
-import { useNetInfo } from "@react-native-community/netinfo";
+import NetInfo from "@react-native-community/netinfo";
 import { usePlaneaciones } from "../context/PlaneacionesContext";
 import { useRecursos } from "../context/RecursosContext";
 import { useEntregables } from "../context/EntregablesContext";
@@ -174,10 +174,16 @@ export const useContenidoViewModel = (): ContenidoViewModel => {
 
   const isLoading = loadingPlan || loadingRec || loadingEnt || loadingPla;
 
-  const netInfo = useNetInfo();
-  const isOffline = netInfo.isConnected === false;
+  const [isOffline, setIsOffline] = useState(false);
   const [isError, setIsError] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsOffline(state.isConnected === false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const retryLoad = useCallback(() => {
     setIsError(false);

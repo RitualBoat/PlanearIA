@@ -59,7 +59,7 @@ export const savePlantillaDocumento = async (
   return normalized;
 };
 
-const deletePlantillaDocumento = async (id: string, userId: string): Promise<void> => {
+export const deletePlantillaDocumento = async (id: string, userId: string): Promise<void> => {
   const raw = await AsyncStorage.getItem(PLANTILLAS_DOCUMENTO_KEY);
   const current = safeParse(raw);
   const next = current.filter((plantilla) => !(plantilla.id === id && plantilla.userId === userId));

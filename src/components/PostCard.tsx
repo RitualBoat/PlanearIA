@@ -3,7 +3,7 @@ import { Pressable, View, Text, StyleSheet, Platform } from "react-native";
 import { Image } from "expo-image";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../context/ThemeContext";
 import { Post } from "../../types";
 
 interface PostCardProps {

@@ -8,7 +8,7 @@ import { isAPIConfigured } from "../sync/config/apiConfig";
 import { apiRequest } from "../utils/apiClient";
 import logger from "../utils/logger";
 import { isNetworkRequestError } from "../utils/networkErrors";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 const NOTIFICACIONES_STORAGE_KEY = "APP_NOTIFICACIONES_DATA";
 

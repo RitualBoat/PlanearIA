@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { Alert, Share } from "react-native";
-import { usePosts } from "../context/PostsContext";
-import { useAuth } from "../context/AuthContext";
+import { usePosts } from ".//usePosts";
+import { useAuth } from ".//useAuth";
 import { useRecursos } from "../context/RecursosContext";
 import { getRoleLabel, Post, PostMood, PostAttachment } from "../../types";
 

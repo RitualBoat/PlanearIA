@@ -14,7 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { useTheme } from "../../context/ThemeContext";
+import { useTheme } from "../../hooks/useTheme";
 import { useFeedViewModel } from "../../hooks/useFeedViewModel";
 import PostCard from "../../components/PostCard";
 import CreatePostModal from "../../components/CreatePostModal";

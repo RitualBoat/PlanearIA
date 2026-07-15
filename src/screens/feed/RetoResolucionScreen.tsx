@@ -3,7 +3,7 @@ import { Pressable, View, Text, StyleSheet, ScrollView, Platform, Alert } from "
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useTheme } from "../../context/ThemeContext";
+import { useTheme } from "../../hooks/useTheme";
 
 const OPTION_LETTERS = ["A", "B", "C", "D", "E", "F"];
 

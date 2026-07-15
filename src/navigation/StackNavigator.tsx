@@ -6,7 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COLORS } from "../../types";
 import { NivelAcademico as NivelAcademicoV2 } from "../../types/planeacionV2";
 import AppTabsNavigator, { MainTabParamList } from "./AppTabsNavigator";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import { useDeepLinkHandler } from "../hooks/useDeepLinkHandler";
 
 // ImportaciÃƒÂ³n de pantallas de autenticaciÃƒÂ³n

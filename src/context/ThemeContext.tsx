@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import React, { createContext, useState, useCallback, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { lightTheme, darkTheme } from "../themes/colors";
 import { ColorTokens, ThemeMode } from "../themes/types";
@@ -14,6 +14,7 @@ interface ThemeContextData {
 }
 
 const ThemeContext = createContext<ThemeContextData | undefined>(undefined);
+export { ThemeContext, type ThemeContextData };
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<ThemeMode>("light");
@@ -49,9 +50,3 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     </ThemeContext.Provider>
   );
 };
-
-export function useTheme(): ThemeContextData {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
-  return ctx;
-}

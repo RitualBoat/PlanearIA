@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "../hooks/useTheme";
 import { PostMood } from "../../types";
 
 const MOODS: { emoji: PostMood; label: string; bg: string; text: string; icon: string }[] = [

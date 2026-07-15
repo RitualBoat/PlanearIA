@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Modal, Platform, Pressable } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "../hooks/useTheme";
 
 interface PostOptionsSheetProps {
   visible: boolean;

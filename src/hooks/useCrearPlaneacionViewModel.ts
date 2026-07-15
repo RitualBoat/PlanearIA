@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
 import { API_CONFIG } from "../sync/config/apiConfig";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from ".//useAuth";
 import { usePlaneaciones } from "../context/PlaneacionesContext";
 import { mapResponseToPlaneacion } from "../utils/planeacionMapper";
 import { getAccessToken } from "../services/auth/authService";

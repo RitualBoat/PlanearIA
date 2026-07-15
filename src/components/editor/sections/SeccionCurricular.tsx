@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { useTheme } from "../../../context/ThemeContext";
+import { useTheme } from "../../../hooks/useTheme";
 import type { EditorMode } from "../../../hooks/useEditorMode";
 import type { ElementosCurriculares } from "../../../../types/planeacionV2";
 

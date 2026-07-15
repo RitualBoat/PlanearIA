@@ -2,9 +2,7 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS } from "../../types";
-
-export const CARRERA_OPTIONS = ["ISC", "IGE", "ARQ", "ITICS"] as const;
-export type CarreraSelectorValue = (typeof CARRERA_OPTIONS)[number] | "";
+import { CARRERA_OPTIONS, type CarreraSelectorValue } from "./CarreraSelector.constants";
 
 interface CarreraSelectorProps {
   value: string;

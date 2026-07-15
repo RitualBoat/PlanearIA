@@ -13,7 +13,7 @@ import { useNavigation, CommonActions } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS } from "../../types";
 import { useNotificaciones } from "../context/NotificacionesContext";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 const FloatingActionIcons: React.FC = () => {
   const { width } = useWindowDimensions();

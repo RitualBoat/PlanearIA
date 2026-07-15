@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import React, { createContext, useState, useCallback, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HIGH_CONTRAST_KEY = "APP_HIGH_CONTRAST";
@@ -17,6 +17,7 @@ interface AccessibilityPreferencesData {
 const AccessibilityPreferencesContext = createContext<AccessibilityPreferencesData | undefined>(
   undefined
 );
+export { AccessibilityPreferencesContext, type AccessibilityPreferencesData };
 
 // Un solo valor persistido "true" cuenta como activado; cualquier otra cosa
 // (ausente o invalido) cae al default seguro off.
@@ -70,12 +71,3 @@ export const AccessibilityPreferencesProvider: React.FC<{ children: React.ReactN
     </AccessibilityPreferencesContext.Provider>
   );
 };
-
-export function useAccessibilityPreferences(): AccessibilityPreferencesData {
-  const ctx = useContext(AccessibilityPreferencesContext);
-  if (!ctx)
-    throw new Error(
-      "useAccessibilityPreferences must be used within AccessibilityPreferencesProvider"
-    );
-  return ctx;
-}

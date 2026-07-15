@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import React, { createContext, useState, useCallback, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontSizeMode } from "../themes/types";
 
@@ -19,6 +19,7 @@ interface FontSizeContextData {
 }
 
 const FontSizeContext = createContext<FontSizeContextData | undefined>(undefined);
+export { FontSizeContext, type FontSizeContextData };
 
 export const FontSizeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [fontSizeMode, setModeState] = useState<FontSizeMode>("medium");
@@ -49,9 +50,3 @@ export const FontSizeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     </FontSizeContext.Provider>
   );
 };
-
-export function useFontSize(): FontSizeContextData {
-  const ctx = useContext(FontSizeContext);
-  if (!ctx) throw new Error("useFontSize must be used within FontSizeProvider");
-  return ctx;
-}

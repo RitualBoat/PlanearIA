@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useTheme } from "../../context/ThemeContext";
+import { useTheme } from "../../hooks/useTheme";
 import { useEscanerPlantillaViewModel } from "../../hooks/useEscanerPlantillaViewModel";
 import { NivelAcademico } from "../../../types/planeacionV2";
 

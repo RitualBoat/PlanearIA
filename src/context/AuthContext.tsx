@@ -1,9 +1,10 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useCallback, useEffect, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SESSION_KEYS } from "../services/auth/sessionStorage";
 import * as authService from "../services/auth/authService";
 import type { AuthUser, AuthSession, RolUsuario } from "../../types/auth";
 import type { RegistroData } from "../services/auth/authService";
+import { PREFERENCIAS_DEFAULT } from "./AuthContext.constants";
 
 // Re-export for consumers that imported from here
 export type { RegistroData };
@@ -16,15 +17,6 @@ export interface PreferenciasUsuario {
   tamanoFuente: "pequeno" | "medio" | "grande";
   notificaciones: boolean;
 }
-
-export const PREFERENCIAS_DEFAULT: PreferenciasUsuario = {
-  recibirRecomendaciones: true,
-  compartirDatos: false,
-  contenidoAdulto: false,
-  tema: "sistema",
-  tamanoFuente: "medio",
-  notificaciones: true,
-};
 
 /**
  * Extended user interface for backward compatibility.
@@ -47,7 +39,7 @@ export interface Usuario {
   fechaModificacion: string;
 }
 
-interface AuthContextData {
+export interface AuthContextData {
   usuario: Usuario | null;
   token: string | null;
   isLoading: boolean;
@@ -68,7 +60,7 @@ interface AuthContextData {
   eliminarCuenta: (password: string) => Promise<{ success: boolean; error?: string }>;
 }
 
-const AuthContext = createContext<AuthContextData | undefined>(undefined);
+export const AuthContext = createContext<AuthContextData | undefined>(undefined);
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -307,11 +299,3 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-export function useAuth(): AuthContextData {
-  const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return ctx;
-}

@@ -1,13 +1,14 @@
-import React, { use } from "react";
-import { Animated, Easing, StyleProp,
+import React, { useCallback } from "react";
+import { Easing, StyleProp,
   StyleSheet,
   Text,
   TextStyle,
   View,
   ViewStyle,
 } from "react-native";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, cancelAnimation, interpolateColor } from "react-native-reanimated";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { NavigationContext } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import { COLORS } from "../../types";
 
 interface AnimatedTopPillProps {
@@ -35,68 +36,39 @@ const AnimatedTopPill: React.FC<AnimatedTopPillProps> = ({
   subtitleStyle,
   children,
 }) => {
-  const navigation = use(NavigationContext);
-  const [ringShift] = React.useState(() => new Animated.Value(0));
-  const [ringOpacity] = React.useState(() => new Animated.Value(0));
-  const glowAnimationRef = React.useRef<Animated.CompositeAnimation | null>(null);
+  const ringShift = useSharedValue(0);
+  const ringOpacity = useSharedValue(0);
 
-  const runGlow = React.useCallback(() => {
-    glowAnimationRef.current?.stop();
-    ringShift.setValue(0);
-    ringOpacity.setValue(0.95);
+  const runGlow = useCallback(() => {
+    cancelAnimation(ringShift);
+    cancelAnimation(ringOpacity);
+    ringShift.value = 0;
+    ringOpacity.value = 0.95;
 
-    const animation = Animated.parallel([
-      Animated.timing(ringShift, {
-        toValue: 1,
-        duration: 1400,
-        easing: Easing.linear,
-        useNativeDriver: false,
-      }),
-      Animated.timing(ringOpacity, {
-        toValue: 0,
-        duration: 1500,
-        delay: 250,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: false,
-      }),
-    ]);
+    ringShift.value = withTiming(1, { duration: 1400, easing: Easing.linear });
+    ringOpacity.value = withTiming(0, { duration: 1500, easing: Easing.out(Easing.cubic) });
+  }, [ringShift, ringOpacity]);
 
-    glowAnimationRef.current = animation;
-    animation.start(() => {
-      if (glowAnimationRef.current === animation) {
-        glowAnimationRef.current = null;
-      }
-    });
-  }, [ringOpacity, ringShift]);
+  useFocusEffect(
+    useCallback(() => {
+      runGlow();
+    }, [runGlow])
+  );
 
-  React.useEffect(() => {
-    runGlow();
-
-    if (!navigation) {
-      return () => {
-        glowAnimationRef.current?.stop();
-        glowAnimationRef.current = null;
-      };
-    }
-
-    const unsubscribeFocus = navigation.addListener("focus", runGlow);
-    return () => {
-      unsubscribeFocus();
-      glowAnimationRef.current?.stop();
-      glowAnimationRef.current = null;
-    };
-  }, [navigation, runGlow]);
-
-  const borderColor = ringShift.interpolate({
-    inputRange: [0, 0.16, 0.33, 0.5, 0.66, 0.83, 1],
-    outputRange: [COLORS.errorLight, "#FF9F1C", "#FFE66D", "#2EC4B6", "#3A86FF", "#8338EC", COLORS.errorLight],
-  });
+  const animatedRingStyle = useAnimatedStyle(() => ({
+    borderColor: interpolateColor(
+      ringShift.value,
+      [0, 0.16, 0.33, 0.5, 0.66, 0.83, 1],
+      [COLORS.errorLight, "#FF9F1C", "#FFE66D", "#2EC4B6", "#3A86FF", "#8338EC", COLORS.errorLight]
+    ),
+    opacity: ringOpacity.value,
+  }));
 
   return (
     <View style={styles.shell}>
       <Animated.View
         pointerEvents="none"
-        style={[styles.rainbowRing, { borderColor, opacity: ringOpacity }]}
+        style={[styles.rainbowRing, animatedRingStyle]}
       />
 
       <View style={[styles.pill, size === "large" && styles.pillLarge, style]}>

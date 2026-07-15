@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from ".//useAuth";
 import { RootStackParamList } from "../navigation/StackNavigator";
 
 type Nav = StackNavigationProp<RootStackParamList>;

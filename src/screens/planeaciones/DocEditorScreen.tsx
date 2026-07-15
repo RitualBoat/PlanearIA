@@ -19,7 +19,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { EditorBridge } from "@10play/tentap-editor";
 import type { RootStackParamList } from "../../navigation/StackNavigator";
-import { useTheme } from "../../context/ThemeContext";
+import { useTheme } from "../../hooks/useTheme";
 import { useEditorMode } from "../../hooks/useEditorMode";
 import { useDocEditorViewModel, type DocSectionId } from "../../hooks/useDocEditorViewModel";
 import { useCopiloto } from "../../hooks/useCopiloto";
@@ -266,7 +266,7 @@ const DocEditorScreen: React.FC = () => {
   }, [isWeb, vm.isDirty]);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener("beforeRemove", (event) => {
+    const onBeforeRemove = (event: any) => {
       if (!vm.isDirty || skipUnsavedPromptRef.current) return;
       (event as { preventDefault?: () => void }).preventDefault?.();
 
@@ -290,11 +290,10 @@ const DocEditorScreen: React.FC = () => {
           { text: "Salir sin guardar", style: "destructive", onPress: continueNavigation },
         ]
       );
-    });
-
-    return () => {
-      unsubscribe();
     };
+
+    navigation.addListener("beforeRemove", onBeforeRemove);
+    return () => navigation.removeListener("beforeRemove", onBeforeRemove);
   }, [isWeb, navigation, vm.isDirty]);
 
   const showSaveFeedback = useCallback((message: string) => {

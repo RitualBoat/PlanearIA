@@ -5,7 +5,7 @@ import type { RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RootStackParamList } from "../navigation/StackNavigator";
 import { usePlaneaciones } from "../context/PlaneacionesContext";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from ".//useAuth";
 import { buildPlaneacionDocumentoBase } from "../utils/createPlaneacionDocumentoBase";
 import { buildDocumentoFromPlantilla, getPlantillaDocumento } from "../services/plantillaDocumentoService";
 import { buildContenidoRawFromDocumento, ensureDocumentoContenidoRaw } from "../utils/docEditorTemplate";

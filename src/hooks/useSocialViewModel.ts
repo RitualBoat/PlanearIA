@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { Alert } from "react-native";
 import { useContactos } from "../context/ContactosContext";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from ".//useAuth";
 import { Contacto, SolicitudConexion } from "../../types";
 
 export type SocialTab = "contactos" | "solicitudes" | "buscar";

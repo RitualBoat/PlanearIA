@@ -9,7 +9,7 @@ import {
   type ViewStyle,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useTheme } from "../../context/ThemeContext";
+import { useTheme } from "../../hooks/useTheme";
 import type { EditorMode } from "../../hooks/useEditorMode";
 
 export interface EditorSectionItem {

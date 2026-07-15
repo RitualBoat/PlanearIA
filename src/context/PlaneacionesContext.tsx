@@ -8,7 +8,7 @@ import React, {
   type ReactNode,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import {
   type Planeacion,
   type FiltrosPlaneacion,

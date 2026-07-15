@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Keyboard, Platform, Pressable, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "../hooks/useTheme";
 import { runGlobalKeyboardDismissHandler } from "../utils/keyboardDismissController";
 
 const KeyboardDismissFab: React.FC = () => {

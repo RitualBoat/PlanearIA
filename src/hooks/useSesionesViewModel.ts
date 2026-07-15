@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from ".//useAuth";
 import * as authService from "../services/auth/authService";
 import type { SesionActiva } from "../services/auth/authService";
 

@@ -15,8 +15,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
-import { useTheme } from "../../context/ThemeContext";
-import { usePosts } from "../../context/PostsContext";
+import { useTheme } from "../../hooks/useTheme";
+import { usePosts } from "../../hooks/usePosts";
 import { Post, PostComment } from "../../../types";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 

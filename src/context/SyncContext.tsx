@@ -18,7 +18,7 @@ import React, {
   useState,
 } from "react";
 import { AppState } from "react-native";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import { SYNC_CONFIG, isAPIConfigured } from "../sync/config/apiConfig";
 import { subscribeConnectivity } from "../sync/services/connectivity";
 import {

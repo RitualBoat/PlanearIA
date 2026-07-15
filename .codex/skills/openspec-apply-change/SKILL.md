@@ -158,3 +158,11 @@ This skill supports the "actions on a change" model:
 
 - **Can be invoked anytime**: Before all artifacts are done (if tasks exist), after partial implementation, interleaved with other actions
 - **Allows artifact updates**: If implementation reveals design issues, suggest updating artifacts - not phase-locked, work fluidly
+
+<!-- PLANEARIA_TLDR_WORKFLOW -->
+
+### PlanearIA TLDR convention
+
+Read `<changeRoot>/TLDR.md` as supplementary context. Update it before completing affected work when implementation changes scope, affected files, behavior, or expected result; keep its five human-facing blocks. Do not add an automated quality or word-count gate.
+
+<!-- /PLANEARIA_TLDR_WORKFLOW -->

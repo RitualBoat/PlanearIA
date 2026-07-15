@@ -14,7 +14,9 @@ Propose a new change - create the change and generate all artifacts in one step.
 I'll create a change with artifacts:
 - proposal.md (what & why)
 - design.md (how)
+- specs (expected behavior)
 - tasks.md (implementation steps)
+- TLDR.md (human guide to the four artifacts)
 
 When ready to implement, run /opsx:apply
 
@@ -78,7 +80,12 @@ When ready to implement, run /opsx:apply
       - Check if every artifact ID in `applyRequires` has `status: "done"` in the artifacts array
       - Stop when all `applyRequires` artifacts are done
 
-   c. **If an artifact requires user input** (unclear context):
+   c. **Create the human TLDR**
+      - Create exactly one `TLDR.md` at the root of `changeRoot`, beside the OpenSpec artifacts.
+      - Write these five blocks in order: Proposal intention, Design approach, Spec expected behavior, Tasks practical plan, and `Resumen integral del change`.
+      - Each block and the final paragraph must have at most 120 words, in accessible Spanish with headings that explain the artifact's real role. This is reviewed by a person; the automated checker only validates the file's presence and location.
+
+   d. **If an artifact requires user input** (unclear context):
       - Use **AskUserQuestion tool** to clarify
       - Then continue with creation
 
@@ -92,6 +99,7 @@ When ready to implement, run /opsx:apply
 After completing all artifacts, summarize:
 - Change name and location
 - List of artifacts created with brief descriptions
+- The `TLDR.md` location and that its human review is still required
 - What's ready: "All artifacts created! Ready for implementation."
 - Prompt: "Run `/opsx:apply` to start implementing."
 

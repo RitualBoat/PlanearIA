@@ -59,6 +59,8 @@ Implement tasks from an OpenSpec change.
    - **spec-driven**: proposal, specs, design, tasks
    - Other schemas: follow the contextFiles from CLI output
 
+   Also read `<changeRoot>/TLDR.md` when it exists. It is supplementary context, not an OpenSpec artifact reported by the CLI.
+
 5. **Show current progress**
 
    Display:
@@ -147,9 +149,11 @@ What would you like to do?
 - If task is ambiguous, pause and ask before implementing
 - If implementation reveals issues, pause and suggest artifact updates
 - Keep code changes minimal and scoped to each task
-- Update task checkbox immediately after completing each task
+   - Update task checkbox immediately after completing each task
+   - Update `TLDR.md` before completing affected tasks when implementation changes scope, affected files, behavior, or expected result. Preserve its five human-facing blocks; do not use an automated word-count or quality gate.
 - Pause on errors, blockers, or unclear requirements - don't guess
 - Use contextFiles from CLI output, don't assume specific file names
+- Treat `TLDR.md` as required supplementary context for a change that has one, and keep it aligned with material implementation changes
 
 **Fluid Workflow Integration**
 

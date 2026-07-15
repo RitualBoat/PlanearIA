@@ -68,7 +68,11 @@ Archive a completed change in the experimental workflow.
 
    If user chooses sync, use Task tool (subagent_type: "general-purpose", prompt: "Use Skill tool to invoke openspec-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"). Proceed to archive regardless of choice.
 
-5. **Perform the archive**
+5. **Confirm the human TLDR is preserved**
+
+   Verify that exactly one `TLDR.md` exists at `<changeRoot>/TLDR.md`. If the change's scope, files, behavior, or expected result changed during apply, update its human-facing summary before archiving. Do not inspect tone, structure, or word counts automatically.
+
+6. **Perform the archive**
 
    Create an `archive` directory under `planningHome.changesDir` if it doesn't exist:
    ```bash
@@ -85,7 +89,7 @@ Archive a completed change in the experimental workflow.
    mv "<changeRoot>" "<planningHome.changesDir>/archive/YYYY-MM-DD-<name>"
    ```
 
-6. **Display summary**
+7. **Display summary**
 
    Show archive completion summary including:
    - Change name
@@ -159,6 +163,7 @@ Target archive directory already exists.
 - Use artifact graph (npm exec --yes=false -- openspec status --json) for completion checking
 - Don't block archive on warnings - just inform and confirm
 - Preserve .openspec.yaml when moving to archive (it moves with the directory)
+- Preserve `TLDR.md` in the same move; never copy it outside the archived change directory
 - Show clear summary of what happened
 - If sync is requested, use the Skill tool to invoke `openspec-sync-specs` (agent-driven)
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting

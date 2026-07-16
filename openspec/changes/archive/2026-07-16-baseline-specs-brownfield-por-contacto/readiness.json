@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "issue": 64,
+  "change": "baseline-specs-brownfield-por-contacto",
+  "surfaces": ["docs", "harness"],
+  "validations": ["openspec-strict", "harness-parity", "opsx-patch"],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/64"
+    },
+    {
+      "id": "pr-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/pull/72"
+    },
+    {
+      "id": "docs-verification",
+      "ref": "npm run openspec:validate; npm run agent:harness:check; npm run agent:opsx:patch:check (2026-07-15)"
+    },
+    {
+      "id": "fixtures",
+      "ref": "npm run test:openspec-readiness (2026-07-15)"
+    },
+    {
+      "id": "adversarial-review",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/64#issuecomment-4987929821"
+    }
+  ],
+  "rollback": {
+    "strategy": "Revertir en un commit aislado el template, las reglas, el checker, sus fixtures y la tabla de owners; regenerar los espejos del harness si aplica. No hay datos ni despliegues que restaurar."
+  },
+  "adversarialReview": {
+    "ref": "https://github.com/RitualBoat/PlanearIA/issues/64#issuecomment-4987929821"
+  },
+  "exceptions": []
+}

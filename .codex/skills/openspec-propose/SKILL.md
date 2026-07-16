@@ -125,6 +125,6 @@ Create exactly one `TLDR.md` at the root of the change after proposal, design, s
 
 ### PlanearIA Definition of Ready and Done
 
-Before creating a change, run `npm run openspec:ready:propose -- --issue <n>`. It is read-only and checks the enriched issue, Project membership and pre-propose metadata. Resolve each FAIL or record only a valid, temporary exception; do not create the change when the gate fails.
+Before creating a change, run `npm run openspec:ready:propose -- --issue <n>`. It is read-only and checks the enriched issue, Project membership and pre-propose metadata. Resolve each FAIL or record only a valid, temporary exception; do not create the change when the gate fails. After proposal, design, specs, and tasks are ready, create `<changeRoot>/brownfield-baseline.md` with only the touched surfaces, current and target behavior, legacy compatibility, owner/context, evidence, and exclusions.
 
 <!-- /PLANEARIA_READINESS_WORKFLOW -->

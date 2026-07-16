@@ -8,6 +8,7 @@ Guias practicas para ejecutar, validar y organizar el proyecto.
 - `DEPLOY_DEMO_HOSTEADA.md`: despliegue de la demo web (Vercel) y CD del APK Android.
 - `MCP_FLUJOS_PLANEARIA.md`: MCPs activos, flujo OpenSpec y uso seguro de SQLite/MongoDB.
 - `OPENSPEC_CLI.md`: instalacion reproducible, comandos locales, update y rollback de OpenSpec.
+- `BASELINE_BROWNFIELD_POR_CONTACTO.md`: contrato y ejemplo para capturar solo la superficie vigente que un change va a modificar.
 - `CODEGRAPH_MCP.md`: guia especifica de CodeGraph como fallback/fuente lineada y comparacion historica contra `rg`.
 - `CAMBIOS_SYNC_OFFLINE_2026-06.md`: changelog de la sesion de sincronizacion offline-first.
 

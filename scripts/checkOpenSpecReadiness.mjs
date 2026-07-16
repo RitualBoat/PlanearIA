@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { existsSync, readFileSync, realpathSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -11,6 +11,17 @@ const ISSUE_MARKER_START = "<!-- openspec-readiness:pre-propose";
 const ISSUE_MARKER_END = "openspec-readiness:pre-propose -->";
 const EXCEPTION_FIELDS = new Set(["project-membership", "manual-evidence"]);
 const REQUIRED_ISSUE_LABELS = ["## Contexto", "## Historia Original", "## Enriquecida", "**No objetivos.**", "**Rollback.**"];
+const BROWNFIELD_BASELINE_FILE = "brownfield-baseline.md";
+const REQUIRED_BROWNFIELD_SECTIONS = [
+  "Superficies tocadas",
+  "Fuentes de verdad actuales",
+  "Comportamiento vigente",
+  "Comportamiento objetivo",
+  "Compatibilidad legacy",
+  "Owner de spec y contexto",
+  "Evidencia actual",
+  "Fuera de alcance",
+];
 
 export const VALIDATION_PROFILES = {
   docs: { validations: ["openspec-strict", "harness-parity"], evidence: ["docs-verification"] },
@@ -139,6 +150,38 @@ function loadReadiness(changeRoot) {
   return parseJson(readFileSync(file, "utf8"), "readiness.json");
 }
 
+function brownfieldBaselineFailure(changeRoot) {
+  const file = path.join(changeRoot, BROWNFIELD_BASELINE_FILE);
+  if (!existsSync(file)) return `Falta ${BROWNFIELD_BASELINE_FILE} en la raíz del change.`;
+
+  try {
+    if (!lstatSync(file).isFile()) return `${BROWNFIELD_BASELINE_FILE} debe ser un archivo regular en la raíz del change.`;
+  } catch {
+    return `No se pudo inspeccionar ${BROWNFIELD_BASELINE_FILE} de forma segura.`;
+  }
+
+  const sections = new Map();
+  let activeSection = null;
+  let raw;
+  try {
+    raw = readFileSync(file, "utf8");
+  } catch {
+    return `No se pudo leer ${BROWNFIELD_BASELINE_FILE} de forma segura.`;
+  }
+  for (const line of raw.split(/\r?\n/)) {
+    const header = line.match(/^## (.+)$/);
+    if (header) {
+      activeSection = header[1].trim();
+      sections.set(activeSection, []);
+    } else if (activeSection) {
+      sections.get(activeSection).push(line);
+    }
+  }
+
+  const missing = REQUIRED_BROWNFIELD_SECTIONS.filter((section) => !sections.get(section)?.join("\n").trim());
+  return missing.length ? `${BROWNFIELD_BASELINE_FILE} omite o deja vacías: ${missing.join(", ")}.` : null;
+}
+
 function requiredForSurfaces(surfaces) {
   const validations = new Set(["openspec-strict"]);
   const evidence = new Set(["issue-link", "pr-link", "adversarial-review"]);
@@ -166,6 +209,15 @@ export function validateArchive({ root = ROOT, change, now = new Date(), runComm
   const tasks = existsSync(tasksPath) ? readFileSync(tasksPath, "utf8") : "";
   addRequired(results, "tasks-complete", existsSync(tasksPath) && !/- \[ \]/.test(tasks), "Hay tareas pendientes o falta tasks.md.", "Completa las tareas pendientes antes de archive.", { now });
   addRequired(results, "tldr", existsSync(tldrPath), "Falta TLDR.md en la raíz del change.", "Crea o mueve TLDR.md a la raíz del change.", { now });
+  const baselineFailure = brownfieldBaselineFailure(changeRoot);
+  addRequired(
+    results,
+    "brownfield-baseline",
+    !baselineFailure,
+    baselineFailure ?? `${BROWNFIELD_BASELINE_FILE} registra la superficie tocada y el delta brownfield requerido.`,
+    `Crea ${BROWNFIELD_BASELINE_FILE} en la raíz con las ocho secciones requeridas y contenido verificable.`,
+    { now },
+  );
 
   let manifest;
   try {

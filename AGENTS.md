@@ -107,6 +107,7 @@ Reglas:
 - `tasks.md` contiene tareas tecnicas pequenas.
 - `[x]` solo con evidencia.
 - Cada change nuevo incluye un unico `TLDR.md` en su raiz. Proposal lo crea con bloques ordenados para intencion, enfoque, comportamiento, plan de trabajo y resumen integral; cada bloque y el resumen final tienen maximo 120 palabras, en espanol accesible y con encabezados utiles. Apply lo actualiza si cambian alcance, archivos, comportamiento o resultado esperado; archive confirma que se conserva al mover el directorio. El checker solo valida presencia y ubicacion, nunca calidad, estructura ni conteo de palabras.
+- Cada change versionable nuevo crea `brownfield-baseline.md` en su raíz durante propose. Solo documenta la superficie que tocará: fuentes vigentes, comportamiento actual/objetivo, compatibilidad legacy, owner de spec/contexto, evidencia y exclusiones. No reemplaza la spec ni inventaría toda la app; el gate de archive comprueba sus ocho secciones mínimas.
 - UI visible requiere Playwright por breakpoint; navegar solo despues de que `expo start --web` responda HTTP 200.
 - `openspec/specs/` es verdad de comportamiento; se actualiza con archive/sync, no a mano.
 - Tras archivar, cerrar la rama del change con `npm run opsx:finish`: publica la rama, crea o reutiliza un PR hacia `development`, espera los checks requeridos y ordena el merge a GitHub. Nunca hace push directo al target protegido; tras confirmar el merge remoto actualiza `development` local y borra la rama local. Previsualiza con `npm run opsx:finish:dry`.

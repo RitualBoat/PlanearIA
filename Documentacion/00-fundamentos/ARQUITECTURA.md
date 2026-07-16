@@ -57,6 +57,13 @@ Screen (View)
               -> MongoDB Atlas
 ```
 
+## Limites de dominio
+
+Antes de cambiar una entidad compartida o conectar experiencias, consultar
+[`MAPA_DDD_ESTRATEGICO_LIGERO.md`](MAPA_DDD_ESTRATEGICO_LIGERO.md). El mapa define el lenguaje,
+owner y contratos proporcionales dentro del monolito modular; no exige microservicios ni un refactor
+global de la estructura actual.
+
 ## Estructura Principal
 
 ```text

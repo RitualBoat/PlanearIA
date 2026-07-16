@@ -65,6 +65,7 @@ rules:
     - Toda accion de IA debe incluir escenarios de confirmacion explicita del docente, fallback sin proveedor configurado, error temporal y resultado revisable que nunca sobreescribe el original.
     - Incluir criterios de accesibilidad cuando la spec toque UI (labels accesibles, contraste via tokens, area de toque minima 44pt).
   design:
+    - "Todo design DEBE declarar los bounded contexts afectados segun `Documentacion/00-fundamentos/MAPA_DDD_ESTRATEGICO_LIGERO.md`. Si afecta un solo contexto, debe declarar explicitamente que no requiere contrato cruzado. Si afecta mas de uno, debe declarar owner de cada dato compartido, consumidores, direccion y forma del contrato, compatibilidad e invariantes aplicables (`userId`, `src/sync`, permisos y confirmacion IA cuando correspondan). Esta declaracion NO exige microservicios, CQRS, event sourcing, colas paralelas ni providers globales nuevos."
     - Para UI de alta paridad, referenciar el ground truth visual (link Figma/Stitch o captura) antes de implementar; si no existe, declararlo como bloqueo, no improvisar.
     - Especificar comportamiento responsive desde la pantalla madre compartida por breakpoint (movil <768, tablet 768-1279, web >=1280).
     - Colores y estilos solo desde tokens de src/themes; las pantallas redisenadas consumen el tema en runtime, no el COLORS estatico.

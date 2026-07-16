@@ -106,6 +106,11 @@ no implementa.
 
 Genera en `openspec/changes/<nombre>/`: `proposal.md` (why/what/capabilities/impact + No objetivos),
 `specs/` (requirements con escenarios `#### Scenario:` WHEN/THEN), `design.md` y `tasks.md`.
+Para todo change versionable nuevo, crea tambien `brownfield-baseline.md` en su raíz: documenta solo
+las superficies tocadas, sus fuentes vigentes, comportamiento actual/objetivo, compatibilidad legacy,
+owner/contexto, evidencia y exclusiones. Consulta la plantilla y ejemplo en
+`Documentacion/02-operacion/BASELINE_BROWNFIELD_POR_CONTACTO.md`; este archivo prepara la revisión,
+no sustituye la spec ni las tareas.
 **Tu trabajo aqui es revisar y corregir la spec, no el codigo.** Es el momento barato de cambiar de opinion.
 Verifica que las specs cumplan las reglas de `openspec/config.yaml` (estados loading/empty/error/offline,
 IA confirmable, accesibilidad) y que `design.md` cite el ground truth visual si toca UI.

@@ -233,6 +233,19 @@ Antes de aprobar un frame de Figma o cerrar la validacion visual de un change, l
 
 ### Ola 0: Fundaciones (sin cambio visual visible)
 
+#### Baseline brownfield de las primeras superficies UX
+
+Antes de proponer estos changes, su `brownfield-baseline.md` declara la fuente vigente, el delta y la
+compatibilidad a conservar. El owner de spec describe la superficie de experiencia; no reemplaza el owner
+de datos definido por `MAPA_DDD_ESTRATEGICO_LIGERO.md`.
+
+| Change | Contexto owner | Owner de spec y fuentes brownfield | Compatibilidad que debe declararse |
+| --- | --- | --- | --- |
+| `theming-runtime` | Experiencia y Preferencias | `ThemeContext`, `FontSizeContext`, `DaltonismoContext`, `src/themes/` | `COLORS` y pantallas no migradas permanecen como fallback hasta su rollout por contacto. |
+| `breakpoints-reactivos` | Experiencia y Preferencias | `src/utils/responsive.ts`, consumidores de layout y futuro `useBreakpoint()` | Estilos a nivel de módulo y rutas responsive actuales se migran gradualmente, sin congelar resize/rotación. |
+| `tokens-completos` | Experiencia y Preferencias | `src/themes/` y primitives consumidoras | Tokens y consumidores existentes se conservan hasta que cada superficie adopte el contrato nuevo. |
+| `app-shell-navegacion` | Experiencia y Preferencias | `App.tsx`, `src/navigation/` y hubs de navegación | Rutas actuales permanecen accesibles; Office, Classroom, Sync e IA son destinos/consumidores, no datos del shell. |
+
 #### Change: `theming-runtime`
 
 - **Historia:** Como docente, cuando cambio el tema, el tamano de fuente o el modo daltonismo en

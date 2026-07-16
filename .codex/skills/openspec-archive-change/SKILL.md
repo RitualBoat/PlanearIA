@@ -129,6 +129,6 @@ Before moving the change, confirm `TLDR.md` remains at `<changeRoot>/TLDR.md` an
 
 ### PlanearIA Definition of Ready and Done
 
-Before archive, run `npm run openspec:ready:archive -- --change <name> --run-local`. It is read-only and checks readiness.json, completed tasks, proportional validation evidence, rollback and adversarial review. Resolve each FAIL or a valid, temporary exception before moving the change.
+Before archive, run `npm run openspec:ready:archive -- --change <name> --run-local`. It is read-only and checks readiness.json, brownfield-baseline.md, completed tasks, proportional validation evidence, rollback and adversarial review. Resolve each FAIL or a valid, temporary exception before moving the change.
 
 <!-- /PLANEARIA_READINESS_WORKFLOW -->

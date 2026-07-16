@@ -68,8 +68,8 @@ function normalizeTldr(value, relativePath) {
 
 function readinessBlock(flow) {
   const instructions = {
-    propose: "Before creating a change, run `npm run openspec:ready:propose -- --issue <n>`. It is read-only and checks the enriched issue, Project membership and pre-propose metadata. Resolve each FAIL or record only a valid, temporary exception; do not create the change when the gate fails.",
-    archive: "Before archive, run `npm run openspec:ready:archive -- --change <name> --run-local`. It is read-only and checks readiness.json, completed tasks, proportional validation evidence, rollback and adversarial review. Resolve each FAIL or a valid, temporary exception before moving the change.",
+    propose: "Before creating a change, run `npm run openspec:ready:propose -- --issue <n>`. It is read-only and checks the enriched issue, Project membership and pre-propose metadata. Resolve each FAIL or record only a valid, temporary exception; do not create the change when the gate fails. After proposal, design, specs, and tasks are ready, create `<changeRoot>/brownfield-baseline.md` with only the touched surfaces, current and target behavior, legacy compatibility, owner/context, evidence, and exclusions.",
+    archive: "Before archive, run `npm run openspec:ready:archive -- --change <name> --run-local`. It is read-only and checks readiness.json, brownfield-baseline.md, completed tasks, proportional validation evidence, rollback and adversarial review. Resolve each FAIL or a valid, temporary exception before moving the change.",
   };
   return `${READINESS_START}\n\n### PlanearIA Definition of Ready and Done\n\n${instructions[flow]}\n\n${READINESS_END}`;
 }

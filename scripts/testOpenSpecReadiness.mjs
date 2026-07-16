@@ -18,6 +18,42 @@ mkdirSync(changeRoot, { recursive: true });
 writeFileSync(path.join(changeRoot, "proposal.md"), "- Issue: #62\n");
 writeFileSync(path.join(changeRoot, "tasks.md"), "- [x] done\n");
 writeFileSync(path.join(changeRoot, "TLDR.md"), "resumen\n");
+const baselinePath = path.join(changeRoot, "brownfield-baseline.md");
+const validBaseline = `# Baseline brownfield: sample-change
+
+## Superficies tocadas
+
+- scripts/checkOpenSpecReadiness.mjs
+
+## Fuentes de verdad actuales
+
+- openspec/specs/openspec-readiness-gates/spec.md
+
+## Comportamiento vigente
+
+- El gate valida artefactos de archive.
+
+## Comportamiento objetivo
+
+- El gate también valida el baseline brownfield.
+
+## Compatibilidad legacy
+
+- Se conserva readiness.json sin campos nuevos.
+
+## Owner de spec y contexto
+
+- Harness operativo; no mueve entidades docentes.
+
+## Evidencia actual
+
+- Fixture local del checker.
+
+## Fuera de alcance
+
+- No modifica UI ni datos de producto.
+`;
+writeFileSync(baselinePath, validBaseline);
 const manifest = {
   schemaVersion: 1,
   issue: 62,
@@ -38,6 +74,14 @@ const manifest = {
 writeFileSync(path.join(changeRoot, "readiness.json"), JSON.stringify(manifest));
 const healthyRun = () => ({ status: 0, stdout: "ok", stderr: "" });
 assert.equal(report(validateArchive({ root, change: "sample-change", now, runCommand: healthyRun, runLocal: true })).ok, true);
+rmSync(baselinePath, { force: true });
+assert.equal(report(validateArchive({ root, change: "sample-change", now, runCommand: healthyRun })).ok, false);
+mkdirSync(baselinePath);
+assert.equal(report(validateArchive({ root, change: "sample-change", now, runCommand: healthyRun })).ok, false);
+rmSync(baselinePath, { recursive: true, force: true });
+writeFileSync(baselinePath, "# Baseline brownfield: sample-change\n\n## Superficies tocadas\n\n- scripts/checkOpenSpecReadiness.mjs\n");
+assert.equal(report(validateArchive({ root, change: "sample-change", now, runCommand: healthyRun })).ok, false);
+writeFileSync(baselinePath, validBaseline);
 writeFileSync(path.join(changeRoot, "tasks.md"), "- [ ] pending\n");
 assert.equal(report(validateArchive({ root, change: "sample-change", now, runCommand: healthyRun })).ok, false);
 writeFileSync(path.join(changeRoot, "tasks.md"), "- [x] done\n");

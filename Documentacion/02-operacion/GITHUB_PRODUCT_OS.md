@@ -57,11 +57,19 @@ Columnas/estados:
 
 ## Milestones
 
-- `Ciclo 0 - Reorientacion y GitHub`.
-- `Ciclo 1 - Plan Classroom`.
-- `Ciclo 2 - Fundacion Classroom`.
-- `Ciclo 3 - Infraestructura Local y CI`.
-- `Ciclo 3 - UX/Navegacion Global`.
+Los milestones representan ciclos/release goals, no epicas. Se cierran solo despues de
+verificar por GitHub CLI que no conservan issues abiertos y que su plan no sigue activo.
+No se renombran por estetica: el historial y los enlaces existentes tienen prioridad.
+
+| Estado | Milestones | Regla operativa |
+| --- | --- | --- |
+| Cerrados historicos | `Ciclo 0 - Reorientacion y GitHub`, `Ciclo 1 - Plan Classroom`, `Ciclo 2 - Fundacion Classroom`, `Ciclo 3 - Infraestructura Local y CI`, `Readiness Ola 0` | Mantener sus issues como evidencia; reabrir solo si una referencia activa fue omitida. |
+| Activos o diferidos | `Ciclo 3 - UX/Navegacion Global`, `Ciclo 4 - Auth y Seguridad`, `Readiness Gate M` | Conservar abiertos mientras el plan UX/UI, el cierre Auth o los gates #46/#47 sigan vigentes. |
+
+Antes de una mutacion, capturar `Project`, issues y milestones; repetir la consulta
+despues. Si el estado cambia de forma concurrente, detenerse y revisar la decision en vez
+de sobrescribirla. Las acciones permitidas son conservar, aparcar o cerrar de forma
+reversible; nunca borrar/fusionar issues o items para limpiar el tablero.
 
 ## Modelo de Work Items
 
@@ -83,6 +91,19 @@ Regla practica para no llenar el tablero de ruido:
 - Al cerrar una fase, dejar evidencia de comandos: `npx tsc --noEmit`, `npm run lint -- --quiet`, `npm test -- --runInBand`, tests focalizados y GitHub Actions si aplica.
 - Si el usuario confirma una Review Manual y pide continuar, mover la fase a `Done` y registrar el comentario de cierre en GitHub.
 - Si varias fases se resolvieron juntas durante un refactor, crear un issue consolidado que documente fases cubiertas, evidencia tecnica y pendientes manuales.
+
+### Seguimiento de Preparacion Operativa SDD
+
+La epic [#42](https://github.com/RitualBoat/PlanearIA/issues/42) permanece abierta en
+`In progress`. Gate M mantiene #46 y #47 abiertos en `Parked`: estan diferidos y bloquean
+R2, no R0/R1. La Ola 0 termino con #48 a #52 cerrados; la Ola 1 registra #62 a #64
+cerrados y [#65](https://github.com/RitualBoat/PlanearIA/issues/65) como change de
+gobernanza con cierre controlado por archive y PR.
+
+La issue [#66](https://github.com/RitualBoat/PlanearIA/issues/66) es deuda operacional
+post-Ola 0: conserva `Backlog`, no recibe el milestone cerrado de Ola 0 y no se cierra
+por normalizar Product OS. Sus hallazgos de doctor/GitNexus y compatibilidad Expo se
+resuelven mediante changes OpenSpec futuros e independientes.
 
 Ejemplo recomendado para Classroom:
 

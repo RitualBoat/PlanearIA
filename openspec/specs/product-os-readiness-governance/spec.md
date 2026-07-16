@@ -1,4 +1,11 @@
-## ADDED Requirements
+# Product OS Readiness Governance Specification
+
+## Purpose
+
+Define the operational governance that keeps the readiness plan, its Product OS tracking,
+milestones, and post-wave debt aligned without losing history or opening unrelated work.
+
+## Requirements
 
 ### Requirement: El Product OS representa el estado ejecutable del plan de readiness
 

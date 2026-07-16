@@ -136,6 +136,26 @@ Un change no se archiva hasta que:
 - Sustituir todos los Context de forma global.
 - Resolver toda la deuda legacy antes de entregar valor.
 
+### 1.10 Seguimiento Product OS de readiness
+
+> Verificado el 2026-07-16 con la epic [#42](https://github.com/RitualBoat/PlanearIA/issues/42),
+> `PlanearIA Product OS` y consultas de GitHub CLI. La decision de normalizacion se registra en
+> [#65](https://github.com/RitualBoat/PlanearIA/issues/65).
+
+| Superficie | Estado operativo | Decision vigente |
+| --- | --- | --- |
+| Epic #42 | Abierta, `In progress` | Conserva el seguimiento de R1 y de los gates que aun bloquean R2; no se cierra con Ola 0. |
+| Gate M | #43-#45 cerrados; #46/#47 abiertos y `Parked` | Se conserva abierto: Figma e IHC estan diferidos, pero no bloquean R0/R1. |
+| Ola 0 | #48-#52 cerrados y `Done` | El milestone se cierra como ciclo terminado; sus issues permanecen como evidencia. |
+| Ola 1 | #62, #63 y #64 cerrados; #65 normaliza la gobernanza | #65 es el unico change versionable durante su ejecucion; despues de archive, una nueva historia requiere autorizacion propia. |
+| Deuda posterior | [#66](https://github.com/RitualBoat/PlanearIA/issues/66) abierta, `Backlog`, sin milestone | Es tracking post-Ola 0 de dos remediaciones separadas: doctor/GitNexus y compatibilidad Expo. No se mezcla con #65 ni reabre Ola 0. |
+
+La normalizacion cierra solo milestones historicos sin issues abiertos: `Ciclo 0 -
+Reorientacion y GitHub`, `Ciclo 1 - Plan Classroom`, `Ciclo 2 - Fundacion Classroom`,
+`Ciclo 3 - Infraestructura Local y CI` y `Readiness Ola 0`. Conserva `Ciclo 3 -
+UX/Navegacion Global`, `Ciclo 4 - Auth y Seguridad` y `Readiness Gate M`; no se propone
+renombrar ni borrar milestones, issues o items.
+
 ## 2. Backlog de User Stories y Changes
 
 ### Gate M: intervencion manual y autorizaciones
@@ -387,7 +407,8 @@ Crear estos issues cuando Ola 0 este en curso/cierre. Son la siguiente ola, no t
 - **Ground truth:** este plan y `meta_guia_planes.md` seccion Product OS.
 - **Depende de:** `autorizar-github-projects-cli`.
 - **Evidencia:** vista del Project y consultas `gh`.
-- **Estado:** pendiente.
+- **Estado:** en ejecucion mediante issue #65 y change `normalizar-product-os-readiness`; actualiza
+  Product OS, documentacion y evidencia sin resolver la deuda tecnica de #66.
 - **Labels:** `change`, `infra`, `docs`, `plan-maestro`.
 
 ### Ola 2: feedback loops, CI y limites ejecutables

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "issue": 65,
+  "change": "normalizar-product-os-readiness",
+  "surfaces": ["docs"],
+  "validations": ["openspec-strict", "harness-parity"],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/65"
+    },
+    {
+      "id": "pr-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/pull/73"
+    },
+    {
+      "id": "docs-verification",
+      "ref": "npm exec --yes=false -- openspec validate --all --strict --no-interactive; npm run openspec:validate; npm run agent:harness:check; git diff --check (2026-07-16)"
+    },
+    {
+      "id": "adversarial-review",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/65#issuecomment-4997456347"
+    }
+  ],
+  "rollback": {
+    "strategy": "Revertir los documentos y artefactos de este change en un commit aislado; reabrir exclusivamente milestones cerrados por este change usando el snapshot de evidencia, sin borrar issues, items ni #66."
+  },
+  "adversarialReview": {
+    "ref": "https://github.com/RitualBoat/PlanearIA/issues/65#issuecomment-4997456347"
+  },
+  "exceptions": []
+}

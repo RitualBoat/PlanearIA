@@ -3,7 +3,7 @@
   "issue": 65,
   "change": "normalizar-product-os-readiness",
   "surfaces": ["docs"],
-  "validations": ["openspec-strict"],
+  "validations": ["openspec-strict", "harness-parity"],
   "evidence": [
     {
       "id": "issue-link",
@@ -15,7 +15,7 @@
     },
     {
       "id": "docs-verification",
-      "ref": "npm exec --yes=false -- openspec validate --all --strict --no-interactive; npm run openspec:validate; git diff --check (2026-07-16)"
+      "ref": "npm exec --yes=false -- openspec validate --all --strict --no-interactive; npm run openspec:validate; npm run agent:harness:check; git diff --check (2026-07-16)"
     },
     {
       "id": "adversarial-review",

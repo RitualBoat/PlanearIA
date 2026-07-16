@@ -29,5 +29,5 @@
 ## 5. Cierre de la implementación
 
 - [x] 5.1 Ejecutar typecheck, lint y las pruebas focalizadas del checker; corregir cualquier regresión antes de marcar tareas.
-- [ ] 5.2 Ejecutar el gate sobre #62 y el change de prueba con evidencia válida e inválida, y registrar en el issue los resultados y las excepciones si existieran.
-- [ ] 5.3 Solicitar revisión adversarial del diff, resolver hallazgos bloqueantes y confirmar que el rollback descrito funciona sin borrar changes ni evidencia.
+- [x] 5.2 Ejecutar el gate sobre #62 y el change de prueba con evidencia válida e inválida, y registrar en el issue los resultados y las excepciones si existieran.
+- [x] 5.3 Solicitar revisión adversarial del diff, resolver hallazgos bloqueantes y confirmar que el rollback descrito funciona sin borrar changes ni evidencia.

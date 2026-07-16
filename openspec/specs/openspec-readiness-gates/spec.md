@@ -53,4 +53,3 @@ El gate read-only de archive SHALL comprobar que el change contiene un `brownfie
 - **WHEN** el baseline contiene bloques de código, enlaces o texto que parece un comando
 - **THEN** el gate lo trata únicamente como documentación estructural
 - **AND** ejecuta solo los comandos fijos permitidos por los perfiles de superficie
-

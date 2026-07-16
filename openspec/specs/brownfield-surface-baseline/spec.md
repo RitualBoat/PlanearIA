@@ -54,4 +54,3 @@ PlanearIA SHALL mantener una plantilla y un ejemplo de delta brownfield que pued
 - **WHEN** un mantenedor ejecuta la validación OpenSpec y las pruebas focalizadas del gate
 - **THEN** la spec y el delta brownfield cumplen el formato SHALL/WHEN/THEN
 - **AND** las fixtures demuestran aceptación de un baseline válido y rechazo de uno faltante o incompleto
-

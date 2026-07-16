@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "issue": 62,
+  "change": "definition-of-ready-sdd",
+  "surfaces": ["docs", "harness"],
+  "validations": ["openspec-strict", "harness-parity", "opsx-patch"],
+  "evidence": [
+    { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/62" },
+    { "id": "pr-link", "ref": "https://github.com/RitualBoat/PlanearIA/pull/70" },
+    { "id": "adversarial-review", "ref": "PASS: revisión adversarial del diff y casos negativos el 2026-07-15" },
+    { "id": "docs-verification", "ref": "npm run openspec:check y rutas de Documentacion actualizadas" },
+    { "id": "fixtures", "ref": "npm run test:openspec-readiness" }
+  ],
+  "rollback": {
+    "strategy": "Revertir el commit del checker y regenerar los espejos con los comandos existentes; no borrar changes ni evidencia."
+  },
+  "adversarialReview": {
+    "ref": "PASS: se corrigieron validación de dependencias y rechazo de comandos inyectados; sin blockers ni majors pendientes."
+  },
+  "exceptions": []
+}

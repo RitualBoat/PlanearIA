@@ -58,6 +58,7 @@ rules:
     - Incluir siempre una seccion de "No objetivos" (fuera de alcance).
     - Referenciar el plan maestro afectado en Documentacion/01-planes-maestros cuando aplique.
     - "Al completar un change nuevo, crear tambien `TLDR.md` en la raiz del directorio del change. Debe resumir Proposal, Design, Spec y Tasks, mas un resumen integral, en ese orden; cada bloque y el resumen tienen maximo 120 palabras, en espanol accesible y con encabezados que expliquen la funcion real del artefacto. Esta es una regla de instruccion y revision humana: la validacion automatica solo comprueba presencia y ubicacion."
+    - "Antes de crear el change, ejecutar el gate read-only `npm run openspec:ready:propose -- --issue <n>`. El issue enriquecido declara un bloque JSON `openspec-readiness:pre-propose`; al proponer, crear `readiness.json` en la raíz para enlazar issue, superficies, validaciones, evidencia, rollback y excepciones temporales."
   specs:
     - Escribir requirements como comportamiento observable por el docente (SHALL + escenarios WHEN/THEN), no como detalles de implementacion.
     - Toda pantalla o flujo de UI debe incluir escenarios de loading, empty, error y offline/sync pendiente.
@@ -76,3 +77,4 @@ rules:
     - Ninguna tarea se marca completada sin evidencia (salida de typecheck, lint y tests afectados).
     - Si el change toca una pantalla visible, incluir una tarea final de validacion visual con capturas por breakpoint (Playwright MCP en web) contra el ground truth, adjuntas al issue; declarar este gate "N/A" NO es una opcion valida por defecto y la UI no se cierra solo con tests automaticos. Antes de navegar, levantar expo start --web y esperar a que el bundler responda (HTTP 200, tipicamente localhost:8081).
     - "El estandar de ejecucion es el Protocolo de Interaccion Guiada (Documentacion/01-planes-maestros/meta_guia_planes.md seccion 2.5): Paso 0 US en GitHub Projects, Paso 1 enrich, Paso 2 propose+apply, Paso 3 QA real de navegador."
+    - "Antes de archive, ejecutar `npm run openspec:ready:archive -- --change <nombre> --run-local`. Registrar en `readiness.json` solo IDs de validación del perfil estático y referencias de evidencia; nunca comandos arbitrarios ni `N/A` silencioso."

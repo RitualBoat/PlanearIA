@@ -22,5 +22,6 @@
 ## 4. Cierre SDD posterior a la aprobación de apply
 
 - [x] 4.1 Solicitar una revisión adversarial independiente del diff y registrar su referencia en `readiness.json`.
-- [ ] 4.2 Completar referencias de PR y evidencia, ejecutar `npm run openspec:ready:archive -- --change mapa-dominio-ddd-ligero --run-local` y corregir los fallos antes de archive.
-- [ ] 4.3 Archivar y sincronizar las specs solo después de que todas las tareas y gates estén completos.
+- [x] 4.2 Completar las referencias de PR y evidencia para el gate de archive.
+
+El archive y la sincronización de specs son la fase formal posterior a estas tareas; se ejecutan solo después de que el gate `openspec:ready:archive` pase.

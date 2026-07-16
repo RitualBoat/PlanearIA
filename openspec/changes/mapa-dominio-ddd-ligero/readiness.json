@@ -11,11 +11,15 @@
     },
     {
       "id": "pr-link",
-      "ref": "pending-after-approved-apply"
+      "ref": "https://github.com/RitualBoat/PlanearIA/pull/71"
     },
     {
       "id": "adversarial-review",
       "ref": "https://github.com/RitualBoat/PlanearIA/issues/63#issuecomment-4987768054"
+    },
+    {
+      "id": "docs-verification",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/63#issuecomment-4987742795"
     }
   ],
   "rollback": {

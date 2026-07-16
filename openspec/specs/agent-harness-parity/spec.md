@@ -3,6 +3,14 @@
 ## Purpose
 TBD - created by archiving change single-source-agent-harness. Update Purpose after archive.
 ## Requirements
+
+### Requirement: DoR/DoD guidance survives harness regeneration
+
+The source instructions under `.agents` SHALL communicate the explicit Definition of Ready and Done gates. Generated root mirrors SHALL derive that guidance from the source, while the post-update OpenSpec patch SHALL insert and verify equivalent guidance in generated propose and archive workflows.
+
+#### Scenario: Source and workflow regeneration
+- **WHEN** a maintainer runs the harness sync and OpenSpec update/patch commands
+- **THEN** the root mirrors and propose/archive workflows retain the readiness guidance without manual edits to generated destinations
 ### Requirement: Fuente unica neutral define la configuracion de todos los harnesses
 La configuracion canonica de harness SHALL residir en `.agents/` (instrucciones raiz, workflows opsx, reglas por path, skills, permisos) y en `.mcp.json` (canon MCP). Todo archivo por harness SHALL ser un artefacto generado desde esa fuente, nunca editado a mano como fuente de verdad.
 

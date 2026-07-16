@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "issue": 63,
+  "change": "mapa-dominio-ddd-ligero",
+  "surfaces": ["docs"],
+  "validations": ["openspec-strict", "harness-parity"],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/63"
+    },
+    {
+      "id": "pr-link",
+      "ref": "pending-after-approved-apply"
+    },
+    {
+      "id": "adversarial-review",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/63#issuecomment-4987768054"
+    }
+  ],
+  "rollback": {
+    "strategy": "Revertir en un commit aislado el mapa, sus enlaces y la regla de design; no existen migraciones ni datos que restaurar."
+  },
+  "adversarialReview": {
+    "ref": "https://github.com/RitualBoat/PlanearIA/issues/63#issuecomment-4987768054"
+  },
+  "exceptions": []
+}

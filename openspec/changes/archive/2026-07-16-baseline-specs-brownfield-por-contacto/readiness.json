@@ -10,6 +10,10 @@
       "ref": "https://github.com/RitualBoat/PlanearIA/issues/64"
     },
     {
+      "id": "pr-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/pull/72"
+    },
+    {
       "id": "docs-verification",
       "ref": "npm run openspec:validate; npm run agent:harness:check; npm run agent:opsx:patch:check (2026-07-15)"
     },

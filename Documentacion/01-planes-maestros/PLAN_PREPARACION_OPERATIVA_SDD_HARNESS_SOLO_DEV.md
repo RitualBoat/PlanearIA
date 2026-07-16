@@ -371,7 +371,7 @@ Crear estos issues cuando Ola 0 este en curso/cierre. Son la siguiente ola, no t
 - **Ground truth:** `openspec/specs`, codigo y tests actuales.
 - **Depende de:** `definition-of-ready-sdd`, `mapa-dominio-ddd-ligero`.
 - **Evidencia:** spec de ejemplo validada por CLI.
-- **Estado:** pendiente.
+- **Estado:** archivado en `openspec/changes/archive/2026-07-16-baseline-specs-brownfield-por-contacto`.
 - **Labels:** `change`, `docs`, `testing`.
 
 #### Change: `normalizar-product-os-readiness`

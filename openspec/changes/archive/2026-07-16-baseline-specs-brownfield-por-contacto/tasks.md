@@ -21,4 +21,4 @@
 - [x] 4.1 Ejecutar `npm run test:openspec-readiness`, `npm exec --yes=false -- openspec validate --all --strict --no-interactive`, `npm run agent:harness:check` y `npm run agent:opsx:patch:check`; corregir toda regresión atribuible al change.
 - [x] 4.2 Ejecutar `npm run typecheck` y `npm run lint -- --quiet`; no se requiere Playwright porque el change no modifica una pantalla visible.
 - [x] 4.3 Vincular al issue #64 la plantilla, ejemplo, fixtures y salidas de validación; solicitar revisión adversarial independiente y registrar su resultado real.
-- [ ] 4.4 Antes de archive, completar las referencias reales de PR/evidencia en `readiness.json` y ejecutar `npm run openspec:ready:archive -- --change baseline-specs-brownfield-por-contacto --run-local`.
+- [x] 4.4 Antes de archive, completar las referencias reales de PR/evidencia en `readiness.json` y ejecutar `npm run openspec:ready:archive -- --change baseline-specs-brownfield-por-contacto --run-local`.

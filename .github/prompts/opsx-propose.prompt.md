@@ -112,3 +112,11 @@ After completing all artifacts, summarize:
 Create exactly one `TLDR.md` at the root of the change after proposal, design, specs, and tasks are ready. It must contain, in order, Proposal intention, Design approach, Spec expected behavior, Tasks practical plan, and `Resumen integral del change`. Each block and the final paragraph have at most 120 words in accessible Spanish with headings that explain the artifact's real function. A person reviews those qualities; automation checks only presence and location.
 
 <!-- /PLANEARIA_TLDR_WORKFLOW -->
+
+<!-- PLANEARIA_READINESS_WORKFLOW -->
+
+### PlanearIA Definition of Ready and Done
+
+Before creating a change, run `npm run openspec:ready:propose -- --issue <n>`. It is read-only and checks the enriched issue, Project membership and pre-propose metadata. Resolve each FAIL or record only a valid, temporary exception; do not create the change when the gate fails.
+
+<!-- /PLANEARIA_READINESS_WORKFLOW -->

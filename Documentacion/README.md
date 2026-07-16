@@ -49,10 +49,12 @@ Si hay contradiccion, gana este orden:
 ```text
 Issue GitHub
   -> enrich con criterios observables
+  -> gate DoR (`openspec:ready:propose`)
   -> OpenSpec propose/design/spec/tasks
   -> apply tarea por tarea
   -> evidencia tecnica y visual
   -> adversarial review
+  -> gate DoD (`openspec:ready:archive`)
   -> archive
 ```
 
@@ -60,6 +62,7 @@ Reglas:
 
 - Todo trabajo no trivial nace en un issue.
 - El issue se enriquece antes de proponer.
+- La DoR se comprueba con `npm run openspec:ready:propose -- --issue <n>` y la DoD con `npm run openspec:ready:archive -- --change <nombre> --run-local`; ambas son read-only y las excepciones válidas son temporales y visibles.
 - Las specs usan requisitos observables `SHALL` con escenarios WHEN/THEN.
 - Las tareas se marcan `[x]` solo con evidencia.
 - UI visible requiere QA con Playwright por breakpoint.

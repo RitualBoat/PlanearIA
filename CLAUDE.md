@@ -82,6 +82,9 @@ Reglas:
 - El issue/user story y su item en PlanearIA Product OS son obligatorios antes de enrich, explore o
   propose para todo change SDD no trivial. Solo un hotfix trivial autorizado explicitamente puede saltarlo.
 - El issue se enriquece antes de proponer.
+- Antes de `propose`, ejecutar `npm run openspec:ready:propose -- --issue <n>`; el issue debe declarar metadata de readiness, dependencias, contexto, rollback, superficies y excepciones temporales justificadas.
+- Antes de `archive`, ejecutar `npm run openspec:ready:archive -- --change <nombre> --run-local`; el change debe tener `readiness.json`, tareas completas, evidencia proporcional, rollback y revisión adversarial. El gate es read-only y reporta `PASS`, `FAIL` o `EXCEPTION`.
+- Las excepciones solo aplican a campos permitidos, requieren motivo, owner, aprobador, expiración ISO y recuperación; nunca silencian identidad, integridad de artefactos ni tareas pendientes.
 - Un change grande a la vez.
 - `proposal.md` define why/what/no objetivos.
 - Specs usan `SHALL` + escenarios WHEN/THEN.

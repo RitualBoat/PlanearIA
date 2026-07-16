@@ -124,3 +124,11 @@ All artifacts complete. All tasks complete.
 Before moving the change, confirm `TLDR.md` remains at `<changeRoot>/TLDR.md` and reflects any material apply changes. Move it with the complete change directory; do not copy it elsewhere or automatically judge its wording, structure, or word count.
 
 <!-- /PLANEARIA_TLDR_WORKFLOW -->
+
+<!-- PLANEARIA_READINESS_WORKFLOW -->
+
+### PlanearIA Definition of Ready and Done
+
+Before archive, run `npm run openspec:ready:archive -- --change <name> --run-local`. It is read-only and checks readiness.json, completed tasks, proportional validation evidence, rollback and adversarial review. Resolve each FAIL or a valid, temporary exception before moving the change.
+
+<!-- /PLANEARIA_READINESS_WORKFLOW -->

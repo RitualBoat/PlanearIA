@@ -319,6 +319,8 @@ Los archivos opsx (`.claude/commands/opsx`, `.claude/skills/openspec-*`, `.codex
 npm run openspec:check           # version local + config + validacion estricta
 npm run agent:opsx:update        # CLI local fijada + patchOpsxWorkflows
 npm run agent:opsx:patch:check   # exit 1 si queda CLI global o comando zombi
+npm run openspec:ready:propose -- --issue <n> # gate DoR read-only antes de propose
+npm run openspec:ready:archive -- --change <nombre> --run-local # gate DoD read-only antes de archive
 ```
 
 ### 11.3 Gate CI

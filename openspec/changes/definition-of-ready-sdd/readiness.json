@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "issue": 62,
+  "change": "definition-of-ready-sdd",
+  "surfaces": ["docs", "harness"],
+  "validations": ["openspec-strict", "harness-parity", "opsx-patch"],
+  "evidence": [
+    { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/62" }
+  ],
+  "rollback": {
+    "strategy": "Revertir el commit del checker y regenerar los espejos con los comandos existentes; no borrar changes ni evidencia."
+  },
+  "adversarialReview": {},
+  "exceptions": []
+}

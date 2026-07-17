@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "issue": 75,
+  "change": "align-expo-localization-sdk54",
+  "surfaces": ["harness"],
+  "validations": ["openspec-strict", "harness-parity", "opsx-patch"],
+  "evidence": [
+    {"id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/75"},
+    {"id": "pr-link", "ref": "PENDIENTE: PR posterior a apply."},
+    {"id": "adversarial-review", "ref": "https://github.com/RitualBoat/PlanearIA/issues/75#issuecomment-4997938117"},
+    {"id": "fixtures", "ref": "https://github.com/RitualBoat/PlanearIA/issues/75#issuecomment-4997910287"}
+  ],
+  "rollback": {"strategy": "Revertir el commit de la remediación y ejecutar npm ci; no hay migraciones ni cambios nativos."},
+  "adversarialReview": {"ref": "https://github.com/RitualBoat/PlanearIA/issues/75#issuecomment-4997938117"},
+  "exceptions": []
+}

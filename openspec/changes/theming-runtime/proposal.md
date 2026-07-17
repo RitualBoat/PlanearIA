@@ -30,7 +30,7 @@ Ademas, la auditoria reporta en H12a que el rollout de theming no tiene mecanism
 2. **Contrato de fabrica `getStyles(tokens)`** con parametro objeto, para que `breakpoints-reactivos` agregue `width` sin reabrir archivos migrados.
 3. **Regla de lint como trinquete**: `no-restricted-imports` prohibe `COLORS` salvo en una lista explicita de archivos legacy autorizados.
 4. **La lista legacy es el mecanismo de rastreo del rollout** (resuelve H12a): artefacto unico, versionado, verificado por CI, cuyo largo es el trabajo restante.
-5. **Lote demostrativo**: los 3 archivos de `src/screens/cuenta/` que aun importan `COLORS`, mas la adaptacion del piloto `CuentaScreen` a la firma nueva. Deja el modulo `cuenta` entero migrado y baja los importadores de 65 a 62.
+5. **Lote demostrativo**: los 3 archivos de `src/screens/cuenta/` que aun importan `COLORS`, mas la adaptacion del piloto `CuentaScreen` a la firma nueva. Deja el modulo `cuenta` entero migrado. Al implementar se verifico que de los 65 importadores brutos, 64 son de produccion y 1 es un test; migrar los 3 del lote deja la lista legacy en 61 archivos de produccion.
 
 ## No objetivos
 

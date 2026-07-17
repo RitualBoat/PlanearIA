@@ -46,7 +46,9 @@ const styles = useMemo(() => getStyles({ colors, isDark, scaled, highContrast })
 
 ## Decision 3: la regla de lint es el mecanismo de rastreo (H12a)
 
-**Contexto.** 65 archivos importan `COLORS` legitimamente como fallback legacy. Una prohibicion global romperia CI con 65 errores. H12a reporta que no existe mecanismo de rastreo del rollout restante.
+**Contexto.** 65 archivos importan `COLORS` (64 de produccion + 1 test, verificado al implementar) legitimamente como fallback legacy. Una prohibicion global romperia CI. H12a reporta que no existe mecanismo de rastreo del rollout restante.
+
+**Ruta real del import.** Los consumidores no importan `COLORS` desde `src/themes/colors` sino desde el barrel `types` (`types/index.ts:700` lo reexporta). La regla debe restringir ambas rutas (`**/themes/colors` y `**/types`, solo el especificador `COLORS`); cubrir unicamente la primera dejaria el trinquete sin efecto.
 
 **Decision.** Un unico artefacto sirve para ambas cosas: `no-restricted-imports` prohibe `COLORS` de forma global, y un `overrides` re-autoriza el import solo en una lista explicita de rutas legacy.
 
@@ -58,7 +60,7 @@ No hace falta un tablero paralelo, un comentario `TODO` ni un conteo manual que 
 
 **Alternativa rechazada: script contador aparte.** Duplicaria la fuente de verdad y no impediria que un archivo nuevo naciera en deuda.
 
-**Consecuencia.** La lista arranca con 62 rutas (65 menos las 3 del lote). El piloto `CuentaScreen` ya no importa `COLORS`, asi que no aparece.
+**Consecuencia.** La lista arranca con 61 rutas de produccion (64 de produccion menos las 3 del lote; los tests quedan fuera de la regla). El piloto `CuentaScreen` ya no importa `COLORS`, asi que no aparece.
 
 ## Decision 4: lote demostrativo = cerrar el modulo `cuenta`
 

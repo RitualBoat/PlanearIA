@@ -7,7 +7,7 @@
   "evidence": [
     { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/78" },
     { "id": "pr-link", "ref": "PENDIENTE: PR posterior a archive." },
-    { "id": "adversarial-review", "ref": "PENDIENTE: revision adversarial durante la tarea 6.2." },
+    { "id": "adversarial-review", "ref": "Revision adversarial 2026-07-17 (verificacion previa a archive): PASS CON HUECOS. 3 minors rastreados y mitigados (hueco teorico de lint en namespace imports inexistentes hoy; colores de rol literales mitigados por etiqueta de texto WCAG y diferidos a tokens-completos; Sesiones/AdminRoles sin captura por 401 backend, daltonismo cubierto por useAppTheme.test.tsx). Sin blockers ni majors; guard de permisos y aislamiento intactos." },
     { "id": "web-http-200", "ref": "PENDIENTE: salida de expo start --web con HTTP 200 antes de navegar (tarea 5.1)." },
     { "id": "playwright-breakpoints", "ref": "PENDIENTE: capturas de las 4 pantallas del lote en movil <768, tablet 768-1279 y web >=1280, en tema claro y oscuro, con daltonismo y fuente xlarge (tareas 5.2-5.4)." },
     { "id": "nielsen", "ref": "PENDIENTE: checklist Nielsen sobre el lote adjunto al issue #78 (tarea 5.5)." }
@@ -16,7 +16,7 @@
     "strategy": "Revertir el commit del PR restaura los import { COLORS } de las 3 pantallas migradas, devuelve CuentaScreen a su firma posicional y elimina el hook useAppTheme y la regla de lint. No hay perdida de datos: el change no toca almacenamiento, esquema, configuracion remota ni proyecto nativo. Los contextos de preferencia y sus claves de AsyncStorage (APP_THEME_MODE, APP_FONT_SIZE_MODE, APP_DALTONISMO_MODE) quedan intactos, asi que un revert no altera las preferencias guardadas del docente, y las claves legacy @planearia:* no se tocan. Las 61 pantallas fuera del lote no cambian, asi que el revert no puede regresionarlas. Desactivacion parcial sin revertir codigo: degradar la regla de lint a 'warn' desbloquea CI conservando el hook y las pantallas migradas; agregar un archivo a la lista legacy autorizada revierte una migracion puntual sin tocar el resto del lote."
   },
   "adversarialReview": {
-    "ref": "PENDIENTE: se registra en la tarea 6.2, antes de archive."
+    "ref": "Revision adversarial independiente 2026-07-17, veredicto PASS CON HUECOS: sin blockers ni majors; 3 minors rastreados y mitigados. Detalle en el campo evidence adversarial-review."
   },
   "exceptions": []
 }

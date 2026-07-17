@@ -27,7 +27,7 @@ No se tocan: `App.tsx`, `src/navigation/`, `src/sync/`, `backend/`, ni las 61 pa
 
 Los cuatro proveedores estan montados en `App.tsx:22-25` y funcionan; las preferencias se guardan y se restauran desde AsyncStorage. El consumo es parcial y desigual (verificado 2026-07-17):
 
-- 65 archivos importan `COLORS` estatico: son inmunes a las tres preferencias.
+- 65 archivos importan `COLORS` estatico (64 de produccion + 1 test): son inmunes a las tres preferencias. La ruta real del import es el barrel `types`, que reexporta `COLORS` desde `themes/colors`.
 - 18 pantallas llaman `useTheme`: reaccionan solo al tema.
 - 1 pantalla (`CuentaScreen`) aplica daltonismo; 3 archivos usan `scaled()`; 7 tienen fabrica `getStyles`.
 - Los importadores de `COLORS` y los consumidores de `useTheme` son conjuntos disjuntos: 0 archivos hibridos.
@@ -40,7 +40,7 @@ No existe mecanismo de rastreo del rollout pendiente (H12a). No existe regla de 
 
 - Un punto de consumo unico (`useAppTheme`) entrega colores con daltonismo aplicado, `isDark`, `scaled` y `highContrast`, memoizado.
 - La fabrica recibe un objeto, para que `breakpoints-reactivos` agregue `width` sin reabrir archivos migrados.
-- El lint prohibe `COLORS` fuera de una lista legacy explicita, y esa lista es el registro rastreable del rollout: 62 archivos tras este change.
+- El lint prohibe `COLORS` fuera de una lista legacy explicita, y esa lista es el registro rastreable del rollout: 61 archivos de produccion tras este change.
 - El modulo `cuenta` queda migrado por completo: las tres preferencias se propagan en sus 4 pantallas sin reiniciar.
 - Los tres contextos conservan su contrato publico sin cambios.
 
@@ -69,7 +69,7 @@ No existe mecanismo de rastreo del rollout pendiente (H12a). No existe regla de 
 
 ## Fuera de alcance
 
-- Los 62 archivos legacy restantes: quedan como rollout rastreado por la lista del lint.
+- Los 61 archivos legacy restantes: quedan como rollout rastreado por la lista del lint.
 - `useBreakpoint()`, el parametro `width` y jubilar `responsive.ts`: son `breakpoints-reactivos` (#79).
 - Tokens, escalas, radios, elevacion y motion: son `tokens-completos`.
 - Navegacion, `App.tsx` y AppShell: son `app-shell-navegacion` (#81).

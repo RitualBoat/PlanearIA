@@ -17,7 +17,9 @@ const GH_EXIT_PENDING = 8;
 // El texto es el unico discriminante disponible: gh sale con 1 tanto aqui como cuando un check esta en rojo
 // (cmdutil.SilentError, sin mensaje). Clasificar por codigo colapsaria ambos casos, que es el bug original.
 // La variante "required" solo la emite gh con --required; se reconoce por robustez aunque no la usemos.
-const EMPTY_ROLLUP = /no (?:required )?checks reported on the '[^']*' branch/i;
+// El nombre de rama se matchea con `.*` y no con `[^']*` porque git admite apostrofes en un ref: acotarlo
+// dejaria de reconocer el mensaje y degradaria a abort justo en el caso que este modulo existe para cubrir.
+const EMPTY_ROLLUP = /no (?:required )?checks reported on the '.*' branch/i;
 
 // Un stderr no reconocido cae en CHECKS_FAILED a proposito: si gh cambia el mensaje, el cierre aborta como
 // antes de este modulo en vez de sondear a ciegas. La direccion segura del fallo es detenerse, nunca mergear.

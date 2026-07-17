@@ -20,11 +20,15 @@ const KEEP_REMOTE = has('--keep-remote');
 const TARGET = value('--target', 'development');
 const PROTECTED = ['main', 'master', 'development'];
 
+// Se exige decimal explicito en vez de confiar en Number(): Number('') y Number(' ') valen 0, asi que una
+// variable de shell vacia (--checks-deadline "$VAR") desactivaria el sondeo en silencio y devolveria el
+// indeterminismo que este mecanismo elimina. Preferimos abortar a degradar sin avisar.
+const SECONDS = /^\d+(?:\.\d+)?$/;
+
 function seconds(flag, fallback) {
   const raw = value(flag, String(fallback));
-  const parsed = Number(raw);
-  if (!Number.isFinite(parsed) || parsed < 0) abort(`${flag} espera segundos no negativos; recibio '${raw}'.`);
-  return parsed * 1000;
+  if (!SECONDS.test(String(raw).trim())) abort(`${flag} espera segundos no negativos; recibio '${raw}'.`);
+  return Number(raw) * 1000;
 }
 
 // GitHub tarda segundos en registrar los checks del commit recien empujado. El deadline cubre esa ventana y

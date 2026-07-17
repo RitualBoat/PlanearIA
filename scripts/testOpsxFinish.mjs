@@ -66,6 +66,18 @@ assert.equal(classifyChecksOutcome({ exitCode: 1, stderr: "" }), CHECKS_FAILED);
 // Mencionar checks sin ser el mensaje de rollup vacio sigue siendo fallo.
 assert.equal(classifyChecksOutcome({ exitCode: 1, stderr: "some checks were not successful" }), CHECKS_FAILED);
 
+// gh ausente: spawnSync devuelve status null y stderr undefined en vez de lanzar. Debe clasificar como
+// fallo (nunca como rollup vacio) para que el cierre aborte con diagnostico y no con un volcado de pila.
+assert.equal(classifyChecksOutcome({ exitCode: null, stderr: "" }), CHECKS_FAILED);
+assert.equal(classifyChecksOutcome({ exitCode: null }), CHECKS_FAILED);
+assert.equal(classifyChecksOutcome({}), CHECKS_FAILED);
+
+// git admite apostrofes en un nombre de rama; el mensaje debe seguir reconociendose.
+assert.equal(
+  classifyChecksOutcome({ exitCode: 1, stderr: "no checks reported on the 'chore/it's-raro' branch" }),
+  CHECKS_NOT_REGISTERED,
+);
+
 // --- Caso 1: checks que aparecen tarde ---
 
 {

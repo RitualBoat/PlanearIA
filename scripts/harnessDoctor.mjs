@@ -122,7 +122,7 @@ function checkMcpSmoke(run, npm, config) {
 
   const limitations = [];
   if (pendingOauth.length > 0) limitations.push(`${pendingOauth.join(', ')} requiere consentimiento OAuth interactivo y no expuso sus herramientas en esta sesion`);
-  const declaredOnly = report.results.filter((item) => item.note?.includes('Complete auth and tool listing')).map((item) => item.name);
+  const declaredOnly = report.results.filter((item) => item.ok && item.note?.includes('Complete auth and tool listing')).map((item) => item.name);
   if (declaredOnly.length > 0) limitations.push(`${declaredOnly.join(', ')} requiere OAuth en un cliente MCP compatible`);
   if (limitations.length === 0) return result('mcp-smoke', 'PASS', 'Todos los MCP activos completaron el smoke.');
   return result('mcp-smoke', 'WARN', `MCP activo responde; ${limitations.join('; ')}.`, pendingOauth.length > 0 ? `Autoriza ${pendingOauth.join(', ')} en una sesion MCP interactiva si una tarea lo necesita; el smoke conserva ok:false hasta entonces.` : null);

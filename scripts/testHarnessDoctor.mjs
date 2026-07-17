@@ -125,6 +125,14 @@ assert.match(both.summary, /expo/);
 // Un reporte ilegible es un fallo real: no hay evidencia que clasificar.
 assert.equal(runDoctor({ config, npm: 'npm', run: healthyRun([], 'mcp test: crashed before reporting', 1) }).checks.find((check) => check.id === 'mcp-smoke').status, 'FAIL');
 
+// Un fallo de paridad imprime JSON valido sin results[]: es FAIL, no un WARN por ausencia de fallos.
+const parityFailure = JSON.stringify({ ok: false, universal: ['expo'], missingCodex: ['expo'], forbidden: [] });
+assert.equal(runDoctor({ config, npm: 'npm', run: healthyRun([], parityFailure, 1) }).checks.find((check) => check.id === 'mcp-smoke').status, 'FAIL');
+
+// Un servidor con nota de transporte url no se nombra dos veces si ademas llegara clasificado.
+const notedAndPending = smokeCheck([{ name: 'figma', ok: true, note: FIGMA_NOTE }, expoPending]);
+assert.equal((notedAndPending.summary.match(/figma/g) ?? []).length, 1);
+
 // Clasificador: la evidencia exigida es conjunta y atada al endpoint configurado.
 assert.equal(configuredEndpoint({ command: 'npx', args: ['-y', 'mcp-remote', EXPO_ENDPOINT] }), EXPO_ENDPOINT);
 assert.equal(classifyFailure({ stderr: EXPO_OAUTH_STDERR, initialized: false, endpoint: EXPO_ENDPOINT }), OAUTH_INTERACTIVE_REQUIRED);

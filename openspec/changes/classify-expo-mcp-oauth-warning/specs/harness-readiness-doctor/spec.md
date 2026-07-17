@@ -2,7 +2,7 @@
 
 ### Requirement: El doctor clasifica por evidencia un MCP stdio con OAuth interactivo pendiente
 
-El smoke MCP SHALL clasificar el fallo de cada servidor stdio y exponer esa clasificacion como un campo estructurado en su resultado, SHALL conservar `ok: false` para todo servidor que no completo `tools/list` y SHALL NOT alterar su codigo de salida por efecto de la clasificacion.
+El smoke MCP SHALL clasificar el fallo de cada servidor stdio y exponer esa clasificacion como un campo estructurado en su resultado, SHALL conservar `ok: false` para todo servidor stdio que no completo `tools/list` y SHALL NOT alterar su veredicto agregado ni su codigo de salida por efecto de la clasificacion. Esta exigencia SHALL NOT aplicar a los servidores declarados con transporte `url`, cuyo contrato vigente solo confirma configuracion presente.
 
 El doctor SHALL registrar `mcp-smoke` como `WARN` unicamente cuando todos los servidores no verificados presenten prueba de OAuth interactivo pendiente y esten declarados en la allowlist `oauthInteractiveServers` del manifest del doctor. La prueba de OAuth interactivo pendiente SHALL exigir de forma conjunta que la evidencia capturada contenga el prompt de autorizacion del cliente remoto con una URL `https` de autorizacion cuyo origen coincida con el del endpoint configurado para ese servidor, y que el servidor nunca haya completado su inicializacion. El doctor SHALL NOT derivar la clasificacion del codigo de salida ni del mensaje de error terminal del subproceso.
 

@@ -82,7 +82,7 @@
     "expo-font": "~14.0.11",
     "expo-image": "~3.0.11",
     "expo-linear-gradient": "~15.0.8",
-    "expo-localization": "~17.0.8",
+    "expo-localization": "~17.0.9",
     "expo-notifications": "~0.32.17",
     "expo-print": "~15.0.8",
     "expo-secure-store": "~15.0.8",

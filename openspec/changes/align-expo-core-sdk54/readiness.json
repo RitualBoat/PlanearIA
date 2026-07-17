@@ -7,10 +7,10 @@
   "evidence": [
     {"id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/92"},
     {"id": "pr-link", "ref": "PENDIENTE: PR posterior a apply."},
-    {"id": "adversarial-review", "ref": "PENDIENTE: revision adversarial posterior a apply."},
-    {"id": "fixtures", "ref": "PENDIENTE: evidencia de validacion posterior a apply."}
+    {"id": "adversarial-review", "ref": "https://github.com/RitualBoat/PlanearIA/issues/92#issuecomment-4999183231"},
+    {"id": "fixtures", "ref": "https://github.com/RitualBoat/PlanearIA/issues/92#issuecomment-4999160487"}
   ],
   "rollback": {"strategy": "Revertir el commit de la remediación y ejecutar npm ci; no hay migraciones ni cambios nativos."},
-  "adversarialReview": {"ref": "PENDIENTE: revision adversarial posterior a apply."},
+  "adversarialReview": {"ref": "https://github.com/RitualBoat/PlanearIA/issues/92#issuecomment-4999183231"},
   "exceptions": []
 }

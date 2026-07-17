@@ -9,6 +9,18 @@ jest.mock("react-native-safe-area-context", () => ({
   SafeAreaView: ({ children }: { children: React.ReactNode }) => children,
 }));
 
+// La pantalla consume el tema en runtime. Este test cubre el guard de permisos,
+// asi que se mockea el hook en vez de montar los proveedores de preferencias.
+jest.mock("../../themes/useAppTheme", () => ({
+  useAppTheme: () => ({
+    colors: jest.requireActual("../../themes/colors").lightTheme,
+    isDark: false,
+    theme: "light",
+    scaled: (size: number) => size,
+    highContrast: false,
+  }),
+}));
+
 let mockCan: (p: Permission) => boolean = () => false;
 jest.mock("../../hooks/usePermission", () => ({
   usePermission: () => ({ can: mockCan }),

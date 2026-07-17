@@ -33,6 +33,7 @@ El segundo comando comprueba la version declarada, instalada y ejecutada; el req
 | Cualquier subcomando no expuesto | `npm exec --yes=false -- openspec <subcomando>` |
 | Regenerar workflows opsx | `npm run agent:opsx:update` |
 | Comprobar normalizacion opsx | `npm run agent:opsx:patch:check` |
+| Cerrar la rama del change por PR | `npm run opsx:finish` (previsualiza con `npm run opsx:finish:dry`) |
 
 Ejemplo del flujo SDD:
 
@@ -84,6 +85,32 @@ No actualices la CLI dentro de una feature de producto. Hazlo en una issue/chang
 
 OpenSpec 1.6.0 aun genera referencias a una CLI global y al comando continue inexistente. `scripts/patchOpsxWorkflows.mjs` corrige ambos defectos de forma idempotente despues de cada update y obliga a fallar si falta la CLI local.
 
+## Cierre del change y espera de checks
+
+`npm run opsx:finish` cierra la rama del change mediante PR hacia `development`. Nunca hace checkout, merge ni push directo sobre el target: publica la rama, crea o reutiliza el PR, espera los checks y ordena el merge a GitHub. Previsualiza con `npm run opsx:finish:dry`, que termina antes de esperar CI.
+
+La espera ocurre en dos fases. GitHub registra los checks del commit recien empujado con unos segundos de retraso; durante esa ventana `gh pr checks` falla en vez de esperar, y `--watch` no lo cubre porque el error se produce antes de su bucle. La fase 1 sondea hasta que los checks aparecen; la fase 2 espera a que terminen, sin filtrar a los requeridos.
+
+`gh` sale con codigo 1 tanto cuando el PR aun no reporta checks como cuando un check esta en rojo, asi que el cierre clasifica por el par (codigo de salida, mensaje de error):
+
+| Estado | Como se detecta | Que hace el cierre |
+|---|---|---|
+| Aprobados | exit 0 | Continua al merge |
+| Pendientes | exit 8 | Espera a que terminen |
+| Aun no registrados | exit 1 con el mensaje de checks no reportados | Reintenta hasta el deadline |
+| Fallidos | cualquier otra terminacion distinta de cero | Aborta sin mergear |
+
+Un mensaje de error no reconocido cuenta como fallo y aborta. Es deliberado: si `gh` cambia su texto, el cierre se detiene en vez de mergear sin checks.
+
+| Bandera | Default | Para que |
+|---|---|---|
+| `--checks-deadline <segundos>` | 120 | Limite del sondeo. `0` fuerza una sola consulta (comportamiento previo al sondeo). |
+| `--checks-interval <segundos>` | 5 | Espera entre consultas del sondeo. |
+
+Si el sondeo se agota, el cierre aborta nombrando PR, commit, tiempo esperado y que revisar, y el PR queda sin mergear. La ausencia de checks nunca se interpreta como checks aprobados. Ante ese diagnostico: confirma en `<url del PR>/checks` que los workflows aplican a `development`, y sube `--checks-deadline` solo si CI tarda mas en arrancar. Un PR hacia `development` siempre deberia reportar los checks requeridos (`TypeScript`, `ESLint`, `Jest`, `Backend smoke`); que no aparezcan indica un problema de CI, no del cierre.
+
+Pruebas locales de esta logica: `npm run test:opsx-finish` (sin red ni procesos; cubre checks tardios, timeout y checks fallidos).
+
 ## Errores frecuentes
 
 | Mensaje/sintoma | Accion |
@@ -94,6 +121,8 @@ OpenSpec 1.6.0 aun genera referencias a una CLI global y al comando continue ine
 | Node menor que el requerido | Instala Node 20.19 o superior y vuelve a ejecutar `npm ci`. |
 | `openspec validate` falla | Ejecuta `npm run openspec:validate` y corrige el change/spec indicado; el check no lo modifica. |
 | Patch check falla | Ejecuta `npm run agent:opsx:update`, revisa el diff y repite el check. |
+| `opsx:finish` aborta: el PR no reporto checks | Revisa `<url del PR>/checks` y que los workflows apliquen a `development`. Sube `--checks-deadline` solo si CI tarda mas en arrancar; el PR queda sin mergear. |
+| `opsx:finish` aborta: los checks fallaron | Corrige la CI en rojo y vuelve a ejecutar. El cierre no reintenta checks fallidos ni relanza workflows. |
 
 ## Rollback seguro
 

@@ -26,7 +26,7 @@
 - [x] 4.1 (Evidencia: matriz-hallazgos.md, 16 hallazgos H1-H16.) Consolidar `matriz-hallazgos.md`: cada hallazgo con evidencia/inferencia, severidad P0-P3, confianza, costo, dependencia, ola recomendada y accion propuesta.
 - [x] 4.2 (Evidencia: matriz-cobertura.md, 11 filas sin celdas vacias.) Completar `matriz-cobertura.md` con todas las olas y gates, verificando que no queden celdas vacias ni N/A sin justificar.
 - [x] 4.3 (Evidencia: mapa-dependencias-roadmap.md y decisiones-abiertas.md DA1-DA8.) Construir `mapa-dependencias-roadmap.md` (orden recomendado de changes/olas con dependencias) y `decisiones-abiertas.md` (incluyendo OQ-A/OQ-B/OQ-C del design y las que surjan).
-- [x] 4.4 (Evidencia: reporte-ejecutivo.md con I1 theming-runtime como primer ejecutable.) Redactar `reporte-ejecutivo.md` con la recomendacion explicita y justificada del primer issue ejecutable de Ola 1 UX/UI.
+- [x] 4.4 (Evidencia: reporte-ejecutivo.md con #78 theming-runtime como primer ejecutable.) Redactar `reporte-ejecutivo.md` con la recomendacion explicita y justificada del primer issue ejecutable de Ola 1 UX/UI.
 
 ## 5. Backlog en Product OS
 
@@ -37,8 +37,8 @@
 
 ## 6. Validacion, TLDR y cierre proporcional
 
-- [ ] 6.1 Actualizar `TLDR.md` si el alcance, archivos o resultado esperado cambiaron durante el apply.
-- [ ] 6.2 Ejecutar validacion del perfil docs: `npm exec --yes=false -- openspec validate --all --strict --no-interactive` y `npm run agent:harness:check`; registrar salidas como evidencia `docs-verification` en `readiness.json`.
-- [ ] 6.3 Registrar en `readiness.json` la evidencia final (issue-link, pr-link, docs-verification) y confirmar que `brownfield-baseline.md` sigue reflejando la superficie tocada.
-- [ ] 6.4 Ejecutar revision adversarial independiente (`/adversarial-review`) sobre reporte, matrices e issues creados; resolver o registrar hallazgos y anotar la referencia en `readiness.json`.
-- [ ] 6.5 Ejecutar `npm run openspec:ready:archive -- --change auditoria-plan-uxui-pre-ola1 --run-local` hasta PASS (o EXCEPTION valida) antes de archivar.
+- [x] 6.1 (Evidencia: TLDR.md actualizado con resultado final: #78-#89, veredicto y primer ejecutable #78.) Actualizar `TLDR.md` si el alcance, archivos o resultado esperado cambiaron durante el apply.
+- [x] 6.2 (Evidencia: openspec validate 23 passed/0 failed; agent:harness:check OK 36 mirrors; registrado en readiness.json docs-verification 2026-07-17.) Ejecutar validacion del perfil docs: `npm exec --yes=false -- openspec validate --all --strict --no-interactive` y `npm run agent:harness:check`; registrar salidas como evidencia `docs-verification` en `readiness.json`.
+- [x] 6.3 (Evidencia: readiness.json con issue-link, pr-link https://github.com/RitualBoat/PlanearIA/pull/90 y docs-verification; brownfield-baseline.md actualizado con el trabajo concurrente #74/#77.) Registrar en `readiness.json` la evidencia final (issue-link, pr-link, docs-verification) y confirmar que `brownfield-baseline.md` sigue reflejando la superficie tocada.
+- [x] 6.4 (Evidencia: revision adversarial independiente por subagente 2026-07-17, veredicto PASS CON HUECOS, 7 minors corregidos o registrados; ref en readiness.json.) Ejecutar revision adversarial independiente (`/adversarial-review`) sobre reporte, matrices e issues creados; resolver o registrar hallazgos y anotar la referencia en `readiness.json`.
+- [x] 6.5 Ejecutar `npm run openspec:ready:archive -- --change auditoria-plan-uxui-pre-ola1 --run-local` hasta PASS (o EXCEPTION valida) antes de archivar. Evidencia: corrida 2026-07-17 con 13/14 PASS y unico FAIL en tasks-complete por esta misma casilla; re-corrida inmediata en PASS total (local-openspec-strict y local-harness-parity correctos).

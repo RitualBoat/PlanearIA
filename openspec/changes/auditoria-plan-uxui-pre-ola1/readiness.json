@@ -11,11 +11,11 @@
     },
     {
       "id": "pr-link",
-      "ref": "PENDIENTE: se actualizara con el PR de #76 despues de apply."
+      "ref": "https://github.com/RitualBoat/PlanearIA/pull/90"
     },
     {
       "id": "adversarial-review",
-      "ref": "PENDIENTE: se actualizara con el veredicto de la revision adversarial antes de archive."
+      "ref": "PASS CON HUECOS (2026-07-17): revision adversarial independiente por subagente sobre change, reporte, PR #90 e issues #78-#89; 0 blockers/majors, 7 minors de contabilidad interna corregidos en el mismo dia (reconciliacion de severidades, tareas 6.1-6.3, precision SyncContext, log de dedup y limite de la dimension estados); 2 preguntas registradas para el owner (aceptar #78/Ola 0 como primer ejecutable; justificacion de prioridad de #79/#82 al activarlos)."
     },
     {
       "id": "docs-verification",
@@ -26,7 +26,7 @@
     "strategy": "Revertir el PR restaura Documentacion/ y openspec/ sin migraciones ni perdida de datos; los issues creados se cierran como not planned si el humano revierte la auditoria, sin borrar historial. No se muta ningun estado externo existente."
   },
   "adversarialReview": {
-    "ref": "PENDIENTE: revision requerida antes de archive."
+    "ref": "PASS CON HUECOS (2026-07-17): sin blockers ni majors; guardrail de no-mutacion verificado con diff y snapshots; conteos del reporte reproducidos independientemente (incluida la suite 93/608); minors corregidos antes de archive."
   },
   "exceptions": []
 }

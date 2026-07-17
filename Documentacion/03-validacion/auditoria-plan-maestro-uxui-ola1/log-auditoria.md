@@ -26,6 +26,9 @@ Registro cronologico de comandos, consultas estructurales y fallbacks. Complemen
   - `WebScrollView` existe con 24 consumidores; `SyncContext` expone idle/syncing/synced/offline/authError.
   - `src/themes/` solo contiene `colors.ts` y `types.ts`: faltan los 6 grupos de tokens (espaciado, radios, tipografia, elevacion, movimiento, z-index).
   - Reduce-motion ya referenciado en 5 archivos.
+  - `SyncContext` define estados idle/syncing/synced/offline/error y una bandera `authError` aparte (precision corregida tras revision adversarial).
+- Deduplicacion (task 5.1): `gh search issues --repo RitualBoat/PlanearIA "<kw>"` con 14 keywords (theming, breakpoint, tokens, shell, componentes, sync status, assign, golden, prototipo, ground truth, xlsx, epic, milestone, escritorio): cero issues existentes que cubran las 12 unidades nuevas; solapes conocidos referenciados sin duplicar (#46/#47/#66/#74/#75).
+- Limite declarado de la dimension "estados loading/empty/error/offline": se audito como CONTENIDO del plan (secciones 1.4, 1.9.3 y criterios por change) y reglas del harness (config OpenSpec exige escenarios por estado en toda spec de UI); NO se inventariaron los estados de las 61 pantallas actuales porque el plan las reemplaza por olas y ese inventario pertenece al propose de cada change de UI.
 - Dependencias (package.json): tentap 1.0.1, mammoth, docx, xlsx 0.18.5, pdfjs-dist 5.5.207, reanimated 4.1.2, gesture-handler 2.28, expo-notifications presentes; `expo-blur` NO instalado (coherente con plan); Playwright NO es dependencia del repo (QA visual solo via MCP).
 - `context/`: existen chat/classroom/excel/infraestructura/planeaciones ground-truth; NO existen `office-ground-truth/` (referenciado por `notasplan-editor`) ni `asistente-ground-truth/` (el plan pide crearlo).
 - `.github/workflows/`: ci.yml, cd.yml, react-doctor.yml, agent-harness-parity.yml. Sin workflow de QA visual/golden journeys; package.json sin scripts playwright/e2e/golden.

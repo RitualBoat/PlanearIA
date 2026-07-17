@@ -22,7 +22,7 @@
 
 ## Cifras de la auditoria
 
-- 16 hallazgos (1 P0, 5 P1, 4 P2, 4 P3, 2 confirmaciones positivas); 12 issues nuevos; 5 referencias a issues existentes sin duplicar (#46, #47, #66, #74, #75); 8 decisiones abiertas registradas; 7 fuentes primarias citadas con aplicabilidad.
+- 16 hallazgos: 1 P0, 7 P1 (5 accionables; H8 resuelto en paralelo por PR #77 y H10 confirmacion cubierta por #81), 4 P2, 4 P3 (que incluyen 3 confirmaciones positivas H14/H15/H16); 12 issues nuevos; 5 referencias a issues existentes sin duplicar (#46, #47, #66, #74, #75); 8 decisiones abiertas registradas; 7 fuentes primarias citadas con aplicabilidad.
 - Verificacion de no-mutacion: `snapshot-post-auditoria.md` compara el tablero antes/despues; el diff del PR solo contiene esta carpeta y el change OpenSpec.
 
 ## Indice de artefactos

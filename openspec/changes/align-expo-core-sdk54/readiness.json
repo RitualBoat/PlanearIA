@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "issue": 92,
+  "change": "align-expo-core-sdk54",
+  "surfaces": ["harness"],
+  "validations": ["openspec-strict", "harness-parity", "opsx-patch"],
+  "evidence": [
+    {"id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/92"},
+    {"id": "pr-link", "ref": "PENDIENTE: PR posterior a apply."},
+    {"id": "adversarial-review", "ref": "PENDIENTE: revision adversarial posterior a apply."},
+    {"id": "fixtures", "ref": "PENDIENTE: evidencia de validacion posterior a apply."}
+  ],
+  "rollback": {"strategy": "Revertir el commit de la remediación y ejecutar npm ci; no hay migraciones ni cambios nativos."},
+  "adversarialReview": {"ref": "PENDIENTE: revision adversarial posterior a apply."},
+  "exceptions": []
+}

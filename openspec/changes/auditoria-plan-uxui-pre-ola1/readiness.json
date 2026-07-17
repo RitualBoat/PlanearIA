@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "issue": 76,
+  "change": "auditoria-plan-uxui-pre-ola1",
+  "surfaces": ["docs"],
+  "validations": ["openspec-strict", "harness-parity"],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/76"
+    },
+    {
+      "id": "pr-link",
+      "ref": "PENDIENTE: se actualizara con el PR de #76 despues de apply."
+    },
+    {
+      "id": "adversarial-review",
+      "ref": "PENDIENTE: se actualizara con el veredicto de la revision adversarial antes de archive."
+    },
+    {
+      "id": "docs-verification",
+      "ref": "2026-07-17: openspec validate --all --strict --no-interactive = 23 passed / 0 failed; npm run agent:harness:check = OK (36 mirrors in parity); reporte en Documentacion/03-validacion/auditoria-plan-maestro-uxui-ola1/ con log-auditoria.md y snapshots pre/post."
+    }
+  ],
+  "rollback": {
+    "strategy": "Revertir el PR restaura Documentacion/ y openspec/ sin migraciones ni perdida de datos; los issues creados se cierran como not planned si el humano revierte la auditoria, sin borrar historial. No se muta ningun estado externo existente."
+  },
+  "adversarialReview": {
+    "ref": "PENDIENTE: revision requerida antes de archive."
+  },
+  "exceptions": []
+}

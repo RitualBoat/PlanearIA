@@ -38,6 +38,40 @@ npm run mcp:test -- --timeout=90000
 Este tester valida handshake `initialize` y `tools/list` de los servidores stdio/locales. Para servidores HTTP
 remotos con OAuth, valida que la configuracion este presente y deja el login al cliente MCP.
 
+### Expo MCP y OAuth no interactivo (change `classify-expo-mcp-oauth-warning`, issue #94)
+
+`expo` es un servidor stdio (`npx -y mcp-remote https://mcp.expo.dev/mcp`) que exige consentimiento OAuth en el
+navegador. Una sesion de agente no puede completarlo, asi que `npm run mcp:test` reporta `expo` con `ok: false` y
+sale con codigo distinto de cero. **Ese comportamiento es correcto y se conserva:** el smoke informa que se
+verifico, y `tools/list` de Expo no se verifico.
+
+`npm run harness:doctor` clasifica esa condicion aparte y reporta `WARN mcp-smoke`, no `FAIL`. La degradacion
+exige evidencia conjunta y verificable:
+
+1. La salida contiene el prompt de autorizacion de `mcp-remote` con una URL `https` de `authorize` cuyo **origen**
+   coincide con el endpoint configurado para ese servidor en `.mcp.json`.
+2. El servidor nunca completo su inicializacion.
+3. El servidor esta declarado en `oauthInteractiveServers` de `harness-doctor.config.json`.
+
+Emitir ese prompt prueba que `mcp-remote` resolvio DNS, alcanzo el host, recibio un 401 con `WWW-Authenticate`,
+leyo la metadata OAuth y registro un cliente: conectividad, instalacion y protocolo estan probados y solo falta el
+consentimiento humano. Por eso es `WARN` y nunca `PASS`. El codigo de salida no se usa para clasificar: el mismo
+estado expira por timeout o sale con codigo distinto de cero (`EADDRINUSE` del puerto de callback) segun haya otro
+`mcp-remote` vivo. Cualquier otra causa (ejecutable ausente, error de red, error de protocolo, respuesta invalida,
+o un OAuth pendiente fuera de la allowlist) sigue siendo `FAIL`, y un fallo real nunca queda enmascarado por un
+OAuth pendiente en paralelo.
+
+**Como autorizar Expo cuando una tarea si necesite su MCP.** Ejecutar en una sesion interactiva, con navegador
+disponible, y completar el consentimiento en la ventana que se abre:
+
+```bash
+npx -y mcp-remote https://mcp.expo.dev/mcp
+```
+
+El token queda cacheado para las siguientes ejecuciones y el smoke pasa a `ok: true`. Alternativamente, iniciar el
+login desde el cliente MCP que soporte el flujo. Nada de esto es requisito para trabajar en el repositorio: solo
+para tareas que consulten Expo MCP.
+
 Paridad de configs por harness (change `single-source-agent-harness`, issue #41): `.codex/config.toml` y
 `.cursor/mcp.json` se **generan desde `.mcp.json`** con `scripts/syncAgentHarness.mjs` (`npm run agent:harness:sync`),
 y su paridad de nombres se valida con `npm run mcp:parity`. El gate CI `agent-harness-parity.yml` corre ambos.

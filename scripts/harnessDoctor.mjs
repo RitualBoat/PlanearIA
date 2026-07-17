@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { OAUTH_INTERACTIVE_REQUIRED } from './lib/mcpFailureClassification.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const STATUS = new Set(['PASS', 'FAIL', 'WARN', 'SKIP']);
@@ -101,13 +102,30 @@ function checkScript(run, npm, id, args, summary, remediation) {
   return execution.status === 0 ? result(id, 'PASS', summary) : commandFailure(id, summary, execution, remediation);
 }
 
-function checkMcpSmoke(run, npm) {
+function checkMcpSmoke(run, npm, config) {
   const execution = run(npm, ['run', 'mcp:test']);
   const report = parseJsonDocument(outputOf(execution));
-  if (execution.status !== 0 || !report?.ok) return commandFailure('mcp-smoke', 'El smoke MCP activo', execution, 'Ejecuta npm run mcp:test y corrige el servidor activo indicado.');
-  const oauthOnly = report.results?.filter((item) => item.note?.includes('Complete auth and tool listing')).map((item) => item.name) ?? [];
-  if (oauthOnly.length > 0) return result('mcp-smoke', 'WARN', `MCP activo responde; ${oauthOnly.join(', ')} requiere OAuth en un cliente MCP compatible.`);
-  return result('mcp-smoke', 'PASS', 'Todos los MCP activos completaron el smoke.');
+  // El codigo de salida del smoke no decide aqui: sigue siendo distinto de cero mientras un servidor no
+  // complete tools/list. Un reporte ilegible si es un fallo real, porque no hay evidencia que clasificar.
+  if (!Array.isArray(report?.results) || report.results.length === 0) return commandFailure('mcp-smoke', 'El smoke MCP activo', execution, 'Ejecuta npm run mcp:test y corrige el servidor activo indicado.');
+
+  const allowlist = new Set(config.oauthInteractiveServers ?? []);
+  const pendingOauth = [];
+  const broken = [];
+  for (const item of report.results) {
+    if (item.ok) continue;
+    // Fuera de la allowlist, un OAuth pendiente probado sigue siendo FAIL: degradarlo exige decision humana.
+    if (item.classification === OAUTH_INTERACTIVE_REQUIRED && allowlist.has(item.name)) pendingOauth.push(item.name);
+    else broken.push(item.name);
+  }
+  if (broken.length > 0) return commandFailure('mcp-smoke', `El smoke MCP activo (${broken.join(', ')})`, execution, 'Ejecuta npm run mcp:test y corrige el servidor activo indicado.');
+
+  const limitations = [];
+  if (pendingOauth.length > 0) limitations.push(`${pendingOauth.join(', ')} requiere consentimiento OAuth interactivo y no expuso sus herramientas en esta sesion`);
+  const declaredOnly = report.results.filter((item) => item.note?.includes('Complete auth and tool listing')).map((item) => item.name);
+  if (declaredOnly.length > 0) limitations.push(`${declaredOnly.join(', ')} requiere OAuth en un cliente MCP compatible`);
+  if (limitations.length === 0) return result('mcp-smoke', 'PASS', 'Todos los MCP activos completaron el smoke.');
+  return result('mcp-smoke', 'WARN', `MCP activo responde; ${limitations.join('; ')}.`, pendingOauth.length > 0 ? `Autoriza ${pendingOauth.join(', ')} en una sesion MCP interactiva si una tarea lo necesita; el smoke conserva ok:false hasta entonces.` : null);
 }
 
 function checkExpo(run, npm) {
@@ -120,7 +138,7 @@ export function runDoctor({ root = ROOT, config = loadConfig(root), run = execut
     checkNodeNpm(run, npm), checkGit(run), checkOpenSpec(run, npm), checkProjects(run, config), checkGitNexus(run, npm, config), checkCodeGraph(run, npm),
     checkScript(run, npm, 'harness-parity', ['run', 'agent:harness:check'], 'Los espejos del harness estan en paridad.', 'Ejecuta npm run agent:harness:sync y revisa el diff generado.'),
     checkScript(run, npm, 'mcp-parity', ['run', 'mcp:parity'], 'Los MCP activos estan en paridad.', 'Ejecuta npm run agent:harness:sync y corrige el MCP activo indicado.'),
-    checkMcpSmoke(run, npm), checkExpo(run, npm), ...config.retiredTools.map((tool) => result(tool.id, tool.status, tool.summary, tool.remediation)),
+    checkMcpSmoke(run, npm, config), checkExpo(run, npm), ...config.retiredTools.map((tool) => result(tool.id, tool.status, tool.summary, tool.remediation)),
   ];
   checks.sort((left, right) => config.checkOrder.indexOf(left.id) - config.checkOrder.indexOf(right.id));
   const counts = Object.fromEntries([...STATUS].map((status) => [status, checks.filter((check) => check.status === status).length]));

@@ -7,10 +7,24 @@ export const FIXTURE_UID =
 export const FIXTURE_QUERY = 'useCrearPlaneacionViewModel MVVM dependencies';
 
 const FTS_DIAGNOSTIC = /FTS indexes missing|FTS extension unavailable|full-text search degraded/i;
+const REPOSITORY_DIAGNOSTIC = /not a git repository/i;
 const AGENT_PATH = /^(AGENTS\.md|CLAUDE\.md|\.agents\/|\.codex\/skills\/)/;
 
 export function hasFtsDiagnostic(output) {
   return FTS_DIAGNOSTIC.test(output);
+}
+
+export function hasRepositoryDiagnostic(output) {
+  return REPOSITORY_DIAGNOSTIC.test(output);
+}
+
+export function assertDiagnosticStatusHealthy(output) {
+  if (hasFtsDiagnostic(output)) {
+    throw new Error('GitNexus status reported an FTS diagnostic. Run npm run gitnexus:repair.');
+  }
+  if (hasRepositoryDiagnostic(output)) {
+    throw new Error('GitNexus status reported that the checkout is not a Git repository. Run the diagnostic from the repository root.');
+  }
 }
 
 export function parseJsonOutput(output, label) {
@@ -58,7 +72,8 @@ function commandEnvironment() {
   const openSslBin = 'C:\\Program Files\\OpenSSL-Win64\\bin';
 
   if (process.platform === 'win32' && existsSync(openSslBin)) {
-    env.PATH = `${openSslBin};${env.PATH ?? ''}`;
+    const inheritedPath = env.PATH ?? env.Path ?? '';
+    env.PATH = `${openSslBin};C:\\Program Files\\nodejs;${inheritedPath}`;
     env.Path = env.PATH;
   }
 
@@ -85,20 +100,34 @@ function run(command, args, { cwd = process.cwd(), env = commandEnvironment() } 
   return output;
 }
 
-function runGitNexus(args, options) {
+function gitCommand() {
+  return process.platform === 'win32' ? 'C:\\Program Files\\Git\\cmd\\git.exe' : 'git';
+}
+
+function repositoryRoot(cwd) {
+  return run(gitCommand(), ['rev-parse', '--show-toplevel'], { cwd }).trim();
+}
+
+export function buildWindowsGitNexusInvocation(args) {
+  return {
+    command: 'C:\\Program Files\\nodejs\\node.exe',
+    args: ['C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npx-cli.js', '-y', `gitnexus@${GITNEXUS_VERSION}`, ...args],
+  };
+}
+
+function runGitNexus(args, options = {}) {
+  const cwd = repositoryRoot(options.cwd ?? process.cwd());
+  const runOptions = { ...options, cwd };
   if (process.platform === 'win32') {
-    const command = ['C:\\Program Files\\nodejs\\npx.ps1', '-y', `gitnexus@${GITNEXUS_VERSION}`, ...args]
-      .map((argument) => `'${argument.replaceAll("'", "''")}'`)
-      .join(' ');
-    const pathPrefix = "$env:PATH = 'C:\\Program Files\\nodejs;C:\\Program Files\\OpenSSL-Win64\\bin;' + $env:PATH; ";
+    const invocation = buildWindowsGitNexusInvocation(args);
     return run(
-      'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe',
-      ['-NoProfile', '-Command', `${pathPrefix}& ${command}`],
-      options,
+      invocation.command,
+      invocation.args,
+      runOptions,
     );
   }
 
-  return run('npx', ['-y', `gitnexus@${GITNEXUS_VERSION}`, ...args], options);
+  return run('npx', ['-y', `gitnexus@${GITNEXUS_VERSION}`, ...args], runOptions);
 }
 
 function readAllowedAgentPaths(args) {
@@ -127,9 +156,7 @@ function readAllowedAgentPaths(args) {
 
 export function diagnose(options) {
   const output = runGitNexus(['status'], options);
-  if (hasFtsDiagnostic(output)) {
-    throw new Error('GitNexus status reported an FTS diagnostic. Run npm run gitnexus:repair.');
-  }
+  assertDiagnosticStatusHealthy(output);
   process.stdout.write(output);
 }
 
@@ -157,8 +184,7 @@ export function verify({ allowedPaths, ...options }) {
   }
   verifyImpactResult(parseJsonOutput(impactOutput, 'GitNexus impact'));
 
-  const gitCommand = process.platform === 'win32' ? 'C:\\Program Files\\Git\\cmd\\git.exe' : 'git';
-  const statusOutput = run(gitCommand, ['status', '--porcelain'], options);
+  const statusOutput = run(gitCommand(), ['status', '--porcelain'], options);
   const unexpectedAgentChanges = findUnexpectedAgentChanges(statusOutput, allowedPaths);
   if (unexpectedAgentChanges.length > 0) {
     throw new Error(`Unexpected agent instruction changes: ${unexpectedAgentChanges.join(', ')}`);

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "issue": 74,
+  "change": "fix-gitnexus-root-doctor",
+  "surfaces": [
+    "harness"
+  ],
+  "validations": [
+    "openspec-strict",
+    "harness-parity",
+    "opsx-patch"
+  ],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/74"
+    },
+    {
+      "id": "pr-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/pull/77"
+    },
+    {
+      "id": "adversarial-review",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/74#issuecomment-4997781512"
+    },
+    {
+      "id": "fixtures",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/74#issuecomment-4997764549"
+    }
+  ],
+  "rollback": {
+    "strategy": "Revertir el commit del wrapper y sus pruebas; no hay migraciones, datos persistidos ni reindexado automático que deshacer."
+  },
+  "adversarialReview": {
+    "ref": "https://github.com/RitualBoat/PlanearIA/issues/74#issuecomment-4997781512"
+  },
+  "exceptions": []
+}

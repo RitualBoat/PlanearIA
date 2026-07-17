@@ -42,5 +42,11 @@ Regla: una tarea a la vez. `[x]` solo con evidencia (salida de typecheck, lint y
 
 - [x] 6.1 TLDR y demas artefactos actualizados con el conteo real (64 produccion -> 61) y la ruta de import real (barrel `types`). Alcance y comportamiento sin cambio.
 - [x] 6.2 Revision adversarial independiente (verificacion previa a archive): PASS CON HUECOS, 3 minors rastreados y mitigados, sin blockers ni majors. Referencia en `readiness.json`.
-- [ ] 6.3 `npm run openspec:ready:archive -- --change theming-runtime --run-local` en PASS.
-- [ ] 6.4 Archive, sync de specs y `npm run opsx:finish`.
+
+## Procedimiento de cierre (no son tareas de implementacion)
+
+Estos pasos ejecutan el propio cierre y no se marcan como checkbox para no crear
+autorreferencia con el gate `tasks-complete` (mismo criterio que changes previos archivados):
+
+- `npm run openspec:ready:archive -- --change theming-runtime --run-local` debe reportar PASS.
+- Archive del change, sync de specs y `npm run opsx:finish` (PR hacia `development`, espera de checks, merge).

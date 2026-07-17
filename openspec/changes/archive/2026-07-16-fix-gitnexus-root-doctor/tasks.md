@@ -12,4 +12,4 @@
 
 - [x] 3.1 Ejecutar `npm run test:gitnexus` y `npm run test:harness:doctor`; adjuntar sus salidas o referencias al issue y a `readiness.json`.
 - [x] 3.2 Ejecutar `npm run gitnexus:diagnose` y `npm run harness:doctor -- --json` desde la raíz; verificar que `gitnexus` ya no falla por `Not a git repository` y separar cualquier fallo ajeno, como Expo, sin ocultarlo.
-- [ ] 3.3 Ejecutar las validaciones de cierre del perfil harness, actualizar las referencias pendientes de `readiness.json`, solicitar revisión adversarial y ejecutar el gate `openspec:ready:archive` antes de archivar.
+- [x] 3.3 Ejecutar las validaciones de cierre del perfil harness, actualizar las referencias pendientes de `readiness.json`, solicitar revisión adversarial y ejecutar el gate `openspec:ready:archive` antes de archivar.

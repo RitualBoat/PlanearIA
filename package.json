@@ -62,7 +62,8 @@
     "mcp:mongodb:readonly": "npx -y mongodb-mcp-server@latest --readOnly --indexCheck --telemetry disabled",
     "doctor": "npx react-doctor@latest",
     "harness:doctor": "node --no-warnings scripts/harnessDoctor.mjs",
-    "test:harness:doctor": "node scripts/testHarnessDoctor.mjs"
+    "test:harness:doctor": "node scripts/testHarnessDoctor.mjs",
+    "test:opsx-finish": "node scripts/testOpsxFinish.mjs"
   },
   "dependencies": {
     "@10play/tentap-editor": "^1.0.1",

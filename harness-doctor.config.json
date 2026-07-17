@@ -16,6 +16,7 @@
     "expo-compatibility",
     "graphify"
   ],
+  "oauthInteractiveServers": ["expo"],
   "gitNexusFailurePatterns": [
     "Not a git repository",
     "FTS indexes missing",

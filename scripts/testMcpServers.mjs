@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
+import { classifyFailure, configuredEndpoint } from "./lib/mcpFailureClassification.mjs";
 
 const DEFAULT_TIMEOUT_MS = 45000;
 const FORBIDDEN_ACTIVE_SERVERS = ["graphify"];
@@ -112,6 +113,7 @@ async function testServer(name, server, timeout) {
       done = true;
       clearTimeout(timer);
       child.kill();
+      const evidence = stderr.join("");
       resolve({
         name,
         ok,
@@ -119,7 +121,10 @@ async function testServer(name, server, timeout) {
         initialized,
         toolCount: toolNames.length,
         tools: toolNames.slice(0, 20),
-        stderr: sanitize(stderr.join("").slice(-1200)),
+        stderr: sanitize(evidence.slice(-1200)),
+        // Aditivo: el veredicto y el codigo de salida del smoke no dependen de la clasificacion. Quien
+        // decide que bloquea es el doctor; este script solo reporta que se verifico y que no.
+        ...(ok ? {} : { classification: classifyFailure({ stderr: evidence, initialized, endpoint: configuredEndpoint(server) }) }),
         ...details,
       });
     };

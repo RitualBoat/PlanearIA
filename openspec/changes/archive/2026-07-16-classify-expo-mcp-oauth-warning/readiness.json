@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "issue": 94,
+  "change": "classify-expo-mcp-oauth-warning",
+  "surfaces": ["harness", "docs"],
+  "validations": ["openspec-strict", "harness-parity", "opsx-patch"],
+  "evidence": [
+    { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/94" },
+    { "id": "pr-link", "ref": "PENDIENTE: PR posterior a apply." },
+    { "id": "adversarial-review", "ref": "https://github.com/RitualBoat/PlanearIA/issues/94#issuecomment-4999461488" },
+    { "id": "fixtures", "ref": "https://github.com/RitualBoat/PlanearIA/issues/94#issuecomment-4999459327" },
+    { "id": "docs-verification", "ref": "Documentacion/02-operacion/MCP_FLUJOS_PLANEARIA.md: limitacion de OAuth no interactivo de Expo, criterio de WARN y ruta de autorizacion manual" }
+  ],
+  "rollback": {
+    "strategy": "Revertir el commit del PR restaura el FAIL mcp-smoke previo sin perder datos ni artefactos: el change solo toca scripts read-only, harness-doctor.config.json y documentacion. Desactivacion parcial sin tocar codigo: vaciar oauthInteractiveServers en harness-doctor.config.json devuelve el mecanismo a FAIL para todos los servidores. No hay migracion de datos, estado persistente ni proyectos nativos que regenerar."
+  },
+  "adversarialReview": {
+    "ref": "https://github.com/RitualBoat/PlanearIA/issues/94#issuecomment-4999461488"
+  },
+  "exceptions": []
+}

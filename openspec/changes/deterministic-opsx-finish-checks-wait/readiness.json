@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "issue": 96,
+  "change": "deterministic-opsx-finish-checks-wait",
+  "surfaces": ["harness", "docs"],
+  "validations": ["openspec-strict", "harness-parity", "opsx-patch"],
+  "evidence": [
+    { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/96" },
+    { "id": "pr-link", "ref": "PENDIENTE: PR posterior a apply." },
+    { "id": "adversarial-review", "ref": "PENDIENTE: revision adversarial previa a archive." },
+    { "id": "fixtures", "ref": "PENDIENTE: salida de npm run test:opsx-finish con checks tardios, timeout y checks fallidos." },
+    { "id": "docs-verification", "ref": "PENDIENTE: Documentacion/02-operacion/: estados de la espera de checks, diagnostico de timeout y ruta de recuperacion." }
+  ],
+  "rollback": {
+    "strategy": "Revertir el commit del PR restaura la invocacion directa de `gh pr checks --watch --fail-fast` sin perder datos ni artefactos: el change solo toca scripts locales del harness, package.json y documentacion. No hay estado persistente, migracion de datos, configuracion remota ni proyectos nativos que regenerar. Desactivacion parcial sin revertir codigo: `--checks-deadline 0` reproduce el comportamiento previo de fallar en la primera consulta con rollup vacio."
+  },
+  "adversarialReview": {
+    "ref": "PENDIENTE: revision adversarial previa a archive."
+  },
+  "exceptions": []
+}

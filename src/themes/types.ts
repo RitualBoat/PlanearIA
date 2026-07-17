@@ -71,3 +71,17 @@ export interface ColorTokens {
 export type ThemeMode = "light" | "dark";
 export type FontSizeMode = "small" | "medium" | "large" | "xlarge";
 export type DaltonismoMode = "none" | "protanopia" | "deuteranopia" | "tritanopia";
+
+/**
+ * Entrada de las fabricas de estilos `getStyles({ ... })`.
+ *
+ * Es un objeto y no parametros posicionales porque el change `breakpoints-reactivos`
+ * agregara `width` a este contrato: con un objeto puede hacerlo sin reabrir ni reordenar
+ * las llamadas de cada archivo ya migrado. El plan UX/UI exige tocar cada archivo una sola vez.
+ */
+export interface ThemedStylesInput {
+  colors: ColorTokens;
+  isDark: boolean;
+  scaled: (baseSize: number) => number;
+  highContrast: boolean;
+}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -24,6 +24,8 @@ import { useTheme } from "../../context/ThemeContext";
 import { useFontSize } from "../../context/FontSizeContext";
 import { useDaltonismo } from "../../context/DaltonismoContext";
 import { useAccessibilityPreferences } from "../../context/AccessibilityPreferencesContext";
+import { useAppTheme } from "../../themes/useAppTheme";
+import { ThemedStylesInput } from "../../themes/types";
 import { changeLanguage } from "../../locales/i18n";
 import { useTranslation } from "react-i18next";
 import { getRoleLabel } from "../../../types";
@@ -93,24 +95,21 @@ const CuentaScreen: React.FC = () => {
   const [scrollY] = React.useState(() => new Animated.Value(0));
   const { t, i18n } = useTranslation();
 
-  // Real accessibility contexts consumed at runtime
-  const { colors, isDark, toggleTheme } = useTheme();
+  // Tokens de tema ya filtrados por daltonismo, escalado tipografico y alto contraste.
+  // COLORS === lightTheme, asi que en tema claro el resultado es identico al estilado
+  // estatico previo; el tema oscuro repinta la pantalla.
+  const { colors: DT, isDark, scaled, highContrast } = useAppTheme();
   const darkMode = isDark;
-  const { scaled, fontSizeMode: fsModeCtx, setFontSizeMode: setFsModeCtx } = useFontSize();
-  const { daltonismoMode, setDaltonismoMode, applyDaltonismo } = useDaltonismo();
-  const {
-    highContrast,
-    voiceReading,
-    reduceMotion,
-    setHighContrast,
-    setVoiceReading,
-    setReduceMotion,
-  } = useAccessibilityPreferences();
+  const { toggleTheme } = useTheme();
+  const { fontSizeMode: fsModeCtx, setFontSizeMode: setFsModeCtx } = useFontSize();
+  const { daltonismoMode, setDaltonismoMode } = useDaltonismo();
+  const { voiceReading, reduceMotion, setHighContrast, setVoiceReading, setReduceMotion } =
+    useAccessibilityPreferences();
 
-  // Runtime theme tokens (daltonism-adjusted). COLORS === lightTheme, so the light
-  // result is identical to the previous static styling; dark repaints the screen.
-  const DT = applyDaltonismo(colors);
-  const styles = getStyles(DT, isDark, scaled, highContrast);
+  const styles = useMemo(
+    () => getStyles({ colors: DT, isDark, scaled, highContrast }),
+    [DT, isDark, scaled, highContrast]
+  );
 
   // Map context font size to UI labels
   const fontSizeMode =
@@ -871,12 +870,7 @@ const CuentaScreen: React.FC = () => {
   );
 };
 
-const getStyles = (
-  DT: any,
-  isDark: boolean,
-  scaled: (baseSize: number) => number,
-  highContrast: boolean
-) => {
+const getStyles = ({ colors: DT, isDark, scaled, highContrast }: ThemedStylesInput) => {
   // "Contraste alto": refuerza texto secundario y bordes usando solo tokens del tema.
   const subtleText = highContrast ? DT.text : DT.textSecondary;
   const cardBorder = highContrast ? DT.borderStrong : DT.border;

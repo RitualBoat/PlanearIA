@@ -17,7 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useAuth } from "../../context/AuthContext";
-import { RootStackParamList } from "../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../navigation/StackNavigator";
 
 const ONBOARDING_KEY = "HAS_SEEN_ONBOARDING";
 const DESKTOP_BREAKPOINT = 768;
@@ -79,7 +79,7 @@ const SLIDES: Slide[] = [
   },
 ];
 
-type Nav = StackNavigationProp<RootStackParamList>;
+type Nav = StackNavigationProp<AppRoutesParamList>;
 
 const OnboardingScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();

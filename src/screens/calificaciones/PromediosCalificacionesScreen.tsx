@@ -9,15 +9,15 @@ import { useAlumnos } from "../../context/AlumnosContext";
 import { useCalificaciones } from "../../context/CalificacionesContext";
 import { useGrupos } from "../../hooks/useGrupos";
 import { COLORS } from "../../../types";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 import {
   calcularPromediosAlumnos,
   calcularPromedioGrupal,
   type PromedioAlumno,
 } from "../../services/promediosService";
 
-type Nav = StackNavigationProp<RootStackParamList, "PromediosCalificaciones">;
-type Route = RouteProp<RootStackParamList, "PromediosCalificaciones">;
+type Nav = StackNavigationProp<AppRoutesParamList, "PromediosCalificaciones">;
+type Route = RouteProp<AppRoutesParamList, "PromediosCalificaciones">;
 
 interface Props {
   navigation: Nav;

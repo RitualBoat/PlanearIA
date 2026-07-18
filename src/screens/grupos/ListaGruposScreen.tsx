@@ -12,14 +12,14 @@ import { useBreakpoint } from "../../hooks/useBreakpoint";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { COLORS, Grupo } from "../../../types";
 import { useGrupos } from "../../hooks/useGrupos";
 import { isWeb } from "../../utils/responsive";
 import WebScrollView from "../../components/WebScrollView";
 import ScreenBackButton from "../../components/ScreenBackButton";
 
-type ListaGruposScreenNavigationProp = StackNavigationProp<RootStackParamList, "ListaGrupos">;
+type ListaGruposScreenNavigationProp = StackNavigationProp<AppRoutesParamList, "ListaGrupos">;
 
 interface ListaGruposScreenProps {
   navigation: ListaGruposScreenNavigationProp;

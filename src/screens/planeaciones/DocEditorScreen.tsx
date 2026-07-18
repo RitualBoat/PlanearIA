@@ -18,7 +18,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { EditorBridge } from "@10play/tentap-editor";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { useTheme } from "../../context/ThemeContext";
 import { useEditorMode } from "../../hooks/useEditorMode";
 import { useDocEditorViewModel, type DocSectionId } from "../../hooks/useDocEditorViewModel";
@@ -42,7 +42,7 @@ import type { ActividadesCopiloto } from "../../services/copilotoService";
 import type { InstrumentoEvaluacion } from "../../../types/planeacionV2";
 import { setGlobalKeyboardDismissHandler } from "../../utils/keyboardDismissController";
 
-type Nav = StackNavigationProp<RootStackParamList, "DocEditor">;
+type Nav = StackNavigationProp<AppRoutesParamList, "DocEditor">;
 type PageFormat = "a4" | "carta";
 type LogoSlotId = "tecnm" | "institucion";
 

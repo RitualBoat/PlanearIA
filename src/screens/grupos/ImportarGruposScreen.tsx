@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as DocumentPicker from "expo-document-picker";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 import type { RouteProp } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import WebScrollView from "../../components/WebScrollView";
@@ -24,8 +24,8 @@ import {
   parseGruposFromAsset,
 } from "../../services/grupoImportService";
 
-type Nav = StackNavigationProp<RootStackParamList, "ImportarGrupos">;
-type Route = RouteProp<RootStackParamList, "ImportarGrupos">;
+type Nav = StackNavigationProp<AppRoutesParamList, "ImportarGrupos">;
+type Route = RouteProp<AppRoutesParamList, "ImportarGrupos">;
 
 interface ImportarGruposScreenProps {
   navigation: Nav;

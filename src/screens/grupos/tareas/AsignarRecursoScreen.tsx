@@ -13,9 +13,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
-import { RootStackParamList } from "../../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../../navigation/StackNavigator";
 import { COLORS } from "../../../../types";
 import WebScrollView from "../../../components/WebScrollView";
+import { navigateToHub } from "../../../navigation/navigateToHub";
 import {
   asignarEntregablesAGrupo,
   asignarRecursosAGrupo,
@@ -27,9 +28,9 @@ import {
   obtenerRecursos,
 } from "../../../services/grupoAsignacionesService";
 
-type AsignarRecursoScreenNavigationProp = StackNavigationProp<RootStackParamList, "AsignarRecurso">;
+type AsignarRecursoScreenNavigationProp = StackNavigationProp<AppRoutesParamList, "AsignarRecurso">;
 
-type AsignarRecursoScreenRouteProp = RouteProp<RootStackParamList, "AsignarRecurso">;
+type AsignarRecursoScreenRouteProp = RouteProp<AppRoutesParamList, "AsignarRecurso">;
 
 interface AsignarRecursoScreenProps {
   navigation: AsignarRecursoScreenNavigationProp;
@@ -186,7 +187,8 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
 
   const goCreateNew = useCallback(() => {
     if (selectedType === "recurso") {
-      navigation.navigate("ListaRecursos");
+      // Los recursos viven en el hub Office; cruce de hub con forma anidada.
+      navigateToHub(navigation, "OfficeTab", "ListaRecursos");
       return;
     }
     navigation.navigate("CrearTareaGrupo", { grupoId });

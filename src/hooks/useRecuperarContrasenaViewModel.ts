@@ -2,11 +2,11 @@ import { useState, useCallback } from "react";
 import { Platform, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import { API_CONFIG } from "../sync/config/apiConfig";
 import logger from "../utils/logger";
 
-type Nav = StackNavigationProp<RootStackParamList, "RecuperarContrasena">;
+type Nav = StackNavigationProp<AppRoutesParamList, "RecuperarContrasena">;
 
 type Step = "email" | "codigo" | "nueva";
 

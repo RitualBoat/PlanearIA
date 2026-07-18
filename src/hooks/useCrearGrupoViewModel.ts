@@ -2,12 +2,13 @@ import { useState, useCallback, useEffect } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RouteProp } from "@react-navigation/native";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import type { Carrera } from "../../types";
 import { useGruposContext } from "../context/GruposContext";
+import { goBackOrHubLanding } from "../navigation/navigateToHub";
 
-type Nav = StackNavigationProp<RootStackParamList, "CrearGrupo">;
-type Route = RouteProp<RootStackParamList, "CrearGrupo">;
+type Nav = StackNavigationProp<AppRoutesParamList, "CrearGrupo">;
+type Route = RouteProp<AppRoutesParamList, "CrearGrupo">;
 
 export interface CrearGrupoViewModel {
   modo: "crear" | "editar";
@@ -36,7 +37,6 @@ export const useCrearGrupoViewModel = (): CrearGrupoViewModel => {
 
   const modo = route.params?.modo === "editar" ? "editar" : "crear";
   const grupoId = route.params?.grupoId;
-  const returnToClassroom = route.params?.returnToClassroom === true;
   const [nombre, setNombre] = useState("");
   const [materia, setMateria] = useState("");
   const [carrera, setCarrera] = useState<Carrera>("ISC");
@@ -116,11 +116,10 @@ export const useCrearGrupoViewModel = (): CrearGrupoViewModel => {
         });
       }
 
-      if (returnToClassroom) {
-        navigation.navigate("MainTabs", { screen: "GruposTab" });
-      } else {
-        navigation.navigate("ListaGrupos");
-      }
+      // Con la pantalla dentro del stack de Clases, el origen real (Classroom
+      // o la lista de grupos) esta en el historial; el antiguo parametro que
+      // forzaba un destino fijo ya no existe.
+      goBackOrHubLanding(navigation, "ClasesTab");
     } catch {
       setValidationError("No se pudo guardar el grupo. Intenta nuevamente.");
     } finally {
@@ -136,7 +135,6 @@ export const useCrearGrupoViewModel = (): CrearGrupoViewModel => {
     horario,
     modo,
     grupoId,
-    returnToClassroom,
     actualizarGrupo,
     agregarGrupo,
     navigation,

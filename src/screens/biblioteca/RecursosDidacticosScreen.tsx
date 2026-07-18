@@ -13,14 +13,15 @@ import { useBreakpoint } from "../../hooks/useBreakpoint";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { COLORS } from "../../../types";
 import { isWeb } from "../../utils/responsive";
 import AnimatedTopPill from "../../components/AnimatedTopPill";
 import { useRecursos } from "../../context/RecursosContext";
+import { goBackOrHubLanding } from "../../navigation/navigateToHub";
 
 type RecursosDidacticosScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
+  AppRoutesParamList,
   "RecursosDidacticos"
 >;
 
@@ -95,9 +96,7 @@ const RecursosDidacticosScreen: React.FC<RecursosDidacticosScreenProps> = ({ nav
         <View style={styles.headerBar}>
           <Pressable
             style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}
-            onPress={() =>
-              navigation.canGoBack() ? navigation.goBack() : navigation.navigate("MainTabs" as any)
-            }
+            onPress={() => goBackOrHubLanding(navigation, "OfficeTab")}
           >
             <MaterialIcons name="arrow-back" size={24} color={COLORS.primary} />
           </Pressable>

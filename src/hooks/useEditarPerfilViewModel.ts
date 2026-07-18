@@ -2,10 +2,10 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { Platform, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import { useAuth } from "../context/AuthContext";
 
-type Nav = StackNavigationProp<RootStackParamList>;
+type Nav = StackNavigationProp<AppRoutesParamList>;
 
 export const BIO_MAX_LENGTH = 300;
 

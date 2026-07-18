@@ -15,6 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import AnimatedTopPill from "../../components/AnimatedTopPill";
 import { useNotificaciones } from "../../context/NotificacionesContext";
 import { useTheme } from "../../context/ThemeContext";
+import { navigateToHub } from "../../navigation/navigateToHub";
 import { Notificacion, TipoNotificacion } from "../../../types";
 
 type FilterType = "todas" | "no_leidas";
@@ -73,14 +74,12 @@ export const NotificacionesScreen: React.FC = () => {
       await marcarComoLeida(n.id);
     }
 
-    // Redirigir según el tipo de notificación
-    if (n.tipo === "solicitud") {
-      navigation.navigate("MainTabs", { screen: "SocialTab" });
-    } else if (n.tipo === "mensaje") {
-      navigation.navigate("MainTabs", { screen: "SocialTab" });
+    // Redirigir según el tipo de notificación (el deep link al objeto real es
+    // del change notificaciones-chrome; aqui solo se reapunta el hub destino)
+    if (n.tipo === "solicitud" || n.tipo === "mensaje") {
+      navigateToHub(navigation, "MasTab", "Social");
     } else if (n.tipo === "tarea") {
-      // Antes abria el menu legacy GruposScreen; ahora va al tab vivo de clases
-      navigation.navigate("MainTabs", { screen: "GruposTab" });
+      navigateToHub(navigation, "ClasesTab");
     }
   };
 

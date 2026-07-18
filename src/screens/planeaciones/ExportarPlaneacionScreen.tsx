@@ -19,7 +19,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import * as Sharing from "expo-sharing";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { usePlaneaciones } from "../../context/PlaneacionesContext";
 import { COLORS } from "../../../types";
 import {
@@ -28,8 +28,8 @@ import {
 } from "../../services/planeacionExportService";
 import type { PlaneacionDocumento } from "../../../types/planeacionV2";
 
-type Nav = StackNavigationProp<RootStackParamList, "ExportarPlaneacion">;
-type ExportarRoute = RouteProp<RootStackParamList, "ExportarPlaneacion">;
+type Nav = StackNavigationProp<AppRoutesParamList, "ExportarPlaneacion">;
+type ExportarRoute = RouteProp<AppRoutesParamList, "ExportarPlaneacion">;
 
 type ExportFormat = "pdf" | "docx";
 

@@ -2,10 +2,10 @@ import { useState, useCallback } from "react";
 import { Platform, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import { useAuth } from "../context/AuthContext";
 
-type Nav = StackNavigationProp<RootStackParamList, "Registro">;
+type Nav = StackNavigationProp<AppRoutesParamList, "Registro">;
 
 export interface RegistroFormData {
   nombre: string;

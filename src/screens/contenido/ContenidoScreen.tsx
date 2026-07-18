@@ -19,7 +19,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Sharing from "expo-sharing";
 import { COLORS } from "../../../types";
-import { RootStackParamList } from "../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../navigation/StackNavigator";
 import {
   useContenidoViewModel,
   CategoriaContenido,
@@ -34,6 +34,7 @@ import {
 } from "../../services/planeacionExportService";
 import type { PlaneacionDocumento } from "../../../types/planeacionV2";
 import { ModalSelectorContactos } from "../../components/social/ModalSelectorContactos";
+import { navigateToHub } from "../../navigation/navigateToHub";
 import type { Contacto } from "../../../types";
 import { useMensajes } from "../../context/MensajesContext";
 import {
@@ -41,7 +42,7 @@ import {
   asignarEntregablesAGrupo,
 } from "../../services/grupoAsignacionesService";
 
-type Nav = StackNavigationProp<RootStackParamList>;
+type Nav = StackNavigationProp<AppRoutesParamList>;
 
 // ─── Design tokens ───
 const DT = {
@@ -413,7 +414,8 @@ const ContenidoScreen: React.FC = () => {
       } else if (item.tipo === "recursos") {
         navigation.navigate("CrearRecurso", { recursoId: (item.raw as any).id });
       } else if (item.tipo === "entregables") {
-        navigation.navigate("ListaEntregables");
+        // Los entregables viven en el hub Clases; cruce de hub con forma anidada.
+        navigateToHub(navigation, "ClasesTab", "ListaEntregables");
       } else if (item.tipo === "plantillas") {
         navigation.navigate("DetallePlantilla", { plantillaId: (item.raw as any).id } as any);
       }
@@ -460,15 +462,13 @@ const ContenidoScreen: React.FC = () => {
           );
           break;
         case "compartir_feed":
-          navigation.navigate("MainTabs", {
-            screen: "FeedTab",
-            params: {
-              openCreatePost: true,
-              attachmentToShare: {
-                type: currentItem.tipo === "planeaciones" ? "planeacion" : "recurso",
-                url: `planearia://${currentItem.tipo}/${(currentItem.raw as any).id}`,
-                name: currentItem.titulo,
-              },
+          // El Feed vive en el hub Mas; cruce de hub con forma anidada.
+          navigateToHub(navigation, "MasTab", "Feed", {
+            openCreatePost: true,
+            attachmentToShare: {
+              type: currentItem.tipo === "planeaciones" ? "planeacion" : "recurso",
+              url: `planearia://${currentItem.tipo}/${(currentItem.raw as any).id}`,
+              name: currentItem.titulo,
             },
           });
           break;

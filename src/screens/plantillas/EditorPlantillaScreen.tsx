@@ -14,7 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { COLORS } from "../../../types";
 import { useEditorPlantillaViewModel } from "../../hooks/useEditorPlantillaViewModel";
 import { isWeb } from "../../utils/responsive";
@@ -37,7 +37,7 @@ const TIPO_OPTIONS: TipoOption[] = [
 ];
 
 const EditorPlantillaScreen: React.FC = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<StackNavigationProp<AppRoutesParamList>>();
   const vm = useEditorPlantillaViewModel();
 
   return (

@@ -18,9 +18,9 @@ import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { useTheme } from "../../context/ThemeContext";
 import { usePosts } from "../../context/PostsContext";
 import { Post, PostComment } from "../../../types";
-import { RootStackParamList } from "../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../navigation/StackNavigator";
 
-type PostDetailRouteProp = RouteProp<RootStackParamList, "PostDetail">;
+type PostDetailRouteProp = RouteProp<AppRoutesParamList, "PostDetail">;
 
 /* Helper */
 function getTimeAgo(dateStr: string): string {

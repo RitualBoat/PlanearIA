@@ -15,13 +15,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { useAlumnos } from "../../context/AlumnosContext";
 import type { Alumno } from "../../../types";
 import WebScrollView from "../../components/WebScrollView";
 import { COLORS } from "../../../types";
 
-type Nav = StackNavigationProp<RootStackParamList, "ListaAlumnos">;
+type Nav = StackNavigationProp<AppRoutesParamList, "ListaAlumnos">;
 
 const ListaAlumnosScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();

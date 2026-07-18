@@ -10,12 +10,12 @@ import { useAsistencias } from "../../context/AsistenciaContext";
 import { useGrupos } from "../../hooks/useGrupos";
 import { COLORS } from "../../../types";
 import type { Alumno, Asistencia } from "../../../types";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 
 type EstadoAsistencia = "presente" | "retardo" | "ausente";
 
-type Nav = StackNavigationProp<RootStackParamList, "RegistrarAsistencia">;
-type Route = RouteProp<RootStackParamList, "RegistrarAsistencia">;
+type Nav = StackNavigationProp<AppRoutesParamList, "RegistrarAsistencia">;
+type Route = RouteProp<AppRoutesParamList, "RegistrarAsistencia">;
 
 interface Props {
   navigation: Nav;

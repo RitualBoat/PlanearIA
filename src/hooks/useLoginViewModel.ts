@@ -2,12 +2,12 @@ import { useState, useCallback } from "react";
 import { Platform, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import type { LoginFormData } from "../../types";
 import { useAuth } from "../context/AuthContext";
 import logger from "../utils/logger";
 
-type Nav = StackNavigationProp<RootStackParamList, "Login">;
+type Nav = StackNavigationProp<AppRoutesParamList, "Login">;
 
 export interface LoginViewModel {
   formData: LoginFormData;

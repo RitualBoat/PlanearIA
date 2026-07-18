@@ -14,6 +14,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import AnimatedTopPill from "../../components/AnimatedTopPill";
 import { useTheme } from "../../context/ThemeContext";
+import { navigateToHub } from "../../navigation/navigateToHub";
 
 interface FAQItemProps {
   pregunta: string;
@@ -144,7 +145,7 @@ export const AyudaScreen: React.FC = () => {
             <Pressable
               style={({ pressed }) => [styles.supportCard, pressed && { opacity: 0.8 }]}
               onPress={() => {
-                navigation.navigate("MainTabs", { screen: "SocialTab" });
+                navigateToHub(navigation, "MasTab", "Social");
               }}
             >
               <View style={[styles.supportIconWrap, { backgroundColor: colors.purpleTint }]}>

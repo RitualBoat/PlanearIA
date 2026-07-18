@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { Alert, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import { usePlaneaciones } from "../context/PlaneacionesContext";
 import {
   NivelAcademico,
@@ -12,7 +12,7 @@ import {
 } from "../../types/planeacionV2";
 import { NivelAcademico as NivelAcademicoLegacy } from "../../types/planeacionLegacy";
 
-type Nav = StackNavigationProp<RootStackParamList, "ListaPlaneaciones">;
+type Nav = StackNavigationProp<AppRoutesParamList, "ListaPlaneaciones">;
 
 type SyncStatus = "idle" | "syncing" | "synced" | "error" | "offline";
 

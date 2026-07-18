@@ -4,12 +4,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES, Tarea } from "../../../types";
 import { useEntregables } from "../../context/EntregablesContext";
 import { useGruposContext } from "../../context/GruposContext";
 
-type Nav = StackNavigationProp<RootStackParamList>;
+type Nav = StackNavigationProp<AppRoutesParamList>;
 
 type FiltroTipo = "todos" | "tarea" | "examen" | "proyecto";
 

@@ -4,7 +4,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { Alumno, ComentarioAlumno } from "../../types";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import {
   parseArray,
   syncComentarioRemoto,
@@ -15,8 +15,8 @@ import {
 const COMENTARIOS_STORAGE_KEY = "@planearia:comentarios_alumno";
 const ALUMNOS_STORAGE_KEY = "@planearia:alumnos";
 
-type Nav = StackNavigationProp<RootStackParamList, "NotasAlumno">;
-type Route = RouteProp<RootStackParamList, "NotasAlumno">;
+type Nav = StackNavigationProp<AppRoutesParamList, "NotasAlumno">;
+type Route = RouteProp<AppRoutesParamList, "NotasAlumno">;
 
 export type EstadoNotasAlumno = "loading" | "success" | "empty" | "error";
 export type FiltroNotasAlumno = "todas" | "recientes" | "importantes";

@@ -17,10 +17,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../../types";
 import type { Recurso } from "../../../types";
 import { useRecursos } from "../../context/RecursosContext";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 
-type Navigation = StackNavigationProp<RootStackParamList>;
-type Route = RouteProp<RootStackParamList, "DetalleRecursoClassroom">;
+type Navigation = StackNavigationProp<AppRoutesParamList>;
+type Route = RouteProp<AppRoutesParamList, "DetalleRecursoClassroom">;
 
 interface ClassroomAttachment {
   label: string;

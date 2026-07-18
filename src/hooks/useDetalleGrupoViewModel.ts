@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RouteProp } from "@react-navigation/native";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import { useGruposContext } from "../context/GruposContext";
 import type {
   Alumno,
@@ -20,9 +20,10 @@ import { classroomRepository } from "../services/classroom/classroomRepository";
 import { useAddStudentsModal } from "./useAddStudentsModal";
 import { useRemoveStudentModal } from "./useRemoveStudentModal";
 import { useGrupoNotas } from "./useGrupoNotas";
+import { navigateToHub } from "../navigation/navigateToHub";
 
-type Nav = StackNavigationProp<RootStackParamList, "DetalleGrupo">;
-type Route = RouteProp<RootStackParamList, "DetalleGrupo">;
+type Nav = StackNavigationProp<AppRoutesParamList, "DetalleGrupo">;
+type Route = RouteProp<AppRoutesParamList, "DetalleGrupo">;
 
 export type TabType =
   | "alumnos"
@@ -257,9 +258,10 @@ export const useDetalleGrupoViewModel = (): DetalleGrupoViewModel => {
   }, [navigation, grupoId]);
 
   const navigateAsignarDeBiblioteca = useCallback(() => {
-    navigation.navigate("MainTabs", {
-      screen: "ContenidoTab",
-      params: { selectionMode: true, targetGroupId: String(grupoId) },
+    // La biblioteca vive en el hub Office; cruce de hub con forma anidada.
+    navigateToHub(navigation, "OfficeTab", "Contenido", {
+      selectionMode: true,
+      targetGroupId: String(grupoId),
     });
   }, [navigation, grupoId]);
 

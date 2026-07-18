@@ -3,7 +3,7 @@ import { Alert, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import { API_CONFIG } from "../sync/config/apiConfig";
 import { useAuth } from "../context/AuthContext";
 import { usePlaneaciones } from "../context/PlaneacionesContext";
@@ -23,7 +23,7 @@ import {
 } from "../../types/planeacionV2";
 import type { PlantillaDocumento, SeccionPlantilla } from "../../types/plantillaDocumento";
 
-type Nav = StackNavigationProp<RootStackParamList, "CrearPlaneacion">;
+type Nav = StackNavigationProp<AppRoutesParamList, "CrearPlaneacion">;
 
 type TemplateSource = "base" | "predeterminada" | "guardada" | "online";
 

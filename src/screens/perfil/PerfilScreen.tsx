@@ -15,7 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
-import { RootStackParamList } from "../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { useAuth } from "../../context/AuthContext";
 import { usePlaneaciones } from "../../context/PlaneacionesContext";
 import { useGruposContext } from "../../context/GruposContext";
@@ -25,7 +25,7 @@ import Toast, { type ToastConfig } from "../../components/Toast";
 import ExpandedStatsModal, { type ExpandedStatsData } from "../../components/ExpandedStatsModal";
 import { getRoleLabel } from "../../../types";
 
-type Nav = StackNavigationProp<RootStackParamList>;
+type Nav = StackNavigationProp<AppRoutesParamList>;
 
 /* ── Skeleton shimmer (loading state) ── */
 const ShimmerBlock: React.FC<{

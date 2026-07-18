@@ -16,11 +16,11 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { usePlantillas } from "../../context/PlantillasContext";
 import type { Plantilla } from "../../../types";
 
-type Nav = StackNavigationProp<RootStackParamList>;
+type Nav = StackNavigationProp<AppRoutesParamList>;
 
 // ─── Design tokens (Stitch 3.5.1) ───
 const DT = {

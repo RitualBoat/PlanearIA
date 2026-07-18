@@ -14,11 +14,11 @@ import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../../types";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 import AnimatedTopPill from "../../components/AnimatedTopPill";
 import { useClassroomHomeViewModel } from "../../hooks/classroom/useClassroomHomeViewModel";
 
-type Navigation = StackNavigationProp<RootStackParamList>;
+type Navigation = StackNavigationProp<AppRoutesParamList>;
 type HomeTab = "cursos" | "calendario" | "pendientes";
 
 const HOME_TABS: { key: HomeTab; label: string; icon: keyof typeof MaterialIcons.glyphMap }[] = [
@@ -90,7 +90,7 @@ const ClassroomHomeScreen: React.FC = () => {
         <View style={styles.heroActions}>
           <Pressable
             style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.6 }]}
-            onPress={() => navigation.navigate("CrearGrupo", { returnToClassroom: true })}
+            onPress={() => navigation.navigate("CrearGrupo")}
           >
             <MaterialIcons name="add" size={20} color="#FFFFFF" />
             <Text style={styles.primaryButtonText}>Crear clase</Text>
@@ -165,7 +165,7 @@ const ClassroomHomeScreen: React.FC = () => {
             <View style={styles.emptyActions}>
               <Pressable
                 style={({ pressed }) => [styles.primaryButton, pressed && { opacity: 0.6 }]}
-                onPress={() => navigation.navigate("CrearGrupo", { returnToClassroom: true })}
+                onPress={() => navigation.navigate("CrearGrupo")}
               >
                 <Text style={styles.primaryButtonText}>Crear grupo</Text>
               </Pressable>

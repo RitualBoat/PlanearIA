@@ -4,15 +4,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
-import { RootStackParamList } from "../../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../../types";
 import WebScrollView from "../../../components/WebScrollView";
 import { useEntregables } from "../../../context/EntregablesContext";
 import { useGruposContext } from "../../../context/GruposContext";
 
-type DetalleTareaScreenNavigationProp = StackNavigationProp<RootStackParamList, "DetalleTarea">;
+type DetalleTareaScreenNavigationProp = StackNavigationProp<AppRoutesParamList, "DetalleTarea">;
 
-type DetalleTareaScreenRouteProp = RouteProp<RootStackParamList, "DetalleTarea">;
+type DetalleTareaScreenRouteProp = RouteProp<AppRoutesParamList, "DetalleTarea">;
 
 interface DetalleTareaScreenProps {
   navigation: DetalleTareaScreenNavigationProp;

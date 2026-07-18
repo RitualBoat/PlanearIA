@@ -2,13 +2,14 @@ import { useState, useCallback, useEffect } from "react";
 import { Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import { useEntregables } from "../context/EntregablesContext";
+import { goBackOrHubLanding } from "../navigation/navigateToHub";
 import { useGruposContext } from "../context/GruposContext";
 import type { Tarea } from "../../types";
 import logger from "../utils/logger";
 
-type Nav = StackNavigationProp<RootStackParamList, "CrearTareaGrupo">;
+type Nav = StackNavigationProp<AppRoutesParamList, "CrearTareaGrupo">;
 
 type TipoTarea = "tarea" | "examen" | "proyecto" | "investigacion";
 
@@ -81,7 +82,6 @@ export const useCrearTareaGrupoViewModel = (
   grupoId: number,
   entregableId?: number,
   unidadId?: string,
-  returnToClassroom = false,
 ): CrearTareaGrupoViewModel => {
   const navigation = useNavigation<Nav>();
   const { crearEntregable, actualizarEntregable, eliminarEntregable, obtenerEntregablePorId } =
@@ -199,11 +199,9 @@ export const useCrearTareaGrupoViewModel = (
           "El entregable se guardó localmente. Se sincronizará cuando haya conexión."
         );
       }
-      if (returnToClassroom) {
-        navigation.navigate("ClassroomGroup", { grupoId });
-      } else {
-        navigation.goBack();
-      }
+      // El origen (ClassroomGroup u otra pantalla del hub Clases) esta en el
+      // historial del stack; regresar a el sustituye al antiguo parametro de retorno.
+      goBackOrHubLanding(navigation, "ClasesTab");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "No se pudo guardar el entregable";
       Alert.alert("Error", msg);
@@ -216,7 +214,6 @@ export const useCrearTareaGrupoViewModel = (
     tipo,
     grupoId,
     unidadId,
-    returnToClassroom,
     valor,
     fechaAsignacion,
     fechaEntrega,

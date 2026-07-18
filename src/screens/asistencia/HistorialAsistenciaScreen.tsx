@@ -8,10 +8,10 @@ import WebScrollView from "../../components/WebScrollView";
 import { useAsistencias } from "../../context/AsistenciaContext";
 import { useGrupos } from "../../hooks/useGrupos";
 import { COLORS } from "../../../types";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 
-type Nav = StackNavigationProp<RootStackParamList, "HistorialAsistencia">;
-type Route = RouteProp<RootStackParamList, "HistorialAsistencia">;
+type Nav = StackNavigationProp<AppRoutesParamList, "HistorialAsistencia">;
+type Route = RouteProp<AppRoutesParamList, "HistorialAsistencia">;
 
 interface Props {
   navigation: Nav;

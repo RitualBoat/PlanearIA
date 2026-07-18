@@ -3,12 +3,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import { usePlaneaciones } from "../context/PlaneacionesContext";
 import { useAuth } from "../context/AuthContext";
 import { buildPlaneacionDocumentoBase } from "../utils/createPlaneacionDocumentoBase";
 import { buildDocumentoFromPlantilla, getPlantillaDocumento } from "../services/plantillaDocumentoService";
 import { buildContenidoRawFromDocumento, ensureDocumentoContenidoRaw } from "../utils/docEditorTemplate";
+import { navigateToHub } from "../navigation/navigateToHub";
 import type {
   ElementosCurriculares,
   Firma,
@@ -20,8 +21,8 @@ import type {
 } from "../../types/planeacionV2";
 import { NivelAcademico } from "../../types/planeacionV2";
 
-type DocEditorNav = StackNavigationProp<RootStackParamList, "DocEditor">;
-type DocEditorRoute = RouteProp<RootStackParamList, "DocEditor">;
+type DocEditorNav = StackNavigationProp<AppRoutesParamList, "DocEditor">;
+type DocEditorRoute = RouteProp<AppRoutesParamList, "DocEditor">;
 
 export type DocSectionId =
   | "info_institucional"
@@ -251,9 +252,8 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
       setIsDirty(false);
       setDraftSavedAt(getNow());
       if (options?.salir) {
-        navigation.navigate("MainTabs", {
-          screen: "ContenidoTab",
-        });
+        // DocEditor vive en la raiz; la biblioteca, dentro del hub Office.
+        navigateToHub(navigation, "OfficeTab", "Contenido");
       }
     } finally {
       setIsSaving(false);

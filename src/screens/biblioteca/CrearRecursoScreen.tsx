@@ -13,12 +13,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
 import { useCrearRecursoViewModel } from "../../hooks/useCrearRecursoViewModel";
+import { goBackOrHubLanding } from "../../navigation/navigateToHub";
 
-type Nav = StackNavigationProp<RootStackParamList, "CrearRecurso">;
-type Route = RouteProp<RootStackParamList, "CrearRecurso">;
+type Nav = StackNavigationProp<AppRoutesParamList, "CrearRecurso">;
+type Route = RouteProp<AppRoutesParamList, "CrearRecurso">;
 
 const ORIGEN_OPTIONS: { key: "manual" | "ia"; label: string; icon: string }[] = [
   { key: "manual", label: "Propio", icon: "folder" },
@@ -31,7 +32,6 @@ const CrearRecursoScreen: React.FC = () => {
   const recursoId = route.params?.recursoId;
   const grupoId = route.params?.grupoId;
   const unidadId = route.params?.unidadId;
-  const returnToClassroom = route.params?.returnToClassroom;
   const vm = useCrearRecursoViewModel(recursoId, grupoId, unidadId);
 
   const [tagInput, setTagInput] = useState("");
@@ -47,12 +47,9 @@ const CrearRecursoScreen: React.FC = () => {
     const saved = await vm.handleGuardar();
     if (!saved) return;
 
-    if (returnToClassroom && grupoId) {
-      navigation.navigate("ClassroomGroup", { grupoId });
-      return;
-    }
-
-    navigation.goBack();
+    // El origen (Classroom en el hub Clases o la biblioteca en Office) esta en
+    // el historial; regresar a el sustituye al antiguo parametro de retorno.
+    goBackOrHubLanding(navigation, "OfficeTab");
   };
 
   const getFileIcon = (fileName?: string): string => {

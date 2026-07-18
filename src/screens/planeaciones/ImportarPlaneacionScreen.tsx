@@ -16,7 +16,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { COLORS } from "../../../types";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { usePlaneaciones } from "../../context/PlaneacionesContext";
 import {
   buildPlaneacionFromImportDraft,
@@ -24,7 +24,7 @@ import {
   type PlaneacionImportDraft,
 } from "../../services/planeacionImportService";
 
-type Nav = StackNavigationProp<RootStackParamList, "ImportarPlaneacion">;
+type Nav = StackNavigationProp<AppRoutesParamList, "ImportarPlaneacion">;
 
 const ImportarPlaneacionScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();

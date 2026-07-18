@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { onIncomingLink, ParsedInvite } from "../services/inviteLinkService";
+import { navigateToHub } from "../navigation/navigateToHub";
 import { useContactos } from "../context/ContactosContext";
 import { useAuth } from "../context/AuthContext";
 
@@ -31,8 +32,9 @@ export function useDeepLinkHandler() {
       }
 
       if (!parsed.fromUserId) {
-        // Navigate to BuscadorPerfiles as fallback
-        navigation.navigate("BuscadorPerfiles");
+        // Fallback: el buscador vive dentro del hub Mas; este hook corre en la
+        // raiz, asi que el destino necesita la forma anidada.
+        navigateToHub(navigation, "MasTab", "BuscadorPerfiles");
         return;
       }
 
@@ -51,7 +53,7 @@ export function useDeepLinkHandler() {
           "Se ha enviado la solicitud de conexión automáticamente.",
           [{ text: "OK" }]
         );
-        navigation.navigate("MainTabs", { screen: "SocialTab" });
+        navigateToHub(navigation, "MasTab", "Social");
       });
     });
 

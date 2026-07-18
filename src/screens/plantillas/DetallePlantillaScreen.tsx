@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { COLORS, FONT_SIZES } from "../../../types";
 import { usePlantillas } from "../../context/PlantillasContext";
 import { isWeb } from "../../utils/responsive";
@@ -20,8 +20,8 @@ const TIPO_META: Record<string, { label: string; icon: string; color: string }> 
 };
 
 const DetallePlantillaScreen: React.FC = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const route = useRoute<RouteProp<RootStackParamList, "DetallePlantilla">>();
+  const navigation = useNavigation<StackNavigationProp<AppRoutesParamList>>();
+  const route = useRoute<RouteProp<AppRoutesParamList, "DetallePlantilla">>();
   const { obtenerPlantillaPorId, eliminarPlantilla } = usePlantillas();
 
   const plantilla = obtenerPlantillaPorId(route.params.plantillaId);

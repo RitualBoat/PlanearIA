@@ -5,13 +5,13 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 import WebScrollView from "../../components/WebScrollView";
 import { useAlumnos } from "../../context/AlumnosContext";
 import { COLORS } from "../../../types";
 
-type Nav = StackNavigationProp<RootStackParamList, "DetalleAlumno">;
-type Route = RouteProp<RootStackParamList, "DetalleAlumno">;
+type Nav = StackNavigationProp<AppRoutesParamList, "DetalleAlumno">;
+type Route = RouteProp<AppRoutesParamList, "DetalleAlumno">;
 
 const DetalleAlumnoScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();

@@ -14,7 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { COLORS, Plantilla } from "../../../types";
 import { useListaPlantillasViewModel } from "../../hooks/useListaPlantillasViewModel";
 import { isWeb } from "../../utils/responsive";
@@ -31,8 +31,8 @@ const FILTER_OPTIONS = [
 const ListaPlantillasScreen: React.FC = () => {
   const { width } = useBreakpoint();
   const wideLayout = width >= 920;
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const route = useRoute<RouteProp<RootStackParamList, "ListaPlantillas">>();
+  const navigation = useNavigation<StackNavigationProp<AppRoutesParamList>>();
+  const route = useRoute<RouteProp<AppRoutesParamList, "ListaPlantillas">>();
   const initialCategoria = route.params?.filtroCategoria;
 
   const vm = useListaPlantillasViewModel(initialCategoria);

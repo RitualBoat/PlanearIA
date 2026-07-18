@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import { Alert } from "react-native";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import { useMensajes } from "../context/MensajesContext";
 import { usePlaneaciones } from "../context/PlaneacionesContext";
 import { useRecursos } from "../context/RecursosContext";
@@ -41,8 +41,8 @@ export interface ConversacionViewModel {
 }
 
 export const useConversacionViewModel = (): ConversacionViewModel => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const route = useRoute<RouteProp<RootStackParamList, "Conversacion">>();
+  const navigation = useNavigation<StackNavigationProp<AppRoutesParamList>>();
+  const route = useRoute<RouteProp<AppRoutesParamList, "Conversacion">>();
   const conversacionId = route.params?.conversacionId;
 
   const {

@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import { useMensajes } from "../context/MensajesContext";
 import { Conversacion } from "../../types";
 
@@ -30,7 +30,7 @@ export interface ChatViewModel {
 }
 
 export const useChatViewModel = (): ChatViewModel => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<StackNavigationProp<AppRoutesParamList>>();
   const { conversaciones, isLoading, error, eliminarConversacion, refreshMensajes } = useMensajes();
 
   const [searchQuery, setSearchQuery] = useState("");

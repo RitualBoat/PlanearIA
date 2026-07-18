@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Alert } from "react-native";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../navigation/StackNavigator";
+import { AppRoutesParamList } from "../navigation/StackNavigator";
 import { usePlantillas } from "../context/PlantillasContext";
 import type { Plantilla } from "../../types";
 
@@ -28,8 +28,8 @@ export interface ContenidoPlantilla {
 }
 
 export function useEditorPlantillaViewModel() {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const route = useRoute<RouteProp<RootStackParamList, "EditorPlantilla">>();
+  const navigation = useNavigation<StackNavigationProp<AppRoutesParamList>>();
+  const route = useRoute<RouteProp<AppRoutesParamList, "EditorPlantilla">>();
   const plantillaId = route.params?.plantillaId;
   const isEditMode = plantillaId != null;
 

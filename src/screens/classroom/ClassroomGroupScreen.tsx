@@ -20,7 +20,7 @@ import type { StackNavigationProp } from "@react-navigation/stack";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../../types";
 import type { Alumno, Recurso, Tarea } from "../../../types";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { useAlumnos } from "../../context/AlumnosContext";
 import {
   type ClassroomContentItem,
@@ -33,8 +33,8 @@ import {
   type ResumirProgresoResultado,
 } from "../../services/classroom/classroomAiService";
 
-type Navigation = StackNavigationProp<RootStackParamList>;
-type Route = RouteProp<RootStackParamList, "ClassroomGroup">;
+type Navigation = StackNavigationProp<AppRoutesParamList>;
+type Route = RouteProp<AppRoutesParamList, "ClassroomGroup">;
 type ClassroomTab = "tablon" | "trabajo" | "personas";
 
 const CLASSROOM_TABS: { key: ClassroomTab; label: string }[] = [

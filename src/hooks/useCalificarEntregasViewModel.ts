@@ -4,14 +4,14 @@ import { Alert, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { Alumno, EntregaTarea } from "../../types";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import { useAlumnos } from "../context/AlumnosContext";
 import { useEntregables } from "../context/EntregablesContext";
 import { CLASSROOM_STORAGE_KEYS } from "../services/classroom/classroomStorage";
 import { sugerirRetroalimentacionClassroom } from "../services/classroom/classroomAiService";
 import logger from "../utils/logger";
 
-type Nav = StackNavigationProp<RootStackParamList, "CalificarEntregas">;
+type Nav = StackNavigationProp<AppRoutesParamList, "CalificarEntregas">;
 
 interface Calificacion {
   alumnoId: number;

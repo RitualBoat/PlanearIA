@@ -19,12 +19,12 @@ import type { StackNavigationProp } from "@react-navigation/stack";
 import WebScrollView from "../../components/WebScrollView";
 import CarreraSelector from "../../components/CarreraSelector";
 import { useCrearAlumnoViewModel, type CarreraOption } from "../../hooks/useCrearAlumnoViewModel";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { useAlumnos } from "../../context/AlumnosContext";
 import { COLORS } from "../../../types";
 
-type Nav = StackNavigationProp<RootStackParamList, "CrearAlumno">;
-type Route = RouteProp<RootStackParamList, "CrearAlumno">;
+type Nav = StackNavigationProp<AppRoutesParamList, "CrearAlumno">;
+type Route = RouteProp<AppRoutesParamList, "CrearAlumno">;
 
 type SaveViewState = "form" | "success" | "sync-error";
 

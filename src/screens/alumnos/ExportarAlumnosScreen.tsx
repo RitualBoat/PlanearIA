@@ -3,7 +3,7 @@ import { Alert, Platform, Pressable, StatusBar, StyleSheet, Text, View } from "r
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute, type RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import WebScrollView from "../../components/WebScrollView";
 import { useAlumnos } from "../../context/AlumnosContext";
@@ -13,8 +13,8 @@ import {
   type AlumnoExportFormat,
 } from "../../services/alumnoExportService";
 
-type Nav = StackNavigationProp<RootStackParamList, "ExportarAlumnos">;
-type Route = RouteProp<RootStackParamList, "ExportarAlumnos">;
+type Nav = StackNavigationProp<AppRoutesParamList, "ExportarAlumnos">;
+type Route = RouteProp<AppRoutesParamList, "ExportarAlumnos">;
 
 const FORMAT_OPTIONS: { key: AlumnoExportFormat; label: string; icon: string; desc: string }[] = [
   {

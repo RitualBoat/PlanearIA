@@ -5,11 +5,11 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { COLORS, FONT_SIZES } from "../../../../types";
 import WebScrollView from "../../../components/WebScrollView";
-import { RootStackParamList } from "../../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../../navigation/StackNavigator";
 import { useCalificarEntregasViewModel } from "../../../hooks/useCalificarEntregasViewModel";
 
 const CalificarEntregasScreen: React.FC = () => {
-  const route = useRoute<RouteProp<RootStackParamList, "CalificarEntregas">>();
+  const route = useRoute<RouteProp<AppRoutesParamList, "CalificarEntregas">>();
   const {
     tareaId,
     grupoId,

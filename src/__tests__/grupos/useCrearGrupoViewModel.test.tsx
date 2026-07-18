@@ -3,6 +3,7 @@ import { useCrearGrupoViewModel } from "../../hooks/useCrearGrupoViewModel";
 
 const mockNavigate = jest.fn();
 const mockGoBack = jest.fn();
+const mockCanGoBack = jest.fn();
 const mockAgregarGrupo = jest.fn();
 const mockActualizarGrupo = jest.fn();
 const mockObtenerGrupo = jest.fn();
@@ -12,6 +13,7 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({
     navigate: mockNavigate,
     goBack: mockGoBack,
+    canGoBack: mockCanGoBack,
   }),
   useRoute: () => ({
     params: mockRouteParams,
@@ -33,6 +35,7 @@ describe("useCrearGrupoViewModel", () => {
     mockAgregarGrupo.mockResolvedValue(undefined);
     mockActualizarGrupo.mockResolvedValue(undefined);
     mockObtenerGrupo.mockReturnValue(undefined);
+    mockCanGoBack.mockReturnValue(true);
   });
 
   it("valida campos requeridos antes de guardar", async () => {
@@ -73,7 +76,33 @@ describe("useCrearGrupoViewModel", () => {
         estado: "activo",
       })
     );
-    expect(mockNavigate).toHaveBeenCalledWith("ListaGrupos");
+    // Con la pantalla dentro del stack de Clases, guardar regresa al origen real.
+    expect(mockGoBack).toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("sin historial (deep link), guardar aterriza en el landing del hub Clases", async () => {
+    mockCanGoBack.mockReturnValue(false);
+    const { result } = renderHook(() => useCrearGrupoViewModel());
+
+    act(() => {
+      result.current.setNombre("7A - Matemáticas Avanzadas");
+      result.current.setMateria("Matemáticas Avanzadas");
+      result.current.setCarrera("ISC");
+      result.current.setSemestre("7");
+      result.current.setPeriodo("Enero-Junio 2026");
+      result.current.setHorario("Lun-Mie-Vie 7:00-9:00");
+    });
+
+    await act(async () => {
+      await result.current.handleCrearGrupo();
+    });
+
+    expect(mockGoBack).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith("MainTabs", {
+      screen: "ClasesTab",
+      params: { screen: "ClassroomHome", params: undefined },
+    });
   });
 
   it("precarga datos en modo editar y actualiza grupo", async () => {
@@ -116,6 +145,6 @@ describe("useCrearGrupoViewModel", () => {
       })
     );
     expect(mockAgregarGrupo).not.toHaveBeenCalled();
-    expect(mockNavigate).toHaveBeenCalledWith("ListaGrupos");
+    expect(mockGoBack).toHaveBeenCalled();
   });
 });

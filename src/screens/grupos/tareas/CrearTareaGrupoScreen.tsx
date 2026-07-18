@@ -16,7 +16,7 @@ import { COLORS, FONT_SIZES } from "../../../../types";
 import WebScrollView from "../../../components/WebScrollView";
 import { useCrearTareaGrupoViewModel } from "../../../hooks/useCrearTareaGrupoViewModel";
 import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../../navigation/StackNavigator";
 
 let DateTimePicker: React.ComponentType<any> | null = null;
 try {
@@ -30,13 +30,12 @@ try {
  * Diseño basado en Stitch screenshots — coincide con el diseño de Figma
  */
 const CrearTareaGrupoScreen: React.FC = () => {
-  const route = useRoute<RouteProp<RootStackParamList, "CrearTareaGrupo">>();
+  const route = useRoute<RouteProp<AppRoutesParamList, "CrearTareaGrupo">>();
   const navigation = useNavigation();
   const vm = useCrearTareaGrupoViewModel(
     route.params.grupoId,
     route.params.entregableId,
-    route.params.unidadId,
-    route.params.returnToClassroom
+    route.params.unidadId
   );
 
   const isExamen = vm.tipo === "examen";

@@ -30,7 +30,9 @@ interface ChildrenProps {
   children: React.ReactNode;
 }
 
-const AppShell: React.FC<ChildrenProps> = ({ children }) => (
+// Antes se llamaba AppShell; se renombra para ceder el nombre al shell de
+// navegacion (src/navigation/AppShell.tsx), que es lo que el plan llama AppShell.
+const AppProviders: React.FC<ChildrenProps> = ({ children }) => (
   <SafeAreaProvider>
     <ThemeProvider>
       <FontSizeProvider>
@@ -96,11 +98,11 @@ const App: React.FC = () => {
   if (!migrated) return null;
 
   return (
-    <AppShell>
+    <AppProviders>
       <DataProviders>
         <MainNavigation />
       </DataProviders>
-    </AppShell>
+    </AppProviders>
   );
 };
 export default App;

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import type { Calificacion } from "../../types";
 import {
   calcularEstadisticasAlumno,
@@ -11,8 +11,8 @@ import {
 import { classroomRepository } from "../services/classroom/classroomRepository";
 import { exportarReporteAlumno } from "../services/reportesExportService";
 
-type Nav = StackNavigationProp<RootStackParamList, "ReportesAlumno">;
-type Route = RouteProp<RootStackParamList, "ReportesAlumno">;
+type Nav = StackNavigationProp<AppRoutesParamList, "ReportesAlumno">;
+type Route = RouteProp<AppRoutesParamList, "ReportesAlumno">;
 
 export type PeriodoReporteAlumno = "Semana" | "Mes" | "Bimestre" | "Personalizado";
 export type EstadoReporteAlumno = "loading" | "success" | "empty" | "error";

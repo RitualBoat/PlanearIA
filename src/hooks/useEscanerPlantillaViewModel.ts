@@ -3,7 +3,7 @@ import { Alert, Platform } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import { useAuth } from "../context/AuthContext";
 import {
   extractRawTextFromImportedFile,
@@ -14,7 +14,7 @@ import { savePlantillaDocumento } from "../services/plantillaDocumentoService";
 import { NivelAcademico } from "../../types/planeacionV2";
 import type { PlantillaDocumento } from "../../types/plantillaDocumento";
 
-type Nav = StackNavigationProp<RootStackParamList, "EscanerPlantilla">;
+type Nav = StackNavigationProp<AppRoutesParamList, "EscanerPlantilla">;
 type PasoEscaner = 1 | 2 | 3 | 4 | 5;
 
 const showMessage = (title: string, message: string) => {

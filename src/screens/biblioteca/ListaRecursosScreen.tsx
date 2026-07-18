@@ -18,7 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system/legacy";
-import { RootStackParamList } from "../../navigation/StackNavigator";
+import { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { COLORS, Recurso } from "../../../types";
 import { useListaRecursosViewModel } from "../../hooks/useListaRecursosViewModel";
 import { isWeb } from "../../utils/responsive";
@@ -51,8 +51,8 @@ const formatTimeAgo = (date: Date): string => {
 const ListaRecursosScreen: React.FC = () => {
   const { width } = useBreakpoint();
   const wideLayout = width >= 920;
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const route = useRoute<RouteProp<RootStackParamList, "ListaRecursos">>();
+  const navigation = useNavigation<StackNavigationProp<AppRoutesParamList>>();
+  const route = useRoute<RouteProp<AppRoutesParamList, "ListaRecursos">>();
   const initialFiltro = route.params?.filtroTipo;
 
   const vm = useListaRecursosViewModel(initialFiltro);

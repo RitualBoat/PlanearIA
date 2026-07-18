@@ -21,10 +21,10 @@ import { COLORS } from "../../../types";
 import type { Recurso, Tarea } from "../../../types";
 import { useEntregables } from "../../context/EntregablesContext";
 import { useRecursos } from "../../context/RecursosContext";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 
-type Navigation = StackNavigationProp<RootStackParamList>;
-type Route = RouteProp<RootStackParamList, "AgregarContenidoClassroom">;
+type Navigation = StackNavigationProp<AppRoutesParamList>;
+type Route = RouteProp<AppRoutesParamList, "AgregarContenidoClassroom">;
 type AssignmentKind = "material" | "actividad";
 
 interface UploadedFile {

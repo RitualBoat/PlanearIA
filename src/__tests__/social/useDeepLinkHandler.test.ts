@@ -89,7 +89,11 @@ describe("useDeepLinkHandler", () => {
     mockInitialUrl = "planearia://invite/tok-789";
     renderHook(() => useDeepLinkHandler());
 
-    expect(mockNavigate).toHaveBeenCalledWith("BuscadorPerfiles");
+    // El buscador vive en el hub Mas: el hook corre en la raiz y usa forma anidada.
+    expect(mockNavigate).toHaveBeenCalledWith("MainTabs", {
+      screen: "MasTab",
+      params: { screen: "BuscadorPerfiles", params: undefined },
+    });
     expect(mockEnviarSolicitud).not.toHaveBeenCalled();
   });
 

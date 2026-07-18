@@ -19,10 +19,10 @@ import { useCalificaciones } from "../../context/CalificacionesContext";
 import { useGrupos } from "../../hooks/useGrupos";
 import { COLORS } from "../../../types";
 import type { Alumno, Calificacion } from "../../../types";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 
-type Nav = StackNavigationProp<RootStackParamList, "CapturarCalificaciones">;
-type Route = RouteProp<RootStackParamList, "CapturarCalificaciones">;
+type Nav = StackNavigationProp<AppRoutesParamList, "CapturarCalificaciones">;
+type Route = RouteProp<AppRoutesParamList, "CapturarCalificaciones">;
 
 interface Props {
   navigation: Nav;

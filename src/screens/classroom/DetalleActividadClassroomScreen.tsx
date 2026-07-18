@@ -21,11 +21,11 @@ import { COLORS } from "../../../types";
 import type { Alumno, EntregaTarea } from "../../../types";
 import { useAlumnos } from "../../context/AlumnosContext";
 import { useEntregables } from "../../context/EntregablesContext";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { CLASSROOM_STORAGE_KEYS } from "../../services/classroom/classroomStorage";
 
-type Navigation = StackNavigationProp<RootStackParamList>;
-type Route = RouteProp<RootStackParamList, "DetalleActividadClassroom">;
+type Navigation = StackNavigationProp<AppRoutesParamList>;
+type Route = RouteProp<AppRoutesParamList, "DetalleActividadClassroom">;
 
 interface DraftCalificacion {
   calificacion: string;

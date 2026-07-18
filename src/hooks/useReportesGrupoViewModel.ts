@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../navigation/StackNavigator";
 import {
   calcularEstadisticasGrupo,
   type EstadisticasGrupo,
@@ -10,8 +10,8 @@ import {
 import { classroomRepository } from "../services/classroom/classroomRepository";
 import { exportarReporteGrupoPDF } from "../services/reportesExportService";
 
-type Nav = StackNavigationProp<RootStackParamList, "ReportesGrupo">;
-type Route = RouteProp<RootStackParamList, "ReportesGrupo">;
+type Nav = StackNavigationProp<AppRoutesParamList, "ReportesGrupo">;
+type Route = RouteProp<AppRoutesParamList, "ReportesGrupo">;
 
 export type PeriodoReporte = "Semana" | "Mes" | "Bimestre" | "Personalizado";
 export type EstadoReporte = "loading" | "success" | "empty" | "error";

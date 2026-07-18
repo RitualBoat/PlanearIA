@@ -3,7 +3,7 @@ import { Pressable, StatusBar, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute, type RouteProp } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RootStackParamList } from "../../navigation/StackNavigator";
+import type { AppRoutesParamList } from "../../navigation/StackNavigator";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import WebScrollView from "../../components/WebScrollView";
 import ErrorStage from "../../components/alumnos/importar/ErrorStage";
@@ -15,8 +15,8 @@ import { styles } from "../../components/alumnos/importar/styles";
 import { useImportarAlumnosViewModel } from "../../hooks/useImportarAlumnosViewModel";
 import { COLORS } from "../../../types";
 
-type Nav = StackNavigationProp<RootStackParamList, "ImportarAlumnos">;
-type Route = RouteProp<RootStackParamList, "ImportarAlumnos">;
+type Nav = StackNavigationProp<AppRoutesParamList, "ImportarAlumnos">;
+type Route = RouteProp<AppRoutesParamList, "ImportarAlumnos">;
 
 interface ImportarAlumnosScreenProps {
   navigation: Nav;

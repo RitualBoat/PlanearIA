@@ -63,8 +63,8 @@ No se renombran por estetica: el historial y los enlaces existentes tienen prior
 
 | Estado | Milestones | Regla operativa |
 | --- | --- | --- |
-| Cerrados historicos | `Ciclo 0 - Reorientacion y GitHub`, `Ciclo 1 - Plan Classroom`, `Ciclo 2 - Fundacion Classroom`, `Ciclo 3 - Infraestructura Local y CI`, `Readiness Ola 0` | Mantener sus issues como evidencia; reabrir solo si una referencia activa fue omitida. |
-| Activos o diferidos | `Ciclo 3 - UX/Navegacion Global`, `Ciclo 4 - Auth y Seguridad`, `Readiness Gate M` | Conservar abiertos mientras el plan UX/UI, el cierre Auth o los gates #46/#47 sigan vigentes. |
+| Cerrados historicos | `Ciclo 0 - Reorientacion y GitHub`, `Ciclo 1 - Plan Classroom`, `Ciclo 2 - Fundacion Classroom`, `Ciclo 3 - Infraestructura Local y CI`, `Readiness Ola 0`, `UX/UI Ola 0 - Fundaciones` | Mantener sus issues como evidencia; reabrir solo si una referencia activa fue omitida. |
+| Activos o diferidos | `Ciclo 3 - UX/Navegacion Global`, `UX/UI Ola 1 - Shell y componentes`, `Ciclo 4 - Auth y Seguridad`, `Readiness Gate M` | Conservar abiertos mientras el plan UX/UI, el cierre Auth o los gates #46/#47 sigan vigentes. `Ciclo 3 - UX/Navegacion Global` agrupa el trabajo transversal del plan UX/UI (ver "Seguimiento del plan UX/UI"). |
 
 Antes de una mutacion, capturar `Project`, issues y milestones; repetir la consulta
 despues. Si el estado cambia de forma concurrente, detenerse y revisar la decision en vez
@@ -104,6 +104,35 @@ La issue [#66](https://github.com/RitualBoat/PlanearIA/issues/66) es deuda opera
 post-Ola 0: conserva `Backlog`, no recibe el milestone cerrado de Ola 0 y no se cierra
 por normalizar Product OS. Sus hallazgos de doctor/GitNexus y compatibilidad Expo se
 resuelven mediante changes OpenSpec futuros e independientes.
+
+### Seguimiento del plan UX/UI
+
+Convencion adoptada el 2026-07-17 (decision DA1/OQ-A de la auditoria #76, resuelta en
+[#89](https://github.com/RitualBoat/PlanearIA/issues/89) via el change `product-os-epic-uxui`).
+Es la plantilla reutilizable para todas las olas del plan
+`Documentacion/01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md`.
+
+- **Epic unico del plan.** [`[Plan Maestro] UX/UI y Navegacion Global` #101](https://github.com/RitualBoat/PlanearIA/issues/101)
+  (labels `epic`, `ux-ui`, `plan-maestro`) agrupa como sub-issues nativos todos los issues del
+  plan, ola por ola. La vista Roadmap se agrupa por parent issue. No se crea un epic por ola.
+- **Milestone por ola, nomenclatura `UX/UI Ola N - <nombre de la ola en el plan>`.** Los nombres
+  se toman literalmente del plan (`Fundaciones`, `Shell y componentes`, `Nucleo visible`,
+  `Experiencias nucleo`, `Resto de la suite`). El prefijo `UX/UI` los distingue de los `Ciclo N`
+  historicos.
+- **Creacion lazy.** Un milestone de ola se crea solo cuando la ola esta activa o es la siguiente
+  inmediata; no se crean por adelantado. Al cerrar una ola sin issues abiertos, su milestone se
+  cierra como registro historico (`UX/UI Ola 0 - Fundaciones` ya esta cerrado con #78-#80).
+- **Transversales en `Ciclo 3 - UX/Navegacion Global`.** El trabajo del plan que no pertenece a una
+  ola concreta (hitos pre-Ola 2, QA visual, ground truth, decisiones y dependencias) usa este
+  milestone existente, que **no se renombra**. Hoy agrupa #85, #86, #87, #88 y #89.
+- **Pasos al activar una ola futura:** (1) crear el milestone `UX/UI Ola N - <nombre>`; (2) asignarlo
+  a los issues de esa ola; (3) enlazarlos como sub-issues del epic #101 (GraphQL `addSubIssue`);
+  (4) al cerrarse la ola sin pendientes, cerrar su milestone. Capturar snapshot antes y despues,
+  operar de forma idempotente y no renombrar ni borrar milestones existentes.
+
+Estado inicial tras el change `product-os-epic-uxui` (2026-07-17): epic #101 con #78-#89 como
+sub-issues; `UX/UI Ola 0 - Fundaciones` cerrado (#78-#80); `UX/UI Ola 1 - Shell y componentes`
+abierto (#81-#84); `Ciclo 3 - UX/Navegacion Global` con #85-#89.
 
 Ejemplo recomendado para Classroom:
 

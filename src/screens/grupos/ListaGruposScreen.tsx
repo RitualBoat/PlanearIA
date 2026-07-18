@@ -7,8 +7,8 @@ import {
   StatusBar,
   TextInput,
   ActivityIndicator,
-  useWindowDimensions,
 } from "react-native";
+import { useBreakpoint } from "../../hooks/useBreakpoint";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -26,7 +26,7 @@ interface ListaGruposScreenProps {
 }
 
 const ListaGruposScreen: React.FC<ListaGruposScreenProps> = ({ navigation }) => {
-  const { width } = useWindowDimensions();
+  const { width } = useBreakpoint();
   const wideLayout = width >= 920;
 
   const {

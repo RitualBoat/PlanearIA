@@ -1,3 +1,5 @@
+import type { Breakpoint } from "../hooks/useBreakpoint";
+
 export interface ColorTokens {
   primary: string;
   primaryDark: string;
@@ -76,12 +78,20 @@ export type DaltonismoMode = "none" | "protanopia" | "deuteranopia" | "tritanopi
  * Entrada de las fabricas de estilos `getStyles({ ... })`.
  *
  * Es un objeto y no parametros posicionales porque el change `breakpoints-reactivos`
- * agregara `width` a este contrato: con un objeto puede hacerlo sin reabrir ni reordenar
- * las llamadas de cada archivo ya migrado. El plan UX/UI exige tocar cada archivo una sola vez.
+ * agrego la dimension a este contrato sin reabrir ni reordenar las llamadas de cada
+ * archivo ya migrado. El plan UX/UI exige tocar cada archivo una sola vez.
+ *
+ * `breakpoint` es opcional a proposito: se entrega como bucket reactivo (no como ancho
+ * crudo) para que una fabrica themeada dependiente de ancho lo memoize por rango, no por
+ * pixel. Es opcional para no forzar a las fabricas themeadas que no usan ancho a cambiar
+ * su firma. La fuente del valor es `useBreakpoint()`; `useAppTheme` no lo provee, asi que
+ * una pantalla que necesite tema + ancho compone ambos hooks:
+ * `getStyles({ ...useAppTheme(), breakpoint })`.
  */
 export interface ThemedStylesInput {
   colors: ColorTokens;
   isDark: boolean;
   scaled: (baseSize: number) => number;
   highContrast: boolean;
+  breakpoint?: Breakpoint;
 }

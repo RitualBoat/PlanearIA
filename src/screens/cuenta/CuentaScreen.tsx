@@ -10,8 +10,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  useWindowDimensions,
 } from "react-native";
+import { useBreakpoint } from "../../hooks/useBreakpoint";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
@@ -89,7 +89,7 @@ const StarRow: React.FC<{ count: number }> = ({ count }) => (
 );
 
 const CuentaScreen: React.FC = () => {
-  const { width } = useWindowDimensions();
+  const { width } = useBreakpoint();
   const wideLayout = width >= 1080;
   const navigation = useNavigation();
   const [scrollY] = React.useState(() => new Animated.Value(0));

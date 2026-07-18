@@ -9,8 +9,8 @@ import {
   Modal,
   Pressable,
   Alert,
-  useWindowDimensions,
 } from "react-native";
+import { useBreakpoint } from "../../hooks/useBreakpoint";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { RouteProp, useRoute } from "@react-navigation/native";
@@ -49,7 +49,7 @@ const formatTimeAgo = (date: Date): string => {
 };
 
 const ListaRecursosScreen: React.FC = () => {
-  const { width } = useWindowDimensions();
+  const { width } = useBreakpoint();
   const wideLayout = width >= 920;
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, "ListaRecursos">>();

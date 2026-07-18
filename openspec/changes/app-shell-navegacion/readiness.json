@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "issue": 81,
+  "change": "app-shell-navegacion",
+  "surfaces": ["ui"],
+  "validations": [],
+  "evidence": [
+    { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/81" },
+    { "id": "pr-link", "ref": "PENDIENTE: PR generado por opsx:finish tras archive." },
+    { "id": "adversarial-review", "ref": "PENDIENTE: revision adversarial independiente antes de archive (tarea 7.6)." },
+    { "id": "web-http-200", "ref": "PENDIENTE: levantar expo start --web y confirmar HTTP 200 antes de navegar (tarea 7.1)." },
+    { "id": "playwright-breakpoints", "ref": "PENDIENTE: capturas en movil 375, tablet 768 y escritorio 1280, mas los limites 767 y 1279 (tarea 7.2)." },
+    { "id": "nielsen", "ref": "PENDIENTE: checklist Nielsen del shell sin severidad >= 3 y checklist anti-slop 1.9.3 en evidencia/README.md (tarea 7.4)." }
+  ],
+  "rollback": {
+    "strategy": "El change es capa de presentacion. Crea src/navigation/AppShell.tsx, AppTopBar.tsx, navigateToHub.ts, los stacks de hub y la pantalla placeholder de Escritorio; reescribe StackNavigator.tsx, sustituye AppTabsNavigator.tsx, elimina src/components/FloatingActionIcons.tsx y toca los 6 archivos acoplados a returnToClassroom mas los 9 sitios que navegan a tabs y las 4 llamadas cruzadas entre experiencias. No modifica almacenamiento, esquema, contratos de sync, backend, configuracion remota ni proyecto nativo: las claves @planearia:*, HAS_SEEN_ONBOARDING y las preferencias de accesibilidad se leen y escriben igual antes y despues, y SYNC_ENTITIES no se toca. Revertir el commit del PR restaura la navegacion previa sin migracion de datos ni perdida local. Desactivacion parcial sin revertir todo: devolver el destino inicial del shell a la tab legacy restaura el landing anterior conservando la jerarquia de hubs, y forzar tabBarPosition bottom a todo ancho degrada el shell adaptativo a barra inferior unica sin romper ninguna ruta."
+  },
+  "adversarialReview": {
+    "ref": "PENDIENTE: se registra el veredicto tras la revision adversarial de la tarea 7.6, antes de archive."
+  },
+  "exceptions": []
+}

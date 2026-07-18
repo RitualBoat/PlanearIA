@@ -5,7 +5,9 @@
   "surfaces": [
     "ui"
   ],
-  "validations": [],
+  "validations": [
+    "openspec-strict"
+  ],
   "evidence": [
     {
       "id": "issue-link",

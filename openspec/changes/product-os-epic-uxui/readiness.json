@@ -8,7 +8,7 @@
     { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/89" },
     { "id": "pr-link", "ref": "PENDIENTE: PR generado por opsx:finish tras archive." },
     { "id": "adversarial-review", "ref": "PENDIENTE: revision adversarial previa a archive." },
-    { "id": "docs-verification", "ref": "PENDIENTE: verificacion de docs y snapshots pre/post apply en evidencia/." }
+    { "id": "docs-verification", "ref": "Snapshots pre/post apply en evidencia/snapshot-pre-apply.md y snapshot-post-apply.md (2026-07-17): epic #101 con 12 sub-issues; milestones UX/UI Ola 0 (#10, cerrado, #78-#80) y Ola 1 (#11, abierto, #81-#84); Ciclo 3 con #85-#89 sin renombrar; idempotencia verificada; milestones/issues ajenos intactos. Docs actualizadas: GITHUB_PRODUCT_OS.md (seccion Seguimiento del plan UX/UI + tabla de milestones) y decisiones-abiertas.md (fila DA1 RESUELTA). openspec validate --all --strict y agent:harness:check en verde." }
   ],
   "rollback": {
     "strategy": "Todas las mutaciones de GitHub son reversibles sin borrar evidencia: quitar la asignacion de milestone de #78-#89, quitar los parentescos de sub-issue, cerrar los milestones nuevos UX/UI Ola 0/1 con nota de reversion (no borrarlos) y cerrar el epic con comentario de reversion. Los cambios documentales (GITHUB_PRODUCT_OS.md y decisiones-abiertas.md) se revierten con git revert del commit del PR. No se toca codigo, datos ni configuracion de la app; no hay estado que migrar. Los milestones Ciclo 3, Ciclo 4 y Readiness Gate M y los issues #35, #42, #46 y #47 no se modifican, por lo que no requieren reversion."

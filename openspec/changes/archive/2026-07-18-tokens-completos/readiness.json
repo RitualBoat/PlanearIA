@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "issue": 80,
+  "change": "tokens-completos",
+  "surfaces": ["ui"],
+  "validations": ["openspec-strict"],
+  "evidence": [
+    { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/80" },
+    { "id": "pr-link", "ref": "PENDIENTE: PR generado por opsx:finish tras archive." },
+    { "id": "adversarial-review", "ref": "Revision adversarial 2026-07-17 (verificacion previa a archive): PASS CON HUECOS. Sin blockers ni majors. 3 minors/preguntas rastreados y mitigados: (1) el barrel tokens.ts arrastra reanimated y AccessibilityPreferencesContext, mitigado porque los modulos estaticos (spacing/radii/zIndex) siguen importables sin contexto; (2) el test de escala ascendente de spacing depende del orden de Object.values, aceptable para una constante; (3) el mock de reanimated del preset no incluye useReducedMotion, pero el test del hook mockea reanimated y produccion usa el export real. Verificado que el change es puramente aditivo (diff vacio en los 4 contextos, types.ts, App.tsx y package.json) y sin regresion (98 suites / 646 tests)." },
+    { "id": "web-http-200", "ref": "La preview de tokens (evidencia/tokens-preview.html) se cargo y renderizo en el Browser pane sin errores de consola en los tres breakpoints (2026-07-17)." },
+    { "id": "playwright-breakpoints", "ref": "QA por breakpoint de la preview de tokens (evidencia/README.md): medicion DOM/estilos computados (el screenshot del harness agota tiempo, misma limitacion que #79). Reflujo del grid: 1 columna a 375, 2 a 768, 3 a 1280. Tipografia en tamanos base exactos (display 40/800, title 29/800, heading 22/700); elevacion difiere claro (rgba(0,93,168,0.06)) vs oscuro (rgba(0,0,0,0.2)); z-index [0..1600] ascendente; espaciado 4-48. Nota: no se migra ninguna pantalla; la superficie visible del change es la preview. Complementado por 18 tests deterministas." },
+    { "id": "nielsen", "ref": "Checklist Nielsen acotado en evidencia/README.md (consistencia, reconocimiento vs recuerdo, accesibilidad de reduce-motion, sin regresion); se adjunta al issue #80 en el cierre." }
+  ],
+  "rollback": {
+    "strategy": "El change es puramente aditivo: agrega modulos de token en src/themes/ (spacing, radii, typography, elevation, motion, zIndex), el barrel tokens.ts, el hook useReducedMotionPreference y sus pruebas. Ninguna pantalla los consume, asi que no hay superficie que regresione. Revertir el commit del PR elimina los archivos nuevos sin tocar almacenamiento, esquema, configuracion remota ni proyecto nativo. No se modifica ningun contexto: useReducedMotionPreference solo lee el reduceMotion existente de AccessibilityPreferencesContext, y las claves de AsyncStorage (APP_REDUCE_MOTION y las de preferencias) y las legacy @planearia:* no se leen ni escriben distinto; un revert no altera preferencias guardadas. Desactivacion parcial: al no haber consumidores, basta con no importar un grupo de token concreto, sin revertir el resto. No se instala expo-blur ni fuente de marca, asi que no hay dependencia nueva que desinstalar."
+  },
+  "adversarialReview": {
+    "ref": "Revision adversarial independiente 2026-07-17, veredicto PASS CON HUECOS: sin blockers ni majors; 3 minors/preguntas rastreados y mitigados. Cambio puramente aditivo, contratos y contextos intactos, sin regresion. Detalle en el campo evidence adversarial-review."
+  },
+  "exceptions": []
+}

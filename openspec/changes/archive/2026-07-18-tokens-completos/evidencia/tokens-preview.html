@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Preview de tokens - PlanearIA (tokens-completos #80)</title>
+<style>
+  :root {
+    --bg: #eef3fa; --surface: #ffffff; --text: #1e2a3a; --muted: #5c6e86;
+    --border: #e3eaf4; --primary: #1676d2; --primary-tint: #eaf4ff;
+    --shadow-blue: rgba(0,93,168,0.06); --shadow-blue-lift: rgba(0,93,168,0.12);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 24px; }
+  header h1 { margin: 0 0 4px; font-size: 22px; }
+  header p { margin: 0; color: var(--muted); font-size: 14px; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px;
+    display: grid; grid-template-columns: 1fr; gap: 16px; }
+  /* tablet 768-1279: dos columnas */
+  @media (min-width: 768px) { main { grid-template-columns: 1fr 1fr; } }
+  /* web >=1280: tres columnas */
+  @media (min-width: 1280px) { main { grid-template-columns: 1fr 1fr 1fr; } }
+  section { background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px; }
+  section h2 { margin: 0 0 12px; font-size: 13px; letter-spacing: 0.5px;
+    text-transform: uppercase; color: var(--primary); font-weight: 700; }
+  .row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .tag { font-size: 12px; color: var(--muted); min-width: 92px;
+    font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
+  .bar { height: 12px; background: var(--primary); border-radius: 4px; }
+  .radius-box { width: 64px; height: 48px; background: var(--primary-tint);
+    border: 2px solid var(--primary); }
+  .swatch { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+  .type-sample { margin-bottom: 6px; }
+  .elev-card { height: 56px; background: var(--surface); border-radius: 12px;
+    border: 1px solid var(--border); margin-bottom: 16px;
+    display: flex; align-items: center; padding: 0 14px; font-size: 13px;
+    color: var(--muted); }
+  .dark-wrap { background: #0f1419; border-radius: 12px; padding: 16px; }
+  .dark-wrap .elev-card { background: #1e252e; border-color: #2e3a48; color: #a0b0c4; }
+  .dark-wrap .elev-card.l1 { box-shadow: 0px 1px 3px rgba(0,0,0,0.2); }
+  .dark-wrap .elev-card.l2 { box-shadow: 0px 4px 12px rgba(0,0,0,0.2); }
+  .dark-wrap .elev-card.l3 { box-shadow: 0px 10px 24px rgba(0,0,0,0.35); }
+  .l1 { box-shadow: 0px 1px 3px var(--shadow-blue); }
+  .l2 { box-shadow: 0px 4px 12px var(--shadow-blue); }
+  .l3 { box-shadow: 0px 10px 24px var(--shadow-blue-lift); }
+  .note { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  code { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 12px; }
+  .full { grid-column: 1 / -1; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Sistema de tokens - PlanearIA</h1>
+  <p>Change <code>tokens-completos</code> (issue #80). Espejo fiel de los valores definidos en <code>src/themes/</code>. Reacomoda a 1 / 2 / 3 columnas en movil / tablet / escritorio.</p>
+</header>
+<main>
+  <section>
+    <h2>Espaciado (ritmo 4pt)</h2>
+    <div class="row"><span class="tag">xs · 4</span><div class="bar" style="width:4px"></div></div>
+    <div class="row"><span class="tag">sm · 8</span><div class="bar" style="width:8px"></div></div>
+    <div class="row"><span class="tag">md · 12</span><div class="bar" style="width:12px"></div></div>
+    <div class="row"><span class="tag">lg · 16</span><div class="bar" style="width:16px"></div></div>
+    <div class="row"><span class="tag">xl · 24</span><div class="bar" style="width:24px"></div></div>
+    <div class="row"><span class="tag">xxl · 32</span><div class="bar" style="width:32px"></div></div>
+    <div class="row"><span class="tag">xxxl · 48</span><div class="bar" style="width:48px"></div></div>
+    <p class="note">Valores no cero multiplos de 4, escala ascendente.</p>
+  </section>
+
+  <section>
+    <h2>Radios (8/12/16/pill)</h2>
+    <div class="swatch">
+      <div style="text-align:center"><div class="radius-box" style="border-radius:8px"></div><span class="tag">sm · 8</span></div>
+      <div style="text-align:center"><div class="radius-box" style="border-radius:12px"></div><span class="tag">md · 12</span></div>
+      <div style="text-align:center"><div class="radius-box" style="border-radius:16px"></div><span class="tag">lg · 16</span></div>
+      <div style="text-align:center"><div class="radius-box" style="border-radius:9999px"></div><span class="tag">pill · 9999</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Z-index (nombrado, ascendente)</h2>
+    <div class="row"><span class="tag">base</span><code>0</code></div>
+    <div class="row"><span class="tag">raised</span><code>1</code></div>
+    <div class="row"><span class="tag">dropdown</span><code>1000</code></div>
+    <div class="row"><span class="tag">sticky</span><code>1100</code></div>
+    <div class="row"><span class="tag">banner</span><code>1200</code></div>
+    <div class="row"><span class="tag">overlay</span><code>1300</code></div>
+    <div class="row"><span class="tag">modal</span><code>1400</code></div>
+    <div class="row"><span class="tag">toast</span><code>1500</code></div>
+    <div class="row"><span class="tag">tooltip</span><code>1600</code></div>
+  </section>
+
+  <section class="full">
+    <h2>Tipografia (base) y escalado por FontSizeContext</h2>
+    <div style="display:grid; grid-template-columns:1fr; gap:16px">
+      <div>
+        <p class="note">Base (medium, factor 1)</p>
+        <div class="type-sample" style="font-size:40px;line-height:44px;font-weight:800;letter-spacing:-0.5px">display 40/44</div>
+        <div class="type-sample" style="font-size:29px;line-height:34px;font-weight:800;letter-spacing:-0.45px">title 29/34</div>
+        <div class="type-sample" style="font-size:22px;line-height:28px;font-weight:700">heading 22/28</div>
+        <div class="type-sample" style="font-size:18px;line-height:24px;font-weight:600">subtitle 18/24</div>
+        <div class="type-sample" style="font-size:15px;line-height:20px;font-weight:400">body 15/20</div>
+        <div class="type-sample" style="font-size:13px;line-height:18px;font-weight:400">caption 13/18</div>
+        <div class="type-sample" style="font-size:11px;line-height:16px;font-weight:600;letter-spacing:0.5px">OVERLINE 11/16</div>
+      </div>
+      <div>
+        <p class="note">xlarge (factor 1.4): fontSize y lineHeight escalan; peso e interletrado se conservan</p>
+        <div class="type-sample" style="font-size:56px;line-height:62px;font-weight:800;letter-spacing:-0.5px">display 56/62</div>
+        <div class="type-sample" style="font-size:41px;line-height:48px;font-weight:800;letter-spacing:-0.45px">title 41/48</div>
+        <div class="type-sample" style="font-size:21px;line-height:28px;font-weight:400">body 21/28</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Elevacion - tema claro</h2>
+    <div class="elev-card l1">level1 · 0 1 3</div>
+    <div class="elev-card l2">level2 · 0 4 12</div>
+    <div class="elev-card l3">level3 · 0 10 24</div>
+    <p class="note">Sombra azul tenue (<code>shadowBlue</code>/<code>shadowBlueLift</code>).</p>
+  </section>
+
+  <section>
+    <h2>Elevacion - tema oscuro</h2>
+    <div class="dark-wrap">
+      <div class="elev-card l1">level1 · 0 1 3</div>
+      <div class="elev-card l2">level2 · 0 4 12</div>
+      <div class="elev-card l3">level3 · 0 10 24</div>
+    </div>
+    <p class="note">Mismo nivel, color de sombra del tema oscuro: la elevacion es theme-aware.</p>
+  </section>
+
+  <section>
+    <h2>Movimiento</h2>
+    <div class="row"><span class="tag">instant</span><code>0 ms</code></div>
+    <div class="row"><span class="tag">fast</span><code>150 ms</code></div>
+    <div class="row"><span class="tag">base</span><code>250 ms</code></div>
+    <div class="row"><span class="tag">slow</span><code>400 ms</code></div>
+    <p class="note">springs: standard / gentle / snappy. Todos con <code>reduceMotion: ReduceMotion.System</code>. Primitiva de decision: <code>useReducedMotionPreference()</code> = SO (reanimated) OR in-app.</p>
+  </section>
+</main>
+</body>
+</html>

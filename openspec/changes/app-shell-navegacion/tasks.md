@@ -54,5 +54,5 @@ Validacion base del change: `npm run typecheck`, `npm run lint -- --quiet`, `npm
 - [x] 7.3 Recorrido de alcance: verificar que `FeedScreen`, `SocialScreen`, `ContenidoScreen`, `CuentaScreen` y `ClassroomHomeScreen` siguen alcanzables desde los nuevos hubs; registrar el recorrido. (Evidencia: evidencia/README.md seccion 4; Contenido, ClassroomHome, Feed, Social y Cuenta alcanzables desde los hubs.)
 - [x] 7.4 Checklist Nielsen del shell sin severidad >= 3 y checklist anti-slop de la seccion 1.9.3, en `evidencia/README.md`. (Evidencia: evidencia/README.md secciones 8 y 9; Nielsen severidad maxima 0; anti-slop 7/7.)
 - [x] 7.5 Actualizar `TLDR.md` si el alcance, los archivos o el comportamiento cambiaron durante la implementacion. (Evidencia: TLDR.md actualizado a tiempo pasado; design.md ampliado con los archivos reales y la nota de tipado.)
-- [ ] 7.6 Revision adversarial independiente y registro de su veredicto en `readiness.json`.
+- [x] 7.6 Revision adversarial independiente y registro de su veredicto en `readiness.json`. (Evidencia: veredicto PASS CON HUECOS registrado en readiness.json; Major cerrado con crossHubReachability.test.ts verificado por mutacion; 2 minors rastreados.)
 - [ ] 7.7 `npm run openspec:ready:archive -- --change app-shell-navegacion --run-local` en PASS.

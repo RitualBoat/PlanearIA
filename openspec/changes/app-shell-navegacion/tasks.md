@@ -49,10 +49,10 @@ Validacion base del change: `npm run typecheck`, `npm run lint -- --quiet`, `npm
 
 ## 7. Validacion visual y cierre
 
-- [ ] 7.1 Levantar `expo start --web`, confirmar HTTP 200 y solo entonces navegar con Playwright.
-- [ ] 7.2 Capturas por breakpoint (movil 375, tablet 768, escritorio 1280) mas los limites 767 y 1279, guardadas en `evidencia/`.
-- [ ] 7.3 Recorrido de alcance: verificar que `FeedScreen`, `SocialScreen`, `ContenidoScreen`, `CuentaScreen` y `ClassroomHomeScreen` siguen alcanzables desde los nuevos hubs; registrar el recorrido.
-- [ ] 7.4 Checklist Nielsen del shell sin severidad >= 3 y checklist anti-slop de la seccion 1.9.3, en `evidencia/README.md`.
-- [ ] 7.5 Actualizar `TLDR.md` si el alcance, los archivos o el comportamiento cambiaron durante la implementacion.
+- [x] 7.1 Levantar `expo start --web`, confirmar HTTP 200 y solo entonces navegar con Playwright. (Evidencia: expo-web via launch.json; curl HTTP 200 confirmado antes de navegar; evidencia/README.md seccion 1.)
+- [x] 7.2 Capturas por breakpoint (movil 375, tablet 768, escritorio 1280) mas los limites 767 y 1279, guardadas en `evidencia/`. (Evidencia: evidencia/capturas/ en 375/767/768/1279/1280 + medicion DOM; tablists=1 en todos los anchos.)
+- [x] 7.3 Recorrido de alcance: verificar que `FeedScreen`, `SocialScreen`, `ContenidoScreen`, `CuentaScreen` y `ClassroomHomeScreen` siguen alcanzables desde los nuevos hubs; registrar el recorrido. (Evidencia: evidencia/README.md seccion 4; Contenido, ClassroomHome, Feed, Social y Cuenta alcanzables desde los hubs.)
+- [x] 7.4 Checklist Nielsen del shell sin severidad >= 3 y checklist anti-slop de la seccion 1.9.3, en `evidencia/README.md`. (Evidencia: evidencia/README.md secciones 8 y 9; Nielsen severidad maxima 0; anti-slop 7/7.)
+- [x] 7.5 Actualizar `TLDR.md` si el alcance, los archivos o el comportamiento cambiaron durante la implementacion. (Evidencia: TLDR.md actualizado a tiempo pasado; design.md ampliado con los archivos reales y la nota de tipado.)
 - [ ] 7.6 Revision adversarial independiente y registro de su veredicto en `readiness.json`.
 - [ ] 7.7 `npm run openspec:ready:archive -- --change app-shell-navegacion --run-local` en PASS.

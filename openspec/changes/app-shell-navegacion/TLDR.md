@@ -12,9 +12,9 @@ Un solo navegador de pestanas que cambia de sitio segun el ancho: barra abajo en
 
 Al abrir la app aterriza en su Escritorio, no en un feed. En el telefono ve cinco pestanas abajo; en la tablet, un rail; en la computadora, una barra lateral con nombres, y al cambiar el tamano de la ventana la barra se transforma sin perder donde estaba. Cada experiencia recuerda su propio recorrido. Al guardar un grupo, tarea o recurso vuelve exactamente de donde salio. Las notificaciones, la ayuda y su cuenta viven arriba, sin taparle el trabajo, con botones comodos. Todo respeta tema oscuro, tamano de letra, daltonismo y reducir movimiento, y sigue funcionando sin conexion.
 
-## Como lo vamos a hacer (Tasks)
+## Como lo hicimos (Tasks)
 
-Siete bloques en orden. Primero se quita una colision de nombres y se congela el inventario de rutas como evidencia. Luego se define el contrato de navegacion tipado. Despues se construye el shell adaptativo con su barra superior, y sobre el los cinco hubs con sus pantallas anidadas. Enseguida se migran las llamadas: los nueve sitios que apuntan a las pestanas viejas, las cuatro llamadas que cruzan de una experiencia a otra, y la eliminacion del parametro que recordaba el origen y del menu flotante. Cierran las pruebas y la validacion visual por breakpoint con checklist de usabilidad.
+Siete bloques en orden. Primero se quito una colision de nombres y se congelo el inventario de rutas como evidencia. Luego se definio el contrato de navegacion tipado. Despues se construyo el shell adaptativo con su barra superior, y sobre el los cinco hubs con sus pantallas anidadas. Enseguida se migraron las llamadas: los nueve sitios que apuntaban a las pestanas viejas, las cuatro que cruzan de una experiencia a otra, y la eliminacion del parametro que recordaba el origen y del menu flotante. Cerraron las pruebas y la validacion visual por breakpoint con checklist de usabilidad.
 
 ## Resumen integral
 

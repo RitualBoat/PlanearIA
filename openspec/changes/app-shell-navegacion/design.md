@@ -102,6 +102,22 @@ Para no repetir literales fragiles en esos sitios, el change expone un modulo `s
 
 Se anade un test de guardia que afirma la particion: toda ruta declarada como propiedad de un hub esta registrada en ese hub y en ningun otro, y ninguna ruta de la raiz aparece dentro de un hub. Asi la regla deja de depender de la memoria de quien edite despues.
 
+**Archivos reales de la implementacion** (nombres finales tras apply):
+
+| Archivo | Rol |
+| --- | --- |
+| `src/navigation/types.ts` | Param lists de la raiz y de los cinco hubs, mas `AppRoutesParamList` (catalogo plano para el tipado de las pantallas ya existentes) |
+| `src/navigation/routeManifest.ts` | Manifiesto de la particion en valores, con chequeos de compilacion bidireccionales contra los param lists |
+| `src/navigation/shellOptions.ts` | `getShellNavigationOptions(breakpoint, reduceMotion)`, aislada de las pantallas para poder testear la regla de una sola barra sin montar los hubs |
+| `src/navigation/AppShell.tsx` | El navegador de tabs adaptativo |
+| `src/navigation/AppTopBar.tsx` | Chrome superior |
+| `src/navigation/navigateToHub.ts` | `navigateToHub` y `goBackOrHubLanding` |
+| `src/navigation/stacks/*.tsx` | Los cinco stacks de hub; cada uno registra sus pantallas desde un `Record` exhaustivo por tipo |
+
+La cadena de garantia es: `Record` exhaustivo de registro por stack -> param list del hub -> manifiesto (atado por tipos en ambas direcciones) -> test de guardia sobre el manifiesto. Una ruta registrada en el hub equivocado, olvidada o duplicada rompe `npm run typecheck` o el test, no la navegacion en produccion.
+
+Nota de tipado: las 55 pantallas y ViewModels ya existentes tipaban su navegacion contra el antiguo `RootStackParamList` plano. Se conservan con el catalogo `AppRoutesParamList` (interseccion de todos los param lists) en vez de reescribir cada archivo contra su hub: la alcanzabilidad real la gobiernan los navegadores y su test de guardia, no ese tipo, y reescribirlos habria sido churn sin valor dentro de un change que ya es el mas delicado de navegacion. Codigo nuevo dentro de un hub debe tipar contra el param list de su hub.
+
 ### 3.3 Que pasa con las pantallas legacy
 
 Criterio de aceptacion del plan: "pantallas actuales siguen accesibles desde los nuevos hubs; migracion por reapuntado, sin borrar rutas".

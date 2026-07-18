@@ -75,6 +75,9 @@ const AppShell: React.FC = () => {
           tabBarActiveBackgroundColor: colors.primaryTint,
           tabBarStyle: isMobile
             ? {
+                // Altura explicita: sin ella el default del navegador recorta
+                // las etiquetas bajo el icono (verificado en QA Playwright 375).
+                height: 64,
                 backgroundColor: colors.surface,
                 borderTopWidth: 1,
                 borderTopColor: highContrast ? colors.borderStrong : colors.border,

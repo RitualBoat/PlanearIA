@@ -11,7 +11,12 @@ import {
 } from "react-native";
 
 import { COLORS, FONT_SIZES } from "../../../types";
-import { isWeb, responsive } from "../../utils/responsive";
+import { isWeb } from "../../utils/responsive";
+import {
+  useBreakpoint,
+  resolveResponsive,
+  type Breakpoint,
+} from "../../hooks/useBreakpoint";
 import { useLoginViewModel } from "../../hooks/useLoginViewModel";
 
 const loginImage = require("../../../assets/PlanearIA.png");
@@ -32,6 +37,11 @@ const LoginScreen: React.FC = () => {
     handleLoginDesarrollador,
     isDevMode,
   } = useLoginViewModel();
+
+  // Fuente reactiva unica del ancho: al rotar o redimensionar, `breakpoint` cambia y
+  // `getStyles` se recalcula, en vez de quedar clavado en el valor tomado al importar.
+  const { breakpoint } = useBreakpoint();
+  const styles = React.useMemo(() => getStyles(breakpoint), [breakpoint]);
 
   return (
     <KeyboardAvoidingView
@@ -129,9 +139,12 @@ const LoginScreen: React.FC = () => {
 };
 
 /**
- * Estilos del componente
+ * Estilos del componente. Es una fabrica que recibe el `breakpoint` vigente para que
+ * los tamanos dependientes de ancho se reevaluen en cada resize/rotacion. Conserva
+ * `COLORS`/`FONT_SIZES` estaticos: migrar el tema en runtime es `tokens-completos`,
+ * fuera del alcance de este change. Se exporta para poder probar el reflow por rango.
  */
-const styles = StyleSheet.create({
+export const getStyles = (breakpoint: Breakpoint) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
@@ -154,27 +167,27 @@ const styles = StyleSheet.create({
     }),
   },
   loginImage: {
-    width: responsive(120, 140, 160),
-    height: responsive(120, 140, 160),
-    marginBottom: responsive(20, 25, 30),
-    borderRadius: responsive(60, 70, 80),
+    width: resolveResponsive(breakpoint, 120, 140, 160),
+    height: resolveResponsive(breakpoint, 120, 140, 160),
+    marginBottom: resolveResponsive(breakpoint, 20, 25, 30),
+    borderRadius: resolveResponsive(breakpoint, 60, 70, 80),
   },
   title: {
-    fontSize: responsive(FONT_SIZES.xxlarge, FONT_SIZES.xxlarge + 4, FONT_SIZES.xxlarge + 8),
+    fontSize: resolveResponsive(breakpoint, FONT_SIZES.xxlarge, FONT_SIZES.xxlarge + 4, FONT_SIZES.xxlarge + 8),
     fontWeight: "bold",
     color: COLORS.primary,
     textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: responsive(FONT_SIZES.large, FONT_SIZES.large + 2, FONT_SIZES.large + 4),
+    fontSize: resolveResponsive(breakpoint, FONT_SIZES.large, FONT_SIZES.large + 2, FONT_SIZES.large + 4),
     color: COLORS.textSecondary,
     textAlign: "center",
-    marginBottom: responsive(30, 35, 40),
+    marginBottom: resolveResponsive(breakpoint, 30, 35, 40),
   },
   formContainer: {
     width: "100%",
-    maxWidth: responsive(300, 350, 380),
+    maxWidth: resolveResponsive(breakpoint, 300, 350, 380),
   },
   input: {
     height: 50,

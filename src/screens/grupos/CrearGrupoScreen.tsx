@@ -7,8 +7,8 @@ import {
   ScrollView,
   StatusBar,
   TextInput,
-  useWindowDimensions,
 } from "react-native";
+import { useBreakpoint } from "../../hooks/useBreakpoint";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { COLORS, Carrera } from "../../../types";
@@ -21,7 +21,7 @@ import { useGrupos } from "../../hooks/useGrupos";
  * Solo JSX y StyleSheet - la logica vive en useCrearGrupoViewModel
  */
 const CrearGrupoScreen: React.FC = () => {
-  const { width } = useWindowDimensions();
+  const { width } = useBreakpoint();
   const wideLayout = width >= 900;
 
   const {

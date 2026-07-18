@@ -8,8 +8,8 @@ import {
   StatusBar,
   TextInput,
   Alert,
-  useWindowDimensions,
 } from "react-native";
+import { useBreakpoint } from "../../hooks/useBreakpoint";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
@@ -29,7 +29,7 @@ const FILTER_OPTIONS = [
 ] as const;
 
 const ListaPlantillasScreen: React.FC = () => {
-  const { width } = useWindowDimensions();
+  const { width } = useBreakpoint();
   const wideLayout = width >= 920;
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, "ListaPlantillas">>();

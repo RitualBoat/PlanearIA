@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "issue": 79,
+  "change": "breakpoints-reactivos",
+  "surfaces": ["ui"],
+  "validations": ["openspec-strict"],
+  "evidence": [
+    { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/79" },
+    { "id": "pr-link", "ref": "PENDIENTE: PR generado por opsx:finish tras archive." },
+    { "id": "adversarial-review", "ref": "Revision adversarial 2026-07-17 (verificacion previa a archive): PASS CON HUECOS. Sin blockers ni majors. 2 minors rastreados: (1) la fabrica getStyles de LoginScreen emite 17 warnings react-native/no-unused-styles, falsos positivos del patron fabrica, consistentes con las fabricas de #78 (Terminos 12, Cuenta 95), 0 errores y lint --quiet en verde; (2) 4 pantallas fuera del set de 10 consumidores (EditarPerfil, BibliotecaPlantillas, ReportesGrupo, DetalleGrupo) siguen usando useWindowDimensions directo, ya reactivas, seguimiento de consistencia. Sin perdida de datos; no toca auth, userId ni sync." },
+    { "id": "web-http-200", "ref": "expo start --web (config expo-web, puerto 8081) respondio con bundle compilado y pantalla renderizada; consola sin errores. Verificado 2026-07-17." },
+    { "id": "playwright-breakpoints", "ref": "QA por breakpoint en la app real (evidencia/README.md): el mecanismo de screenshot del harness agota tiempo, asi que se midio por DOM/estilos computados (numerico y exacto). LoginScreen a 1280: logo 160x160 y titulo 32px = getStyles('desktop'). CuentaScreen (migrada): reflow en vivo sin recargar, la columna wideLayout (>=1080) aparece a 1280 y desaparece a 375 al disparar el evento resize real. Limitacion del harness documentada: resize_window (CDP) no emite el evento DOM resize (0 eventos medidos); el reflow ocurre con el evento real, equivalente a arrastrar la ventana. Complementado por 11 tests deterministas." },
+    { "id": "nielsen", "ref": "Checklist Nielsen del reflow en evidencia/README.md; se adjunta al issue #79 en el cierre." }
+  ],
+  "rollback": {
+    "strategy": "Revertir el commit del PR restaura src/utils/responsive.ts completo (responsive() y getScreenDimensions()), devuelve LoginScreen a su StyleSheet de modulo y a responsive(), y restablece los useWindowDimensions inline de los 6 mixtos; elimina src/hooks/useBreakpoint.ts y el campo opcional breakpoint de ThemedStylesInput. No hay perdida de datos: el change no toca almacenamiento, esquema, configuracion remota ni proyecto nativo, y las claves de AsyncStorage (@planearia:* y las de preferencias) no se leen ni escriben distinto. Desactivacion parcial sin revertir todo: los 6 mixtos ya eran reactivos por su cuenta, asi que revertir solo LoginScreen restaura su estado previo sin afectar al resto; y el campo breakpoint es opcional, por lo que retirarlo del tipo no rompe a las fabricas themeadas que no lo usan."
+  },
+  "adversarialReview": {
+    "ref": "Revision adversarial independiente 2026-07-17, veredicto PASS CON HUECOS: sin blockers ni majors; 2 minors rastreados y mitigados (warnings de lint del patron fabrica consistentes con #78; 4 pantallas reactivas fuera del set declarado como seguimiento). Detalle en el campo evidence adversarial-review."
+  },
+  "exceptions": []
+}

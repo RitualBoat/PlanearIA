@@ -21,7 +21,12 @@ const DIRS = [
   ".claude/skills",
   ".codex/skills",
   ".cursor/commands",
+  // Cursor y opencode reciben ademas una copia bajo skills/. Quedaron fuera de esta lista desde el
+  // inicio, asi que conservaban tanto la CLI global como la ruta de archive rota: un agente en esos
+  // harnesses leia instrucciones que el resto ya no tiene.
+  ".cursor/skills",
   ".opencode/commands",
+  ".opencode/skills",
   ".github/prompts",
 ];
 
@@ -34,6 +39,32 @@ const BARE_CLI =
   /(?<!npm exec --yes=false -- )\bopenspec (?=(?:--version|archive|config|context|doctor|instructions|list|new|show|status|store|update|validate)\b)/g;
 const GLOBAL_ALLOWED_TOOLS = /allowed-tools: Bash\(openspec:\*\)/g;
 const UNGUARDED_ALLOWED_TOOLS = /allowed-tools: Bash\(npm exec -- openspec:\*\)/g;
+// Dos defectos de la plantilla upstream de archive, ambos verificados contra el CLI fijado:
+//
+// 1. Ofrecer "Sync now (recommended)" antes de archivar garantiza el aborto posterior: la CLI aplica las
+//    mismas deltas durante el archive y falla al reencontrar una requirement ADDED ya presente
+//    (dist/core/specs-apply.js:229). El camino recomendado es el que rompe.
+// 2. `mv` manual abandona el `moveDirectory` de la CLI (dist/core/archive.js:415), que es el unico con
+//    degradacion a copy+remove ante el bloqueo de Windows sobre `specs/`.
+const SYNC_PROMPT =
+  /( *)- If changes needed: "Sync now \(recommended\)", "Archive without syncing"\r?\n *- If already synced: "Archive now", "Sync anyway", "Cancel"/g;
+const CANONICAL_SYNC_PROMPT =
+  '$1- Report the assessment only. Do NOT offer to sync before archiving: `npm run opsx:archive` classifies the sync state and picks the correct archive invocation.';
+const MANUAL_MOVE = /mv "<changeRoot>" "<planningHome\.changesDir>\/archive\/YYYY-MM-DD-<name>"/g;
+const CANONICAL_MOVE = "npm run opsx:archive -- <change-name>";
+// La rama "si el usuario elige sincronizar" queda sin sujeto cuando la opcion desaparece del prompt, y
+// el guardrail correspondiente seguiria autorizandola. Se neutralizan ambas para que el workflow no
+// conserve una ruta que ya no se ofrece.
+const SYNC_BRANCH = /If user chooses sync, use Task tool \([^)]*\)\. Proceed to archive regardless of choice\./g;
+const CANONICAL_SYNC_BRANCH =
+  "Do not sync here. `npm run opsx:archive` resolves the sync state and archives with or without applying deltas.";
+const SYNC_GUARDRAIL =
+  /- If sync is requested, use (?:the Skill tool to invoke `openspec-sync-specs`|openspec-sync-specs approach) \(agent-driven\)/g;
+const CANONICAL_SYNC_GUARDRAIL =
+  "- Do not sync main specs before archiving; the OpenSpec CLI is their only writer during archive";
+
+const CLOSURE_START = "<!-- PLANEARIA_CLOSURE_WORKFLOW -->";
+const CLOSURE_END = "<!-- /PLANEARIA_CLOSURE_WORKFLOW -->";
 const TLDR_START = "<!-- PLANEARIA_TLDR_WORKFLOW -->";
 const TLDR_END = "<!-- /PLANEARIA_TLDR_WORKFLOW -->";
 const READINESS_START = "<!-- PLANEARIA_READINESS_WORKFLOW -->";
@@ -83,6 +114,30 @@ function normalizeReadiness(value, relativePath) {
   return `${value.replace(/\s*$/, "")}\n\n${block}\n`;
 }
 
+function closureBlock() {
+  return [
+    CLOSURE_START,
+    "",
+    "### PlanearIA canonical closure order",
+    "",
+    "Archive with `npm run opsx:archive -- <change-name>`; preview with `npm run opsx:archive:dry`. That command is the single owner of this step: it guards the branch, runs the archive readiness gate, classifies whether the delta specs are already applied, delegates the spec sync and the directory move to the OpenSpec CLI, and commits the result on the change branch.",
+    "",
+    "The OpenSpec CLI is the only writer of main specs during archive. Do not run `/opsx:sync` first for a change you are about to archive: the CLI applies the same deltas and aborts when an ADDED requirement already exists. Do not move the change directory by hand; the CLI move degrades safely on Windows and a manual `mv` does not.",
+    "",
+    "Rerunning the archive is safe: an already archived and committed change reports a no-op. Close the branch afterwards with `npm run opsx:finish`, which never pushes directly to the protected target.",
+    "",
+    CLOSURE_END,
+  ].join("\n");
+}
+
+function normalizeClosure(value, relativePath) {
+  if (tldrFlow(relativePath) !== "archive") return value;
+  const block = closureBlock();
+  const marker = new RegExp(`${CLOSURE_START.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?${CLOSURE_END.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`);
+  if (marker.test(value)) return value.replace(marker, block);
+  return `${value.replace(/\s*$/, "")}\n\n${block}\n`;
+}
+
 function walk(dir) {
   const absoluteDir = path.join(ROOT, dir);
   if (!existsSync(absoluteDir)) return [];
@@ -105,12 +160,16 @@ function hasMatch(pattern, value) {
 }
 
 function normalize(value, relativePath) {
-  return normalizeReadiness(normalizeTldr(value
+  return normalizeClosure(normalizeReadiness(normalizeTldr(value
     .replace(ZOMBIE, CANONICAL_BLOCKED)
+    .replace(SYNC_PROMPT, CANONICAL_SYNC_PROMPT)
+    .replace(MANUAL_MOVE, CANONICAL_MOVE)
+    .replace(SYNC_BRANCH, CANONICAL_SYNC_BRANCH)
+    .replace(SYNC_GUARDRAIL, CANONICAL_SYNC_GUARDRAIL)
     .replace(UNGUARDED_ALLOWED_TOOLS, `allowed-tools: Bash(${LOCAL_CLI}:*)`)
     .replace(GLOBAL_ALLOWED_TOOLS, `allowed-tools: Bash(${LOCAL_CLI}:*)`)
     .replace(UNGUARDED_LOCAL_CLI, `${LOCAL_CLI} `)
-    .replace(BARE_CLI, `${LOCAL_CLI} `), relativePath), relativePath);
+    .replace(BARE_CLI, `${LOCAL_CLI} `), relativePath), relativePath), relativePath);
 }
 
 const files = DIRS.flatMap(walk);
@@ -126,9 +185,14 @@ for (const relativePath of files) {
   if (hasMatch(BARE_CLI, raw)) reasons.push("CLI global no reproducible");
   if (hasMatch(GLOBAL_ALLOWED_TOOLS, raw)) reasons.push("permiso ligado a CLI global");
   if (hasMatch(UNGUARDED_ALLOWED_TOOLS, raw)) reasons.push("permiso permite fallback externo");
+  if (hasMatch(SYNC_PROMPT, raw)) reasons.push("recomienda sincronizar specs antes de archivar");
+  if (hasMatch(MANUAL_MOVE, raw)) reasons.push("prescribe mv manual del directorio del change");
+  if (hasMatch(SYNC_BRANCH, raw)) reasons.push("conserva la rama de sincronizacion previa al archive");
+  if (hasMatch(SYNC_GUARDRAIL, raw)) reasons.push("autoriza sincronizar specs antes de archivar");
   const flow = tldrFlow(relativePath);
   if (flow && !raw.replace(/\r\n/g, "\n").includes(tldrBlock(flow))) reasons.push(`guia TLDR de ${flow} ausente o desactualizada`);
   if ((flow === "propose" || flow === "archive") && !raw.replace(/\r\n/g, "\n").includes(readinessBlock(flow))) reasons.push(`guia readiness de ${flow} ausente o desactualizada`);
+  if (flow === "archive" && !raw.replace(/\r\n/g, "\n").includes(closureBlock())) reasons.push("guia de orden canonico de cierre ausente o desactualizada");
   if (reasons.length === 0) continue;
 
   violations.push({ relativePath, reasons });

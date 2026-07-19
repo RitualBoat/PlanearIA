@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "issue": 113,
+  "change": "cierre-openspec-determinista",
+  "surfaces": [
+    "harness",
+    "docs"
+  ],
+  "validations": [
+    "openspec-strict",
+    "harness-parity",
+    "opsx-patch"
+  ],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/113"
+    },
+    {
+      "id": "pr-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/pull/120"
+    },
+    {
+      "id": "adversarial-review",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/113#issuecomment-5017482847"
+    },
+    {
+      "id": "fixtures",
+      "ref": "openspec/changes/cierre-openspec-determinista/evidencia/01-suites.txt y 02-validacion.txt (test:opsx-archive con tres estados de sincronizacion, cuatro de repositorio y regresion del parser de git status)"
+    },
+    {
+      "id": "docs-verification",
+      "ref": "openspec/changes/cierre-openspec-determinista/evidencia/02-validacion.txt (agent:harness:check en paridad con 36 espejos; agent:opsx:patch:check en verde tras normalizar 19 workflows) y 03-dry-run-gate.txt"
+    }
+  ],
+  "rollback": {
+    "strategy": "Revertir el commit del PR restaura el flujo actual sin migraciones ni datos persistidos que deshacer: el archive vuelve a ser manual y vuelve a poder abortar por sincronizacion previa. Las piezas son independientes y admiten desactivacion parcial: se puede revertir solo la normalizacion de workflows conservando el comando, o solo el comando conservando la documentacion del orden canonico. Los changes ya archivados no se tocan en ningun escenario de rollback, y la logica de espera de checks de opsx:finish no participa del revert."
+  },
+  "adversarialReview": {
+    "ref": "https://github.com/RitualBoat/PlanearIA/issues/113#issuecomment-5017482847"
+  },
+  "exceptions": []
+}

@@ -33,6 +33,7 @@ El segundo comando comprueba la version declarada, instalada y ejecutada; el req
 | Cualquier subcomando no expuesto | `npm exec --yes=false -- openspec <subcomando>` |
 | Regenerar workflows opsx | `npm run agent:opsx:update` |
 | Comprobar normalizacion opsx | `npm run agent:opsx:patch:check` |
+| Archivar un change terminado | `npm run opsx:archive -- <change>` (previsualiza con `npm run opsx:archive:dry -- <change>`) |
 | Cerrar la rama del change por PR | `npm run opsx:finish` (previsualiza con `npm run opsx:finish:dry`) |
 
 Ejemplo del flujo SDD:
@@ -85,11 +86,71 @@ No actualices la CLI dentro de una feature de producto. Hazlo en una issue/chang
 
 OpenSpec 1.6.0 aun genera referencias a una CLI global y al comando continue inexistente. `scripts/patchOpsxWorkflows.mjs` corrige ambos defectos de forma idempotente despues de cada update y obliga a fallar si falta la CLI local.
 
+## Orden canonico del cierre
+
+El cierre tiene dos comandos y un owner por paso. No hay pasos manuales entre ellos.
+
+| Paso | Owner | Comando | Efecto |
+|---|---|---|---|
+| Gate de readiness | `checkOpenSpecReadiness.mjs` | Lo invoca `opsx:archive` | Read-only; aborta el archive ante `FAIL` |
+| Clasificacion de sincronizacion | `opsx:archive` | — | Decide si las deltas ya estan aplicadas |
+| Escritura de specs principales | CLI de OpenSpec | Lo invoca `opsx:archive` | Unico escritor de `openspec/specs/` durante el archive |
+| Movimiento a `archive/` | CLI de OpenSpec | Lo invoca `opsx:archive` | `moveDirectory`, con fallback copy+remove en Windows |
+| Commit del archive | `opsx:archive` | — | Deja el arbol limpio en la rama del change |
+| PR, checks y merge | `opsx:finish` | `npm run opsx:finish` | Nunca escribe local ni remotamente sobre el target |
+
+Regla que resuelve el conflicto historico: **la CLI de OpenSpec es el unico escritor de las specs
+principales durante el archive**. No ejecutes `/opsx:sync` antes de archivar un change que vas a
+archivar en ese momento. La CLI aplica las mismas deltas y aborta al reencontrar una requirement
+`ADDED` que ya existe. `/opsx:sync` solo es legitimo para actualizar specs a mitad de un change que
+seguira activo.
+
+### Los tres estados de sincronizacion
+
+`opsx:archive` clasifica antes de escribir, por presencia de los encabezados `### Requirement:`, que es
+el mismo criterio con el que la CLI decide abortar:
+
+| Estado | Cuando | Que hace |
+|---|---|---|
+| `pendiente` | Ninguna operacion decisiva esta aplicada | `openspec archive --yes` (aplica las deltas) |
+| `sincronizada` | Todas las operaciones decisivas ya estan aplicadas | `openspec archive --yes --skip-specs` |
+| `parcial` | Mezcla de aplicadas y pendientes, o una operacion indeterminada | Aborta nombrando la requirement; no escribe nada |
+
+Una operacion `MODIFIED` cuya requirement existe es **neutra**: aplicarla reemplaza el bloque completo,
+asi que es idempotente y no distingue un estado del otro. Una delta compuesta solo de `MODIFIED`
+clasifica como `pendiente` y deja que la CLI la aplique.
+
+`parcial` aborta en vez de elegir porque ninguna rama es segura: aplicar las deltas falla a medias
+dejando specs escritas, y omitirlas archiva declarando sincronizado algo que no lo esta. Resuelve la
+spec principal para que la delta quede totalmente aplicada o totalmente sin aplicar, y repite.
+
+### Reejecucion
+
+`opsx:archive` clasifica el estado del repositorio antes de actuar, asi que repetirlo es seguro:
+
+| Estado observado | Accion |
+|---|---|
+| Change activo y sin archivar | Ruta normal completa |
+| Archivado y commiteado | No-op con exito; informa el commit |
+| Archivado sin commitear | Consolida y commitea; no repite el archive |
+| Activo y archivado a la vez | Aborta: archive interrumpido, resuelve cual es el bueno |
+
+No existe una bandera para omitir la clasificacion. Una via de escape devolveria el indeterminismo que
+este comando elimina.
+
+Pruebas locales de esta logica: `npm run test:opsx-archive` (sin red ni git; cubre los tres estados de
+sincronizacion, los cuatro de repositorio y el parseo de deltas).
+
 ## Cierre del change y espera de checks
 
 `npm run opsx:finish` cierra la rama del change mediante PR hacia `development`. Nunca hace checkout, merge ni push directo sobre el target: publica la rama, crea o reutiliza el PR, espera los checks y ordena el merge a GitHub. Previsualiza con `npm run opsx:finish:dry`, que termina antes de esperar CI.
 
 La espera ocurre en dos fases. GitHub registra los checks del commit recien empujado con unos segundos de retraso; durante esa ventana `gh pr checks` falla en vez de esperar, y `--watch` no lo cubre porque el error se produce antes de su bucle. La fase 1 sondea hasta que los checks aparecen; la fase 2 espera a que terminen, sin filtrar a los requeridos.
+
+El `git checkout` a `development` que aparece en el reflog al final de cada change proviene de este
+comando, no de la CLI de OpenSpec: `openspec archive` no ejecuta ninguna operacion git. Por eso
+archivar despues de `opsx:finish` deja la salida sin rastrear en una rama protegida, y por eso
+`opsx:archive` verifica la rama antes de escribir.
 
 `gh` sale con codigo 1 tanto cuando el PR aun no reporta checks como cuando un check esta en rojo, asi que el cierre clasifica por el par (codigo de salida, mensaje de error):
 
@@ -121,6 +182,12 @@ Pruebas locales de esta logica: `npm run test:opsx-finish` (sin red ni procesos;
 | Node menor que el requerido | Instala Node 20.19 o superior y vuelve a ejecutar `npm ci`. |
 | `openspec validate` falla | Ejecuta `npm run openspec:validate` y corrige el change/spec indicado; el check no lo modifica. |
 | Patch check falla | Ejecuta `npm run agent:opsx:update`, revisa el diff y repite el check. |
+| `opsx:archive` aborta: sincronizacion parcial | La spec principal tiene solo una parte de la delta aplicada. Completa o revierte esa parte segun las requirements que nombra el diagnostico y repite. No se escribio nada. |
+| `opsx:archive` aborta: rama protegida o detached HEAD | Archiva desde la rama del change. Si ya ejecutaste `opsx:finish`, vuelve a la rama antes de archivar. |
+| `opsx:archive` aborta: cambios sin commitear fuera de `openspec/` | Commitea o guarda ese trabajo; el commit del archive no debe arrastrarlo. |
+| `opsx:archive` aborta: change activo y archivado a la vez | Un archive quedo a medias. Decide cual directorio conservar y elimina el otro antes de repetir. |
+| `openspec archive` aborta: `ADDED ... already exists` | Sintoma de haber sincronizado antes de archivar. Usa `npm run opsx:archive`, que clasifica el estado y elige la invocacion correcta. |
+| `opsx:finish` aborta: hay cambios sin commitear | Ejecuta `npm run opsx:archive -- <change>` antes; es el owner del commit del archive. |
 | `opsx:finish` aborta: el PR no reporto checks | Revisa `<url del PR>/checks` y que los workflows apliquen a `development`. Sube `--checks-deadline` solo si CI tarda mas en arrancar; el PR queda sin mergear. |
 | `opsx:finish` aborta: los checks fallaron | Corrige la CI en rojo y vuelve a ejecutar. El cierre no reintenta checks fallidos ni relanza workflows. |
 

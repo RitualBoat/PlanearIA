@@ -161,6 +161,13 @@ startup_timeout_sec = 20
 tool_timeout_sec = 60
 `;
 
+// Codex-specific extra (not in .mcp.json): herramientas que escriben en superficies
+// publicas y deben pedir aprobacion explicita antes de ejecutarse.
+const CODEX_TOOL_APPROVALS = [
+  ["github", "issue_write"],
+  ["github", "add_issue_comment"],
+];
+
 function tomlArgs(args) {
   return `[${(args || []).map((a) => JSON.stringify(a)).join(", ")}]`;
 }
@@ -189,6 +196,16 @@ function renderMcp(outputs) {
       );
     }
   }
+  // Aprobacion explicita por herramienta. Se emite solo para servidores presentes en
+  // .mcp.json, para no dejar configuracion apuntando a un servidor inexistente.
+  const approvals = CODEX_TOOL_APPROVALS.filter(([server]) => server in servers);
+  if (approvals.length) {
+    blocks.push("# --- Codex-specific extra (not in .mcp.json): aprobacion por herramienta ---");
+    for (const [server, tool] of approvals) {
+      blocks.push(`[mcp_servers.${server}.tools.${tool}]\napproval_mode = "approve"`);
+    }
+  }
+
   outputs.push({ rel: ".codex/config.toml", content: norm(blocks.join("\n\n")) });
 }
 

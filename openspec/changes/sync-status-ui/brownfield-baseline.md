@@ -50,7 +50,7 @@ Registra solo la superficie que este change toca. No inventaria la app ni sustit
 - Siete estados con precedencia explicita: `local` (sincronizacion desactivada), `sin-conexion`, `sesion-expirada`, `sincronizando`, `sin-servidor`, `pendiente`, `sincronizado`. Sin conexion gana sobre sesion expirada; sincronizacion desactivada gana sobre todo.
 - Ningun estado de sincronizacion usa el tono de error; el rojo se reserva al fallo de guardado local. La cadena "Error sync" desaparece de `src/`.
 - `AppTopBar` presenta cuatro elementos de chrome, incluido el indicador de sincronizacion, con variante compacta en movil.
-- `ListaPlaneacionesScreen` deja de derivar estado y consume el indicador compartido.
+- `ListaPlaneacionesScreen` deja de derivar estado **y deja de mostrarlo**: el chrome lo lleva de forma global, asi que el indicador de la pantalla repetia la misma frase en la misma vista (decidido durante la QA visual, ver `design.md` D8). Un guardarrail impide que la derivacion local reaparezca.
 - `SyncStatusBanner` conserva su rol de interrupcion, migrada a tokens y al vocabulario compartido.
 - El estado se entiende por texto, sin depender de color ni icono; `aria-busy` explicito durante la sincronizacion.
 

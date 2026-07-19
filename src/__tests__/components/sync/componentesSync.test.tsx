@@ -111,7 +111,10 @@ describe("SyncStatusChip", () => {
     const onReingresar = jest.fn();
     montar(<SyncStatusChip onReingresar={onReingresar} testID="chip" />);
 
-    expect(screen.getByTestId("chip").props.accessibilityRole).toBe("text");
+    // Lo que importa no es el rol concreto sino que no se ofrezca una accion: sin red, el
+    // reingreso no puede completarse.
+    expect(screen.getByTestId("chip").props.accessibilityRole).not.toBe("button");
+    expect(onReingresar).not.toHaveBeenCalled();
   });
 
   it("al docente invitado no le dice que esta sincronizado", () => {

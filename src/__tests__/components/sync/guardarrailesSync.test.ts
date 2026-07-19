@@ -35,6 +35,14 @@ const archivosDeSync = (): string[] =>
 const SUPERFICIES_DE_ESTADO = [
   path.join(RAIZ, "components", "SyncStatusBanner.tsx"),
   path.join(RAIZ, "navigation", "AppTopBar.tsx"),
+];
+
+/**
+ * Pantallas que antes derivaban estado de sync por su cuenta y ahora no presentan ninguno:
+ * el chrome lo lleva de forma global. No basta con que hoy esten limpias; la guardia impide
+ * que vuelva a aparecer una derivacion local cuando alguien edite la pantalla.
+ */
+const PANTALLAS_SIN_DERIVACION = [
   path.join(RAIZ, "screens", "planeaciones", "ListaPlaneacionesScreen.tsx"),
 ];
 
@@ -46,9 +54,11 @@ describe("guardarrail de color en la capa de sync", () => {
   });
 
   it("ninguna superficie de estado codifica color con literales hexadecimales", () => {
-    const infractores = [...archivosDeSync(), ...SUPERFICIES_DE_ESTADO].filter((archivo) =>
-      /#[0-9a-fA-F]{3,8}\b/.test(leer(archivo))
-    );
+    const infractores = [
+      ...archivosDeSync(),
+      ...SUPERFICIES_DE_ESTADO,
+      ...PANTALLAS_SIN_DERIVACION,
+    ].filter((archivo) => /#[0-9a-fA-F]{3,8}\b/.test(leer(archivo)));
 
     expect(infractores.map((archivo) => path.basename(archivo))).toEqual([]);
   });
@@ -76,9 +86,11 @@ describe("guardarrail de derivacion unica", () => {
   ];
 
   it("los titulos de estado solo viven en la tabla de presentacion", () => {
-    const candidatos = [...archivosDeSync(), ...SUPERFICIES_DE_ESTADO].filter(
-      (archivo) => path.basename(archivo) !== "syncPresentation.ts"
-    );
+    const candidatos = [
+      ...archivosDeSync(),
+      ...SUPERFICIES_DE_ESTADO,
+      ...PANTALLAS_SIN_DERIVACION,
+    ].filter((archivo) => path.basename(archivo) !== "syncPresentation.ts");
 
     const infractores = candidatos
       .map((archivo) => ({
@@ -111,9 +123,24 @@ describe("guardarrail de derivacion unica", () => {
    * no era suyo, mientras la barra global llamaba al mismo evento "datos locales".
    */
   it("la cadena Error sync no existe en el codigo fuente", () => {
-    const conError = SUPERFICIES_DE_ESTADO.filter((archivo) => leer(archivo).includes("Error sync"));
+    const conError = [...SUPERFICIES_DE_ESTADO, ...PANTALLAS_SIN_DERIVACION].filter((archivo) =>
+      leer(archivo).includes("Error sync")
+    );
 
     expect(conError).toEqual([]);
+  });
+
+  /**
+   * La pantalla de planeaciones ya no muestra estado de sync: el chrome lo lleva de forma
+   * global y repetirlo aqui mostraba la misma frase dos veces en la misma vista. Lo que si
+   * debe seguir siendo cierto es que no vuelva a derivarlo por su cuenta.
+   */
+  it("las pantallas migradas no vuelven a derivar estado de sync", () => {
+    const infractores = PANTALLAS_SIN_DERIVACION.filter((archivo) =>
+      /buildSyncState|syncStatus|pendingCount/.test(soloCodigo(archivo))
+    );
+
+    expect(infractores.map((archivo) => path.basename(archivo))).toEqual([]);
   });
 
   it("la tabla de presentacion no importa React ni contextos en tiempo de ejecucion", () => {
@@ -122,6 +149,41 @@ describe("guardarrail de derivacion unica", () => {
     // La pureza es estructural: permite congelar la tabla sin montar React ni simular
     // almacenamiento, y garantiza que traducir un estado no pueda tener efectos.
     expect(tabla).not.toMatch(/^import\s+(?!type)/m);
+  });
+});
+
+describe("roles accesibles que React Native Web no traduce", () => {
+  /**
+   * `accessibilityRole="text"` se traduce a un `div` sin atributo `role`, y un `aria-label`
+   * sobre un elemento generico no lo anuncian los lectores de pantalla. Verificado en
+   * navegador el 2026-07-19: el chip compacto quedaba mudo, que es exactamente la
+   * informacion que existe para dar.
+   *
+   * La guardia es sobre la fuente porque el renderer nativo de las pruebas conserva
+   * `accessibilityRole` tal cual: la perdida solo ocurre en web.
+   */
+  it("ninguna superficie de estado usa el rol que web descarta", () => {
+    const infractores = archivosDeSync().filter((archivo) =>
+      /accessibilityRole="text"/.test(soloCodigo(archivo))
+    );
+
+    expect(infractores.map((archivo) => path.basename(archivo))).toEqual([]);
+  });
+
+  it("las superficies no interactivas declaran un rol que si conserva su etiqueta", () => {
+    const superficies = ["SyncStatusChip.tsx", "PendingBadge.tsx", "SaveStateLabel.tsx"];
+
+    for (const componente of superficies) {
+      expect(soloCodigo(path.join(CARPETA_SYNC, componente))).toMatch(
+        /accessibilityRole="image"/
+      );
+    }
+  });
+
+  it("el chip no se declara como region viva, que interrumpiria en cada ciclo", () => {
+    expect(soloCodigo(path.join(CARPETA_SYNC, "SyncStatusChip.tsx"))).not.toMatch(
+      /accessibilityRole="(alert|status)"/
+    );
   });
 });
 

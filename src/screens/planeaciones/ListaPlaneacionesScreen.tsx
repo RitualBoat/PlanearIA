@@ -13,7 +13,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 import ScreenBackButton from "../../components/ScreenBackButton";
 import { useListaPlaneacionesViewModel } from "../../hooks/useListaPlaneacionesViewModel";
-import SyncStatusChip from "../../components/sync/SyncStatusChip";
 import type { PlaneacionDocumento } from "../../../types/planeacionV2";
 import { NivelAcademico } from "../../../types/planeacionV2";
 
@@ -151,11 +150,6 @@ const ListaPlaneacionesScreen: React.FC = () => {
           <Text style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
             {vm.documentosFiltrados.length} de {vm.documentos.length}
           </Text>
-          {/*
-            El indicador va una vez en el encabezado, no en cada tarjeta: el estado es
-            global, asi que repetirlo por documento comunicaba lo mismo N veces.
-          */}
-          <SyncStatusChip style={styles.syncChip} testID="planeaciones-sync-chip" />
         </View>
 
         <View style={styles.headerActions}>
@@ -584,10 +578,6 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 12,
-  },
-  syncChip: {
-    alignSelf: "flex-start",
-    marginTop: 6,
   },
   emptyState: {
     alignItems: "center",

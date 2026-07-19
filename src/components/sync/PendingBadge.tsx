@@ -39,7 +39,9 @@ const PendingBadge: React.FC<PendingBadgeProps> = ({ style, testID }) => {
   return (
     <View
       style={[styles.badge, { backgroundColor: colors[paleta.fondo] }, style]}
-      accessibilityRole="text"
+      // Ver SyncStatusChip: accessibilityRole="text" pierde el aria-label en web. Sin rol,
+      // el lector anunciaria solo la cifra ("5") y no que son cambios por sincronizar.
+      accessibilityRole="image"
       accessibilityLabel={frasePendientes(pendingCount)}
       testID={testID}
     >

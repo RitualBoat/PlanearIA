@@ -119,7 +119,13 @@ const SyncStatusChip: React.FC<SyncStatusChipProps> = ({
     return (
       <Animated.View
         style={[estiloBase, estiloAnimado]}
-        accessibilityRole="text"
+        // "image" y no "text": React Native Web traduce accessibilityRole="text" a un div
+        // sin rol, y un aria-label sobre un elemento generico no se anuncia (verificado en
+        // navegador el 2026-07-19). En variante compacta eso dejaba el estado mudo, que es
+        // justo la informacion que este componente existe para dar. El rol de imagen
+        // etiquetada se anuncia de forma fiable y, a diferencia de "status", no crea una
+        // region viva que interrumpiria en cada ciclo de sincronizacion.
+        accessibilityRole="image"
         accessibilityState={{ busy: presentacion.ocupado }}
         {...propsAccesibles}
       >

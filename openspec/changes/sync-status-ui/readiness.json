@@ -29,32 +29,32 @@
     },
     {
       "id": "web-http-200",
-      "ref": "PENDIENTE: confirmar expo start --web en HTTP 200 antes de navegar."
+      "ref": "expo start --web en el puerto 8082 confirmado en HTTP 200 (status=200, 0.77 s) ANTES de navegar, el 2026-07-19. Se uso 8082 y no 8081 porque ese puerto ya estaba ocupado por un servidor previo y hacer QA contra un build ajeno habria invalidado la evidencia. Navegacion posterior con Playwright MCP."
     },
     {
       "id": "playwright-breakpoints",
-      "ref": "PENDIENTE: QA visual N1 con Playwright MCP a 375/768/1280, incluida la variante compacta del chip en movil y la ausencia de desborde horizontal en el chrome."
+      "ref": "QA visual N1 del 2026-07-19 con Playwright MCP a 375/768/1280, con medicion DOM excluyendo subarboles aria-hidden y capturas reales del journey GJ0 en evidencia/capturas/. Chip: 32 px compacto a 375 (solo icono, etiqueta accesible completa) y 203x28 px a 768/1280; sin desborde horizontal en ningun ancho (scrollWidth == viewport en los tres); exactamente 1 superficie de navegacion primaria. El chip persiste en todos los hubs recorridos. La corrida encontro y corrigio un defecto solo visible en web: accessibilityRole=\"text\" se traduce a un div sin rol y su aria-label no se anuncia, lo que dejaba mudo al chip compacto; corregido a accessibilityRole=\"image\", verificado en el arbol de accesibilidad como img con nombre completo. En ListaPlaneaciones se verifico en el DOM real que la cadena \"Error sync\" no existe y que queda exactamente 1 chip de sync en la vista. npm run qa:visual:check -- --change sync-status-ui en PASS."
     },
     {
       "id": "nielsen",
-      "ref": "PENDIENTE: checklist Nielsen sin severidad >=3 y checklist anti-slop 1.9.3."
+      "ref": "Checklist Nielsen en evidencia/README.md: severidad maxima 1 (umbral de bloqueo 3), sin heuristicas bloqueantes. Checklist anti-slop 1.9.3 con los siete puntos en OK."
     },
     {
       "id": "offline-reconnect",
-      "ref": "PENDIENTE: transicion real offline -> reconexion en navegador, evidenciando que chip y barra pasan por sin-conexion y vuelven a sincronizado con el mismo vocabulario, mas el estado de sincronizacion desactivada en sesion de invitado."
+      "ref": "Transicion de red ejercitada en navegador el 2026-07-19 despachando los eventos offline/online que la app escucha (ruta web de connectivity.ts), verificando ademas el estado de sincronizacion desactivada en sesion de invitado, que es el caso que este change corrige: el chip dice \"Guardado en este dispositivo\" donde antes se afirmaba \"Sincronizado\" en verde. LIMITACION DECLARADA: los estados autenticados (sin-conexion, sesion-expirada, sincronizando, sin-servidor, pendiente) no se verificaron en navegador porque la precedencia deja al invitado en \"local\" haga lo que haga la red, y el backend rechaza el origen localhost por CORS; no se crearon cuentas ni se usaron credenciales para forzarlo. Esos siete estados y sus dos reglas de precedencia quedan cubiertos de forma determinista por la prueba de tabla de derivarPresentacionSync (16 casos) y por las pruebas de componente (17 casos). El journey GJ4 offline-reconexion NO se reclama: el manifiesto lo tiene en estado declarado y reservado al change golden-journeys-web. Detalle en evidencia/README.md."
     },
     {
       "id": "cross-device",
-      "ref": "PENDIENTE: este change es capa visual y no altera el motor; la evidencia cross-device se sostiene en que src/sync, SYNC_ENTITIES y syncAllEntities quedan con diff vacio y en npm run test:sync en verde, no en un flujo nuevo entre dispositivos."
+      "ref": "Este change es capa visual y no altera el motor. Verificado por diff contra development: src/sync/ tiene diff vacio, PlaneacionesContext.tsx tiene diff vacio y package.json no suma dependencias. npm run test:sync -- --runInBand en verde (4 suites, 23 tests). No se ejercito un flujo nuevo entre dispositivos porque este change no introduce ninguno."
     },
     {
       "id": "no-local-loss",
-      "ref": "PENDIENTE: este change no escribe en almacenamiento ni en colas en ningun camino de codigo; la evidencia se sostiene en el diff vacio de src/sync y de los contextos de datos, mas npm run test:sync en verde."
+      "ref": "Este change no escribe en almacenamiento ni en colas en ningun camino de codigo: un guardarrail de prueba verifica que ningun archivo de src/components/sync/ referencia fetch, subscribeConnectivity, queueEntityOperation ni AsyncStorage, y que no declara estado propio de sincronizacion. Sumado al diff vacio de src/sync y de los contextos de datos, y a npm run test:sync en verde, no hay camino por el que este change pueda perder datos locales u operaciones pendientes."
     }
   ],
   "rollback": {
-    "strategy": "Change casi enteramente aditivo. Agrega src/hooks/useSyncPresentation.ts, src/components/sync/ (SyncStatusChip, SaveStateLabel, PendingBadge y barrel) y sus pruebas. Modifica en su lugar solo tres archivos existentes, todos de capa visual: AppTopBar.tsx (monta el chip), ListaPlaneacionesScreen.tsx (elimina buildSyncState y consume el chip) y SyncStatusBanner.tsx (migra a tokens y al vocabulario compartido), mas la adopcion de SaveStateLabel en EditorPlantillaScreen.tsx como consumidor de referencia. No toca src/sync, el motor, SYNC_ENTITIES, esquemas, almacenamiento, configuracion remota, proyecto nativo ni dependencias: como este change nunca escribe en almacenamiento ni en colas, ningun revert puede perder datos locales ni operaciones pendientes. Revertir el commit del PR devuelve las cuatro superficies a su derivacion actual (incluido buildSyncState con sus hex) y elimina hook y componentes nuevos; la maquina de estado paralela de PlaneacionesContext queda intacta en ambos sentidos, asi que la reversion es completa y sin residuo. Desactivacion parcial sin revertir: retirar el montaje del chip en AppTopBar deja el resto operando, y SaveStateLabel puede quitarse de su consumidor de referencia de forma aislada.",
-    "verified": false
+    "strategy": "Change casi enteramente aditivo. Agrega src/hooks/syncPresentation.ts (tabla pura), src/hooks/useSyncPresentation.ts (hook), src/components/sync/ (SyncStatusChip, SaveStateLabel, PendingBadge, tonos y barrel) y tres suites de pruebas. Modifica en su lugar cuatro archivos existentes, todos de capa visual: AppTopBar.tsx (monta el chip), ListaPlaneacionesScreen.tsx (elimina buildSyncState y su indicador), SyncStatusBanner.tsx (migra a tokens y al vocabulario compartido) y EditorPlantillaScreen.tsx (adopta SaveStateLabel). Ajusta ademas dos suites vigentes para proveer el contexto de sync que el chrome ahora requiere. Verificado por diff contra development: src/sync/, PlaneacionesContext.tsx y package.json quedan sin cambios. Como este change nunca escribe en almacenamiento ni en colas, ningun revert puede perder datos locales ni operaciones pendientes. Revertir el commit del PR devuelve las cuatro superficies a su derivacion actual (incluido buildSyncState con sus cuatro hex y su copy \"Error sync\") y elimina tabla, hook y componentes; la maquina de estado paralela de PlaneacionesContext queda intacta en ambos sentidos, asi que la reversion es completa y sin residuo. Desactivacion parcial sin revertir: retirar el montaje del chip en AppTopBar deja el resto operando, y SaveStateLabel puede quitarse de su consumidor de referencia de forma aislada.",
+    "verified": true
   },
   "adversarialReview": {
     "ref": "PENDIENTE: se completa antes de archive."

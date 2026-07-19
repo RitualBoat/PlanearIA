@@ -66,7 +66,9 @@ const SaveStateLabel: React.FC<SaveStateLabelProps> = ({ estado, guardadoEn, sty
   return (
     <View
       style={[styles.fila, style]}
-      accessibilityRole="text"
+      // Ver SyncStatusChip: accessibilityRole="text" pierde el aria-label en web, y aqui la
+      // etiqueta es la que une el guardado local con el estado de sync.
+      accessibilityRole="image"
       accessibilityLabel={etiquetaCompleta}
       accessibilityState={{ busy: aspecto.ocupado }}
       // React Native Web no deriva aria-busy de accessibilityState (verificado en #82).

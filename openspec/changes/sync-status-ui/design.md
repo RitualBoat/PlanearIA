@@ -95,6 +95,16 @@ El chip no usa `accessibilityRole="alert"`: un estado ambiente que cambia cada 1
 
 El estado `sincronizando` no gira un icono en bucle. El ciclo de polling corre cada 12 segundos (`SYNC_CONFIG.pollInterval`), asi que un spinner permanente convertiria el chrome en un elemento en movimiento constante: costo de bateria, distraccion y jank en gama media, contra el presupuesto de motion 1.9.4. La transicion entre estados es un fundido corto con `withTiming`, y bajo `useReducedMotionPreference()` se sirve el cambio sin transicion.
 
+### D8. La pantalla de planeaciones deja de mostrar estado, no solo de derivarlo (decidido en QA)
+
+El plan pedia sustituir `buildSyncState` por el componente compartido, y asi se implemento primero. La captura a 1280 mostro el resultado real: la misma frase, "Guardado en este dispositivo", dos veces en la misma vista, en el chrome y en el encabezado de la pantalla, separadas por 120 px. Eso no es lenguaje visual coherente, es repeticion.
+
+Como el chip del chrome esta presente en toda pantalla del shell, y en los tres estados que el docente podria querer resolver la barra global aporta el texto completo, el indicador de la pantalla no agregaba informacion. Se retiro.
+
+La obligacion que la spec si le fija a la pantalla se conserva y se refuerza: no derivar estado por su cuenta. Un guardarrail nuevo verifica que `buildSyncState`, `syncStatus` y `pendingCount` no reaparezcan en ese archivo.
+
+*Alternativa considerada.* Conservarlo porque en movil el chip del chrome es compacto y sin palabras. Rechazada: en movil, los estados sin palabras son precisamente los calmos (`sincronizado` y `local`), donde el icono basta; en los estados con noticia, la barra ocupa el ancho completo con la frase entera. No se pierde texto donde importa.
+
 ## Risks / Trade-offs
 
 - **[El chip global puede decir "Todo sincronizado" mientras planeaciones tiene trabajo en cola]** → `pendingCount` **si** incluye planeaciones (`entitySync.ts:390-396` recorre `[...Object.keys(SYNC_ENTITIES), "planeaciones"]`), asi que el estado 6 lo detecta y el chip dira "N cambios por sincronizar". Lo que no lo mueve es `status`: el ciclo propio de `PlaneacionesContext` no dispara `syncAllEntities()`. El riesgo real queda acotado a que el chip diga "Todo sincronizado" durante un ciclo de planeaciones en curso, sin ocultar trabajo pendiente. Se documenta como limitacion conocida y se cubre en la prueba de la tabla.

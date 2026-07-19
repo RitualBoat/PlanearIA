@@ -88,12 +88,24 @@ function exceptionFor(exceptions, field, now) {
   return null;
 }
 
+// El resumen se declara por estado. Antes se reutilizaba el texto de fallo tambien en PASS, asi que el
+// gate imprimia lineas como "PASS tldr: Falta TLDR.md en la raíz del change": afirmaban lo contrario de
+// lo que acababan de verificar. Un informe que se contradice a si mismo no sirve como evidencia, que es
+// justo para lo que existe este gate.
+export function summaryFor(summary, status) {
+  if (summary && typeof summary === "object") return status === "PASS" ? summary.pass : summary.fail;
+  // Forma legacy de un solo texto: solo es correcta describiendo el fallo, asi que en PASS se marca en
+  // vez de mentir. Convertir la llamada a { pass, fail } es la correccion.
+  return status === "PASS" ? `Verificado. (Resumen sin variante PASS declarada: "${summary}")` : summary;
+}
+
 function addRequired(results, id, ok, summary, remediation, { exceptions = [], exceptionField = null, now = new Date() } = {}) {
-  if (ok) return results.push(result(id, "PASS", summary));
+  if (ok) return results.push(result(id, "PASS", summaryFor(summary, "PASS")));
+  const failure = summaryFor(summary, "FAIL");
   const match = exceptionField ? exceptionFor(exceptions, exceptionField, now) : null;
-  if (match?.exception) return results.push(result(id, "EXCEPTION", `${summary} Excepción vigente hasta ${match.exception.expiresOn}.`, match.exception.recovery));
-  if (match?.invalid) return results.push(result(id, "FAIL", `${summary} ${match.invalid}`, remediation));
-  return results.push(result(id, "FAIL", summary, remediation));
+  if (match?.exception) return results.push(result(id, "EXCEPTION", `${failure} Excepción vigente hasta ${match.exception.expiresOn}.`, match.exception.recovery));
+  if (match?.invalid) return results.push(result(id, "FAIL", `${failure} ${match.invalid}`, remediation));
+  return results.push(result(id, "FAIL", failure, remediation));
 }
 
 function validateManifestShape(manifest, fields) {
@@ -103,24 +115,24 @@ function validateManifestShape(manifest, fields) {
 
 export function validateIssue(issue, { now = new Date() } = {}) {
   const results = [];
-  addRequired(results, "issue-open", issue?.state === "OPEN", "El issue debe permanecer abierto antes de propose.", "Reabre o selecciona un issue abierto.", { now });
+  addRequired(results, "issue-open", issue?.state === "OPEN", { pass: "El issue permanece abierto.", fail: "El issue debe permanecer abierto antes de propose." }, "Reabre o selecciona un issue abierto.", { now });
   const body = issue?.body ?? "";
   for (const label of REQUIRED_ISSUE_LABELS) {
     const present = body.includes(label);
-    addRequired(results, `issue-${label.replace(/[^a-z]+/gi, "-").replace(/^-|-$/g, "").toLowerCase()}`, present, present ? `${label} está presente en el issue enriquecido.` : `Falta ${label} en el issue enriquecido.`, "Conserva la historia original y agrega la sección enriquecida requerida.", { now });
+    addRequired(results, `issue-${label.replace(/[^a-z]+/gi, "-").replace(/^-|-$/g, "").toLowerCase()}`, present, { pass: `${label} está presente en el issue enriquecido.`, fail: `Falta ${label} en el issue enriquecido.` }, "Conserva la historia original y agrega la sección enriquecida requerida.", { now });
   }
 
   let manifest;
   try {
     manifest = issueManifest(body);
     const missing = validateManifestShape(manifest, ["schemaVersion", "change", "execution", "dependencies", "currentState", "surfaces", "manualIntervention", "exceptions"]);
-    addRequired(results, "issue-manifest", missing.length === 0 && manifest.schemaVersion === 1 && manifest.execution === "versioned" && Array.isArray(manifest.surfaces) && Array.isArray(manifest.exceptions), missing.length ? `El manifest del issue omite: ${missing.join(", ")}.` : "El manifest de readiness del issue no cumple schemaVersion 1/execution versioned.", "Corrige el bloque JSON openspec-readiness:pre-propose del issue.", { now });
-    addRequired(results, "project-membership", issue?.projectItems?.some((item) => item.title === "PlanearIA Product OS"), "El issue debe pertenecer a PlanearIA Product OS.", "Agrega el issue al Project o registra una excepción temporal aprobada.", { exceptions: manifest.exceptions, exceptionField: "project-membership", now });
+    addRequired(results, "issue-manifest", missing.length === 0 && manifest.schemaVersion === 1 && manifest.execution === "versioned" && Array.isArray(manifest.surfaces) && Array.isArray(manifest.exceptions), { pass: "El manifest de readiness del issue cumple schemaVersion 1 y execution versioned.", fail: missing.length ? `El manifest del issue omite: ${missing.join(", ")}.` : "El manifest de readiness del issue no cumple schemaVersion 1/execution versioned." }, "Corrige el bloque JSON openspec-readiness:pre-propose del issue.", { now });
+    addRequired(results, "project-membership", issue?.projectItems?.some((item) => item.title === "PlanearIA Product OS"), { pass: "El issue pertenece a PlanearIA Product OS.", fail: "El issue debe pertenecer a PlanearIA Product OS." }, "Agrega el issue al Project o registra una excepción temporal aprobada.", { exceptions: manifest.exceptions, exceptionField: "project-membership", now });
     const dependencies = issue.dependencyStates ?? [];
-    addRequired(results, "dependencies", dependencies.length === manifest.dependencies.length && dependencies.every((dependency) => dependency.state === "CLOSED"), "Hay dependencias sin cerrar o no verificables.", "Cierra las dependencias declaradas o registra una excepción temporal aprobada.", { exceptions: manifest.exceptions, exceptionField: "manual-evidence", now });
+    addRequired(results, "dependencies", dependencies.length === manifest.dependencies.length && dependencies.every((dependency) => dependency.state === "CLOSED"), { pass: "Todas las dependencias declaradas están cerradas.", fail: "Hay dependencias sin cerrar o no verificables." }, "Cierra las dependencias declaradas o registra una excepción temporal aprobada.", { exceptions: manifest.exceptions, exceptionField: "manual-evidence", now });
     for (const exception of manifest.exceptions ?? []) {
       const failure = validateException(exception, now);
-      addRequired(results, `issue-exception-${exception.field ?? "unknown"}`, !failure, failure ?? `Excepción válida para ${exception.field}.`, "Corrige o elimina la excepción inválida.", { now });
+      addRequired(results, `issue-exception-${exception.field ?? "unknown"}`, !failure, { pass: `Excepción válida para ${exception.field}.`, fail: failure ?? `Excepción inválida para ${exception.field}.` }, "Corrige o elimina la excepción inválida.", { now });
     }
   } catch (error) {
     addRequired(results, "issue-manifest", false, error.message, "Agrega un bloque JSON openspec-readiness:pre-propose válido al issue.", { now });
@@ -207,14 +219,17 @@ export function validateArchive({ root = ROOT, change, now = new Date(), runComm
   const proposalPath = path.join(changeRoot, "proposal.md");
   const tldrPath = path.join(changeRoot, "TLDR.md");
   const tasks = existsSync(tasksPath) ? readFileSync(tasksPath, "utf8") : "";
-  addRequired(results, "tasks-complete", existsSync(tasksPath) && !/- \[ \]/.test(tasks), "Hay tareas pendientes o falta tasks.md.", "Completa las tareas pendientes antes de archive.", { now });
-  addRequired(results, "tldr", existsSync(tldrPath), "Falta TLDR.md en la raíz del change.", "Crea o mueve TLDR.md a la raíz del change.", { now });
+  addRequired(results, "tasks-complete", existsSync(tasksPath) && !/- \[ \]/.test(tasks), { pass: "Todas las tareas de tasks.md están completas.", fail: "Hay tareas pendientes o falta tasks.md." }, "Completa las tareas pendientes antes de archive.", { now });
+  addRequired(results, "tldr", existsSync(tldrPath), { pass: "TLDR.md está en la raíz del change.", fail: "Falta TLDR.md en la raíz del change." }, "Crea o mueve TLDR.md a la raíz del change.", { now });
   const baselineFailure = brownfieldBaselineFailure(changeRoot);
   addRequired(
     results,
     "brownfield-baseline",
     !baselineFailure,
-    baselineFailure ?? `${BROWNFIELD_BASELINE_FILE} registra la superficie tocada y el delta brownfield requerido.`,
+    {
+      pass: `${BROWNFIELD_BASELINE_FILE} registra la superficie tocada y el delta brownfield requerido.`,
+      fail: baselineFailure ?? `${BROWNFIELD_BASELINE_FILE} no cumple el contrato de baseline brownfield.`,
+    },
     `Crea ${BROWNFIELD_BASELINE_FILE} en la raíz con las ocho secciones requeridas y contenido verificable.`,
     { now },
   );
@@ -223,27 +238,27 @@ export function validateArchive({ root = ROOT, change, now = new Date(), runComm
   try {
     manifest = loadReadiness(changeRoot);
     const missing = validateManifestShape(manifest, ["schemaVersion", "issue", "change", "surfaces", "validations", "evidence", "rollback", "adversarialReview", "exceptions"]);
-    addRequired(results, "archive-manifest", missing.length === 0 && manifest.schemaVersion === 1 && manifest.change === change && Array.isArray(manifest.surfaces) && Array.isArray(manifest.validations) && Array.isArray(manifest.evidence) && Array.isArray(manifest.exceptions), missing.length ? `readiness.json omite: ${missing.join(", ")}.` : "readiness.json no coincide con el contrato del change.", "Corrige readiness.json con schemaVersion 1 y los campos requeridos.", { now });
+    addRequired(results, "archive-manifest", missing.length === 0 && manifest.schemaVersion === 1 && manifest.change === change && Array.isArray(manifest.surfaces) && Array.isArray(manifest.validations) && Array.isArray(manifest.evidence) && Array.isArray(manifest.exceptions), { pass: "readiness.json cumple el contrato del change.", fail: missing.length ? `readiness.json omite: ${missing.join(", ")}.` : "readiness.json no coincide con el contrato del change." }, "Corrige readiness.json con schemaVersion 1 y los campos requeridos.", { now });
   } catch (error) {
     addRequired(results, "archive-manifest", false, error.message, "Crea un readiness.json válido en la raíz del change.", { now });
     return { results, manifest: null };
   }
 
-  addRequired(results, "proposal-traceability", existsSync(proposalPath) && readFileSync(proposalPath, "utf8").includes(`#${manifest.issue}`), "proposal.md no enlaza al issue declarado por readiness.json.", "Agrega la referencia del issue a proposal.md o corrige readiness.json.", { now });
+  addRequired(results, "proposal-traceability", existsSync(proposalPath) && readFileSync(proposalPath, "utf8").includes(`#${manifest.issue}`), { pass: `proposal.md enlaza al issue #${manifest.issue} declarado por readiness.json.`, fail: "proposal.md no enlaza al issue declarado por readiness.json." }, "Agrega la referencia del issue a proposal.md o corrige readiness.json.", { now });
   const unknownSurfaces = manifest.surfaces.filter((surface) => !VALIDATION_PROFILES[surface]);
-  addRequired(results, "surface-profile", unknownSurfaces.length === 0, `Hay superficies no reconocidas: ${unknownSurfaces.join(", ")}.`, "Usa únicamente docs, harness, ui, sync, ia o backend.", { now });
+  addRequired(results, "surface-profile", unknownSurfaces.length === 0, { pass: `Superficies declaradas reconocidas: ${manifest.surfaces.join(", ")}.`, fail: `Hay superficies no reconocidas: ${unknownSurfaces.join(", ")}.` }, "Usa únicamente docs, harness, ui, sync, ia o backend.", { now });
   const required = requiredForSurfaces(manifest.surfaces);
   const unknownValidations = manifest.validations.filter((id) => typeof id !== "string" || !Object.hasOwn(LOCAL_VALIDATIONS, id));
   const injectedCommands = ["command", "commands", "executable", "path"].filter((field) => Object.hasOwn(manifest, field));
-  addRequired(results, "validation-ids", injectedCommands.length === 0 && unknownValidations.length === 0 && [...required.validations].every((id) => manifest.validations.includes(id)), injectedCommands.length ? `readiness.json declara campos no permitidos: ${injectedCommands.join(", ")}.` : unknownValidations.length ? `readiness.json incluye IDs desconocidos: ${unknownValidations.join(", ")}.` : "Faltan IDs de validación requeridos por las superficies declaradas.", "Usa los IDs del perfil estático; no declares comandos o IDs propios.", { now });
+  addRequired(results, "validation-ids", injectedCommands.length === 0 && unknownValidations.length === 0 && [...required.validations].every((id) => manifest.validations.includes(id)), { pass: "Los IDs de validación declarados cubren las superficies del change.", fail: injectedCommands.length ? `readiness.json declara campos no permitidos: ${injectedCommands.join(", ")}.` : unknownValidations.length ? `readiness.json incluye IDs desconocidos: ${unknownValidations.join(", ")}.` : "Faltan IDs de validación requeridos por las superficies declaradas." }, "Usa los IDs del perfil estático; no declares comandos o IDs propios.", { now });
   const evidenceIds = new Set(manifest.evidence.filter((item) => item?.id && item?.ref).map((item) => item.id));
   const missingEvidence = [...required.evidence].filter((id) => !evidenceIds.has(id));
-  addRequired(results, "evidence", missingEvidence.length === 0, `Falta evidencia: ${missingEvidence.join(", ")}.`, "Registra enlaces o referencias de evidencia en readiness.json, o una excepción temporal válida.", { exceptions: manifest.exceptions, exceptionField: "manual-evidence", now });
-  addRequired(results, "rollback", typeof manifest.rollback?.strategy === "string" && manifest.rollback.strategy.trim().length > 0, "Falta una estrategia de rollback en readiness.json.", "Declara cómo revertir el change sin borrar changes ni evidencia.", { now });
-  addRequired(results, "adversarial-review", typeof manifest.adversarialReview?.ref === "string" && manifest.adversarialReview.ref.trim().length > 0, "Falta la referencia de revisión adversarial.", "Ejecuta la revisión adversarial y registra su evidencia.", { exceptions: manifest.exceptions, exceptionField: "manual-evidence", now });
+  addRequired(results, "evidence", missingEvidence.length === 0, { pass: "La evidencia requerida por las superficies está registrada.", fail: `Falta evidencia: ${missingEvidence.join(", ")}.` }, "Registra enlaces o referencias de evidencia en readiness.json, o una excepción temporal válida.", { exceptions: manifest.exceptions, exceptionField: "manual-evidence", now });
+  addRequired(results, "rollback", typeof manifest.rollback?.strategy === "string" && manifest.rollback.strategy.trim().length > 0, { pass: "readiness.json declara una estrategia de rollback.", fail: "Falta una estrategia de rollback en readiness.json." }, "Declara cómo revertir el change sin borrar changes ni evidencia.", { now });
+  addRequired(results, "adversarial-review", typeof manifest.adversarialReview?.ref === "string" && manifest.adversarialReview.ref.trim().length > 0, { pass: "readiness.json registra la referencia de revisión adversarial.", fail: "Falta la referencia de revisión adversarial." }, "Ejecuta la revisión adversarial y registra su evidencia.", { exceptions: manifest.exceptions, exceptionField: "manual-evidence", now });
   for (const exception of manifest.exceptions) {
     const failure = validateException(exception, now);
-    addRequired(results, `archive-exception-${exception.field ?? "unknown"}`, !failure, failure ?? `Excepción válida para ${exception.field}.`, "Corrige o elimina la excepción inválida.", { now });
+    addRequired(results, `archive-exception-${exception.field ?? "unknown"}`, !failure, { pass: `Excepción válida para ${exception.field}.`, fail: failure ?? `Excepción inválida para ${exception.field}.` }, "Corrige o elimina la excepción inválida.", { now });
   }
 
   if (runLocal) {
@@ -251,7 +266,7 @@ export function validateArchive({ root = ROOT, change, now = new Date(), runComm
       const [command, args] = LOCAL_VALIDATIONS[id];
       const execution = runCommand(command, args, { cwd: root });
       const detail = sanitize(`${execution.stdout}${execution.stderr}${execution.error}`).trim().slice(-240);
-      addRequired(results, `local-${id}`, execution.status === 0, execution.status === 0 ? `${id} terminó correctamente.` : `${id} falló${detail ? `: ${detail}` : "."}`, `Ejecuta y corrige ${command} ${args.join(" ")}.`, { now });
+      addRequired(results, `local-${id}`, execution.status === 0, { pass: `${id} terminó correctamente.`, fail: `${id} falló${detail ? `: ${detail}` : "."}` }, `Ejecuta y corrige ${command} ${args.join(" ")}.`, { now });
     }
   }
   return { results, manifest };

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { report, validateArchive, validateIssue } from "./checkOpenSpecReadiness.mjs";
+import { report, summaryFor, validateArchive, validateIssue } from "./checkOpenSpecReadiness.mjs";
 
 const now = new Date("2026-07-15T12:00:00Z");
 const issueBody = `## Contexto\n\n## Historia Original\n\n## Enriquecida\n\n**No objetivos.**\n\n**Rollback.**\n\n<!-- openspec-readiness:pre-propose\n{"schemaVersion":1,"change":"sample-change","execution":"versioned","dependencies":[49],"currentState":"CodeGraph","surfaces":["docs","harness"],"manualIntervention":"none","exceptions":[]}\nopenspec-readiness:pre-propose -->`;
@@ -11,6 +11,31 @@ assert.equal(report(validateIssue(issue, { now })).ok, true);
 assert.equal(report(validateIssue({ ...issue, body: issueBody.replace("**Rollback.**", "") }, { now })).ok, false);
 assert.equal(report(validateIssue({ ...issue, projectItems: [] }, { now })).ok, false);
 assert.equal(report(validateIssue({ ...issue, dependencyStates: [{ number: 49, state: "OPEN" }] }, { now })).ok, false);
+
+// --- El resumen de cada linea debe describir el estado que reporta ---
+//
+// Regresion de #113: addRequired reutilizaba el texto de fallo tambien en PASS, asi que el gate
+// imprimia "PASS tldr: Falta TLDR.md en la raiz del change". Un informe que se contradice a si mismo
+// no sirve como evidencia, que es exactamente para lo que existe este gate.
+assert.equal(summaryFor({ pass: "Verificado.", fail: "Falta X." }, "PASS"), "Verificado.");
+assert.equal(summaryFor({ pass: "Verificado.", fail: "Falta X." }, "FAIL"), "Falta X.");
+// La forma legacy de un solo texto se marca en PASS en vez de afirmar el fallo como si fuera exito.
+assert.match(summaryFor("Falta X.", "PASS"), /Resumen sin variante PASS declarada/);
+assert.equal(summaryFor("Falta X.", "FAIL"), "Falta X.");
+
+// Sobre el gate real: ninguna linea PASS puede contener el vocabulario de fallo de su propia
+// verificacion. Fija el defecto sobre el informe completo, no solo sobre el helper.
+const NEGACIONES = /(Falta|Faltan|no cumple|no coincide|no enlaza|no reconocidas|sin cerrar|pendientes|debe permanecer|debe pertenecer|desconocidos|no permitidos)/;
+const informeIssue = validateIssue(issue, { now }).results;
+assert.equal(informeIssue.length > 0, true);
+for (const linea of informeIssue.filter((item) => item.status === "PASS")) {
+  assert.equal(NEGACIONES.test(linea.summary), false, `La linea PASS ${linea.id} describe un fallo: ${linea.summary}`);
+}
+// Y las lineas FAIL si deben describirlo, para que la prueba no pase por vacuidad.
+const informeRoto = validateIssue({ ...issue, state: "CLOSED", projectItems: [] }, { now }).results;
+const fallos = informeRoto.filter((item) => item.status === "FAIL");
+assert.equal(fallos.length >= 2, true);
+assert.equal(fallos.every((linea) => NEGACIONES.test(linea.summary)), true);
 
 const root = mkdtempSync(path.join(tmpdir(), "planearia-readiness-"));
 const changeRoot = path.join(root, "openspec", "changes", "sample-change");

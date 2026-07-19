@@ -30,6 +30,34 @@ export function classifyChecksOutcome({ exitCode, stderr = "" } = {}) {
   return CHECKS_FAILED;
 }
 
+export const HEAD_MATCHED = "head-matched";
+export const HEAD_STALE = "head-stale";
+
+// GitHub tarda en reflejar un push en la API del PR: durante esa ventana `gh pr view --json headRefOid`
+// devuelve todavia el commit anterior. Fijar el merge a ese OID con --match-head-commit lo hace fallar
+// con "Head branch was modified", aunque nadie haya tocado la rama. Es una carrera distinta a la del
+// rollup de checks: aquella decide cuando esperar, esta decide QUE commit se mergea.
+//
+// La direccion segura del fallo es no mergear: preferimos abortar con diagnostico antes que soltar
+// --match-head-commit, que es la unica garantia de que se mergea exactamente lo que CI valido.
+export async function waitForHeadRef({ readHeadRef, expected, sleep, now, deadlineMs = 60_000, intervalMs = 5_000 } = {}) {
+  const started = now();
+  let attempts = 0;
+  let observed = null;
+
+  for (;;) {
+    observed = await readHeadRef();
+    attempts += 1;
+    if (observed === expected) return { outcome: HEAD_MATCHED, observed, attempts, waitedMs: now() - started };
+
+    const waited = now() - started;
+    if (waited + intervalMs > deadlineMs) {
+      return { outcome: HEAD_STALE, observed, expected, attempts, waitedMs: waited, timedOut: true };
+    }
+    await sleep(intervalMs);
+  }
+}
+
 // Sondea solo mientras el rollup siga vacio. Cualquier otro estado sale de inmediato: reintentar un check
 // fallido lo convertiria en un timeout confuso, y un pendiente ya prueba que el rollup existe.
 //

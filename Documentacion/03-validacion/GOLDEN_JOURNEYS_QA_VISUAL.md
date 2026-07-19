@@ -123,9 +123,13 @@ clave, y ahora su contenido es verificable en vez de texto libre.
 
 ## 5. Las trampas del entorno web
 
-Verificadas durante la QA de #79 y #81 (2026-07-17 y 2026-07-18) y **corregidas con la corrida de
-referencia de #85** (2026-07-19), que desmintio tres de ellas y anadio una. **Son pasos obligatorios,
-no anecdotas**: un runbook que ignora como falla la herramienta no es reproducible.
+Verificadas durante la QA de #79 y #81 (2026-07-17 y 2026-07-18), **corregidas con la corrida de
+referencia de #85** (2026-07-19), que desmintio tres de ellas y anadio una, y ampliadas por #110
+(2026-07-19) con la trampa de 5.7. **Son pasos obligatorios, no anecdotas**: un runbook que ignora
+como falla la herramienta no es reproducible.
+
+Todas comparten la misma firma: **la tecnica no falla, no queda vacia y devuelve un resultado
+plausible pero equivocado**. Por eso se documentan con sintoma, causa y remedio, y no como consejos.
 
 ### 5.1 El bundler tarda en responder
 
@@ -198,7 +202,44 @@ c.querySelectorAll('[aria-hidden="true"]').forEach(n => n.remove());
 const visible = c.innerText;
 ```
 
-### 5.7 Nota operativa
+### 5.7 Medir un modal por `[aria-modal="true"]` devuelve el envoltorio, no el panel
+
+**Es de la misma familia que 5.2 y cuesta lo mismo: produjo un defecto archivado que no existia.**
+
+El `Modal` de React Native, en web, se traduce a un contenedor `position: fixed` del tamano del
+viewport, y **react-native-web le pone `aria-modal="true"` a ese contenedor**. La prop
+`accessibilityViewIsModal` que declara el panel no viaja al DOM: no esta en la lista que RN Web
+reenvia. Resultado: el unico `[aria-modal="true"]` del arbol es el envoltorio.
+
+Medir por ese selector devuelve **siempre** un rectangulo del ancho de la ventana pegado al borde
+inferior, en cualquier breakpoint. No lanza error, no queda vacio y devuelve numeros plausibles: la
+firma exacta de una hoja movil. Asi se archivo en #84 que `Sheet` renderizaba como hoja movil a
+768 px cuando el codigo produce un dialogo centrado de 520 px
+(`openspec/changes/archive/2026-07-19-assign-sheet/evidencia/README.md:19` y `:90-94`). Esa evidencia
+archivada **no se corrige en su lugar**: el historico se deja intacto y la medicion correcta se
+publica hacia adelante en la evidencia del change `sheet-medicion-panel-qa` (#110).
+
+**Regla general, no solo para modales:** ancla la medicion en un identificador **propio del elemento**
+que quieres medir. No localices por atributos de rol o de accesibilidad que la plataforma web pueda
+haber colocado en un contenedor que ella genera.
+
+```js
+// MAL: devuelve el envoltorio full-viewport que crea RN Web
+document.querySelector('[aria-modal="true"]').getBoundingClientRect();
+
+// BIEN: ancla propia del panel
+document.querySelector('[data-testid="sheet-catalogo-panel"]').getBoundingClientRect();
+```
+
+Si el componente no expone un ancla propia, **agregala antes de medir**. En `Sheet` la convencion es
+derivarla del `testID` que ya recibe (`${testID}-panel`, junto a `-backdrop` y `-close`), asi que no
+crece el contrato publico y todo consumidor que ya pasa `testID` la obtiene gratis.
+
+**Senal de alarma que ahorra la sesion entera:** si la medicion afirma una forma que el codigo del
+componente no puede producir, verifica primero que mediste el elemento correcto. Antes de declarar un
+defecto, descarta el instrumento.
+
+### 5.8 Nota operativa
 
 Limpiar `localStorage` resetea onboarding y sesion; es como se recorre GJ0 desde el paso 1.
 

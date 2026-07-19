@@ -30,17 +30,17 @@ Issue: [#85](https://github.com/RitualBoat/PlanearIA/issues/85). Un bloque a la 
 
 ## 4. Corrida de referencia real
 
-- [ ] 4.1 Levantar `expo start --web` y confirmar HTTP 200 antes de navegar; registrar el comando y la respuesta.
-- [ ] 4.2 Ejecutar GJ0 completo en 375, 768 y 1280 con Playwright MCP: medicion DOM por ancho y capturas reales en `evidencia/capturas/`.
-- [ ] 4.3 Redactar `evidencia/README.md` cumpliendo las siete secciones del contrato, incluida la clasificacion del ruido de consola y las limitaciones honestas.
-- [ ] 4.4 Correr `npm run qa:visual:check -- --change golden-journeys-qa-visual` sobre la propia evidencia y registrar su salida; el change se autoverifica con su propio contrato.
+- [x] 4.1 (Evidencia: curl a http://localhost:8081 devolvio HTTP 200 antes de navegar; git diff development -- src/ vacio, el codigo servido es identico a development.) Levantar `expo start --web` y confirmar HTTP 200 antes de navegar; registrar el comando y la respuesta.
+- [ ] 4.2 BLOQUEADO (capturas no tomadas: el panel Browser agota 30s de forma consistente y Playwright MCP responde "Browser is already in use" por perfil tomado por una sesion concurrente. No se fabricaron capturas.) Ejecutar GJ0 completo en 375, 768 y 1280 con Playwright MCP: medicion DOM por ancho y capturas reales en `evidencia/capturas/`.
+- [x] 4.3 (Evidencia: evidencia/README.md con las siete secciones; declara explicitamente que las capturas no se tomaron y por que.) Redactar `evidencia/README.md` cumpliendo las siete secciones del contrato, incluida la clasificacion del ruido de consola y las limitaciones honestas.
+- [x] 4.4 (Evidencia: qa:visual:check ejecutado: FAIL por evidencia-capturas nombrando los tres archivos ausentes; el resto de afirmaciones en PASS.) Correr `npm run qa:visual:check -- --change golden-journeys-qa-visual` sobre la propia evidencia y registrar su salida; el change se autoverifica con su propio contrato.
 
 ## 5. Validacion y cierre
 
-- [ ] 5.1 `npm run typecheck` y `npm run lint -- --quiet` en verde.
-- [ ] 5.2 `npm test -- --runInBand` sin regresion de la linea base (103 suites / 677 tests).
-- [ ] 5.3 `npm run test:golden-journeys` en verde.
-- [ ] 5.4 `npm run openspec:validate` en verde.
+- [x] 5.1 (Evidencia: typecheck y lint --quiet sin errores.) `npm run typecheck` y `npm run lint -- --quiet` en verde.
+- [x] 5.2 (Evidencia: 103 suites / 677 tests en verde, sin regresion de la linea base.) `npm test -- --runInBand` sin regresion de la linea base (103 suites / 677 tests).
+- [x] 5.3 (Evidencia: golden-journeys-tests PASS, 13 escenarios.) `npm run test:golden-journeys` en verde.
+- [x] 5.4 (Evidencia: openspec:validate 29/29 y openspec-tldr OK.) `npm run openspec:validate` en verde.
 - [ ] 5.5 Actualizar `TLDR.md` si cambiaron alcance, archivos, comportamiento o resultado esperado.
 - [ ] 5.6 Revision adversarial independiente antes de archivar.
 - [ ] 5.7 `npm run openspec:ready:archive -- --change golden-journeys-qa-visual --run-local` en PASS.

@@ -133,13 +133,15 @@ function relative(target) {
 
 const changeDir = path.join(CHANGES_DIR, change);
 const archivedDir = findArchivedDir(change);
-const openspecDirty = statusEntries('--', 'openspec/').length > 0;
+// La frescura del archive se mide solo sobre las rutas que el archive produce, por el mismo motivo que
+// consolidate() acota su 'git add': trabajo ajeno dentro de openspec/ no debe alterar la clasificacion.
+const archiveDirty = statusEntries('--', ...archivePaths(archivedDir)).length > 0;
 const archiveTracked = archivedDir ? readGit('ls-files', '--', relative(archivedDir)).length > 0 : false;
 
 const repositoryState = classifyRepositoryState({
   changeDirExists: existsSync(changeDir),
   archiveDirExists: Boolean(archivedDir),
-  archiveCommitted: archiveTracked && !openspecDirty,
+  archiveCommitted: archiveTracked && !archiveDirty,
 });
 
 console.log(`\n[opsx:archive] Archivando '${change}' en '${branch}'${DRY ? ' (DRY-RUN)' : ''}\n`);
@@ -164,9 +166,24 @@ function issueNumber(root) {
   }
 }
 
-function consolidate(message) {
-  git('add', '-A', '--', 'openspec/');
-  if (!DRY && !readGit('diff', '--cached', '--name-only', '--', 'openspec/')) {
+// Rutas que produce el archive y solo ellas. `git add -A -- openspec/` arrastraria al commit cualquier
+// otro trabajo sin commitear dentro de openspec/ (un segundo change en borrador, por ejemplo), que es
+// justo lo que la guardia de trabajo ajeno quiere evitar y que esa guardia no cubre porque solo mira
+// fuera de openspec/. Se enumeran: el origen borrado, el destino nuevo y las specs escritas.
+// `git add -- <ruta>` es fatal si la ruta no existe en disco ni esta rastreada, que es exactamente el
+// caso del directorio de origen en una reejecucion cuyo borrado ya quedo commiteado. Se filtra por eso.
+function archivePaths(archiveTarget) {
+  const candidates = ['openspec/specs', relative(changeDir)];
+  if (archiveTarget) candidates.push(relative(archiveTarget));
+  return candidates.filter(
+    (candidate) => existsSync(path.join(ROOT, candidate)) || readGit('ls-files', '--', candidate).length > 0,
+  );
+}
+
+function consolidate(message, archiveTarget) {
+  const paths = archivePaths(archiveTarget);
+  git('add', '-A', '--', ...paths);
+  if (!DRY && !readGit('diff', '--cached', '--name-only', '--', ...paths)) {
     ok('no hay nada que consolidar; el archive ya estaba commiteado.');
     return false;
   }
@@ -189,7 +206,7 @@ if (repositoryState === REPO_ARCHIVED_UNCOMMITTED) {
   const issue = issueNumber(archivedDir);
   ok(`'${change}' ya esta en ${relative(archivedDir)} pero su salida no esta commiteada.`);
   ok('se consolida sin repetir el archive.');
-  consolidate(`docs(openspec): archivar ${change}${issue ? ` (#${issue})` : ''}`);
+  consolidate(`docs(openspec): archivar ${change}${issue ? ` (#${issue})` : ''}`, archivedDir);
   console.log(`\n[opsx:archive] Listo. Continua con 'npm run opsx:finish'.\n`);
   process.exit(0);
 }
@@ -269,11 +286,11 @@ if (archived.status !== 0) {
   abort(`La CLI de OpenSpec no pudo archivar '${change}'. El change no se movio; revisa el diagnostico anterior.`);
 }
 
-consolidate(commitMessage(issue, skipSpecs));
+consolidate(commitMessage(issue, skipSpecs), findArchivedDir(change));
 
 const finalDir = findArchivedDir(change);
 if (!finalDir) abort('El archive termino pero no se encontro el directorio archivado. Revisa openspec/changes/archive/.');
-if (statusEntries('--', 'openspec/').length) {
+if (statusEntries('--', ...archivePaths(finalDir)).length) {
   abort('Quedaron cambios sin commitear en openspec/ tras consolidar. Revisa git status antes de continuar.');
 }
 

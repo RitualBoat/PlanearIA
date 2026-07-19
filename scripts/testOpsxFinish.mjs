@@ -4,8 +4,11 @@ import {
   CHECKS_NOT_REGISTERED,
   CHECKS_PASSED,
   CHECKS_PENDING,
+  HEAD_MATCHED,
+  HEAD_STALE,
   classifyChecksOutcome,
   waitForChecks,
+  waitForHeadRef,
 } from "./lib/prChecksWait.mjs";
 
 // Texto real de gh 2.96.0 (cli/cli, pkg/cmd/pr/checks/checks.go): fmt.Errorf("no checks reported on the
@@ -180,4 +183,82 @@ assert.equal(
   assert.equal(sleeps, 2);
 }
 
-console.log("opsx-finish checks wait: OK (clasificacion, checks tardios, timeout, checks fallidos y fronteras)");
+// --- Espera del headRefOid: la carrera que hizo fallar el merge de #120 ---
+//
+// GitHub tarda en reflejar el push en la API del PR. `gh pr view --json headRefOid` devolvia todavia el
+// commit anterior, el cierre ataba --match-head-commit a ese OID obsoleto y el merge fallaba con
+// "Head branch was modified" sin que nadie hubiera tocado la rama. Es una carrera distinta a la del
+// rollup de checks: aquella decide cuando esperar, esta decide QUE commit se mergea.
+
+const LOCAL_HEAD = "c8b4d6cd68419fd2796afeac74b7bbbf263fc3a6";
+const STALE_HEAD = "6e44b813e82d4624047546c8871cd121e570d634";
+
+function scriptedHeads(values) {
+  const calls = [];
+  return {
+    calls,
+    readHeadRef: async () => {
+      const value = values[Math.min(calls.length, values.length - 1)];
+      calls.push(value);
+      return value;
+    },
+  };
+}
+
+{
+  // GitHub ya refleja el push en la primera consulta: no se duerme.
+  const clock = fakeClock();
+  const { readHeadRef, calls } = scriptedHeads([LOCAL_HEAD]);
+  const result = await waitForHeadRef({ readHeadRef, expected: LOCAL_HEAD, sleep: clock.sleep, now: clock.now, deadlineMs: 60_000, intervalMs: 5_000 });
+  assert.equal(result.outcome, HEAD_MATCHED);
+  assert.equal(result.observed, LOCAL_HEAD);
+  assert.equal(calls.length, 1);
+  assert.equal(result.waitedMs, 0);
+}
+
+{
+  // El caso real de #120: dos consultas con el OID viejo y luego el nuevo. Debe continuar, no abortar.
+  const clock = fakeClock();
+  const { readHeadRef, calls } = scriptedHeads([STALE_HEAD, STALE_HEAD, LOCAL_HEAD]);
+  const result = await waitForHeadRef({ readHeadRef, expected: LOCAL_HEAD, sleep: clock.sleep, now: clock.now, deadlineMs: 60_000, intervalMs: 5_000 });
+  assert.equal(result.outcome, HEAD_MATCHED);
+  assert.equal(calls.length, 3);
+  assert.equal(result.waitedMs, 10_000);
+}
+
+{
+  // El OID nunca coincide: agota el deadline y reporta ambos commits, sin mergear.
+  const clock = fakeClock();
+  const { readHeadRef } = scriptedHeads([STALE_HEAD]);
+  const result = await waitForHeadRef({ readHeadRef, expected: LOCAL_HEAD, sleep: clock.sleep, now: clock.now, deadlineMs: 20_000, intervalMs: 5_000 });
+  assert.equal(result.outcome, HEAD_STALE);
+  assert.equal(result.timedOut, true);
+  // El diagnostico necesita los dos lados para que el operador distinga retraso de GitHub de un push ajeno.
+  assert.equal(result.observed, STALE_HEAD);
+  assert.equal(result.expected, LOCAL_HEAD);
+  assert.equal(result.waitedMs <= 20_000, true);
+}
+
+{
+  // No vacuidad: con el mismo guion, esperar el OID viejo coincide de inmediato. Asi la suite falla si
+  // waitForHeadRef ignorase `expected` y devolviera siempre HEAD_MATCHED o siempre HEAD_STALE.
+  const clock = fakeClock();
+  const { readHeadRef } = scriptedHeads([STALE_HEAD]);
+  const result = await waitForHeadRef({ readHeadRef, expected: STALE_HEAD, sleep: clock.sleep, now: clock.now, deadlineMs: 20_000, intervalMs: 5_000 });
+  assert.equal(result.outcome, HEAD_MATCHED);
+}
+
+{
+  // sleep se invoca una vez por reintento y nunca tras la coincidencia.
+  let sleeps = 0;
+  const clock = fakeClock();
+  const sleep = async (ms) => {
+    sleeps += 1;
+    await clock.sleep(ms);
+  };
+  const { readHeadRef } = scriptedHeads([STALE_HEAD, STALE_HEAD, LOCAL_HEAD]);
+  await waitForHeadRef({ readHeadRef, expected: LOCAL_HEAD, sleep, now: clock.now, deadlineMs: 60_000, intervalMs: 5_000 });
+  assert.equal(sleeps, 2);
+}
+
+console.log("opsx-finish: OK (checks: clasificacion, tardios, timeout, fallidos; headRefOid: coincidencia, retraso, timeout y no vacuidad)");

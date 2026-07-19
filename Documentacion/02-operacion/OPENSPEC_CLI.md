@@ -145,7 +145,14 @@ sincronizacion, los cuatro de repositorio y el parseo de deltas).
 
 `npm run opsx:finish` cierra la rama del change mediante PR hacia `development`. Nunca hace checkout, merge ni push directo sobre el target: publica la rama, crea o reutiliza el PR, espera los checks y ordena el merge a GitHub. Previsualiza con `npm run opsx:finish:dry`, que termina antes de esperar CI.
 
-La espera ocurre en dos fases. GitHub registra los checks del commit recien empujado con unos segundos de retraso; durante esa ventana `gh pr checks` falla en vez de esperar, y `--watch` no lo cubre porque el error se produce antes de su bucle. La fase 1 sondea hasta que los checks aparecen; la fase 2 espera a que terminen, sin filtrar a los requeridos.
+Antes de esperar checks, el cierre comprueba que GitHub ya refleje el push. La API del PR puede seguir
+reportando el commit anterior durante unos segundos; atar `--match-head-commit` a ese OID obsoleto hace
+que el merge falle con `Head branch was modified` aunque nadie haya tocado la rama. El cierre sondea
+`headRefOid` hasta que coincide con `HEAD` local, limitado por `--head-deadline` (60s por defecto). Si no
+coincide, aborta mostrando ambos commits y el PR queda sin mergear: no se relaja `--match-head-commit`,
+que es la unica garantia de que se mergea exactamente lo que CI valido.
+
+La espera de checks ocurre despues, en dos fases. GitHub registra los checks del commit recien empujado con unos segundos de retraso; durante esa ventana `gh pr checks` falla en vez de esperar, y `--watch` no lo cubre porque el error se produce antes de su bucle. La fase 1 sondea hasta que los checks aparecen; la fase 2 espera a que terminen, sin filtrar a los requeridos.
 
 El `git checkout` a `development` que aparece en el reflog al final de cada change proviene de este
 comando, no de la CLI de OpenSpec: `openspec archive` no ejecuta ninguna operacion git. Por eso
@@ -167,6 +174,7 @@ Un mensaje de error no reconocido cuenta como fallo y aborta. Es deliberado: si 
 |---|---|---|
 | `--checks-deadline <segundos>` | 120 | Limite del sondeo. `0` fuerza una sola consulta (comportamiento previo al sondeo). |
 | `--checks-interval <segundos>` | 5 | Espera entre consultas del sondeo. |
+| `--head-deadline <segundos>` | 60 | Limite de la espera a que GitHub refleje el push en el PR. |
 
 Si el sondeo se agota, el cierre aborta nombrando PR, commit, tiempo esperado y que revisar, y el PR queda sin mergear. La ausencia de checks nunca se interpreta como checks aprobados. Ante ese diagnostico: confirma en `<url del PR>/checks` que los workflows aplican a `development`, y sube `--checks-deadline` solo si CI tarda mas en arrancar. Un PR hacia `development` siempre deberia reportar los checks requeridos (`TypeScript`, `ESLint`, `Jest`, `Backend smoke`); que no aparezcan indica un problema de CI, no del cierre.
 
@@ -189,6 +197,8 @@ Pruebas locales de esta logica: `npm run test:opsx-finish` (sin red ni procesos;
 | `openspec archive` aborta: `ADDED ... already exists` | Sintoma de haber sincronizado antes de archivar. Usa `npm run opsx:archive`, que clasifica el estado y elige la invocacion correcta. |
 | `opsx:finish` aborta: hay cambios sin commitear | Ejecuta `npm run opsx:archive -- <change>` antes; es el owner del commit del archive. |
 | `opsx:finish` aborta: el PR no reporto checks | Revisa `<url del PR>/checks` y que los workflows apliquen a `development`. Sube `--checks-deadline` solo si CI tarda mas en arrancar; el PR queda sin mergear. |
+| `opsx:finish` aborta: el PR reporta un commit distinto al local | GitHub aun no refleja el push, o alguien mas empujo a la rama. Compara los dos commits del diagnostico; si solo es retraso, repite el cierre o sube `--head-deadline`. |
+| `opsx:finish` aborta: GitHub rechazo el merge | La rama avanzo entre la validacion y el merge. Revisa el PR y repite el cierre. |
 | `opsx:finish` aborta: los checks fallaron | Corrige la CI en rojo y vuelve a ejecutar. El cierre no reintenta checks fallidos ni relanza workflows. |
 
 ## Rollback seguro

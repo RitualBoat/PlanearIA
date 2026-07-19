@@ -9,7 +9,9 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import {
   CHECKS_FAILED,
   CHECKS_NOT_REGISTERED,
+  HEAD_STALE,
   waitForChecks,
+  waitForHeadRef,
 } from './lib/prChecksWait.mjs';
 
 const args = process.argv.slice(2);
@@ -36,6 +38,8 @@ function seconds(flag, fallback) {
 // comportamiento previo al sondeo, documentado como via de desactivacion.
 const CHECKS_DEADLINE_MS = seconds('--checks-deadline', 120);
 const CHECKS_INTERVAL_MS = seconds('--checks-interval', 5);
+// Ventana en la que GitHub aun puede reportar el commit previo al push recien hecho.
+const HEAD_DEADLINE_MS = seconds('--head-deadline', 60);
 
 function execute(command, commandArgs, { capture = true } = {}) {
   if (DRY) {
@@ -101,6 +105,34 @@ try {
 
 if (pullRequest.state !== 'OPEN') abort(`El PR #${pullRequest.number} no esta abierto (${pullRequest.state}).`);
 
+// El PR se resuelve inmediatamente despues del push, asi que su headRefOid puede ser todavia el commit
+// anterior. Todo lo que sigue -- los checks que se esperan y el commit al que se ata el merge -- depende
+// de que ese OID sea el que se acaba de publicar.
+const localHead = readGit('rev-parse', 'HEAD');
+if (pullRequest.headRefOid !== localHead) {
+  ok(`esperando a que GitHub refleje el push en el PR #${pullRequest.number} (hasta ${HEAD_DEADLINE_MS / 1000}s)`);
+  const head = await waitForHeadRef({
+    readHeadRef: async () => JSON.parse(gh('pr', 'view', String(pullRequest.number), '--json', 'headRefOid')).headRefOid,
+    expected: localHead,
+    sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+    now: () => Date.now(),
+    deadlineMs: HEAD_DEADLINE_MS,
+    intervalMs: CHECKS_INTERVAL_MS,
+  });
+
+  if (head.outcome === HEAD_STALE) {
+    abort(
+      `El PR #${pullRequest.number} sigue reportando un commit distinto al local tras ${Math.round(head.waitedMs / 1000)}s.\n` +
+        `  Local:     ${localHead}\n` +
+        `  En GitHub: ${head.observed}\n` +
+        '  Si alguien mas empujo a la rama, revisa antes de reintentar. Si solo es retraso de GitHub, vuelve a\n' +
+        '  ejecutar el cierre o sube el limite con --head-deadline <segundos>. El PR queda sin mergear.',
+    );
+  }
+  pullRequest.headRefOid = head.observed;
+  ok(`GitHub ya reporta el commit local (${head.attempts} consulta(s))`);
+}
+
 // Fase 1: sondear hasta que GitHub registre los checks. gh --watch no cubre esta ventana porque falla antes
 // de su bucle cuando el rollup del commit sigue vacio, y su codigo de salida no la distingue de una CI en
 // rojo. Se clasifica por evidencia; solo el rollup vacio reintenta.
@@ -147,7 +179,18 @@ if (DRY) {
   process.exit(0);
 }
 
-gh('pr', 'merge', String(pullRequest.number), '--merge', '--delete-branch', '--match-head-commit', pullRequest.headRefOid);
+// --match-head-commit ata el merge al commit que CI valido. Si GitHub lo rechaza, el cierre se detiene
+// con diagnostico: un volcado de pila aqui esconderia la causa, que casi siempre es que la rama avanzo.
+try {
+  gh('pr', 'merge', String(pullRequest.number), '--merge', '--delete-branch', '--match-head-commit', pullRequest.headRefOid);
+} catch {
+  abort(
+    `GitHub rechazo el merge del PR #${pullRequest.number}.\n` +
+      `  Commit exigido: ${pullRequest.headRefOid}\n` +
+      '  Causa habitual: la rama avanzo entre la validacion y el merge.\n' +
+      `  Revisa ${pullRequest.url} y vuelve a ejecutar el cierre; el PR queda sin mergear.`,
+  );
+}
 ok(`PR #${pullRequest.number} mergeado por GitHub`);
 
 git('fetch', 'origin', '--prune');

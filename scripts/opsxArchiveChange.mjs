@@ -64,13 +64,14 @@ function git(...commandArgs) {
   return readGit(...commandArgs);
 }
 
-// npm en Windows es un .cmd, que spawnSync no resuelve por nombre desnudo. Se nombra el ejecutable real
-// en vez de activar `shell: true`: con shell los argumentos se concatenan sin escapar (Node lo marca
-// DEP0190) y el nombre del change entraria a una linea de comandos interpretada.
-const NPM = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+// Ni `npm` ni `npm.cmd` sirven aqui. En Windows npm es un .cmd, y desde la correccion de CVE-2024-27980
+// Node rechaza spawnear .cmd/.bat sin `shell: true` (EINVAL, status null). Activar el shell devolveria
+// argumentos concatenados sin escapar (DEP0190). La salida es no pasar por npm: se ejecuta el script de
+// Node directamente con el mismo interprete, sin shell, sin .cmd y sin superficie de inyeccion.
+const OPENSPEC_BIN = path.join(ROOT, 'node_modules', '@fission-ai', 'openspec', 'bin', 'openspec.js');
 
-function runNpm(commandArgs, { inherit = false } = {}) {
-  return spawnSync(NPM, commandArgs, {
+function runNode(scriptPath, scriptArgs, { inherit = false } = {}) {
+  return spawnSync(process.execPath, [scriptPath, ...scriptArgs], {
     cwd: ROOT,
     encoding: 'utf8',
     stdio: inherit ? 'inherit' : 'pipe',
@@ -214,7 +215,7 @@ if (repositoryState === REPO_ARCHIVED_UNCOMMITTED) {
 // --- Ruta normal: gate, clasificacion, archive, consolidacion ---
 
 ok('ejecutando el gate de readiness de archive');
-const gate = runNpm(['run', 'openspec:ready:archive', '--', '--change', change, '--run-local'], { inherit: true });
+const gate = runNode(path.join(ROOT, 'scripts', 'checkOpenSpecReadiness.mjs'), ['--phase', 'archive', '--change', change, '--run-local'], { inherit: true });
 if (gate.status !== 0) {
   abort(`El gate de readiness reporto fallo para '${change}'. Resuelve cada FAIL antes de archivar.`);
 }
@@ -261,11 +262,11 @@ if (skipSpecs) {
   ok('las deltas no estan aplicadas; la CLI las aplicara durante el archive');
 }
 
-const archiveArgs = ['exec', '--yes=false', '--', 'openspec', 'archive', change, '--yes'];
+const archiveArgs = ['archive', change, '--yes'];
 if (skipSpecs) archiveArgs.push('--skip-specs');
 
 if (DRY) {
-  console.log(`  [dry-run] npm ${archiveArgs.join(' ')}`);
+  console.log(`  [dry-run] node ${relative(OPENSPEC_BIN)} ${archiveArgs.join(' ')}`);
   const issue = issueNumber(changeDir);
   console.log(`  [dry-run] git add -A -- openspec/`);
   console.log(`  [dry-run] git commit -m "${commitMessage(issue, skipSpecs)}"`);
@@ -281,7 +282,7 @@ function commitMessage(issue, skipped) {
 }
 
 const issue = issueNumber(changeDir);
-const archived = runNpm(archiveArgs, { inherit: true });
+const archived = runNode(OPENSPEC_BIN, archiveArgs, { inherit: true });
 if (archived.status !== 0) {
   abort(`La CLI de OpenSpec no pudo archivar '${change}'. El change no se movio; revisa el diagnostico anterior.`);
 }

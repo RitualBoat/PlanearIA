@@ -62,3 +62,11 @@ command = "cmd"
 args = ["/c", "npx", "@playwright/mcp@latest"]
 startup_timeout_sec = 60
 tool_timeout_sec = 120
+
+# --- Codex-specific extra (not in .mcp.json): aprobacion por herramienta ---
+
+[mcp_servers.github.tools.issue_write]
+approval_mode = "approve"
+
+[mcp_servers.github.tools.add_issue_comment]
+approval_mode = "approve"

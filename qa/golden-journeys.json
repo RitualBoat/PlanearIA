@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "actualizado": "2026-07-19",
+  "issue": 85,
+  "descripcion": "Fuente de verdad de los golden journeys de PlanearIA y del contrato de QA visual por breakpoint. La prosa vive en Documentacion/03-validacion/GOLDEN_JOURNEYS_QA_VISUAL.md y cita a este archivo; si discrepan, manda este archivo.",
+  "fuenteDeAnchos": {
+    "archivo": "src/hooks/useBreakpoint.ts",
+    "spec": "openspec/specs/reactive-breakpoints",
+    "rangos": {
+      "mobile": "<768",
+      "tablet": "768-1279",
+      "desktop": ">=1280"
+    }
+  },
+  "umbralNielsenBloqueo": 3,
+  "patronCaptura": "{slug}-{ancho}.png",
+  "niveles": {
+    "N1": {
+      "disparador": "Todo change con UI visible.",
+      "anchos": [375, 768, 1280],
+      "journeysObligatorios": ["arranque-y-alcance-del-shell"],
+      "medicionDomObligatoria": false
+    },
+    "N2": {
+      "disparador": "El change altera la estructura de layout o de navegacion.",
+      "anchos": [375, 767, 768, 1279, 1280],
+      "journeysObligatorios": ["arranque-y-alcance-del-shell"],
+      "medicionDomObligatoria": true
+    },
+    "N3": {
+      "disparador": "El change toca la superficie de uno o mas golden journeys.",
+      "anchos": [375, 767, 768, 1279, 1280],
+      "journeysObligatorios": ["arranque-y-alcance-del-shell"],
+      "medicionDomObligatoria": true,
+      "nota": "Ademas de los obligatorios, cubre cada journey cuya superficie toca el change, declarado en readiness.json como qaVisualJourneys."
+    }
+  },
+  "seccionesObligatoriasEvidencia": [
+    "Entorno",
+    "Medicion por breakpoint",
+    "Journeys cubiertos",
+    "Checklist Nielsen",
+    "Checklist anti-slop",
+    "Consola",
+    "Limitaciones"
+  ],
+  "journeys": [
+    {
+      "id": "GJ0",
+      "slug": "arranque-y-alcance-del-shell",
+      "nombre": "Arranque y alcance del shell",
+      "persona": null,
+      "estado": "vigente",
+      "porQueImporta": "Es el unico journey ejecutable de punta a punta hoy y la red de regresion real del periodo Ola 1-2: protege que ningun change de UI deje una experiencia inalcanzable ni duplique la navegacion primaria.",
+      "origen": "Derivado de la QA de #81 (openspec/changes/archive/2026-07-18-app-shell-navegacion/evidencia/README.md) y de src/navigation/routeManifest.ts.",
+      "pasos": [
+        { "n": 1, "accion": "Abrir la app sin sesion previa", "ruta": "Onboarding", "hub": null },
+        { "n": 2, "accion": "Saltar el onboarding, que crea sesion de invitado", "ruta": "Escritorio", "hub": "InicioTab" },
+        { "n": 3, "accion": "Abrir el hub Office desde la navegacion primaria", "ruta": "OfficeHome", "hub": "OfficeTab" },
+        { "n": 4, "accion": "Abrir el hub Clases desde la navegacion primaria", "ruta": "ClassroomHome", "hub": "ClasesTab" },
+        { "n": 5, "accion": "Abrir el hub Asistente desde la navegacion primaria", "ruta": "AsistenteHome", "hub": "AsistenteTab" },
+        { "n": 6, "accion": "Abrir el hub Mas desde la navegacion primaria", "ruta": "MasHome", "hub": "MasTab" },
+        { "n": 7, "accion": "Abrir una pantalla legacy real desde su hub duenio", "ruta": "Contenido", "hub": "OfficeTab" }
+      ],
+      "criteriosObservables": [
+        "A cualquier ancho existe exactamente una superficie de navegacion primaria montada (una sola tablist).",
+        "El destino activo expone su estado seleccionado de forma accesible.",
+        "Cada destino de la navegacion primaria tiene area de toque de al menos 44 puntos en su lado corto.",
+        "Cada hub monta la pantalla de aterrizaje que declara HUB_LANDING en src/navigation/routeManifest.ts.",
+        "Los errores de consola se clasifican y ninguno es atribuible al shell."
+      ],
+      "rutas": ["Onboarding", "Escritorio", "OfficeHome", "ClassroomHome", "AsistenteHome", "MasHome", "Contenido"],
+      "delta": null
+    },
+    {
+      "id": "GJ1",
+      "slug": "lunes-7am-preparar-el-dia",
+      "nombre": "Lunes 7am: preparar el dia",
+      "persona": "Maria",
+      "estado": "parcial",
+      "porQueImporta": "Es el momento de mayor carga cognitiva del docente: hoy repasa de memoria que grupos tiene y busca la planeacion en carpetas o en WhatsApp enviado a si misma.",
+      "origen": "Documentacion/00-fundamentos/IHC_DISCOVERY_DOCENTE.md seccion 4, Recorrido 1.",
+      "pasos": [
+        { "n": 1, "accion": "Abrir la app y aterrizar en el Escritorio", "ruta": "Escritorio", "hub": "InicioTab" },
+        { "n": 2, "accion": "Usar el dock del Escritorio para abrir Office", "ruta": "OfficeHome", "hub": "OfficeTab" },
+        { "n": 3, "accion": "Abrir la lista de planeaciones para localizar el material del dia", "ruta": "ListaPlaneaciones", "hub": "OfficeTab" }
+      ],
+      "criteriosObservables": [
+        "La app aterriza en el Escritorio y no en un feed.",
+        "El Escritorio declara explicitamente que es una version temporal y ofrece salidas reales a los otros hubs.",
+        "La lista de planeaciones muestra su estado real: contenido, vacio o error, sin tarjetas de relleno."
+      ],
+      "rutas": ["Escritorio", "OfficeHome", "ListaPlaneaciones"],
+      "delta": {
+        "descripcion": "El Escritorio no responde aun 'que sigue hoy': no hay tablero del dia, ni clases proximas, ni documentos recientes. Hoy es un dock de lanzamiento declarado como temporal.",
+        "changeDuenio": "escritorio-docente",
+        "ola": "Ola 2",
+        "criteriosPendientes": [
+          "Al abrir, el docente ve que le toca hoy sin navegar.",
+          "Los documentos recientes son alcanzables desde el Escritorio."
+        ]
+      }
+    },
+    {
+      "id": "GJ2",
+      "slug": "crear-planeacion-y-asignarla",
+      "nombre": "Crear una planeacion y asignarla a un grupo",
+      "persona": "Luis",
+      "estado": "parcial",
+      "porQueImporta": "Hoy el docente pide borrador a una IA sin contexto de su clase, lo formatea en otra app y hace tres o cuatro pasos manuales por material para entregarlo.",
+      "origen": "Documentacion/00-fundamentos/IHC_DISCOVERY_DOCENTE.md seccion 4, Recorrido 2.",
+      "pasos": [
+        { "n": 1, "accion": "Abrir el hub Office", "ruta": "OfficeHome", "hub": "OfficeTab" },
+        { "n": 2, "accion": "Iniciar la creacion de una planeacion", "ruta": "CrearPlaneacion", "hub": "OfficeTab" },
+        { "n": 3, "accion": "Editar el documento en el editor", "ruta": "DocEditor", "hub": null },
+        { "n": 4, "accion": "Abrir el grupo destino desde el hub Clases", "ruta": "DetalleGrupo", "hub": "ClasesTab" },
+        { "n": 5, "accion": "Asignar el material como tarea del grupo", "ruta": "CrearTareaGrupo", "hub": "ClasesTab" }
+      ],
+      "criteriosObservables": [
+        "El editor abre a pantalla completa sin que la navegacion primaria tape el contenido.",
+        "Al guardar o cerrar un formulario, el regreso llega al origen real y no a un destino fijo.",
+        "Toda accion de la IA sobre el documento produce un resultado revisable y requiere confirmacion docente."
+      ],
+      "rutas": ["OfficeHome", "CrearPlaneacion", "DocEditor", "DetalleGrupo", "CrearTareaGrupo", "AsignarRecurso"],
+      "delta": {
+        "descripcion": "Asignar sigue siendo un cambio de hub y varios pasos: no existe 'asignar a clase' desde el propio documento, ni el flujo de creacion tipo-primero.",
+        "changeDuenio": "crear-tipo-primero + assign-sheet",
+        "ola": "Ola 2",
+        "criteriosPendientes": [
+          "Crear parte del tipo de documento, no del modulo.",
+          "Asignar a una clase se resuelve desde el documento sin perder el contexto."
+        ]
+      }
+    },
+    {
+      "id": "GJ3",
+      "slug": "capturar-calificaciones",
+      "nombre": "Pasar calificaciones de papel a la app",
+      "persona": "Carmen",
+      "estado": "parcial",
+      "porQueImporta": "El papel le funciona; el dolor esta en la recaptura. Si la app no acepta SU forma de trabajar, no la adopta.",
+      "origen": "Documentacion/00-fundamentos/IHC_DISCOVERY_DOCENTE.md seccion 4, Recorrido 3.",
+      "pasos": [
+        { "n": 1, "accion": "Abrir el hub Clases", "ruta": "ClassroomHome", "hub": "ClasesTab" },
+        { "n": 2, "accion": "Abrir la lista de grupos", "ruta": "ListaGrupos", "hub": "ClasesTab" },
+        { "n": 3, "accion": "Abrir el grupo del que trae calificaciones en papel", "ruta": "DetalleGrupo", "hub": "ClasesTab" },
+        { "n": 4, "accion": "Capturar las calificaciones del grupo", "ruta": "CapturarCalificaciones", "hub": "ClasesTab" },
+        { "n": 5, "accion": "Consultar los promedios resultantes", "ruta": "PromediosCalificaciones", "hub": "ClasesTab" }
+      ],
+      "criteriosObservables": [
+        "La captura mantiene visible a que alumno corresponde cada valor mientras se teclea.",
+        "Un error de captura se puede corregir sin perder el resto de lo capturado.",
+        "El flujo no pierde datos si se interrumpe la conexion durante la captura."
+      ],
+      "rutas": ["ClassroomHome", "ListaGrupos", "DetalleGrupo", "CapturarCalificaciones", "PromediosCalificaciones", "ImportarAlumnos"],
+      "delta": {
+        "descripcion": "No existe importar SU hoja de calculo tal cual con sus formulas visibles: hoy la importacion es de alumnos, no de la plantilla de calificaciones que la docente ya usa.",
+        "changeDuenio": "CalcuPLAN",
+        "ola": "diferido",
+        "criteriosPendientes": [
+          "Importar la hoja propia de la docente conservando su estructura.",
+          "Las formulas quedan visibles y editables, no ocultas tras automatismo."
+        ]
+      }
+    },
+    {
+      "id": "GJ4",
+      "slug": "offline-reconexion",
+      "nombre": "Trabajar sin conexion y reconectar sin perder nada",
+      "persona": null,
+      "estado": "declarado",
+      "porQueImporta": "PlanearIA es offline-first y sus docentes objetivo trabajan con conectividad intermitente; es el journey que sostiene la promesa central del producto.",
+      "origen": "PLAN_PREPARACION_OPERATIVA_SDD_HARNESS_SOLO_DEV.md:481, criterios de aceptacion del change golden-journeys-web.",
+      "pasos": [],
+      "criteriosObservables": [],
+      "rutas": [],
+      "delta": {
+        "descripcion": "Reservado. Sus pasos y criterios se definen en el change duenio, no aqui: exige fixtures de datos y control de red que este change no construye.",
+        "changeDuenio": "golden-journeys-web",
+        "ola": "Ola 2 del plan de harness",
+        "criteriosPendientes": []
+      }
+    },
+    {
+      "id": "GJ5",
+      "slug": "accion-ia-revisable",
+      "nombre": "Accion de IA revisable con confirmacion docente",
+      "persona": null,
+      "estado": "declarado",
+      "porQueImporta": "El limite arquitectonico 'la IA propone, el docente decide' necesita una verificacion de recorrido, no solo pruebas unitarias.",
+      "origen": "PLAN_PREPARACION_OPERATIVA_SDD_HARNESS_SOLO_DEV.md:481, criterios de aceptacion del change golden-journeys-web.",
+      "pasos": [],
+      "criteriosObservables": [],
+      "rutas": [],
+      "delta": {
+        "descripcion": "Reservado. Exige escenarios de proveedor ausente, error temporal y limite de uso que dependen de fixtures del gateway de IA; se definen en el change duenio.",
+        "changeDuenio": "golden-journeys-web",
+        "ola": "Ola 2 del plan de harness",
+        "criteriosPendientes": []
+      }
+    }
+  ]
+}

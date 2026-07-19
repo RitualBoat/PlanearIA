@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "issue": 85,
+  "change": "golden-journeys-qa-visual",
+  "surfaces": [
+    "docs",
+    "ui"
+  ],
+  "validations": [
+    "openspec-strict",
+    "harness-parity"
+  ],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/85"
+    },
+    {
+      "id": "pr-link",
+      "ref": "PENDIENTE: PR generado por opsx:finish tras archive."
+    },
+    {
+      "id": "docs-verification",
+      "ref": "Las 15 rutas citadas por los journeys verificadas contra src/navigation/routeManifest.ts por la afirmacion manifiesto-rutas de qa:visual:check (PASS). Runbook registrado como primera entrada de Reportes Vigentes en Documentacion/03-validacion/README.md. Runbook corregido tras la corrida real: las trampas 5.2, 5.3 y 5.5 heredadas resultaron inexactas para Playwright MCP y se anadio 5.6 (aria-hidden)."
+    },
+    {
+      "id": "adversarial-review",
+      "ref": "Revision adversarial 2026-07-19, veredicto PASS CON HUECOS. Sin blockers. (1) MAJOR detectado y CERRADO dentro de la revision: los chequeos evidencia-medicion-dom y evidencia-journeys-cubiertos buscaban en todo el reporte, y como los nombres de captura contienen el ancho y el slug del journey, una simple tabla de capturas los satisfacia. Verificado por ataque: un reporte que decia 'Se reviso en todos los anchos y todo se ve bien' y 'No documentamos nada aqui' pasaba N2 COMPLETO, las once afirmaciones en PASS. Corregido con parseo del reporte por encabezados Markdown y exclusion de los nombres .png antes de buscar; cada chequeo se acota ahora a su seccion. Verificado por mutacion: el mismo ataque falla en evidencia-medicion-dom y evidencia-journeys-cubiertos, y la evidencia real del change sigue en PASS. (2) MAJOR detectado y CERRADO: evidencia-secciones aceptaba la seccion nombrada en cualquier parrafo; ahora exige un encabezado real. (3) Los fixtures daban falsa confianza porque sus reportes no incluian tabla de capturas, que es lo que tiene un reporte real. Se anadieron 4 escenarios (13 -> 17), incluido el ataque completo como regresion. (4) MINOR declarado: el nivel de QA visual es autodeclarado en readiness.json y el checker no puede juzgar si es el correcto; un change que altere la navegacion podria declarar N1. Se corrigio la sobreafirmacion del design D4 ('no es autoevaluacion silenciosa') y se anadio la advertencia al runbook seccion 3. (5) MINOR declarado y ya previsto en design D5: el checker verifica que la evidencia este completa, no que sea cierta; el cierre real es el baseline comparable de golden-journeys-web. (6) MINOR aceptado: la linea de severidad Nielsen se busca en todo el reporte y no solo en su seccion; falsificarla exige escribirla deliberadamente y el valor de endurecerlo es bajo. (7) MINOR rastreado: rutasRegistradas extrae toda cadena entrecomillada anterior al marcador de chequeos de tipo de routeManifest.ts; hoy todas son rutas, pero anadir ahi otra cadena entrecomillada podria admitir una ruta fantasma."
+    },
+    {
+      "id": "web-http-200",
+      "ref": "expo start --web en el puerto 8081 (perfil expo-web de .claude/launch.json); HTTP 200 confirmado con curl antes de navegar. El codigo servido es identico a development: git diff development -- src/ vacio en esta rama."
+    },
+    {
+      "id": "playwright-breakpoints",
+      "ref": "Corrida de referencia de GJ0 con Playwright MCP el 2026-07-19 en 375/768/1280 (nivel N1): tablists=1 en los tres anchos, barra inferior 367x55 en y=753 a 375, rail 68x954 a 768 y sidebar 199x824 a 1280; toques 69x55, 68x58 y 199x54, todos >= 44 pt; aria-selected correcto en los cinco destinos. Los 7 pasos del journey recorridos con clics reales, incluida la pantalla legacy Contenido desde Office. Capturas reales en evidencia/capturas/. npm run qa:visual:check -- --change golden-journeys-qa-visual: PASS en las once afirmaciones. Nota honesta: un primer intento quedo sin capturas por bloqueo de herramienta y el checker fallo correctamente en evidencia-capturas; no se fabricaron capturas, se resolvio el bloqueo y se repitio el recorrido."
+    },
+    {
+      "id": "nielsen",
+      "ref": "Checklist Nielsen del shell en evidencia/README.md: severidad maxima 0, ningun hallazgo >= 3. Checklist anti-slop 1.9.3: 7/7. Alcance declarado: evalua el shell recorrido por GJ0, no las pantallas internas. Consola: 28 errores, 100% respuestas 401 del backend por navegar sin sesion; cero atribuibles al change, que no toca src/."
+    }
+  ],
+  "qaVisualNivel": "N1",
+  "rollback": {
+    "strategy": "El change es aditivo y no toca codigo de producto. Crea qa/golden-journeys.json, Documentacion/03-validacion/GOLDEN_JOURNEYS_QA_VISUAL.md, scripts/checkGoldenJourneys.mjs, scripts/testGoldenJourneys.mjs, la evidencia del change y dos entradas en scripts de package.json (qa:visual:check, test:golden-journeys); ademas agrega una linea al indice de Documentacion/03-validacion/README.md. No modifica src/, backend/, almacenamiento, esquema, contratos de sync, claves @planearia:*, SYNC_ENTITIES, workflows de CI, gates compartidos (scripts/checkOpenSpecReadiness.mjs queda intacto) ni proyecto nativo, y no agrega dependencias. Ningun runtime de la app importa estos archivos, asi que revertir el commit del PR restaura el estado previo sin migracion ni perdida de datos y sin afectar ninguna suite existente. Desactivacion parcial sin revertir todo: dejar de invocar qa:visual:check devuelve la QA visual al modo actual conducido por agente, conservando manifiesto y runbook como documentacion de referencia.",
+    "trigger": "Si el contrato de evidencia resulta desproporcionado para changes pequenos de UI, se degrada al nivel N1 o se revierte el commit."
+  },
+  "adversarialReview": {
+    "ref": "Revision adversarial 2026-07-19, veredicto PASS CON HUECOS. Sin blockers. (1) MAJOR detectado y CERRADO dentro de la revision: los chequeos evidencia-medicion-dom y evidencia-journeys-cubiertos buscaban en todo el reporte, y como los nombres de captura contienen el ancho y el slug del journey, una simple tabla de capturas los satisfacia. Verificado por ataque: un reporte que decia 'Se reviso en todos los anchos y todo se ve bien' y 'No documentamos nada aqui' pasaba N2 COMPLETO, las once afirmaciones en PASS. Corregido con parseo del reporte por encabezados Markdown y exclusion de los nombres .png antes de buscar; cada chequeo se acota ahora a su seccion. Verificado por mutacion: el mismo ataque falla en evidencia-medicion-dom y evidencia-journeys-cubiertos, y la evidencia real del change sigue en PASS. (2) MAJOR detectado y CERRADO: evidencia-secciones aceptaba la seccion nombrada en cualquier parrafo; ahora exige un encabezado real. (3) Los fixtures daban falsa confianza porque sus reportes no incluian tabla de capturas, que es lo que tiene un reporte real. Se anadieron 4 escenarios (13 -> 17), incluido el ataque completo como regresion. (4) MINOR declarado: el nivel de QA visual es autodeclarado en readiness.json y el checker no puede juzgar si es el correcto; un change que altere la navegacion podria declarar N1. Se corrigio la sobreafirmacion del design D4 ('no es autoevaluacion silenciosa') y se anadio la advertencia al runbook seccion 3. (5) MINOR declarado y ya previsto en design D5: el checker verifica que la evidencia este completa, no que sea cierta; el cierre real es el baseline comparable de golden-journeys-web. (6) MINOR aceptado: la linea de severidad Nielsen se busca en todo el reporte y no solo en su seccion; falsificarla exige escribirla deliberadamente y el valor de endurecerlo es bajo. (7) MINOR rastreado: rutasRegistradas extrae toda cadena entrecomillada anterior al marcador de chequeos de tipo de routeManifest.ts; hoy todas son rutas, pero anadir ahi otra cadena entrecomillada podria admitir una ruta fantasma."
+  },
+  "exceptions": [],
+  "qaVisualJourneys": [
+    "arranque-y-alcance-del-shell"
+  ]
+}

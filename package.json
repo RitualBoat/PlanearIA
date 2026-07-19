@@ -52,6 +52,8 @@
     "test:openspec-cli": "node scripts/testOpenSpecCli.mjs",
     "test:openspec-tldr": "node scripts/testOpenSpecTldr.mjs",
     "test:openspec-readiness": "node scripts/testOpenSpecReadiness.mjs",
+    "qa:visual:check": "node scripts/checkGoldenJourneys.mjs",
+    "test:golden-journeys": "node scripts/testGoldenJourneys.mjs",
     "agent:opsx:update": "openspec update --force && node scripts/patchOpsxWorkflows.mjs",
     "agent:opsx:patch:check": "node scripts/patchOpsxWorkflows.mjs --check",
     "opsx:finish": "node scripts/opsxFinishChange.mjs",

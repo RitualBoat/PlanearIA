@@ -11,6 +11,7 @@ import {
   findUnexpectedAgentChanges,
   hasFtsDiagnostic,
   hasRepositoryDiagnostic,
+  repair,
   runStructuralVerification,
   verifyImpactResult,
   verifyQueryResult,
@@ -111,6 +112,58 @@ const badImpact = spyRunner([QUERY_OK, JSON.stringify({ target: { id: FIXTURE_UI
 const badImpactResult = runStructuralVerification({}, badImpact.runner);
 assert.equal(badImpactResult.ok, false);
 assert.match(badImpactResult.reason, /must be exact/i);
+
+// La recuperacion escala por los estados observados en #112: un analyze interrumpido deja el indice
+// mid-incremental-recovery (donde --repair-fts se niega a correr y pide un analyze previo) y un FTS
+// inconsistente hace fallar el reindex. Un solo intento no recupera ninguno de los dos.
+function repairRunner(outcomes) {
+  const issued = [];
+  const runner = (args) => {
+    issued.push(args.join(' '));
+    if (args[0] === 'status') return FRESH_STATUS;
+    const outcome = outcomes.shift();
+    if (outcome instanceof Error) throw outcome;
+    return outcome ?? 'Repository indexed successfully';
+  };
+  return { issued, runner };
+}
+
+const firstTry = repairRunner([]);
+repair({}, firstTry.runner);
+assert.deepEqual(firstTry.issued, ['analyze --index-only --name PlanearIA .', 'status']);
+
+// Segundo intento: el reindex recupera el estado sucio que dejo un analyze interrumpido.
+const retry = repairRunner([new Error('mid-incremental-recovery')]);
+repair({}, retry.runner);
+assert.deepEqual(retry.issued.slice(0, 2), [
+  'analyze --index-only --name PlanearIA .',
+  'analyze --index-only --name PlanearIA .',
+]);
+
+// Escalada: dos reindex fallidos llevan a --repair-fts y a un reindex final.
+const escalated = repairRunner([
+  new Error("FTS index 'file_fts' is inconsistent: term 'salud' is missing during delete."),
+  new Error("FTS index 'file_fts' is inconsistent"),
+]);
+repair({}, escalated.runner);
+assert.deepEqual(escalated.issued, [
+  'analyze --index-only --name PlanearIA .',
+  'analyze --index-only --name PlanearIA .',
+  'analyze --repair-fts --index-only --name PlanearIA .',
+  'analyze --index-only --name PlanearIA .',
+  'status',
+]);
+
+// Si nada recupera, falla en vez de declarar exito.
+const hopeless = repairRunner([new Error('boom'), new Error('boom'), new Error('boom'), new Error('boom')]);
+assert.throws(() => repair({}, hopeless.runner), /could not rebuild the index/i);
+
+// La recuperacion no puede declarar exito dejando el indice stale.
+const stillStale = {
+  issued: [],
+  runner: (args) => (args[0] === 'status' ? STALE_STATUS : 'Repository indexed successfully'),
+};
+assert.throws(() => repair({}, stillStale.runner), /still not fresh/i);
 
 const unexpected = findUnexpectedAgentChanges(
   ' M AGENTS.md\n M .agents/instructions/core.md\n M src/hooks/example.ts',

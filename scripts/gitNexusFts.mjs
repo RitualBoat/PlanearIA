@@ -192,21 +192,50 @@ export function diagnose(options) {
   assertDiagnosticStatusHealthy(output);
 }
 
-export function repair(options) {
-  // Reindexa en vez de reparar solo FTS: la ruta --repair-fts termina en exito y deja el indice
-  // stale, de modo que la recuperacion prometia una frescura que no entregaba (#112). --index-only
-  // se conserva porque es la bandera que impide que analyze escriba en los archivos de agente.
-  const output = runGitNexus(['analyze', '--index-only', '--name', 'PlanearIA', '.'], options);
-  if (hasFtsDiagnostic(output)) {
+const REINDEX_ARGS = ['analyze', '--index-only', '--name', 'PlanearIA', '.'];
+const REPAIR_FTS_ARGS = ['analyze', '--repair-fts', '--index-only', '--name', 'PlanearIA', '.'];
+
+function attempt(args, options, runner) {
+  try {
+    return { ok: true, output: runner(args, options) };
+  } catch (error) {
+    return { ok: false, output: error.message };
+  }
+}
+
+// Runner inyectable por el mismo motivo que en runStructuralVerification: la escalada solo se puede
+// comprobar afirmando que secuencia de subcomandos emite.
+export function repair(options = {}, runner = runGitNexus) {
+  // Reindexa en vez de reparar solo FTS: la ruta --repair-fts termina en exito y deja el indice stale,
+  // de modo que la recuperacion prometia una frescura que no entregaba (#112). --index-only se
+  // conserva porque es la bandera que impide que analyze escriba en los archivos de agente.
+  //
+  // El reindex por si solo no basta en dos estados observados en este repositorio:
+  //   1. Un analyze interrumpido deja el indice mid-incremental-recovery. Ahi --repair-fts se niega a
+  //      correr y pide explicitamente un analyze previo, que recupera el estado; por eso se reintenta.
+  //   2. Un indice con FTS inconsistente hace fallar el reindex ("term ... is missing during delete").
+  //      Ese es justo el caso para el que existe --repair-fts, asi que se escala a el y se reindexa.
+  let execution = attempt(REINDEX_ARGS, options, runner);
+  if (!execution.ok) {
+    execution = attempt(REINDEX_ARGS, options, runner);
+  }
+  if (!execution.ok) {
+    attempt(REPAIR_FTS_ARGS, options, runner);
+    execution = attempt(REINDEX_ARGS, options, runner);
+  }
+  if (!execution.ok) {
+    throw new Error(`GitNexus repair could not rebuild the index.\n${execution.output}`);
+  }
+  if (hasFtsDiagnostic(execution.output)) {
     throw new Error('GitNexus repair completed with an FTS diagnostic.');
   }
 
-  const statusOutput = runGitNexus(['status'], options);
+  const statusOutput = runner(['status'], options);
   if (classifyIndexFreshness(statusOutput) !== FRESH) {
     throw new Error('GitNexus repair finished but the index is still not fresh. Review npm run gitnexus:diagnose.');
   }
 
-  process.stdout.write(output);
+  process.stdout.write(execution.output);
 }
 
 // Fuente unica de "estructuralmente sano": la comparten `verify` y el doctor del harness para que no

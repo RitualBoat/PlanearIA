@@ -179,6 +179,9 @@ const CatalogoComponentesScreen: React.FC = () => {
         visible={sheetVisible}
         titulo="Hoja de ejemplo"
         onClose={() => setSheetVisible(false)}
+        // El catalogo es la superficie donde se mide la biblioteca base en navegador; sin
+        // testID la hoja no se puede anclar y la medicion cae en el contenedor del Modal.
+        testID="sheet-catalogo"
         footer={
           <>
             <Button label="Cancelar" variant="ghost" onPress={() => setSheetVisible(false)} />

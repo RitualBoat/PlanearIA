@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "issue": 110,
+  "change": "sheet-medicion-panel-qa",
+  "surfaces": [
+    "ui",
+    "docs"
+  ],
+  "validations": [
+    "openspec-strict",
+    "harness-parity"
+  ],
+  "qaVisualNivel": "N2",
+  "qaVisualJourneys": [
+    "arranque-y-alcance-del-shell"
+  ],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/110"
+    },
+    {
+      "id": "pr-link",
+      "ref": "PENDIENTE: PR generado por opsx:finish tras archive."
+    },
+    {
+      "id": "adversarial-review",
+      "ref": "Revision adversarial independiente del 2026-07-19, previa a archive: PASS CON HUECOS. Sin blockers y sin majors. El major candidato mas fuerte se investigo y quedo DESMENTIDO: el requisito nuevo de base-component-library obliga a TODA capa modal de la biblioteca a exponer ancla propia, asi que si existiera otro componente base montando Modal sin ancla, la spec afirmaria algo falso del sistema al archivar; verificado que Sheet es el unico (grep -l Modal src/components/base/*.tsx devuelve un solo archivo), por lo que el requisito se cumple universalmente. Segundo riesgo investigado y descartado: un delta MODIFIED puede perder texto normativo del requisito original en silencio; verificado por comparacion de clausulas que las 5 SHALL y los 3 escenarios originales de 'El procedimiento de QA visual es reproducible' estan integros en el delta, que suma 5 SHALL y 3 escenarios sin retirar ninguno. Tercer riesgo investigado y descartado: que el change alterara apariencia; verificado que ninguna linea de estilo se toca (el unico match de patron de estilo en el diff cae dentro de un comentario) y que src/sync, backend y package.json quedan sin cambios. Dos minors encontrados y CORREGIDOS: (1) la tarea 5.5 prometia comparar la apariencia contra un servidor de development, comparacion que no se ejecuto; se reescribio para declarar la verificacion real, que es mas fuerte (getStyles intacto por diff + coincidencia numerica + captura), porque si getStyles no cambia y testID no participa del estilo la apariencia no puede cambiar; (2) proposal.md declaraba deuda sobre 'los demas componentes base que puedan envolverse en Modal', conjunto que hoy esta vacio, redactado de forma que sugeria cobertura pendiente inexistente; corregido para declarar que la cobertura es universal hoy y que la deuda es hacia adelante. Minor declarado y no corregido: la suite mockea el modulo useBreakpoint, asi que si Sheet migrara a otra fuente de breakpoint la prueba seguiria verde midiendo un mock; es el costo aceptado y declarado en design.md D2, mitigado porque la clasificacion del ancho entra por getBreakpoint real via requireActual. Detalle en evidencia/README.md."
+    },
+    {
+      "id": "web-http-200",
+      "ref": "expo start --web en el puerto 8085 confirmado en HTTP 200 ANTES de navegar el 2026-07-19: status=200, 2.929 s, 1257 b. Se uso 8085 y no 8081/8082/8083 porque los tres tenian servidores node previos escuchando (PIDs 36988, 35224, 29888, arrancados a las 02:32 del mismo dia, restos de la sesion de #84); medir contra cualquiera habria sido QA contra un build ajeno. Navegacion posterior con Playwright MCP y clics reales sobre el DOM."
+    },
+    {
+      "id": "playwright-breakpoints",
+      "ref": "QA visual N2 del 2026-07-19 con Playwright MCP a 375/767/768/1279/1280, con medicion DOM real por getBoundingClientRect y getComputedStyle, midiendo LAS DOS ANCLAS EN LA MISMA LLAMADA para demostrar el contraste en vez de solo afirmarlo. Ancla correcta [data-testid=sheet-catalogo-panel]: 375 y 767 dan panel a ancho completo pegado al borde inferior con radio inferior 0; 768, 1279 y 1280 dan panel de 520 px centrado, no pegado al borde, con radio inferior de 16 px. Ancla equivocada [aria-modal=true]: devuelve el viewport completo en los cinco anchos (768x812, 1280x900, position fixed), que es la firma exacta de 'hoja inferior'. CORRECCION FORMAL DEL FALSO POSITIVO DE #84: su evidencia archivada declara a 768 px 'hoja inferior' (evidencia/README.md:19) y lo eleva a defecto heredado del Sheet de #82 en su readiness.json; la medicion correcta a 768 px es 520 px centrado (left 124, right 644), confirmada ademas por captura visual. El componente nunca tuvo el defecto: la causa fue el selector. La evidencia archivada NO se edita (design.md D5), verificado por git status sin cambios en openspec/changes/archive/. Cero desborde horizontal en los cinco anchos. GJ0 recorrido y capturado en los cinco anchos con 5 destinos primarios unicos. npm run qa:visual:check -- --change sheet-medicion-panel-qa en PASS."
+    },
+    {
+      "id": "nielsen",
+      "ref": "Checklist Nielsen en evidencia/README.md: severidad maxima 0 (umbral de bloqueo 3), sin heuristicas bloqueantes. La severidad 1 que #84 habia declarado por 'forma del panel en tablet/escritorio' queda retirada porque el defecto no existia. Checklist anti-slop 1.9.3 con los siete criterios en cumplimiento, sustentados en que el change no altera ninguna propiedad de estilo."
+    },
+    {
+      "id": "docs-verification",
+      "ref": "Documentacion/03-validacion/GOLDEN_JOURNEYS_QA_VISUAL.md gana la trampa 5.7 ('Medir un modal por [aria-modal=true] devuelve el envoltorio, no el panel') con sintoma, causa, remedio prescrito, ejemplo de codigo mal/bien y la regla general de anclar por identificador propio del elemento. La antigua 5.7 (Nota operativa) pasa a 5.8 sin cambios de contenido. El encabezado de la seccion 5 declara ahora la firma comun de todas las trampas: la tecnica no falla, no queda vacia y devuelve un resultado plausible pero equivocado. Verificado que no se edito ningun archivo bajo openspec/changes/archive/."
+    }
+  ],
+  "rollback": {
+    "strategy": "Change aditivo sobre superficie de instrumentacion y prueba. Modifica dos archivos de producto sin tocar su comportamiento: src/components/base/Sheet.tsx (un testID derivado en el panel y su comentario, sin cambios de estilo, layout, estado ni contrato publico) y src/screens/mas/CatalogoComponentesScreen.tsx (un testID en la hoja de ejemplo de una ruta solo de desarrollo). Agrega src/__tests__/components/base/sheetResponsiva.test.tsx y una seccion en Documentacion/03-validacion/GOLDEN_JOURNEYS_QA_VISUAL.md, mas la evidencia del change. No toca src/sync, SYNC_ENTITIES, colas, almacenamiento, claves @planearia:*, backend, esquema, filtrado por userId, navegacion, dependencias, proyecto nativo, workflows de CI, gates compartidos ni openspec/changes/archive/. testID no participa del estilo y es inerte en nativo; en web solo emite data-testid, asi que no hay diferencia observable para el docente en ninguna plataforma. Revertir el commit del PR restaura el estado previo sin migracion ni perdida de datos: la unica consecuencia es que la QA visual pierde el ancla y la regresion por breakpoint desaparece, es decir vuelve la condicion que produjo el falso positivo de #84. Desactivacion parcial sin revertir todo: quitar solo el archivo de prueba conserva el ancla y la documentacion; quitar solo la seccion del runbook conserva ancla y regresion.",
+    "verified": true
+  },
+  "adversarialReview": {
+    "ref": "Revision adversarial independiente del 2026-07-19, previa a archive: PASS CON HUECOS. Sin blockers y sin majors. El major candidato (que la spec nueva afirmara algo falso si otro componente base montara Modal sin ancla) se investigo y quedo desmentido: Sheet es el unico. Se verifico ademas que el delta MODIFIED no pierde texto normativo (5 SHALL y 3 escenarios originales integros) y que ninguna linea de estilo se toca. Dos minors corregidos: la tarea 5.5 prometia una comparacion contra development que no se ejecuto, reescrita para declarar la verificacion real y mas fuerte; y proposal.md declaraba una deuda de cobertura que hoy esta vacia, corregida a deuda hacia adelante. Un minor declarado y no corregido: el mock del modulo useBreakpoint podria enmascarar una migracion futura de fuente, costo aceptado en design.md D2. Detalle completo en evidencia/README.md."
+  },
+  "exceptions": []
+}

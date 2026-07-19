@@ -84,7 +84,19 @@ const Sheet: React.FC<SheetProps> = ({ visible, titulo, onClose, children, foote
           />
         </Animated.View>
 
-        <Animated.View style={[styles.panel, panelAnimado]} accessibilityViewIsModal>
+        {/*
+          El `testID` propio del panel no es decorativo: en web el `Modal` de RN envuelve
+          todo en un contenedor `position: fixed` a viewport completo que ya lleva
+          `aria-modal="true"`, y `accessibilityViewIsModal` no viaja al DOM (no esta en la
+          lista de props que react-native-web reenvia). Sin este ancla, medir la hoja por
+          `[aria-modal="true"]` devuelve ese contenedor y la reporta full-width y pegada
+          al borde inferior en cualquier ancho. Ver #84.
+        */}
+        <Animated.View
+          style={[styles.panel, panelAnimado]}
+          accessibilityViewIsModal
+          testID={testID ? `${testID}-panel` : undefined}
+        >
           <View style={styles.encabezado}>
             <Text style={styles.titulo} numberOfLines={2}>
               {titulo}

@@ -36,6 +36,30 @@ jest.mock("../../context/AuthContext", () => ({
   useAuth: () => ({ logout: mockLogout }),
 }));
 
+/**
+ * Desde sync-status-ui (#83) el chrome presenta el indicador de sincronizacion, asi que
+ * requiere el contexto de sync. Se simula igual que los demas contextos de esta suite: el
+ * proveedor real arrancaria temporizadores y ciclos de red, y lo que aqui se verifica es la
+ * accesibilidad del chrome, no el motor.
+ */
+jest.mock("../../themes/useReducedMotionPreference", () => ({
+  useReducedMotionPreference: () => false,
+}));
+
+jest.mock("../../context/SyncContext", () => ({
+  useSyncStatus: () => ({
+    isOnline: true,
+    status: "synced",
+    lastSyncAt: null,
+    pendingCount: 0,
+    syncEnabled: true,
+    authError: false,
+    notice: null,
+    dismissNotice: jest.fn(),
+    syncNow: jest.fn(),
+  }),
+}));
+
 jest.mock("../../themes/useAppTheme", () => ({
   useAppTheme: () => ({
     theme: "light",

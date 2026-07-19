@@ -13,28 +13,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 import ScreenBackButton from "../../components/ScreenBackButton";
 import { useListaPlaneacionesViewModel } from "../../hooks/useListaPlaneacionesViewModel";
+import SyncStatusChip from "../../components/sync/SyncStatusChip";
 import type { PlaneacionDocumento } from "../../../types/planeacionV2";
 import { NivelAcademico } from "../../../types/planeacionV2";
-
-const buildSyncState = (
-  syncStatus: "idle" | "syncing" | "synced" | "error" | "offline",
-  pendingCount: number,
-  isOnline: boolean
-): { icon: keyof typeof MaterialIcons.glyphMap; label: string; color: string } => {
-  if (!isOnline || syncStatus === "offline") {
-    return { icon: "cloud-off", label: "Sin conexion", color: "#f59e0b" };
-  }
-  if (syncStatus === "error") {
-    return { icon: "error-outline", label: "Error sync", color: "#dc2626" };
-  }
-  if (syncStatus === "syncing") {
-    return { icon: "sync", label: "Sincronizando", color: "#2563eb" };
-  }
-  if (pendingCount > 0) {
-    return { icon: "cloud-upload", label: `${pendingCount} pendientes`, color: "#2563eb" };
-  }
-  return { icon: "cloud-done", label: "Sincronizado", color: "#16a34a" };
-};
 
 const buildWeeksLabel = (doc: PlaneacionDocumento): string => {
   const semanas = doc.datosGenerales.semanas;
@@ -45,8 +26,6 @@ const buildWeeksLabel = (doc: PlaneacionDocumento): string => {
 const ListaPlaneacionesScreen: React.FC = () => {
   const { colors } = useTheme();
   const vm = useListaPlaneacionesViewModel();
-
-  const syncMeta = buildSyncState(vm.syncStatus, vm.pendingCount, vm.isOnline);
 
   const removeChip = (type: "nivel" | "asignatura" | "grado" | "inicio" | "fin") => {
     if (type === "nivel") vm.setFiltroNivel(undefined);
@@ -149,11 +128,6 @@ const ListaPlaneacionesScreen: React.FC = () => {
               </Text>
             </View>
           </View>
-
-          <View style={[styles.syncPill, { backgroundColor: `${syncMeta.color}22` }]}> 
-            <MaterialIcons name={syncMeta.icon} size={13} color={syncMeta.color} />
-            <Text style={[styles.syncPillText, { color: syncMeta.color }]}>{syncMeta.label}</Text>
-          </View>
         </Pressable>
       </View>
     );
@@ -177,6 +151,11 @@ const ListaPlaneacionesScreen: React.FC = () => {
           <Text style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
             {vm.documentosFiltrados.length} de {vm.documentos.length}
           </Text>
+          {/*
+            El indicador va una vez en el encabezado, no en cada tarjeta: el estado es
+            global, asi que repetirlo por documento comunicaba lo mismo N veces.
+          */}
+          <SyncStatusChip style={styles.syncChip} testID="planeaciones-sync-chip" />
         </View>
 
         <View style={styles.headerActions}>
@@ -606,18 +585,9 @@ const styles = StyleSheet.create({
   metaText: {
     fontSize: 12,
   },
-  syncPill: {
-    borderRadius: 999,
+  syncChip: {
     alignSelf: "flex-start",
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-  },
-  syncPillText: {
-    fontSize: 11,
-    fontWeight: "700",
+    marginTop: 6,
   },
   emptyState: {
     alignItems: "center",

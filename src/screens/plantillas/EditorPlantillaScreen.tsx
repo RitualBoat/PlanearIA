@@ -17,6 +17,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { COLORS } from "../../../types";
 import { useEditorPlantillaViewModel } from "../../hooks/useEditorPlantillaViewModel";
+import SaveStateLabel from "../../components/sync/SaveStateLabel";
 import { isWeb } from "../../utils/responsive";
 
 type TipoOption = {
@@ -246,6 +247,18 @@ const EditorPlantillaScreen: React.FC = () => {
               )}
             </View>
 
+            {/*
+              Este editor no tiene autoguardado: hasta que el docente pulsa guardar, sus
+              cambios solo viven en la pantalla. Decirlo es mas honesto que callarlo, y el
+              estado sale del mismo `isSaving` que ya gobierna los botones, sin inventar
+              una maquina de guardado paralela.
+            */}
+            <SaveStateLabel
+              estado={vm.isSaving ? "guardando" : "pendiente"}
+              style={styles.saveState}
+              testID="editor-plantilla-save-state"
+            />
+
             {/* Bottom actions */}
             <View style={styles.actionsRow}>
               <Pressable
@@ -382,6 +395,7 @@ const styles = StyleSheet.create({
   seccionRow: { flexDirection: "row", alignItems: "center", marginBottom: 6 },
   // Actions
   actionsRow: { flexDirection: "row", gap: 10, marginTop: 4 },
+  saveState: { marginTop: 12 },
   btnSecondary: {
     flex: 1,
     flexDirection: "row",

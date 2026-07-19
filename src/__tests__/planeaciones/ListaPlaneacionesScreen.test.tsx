@@ -40,6 +40,44 @@ jest.mock("../../context/ThemeContext", () => ({
   }),
 }));
 
+/**
+ * Desde sync-status-ui (#83) la pantalla dejo de derivar su propio estado de sync y
+ * presenta `SyncStatusChip`, que lee el contexto global y el tema en runtime. Se simulan
+ * ambos, en linea con el resto de esta suite: aqui se verifica el render de la lista, no
+ * el motor de sincronizacion ni el sistema de temas.
+ */
+jest.mock("@react-native-async-storage/async-storage", () =>
+  require("@react-native-async-storage/async-storage/jest/async-storage-mock")
+);
+
+jest.mock("../../context/SyncContext", () => ({
+  useSyncStatus: () => ({
+    isOnline: true,
+    status: "synced",
+    lastSyncAt: null,
+    pendingCount: 0,
+    syncEnabled: true,
+    authError: false,
+    notice: null,
+    dismissNotice: jest.fn(),
+    syncNow: jest.fn(),
+  }),
+}));
+
+jest.mock("../../themes/useReducedMotionPreference", () => ({
+  useReducedMotionPreference: () => false,
+}));
+
+jest.mock("../../themes/useAppTheme", () => ({
+  useAppTheme: () => ({
+    theme: "light",
+    isDark: false,
+    highContrast: false,
+    scaled: (size: number) => size,
+    colors: new Proxy({}, { get: (_target, prop) => `color-${String(prop)}` }),
+  }),
+}));
+
 jest.mock("../../hooks/useListaPlaneacionesViewModel", () => ({
   useListaPlaneacionesViewModel: () => ({
     documentos: [

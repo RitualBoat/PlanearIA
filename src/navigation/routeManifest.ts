@@ -98,6 +98,17 @@ export const HUB_ROUTES = {
   ] as const,
 } as const;
 
+/**
+ * Rutas que existen solo en compilaciones de desarrollo y por tanto NO forman parte del
+ * manifiesto de produccion.
+ *
+ * El manifiesto inventaria la navegacion que alcanza el docente; el catalogo de la
+ * biblioteca base (#82) es herramienta de revision y `MasStack` solo lo registra bajo
+ * `__DEV__`. Se declara aqui, y no se omite en silencio, para que la exhaustividad siga
+ * siendo total: cada ruta del contrato esta en el manifiesto o en esta lista.
+ */
+export const DEV_ONLY_ROUTES = ["CatalogoComponentes"] as const;
+
 /** Hub inicial del shell: la app abre en el Escritorio (D1). */
 export const INITIAL_HUB = "InicioTab" as const;
 
@@ -149,7 +160,10 @@ type _AsistenteExhaustive = ExpectNever<
   Exclude<keyof AsistenteStackParamList, (typeof HUB_ROUTES.AsistenteTab)[number]>
 >;
 type _MasExhaustive = ExpectNever<
-  Exclude<keyof MasStackParamList, (typeof HUB_ROUTES.MasTab)[number]>
+  Exclude<
+    keyof MasStackParamList,
+    (typeof HUB_ROUTES.MasTab)[number] | (typeof DEV_ONLY_ROUTES)[number]
+  >
 >;
 type _HubKeys = ExpectNever<Exclude<keyof AppShellParamList, keyof typeof HUB_ROUTES>>;
 type _LandingKeys = ExpectNever<Exclude<keyof AppShellParamList, keyof typeof HUB_LANDING>>;

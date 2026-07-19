@@ -18,9 +18,26 @@ import ConversacionScreen from "../../screens/chat/ConversacionScreen";
 import FeedScreen from "../../screens/feed/FeedScreen";
 import SocialScreen from "../../screens/social/SocialScreen";
 
+import CatalogoComponentesScreen from "../../screens/mas/CatalogoComponentesScreen";
+
 const Stack = createStackNavigator<MasStackParamList>();
 
-const SCREENS: Record<keyof MasStackParamList, React.ComponentType<any>> = {
+/**
+ * Catalogo de la biblioteca base (#82): herramienta de revision, no pantalla de producto.
+ *
+ * Se registra solo bajo `__DEV__` para que exista durante la QA visual (expo start --web
+ * corre en desarrollo) y quede fuera del bundle que usa el docente.
+ */
+export const RUTAS_SOLO_DESARROLLO = ["CatalogoComponentes"] as const;
+
+/**
+ * Rutas de produccion del hub. `CatalogoComponentes` queda fuera a proposito: se registra
+ * aparte y solo bajo `__DEV__`.
+ */
+const SCREENS: Record<
+  Exclude<keyof MasStackParamList, (typeof RUTAS_SOLO_DESARROLLO)[number]>,
+  React.ComponentType<any>
+> = {
   MasHome: MasHomeScreen,
   Cuenta: CuentaScreen,
   EditarPerfil: EditarPerfilScreen,
@@ -50,6 +67,13 @@ const MasStack: React.FC = () => (
     {ROUTE_NAMES.map((name) => (
       <Stack.Screen key={name} name={name} component={SCREENS[name]} />
     ))}
+    {__DEV__ ? (
+      <Stack.Screen
+        name="CatalogoComponentes"
+        component={CatalogoComponentesScreen}
+        options={{ title: "Catalogo de componentes" }}
+      />
+    ) : null}
   </Stack.Navigator>
 );
 

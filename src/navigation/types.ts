@@ -138,6 +138,9 @@ export type MasStackParamList = {
       }
     | undefined;
   Social: undefined;
+  // Solo desarrollo: catalogo de la biblioteca base (#82). MasStack lo registra bajo
+  // __DEV__, asi que no es alcanzable en produccion.
+  CatalogoComponentes: undefined;
 };
 
 export type AppShellParamList = {

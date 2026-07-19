@@ -56,6 +56,8 @@
     "test:golden-journeys": "node scripts/testGoldenJourneys.mjs",
     "agent:opsx:update": "openspec update --force && node scripts/patchOpsxWorkflows.mjs",
     "agent:opsx:patch:check": "node scripts/patchOpsxWorkflows.mjs --check",
+    "opsx:archive": "node scripts/opsxArchiveChange.mjs",
+    "opsx:archive:dry": "node scripts/opsxArchiveChange.mjs --dry-run",
     "opsx:finish": "node scripts/opsxFinishChange.mjs",
     "opsx:finish:dry": "node scripts/opsxFinishChange.mjs --dry-run",
     "mcp:github": "node --no-warnings scripts/mcpGithubFromGh.mjs",
@@ -65,7 +67,8 @@
     "doctor": "npx react-doctor@latest",
     "harness:doctor": "node --no-warnings scripts/harnessDoctor.mjs",
     "test:harness:doctor": "node scripts/testHarnessDoctor.mjs",
-    "test:opsx-finish": "node scripts/testOpsxFinish.mjs"
+    "test:opsx-finish": "node scripts/testOpsxFinish.mjs",
+    "test:opsx-archive": "node scripts/testOpsxArchive.mjs"
   },
   "dependencies": {
     "@10play/tentap-editor": "^1.0.1",

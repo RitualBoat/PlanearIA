@@ -89,7 +89,7 @@ Flujo formal:
 Paso 0 - Creacion: issue GitHub / item Project
 Paso 1 - Enrich: criterios de aceptacion observables
 Paso 2 - Propose & Apply: proposal/design/spec/tasks + TLDR humano + implementacion tarea por tarea
-Paso 3 - Audit & QA: evidencia tecnica y visual; adversarial review; archive
+Paso 3 - Audit & QA: evidencia tecnica y visual; adversarial review; archive (npm run opsx:archive)
 Paso 4 - Cierre: PR/merge de GitHub hacia development y borrado de la rama (npm run opsx:finish)
 ```
 
@@ -110,6 +110,8 @@ Reglas:
 - Cada change versionable nuevo crea `brownfield-baseline.md` en su raíz durante propose. Solo documenta la superficie que tocará: fuentes vigentes, comportamiento actual/objetivo, compatibilidad legacy, owner de spec/contexto, evidencia y exclusiones. No reemplaza la spec ni inventaría toda la app; el gate de archive comprueba sus ocho secciones mínimas.
 - UI visible requiere Playwright por breakpoint; navegar solo despues de que `expo start --web` responda HTTP 200.
 - `openspec/specs/` es verdad de comportamiento; se actualiza con archive/sync, no a mano.
+- Archivar es `npm run opsx:archive -- <change>`, unico owner del paso: verifica la rama, corre el gate de readiness, clasifica si las deltas ya estan aplicadas, delega a la CLI la escritura de specs y el movimiento del directorio, y commitea la salida en la rama del change. Previsualiza con `npm run opsx:archive:dry`. Reejecutarlo sobre un change ya archivado es no-op.
+- La CLI de OpenSpec es el unico escritor de `openspec/specs/` durante el archive. No ejecutar `/opsx:sync` antes de archivar un change que se va a archivar en ese momento: la CLI aplica las mismas deltas y aborta al reencontrar una requirement `ADDED` existente. Tampoco mover el directorio del change a mano. Una sincronizacion parcial aborta el archive nombrando la requirement discrepante.
 - Tras archivar, cerrar la rama del change con `npm run opsx:finish`: publica la rama, crea o reutiliza un PR hacia `development`, espera los checks requeridos y ordena el merge a GitHub. Nunca hace push directo al target protegido; tras confirmar el merge remoto actualiza `development` local y borra la rama local. Previsualiza con `npm run opsx:finish:dry`.
 
 Skills utiles por agente:

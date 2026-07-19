@@ -63,10 +63,9 @@ Archive a completed change in the experimental workflow.
    - Show a combined summary before prompting
 
    **Prompt options:**
-   - If changes needed: "Sync now (recommended)", "Archive without syncing"
-   - If already synced: "Archive now", "Sync anyway", "Cancel"
+   - Report the assessment only. Do NOT offer to sync before archiving: `npm run opsx:archive` classifies the sync state and picks the correct archive invocation.
 
-   If user chooses sync, use Task tool (subagent_type: "general-purpose", prompt: "Use Skill tool to invoke openspec-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"). Proceed to archive regardless of choice.
+   Do not sync here. `npm run opsx:archive` resolves the sync state and archives with or without applying deltas.
 
 5. **Confirm the human TLDR is preserved**
 
@@ -86,7 +85,7 @@ Archive a completed change in the experimental workflow.
    - If no: Move `changeRoot` to the archive directory
 
    ```bash
-   mv "<changeRoot>" "<planningHome.changesDir>/archive/YYYY-MM-DD-<name>"
+   npm run opsx:archive -- <change-name>
    ```
 
 7. **Display summary**
@@ -165,5 +164,5 @@ Target archive directory already exists.
 - Preserve .openspec.yaml when moving to archive (it moves with the directory)
 - Preserve `TLDR.md` in the same move; never copy it outside the archived change directory
 - Show clear summary of what happened
-- If sync is requested, use the Skill tool to invoke `openspec-sync-specs` (agent-driven)
+- Do not sync main specs before archiving; the OpenSpec CLI is their only writer during archive
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting

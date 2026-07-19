@@ -59,10 +59,9 @@ Archive a completed change in the experimental workflow.
    - Show a combined summary before prompting
 
    **Prompt options:**
-   - If changes needed: "Sync now (recommended)", "Archive without syncing"
-   - If already synced: "Archive now", "Sync anyway", "Cancel"
+   - Report the assessment only. Do NOT offer to sync before archiving: `npm run opsx:archive` classifies the sync state and picks the correct archive invocation.
 
-   If user chooses sync, use Task tool (subagent_type: "general-purpose", prompt: "Use Skill tool to invoke openspec-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"). Proceed to archive regardless of choice.
+   Do not sync here. `npm run opsx:archive` resolves the sync state and archives with or without applying deltas.
 
 5. **Perform the archive**
 
@@ -78,7 +77,7 @@ Archive a completed change in the experimental workflow.
    - If no: Move `changeRoot` to the archive directory
 
    ```bash
-   mv "<changeRoot>" "<planningHome.changesDir>/archive/YYYY-MM-DD-<name>"
+   npm run opsx:archive -- <change-name>
    ```
 
 6. **Display summary**
@@ -156,7 +155,7 @@ Target archive directory already exists.
 - Don't block archive on warnings - just inform and confirm
 - Preserve .openspec.yaml when moving to archive (it moves with the directory)
 - Show clear summary of what happened
-- If sync is requested, use the Skill tool to invoke `openspec-sync-specs` (agent-driven)
+- Do not sync main specs before archiving; the OpenSpec CLI is their only writer during archive
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting
 
 <!-- PLANEARIA_TLDR_WORKFLOW -->
@@ -174,3 +173,15 @@ Before moving the change, confirm `TLDR.md` remains at `<changeRoot>/TLDR.md` an
 Before archive, run `npm run openspec:ready:archive -- --change <name> --run-local`. It is read-only and checks readiness.json, brownfield-baseline.md, completed tasks, proportional validation evidence, rollback and adversarial review. Resolve each FAIL or a valid, temporary exception before moving the change.
 
 <!-- /PLANEARIA_READINESS_WORKFLOW -->
+
+<!-- PLANEARIA_CLOSURE_WORKFLOW -->
+
+### PlanearIA canonical closure order
+
+Archive with `npm run opsx:archive -- <change-name>`; preview with `npm run opsx:archive:dry`. That command is the single owner of this step: it guards the branch, runs the archive readiness gate, classifies whether the delta specs are already applied, delegates the spec sync and the directory move to the OpenSpec CLI, and commits the result on the change branch.
+
+The OpenSpec CLI is the only writer of main specs during archive. Do not run `/opsx:sync` first for a change you are about to archive: the CLI applies the same deltas and aborts when an ADDED requirement already exists. Do not move the change directory by hand; the CLI move degrades safely on Windows and a manual `mv` does not.
+
+Rerunning the archive is safe: an already archived and committed change reports a no-op. Close the branch afterwards with `npm run opsx:finish`, which never pushes directly to the protected target.
+
+<!-- /PLANEARIA_CLOSURE_WORKFLOW -->

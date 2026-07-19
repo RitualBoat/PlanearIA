@@ -1,7 +1,8 @@
-# Spec delta: cross-surface-assignment
+# cross-surface-assignment Specification
 
-## ADDED Requirements
-
+## Purpose
+Define como el docente asigna o adjunta un elemento existente a una clase, unidad o actividad desde cualquier superficie de PlanearIA: un solo selector compartido, destino en cascada con los niveles finos opcionales, confirmacion explicita que nombra el destino antes de escribir, escritura siempre encolada en el motor de sincronizacion vigente, y resultado afirmado segun el hecho real y nunca de forma incondicional. Es capa de producto sobre el motor: las colas, el almacenamiento y la reconciliacion pertenecen a `src/sync` y no viven aqui.
+## Requirements
 ### Requirement: Un solo selector resuelve asignar y adjuntar en toda la app
 
 El sistema SHALL resolver la accion de asignar o adjuntar un elemento existente a un destino academico mediante un unico componente selector compartido, alimentado por un unico ViewModel. Ninguna superficie SHALL construir su propio selector de destino, ni su propio dialogo de confirmacion de asignacion, ni duplicar la logica de resolucion de destinos.

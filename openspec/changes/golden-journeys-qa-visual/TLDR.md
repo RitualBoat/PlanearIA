@@ -31,12 +31,12 @@ automatica lo detecta. Es la diferencia entre confiar en que alguien reviso y po
 
 ## Como lo hicimos (Tasks)
 
-Cinco bloques en orden. Primero el archivo de recorridos, con los cuatro definidos y dos reservados
-para mas adelante, verificando que cada pantalla mencionada exista de verdad en el codigo. Luego la
-revision automatica y sus casos de prueba, incluidos los que deben fallar. Despues el documento que
-explica el procedimiento, con las trampas del navegador que producen pruebas engañosas si se
-ignoran. Enseguida ejecutamos el recorrido base sobre la aplicacion real en tres tamaños, con capturas
-verdaderas. Cierran las validaciones del proyecto y una revision critica independiente.
+Cinco bloques en orden. Primero el archivo de recorridos, con los cuatro definidos y dos reservados,
+verificando que cada pantalla mencionada exista de verdad en el codigo. Luego la revision automatica y
+sus casos de prueba, incluidos los que deben fallar. Despues el documento del procedimiento, con las
+trampas del navegador que producen pruebas engañosas. Enseguida ejecutamos el recorrido base sobre la
+aplicacion real en tres tamaños, con capturas verdaderas. Cerro una revision critica que ataco a la
+propia revision automatica: encontro que un reporte vacio podia colarse, y se corrigio.
 
 ## Resumen integral
 

@@ -41,6 +41,6 @@ Issue: [#85](https://github.com/RitualBoat/PlanearIA/issues/85). Un bloque a la 
 - [x] 5.2 (Evidencia: 103 suites / 677 tests en verde, sin regresion de la linea base.) `npm test -- --runInBand` sin regresion de la linea base (103 suites / 677 tests).
 - [x] 5.3 (Evidencia: golden-journeys-tests PASS, 13 escenarios.) `npm run test:golden-journeys` en verde.
 - [x] 5.4 (Evidencia: openspec:validate 29/29 y openspec-tldr OK.) `npm run openspec:validate` en verde.
-- [ ] 5.5 Actualizar `TLDR.md` si cambiaron alcance, archivos, comportamiento o resultado esperado.
+- [x] 5.5 (Evidencia: TLDR.md actualizado: conteo de trampas corregido tras la corrida real y bloque de Tasks reescrito para registrar que la revision adversarial ataco al checker y cerro el hueco.) Actualizar `TLDR.md` si cambiaron alcance, archivos, comportamiento o resultado esperado.
 - [x] 5.6 (Evidencia: revision adversarial 2026-07-19, PASS CON HUECOS. Dos majors detectados y cerrados dentro de la revision: los chequeos de medicion y de cobertura eran falsos positivos por los nombres de captura; un reporte hueco pasaba N2 completo. Corregido con parseo por secciones y verificado por mutacion; fixtures 13 -> 17.) Revision adversarial independiente antes de archivar.
-- [ ] 5.7 `npm run openspec:ready:archive -- --change golden-journeys-qa-visual --run-local` en PASS.
+- [x] 5.7 (Evidencia: gate de archive ejecutado con --run-local; openspec-strict y harness-parity en verde y las 14 afirmaciones en PASS.) `npm run openspec:ready:archive -- --change golden-journeys-qa-visual --run-local` en PASS.

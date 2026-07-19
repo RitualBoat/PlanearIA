@@ -48,6 +48,7 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [successState, setSuccessState] = useState(false);
+  const [asignadosCount, setAsignadosCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
@@ -147,16 +148,22 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
       setIsSaving(true);
       setError("");
 
-      if (selectedType === "recurso") {
-        await asignarRecursosAGrupo(grupoId, selectedIds);
-      } else {
-        await asignarEntregablesAGrupo(grupoId, selectedIds);
-      }
+      const asignados =
+        selectedType === "recurso"
+          ? await asignarRecursosAGrupo(grupoId, selectedIds)
+          : await asignarEntregablesAGrupo(grupoId, selectedIds);
 
       setConfirmVisible(false);
       setModalVisible(false);
       setSelectedIds([]);
-      setSuccessState(true);
+      // No se afirma exito sin escritura: antes esta pantalla mostraba "Asignacion
+      // completada" aunque no se modificara ningun elemento.
+      if (asignados === 0) {
+        setError("Ningun elemento cambio de grupo.");
+      } else {
+        setAsignadosCount(asignados);
+        setSuccessState(true);
+      }
       await loadData();
     } catch {
       setError("No se pudo completar la asignación.");
@@ -205,7 +212,9 @@ const AsignarRecursoScreen: React.FC<AsignarRecursoScreenProps> = ({ navigation,
             </View>
             <Text style={styles.successTitle}>Asignación completada</Text>
             <Text style={styles.successSubtitle}>
-              Los elementos fueron vinculados al grupo seleccionado.
+              {asignadosCount === 1
+                ? "1 elemento fue vinculado al grupo seleccionado."
+                : `${asignadosCount} elementos fueron vinculados al grupo seleccionado.`}
             </Text>
 
             <View style={styles.infoCard}>

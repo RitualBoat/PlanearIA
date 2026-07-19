@@ -22,6 +22,9 @@ import { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { COLORS, Recurso } from "../../../types";
 import { useListaRecursosViewModel } from "../../hooks/useListaRecursosViewModel";
 import { isWeb } from "../../utils/responsive";
+import { AssignSheet } from "../../components/assign";
+import type { ElementoAsignable } from "../../components/assign";
+import { navigateToHub } from "../../navigation/navigateToHub";
 
 const FILTER_OPTIONS = [
   { id: "todos", label: "Todos" },
@@ -57,6 +60,7 @@ const ListaRecursosScreen: React.FC = () => {
 
   const vm = useListaRecursosViewModel(initialFiltro);
   const [menuRecurso, setMenuRecurso] = useState<Recurso | null>(null);
+  const [recursoParaAsignar, setRecursoParaAsignar] = useState<ElementoAsignable | null>(null);
 
   const handleEditar = (recurso: Recurso) => {
     setMenuRecurso(null);
@@ -81,8 +85,15 @@ const ListaRecursosScreen: React.FC = () => {
   };
 
   const handleAsignar = () => {
+    if (!menuRecurso) return;
+    // Antes esta accion abria un Alert "Proximamente". Ahora abre la hoja compartida, que es
+    // la unica forma sancionada de asignar: escribe por el camino que encola en src/sync.
+    setRecursoParaAsignar({
+      id: menuRecurso.id as number,
+      titulo: menuRecurso.titulo,
+      tipo: "recurso",
+    });
     setMenuRecurso(null);
-    Alert.alert("Próximamente", "Esta función se implementará en una próxima actualización.");
   };
 
   const handleCompartir = async () => {
@@ -374,7 +385,7 @@ const ListaRecursosScreen: React.FC = () => {
               onPress={handleAsignar}
             >
               <MaterialIcons name="assignment-turned-in" size={22} color={COLORS.text} />
-              <Text style={styles.menuItemText}>Asignar a entregable</Text>
+              <Text style={styles.menuItemText}>Asignar a clase</Text>
             </Pressable>
 
             <Pressable
@@ -402,6 +413,16 @@ const ListaRecursosScreen: React.FC = () => {
           </Pressable>
         </Pressable>
       </Modal>
+
+      {recursoParaAsignar ? (
+        <AssignSheet
+          visible
+          elementos={[recursoParaAsignar]}
+          onClose={() => setRecursoParaAsignar(null)}
+          onCrearClase={() => navigateToHub(navigation, "ClasesTab", "CrearGrupo")}
+          testID="asignar-recurso-sheet"
+        />
+      ) : null}
     </View>
   );
 };

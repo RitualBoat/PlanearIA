@@ -49,4 +49,4 @@
 - [x] 6.4 Actualizar `TLDR.md` si el alcance, los archivos, el comportamiento o el resultado esperado cambiaron durante la implementacion
 - [x] 6.5 Completar `readiness.json` con los enlaces de evidencia reales (issue, PR, revision adversarial, HTTP 200, breakpoints, Nielsen)
 - [x] 6.6 Ejecutar la revision adversarial independiente y registrar su veredicto
-- [ ] 6.7 Ejecutar `npm run openspec:ready:archive -- --change componentes-base --run-local` y resolver cada FAIL antes de archivar
+- [x] 6.7 Ejecutar `npm run openspec:ready:archive -- --change componentes-base --run-local` y resolver cada FAIL antes de archivar

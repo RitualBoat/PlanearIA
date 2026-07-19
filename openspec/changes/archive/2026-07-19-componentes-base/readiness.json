@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "issue": 82,
+  "change": "componentes-base",
+  "surfaces": [
+    "ui"
+  ],
+  "validations": [
+    "openspec-strict"
+  ],
+  "qaVisualNivel": "N1",
+  "qaVisualJourneys": [
+    "arranque-y-alcance-del-shell"
+  ],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/82"
+    },
+    {
+      "id": "pr-link",
+      "ref": "PENDIENTE: PR generado por opsx:finish tras archive."
+    },
+    {
+      "id": "adversarial-review",
+      "ref": "Revision adversarial independiente 2026-07-19, previa a archive: PASS CON HUECOS. Sin blockers. 2 majors encontrados y CORREGIDOS durante la revision: (1) la prueba de reduce-motion del Skeleton era vacua, afirmaba solo rol y etiqueta, identicos en la rama animada y en la estatica, asi que habria pasado aunque el componente ignorara la preferencia; reescrita para exigir que ambas ramas difieran. (2) EmptyState.accion era opcional pese a que la spec exige al menos una accion de salida por variante; pasa a obligatoria en el tipo y el compilador encontro 3 llamadas sin salida. 4 minors corregidos o aceptados con razon escrita: Card presionable ahora exige accessibilityLabel por tipo; el hitSlop del Chip asumia ancho >=44 y se fija minWidth 44 (verificado en navegador: 104pt); role=alert de Banner con hijos interactivos aceptado; rol implicito de TextInput aceptado. Aditividad verificada por diff: contextos, themes y componentes legacy sin cambios; sin dependencias nuevas. Suite completa 108 suites / 720 tests en verde. Detalle en evidencia/README.md."
+    },
+    {
+      "id": "web-http-200",
+      "ref": "expo start --web (puerto 8081) confirmado en HTTP 200 (status=200, 1.60s) ANTES de navegar, el 2026-07-19. Navegacion posterior con Playwright MCP."
+    },
+    {
+      "id": "playwright-breakpoints",
+      "ref": "QA visual N1 del 2026-07-19 con Playwright MCP a 375/768/1280, con medicion DOM y capturas reales del journey GJ0 en evidencia/capturas/. Resultados: padding de Screen 16/24/24 px; ancho maximo sin limite/840/1120; exactamente 1 superficie de navegacion primaria en los tres anchos (barra inferior 367x55, rail 68x830, sidebar); sin desborde horizontal. Button 46px con min-height 44; Chip 32px visual con area extendida a 44 por hitSlop; tipografia de subtitulo 18/24/600 exacta al token. Anillo de foco medido en 4.61:1 con tabulacion real. La corrida encontro y corrigio 2 defectos solo visibles en web (aria-busy/aria-checked ausentes y anillo de foco de bajo contraste). Detalle en evidencia/README.md. npm run qa:visual:check -- --change componentes-base en PASS."
+    },
+    {
+      "id": "nielsen",
+      "ref": "Checklist Nielsen acotado en evidencia/README.md: severidad maxima 1 (umbral de bloqueo 3), sin heuristicas bloqueantes. Checklist anti-slop 1.9.3 completo con los siete puntos en OK."
+    }
+  ],
+  "rollback": {
+    "strategy": "El change es aditivo: agrega src/components/base/ con diez componentes presentacionales y su barrel, cinco suites de pruebas en src/__tests__/components/base/, la pantalla CatalogoComponentesScreen y su registro condicional bajo __DEV__ en MasStack, mas su entrada en MasHomeScreen tambien bajo __DEV__. Verificado con diff contra development: los cuatro contextos protegidos y src/themes/ tienen diff vacio; los componentes legacy que se solapan (Toast.tsx, ConfirmDialog.tsx, SyncStatusBanner.tsx, StatCard.tsx) tienen diff vacio; package.json no suma dependencias (solo acota testMatch a archivos .test.*, verificado sin perder suites: 107 archivos en disco, 107 vistos por jest). No toca almacenamiento, esquema, configuracion remota ni proyecto nativo. Revertir el commit del PR elimina la carpeta base, sus pruebas, el catalogo y su registro; como ninguna pantalla de produccion consume la biblioteca, no hay superficie de usuario que regresione y el shell de #81 queda intacto. Las claves @planearia:* y las de preferencias no se leen ni escriben distinto. Desactivacion parcial: basta con no importar un componente concreto, o retirar solo el registro del catalogo y su entrada, sin revertir el resto.",
+    "verified": true
+  },
+  "adversarialReview": {
+    "ref": "Revision adversarial independiente 2026-07-19, previa a archive: PASS CON HUECOS. Sin blockers. 2 majors encontrados y CORREGIDOS durante la revision: (1) la prueba de reduce-motion del Skeleton era vacua, afirmaba solo rol y etiqueta, identicos en la rama animada y en la estatica, asi que habria pasado aunque el componente ignorara la preferencia; reescrita para exigir que ambas ramas difieran. (2) EmptyState.accion era opcional pese a que la spec exige al menos una accion de salida por variante; pasa a obligatoria en el tipo y el compilador encontro 3 llamadas sin salida. 4 minors corregidos o aceptados con razon escrita: Card presionable ahora exige accessibilityLabel por tipo; el hitSlop del Chip asumia ancho >=44 y se fija minWidth 44 (verificado en navegador: 104pt); role=alert de Banner con hijos interactivos aceptado; rol implicito de TextInput aceptado. Aditividad verificada por diff: contextos, themes y componentes legacy sin cambios; sin dependencias nuevas. Suite completa 108 suites / 720 tests en verde. Detalle en evidencia/README.md."
+  },
+  "exceptions": []
+}

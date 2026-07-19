@@ -61,6 +61,23 @@ const SECCIONES: Array<{ titulo: string; entradas: Entrada[] }> = [
 ];
 
 /**
+ * Herramientas de desarrollo. Solo se agregan bajo `__DEV__`, junto con la ruta que
+ * `MasStack` registra: una pantalla sin punto de entrada seria inalcanzable salvo por
+ * URL, y este proyecto no configura `linking`.
+ */
+const SECCION_DESARROLLO: { titulo: string; entradas: Entrada[] } = {
+  titulo: "Desarrollo",
+  entradas: [
+    {
+      destino: "CatalogoComponentes",
+      icon: "widgets",
+      titulo: "Catalogo de componentes",
+      descripcion: "Biblioteca base con todos sus estados",
+    },
+  ],
+};
+
+/**
  * Hub Mas (D7): reune cuenta, perfil y la comunidad legacy. Feed y Social viven
  * aqui hasta que conectaplan las sustituya (D5); se reapuntan, no se redisenan.
  */
@@ -77,7 +94,7 @@ const MasHomeScreen: React.FC = () => {
       <Text style={styles.titulo}>Mas</Text>
       <Text style={styles.subtitulo}>Tu cuenta y tu comunidad, en un solo lugar.</Text>
 
-      {SECCIONES.map((seccion) => (
+      {(__DEV__ ? [...SECCIONES, SECCION_DESARROLLO] : SECCIONES).map((seccion) => (
         <View key={seccion.titulo} style={styles.seccion}>
           <Text style={styles.seccionTitulo}>{seccion.titulo}</Text>
           <View style={styles.lista}>

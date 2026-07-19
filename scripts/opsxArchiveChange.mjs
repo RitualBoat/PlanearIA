@@ -268,7 +268,7 @@ if (skipSpecs) archiveArgs.push('--skip-specs');
 if (DRY) {
   console.log(`  [dry-run] node ${relative(OPENSPEC_BIN)} ${archiveArgs.join(' ')}`);
   const issue = issueNumber(changeDir);
-  console.log(`  [dry-run] git add -A -- openspec/`);
+  console.log(`  [dry-run] git add -A -- ${archivePaths(findArchivedDir(change)).join(' ')}`);
   console.log(`  [dry-run] git commit -m "${commitMessage(issue, skipSpecs)}"`);
   console.log(`\n[opsx:archive] dry-run termina sin escribir. Estado clasificado: ${sync.state}.\n`);
   process.exit(0);

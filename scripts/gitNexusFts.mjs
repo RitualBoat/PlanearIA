@@ -186,8 +186,10 @@ function readAllowedAgentPaths(args) {
 
 export function diagnose(options) {
   const output = runGitNexus(['status'], options);
-  assertDiagnosticStatusHealthy(output);
+  // El diagnostico se imprime antes de evaluarlo: un comando que oculta su diagnostico justo cuando
+  // encuentra un problema deja a sus consumidores sin la linea que necesitan para clasificar.
   process.stdout.write(output);
+  assertDiagnosticStatusHealthy(output);
 }
 
 export function repair(options) {

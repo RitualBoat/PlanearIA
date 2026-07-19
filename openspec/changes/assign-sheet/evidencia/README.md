@@ -101,13 +101,29 @@ Impacto acotado: es forma visual, no funcion. En los cinco anchos no hay desbord
 
 **4. El estado vacio no tiene captura de navegador.** Esta cubierto por prueba de componente que verifica que se presenta y que su salida "Crear clase" dispara la navegacion. No se capturo porque exigia vaciar las clases y rehacer el recorrido; se declara en vez de omitirse.
 
+## Revision adversarial previa a archive
+
+Veredicto: **PASS CON HUECOS**. Sin blockers. **Dos majors encontrados y corregidos**, ambos invisibles para la suite en verde y para la QA visual, porque los dos requieren un estado que el recorrido feliz no produce.
+
+**Major 1 (corregido): la hoja ofrecia actividad como destino de un entregable y la escritura la descartaba en silencio.** El nivel de actividad se apoya en `Recurso.tareaId`; `Tarea` no declara ese campo, asi que al asignar un entregable el `tareaId` elegido nunca se aplicaba. El docente podia elegir "Ejercicios de fracciones", leer "Destino: 2do A - Unidad 1 - Ejercicios de fracciones" en la confirmacion, y obtener una escritura sin esa actividad. Contradecia dos requisitos propios a la vez: que la confirmacion nombre el destino elegido y que elegir actividad deje el elemento referenciado a ella. Corregido con `admiteActividad`: el nivel solo se ofrece cuando **todos** los elementos son recursos, y desaparece con un entregable o una seleccion mixta. Dos pruebas nuevas.
+
+**Major 2 (corregido): estado vacio falso durante el arranque.** `sinClases` se derivaba solo de `clases.length === 0`, pero `GruposContext` nace con `isLoading: true` y lista vacia. Un docente **con** clases veia "Aun no tienes clases" con su boton de crear mientras el contexto cargaba. Es la misma familia de defecto que cerro #83: afirmar algo falso con tono tranquilizador. Corregido consumiendo `isLoading` del contexto y sirviendo `Skeleton` mientras carga. Una prueba nueva.
+
+**Minors declarados, no corregidos:**
+
+1. La hoja se **desmonta** al cerrar (`recursoParaAsignar ? <AssignSheet/> : null`), asi que `Sheet` nunca anima su salida: `visible` no llega a pasar a `false`. Mantenerla montada exigiria conservar el ultimo elemento en estado solo para animar la salida; se prefiere la simplicidad, y bajo reduce-motion el comportamiento es identico.
+2. `encolarActualizaciones` encola en serie y `queueEntityOperation` intenta un flush por elemento, asi que asignar N elementos dispara N flushes. Es el mismo patron que ya siguen los contextos de datos; optimizarlo aqui seria divergir de ellos.
+3. Si `RecursosContext` estuviera aun cargando, la guardia de existencia haria reportar "no se asigno nada" en vez de escribir. Alcance real bajo: la hoja se abre desde una lista alimentada por ese mismo contexto, asi que en el flujo entregado ya esta cargado.
+
+**Verificado ademas:** las pruebas de regresion **no son vacuas** (4 de 5 fallan contra la implementacion anterior); `src/sync/`, `backend/` y `package.json` tienen diff vacio; la firma publica de `grupoAsignacionesService` no cambio, asi que sus dos consumidores no tocados siguen compilando y ahora encolan.
+
 ## Validacion tecnica
 
 | Comando | Resultado |
 | --- | --- |
 | `npm run typecheck` | verde |
 | `npm run lint -- --quiet` | verde |
-| `npm test -- --runInBand` | **115 suites / 808 tests** en verde (linea base 111/776) |
+| `npm test -- --runInBand` | **115 suites / 810 tests** en verde (linea base 111/776) |
 | `npm run test:sync -- --runInBand` | 4 suites / 23 tests en verde |
 | `npm run test:classroom -- --runInBand` | 6 suites / 21 tests en verde |
 

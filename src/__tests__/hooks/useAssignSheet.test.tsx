@@ -14,12 +14,17 @@ const mockActualizarEntregable = jest.fn().mockResolvedValue({ syncOk: true });
 const mockObtenerRecursoPorId = jest.fn((id: number) => (id === 404 ? undefined : { id }));
 const mockObtenerEntregablePorId = jest.fn((id: number) => (id === 404 ? undefined : { id }));
 
+let mockGruposCargando = false;
+
 jest.mock("../../context/GruposContext", () => ({
   useGruposContext: () => ({
-    grupos: [
-      { id: 1, nombre: "2do A" },
-      { id: 2, nombre: "3ro B" },
-    ],
+    grupos: mockGruposCargando
+      ? []
+      : [
+          { id: 1, nombre: "2do A" },
+          { id: 2, nombre: "3ro B" },
+        ],
+    isLoading: mockGruposCargando,
   }),
 }));
 
@@ -52,6 +57,7 @@ const RECURSO: ElementoAsignable = { id: 1, titulo: "Guia", tipo: "recurso" };
 describe("useAssignSheet", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGruposCargando = false;
     mockGetUnidades.mockResolvedValue([
       { id: "u1", grupoId: 1, nombre: "Unidad 1", posicion: 0 },
     ]);
@@ -168,7 +174,9 @@ describe("useAssignSheet", () => {
     expect(mockActualizarRecurso).not.toHaveBeenCalled();
   });
 
-  it("excluye al propio entregable de la lista de actividades destino", async () => {
+  it("no ofrece actividad como destino de un entregable", async () => {
+    // `Tarea` no declara `tareaId`: si el nivel se ofreciera, la eleccion se descartaria en
+    // silencio y la confirmacion nombraria un destino que la escritura no aplica.
     const { result } = montar([{ id: 50, titulo: "Ensayo", tipo: "entregable" }]);
 
     await act(async () => {
@@ -176,7 +184,32 @@ describe("useAssignSheet", () => {
     });
     await waitFor(() => expect(result.current.cargando).toBe(false));
 
+    expect(result.current.admiteActividad).toBe(false);
     expect(result.current.actividades).toHaveLength(0);
+  });
+
+  it("no ofrece actividad si la seleccion mezcla recursos y entregables", async () => {
+    const { result } = montar([
+      { id: 1, titulo: "Guia", tipo: "recurso" },
+      { id: 50, titulo: "Ensayo", tipo: "entregable" },
+    ]);
+
+    await act(async () => {
+      result.current.elegirClase(1);
+    });
+    await waitFor(() => expect(result.current.cargando).toBe(false));
+
+    expect(result.current.admiteActividad).toBe(false);
+  });
+
+  it("no declara al docente sin clases mientras el contexto aun carga", () => {
+    mockGruposCargando = true;
+    const { result } = montar();
+
+    // La hoja distingue "cargando" de "no tienes clases": afirmar lo segundo durante el
+    // arranque del contexto es falso para un docente que si tiene clases.
+    expect(result.current.clases).toHaveLength(0);
+    expect(result.current.cargando).toBe(true);
   });
 
   it("no escribe ni afirma exito sobre un elemento inexistente", async () => {

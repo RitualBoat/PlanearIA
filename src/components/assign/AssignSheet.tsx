@@ -147,7 +147,12 @@ const AssignSheet: React.FC<AssignSheetProps> = ({
         )
       }
     >
-      {sinClases ? (
+      {vm.cargando && vm.clases.length === 0 ? (
+        <View style={styles.cargandoClases}>
+          <Skeleton height={MIN_TOUCH_TARGET} shape="card" />
+          <Skeleton height={MIN_TOUCH_TARGET} shape="card" />
+        </View>
+      ) : sinClases ? (
         <EmptyState
           variant="empty"
           titulo="Aun no tienes clases"
@@ -228,29 +233,33 @@ const AssignSheet: React.FC<AssignSheetProps> = ({
                 )}
               </Seccion>
 
-              <Seccion titulo="Actividad (opcional)" styles={styles}>
-                {vm.cargando ? (
-                  <Skeleton height={MIN_TOUCH_TARGET} shape="card" />
-                ) : vm.actividades.length === 0 ? (
-                  <Text style={styles.sinOpciones}>Esta clase aun no tiene actividades.</Text>
-                ) : (
-                  vm.actividades.map((opcion) => (
-                    <OpcionFila
-                      key={opcion.id}
-                      opcion={opcion}
-                      seleccionada={String(vm.destino.tareaId) === opcion.id}
-                      onPress={() =>
-                        vm.elegirActividad(
-                          String(vm.destino.tareaId) === opcion.id ? null : Number(opcion.id)
-                        )
-                      }
-                      styles={styles}
-                      colors={colors}
-                      testID={testID ? `${testID}-actividad-${opcion.id}` : undefined}
-                    />
-                  ))
-                )}
-              </Seccion>
+              {/* El nivel de actividad no se ofrece cuando algun elemento no puede
+                  referenciarla: mostrarlo dejaria elegir un destino que no se aplica. */}
+              {vm.admiteActividad ? (
+                <Seccion titulo="Actividad (opcional)" styles={styles}>
+                  {vm.cargando ? (
+                    <Skeleton height={MIN_TOUCH_TARGET} shape="card" />
+                  ) : vm.actividades.length === 0 ? (
+                    <Text style={styles.sinOpciones}>Esta clase aun no tiene actividades.</Text>
+                  ) : (
+                    vm.actividades.map((opcion) => (
+                      <OpcionFila
+                        key={opcion.id}
+                        opcion={opcion}
+                        seleccionada={String(vm.destino.tareaId) === opcion.id}
+                        onPress={() =>
+                          vm.elegirActividad(
+                            String(vm.destino.tareaId) === opcion.id ? null : Number(opcion.id)
+                          )
+                        }
+                        styles={styles}
+                        colors={colors}
+                        testID={testID ? `${testID}-actividad-${opcion.id}` : undefined}
+                      />
+                    ))
+                  )}
+                </Seccion>
+              ) : null}
             </>
           ) : null}
 
@@ -320,6 +329,9 @@ const getStyles = ({ colors, scaled, highContrast }: ThemedStylesInput) =>
   StyleSheet.create({
     cuerpo: {
       maxHeight: 420,
+    },
+    cargandoClases: {
+      gap: spacing.xs,
     },
     resumenElementos: {
       ...scaleType(typography.body, scaled),

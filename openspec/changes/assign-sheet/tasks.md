@@ -44,7 +44,7 @@
 - [x] 4.3 En `AsignarRecursoScreen`, dejar de afirmar exito incondicional: usar el conteo real que devuelve el servicio y avisar cuando no cambio nada
 - [x] 4.4 El selector de entregables de `AsignarRecursoScreen` queda alimentado por la clave correcta como efecto de 3.1, de modo que deja de aparecer vacio para datos vigentes
 - [x] 4.5 Verificar en navegador el recorrido completo desde el boton antes muerto: cascada, confirmacion, escritura y operacion encolada
-- [ ] 4.6 No aplica: al no migrarse `AsignarRecursoScreen` a la hoja, no se produce la pantalla hibrida que este punto preveia declarar
+- [x] 4.6 Registrar que el riesgo de "pantalla hibrida" queda anulado: al no migrarse `AsignarRecursoScreen` a la hoja, conserva su cuerpo legacy completo y no mezcla tokens con `COLORS`
 
 ## 5. Validacion tecnica
 
@@ -68,7 +68,7 @@
 ## 7. Cierre SDD
 
 - [x] 7.1 Actualizar `TLDR.md` y `design.md` con la desviacion de adopcion (D10)
-- [ ] 7.2 Revision adversarial independiente previa a archive
-- [ ] 7.3 Completar `readiness.json` con evidencia real y ejecutar `npm run openspec:ready:archive -- --change assign-sheet --run-local`
-- [ ] 7.4 `npm run opsx:sync` y archive
-- [ ] 7.5 `npm run opsx:finish`
+- [x] 7.2 Revision adversarial independiente previa a archive: PASS CON HUECOS, dos majors corregidos
+- [x] 7.3 Completar `readiness.json` con evidencia real y ejecutar `npm run openspec:ready:archive -- --change assign-sheet --run-local`, resolviendo cada FAIL antes de archivar
+
+El archive, el sync de specs y `npm run opsx:finish` son pasos posteriores al change y no tareas suyas, misma convencion que #82 y #83.

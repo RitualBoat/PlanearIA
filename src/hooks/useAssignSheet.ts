@@ -48,6 +48,8 @@ export interface AssignSheetViewModel {
   clases: OpcionDestino[];
   unidades: OpcionDestino[];
   actividades: OpcionDestino[];
+  /** Falso cuando algun elemento no puede referenciar una actividad: el nivel no se ofrece. */
+  admiteActividad: boolean;
   destino: DestinoAsignacion;
   elegirClase: (grupoId: number | null) => void;
   elegirUnidad: (unidadId: string | null) => void;
@@ -67,7 +69,7 @@ export interface AssignSheetViewModel {
 const DESTINO_VACIO: DestinoAsignacion = { grupoId: null, unidadId: null, tareaId: null };
 
 export function useAssignSheet(elementos: ElementoAsignable[]): AssignSheetViewModel {
-  const { grupos } = useGruposContext();
+  const { grupos, isLoading: cargandoClases } = useGruposContext();
   const { actualizarRecurso, obtenerRecursoPorId } = useRecursos();
   const { actualizarEntregable, obtenerEntregablePorId } = useEntregables();
 
@@ -140,18 +142,28 @@ export function useAssignSheet(elementos: ElementoAsignable[]): AssignSheetViewM
     [unidadesGrupo]
   );
 
-  // Un entregable no puede ser destino de si mismo: se excluye de sus propias actividades.
-  const idsEntregablesEnJuego = useMemo(
-    () => new Set(elementos.filter((item) => item.tipo === "entregable").map((item) => item.id)),
+  /**
+   * La actividad como destino solo aplica a recursos.
+   *
+   * Un entregable no tiene campo para referenciar a otro entregable: `Tarea` no declara
+   * `tareaId`. Ofrecer el nivel igualmente dejaria al docente eligiendo un destino que la
+   * escritura descarta en silencio, y la confirmacion nombraria algo que no va a ocurrir.
+   * Con un solo entregable en juego, el nivel desaparece.
+   */
+  const admiteActividad = useMemo(
+    () => elementos.length > 0 && elementos.every((item) => item.tipo === "recurso"),
     [elementos]
   );
 
   const actividades = useMemo<OpcionDestino[]>(
     () =>
-      actividadesGrupo
-        .filter((actividad) => !idsEntregablesEnJuego.has(Number(actividad.id)))
-        .map((actividad) => ({ id: String(actividad.id), label: actividad.titulo })),
-    [actividadesGrupo, idsEntregablesEnJuego]
+      admiteActividad
+        ? actividadesGrupo.map((actividad) => ({
+            id: String(actividad.id),
+            label: actividad.titulo,
+          }))
+        : [],
+    [actividadesGrupo, admiteActividad]
   );
 
   const elegirClase = useCallback((grupoId: number | null) => {
@@ -190,8 +202,12 @@ export function useAssignSheet(elementos: ElementoAsignable[]): AssignSheetViewM
     return partes.join(" - ");
   }, [destino, clases, unidades, actividades]);
 
+  // `cargandoClases` cuenta como carga: sin el, un docente con clases ve "aun no tienes
+  // clases" durante el arranque del contexto, que es una afirmacion falsa.
+  const cargandoTodo = cargando || cargandoClases;
+
   const puedeConfirmar =
-    destino.grupoId !== null && elementos.length > 0 && !ejecutando && !cargando;
+    destino.grupoId !== null && elementos.length > 0 && !ejecutando && !cargandoTodo;
 
   const asignar = useCallback(async () => {
     if (destino.grupoId === null || elementos.length === 0 || ejecutando) return;
@@ -256,13 +272,14 @@ export function useAssignSheet(elementos: ElementoAsignable[]): AssignSheetViewM
     clases,
     unidades,
     actividades,
+    admiteActividad,
     destino,
     elegirClase,
     elegirUnidad,
     elegirActividad,
     resumenDestino,
     puedeConfirmar,
-    cargando,
+    cargando: cargandoTodo,
     error,
     reintentar,
     ejecutando,

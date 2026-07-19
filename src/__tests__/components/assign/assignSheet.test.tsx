@@ -20,7 +20,7 @@ const mockActualizarRecurso = jest.fn().mockResolvedValue({ syncOk: true });
 let mockGrupos: Array<{ id: number; nombre: string }> = [{ id: 1, nombre: "2do A" }];
 
 jest.mock("../../../context/GruposContext", () => ({
-  useGruposContext: () => ({ grupos: mockGrupos }),
+  useGruposContext: () => ({ grupos: mockGrupos, isLoading: false }),
 }));
 
 jest.mock("../../../context/RecursosContext", () => ({

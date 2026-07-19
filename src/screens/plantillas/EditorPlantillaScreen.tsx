@@ -17,6 +17,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { AppRoutesParamList } from "../../navigation/StackNavigator";
 import { COLORS } from "../../../types";
 import { useEditorPlantillaViewModel } from "../../hooks/useEditorPlantillaViewModel";
+import SaveStateLabel from "../../components/sync/SaveStateLabel";
 import { isWeb } from "../../utils/responsive";
 
 type TipoOption = {
@@ -246,6 +247,21 @@ const EditorPlantillaScreen: React.FC = () => {
               )}
             </View>
 
+            {/*
+              Solo mientras guarda. Este editor no rastrea si el formulario esta sucio, asi
+              que mostrar "Cambios sin guardar" al abrir una plantilla que nadie ha tocado
+              afirmaria algo falso, que es justo lo que este change existe para eliminar.
+              El estado sale del mismo `isSaving` que ya gobierna los botones, sin inventar
+              una maquina de guardado paralela.
+            */}
+            {vm.isSaving ? (
+              <SaveStateLabel
+                estado="guardando"
+                style={styles.saveState}
+                testID="editor-plantilla-save-state"
+              />
+            ) : null}
+
             {/* Bottom actions */}
             <View style={styles.actionsRow}>
               <Pressable
@@ -382,6 +398,7 @@ const styles = StyleSheet.create({
   seccionRow: { flexDirection: "row", alignItems: "center", marginBottom: 6 },
   // Actions
   actionsRow: { flexDirection: "row", gap: 10, marginTop: 4 },
+  saveState: { marginTop: 12 },
   btnSecondary: {
     flex: 1,
     flexDirection: "row",

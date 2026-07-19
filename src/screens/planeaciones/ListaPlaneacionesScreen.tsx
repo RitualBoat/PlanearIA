@@ -16,26 +16,6 @@ import { useListaPlaneacionesViewModel } from "../../hooks/useListaPlaneacionesV
 import type { PlaneacionDocumento } from "../../../types/planeacionV2";
 import { NivelAcademico } from "../../../types/planeacionV2";
 
-const buildSyncState = (
-  syncStatus: "idle" | "syncing" | "synced" | "error" | "offline",
-  pendingCount: number,
-  isOnline: boolean
-): { icon: keyof typeof MaterialIcons.glyphMap; label: string; color: string } => {
-  if (!isOnline || syncStatus === "offline") {
-    return { icon: "cloud-off", label: "Sin conexion", color: "#f59e0b" };
-  }
-  if (syncStatus === "error") {
-    return { icon: "error-outline", label: "Error sync", color: "#dc2626" };
-  }
-  if (syncStatus === "syncing") {
-    return { icon: "sync", label: "Sincronizando", color: "#2563eb" };
-  }
-  if (pendingCount > 0) {
-    return { icon: "cloud-upload", label: `${pendingCount} pendientes`, color: "#2563eb" };
-  }
-  return { icon: "cloud-done", label: "Sincronizado", color: "#16a34a" };
-};
-
 const buildWeeksLabel = (doc: PlaneacionDocumento): string => {
   const semanas = doc.datosGenerales.semanas;
   if (!Array.isArray(semanas) || semanas.length === 0) return "Sin semanas";
@@ -45,8 +25,6 @@ const buildWeeksLabel = (doc: PlaneacionDocumento): string => {
 const ListaPlaneacionesScreen: React.FC = () => {
   const { colors } = useTheme();
   const vm = useListaPlaneacionesViewModel();
-
-  const syncMeta = buildSyncState(vm.syncStatus, vm.pendingCount, vm.isOnline);
 
   const removeChip = (type: "nivel" | "asignatura" | "grado" | "inicio" | "fin") => {
     if (type === "nivel") vm.setFiltroNivel(undefined);
@@ -148,11 +126,6 @@ const ListaPlaneacionesScreen: React.FC = () => {
                 {vm.formatFecha(doc.fechaModificacion)}
               </Text>
             </View>
-          </View>
-
-          <View style={[styles.syncPill, { backgroundColor: `${syncMeta.color}22` }]}> 
-            <MaterialIcons name={syncMeta.icon} size={13} color={syncMeta.color} />
-            <Text style={[styles.syncPillText, { color: syncMeta.color }]}>{syncMeta.label}</Text>
           </View>
         </Pressable>
       </View>
@@ -605,19 +578,6 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 12,
-  },
-  syncPill: {
-    borderRadius: 999,
-    alignSelf: "flex-start",
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-  },
-  syncPillText: {
-    fontSize: 11,
-    fontWeight: "700",
   },
   emptyState: {
     alignItems: "center",

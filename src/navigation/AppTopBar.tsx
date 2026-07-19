@@ -8,6 +8,8 @@ import { getElevation, radii, scaleType, spacing, typography, zIndex } from "../
 import type { ThemedStylesInput } from "../themes/types";
 import { useNotificaciones } from "../context/NotificacionesContext";
 import { useAuth } from "../context/AuthContext";
+import { useBreakpoint } from "../hooks/useBreakpoint";
+import SyncStatusChip from "../components/sync/SyncStatusChip";
 import { navigateToHub } from "./navigateToHub";
 
 /**
@@ -16,6 +18,9 @@ import { navigateToHub } from "./navigateToHub";
  * ocupa su propio espacio en vez de superponerse al contenido (riesgo R4), con
  * toque de 44 pt y tokens de tema en runtime. El rediseno de la pantalla de
  * notificaciones pertenece a notificaciones-chrome; aqui solo vive la campana.
+ *
+ * Desde sync-status-ui (#83) presenta ademas el indicador global de sincronizacion, que
+ * toma su presentacion de la fuente unica y ocupa espacio propio como el resto del chrome.
  */
 const AppTopBar: React.FC = () => {
   const insets = useSafeAreaInsets();
@@ -23,6 +28,7 @@ const AppTopBar: React.FC = () => {
   const { unreadCount } = useNotificaciones();
   const { logout } = useAuth();
   const { colors, isDark, scaled, highContrast } = useAppTheme();
+  const { breakpoint } = useBreakpoint();
   const [menuVisible, setMenuVisible] = useState(false);
 
   const styles = useMemo(
@@ -43,8 +49,7 @@ const AppTopBar: React.FC = () => {
     navigateToHub(navigation, "MasTab", "Cuenta");
   }, [navigation]);
 
-  const handleLogout = useCallback(async () => {
-    setMenuVisible(false);
+  const irALogin = useCallback(async () => {
     await logout();
     navigation.dispatch(
       CommonActions.reset({
@@ -54,6 +59,20 @@ const AppTopBar: React.FC = () => {
     );
   }, [logout, navigation]);
 
+  const handleLogout = useCallback(async () => {
+    setMenuVisible(false);
+    await irALogin();
+  }, [irALogin]);
+
+  /**
+   * Salida del estado de sesion expirada. Pasa por `logout` a proposito: el token que el
+   * servidor ya rechazo debe limpiarse antes de volver al login, o la siguiente sesion
+   * arrancaria arrastrando credenciales invalidas.
+   */
+  const handleReingresar = useCallback(() => {
+    void irALogin();
+  }, [irALogin]);
+
   return (
     <>
       <View style={[styles.bar, { paddingTop: insets.top }]}>
@@ -61,6 +80,11 @@ const AppTopBar: React.FC = () => {
           PlanearIA
         </Text>
         <View style={styles.acciones}>
+          <SyncStatusChip
+            compacto={breakpoint === "mobile"}
+            onReingresar={handleReingresar}
+            testID="chrome-sync-chip"
+          />
           <Pressable
             style={({ pressed }) => [styles.accion, pressed && styles.accionPressed]}
             onPress={() => navigation.navigate("Notificaciones" as never)}

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "issue": 85,
+  "change": "golden-journeys-qa-visual",
+  "surfaces": [
+    "docs",
+    "ui"
+  ],
+  "validations": [
+    "openspec-strict",
+    "harness-parity"
+  ],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/85"
+    },
+    {
+      "id": "pr-link",
+      "ref": "PENDIENTE: PR generado por opsx:finish tras archive."
+    },
+    {
+      "id": "docs-verification",
+      "ref": "PENDIENTE: rutas citadas en el manifiesto verificadas contra src/navigation/routeManifest.ts; runbook registrado en Documentacion/03-validacion/README.md."
+    },
+    {
+      "id": "adversarial-review",
+      "ref": "PENDIENTE: revision adversarial independiente antes de archive."
+    },
+    {
+      "id": "web-http-200",
+      "ref": "PENDIENTE: expo start --web via .claude/launch.json (expo-web, puerto 8081) con HTTP 200 confirmado antes de navegar, para la corrida de referencia de GJ0."
+    },
+    {
+      "id": "playwright-breakpoints",
+      "ref": "PENDIENTE: corrida de referencia de GJ0 en 375/768/1280 (nivel N1) con medicion DOM y capturas reales, mas la salida de npm run qa:visual:check sobre la propia evidencia del change."
+    },
+    {
+      "id": "nielsen",
+      "ref": "PENDIENTE: checklist Nielsen con severidad y checklist anti-slop 1.9.3 sobre la corrida de referencia; alcance declarado (evalua el shell recorrido por GJ0, no un rediseno de pantallas)."
+    }
+  ],
+  "qaVisualNivel": "N1",
+  "rollback": {
+    "strategy": "El change es aditivo y no toca codigo de producto. Crea qa/golden-journeys.json, Documentacion/03-validacion/GOLDEN_JOURNEYS_QA_VISUAL.md, scripts/checkGoldenJourneys.mjs, scripts/testGoldenJourneys.mjs, la evidencia del change y dos entradas en scripts de package.json (qa:visual:check, test:golden-journeys); ademas agrega una linea al indice de Documentacion/03-validacion/README.md. No modifica src/, backend/, almacenamiento, esquema, contratos de sync, claves @planearia:*, SYNC_ENTITIES, workflows de CI, gates compartidos (scripts/checkOpenSpecReadiness.mjs queda intacto) ni proyecto nativo, y no agrega dependencias. Ningun runtime de la app importa estos archivos, asi que revertir el commit del PR restaura el estado previo sin migracion ni perdida de datos y sin afectar ninguna suite existente. Desactivacion parcial sin revertir todo: dejar de invocar qa:visual:check devuelve la QA visual al modo actual conducido por agente, conservando manifiesto y runbook como documentacion de referencia.",
+    "trigger": "Si el contrato de evidencia resulta desproporcionado para changes pequenos de UI, se degrada al nivel N1 o se revierte el commit."
+  },
+  "adversarialReview": {
+    "ref": "PENDIENTE: revision adversarial independiente antes de archive."
+  },
+  "exceptions": []
+}

@@ -64,14 +64,16 @@ function git(...commandArgs) {
   return readGit(...commandArgs);
 }
 
-// npm en Windows es un .cmd: sin shell, spawnSync no lo resuelve. Mismo criterio que
-// scripts/checkOpenSpecReadiness.mjs para no divergir entre gates.
+// npm en Windows es un .cmd, que spawnSync no resuelve por nombre desnudo. Se nombra el ejecutable real
+// en vez de activar `shell: true`: con shell los argumentos se concatenan sin escapar (Node lo marca
+// DEP0190) y el nombre del change entraria a una linea de comandos interpretada.
+const NPM = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+
 function runNpm(commandArgs, { inherit = false } = {}) {
-  return spawnSync('npm', commandArgs, {
+  return spawnSync(NPM, commandArgs, {
     cwd: ROOT,
     encoding: 'utf8',
     stdio: inherit ? 'inherit' : 'pipe',
-    shell: process.platform === 'win32',
   });
 }
 

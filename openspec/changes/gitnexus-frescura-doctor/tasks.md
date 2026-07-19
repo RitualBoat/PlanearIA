@@ -55,3 +55,11 @@
 - [ ] 8.7 Ejecutar la revision adversarial con `/adversarial-review` y resolver Blockers y Majors antes de archivar.
 - [ ] 8.8 Ejecutar `npm run openspec:ready:archive -- --change gitnexus-frescura-doctor --run-local` y resolver cada `FAIL`.
 - [ ] 8.9 Actualizar `TLDR.md` si el alcance, los archivos, el comportamiento o el resultado esperado cambiaron durante el apply.
+
+## 9. Hallazgos de la revision adversarial
+
+- [x] 9.1 Cerrar el hueco de `gitnexus:verify`, que aprobaba un indice stale pese a estar documentado como gate de salud: comprobar la frescura antes de los fixtures y cubrirlo con la salida real del CLI.
+- [x] 9.2 Hacer inyectable el runner de `runStructuralVerification` y afirmar en pruebas que solo emite `query` e `impact`, para que la promesa read-only del doctor no dependa de una asercion que solo ve sus llamadas directas.
+- [x] 9.3 Cubrir los desenlaces de fallo de la verificacion estructural (consulta vacia, diagnostico FTS, impact no exacto) y comprobar que no continua tras el primer fallo.
+- [x] 9.4 Registrar en la spec los escenarios del gate de salud sobre indice stale y del conjunto de subcomandos de solo lectura.
+- [x] 9.5 Verificar que ningun workflow de CI invoca `harness:doctor` ni `gitnexus:*`, de modo que el endurecimiento no rompe la entrega.

@@ -1,0 +1,29 @@
+Grupo 9 - hallazgos de la revision adversarial
+fecha: 2026-07-19
+
+HALLAZGO 1 (Major): gitnexus:verify aprobaba un indice stale.
+  AGENTS.md lo documenta como 'gate de salud', pero solo comprobaba los fixtures
+  estructurales. Un indice atrasado que resuelve sus fixtures pasaba: el mismo falso
+  verde de #112 a menor escala.
+  Reproduccion antes del arreglo: indice en 4fbd9c0, HEAD en 336be41 -> verify PASS.
+  Despues del arreglo:
+    Error: GitNexus index is stale against the current checkout.
+           Run npm run gitnexus:repair and then npm run gitnexus:verify.
+
+HALLAZGO 2 (Minor->Major): la asercion read-only del doctor solo veia sus llamadas
+  directas, no los subcomandos emitidos dentro del subproceso 'structural'.
+  Arreglo: runner inyectable en runStructuralVerification y prueba que afirma que
+  la unica secuencia emitida es [query, impact], sin analyze ni banderas de escritura.
+
+HALLAZGO 3 (refutado, no es Blocker): ningun workflow de CI invoca harness:doctor
+  ni gitnexus:*, por lo que endurecer la clasificacion no rompe la entrega.
+  Comprobado con grep sobre .github/workflows/.
+
+=== validacion tras los arreglos ===
+gitnexus:repair -> exit 0
+Indexed commit: 336be41
+Current commit: 336be41
+Status: ✅ up-to-date
+gitnexus:verify -> GitNexus FTS verification passed.
+test:gitnexus -> GitNexus FTS verifier unit smoke passed.
+test:harness:doctor -> Harness doctor tests passed.

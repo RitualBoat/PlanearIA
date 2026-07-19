@@ -11,6 +11,7 @@ import {
   findUnexpectedAgentChanges,
   hasFtsDiagnostic,
   hasRepositoryDiagnostic,
+  runStructuralVerification,
   verifyImpactResult,
   verifyQueryResult,
 } from './gitNexusFts.mjs';
@@ -74,6 +75,42 @@ assert.throws(
   () => verifyImpactResult({ target: { id: FIXTURE_UID }, epistemic: 'estimated' }),
   /must be exact/i,
 );
+
+// La verificacion estructural solo puede leer: si algun dia emitiera analyze o una reparacion, la
+// promesa read-only del doctor seria falsa sin que ninguna asercion lo notara.
+const QUERY_OK = JSON.stringify({ definitions: [{ id: 'File:src/hooks/useCrearPlaneacionViewModel.ts' }] });
+const IMPACT_OK = JSON.stringify({ target: { id: FIXTURE_UID }, epistemic: 'exact' });
+
+function spyRunner(responses) {
+  const issued = [];
+  const runner = (args) => {
+    issued.push(args);
+    return responses[issued.length - 1];
+  };
+  return { issued, runner };
+}
+
+const readOnly = spyRunner([QUERY_OK, IMPACT_OK]);
+assert.deepEqual(runStructuralVerification({}, readOnly.runner), { ok: true, reason: null });
+assert.deepEqual(readOnly.issued.map((args) => args[0]), ['query', 'impact']);
+for (const args of readOnly.issued) {
+  assert.equal(args.some((arg) => /^(analyze|--repair-fts|--index-only)$/.test(arg)), false, args.join(' '));
+}
+
+// Los desenlaces de fallo devuelven un motivo clasificado en vez de lanzar, y no siguen adelante.
+const emptyQuery = spyRunner([JSON.stringify({ definitions: [], process_symbols: [] })]);
+const emptyResult = runStructuralVerification({}, emptyQuery.runner);
+assert.equal(emptyResult.ok, false);
+assert.match(emptyResult.reason, /no structural context/i);
+assert.equal(emptyQuery.issued.length, 1);
+
+const degradedFts = spyRunner(['FTS indexes missing']);
+assert.equal(runStructuralVerification({}, degradedFts.runner).ok, false);
+
+const badImpact = spyRunner([QUERY_OK, JSON.stringify({ target: { id: FIXTURE_UID }, epistemic: 'estimated' })]);
+const badImpactResult = runStructuralVerification({}, badImpact.runner);
+assert.equal(badImpactResult.ok, false);
+assert.match(badImpactResult.reason, /must be exact/i);
 
 const unexpected = findUnexpectedAgentChanges(
   ' M AGENTS.md\n M .agents/instructions/core.md\n M src/hooks/example.ts',

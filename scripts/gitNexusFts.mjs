@@ -211,8 +211,11 @@ export function repair(options) {
 
 // Fuente unica de "estructuralmente sano": la comparten `verify` y el doctor del harness para que no
 // puedan derivar hacia dos definiciones distintas.
-export function runStructuralVerification(options = {}) {
-  const queryOutput = runGitNexus(['query', '-r', 'PlanearIA', FIXTURE_QUERY], options);
+// El runner es inyectable para que una prueba pueda afirmar que esta ruta solo emite subcomandos de
+// lectura. Sin esa inyeccion, la promesa de "read-only" del doctor solo se podria comprobar sobre sus
+// llamadas directas, no sobre lo que ocurre dentro de este subproceso.
+export function runStructuralVerification(options = {}, runner = runGitNexus) {
+  const queryOutput = runner(['query', '-r', 'PlanearIA', FIXTURE_QUERY], options);
   if (hasFtsDiagnostic(queryOutput)) {
     return { ok: false, reason: 'GitNexus query reported an FTS diagnostic.' };
   }
@@ -222,7 +225,7 @@ export function runStructuralVerification(options = {}) {
     return { ok: false, reason: error.message };
   }
 
-  const impactOutput = runGitNexus(
+  const impactOutput = runner(
     ['impact', '-r', 'PlanearIA', '--uid', FIXTURE_UID, '--depth', '3', '--include-tests'],
     options,
   );
@@ -239,6 +242,10 @@ export function runStructuralVerification(options = {}) {
 }
 
 export function verify({ allowedPaths, ...options }) {
+  // El gate de salud comprueba la frescura antes que la estructura: sin esto, `verify` aprobaria un
+  // indice atrasado que resuelve sus fixtures, que es el mismo falso verde de #112 en pequeno.
+  assertDiagnosticStatusHealthy(runGitNexus(['status'], options));
+
   const structural = runStructuralVerification(options);
   if (!structural.ok) {
     throw new Error(structural.reason);

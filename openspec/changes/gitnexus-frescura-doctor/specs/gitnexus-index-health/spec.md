@@ -38,6 +38,18 @@ This contract SHALL bind every consumer of the diagnostic, including the harness
 - **THEN** the freshness classification is `unclassifiable` and the consumer reports GitNexus as failed
 - **AND** the absence of a known failure signature is not accepted as evidence of health
 
+#### Scenario: The health gate runs against a stale index
+
+- **WHEN** the structural verification command runs on a checkout whose index is classified as `stale`
+- **THEN** it fails on freshness before evaluating its fixtures
+- **AND** the fact that its fixtures would still resolve does not make it report the structural path as healthy
+
+#### Scenario: Structural verification issues only read commands
+
+- **WHEN** the shared structural verification runs in any outcome
+- **THEN** the only GitNexus subcommands it issues are the known query and the UID-disambiguated impact
+- **AND** it never issues an analyze, repair, or reindex invocation
+
 #### Scenario: Fresh index fails the structural fixture
 
 - **WHEN** the index is classified as `fresh` but the known MVVM query returns no structural context or the UID-disambiguated impact fixture does not resolve exactly

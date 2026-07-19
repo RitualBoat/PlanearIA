@@ -143,6 +143,10 @@
       "<rootDir>/node_modules/",
       "<rootDir>/context/referencias-opensource",
       "<rootDir>/context/planeaciones-ground-truth/referencias-opensource"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.[jt]s?(x)",
+      "**/?(*.)+(spec|test).[jt]s?(x)"
     ]
   },
   "private": true

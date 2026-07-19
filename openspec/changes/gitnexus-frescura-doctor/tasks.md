@@ -51,10 +51,10 @@
 - [x] 8.3 Ejecutar `npm run typecheck` y `npm run lint -- --quiet`.
 - [x] 8.4 Ejecutar `npm exec --yes=false -- openspec validate --all --strict --no-interactive` y `npm run agent:harness:check`.
 - [x] 8.5 Registrar la duracion final del check `gitnexus` del doctor y compararla con la linea base de 1.3.
-- [ ] 8.6 Completar `readiness.json` con issue, superficies, validaciones, evidencia, rollback y la referencia de la revision adversarial.
-- [ ] 8.7 Ejecutar la revision adversarial con `/adversarial-review` y resolver Blockers y Majors antes de archivar.
-- [ ] 8.8 Ejecutar `npm run openspec:ready:archive -- --change gitnexus-frescura-doctor --run-local` y resolver cada `FAIL`.
-- [ ] 8.9 Actualizar `TLDR.md` si el alcance, los archivos, el comportamiento o el resultado esperado cambiaron durante el apply.
+- [x] 8.6 Completar `readiness.json` con issue, superficies, validaciones, evidencia, rollback y la referencia de la revision adversarial.
+- [x] 8.7 Ejecutar la revision adversarial con `/adversarial-review` y resolver Blockers y Majors antes de archivar.
+- [x] 8.8 Ejecutar `npm run openspec:ready:archive -- --change gitnexus-frescura-doctor --run-local` y resolver cada `FAIL`.
+- [x] 8.9 Actualizar `TLDR.md` si el alcance, los archivos, el comportamiento o el resultado esperado cambiaron durante el apply.
 
 ## 9. Hallazgos de la revision adversarial
 

@@ -23,9 +23,9 @@ verdad, conservando la bandera que impide que toque los archivos de instruccione
 Un indice atrasado nunca da aprobado. Un indice fresco que no logra resolver la consulta de prueba
 tampoco. Una salida que el clasificador no entiende falla en vez de pasar de largo, porque no encontrar
 un error conocido no es prueba de salud. Un indice fresco y funcional si aprueba. El doctor sigue sin
-tocar nada: no repara, no reconstruye, no escribe, y una prueba lo verifica revisando los comandos que
-ejecuta, no solo el resultado. El comando de recuperacion deja de poder declarar exito si el indice
-sigue atrasado, y sigue habiendo un solo camino de recuperacion, no dos.
+tocar nada: no repara, no reconstruye, no escribe, y una prueba verifica que solo emite comandos de
+lectura. El comando de recuperacion deja de poder declarar exito si el indice sigue atrasado. La
+revision adversarial anadio un caso: el comando de verificacion tampoco aprueba ya un indice atrasado.
 
 ## Como se implementa paso a paso (tasks)
 

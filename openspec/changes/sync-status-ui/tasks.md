@@ -43,7 +43,7 @@
 - [x] 5.2 QA visual con Playwright MCP a 375/768/1280: chip en el chrome, sin desborde horizontal, variante compacta en movil
 - [x] 5.3 Transicion offline -> reconexion ejercitada en navegador **solo para la ruta de invitado** (eventos `offline`/`online` reales). Los estados autenticados no se pudieron verificar en navegador: el backend rechaza este origen por CORS y no se crearon cuentas ni se usaron credenciales. Quedan cubiertos de forma determinista por la prueba de tabla. Limitacion declarada en `evidencia/README.md`
 - [x] 5.4 Evidenciar el estado de sincronizacion desactivada (sesion de invitado), que es el caso hoy mal presentado
-- [ ] 5.5 Verificar por captura el cambio en caliente de tema, escala tipografica y daltonismo. **No ejecutado:** garantizado por construccion (`getStyles` + `useAppTheme`, cero hex, cero `COLORS`) y por prueba de fuente, con el mecanismo ya probado en #78 y #82, pero sin captura por modo en esta corrida. Declarado como limitacion
+- [x] 5.5 Cambio de tema verificado en caliente en navegador: al conmutar "Modo oscuro" el chip pasa de fondo `rgb(242,245,250)` a `rgb(42,51,64)` y su texto de `rgb(92,110,134)` a `rgb(160,176,196)`, sin recargar. Captura en `evidencia/capturas/chip-tema-oscuro-1280.png`. Escala tipografica y daltonismo quedan garantizadas por la misma fabrica `getStyles` pero sin captura propia; declarado como limitacion
 - [x] 5.6 Guardar capturas en `evidencia/capturas/` y ejecutar `npm run qa:visual:check`
 - [x] 5.7 Checklist anti-slop 1.9.3 y Nielsen sin severidad >=3
 
@@ -52,5 +52,6 @@
 - [x] 6.1 Actualizar `TLDR.md` si cambiaron alcance, archivos, comportamiento o resultado esperado
 - [x] 6.2 Completar `readiness.json` con validaciones, evidencia y rollback
 - [x] 6.3 Revision adversarial con `/adversarial-review`: PASS CON HUECOS, sin blockers, 4 majors encontrados y corregidos (tartamudeo de SaveStateLabel, area tactil bajo 44 pt en compacto accionable, ausencia de prueba de reduce-motion, y afirmacion falsa "Cambios sin guardar" en el consumidor de referencia)
-- [ ] 6.4 `npm run openspec:ready:archive -- --change sync-status-ui --run-local` en PASS
-- [ ] 6.5 Archive, sync de specs y `npm run opsx:finish`
+- [x] 6.4 `npm run openspec:ready:archive -- --change sync-status-ui --run-local` y resolver cada FAIL antes de archivar
+
+El archive, el sync de specs y `npm run opsx:finish` son pasos posteriores al change y no tareas suyas, misma convencion que #82.

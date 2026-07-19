@@ -1,0 +1,7 @@
+Tarea 1.3 - linea base de duraciones (indice fresco, 1d4dcb0)
+fecha: 2026-07-19
+
+gitnexus:diagnose: 5 s
+gitnexus:verify: 16 s
+
+harness:doctor (completo, antes del cambio): 35 s

@@ -22,7 +22,8 @@
     "FTS indexes missing",
     "FTS extension unavailable",
     "full-text search degraded",
-    "query returned no structural context"
+    "query returned no structural context",
+    "impact did not resolve the expected"
   ],
   "retiredTools": [
     {

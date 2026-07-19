@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "issue": 112,
+  "change": "gitnexus-frescura-doctor",
+  "surfaces": [
+    "harness",
+    "docs"
+  ],
+  "validations": [
+    "openspec-strict",
+    "harness-parity",
+    "opsx-patch"
+  ],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/112"
+    },
+    {
+      "id": "pr-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/pull/118"
+    },
+    {
+      "id": "adversarial-review",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/112#issuecomment-5017188436"
+    },
+    {
+      "id": "fixtures",
+      "ref": "openspec/changes/gitnexus-frescura-doctor/evidencia/06-validacion-final.txt y 07-revision-adversarial.txt"
+    },
+    {
+      "id": "docs-verification",
+      "ref": "openspec/changes/gitnexus-frescura-doctor/evidencia/06-validacion-final.txt (agent:harness:check en paridad, 36 espejos)"
+    }
+  ],
+  "rollback": {
+    "strategy": "Revertir el commit del PR restaura la clasificacion anterior del doctor y el cuerpo previo de gitnexus:repair, sin migraciones, datos persistidos ni reindexado automatico que deshacer. Las piezas son independientes y admiten desactivacion parcial: se puede revertir solo el cambio de repair conservando la clasificacion de frescura, o solo la verificacion estructural conservando esa clasificacion. El indice .gitnexus es local e ignorado en .git/info/exclude, asi que ningun rollback lo arrastra."
+  },
+  "adversarialReview": {
+    "ref": "https://github.com/RitualBoat/PlanearIA/issues/112#issuecomment-5017188436"
+  },
+  "exceptions": []
+}

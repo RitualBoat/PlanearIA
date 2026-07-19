@@ -137,10 +137,13 @@ sin deliberar ni pedir permiso ni releer archivos a mano; asi no se gastan token
 
 - GitNexus: PRIMARIO para casi cualquier consulta estructural de codigo (flujos MVVM, call chains,
   dependencias, backend/IA, sync/offline, impacto). Es el default de toda IA/agente para entender el codigo.
-  Frescura: `npm run gitnexus:diagnose`; reparacion local: `npm run gitnexus:repair`; gate de salud:
-  `npm run gitnexus:verify`. La version queda fijada dentro del wrapper y la reparacion usa siempre
-  `--repair-fts --index-only` para no inyectar archivos de agente. CodeGraph entra como fallback si este
-  contrato falla o no entrega el contexto requerido.
+  Frescura: `npm run gitnexus:diagnose`, que falla si el indice esta stale o si su estado no se puede
+  clasificar. Recuperacion: `npm run gitnexus:repair` y despues `npm run gitnexus:verify`; es la unica
+  secuencia, no hay un segundo comando. La version queda fijada dentro del wrapper y la reparacion
+  reindexa con `--index-only`, bandera que impide inyectar archivos de agente, y rechaza su propio
+  resultado si el indice sigue sin quedar fresco. `npm run harness:doctor` no repara ni reindexa: solo
+  clasifica la frescura y ejecuta la verificacion estructural, y reporta FAIL en cuanto una de las dos
+  falla. CodeGraph entra como fallback si este contrato falla o no entrega el contexto requerido.
 - CodeGraph: FALLBACK cuando GitNexus no da el detalle exacto de UN archivo o simbolo especifico
   (fuente lineada estilo Read, comprobacion puntual), esta stale o resulta ambiguo. No usar junto a GitNexus
   por reflejo; solo si el primero falla, omite un archivo clave o el change pide comparacion de evidencia.

@@ -1,0 +1,27 @@
+Tareas 8.1-8.5 - validacion final
+fecha: 2026-07-19
+commit: 4fbd9c0 + cambios de documentacion de agente
+
+=== test:gitnexus ===
+GitNexus FTS verifier unit smoke passed.
+
+=== test:harness:doctor ===
+Harness doctor tests passed.
+
+=== typecheck ===
+
+(sin errores)
+
+=== lint --quiet ===
+(sin hallazgos)
+
+=== openspec validate --all --strict ===
+Totals: 33 passed, 0 failed (33 items)
+
+=== agent:harness:check ===
+agent-harness: OK (36 mirrors in parity)
+
+=== 8.2 harness:doctor con indice fresco ===
+Harness doctor: PASS
+PASS gitnexus: GitNexus responde con indice fresco y verificacion estructural resuelta.
+duracion total del doctor: 51 s

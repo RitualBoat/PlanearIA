@@ -3,6 +3,7 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { OAUTH_INTERACTIVE_REQUIRED } from './lib/mcpFailureClassification.mjs';
+import { STALE, UNCLASSIFIABLE, classifyIndexFreshness } from './gitNexusFts.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const STATUS = new Set(['PASS', 'FAIL', 'WARN', 'SKIP']);
@@ -83,11 +84,40 @@ function checkProjects(run, config) {
   return result('github-projects', 'PASS', `Project ${config.project.title} visible.`);
 }
 
+const GITNEXUS_RECOVERY = 'Ejecuta npm run gitnexus:repair y despues npm run gitnexus:verify. El doctor no repara ni reindexa por si mismo.';
+
 function checkGitNexus(run, npm, config) {
   const execution = run(npm, ['run', 'gitnexus:diagnose']);
   const output = outputOf(execution);
-  if (execution.status !== 0 || isGitNexusFailure(output, config.gitNexusFailurePatterns)) return result('gitnexus', 'FAIL', 'GitNexus no ofrece una ruta estructural primaria sana.', 'Revisa npm run gitnexus:diagnose y ejecuta npm run gitnexus:repair solo como accion separada.');
-  return result('gitnexus', 'PASS', 'GitNexus no reporta diagnosticos de salud conocidos.');
+
+  if (isGitNexusFailure(output, config.gitNexusFailurePatterns)) {
+    return result('gitnexus', 'FAIL', 'GitNexus no ofrece una ruta estructural primaria sana.', GITNEXUS_RECOVERY);
+  }
+
+  // La salud se afirma por clasificacion explicita, no por ausencia de firmas conocidas: bajo la
+  // forma anterior cualquier modo de fallo no enumerado se reportaba en verde (#112).
+  const freshness = classifyIndexFreshness(output);
+  if (freshness === STALE) {
+    return result('gitnexus', 'FAIL', 'El indice de GitNexus esta stale frente al checkout actual; la ruta estructural primaria decidiria con un grafo atrasado.', GITNEXUS_RECOVERY);
+  }
+  if (freshness === UNCLASSIFIABLE) {
+    const evidence = output ? `: ${output.slice(-240)}` : '.';
+    return result('gitnexus', 'FAIL', `El diagnostico de GitNexus no permite clasificar la frescura del indice${evidence}`, GITNEXUS_RECOVERY);
+  }
+
+  if (execution.status !== 0) {
+    return commandFailure('gitnexus', 'GitNexus', execution, GITNEXUS_RECOVERY);
+  }
+
+  const structural = run(process.execPath, [path.join(ROOT, 'scripts', 'gitNexusFts.mjs'), 'structural']);
+  const structuralOutput = outputOf(structural);
+  // Mismo principio que el resto del doctor: una firma semantica de fallo invalida el resultado
+  // aunque el subproceso termine con codigo cero.
+  if (structural.status !== 0 || isGitNexusFailure(structuralOutput, config.gitNexusFailurePatterns)) {
+    return result('gitnexus', 'FAIL', `El indice esta fresco pero la verificacion estructural no resolvio su fixture${structuralOutput ? `: ${structuralOutput.slice(-240)}` : '.'}`, GITNEXUS_RECOVERY);
+  }
+
+  return result('gitnexus', 'PASS', 'GitNexus responde con indice fresco y verificacion estructural resuelta.');
 }
 
 function checkCodeGraph(run, npm) {

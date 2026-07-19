@@ -1,0 +1,22 @@
+Tarea 1.2 - cadenas literales del estado del indice
+fecha: 2026-07-19
+
+Stale (capturado en 6b6e23c, indice en cca8116):
+  Branch: feat/gitnexus-frescura-doctor
+  Workspace index: last analyzed on 'development' (re-run gitnexus analyze to follow the current branch)
+  Indexed commit: cca8116
+  Current commit: 6b6e23c
+  Status: (U+26A0 U+FE0F) stale (re-run gitnexus analyze)
+
+Fresh (tras analyze --index-only en 1d4dcb0):
+  Indexed commit: 1d4dcb0
+  Current commit: 1d4dcb0
+  Status: (U+2705) up-to-date
+
+Bytes verificados con cat -A:
+  stale  -> 'Status: M-bM-^ M- M-oM-8M-^O stale (re-run gitnexus analyze)'
+  fresh  -> 'Status: M-bM-^\M-^E up-to-date'
+
+Consecuencia de diseno: el clasificador se ancla a la linea que empieza por 'Status:'
+y evalua el resto tras retirar la decoracion. La palabra suelta no basta: la propia ruta
+del repositorio o el mensaje de rama pueden contener texto de frescura.

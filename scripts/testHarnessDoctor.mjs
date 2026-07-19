@@ -7,7 +7,7 @@ const config = {
   project: { owner: 'RitualBoat', title: 'PlanearIA Product OS' },
   checkOrder: ['node-npm', 'git-worktree', 'openspec', 'github-projects', 'gitnexus', 'codegraph', 'harness-parity', 'mcp-parity', 'mcp-smoke', 'expo-compatibility', 'graphify'],
   oauthInteractiveServers: ['expo'],
-  gitNexusFailurePatterns: ['Not a git repository', 'FTS indexes missing'],
+  gitNexusFailurePatterns: ['Not a git repository', 'FTS indexes missing', 'query returned no structural context', 'impact did not resolve the expected'],
   retiredTools: [{ id: 'graphify', status: 'SKIP', summary: 'Graphify retirado/manual; no forma parte del harness activo.', remediation: null }],
 };
 
@@ -27,12 +27,24 @@ function smokeReport(results) {
 const healthyResults = [{ name: 'codegraph', ok: true }, { name: 'figma', ok: true, note: FIGMA_NOTE }];
 const mcpReport = smokeReport(healthyResults);
 
+// Salidas reales del CLI fijado, capturadas el 2026-07-19 (evidencia 02-cadenas-estado.txt).
+const FRESH_STATUS = 'Repository: C:\\repo\nIndexed commit: 1d4dcb0\nCurrent commit: 1d4dcb0\nStatus: ✅ up-to-date';
+const STALE_STATUS = 'Repository: C:\\repo\nIndexed commit: cca8116\nCurrent commit: 6b6e23c\nStatus: ⚠️ stale (re-run gitnexus analyze)';
+const STRUCTURAL_OK = 'GitNexus structural verification passed.';
+const STRUCTURAL_EMPTY = 'GitNexus query returned no structural context for the MVVM fixture.';
+
+function isStructuralCall(args) {
+  return args.includes('structural');
+}
+
 function healthyRun(calls, mcpStdout = mcpReport, mcpStatus = 0) {
   return (command, args) => {
     calls.push([command, ...args]);
     if (command === 'gh') return { status: 0, stdout: JSON.stringify({ projects: [{ title: 'PlanearIA Product OS' }] }) };
     if (command === 'git' && args[0] === 'status') return { status: 0, stdout: '' };
     if (command === 'git') return { status: 0, stdout: 'C:/repo' };
+    if (args.includes('gitnexus:diagnose')) return { status: 0, stdout: FRESH_STATUS };
+    if (isStructuralCall(args)) return { status: 0, stdout: STRUCTURAL_OK };
     // El doctor invoca el smoke dos veces: acotado a codegraph para el fallback lineado y completo para
     // mcp-smoke. Cada invocacion recibe su propio reporte para no cruzar los fixtures.
     if (args.includes('mcp:test') && args.includes('codegraph')) return { status: 0, stdout: smokeReport([{ name: 'codegraph', ok: true }]) };
@@ -59,13 +71,72 @@ assert.equal(healthy.checks.find((check) => check.id === 'mcp-smoke').status, 'W
 assert.equal(healthy.checks.find((check) => check.id === 'graphify').status, 'SKIP');
 assert.equal(calls.some((call) => call.join(' ').toLowerCase().includes('graphify')), false);
 
-const falseGreen = runDoctor({
-  config,
-  npm: 'npm',
-  run: (command, args) => command === 'npm' && args.includes('gitnexus:diagnose') ? { status: 0, stdout: 'Not a git repository' } : healthyRun([])(command, args),
-});
-assert.equal(falseGreen.ok, false);
-assert.equal(falseGreen.checks.find((check) => check.id === 'gitnexus').status, 'FAIL');
+// El caso sano ejercita la ruta completa: frescura clasificada y verificacion estructural resuelta.
+assert.equal(healthy.checks.find((check) => check.id === 'gitnexus').status, 'PASS');
+assert.equal(calls.some((call) => isStructuralCall(call)), true);
+
+function gitNexusCheck(diagnose, structural = { status: 0, stdout: STRUCTURAL_OK }, calls = []) {
+  const report = runDoctor({
+    config,
+    npm: 'npm',
+    run: (command, args) => {
+      if (command === 'npm' && args.includes('gitnexus:diagnose')) {
+        calls.push([command, ...args]);
+        return diagnose;
+      }
+      if (isStructuralCall(args)) {
+        calls.push([command, ...args]);
+        return structural;
+      }
+      return healthyRun([])(command, args);
+    },
+  });
+  return { report, check: report.checks.find((item) => item.id === 'gitnexus') };
+}
+
+const falseGreen = gitNexusCheck({ status: 0, stdout: 'Not a git repository' });
+assert.equal(falseGreen.report.ok, false);
+assert.equal(falseGreen.check.status, 'FAIL');
+
+// #112: un indice stale nunca puede pasar, y no se degrada a WARN para conservar el verde agregado.
+const staleIndex = gitNexusCheck({ status: 0, stdout: STALE_STATUS });
+assert.equal(staleIndex.check.status, 'FAIL');
+assert.equal(staleIndex.report.ok, false);
+assert.match(staleIndex.check.summary, /stale/i);
+assert.match(staleIndex.check.remediation, /gitnexus:repair/);
+assert.match(staleIndex.check.remediation, /gitnexus:verify/);
+
+// Una salida que no permite clasificar la frescura falla: la ausencia de una firma de error
+// conocida no es evidencia de salud.
+for (const stdout of ['', 'ok', 'Repository: C:\\repo\nIndexed commit: abc1234']) {
+  const unclassifiable = gitNexusCheck({ status: 0, stdout });
+  assert.equal(unclassifiable.check.status, 'FAIL');
+  assert.equal(unclassifiable.report.ok, false);
+}
+
+// Indice fresco cuyo fixture estructural no resuelve: tampoco pasa.
+const brokenStructural = gitNexusCheck({ status: 0, stdout: FRESH_STATUS }, { status: 1, stdout: STRUCTURAL_EMPTY });
+assert.equal(brokenStructural.check.status, 'FAIL');
+assert.match(brokenStructural.check.summary, /estructural/i);
+
+// La firma semantica invalida el resultado aunque el subproceso termine con codigo cero.
+const structuralExitZero = gitNexusCheck({ status: 0, stdout: FRESH_STATUS }, { status: 0, stdout: STRUCTURAL_EMPTY });
+assert.equal(structuralExitZero.check.status, 'FAIL');
+
+// Indice fresco y funcional: la unica combinacion que aprueba.
+const healthyGitNexus = gitNexusCheck({ status: 0, stdout: FRESH_STATUS });
+assert.equal(healthyGitNexus.check.status, 'PASS');
+
+// La comprobacion es read-only en todos los desenlaces: nunca repara ni reindexa.
+const mutationCalls = [];
+for (const diagnose of [{ status: 0, stdout: FRESH_STATUS }, { status: 0, stdout: STALE_STATUS }, { status: 0, stdout: 'ok' }]) {
+  gitNexusCheck(diagnose, { status: 0, stdout: STRUCTURAL_OK }, mutationCalls);
+}
+assert.equal(mutationCalls.length > 0, true);
+for (const call of mutationCalls) {
+  const rendered = call.join(' ');
+  assert.equal(/analyze|--repair-fts|--index-only|gitnexus:repair/.test(rendered), false, rendered);
+}
 
 const inaccessibleProject = runDoctor({
   config,

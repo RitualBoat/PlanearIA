@@ -1,0 +1,45 @@
+commit: 6b6e23c
+fecha: 2026-07-19
+
+=== npm run harness:doctor ===
+
+> planearia@1.0.0 harness:doctor
+> node --no-warnings scripts/harnessDoctor.mjs
+
+Harness doctor: PASS
+PASS node-npm: Node v26.4.0; npm 11.17.0.
+WARN git-worktree: Repositorio Git valido con cambios locales.
+      Recuperacion: Clasifica o aisla los cambios antes de iniciar otro change.
+PASS openspec: OpenSpec local y artefactos validos.
+PASS github-projects: Project PlanearIA Product OS visible.
+PASS gitnexus: GitNexus no reporta diagnosticos de salud conocidos.
+PASS codegraph: CodeGraph MCP responde como fallback lineado.
+PASS harness-parity: Los espejos del harness estan en paridad.
+PASS mcp-parity: Los MCP activos estan en paridad.
+WARN mcp-smoke: MCP activo responde; expo requiere consentimiento OAuth interactivo y no expuso sus herramientas en esta sesion; figma requiere OAuth en un cliente MCP compatible.
+      Recuperacion: Autoriza expo en una sesion MCP interactiva si una tarea lo necesita; el smoke conserva ok:false hasta entonces.
+PASS expo-compatibility: Las dependencias Expo son compatibles con la version instalada.
+SKIP graphify: Graphify retirado/manual; no forma parte del harness activo.
+exit=0
+
+=== npm run gitnexus:diagnose ===
+
+> planearia@1.0.0 gitnexus:diagnose
+> node scripts/gitNexusFts.mjs diagnose
+
+Repository: C:\Users\RitualBoatLaptop\Documents\Projects\PlanearIA
+Branch: feat/gitnexus-frescura-doctor
+Workspace index: last analyzed on 'development' (re-run gitnexus analyze to follow the current branch)
+Indexed: 7/19/2026, 10:53:43 AM
+Indexed commit: cca8116
+Current commit: 6b6e23c
+Status: ⚠️ stale (re-run gitnexus analyze)
+exit=0
+
+=== npm run gitnexus:verify ===
+
+> planearia@1.0.0 gitnexus:verify
+> node scripts/gitNexusFts.mjs verify
+
+GitNexus FTS verification passed.
+exit=0

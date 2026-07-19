@@ -10,6 +10,28 @@ const FTS_DIAGNOSTIC = /FTS indexes missing|FTS extension unavailable|full-text 
 const REPOSITORY_DIAGNOSTIC = /not a git repository/i;
 const AGENT_PATH = /^(AGENTS\.md|CLAUDE\.md|\.agents\/|\.codex\/skills\/)/;
 
+export const FRESH = 'fresh';
+export const STALE = 'stale';
+export const UNCLASSIFIABLE = 'unclassifiable';
+
+// El CLI decora la linea de estado ("Status: [emoji] up-to-date" / "Status: [emoji] stale (...)"),
+// asi que el ancla es la linea, no la palabra: la ruta del repositorio o el mensaje de rama pueden
+// contener texto de frescura sin describir el estado del indice.
+const STATUS_LINE = /^\s*Status:\s*(.*)$/;
+
+export function classifyIndexFreshness(output) {
+  const lines = String(output ?? '').split(/\r?\n/);
+  const statusLine = lines.find((line) => STATUS_LINE.test(line));
+  if (!statusLine) return UNCLASSIFIABLE;
+
+  const value = statusLine.match(STATUS_LINE)[1];
+  const fresh = /\bup-to-date\b/i.test(value);
+  const stale = /\bstale\b/i.test(value);
+  // Afirmar ambas cosas, o ninguna, no es evidencia de salud: se rechaza en vez de elegir una.
+  if (fresh === stale) return UNCLASSIFIABLE;
+  return fresh ? FRESH : STALE;
+}
+
 export function hasFtsDiagnostic(output) {
   return FTS_DIAGNOSTIC.test(output);
 }
@@ -24,6 +46,14 @@ export function assertDiagnosticStatusHealthy(output) {
   }
   if (hasRepositoryDiagnostic(output)) {
     throw new Error('GitNexus status reported that the checkout is not a Git repository. Run the diagnostic from the repository root.');
+  }
+
+  const freshness = classifyIndexFreshness(output);
+  if (freshness === STALE) {
+    throw new Error('GitNexus index is stale against the current checkout. Run npm run gitnexus:repair and then npm run gitnexus:verify.');
+  }
+  if (freshness === UNCLASSIFIABLE) {
+    throw new Error('GitNexus status did not report a classifiable index state. Absence of a known failure is not evidence of health.');
   }
 }
 
@@ -156,34 +186,73 @@ function readAllowedAgentPaths(args) {
 
 export function diagnose(options) {
   const output = runGitNexus(['status'], options);
-  assertDiagnosticStatusHealthy(output);
+  // El diagnostico se imprime antes de evaluarlo: un comando que oculta su diagnostico justo cuando
+  // encuentra un problema deja a sus consumidores sin la linea que necesitan para clasificar.
   process.stdout.write(output);
+  assertDiagnosticStatusHealthy(output);
 }
 
 export function repair(options) {
-  const output = runGitNexus(['analyze', '--repair-fts', '--index-only', '--name', 'PlanearIA', '.'], options);
+  // Reindexa en vez de reparar solo FTS: la ruta --repair-fts termina en exito y deja el indice
+  // stale, de modo que la recuperacion prometia una frescura que no entregaba (#112). --index-only
+  // se conserva porque es la bandera que impide que analyze escriba en los archivos de agente.
+  const output = runGitNexus(['analyze', '--index-only', '--name', 'PlanearIA', '.'], options);
   if (hasFtsDiagnostic(output)) {
     throw new Error('GitNexus repair completed with an FTS diagnostic.');
   }
+
+  const statusOutput = runGitNexus(['status'], options);
+  if (classifyIndexFreshness(statusOutput) !== FRESH) {
+    throw new Error('GitNexus repair finished but the index is still not fresh. Review npm run gitnexus:diagnose.');
+  }
+
   process.stdout.write(output);
 }
 
-export function verify({ allowedPaths, ...options }) {
-  const queryOutput = runGitNexus(['query', '-r', 'PlanearIA', FIXTURE_QUERY], options);
+// Fuente unica de "estructuralmente sano": la comparten `verify` y el doctor del harness para que no
+// puedan derivar hacia dos definiciones distintas.
+// El runner es inyectable para que una prueba pueda afirmar que esta ruta solo emite subcomandos de
+// lectura. Sin esa inyeccion, la promesa de "read-only" del doctor solo se podria comprobar sobre sus
+// llamadas directas, no sobre lo que ocurre dentro de este subproceso.
+export function runStructuralVerification(options = {}, runner = runGitNexus) {
+  const queryOutput = runner(['query', '-r', 'PlanearIA', FIXTURE_QUERY], options);
   if (hasFtsDiagnostic(queryOutput)) {
-    throw new Error('GitNexus query reported an FTS diagnostic.');
+    return { ok: false, reason: 'GitNexus query reported an FTS diagnostic.' };
   }
-  verifyQueryResult(parseJsonOutput(queryOutput, 'GitNexus query'));
+  try {
+    verifyQueryResult(parseJsonOutput(queryOutput, 'GitNexus query'));
+  } catch (error) {
+    return { ok: false, reason: error.message };
+  }
 
-  const impactOutput = runGitNexus(
+  const impactOutput = runner(
     ['impact', '-r', 'PlanearIA', '--uid', FIXTURE_UID, '--depth', '3', '--include-tests'],
     options,
   );
   if (hasFtsDiagnostic(impactOutput)) {
-    throw new Error('GitNexus impact reported an FTS diagnostic.');
+    return { ok: false, reason: 'GitNexus impact reported an FTS diagnostic.' };
   }
-  verifyImpactResult(parseJsonOutput(impactOutput, 'GitNexus impact'));
+  try {
+    verifyImpactResult(parseJsonOutput(impactOutput, 'GitNexus impact'));
+  } catch (error) {
+    return { ok: false, reason: error.message };
+  }
 
+  return { ok: true, reason: null };
+}
+
+export function verify({ allowedPaths, ...options }) {
+  // El gate de salud comprueba la frescura antes que la estructura: sin esto, `verify` aprobaria un
+  // indice atrasado que resuelve sus fixtures, que es el mismo falso verde de #112 en pequeno.
+  assertDiagnosticStatusHealthy(runGitNexus(['status'], options));
+
+  const structural = runStructuralVerification(options);
+  if (!structural.ok) {
+    throw new Error(structural.reason);
+  }
+
+  // El guardia de archivos de agente vive solo aqui: es una preocupacion de paridad del harness, no
+  // de salud del indice, y el doctor ya la cubre en su check harness-parity.
   const statusOutput = run(gitCommand(), ['status', '--porcelain'], options);
   const unexpectedAgentChanges = findUnexpectedAgentChanges(statusOutput, allowedPaths);
   if (unexpectedAgentChanges.length > 0) {
@@ -203,8 +272,17 @@ function main() {
     repair({});
   } else if (mode === 'verify') {
     verify({ allowedPaths });
+  } else if (mode === 'structural') {
+    // Plomeria interna del doctor: expone la verificacion estructural sin el guardia de archivos de
+    // agente de `verify`. No se publica como script de npm para no ofrecer una segunda ruta de
+    // recuperacion al agente que lea package.json.
+    const structural = runStructuralVerification({});
+    if (!structural.ok) {
+      throw new Error(structural.reason);
+    }
+    process.stdout.write('GitNexus structural verification passed.\n');
   } else {
-    throw new Error('Usage: node scripts/gitNexusFts.mjs <diagnose|repair|verify> [--allow-agent-change <path>]');
+    throw new Error('Usage: node scripts/gitNexusFts.mjs <diagnose|repair|verify|structural> [--allow-agent-change <path>]');
   }
 }
 

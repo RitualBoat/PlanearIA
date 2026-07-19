@@ -1,0 +1,32 @@
+Tarea 5.2/5.3/5.4 - la recuperacion restaura la frescura
+fecha: 2026-07-19
+
+Secuencia observada, partiendo de indice en 1d4dcb0 con HEAD en 4fbd9c0:
+
+1. ANTES del repair:
+     Indexed commit: 1d4dcb0 / Current commit: 4fbd9c0 / Status: stale
+     harness:doctor -> FAIL gitnexus (frescura), ok=false
+
+2. Primer 'npm run gitnexus:repair': analyze imprimio 'Repository indexed successfully'
+   pero dejo el indice sucio (incrementalInProgress) y el status siguio stale.
+   La comprobacion posterior de frescura lo rechazo con exit distinto de cero.
+   HALLAZGO: incluso la ruta de reindex puede declarar exito sin restaurar frescura.
+   Es exactamente el escenario 'Recovery reports success without restoring freshness'.
+
+3. Segundo 'npm run gitnexus:repair': forzo rebuild completo y dejo el indice al dia.
+
+4. Tercer 'npm run gitnexus:repair' (idempotente): exit=0, incremental sin cambios.
+
+=== DESPUES: npm run gitnexus:diagnose ===
+Indexed commit: 4fbd9c0
+Current commit: 4fbd9c0
+Status: ✅ up-to-date
+exit=0
+
+=== npm run gitnexus:verify (FTS sano sin --repair-fts) ===
+
+GitNexus FTS verification passed.
+
+=== 5.4 git status --porcelain (sin cambios en archivos de agente) ===
+ M scripts/gitNexusFts.mjs
+?? openspec/changes/gitnexus-frescura-doctor/evidencia/05-recuperacion.txt

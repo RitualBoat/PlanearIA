@@ -1,0 +1,15 @@
+=== npm run opsx:archive:dry -- cierre-openspec-determinista ===
+Ejecutado 2026-07-19 en fix/cierre-openspec-determinista, gate en PASS.
+
+PASS      local-harness-parity: harness-parity terminó correctamente.
+PASS      local-opsx-patch: opsx-patch terminó correctamente.
+(node:29836) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[opsx:archive] estado de sincronizacion: pendiente (1 capacidad(es), 5 operacion(es))
+[opsx:archive] las deltas no estan aplicadas; la CLI las aplicara durante el archive
+  [dry-run] node node_modules/@fission-ai/openspec/bin/openspec.js archive cierre-openspec-determinista --yes
+  [dry-run] git add -A -- openspec/specs openspec/changes/cierre-openspec-determinista
+  [dry-run] git commit -m "docs(openspec): archivar cierre-openspec-determinista y sincronizar specs (#113)"
+
+[opsx:archive] dry-run termina sin escribir. Estado clasificado: pendiente.
+

@@ -1,0 +1,16 @@
+=== test:opsx-archive ===
+> node scripts/testOpsxArchive.mjs
+
+opsx-archive: OK (parseo de deltas, tres estados de sincronizacion, cuatro de repositorio)
+
+=== test:opsx-finish ===
+> node scripts/testOpsxFinish.mjs
+
+opsx-finish checks wait: OK (clasificacion, checks tardios, timeout, checks fallidos y fronteras)
+
+=== openspec:check ===
+
+> planearia@1.0.0 openspec:check
+> node scripts/checkOpenSpecCli.mjs
+
+openspec-check: OK (CLI 1.6.0, Node 26.4.0, 1 change(s), 33 item(s) validado(s))

@@ -89,9 +89,20 @@ La hoja informa la falta de conexion, no la castiga. Bloquear la asignacion offl
 
 `AsignarRecursoScreen` es el unico que adopta la hoja. Es la superficie dedicada a asignar, es alcanzable desde Detalle de Grupo y es la que sufre los dos defectos. Cumple el criterio "usado por al menos un flujo real al cerrar" sobre el flujo donde mas se nota, sin abrir pantallas que no son de esta ola.
 
+### D10. La adopcion se movio a `ListaRecursosScreen` (decidido durante la implementacion)
+
+El propose fijaba `AsignarRecursoScreen`. Al implementarlo se vio que esa pantalla tiene la forma **inversa** a la hoja: su destino es fijo por ruta (`grupoId` viene de Detalle de Grupo) y lo que el docente elige son los elementos. Montar la hoja ahi habria exigido inventar una preseleccion de destino, conservar igual su selector de elementos y dejar la hoja resolviendo un problema que en esa pantalla no existe.
+
+`ListaRecursosScreen` tiene la forma exacta que la hoja resuelve: el elemento es conocido (un recurso de la biblioteca) y el destino no. Ademas su menu tenia un **boton muerto** que abria un `Alert` "Proximamente". Adoptar ahi cumple el criterio del plan sobre un flujo real, cierra un camino anunciado y no entregado, y coloca la pieza en Office, que es el hub que el plan dice que esta hoja debe alimentar.
+
+`AsignarRecursoScreen` no se migra. Recibe solo lo que la spec le exige: dejar de afirmar exito cuando no se escribio nada, usando el conteo real que el servicio ya devuelve. Su rediseno no es de esta ola.
+
+Consecuencia registrada: el riesgo de "pantalla hibrida" que preveia esta seccion **no se materializa**, porque `AsignarRecursoScreen` conserva su cuerpo legacy completo y no monta componentes en tokens.
+
 ## Risks / Trade-offs
 
-- **Pantalla hibrida.** `AsignarRecursoScreen` conserva su cuerpo con `COLORS` legacy mientras su selector pasa a tokens. Es visualmente inconsistente por un tiempo. Se acepta: redisenar la pantalla entera no es de esta ola y hacerlo aqui diluiria el change. La inconsistencia queda declarada en la evidencia.
+- ~~**Pantalla hibrida.**~~ Anulado por D10: al no migrarse `AsignarRecursoScreen` a la hoja, no hay pantalla con mitad tokens y mitad `COLORS` legacy.
+- **La forma responsiva del `Sheet` base es poco fiable en web.** Medido en QA: al mismo ancho de 768 px el shell renderiza su forma tablet y la hoja su forma movil. Es un defecto heredado de `Sheet` (#82) que este change solo **surface**, por ser su primer consumidor en produccion. Impacto acotado a forma visual: sin desborde, con 44pt reales y flujo completo en los cinco anchos. Queda declarado en evidencia y como seguimiento del owner de `base-component-library`; abrir ese componente excede este change.
 - **La correccion de clave cambia donde aterrizan escrituras futuras.** Mitigado porque la lectura sigue fusionando ambas claves y porque nada se borra ni se migra. Un revert devuelve la escritura a la clave legacy sin dejar datos huerfanos: lo escrito en el intervalo queda en la clave que la app usa para leer.
 - **Coherencia `tareaId` / `asignadoComoTarea`.** Dos campos para un hecho es una debilidad del modelo heredado. Este change no la resuelve; la contiene fijando ambos juntos en el hook y verificandolo por prueba.
 - **Los dos defectos son invisibles para la suite actual.** Por eso las pruebas de regresion se escriben contra el sintoma (la asignacion sobrevive a un pull; el entregable real cambia), no contra la implementacion.

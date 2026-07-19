@@ -43,8 +43,9 @@ Ninguna. Este change no altera el comportamiento garantizado por `adaptive-app-s
 - `src/hooks/useAssignSheet.ts`.
 - Pruebas en `src/__tests__/`.
 
-**Codigo modificado (dos archivos)**
-- `src/screens/grupos/tareas/AsignarRecursoScreen.tsx`: adopta la hoja; pierde sus tres `Modal` de seleccion y confirmacion y su pantalla de exito incondicional.
+**Codigo modificado (tres archivos)**
+- `src/screens/biblioteca/ListaRecursosScreen.tsx`: monta la hoja en el menu de cada recurso, sustituyendo el `Alert` "Proximamente". **Desviacion respecto del propose original, registrada en `design.md` D10**: la adopcion se movio aqui desde `AsignarRecursoScreen`, cuyo destino ya viene fijo por ruta y por tanto tiene la forma inversa a la que la hoja resuelve.
+- `src/screens/grupos/tareas/AsignarRecursoScreen.tsx`: correccion minima de veracidad. Usa el conteo real que devuelve el servicio en vez de afirmar exito incondicional. No adopta la hoja ni se redisena.
 - `src/services/grupoAsignacionesService.ts`: encola y corrige la clave de entregables. Firma publica sin cambios.
 
 **Sin impacto**

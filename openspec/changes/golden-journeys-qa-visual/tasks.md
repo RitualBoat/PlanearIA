@@ -20,13 +20,13 @@ Issue: [#85](https://github.com/RitualBoat/PlanearIA/issues/85). Un bloque a la 
 
 ## 3. Runbook
 
-- [ ] 3.1 Crear `Documentacion/03-validacion/GOLDEN_JOURNEYS_QA_VISUAL.md` con el encabezado de estado/uso/fuente de verdad que usa el resto de `Documentacion/`.
-- [ ] 3.2 Documentar el procedimiento paso a paso: levantar `expo start --web` (`.claude/launch.json`, perfil `expo-web`, puerto 8081), confirmar HTTP 200, recorrer por ancho, medir por DOM, capturar, aplicar Nielsen y anti-slop, clasificar consola, archivar.
-- [ ] 3.3 Documentar las cuatro trampas del entorno web como pasos obligatorios, con el motivo por el que cada una produce evidencia enganosa si se ignora.
-- [ ] 3.4 Documentar los tres niveles de proporcionalidad, como se declara el nivel en `readiness.json` y el contrato de evidencia (ubicacion y secciones obligatorias).
-- [ ] 3.5 Registrar la decision Playwright: tabla de tradeoffs, veredicto (solo MCP), owner, fecha de revision y disparador; nombrar a `golden-journeys-web` como dueno de la automatizacion en CI.
-- [ ] 3.6 Declarar explicitamente que este trabajo no cierra R2 y que #46 y #47 siguen abiertos.
-- [ ] 3.7 Registrar el runbook en la seccion "Reportes Vigentes" de `Documentacion/03-validacion/README.md`.
+- [x] 3.1 (Evidencia: Documentacion/03-validacion/GOLDEN_JOURNEYS_QA_VISUAL.md con encabezado estado/uso/fuente de verdad/no usar para.) Crear `Documentacion/03-validacion/GOLDEN_JOURNEYS_QA_VISUAL.md` con el encabezado de estado/uso/fuente de verdad que usa el resto de `Documentacion/`.
+- [x] 3.2 (Evidencia: Seccion 4: HTTP 200, recorrido por ancho, medicion DOM, capturas, checklists, clasificacion de consola y verificacion.) Documentar el procedimiento paso a paso: levantar `expo start --web` (`.claude/launch.json`, perfil `expo-web`, puerto 8081), confirmar HTTP 200, recorrer por ancho, medir por DOM, capturar, aplicar Nielsen y anti-slop, clasificar consola, archivar.
+- [x] 3.3 (Evidencia: Seccion 5: las cuatro trampas con su motivo; 5.2 marcada como la mas peligrosa por producir evidencia que parece correcta.) Documentar las cuatro trampas del entorno web como pasos obligatorios, con el motivo por el que cada una produce evidencia enganosa si se ignora.
+- [x] 3.4 (Evidencia: Seccion 3 (niveles y como se declara en readiness.json) y seccion 6 (contrato de evidencia con las siete secciones).) Documentar los tres niveles de proporcionalidad, como se declara el nivel en `readiness.json` y el contrato de evidencia (ubicacion y secciones obligatorias).
+- [x] 3.5 (Evidencia: Seccion 7: tabla de tradeoffs, veredicto solo MCP, owner, revision 2027-01-19, dos disparadores y golden-journeys-web como duenio.) Registrar la decision Playwright: tabla de tradeoffs, veredicto (solo MCP), owner, fecha de revision y disparador; nombrar a `golden-journeys-web` como dueno de la automatizacion en CI.
+- [x] 3.6 (Evidencia: Seccion 8: tabla de los cuatro componentes de R2; #46 y #47 declarados abiertos.) Declarar explicitamente que este trabajo no cierra R2 y que #46 y #47 siguen abiertos.
+- [x] 3.7 (Evidencia: Primera entrada de Reportes Vigentes en Documentacion/03-validacion/README.md.) Registrar el runbook en la seccion "Reportes Vigentes" de `Documentacion/03-validacion/README.md`.
 
 ## 4. Corrida de referencia real
 

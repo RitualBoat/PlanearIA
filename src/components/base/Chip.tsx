@@ -158,6 +158,10 @@ const Chip: React.FC<ChipProps> = ({
       accessibilityRole="checkbox"
       accessibilityLabel={label}
       accessibilityState={{ disabled, selected, checked: selected }}
+      // React Native Web no deriva aria-checked de accessibilityState: sin este prop el
+      // chip se anuncia como casilla sin estado, que es justo la informacion util. React
+      // Native lo mapea de vuelta a accessibilityState en nativo.
+      aria-checked={selected}
       testID={testID}
     >
       <View style={styles.contenido}>{contenido}</View>
@@ -200,7 +204,7 @@ const getStyles = ({ colors, scaled, highContrast }: ThemedStylesInput) =>
       opacity: 0.5,
     },
     focusRing: {
-      boxShadow: `0px 0px 0px 3px ${colors.primaryTint}`,
+      boxShadow: `0px 0px 0px 3px ${colors.primary}`,
     },
   });
 

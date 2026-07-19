@@ -115,7 +115,7 @@ const getStyles = ({ colors, highContrast }: ThemedStylesInput) => {
     focusRing: {
       borderColor: colors.primary,
       // Anillo propio en vez del outline del navegador: es theme-aware y verificable.
-      boxShadow: `0px 0px 0px 3px ${colors.primaryTint}`,
+      boxShadow: `0px 0px 0px 3px ${colors.primary}`,
     },
     disabled: {
       opacity: 0.5,

@@ -47,6 +47,7 @@ describe("Button", () => {
     expect(screen.getByTestId("button-loading")).toBeTruthy();
   });
 
+
   it("declara rol y etiqueta accesibles", () => {
     renderConProveedores(<Button label="Guardar planeacion" onPress={jest.fn()} testID="btn" />);
 
@@ -115,6 +116,7 @@ describe("Chip", () => {
       checked: true,
     });
   });
+
 
   it("extiende el area tactil sin cambiar el tamano visual", () => {
     renderConProveedores(<Chip label="Matematicas" onPress={jest.fn()} testID="chip" />);

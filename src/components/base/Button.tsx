@@ -96,6 +96,11 @@ const Button: React.FC<ButtonProps> = ({
       accessibilityLabel={label}
       accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled: bloqueado, busy: loading }}
+      // React Native Web no deriva aria-busy de accessibilityState (si deriva
+      // aria-disabled). Sin este prop el lector de pantalla en web no anuncia que la
+      // accion esta en curso. React Native lo mapea de vuelta a accessibilityState en
+      // nativo, asi que declararlo no duplica comportamiento.
+      aria-busy={loading}
       testID={testID}
     >
       <View style={styles.contenido}>
@@ -157,7 +162,7 @@ const getStyles = ({ colors, scaled, highContrast }: ThemedStylesInput) =>
       borderColor: highContrast ? colors.borderStrong : colors.borderLight,
     },
     focusRing: {
-      boxShadow: `0px 0px 0px 3px ${colors.primaryTint}`,
+      boxShadow: `0px 0px 0px 3px ${colors.primary}`,
     },
   });
 

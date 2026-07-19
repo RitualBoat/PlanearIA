@@ -50,6 +50,28 @@ describe("guardarrail de color en la biblioteca base", () => {
   });
 });
 
+describe("props ARIA que React Native Web no deriva solo", () => {
+  /**
+   * `accessibilityState` cubre nativo, pero React Native Web no lo traduce a `aria-busy`
+   * ni a `aria-checked` (si a `aria-disabled`). Verificado en navegador el 2026-07-19: sin
+   * estos props, el boton cargando y el chip seleccionado se anuncian sin estado en web.
+   *
+   * La guardia es sobre la fuente y no sobre el render porque el renderer nativo de las
+   * pruebas normaliza los props `aria-*` de vuelta a `accessibilityState`, asi que la
+   * diferencia solo es observable en web.
+   */
+  const leer = (archivo: string) =>
+    readFileSync(path.join(CARPETA_BASE, archivo), "utf8");
+
+  it("Button declara aria-busy para el estado de carga", () => {
+    expect(leer("Button.tsx")).toMatch(/aria-busy=\{loading\}/);
+  });
+
+  it("Chip declara aria-checked para el estado de seleccion", () => {
+    expect(leer("Chip.tsx")).toMatch(/aria-checked=\{selected\}/);
+  });
+});
+
 describe("hitSlopToMinTarget", () => {
   it("no agrega area cuando el control ya cubre el minimo", () => {
     expect(hitSlopToMinTarget(MIN_TOUCH_TARGET, MIN_TOUCH_TARGET)).toBeUndefined();

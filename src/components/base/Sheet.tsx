@@ -177,7 +177,7 @@ const getStyles = ({ colors, scaled, highContrast, breakpoint = "mobile" }: Them
       borderTopColor: colors.divider,
     },
     focusRing: {
-      boxShadow: `0px 0px 0px 3px ${colors.primaryTint}`,
+      boxShadow: `0px 0px 0px 3px ${colors.primary}`,
     },
   });
 };

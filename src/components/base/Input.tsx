@@ -111,7 +111,7 @@ const getStyles = ({ colors, scaled, highContrast }: ThemedStylesInput) =>
     },
     campoFocused: {
       borderColor: colors.primary,
-      boxShadow: `0px 0px 0px 3px ${colors.primaryTint}`,
+      boxShadow: `0px 0px 0px 3px ${colors.primary}`,
     },
     campoError: {
       borderColor: colors.error,

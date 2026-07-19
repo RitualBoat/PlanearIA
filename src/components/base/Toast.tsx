@@ -138,7 +138,7 @@ const getStyles = ({ colors, scaled, highContrast }: ThemedStylesInput) => {
       borderRadius: radii.sm,
     },
     focusRing: {
-      boxShadow: `0px 0px 0px 3px ${colors.primaryTint}`,
+      boxShadow: `0px 0px 0px 3px ${colors.primary}`,
     },
   });
 };

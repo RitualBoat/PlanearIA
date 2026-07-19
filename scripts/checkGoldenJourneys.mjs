@@ -136,9 +136,44 @@ export function validarManifiesto(manifest, rutasConocidas) {
   return results;
 }
 
+/**
+ * Divide el reporte en secciones por encabezado Markdown.
+ *
+ * Existe porque buscar en todo el documento produce falsos positivos: los nombres de
+ * las capturas contienen el slug del journey y el ancho, asi que una tabla de capturas
+ * satisfacia por si sola los chequeos de cobertura y de medicion. Verificado por ataque
+ * adversarial el 2026-07-19: un reporte sin ninguna medicion pasaba N2.
+ */
+export function seccionesDelReporte(reporte) {
+  const secciones = new Map();
+  let actual = "";
+  let cuerpo = [];
+  for (const linea of reporte.split(/\r?\n/)) {
+    const encabezado = linea.match(/^#{1,6}\s+(.*\S)\s*$/);
+    if (encabezado) {
+      if (actual) secciones.set(actual, cuerpo.join("\n"));
+      actual = encabezado[1].toLowerCase();
+      cuerpo = [];
+    } else if (actual) {
+      cuerpo.push(linea);
+    }
+  }
+  if (actual) secciones.set(actual, cuerpo.join("\n"));
+  return secciones;
+}
+
+/** Cuerpo de la seccion cuyo encabezado contiene el nombre dado, sin nombres de captura. */
+function cuerpoDeSeccion(secciones, nombre) {
+  for (const [titulo, cuerpo] of secciones) {
+    if (titulo.includes(nombre.toLowerCase())) return cuerpo.replace(/[\w.-]+\.png/gi, " ");
+  }
+  return null;
+}
+
 export function validarEvidencia(manifest, { nivel, journeys, reporte, capturas }) {
   const results = [];
   const config = manifest.niveles[nivel];
+  const secciones = seccionesDelReporte(reporte);
 
   const obligatorios = new Set([...(config.journeysObligatorios ?? []), ...journeys]);
   const conocidos = new Map(manifest.journeys.map((journey) => [journey.slug, journey]));
@@ -165,8 +200,9 @@ export function validarEvidencia(manifest, { nivel, journeys, reporte, capturas 
     ),
   );
 
+  // Se exige la seccion como encabezado real, no como cadena suelta en cualquier parrafo.
   const faltantesSeccion = manifest.seccionesObligatoriasEvidencia.filter(
-    (seccion) => !reporte.toLowerCase().includes(seccion.toLowerCase()),
+    (seccion) => cuerpoDeSeccion(secciones, seccion) === null,
   );
   results.push(
     result(
@@ -178,7 +214,8 @@ export function validarEvidencia(manifest, { nivel, journeys, reporte, capturas 
   );
 
   const cubiertos = [...obligatorios].filter((slug) => conocidos.has(slug) && conocidos.get(slug).estado !== "declarado");
-  const sinMencion = cubiertos.filter((slug) => !reporte.includes(slug));
+  const seccionJourneys = cuerpoDeSeccion(secciones, "Journeys cubiertos") ?? "";
+  const sinMencion = cubiertos.filter((slug) => !seccionJourneys.includes(slug));
   results.push(
     result(
       "evidencia-journeys-cubiertos",
@@ -229,7 +266,8 @@ export function validarEvidencia(manifest, { nivel, journeys, reporte, capturas 
   }
 
   if (config.medicionDomObligatoria) {
-    const sinMedicion = config.anchos.filter((ancho) => !reporte.includes(String(ancho)));
+    const seccionMedicion = cuerpoDeSeccion(secciones, "Medicion por breakpoint") ?? "";
+    const sinMedicion = config.anchos.filter((ancho) => !seccionMedicion.includes(String(ancho)));
     results.push(
       result(
         "evidencia-medicion-dom",

@@ -71,6 +71,10 @@ breakpoint se manifiesta primero.
 `qaVisualJourneys` solo hace falta en N3. Para saber si tu change toca un journey, compara los
 archivos que tocas contra el campo `rutas` de cada journey del manifiesto.
 
+**El nivel lo eliges tu y el checker no puede corregirte**: exige que este declarado y que exista,
+pero no sabe si tu change altero la navegacion. Elegir de menos es la forma facil de vaciar este gate,
+y es lo que la revision adversarial debe mirar antes de archivar.
+
 ## 4. Procedimiento
 
 ### 4.1 Levantar el servidor y confirmar HTTP 200

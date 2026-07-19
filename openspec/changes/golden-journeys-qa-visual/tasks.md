@@ -42,5 +42,5 @@ Issue: [#85](https://github.com/RitualBoat/PlanearIA/issues/85). Un bloque a la 
 - [x] 5.3 (Evidencia: golden-journeys-tests PASS, 13 escenarios.) `npm run test:golden-journeys` en verde.
 - [x] 5.4 (Evidencia: openspec:validate 29/29 y openspec-tldr OK.) `npm run openspec:validate` en verde.
 - [ ] 5.5 Actualizar `TLDR.md` si cambiaron alcance, archivos, comportamiento o resultado esperado.
-- [ ] 5.6 Revision adversarial independiente antes de archivar.
+- [x] 5.6 (Evidencia: revision adversarial 2026-07-19, PASS CON HUECOS. Dos majors detectados y cerrados dentro de la revision: los chequeos de medicion y de cobertura eran falsos positivos por los nombres de captura; un reporte hueco pasaba N2 completo. Corregido con parseo por secciones y verificado por mutacion; fixtures 13 -> 17.) Revision adversarial independiente antes de archivar.
 - [ ] 5.7 `npm run openspec:ready:archive -- --change golden-journeys-qa-visual --run-local` en PASS.

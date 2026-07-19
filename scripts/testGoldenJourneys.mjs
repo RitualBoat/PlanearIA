@@ -50,11 +50,32 @@ const MANIFIESTO_BASE = {
 const REPORTE_COMPLETO = [
   "# Evidencia",
   "## Entorno",
-  "HTTP 200 confirmado. Anchos 375 y 768.",
+  "HTTP 200 confirmado.",
+  "## Medicion por breakpoint",
+  "375: barra inferior. 768: rail.",
   "## Journeys cubiertos",
   "Recorrido shell completo.",
   "## Consola",
   "Sin errores atribuibles.",
+  "Severidad Nielsen maxima: 0",
+].join("\n");
+
+// Reporte hueco cuya tabla de capturas contiene el slug y los anchos como texto.
+// Antes del endurecimiento del 2026-07-19 este reporte pasaba N2 entero.
+const REPORTE_HUECO = [
+  "# Evidencia",
+  "## Entorno",
+  "HTTP 200.",
+  "## Medicion por breakpoint",
+  "Se reviso en todos los anchos y todo se ve bien.",
+  "| Captura |",
+  "| --- |",
+  "| capturas/shell-375.png |",
+  "| capturas/shell-768.png |",
+  "## Journeys cubiertos",
+  "No documentamos nada aqui.",
+  "## Consola",
+  "ok",
   "Severidad Nielsen maxima: 0",
 ].join("\n");
 
@@ -116,10 +137,23 @@ try {
   // Nivel N2 exige medicion numerica por ancho.
   const sinMedicion = escenario("sin-medicion", {
     nivel: "N2",
-    reporte: REPORTE_COMPLETO.replace("Anchos 375 y 768.", "Se reviso en todos los anchos."),
+    reporte: REPORTE_COMPLETO.replace("375: barra inferior. 768: rail.", "Se reviso en todos los anchos."),
   });
   assert.ok(fallo(sinMedicion, "evidencia-medicion-dom"), "N2 sin medicion por ancho debe fallar");
   assert.deepEqual(fallidos(escenario("con-medicion", { nivel: "N2" })), [], "N2 con medicion debe pasar");
+
+  // Regresion del ataque adversarial: los nombres de captura contienen el slug y el
+  // ancho, asi que una tabla de capturas NO debe satisfacer cobertura ni medicion.
+  const hueco = escenario("hueco", { nivel: "N2", reporte: REPORTE_HUECO });
+  assert.ok(fallo(hueco, "evidencia-medicion-dom"), "la tabla de capturas no debe contar como medicion");
+  assert.ok(fallo(hueco, "evidencia-journeys-cubiertos"), "la tabla de capturas no debe contar como cobertura");
+  assert.match(fallo(hueco, "evidencia-medicion-dom").summary, /375/);
+
+  // Una seccion nombrada solo en prosa, sin encabezado propio, no cuenta.
+  const soloProsa = escenario("solo-prosa", {
+    reporte: REPORTE_COMPLETO.replace("## Consola", "Revisamos la Consola y no hubo nada."),
+  });
+  assert.ok(fallo(soloProsa, "evidencia-secciones"), "una seccion sin encabezado real debe fallar");
 
   // Nivel inexistente.
   const nivelMalo = escenario("nivel-malo", { nivel: "N9" });
@@ -148,7 +182,7 @@ try {
   const reservado = escenario("reservado", { manifiesto: exigeReservado });
   assert.ok(fallo(reservado, "journeys-no-reservados"), "exigir un journey reservado debe fallar");
 
-  console.log("golden-journeys-tests: PASS (13 escenarios: manifiesto, capturas, secciones, severidad, journeys, niveles, medicion)");
+  console.log("golden-journeys-tests: PASS (17 escenarios: manifiesto, capturas, secciones, severidad, journeys, niveles, medicion, reporte hueco)");
 } finally {
   const resolvedFixture = path.resolve(fixture);
   const resolvedTemp = path.resolve(tmpdir());

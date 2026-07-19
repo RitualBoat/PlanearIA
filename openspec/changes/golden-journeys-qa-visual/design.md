@@ -59,8 +59,13 @@ deriva directamente de lo que #81 ya verifico. Es la red de regresion real del p
 Los anchos derivan de `useBreakpoint()` (#79: `mobile <768`, `tablet 768-1279`, `desktop >=1280`).
 375 es el movil representativo; 768 y 1280 son los limites **inferiores** de tablet y escritorio;
 767 y 1279 son los limites **superiores**, donde una regresion de breakpoint se manifiesta primero
-(exactamente el patron que #81 uso). El nivel se declara en `readiness.json` del change y el checker
-lo exige: no es autoevaluacion silenciosa.
+(exactamente el patron que #81 uso).
+
+El nivel se declara en `readiness.json` del change. **El checker exige que este declarado y que sea
+valido, pero no puede juzgar si es el correcto**: un change que altera la navegacion podria declarar
+N1 y saltarse los anchos limite. Lo que se gana frente a hoy es que la eleccion queda escrita y
+auditable en la revision adversarial, no que sea imposible equivocarse. Declarado aqui para no
+sobrevender el gate.
 
 ### D5. El gate se vuelve ejecutable verificando la evidencia, no ejecutando el navegador
 

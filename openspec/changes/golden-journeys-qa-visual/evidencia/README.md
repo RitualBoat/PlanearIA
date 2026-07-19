@@ -136,4 +136,19 @@ Resultado: **PASS** en las once afirmaciones.
 Nota de proceso honesta: en un primer intento esta misma corrida quedo sin capturas por un bloqueo de
 herramienta, y el checker **fallo correctamente** en `evidencia-capturas` nombrando los tres archivos
 ausentes. No se fabricaron capturas para sortearlo; se resolvio el bloqueo y se repitio el recorrido.
-Esa es la prueba de que el verificador no es decorativo.
+
+## Endurecimiento por la revision adversarial
+
+La revision adversarial ataco al checker y encontro un hueco real: los chequeos de **medicion** y de
+**cobertura de journeys** buscaban en todo el documento, y como los nombres de captura contienen el
+ancho (`-375.png`) y el slug del journey, **una simple tabla de capturas los satisfacia**. Un reporte
+que decia literalmente "Se reviso en todos los anchos y todo se ve bien" y "No documentamos nada aqui"
+**pasaba N2 completo**, con las once afirmaciones en PASS.
+
+Corregido: el reporte se parsea por encabezados Markdown y cada chequeo se acota a su seccion,
+descartando los nombres `.png` antes de buscar. Verificado por mutacion: el mismo ataque ahora falla
+en `evidencia-medicion-dom` y `evidencia-journeys-cubiertos`, y esta evidencia real sigue en PASS.
+
+Los fixtures originales daban falsa confianza porque sus reportes no incluian tabla de capturas, que
+es justo lo que tiene un reporte real. Se anadieron cuatro escenarios (13 -> 17), incluido el ataque
+completo como regresion.

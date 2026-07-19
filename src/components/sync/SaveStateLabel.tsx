@@ -54,10 +54,10 @@ const SaveStateLabel: React.FC<SaveStateLabelProps> = ({ estado, guardadoEn, sty
 
   const aspecto = aspectoDe(estado, guardadoEn);
 
-  // El complemento de sync solo aparece cuando aporta: con todo sincronizado seria ruido,
-  // y mientras se guarda localmente el estado remoto aun no es la informacion relevante.
-  const complementoSync =
-    estado === "guardado" && sync.estado !== "sincronizado" ? sync.titulo : null;
+  // El complemento sale de la tabla y no de `titulo`: tres estados se titulan "Guardado en
+  // este dispositivo", que junto a esta etiqueta producia "Guardado - Guardado en este
+  // dispositivo". La tabla decide cuando el estado remoto es noticia distinta.
+  const complementoSync = estado === "guardado" ? sync.complementoGuardado : null;
 
   const etiquetaCompleta = complementoSync
     ? `${aspecto.texto}. ${sync.etiquetaA11y}`

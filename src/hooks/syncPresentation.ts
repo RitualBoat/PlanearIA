@@ -47,6 +47,16 @@ export interface PresentacionSync {
   accion: AccionSync | null;
   /** Alimenta `aria-busy`, que React Native Web no deriva de accessibilityState. */
   ocupado: boolean;
+  /**
+   * Frase breve para acompanar el estado de guardado de un documento, o `null` cuando el
+   * estado global no agrega nada a "esta guardado".
+   *
+   * Existe porque `titulo` no sirve para ese uso: tres de los siete estados se titulan
+   * "Guardado en este dispositivo", asi que junto a la etiqueta de guardado producian
+   * "Guardado - Guardado en este dispositivo". El complemento solo aparece cuando el estado
+   * remoto es noticia distinta de lo que la etiqueta local ya dijo.
+   */
+  complementoGuardado: string | null;
 }
 
 export interface EntradaSync {
@@ -67,6 +77,20 @@ export interface EntradaSync {
 export const frasePendientes = (pendingCount: number): string =>
   `${pendingCount} ${pendingCount === 1 ? "cambio" : "cambios"} por sincronizar`;
 
+/**
+ * Duracion del fundido al cambiar de estado, o `null` para servir el cambio sin animar.
+ *
+ * Se extrae como funcion pura para que la regla sea verificable: una prueba que solo
+ * renderice el chip con la preferencia activa pasaria igual aunque el componente la
+ * ignorara, porque rol, etiqueta y texto son identicos en ambas ramas. Ese fue justamente
+ * el hallazgo de la revision adversarial de #82 sobre la prueba del Skeleton.
+ */
+export const duracionTransicionSync = (reduceMotion: boolean): number | null =>
+  reduceMotion ? null : DURACION_FUNDIDO_MS;
+
+/** Fundido corto: comunica el cambio sin competir con el contenido. */
+export const DURACION_FUNDIDO_MS = 150;
+
 const componerEtiqueta = (titulo: string, detalle: string | null): string =>
   detalle ? `${titulo}. ${detalle}` : titulo;
 
@@ -77,7 +101,8 @@ const presentar = (
   titulo: string,
   detalle: string | null,
   accion: AccionSync | null = null,
-  ocupado = false
+  ocupado = false,
+  complementoGuardado: string | null = null
 ): PresentacionSync => ({
   estado,
   tono,
@@ -87,6 +112,7 @@ const presentar = (
   etiquetaA11y: componerEtiqueta(titulo, detalle),
   accion,
   ocupado,
+  complementoGuardado,
 });
 
 /**
@@ -126,7 +152,10 @@ export function derivarPresentacionSync({
       "aviso",
       "cloud-off",
       "Sin conexion",
-      "Puedes seguir trabajando: tus cambios se guardan en este dispositivo."
+      "Puedes seguir trabajando: tus cambios se guardan en este dispositivo.",
+      null,
+      false,
+      "Sin conexion"
     );
   }
 
@@ -137,12 +166,23 @@ export function derivarPresentacionSync({
       "lock-outline",
       "Tu sesion expiro",
       "Vuelve a iniciar sesion para sincronizar tus cambios.",
-      "reingresar"
+      "reingresar",
+      false,
+      "Sesion expirada"
     );
   }
 
   if (status === "syncing") {
-    return presentar("sincronizando", "info", "sync", "Sincronizando", null, null, true);
+    return presentar(
+      "sincronizando",
+      "info",
+      "sync",
+      "Sincronizando",
+      null,
+      null,
+      true,
+      "Sincronizando"
+    );
   }
 
   if (status === "error") {
@@ -162,7 +202,10 @@ export function derivarPresentacionSync({
       "info",
       "cloud-upload",
       frasePendientes(pendingCount),
-      "Se sincronizaran solos en cuanto sea posible."
+      "Se sincronizaran solos en cuanto sea posible.",
+      null,
+      false,
+      "Sin subir"
     );
   }
 

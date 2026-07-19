@@ -8,18 +8,21 @@ import {
   radii,
   scaleType,
   spacing,
-  timing,
   typography,
   useReducedMotionPreference,
 } from "../../themes/tokens";
 import type { ThemedStylesInput } from "../../themes/types";
 import { useSyncStatus } from "../../context/SyncContext";
 import { useSyncPresentation } from "../../hooks/useSyncPresentation";
+import { duracionTransicionSync } from "../../hooks/syncPresentation";
 import { MIN_TOUCH_TARGET, hitSlopToMinTarget, useFocusRing } from "../base/primitives";
 import { TONOS_SYNC } from "./tonos";
 
 /** Alto visual del chip. Menor a 44pt para no romper la densidad del chrome; el area tactil la completa hitSlop. */
 const ALTO_VISUAL = 28;
+
+/** Punto de partida del fundido al cambiar de estado. */
+const OPACIDAD_ENTRADA = 0.4;
 
 export interface SyncStatusChipProps {
   /**
@@ -70,12 +73,14 @@ const SyncStatusChip: React.FC<SyncStatusChipProps> = ({
   // dejaria el chrome en movimiento permanente, contra el presupuesto de motion 1.9.4.
   const opacidad = useSharedValue(1);
   useEffect(() => {
-    if (reduceMotion) {
+    const duracion = duracionTransicionSync(reduceMotion);
+    if (duracion === null) {
+      // Variante estatica: el estado nuevo aparece de inmediato, con la misma informacion.
       opacidad.value = 1;
       return;
     }
-    opacidad.value = 0.4;
-    opacidad.value = withTiming(1, timing.fast);
+    opacidad.value = OPACIDAD_ENTRADA;
+    opacidad.value = withTiming(1, { duration: duracion });
   }, [presentacion.estado, reduceMotion, opacidad]);
 
   const estiloAnimado = useAnimatedStyle(() => ({ opacity: opacidad.value }));
@@ -101,6 +106,11 @@ const SyncStatusChip: React.FC<SyncStatusChipProps> = ({
   const estiloBase = [
     styles.chip,
     { backgroundColor: colors[paleta.fondo] },
+    // Solo cuando es accionable: `hitSlop` extiende el alto, pero no puede ensanchar por
+    // debajo del ancho real, y en compacto el chip mide 32 px (medido en navegador). Sin
+    // este minimo el area tactil quedaria en 32 pt de lado corto. Mismo defecto que #82
+    // corrigio en Chip. El chip inerte no necesita area tactil.
+    Boolean(alPresionar) && styles.accionable,
     focused && styles.focusRing,
     style,
   ];
@@ -167,6 +177,9 @@ const getStyles = ({ colors, scaled }: ThemedStylesInput) =>
       paddingHorizontal: spacing.sm,
       borderRadius: radii.pill,
       alignSelf: "center",
+    },
+    accionable: {
+      minWidth: MIN_TOUCH_TARGET,
     },
     contenido: {
       flexDirection: "row",

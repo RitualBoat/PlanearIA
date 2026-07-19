@@ -1,5 +1,7 @@
 import {
+  DURACION_FUNDIDO_MS,
   derivarPresentacionSync,
+  duracionTransicionSync,
   type EntradaSync,
   type EstadoSync,
 } from "../../hooks/syncPresentation";
@@ -171,10 +173,53 @@ describe("derivarPresentacionSync: garantias transversales", () => {
     }
   });
 
+  /**
+   * La regla de reducir movimiento se prueba como decision y no como render: montar el chip
+   * con la preferencia activa pasaria igual aunque el componente la ignorara, porque rol,
+   * etiqueta y texto son identicos en ambas ramas. Ese fue el hallazgo de #82 sobre la
+   * prueba del Skeleton, y esta prueba existe para no repetirlo.
+   */
+  it("la preferencia de reducir movimiento cambia la decision, no solo el render", () => {
+    const conMovimiento = duracionTransicionSync(false);
+    const sinMovimiento = duracionTransicionSync(true);
+
+    expect(conMovimiento).toBe(DURACION_FUNDIDO_MS);
+    expect(sinMovimiento).toBeNull();
+    expect(sinMovimiento).not.toEqual(conMovimiento);
+  });
+
+  it("el fundido es breve, para no competir con el contenido", () => {
+    expect(DURACION_FUNDIDO_MS).toBeGreaterThan(0);
+    expect(DURACION_FUNDIDO_MS).toBeLessThanOrEqual(200);
+  });
+
   it("cubre los siete estados sin repetir ninguno", () => {
     const estados = TODAS_LAS_ENTRADAS.map((caso) => derivarPresentacionSync(caso).estado);
 
     expect(new Set(estados).size).toBe(7);
+  });
+
+  /**
+   * Hallazgo de la revision adversarial: `titulo` no servia como complemento de la etiqueta
+   * de guardado, porque tres estados se titulan "Guardado en este dispositivo" y producian
+   * "Guardado - Guardado en este dispositivo". El complemento es campo propio de la tabla.
+   */
+  it("ningun complemento de guardado repite lo que la etiqueta local ya dijo", () => {
+    for (const caso of TODAS_LAS_ENTRADAS) {
+      const { complementoGuardado } = derivarPresentacionSync(caso);
+      if (complementoGuardado === null) continue;
+      expect(complementoGuardado).not.toMatch(/^Guardado/);
+    }
+  });
+
+  it("los estados sin noticia para un documento guardado no aportan complemento", () => {
+    const sinComplemento = ["local", "sincronizado", "sin-servidor"];
+
+    for (const caso of TODAS_LAS_ENTRADAS) {
+      const { estado, complementoGuardado } = derivarPresentacionSync(caso);
+      if (sinComplemento.includes(estado)) expect(complementoGuardado).toBeNull();
+      else expect(complementoGuardado).not.toBeNull();
+    }
   });
 
   it("solo los estados recuperables ofrecen accion", () => {

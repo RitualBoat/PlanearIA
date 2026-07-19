@@ -51,6 +51,6 @@
 
 - [x] 6.1 Actualizar `TLDR.md` si cambiaron alcance, archivos, comportamiento o resultado esperado
 - [x] 6.2 Completar `readiness.json` con validaciones, evidencia y rollback
-- [ ] 6.3 Revision adversarial con `/adversarial-review` y correccion de hallazgos
+- [x] 6.3 Revision adversarial con `/adversarial-review`: PASS CON HUECOS, sin blockers, 4 majors encontrados y corregidos (tartamudeo de SaveStateLabel, area tactil bajo 44 pt en compacto accionable, ausencia de prueba de reduce-motion, y afirmacion falsa "Cambios sin guardar" en el consumidor de referencia)
 - [ ] 6.4 `npm run openspec:ready:archive -- --change sync-status-ui --run-local` en PASS
 - [ ] 6.5 Archive, sync de specs y `npm run opsx:finish`

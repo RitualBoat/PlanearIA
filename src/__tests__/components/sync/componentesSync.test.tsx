@@ -2,7 +2,8 @@ import React from "react";
 import { Text } from "react-native";
 import { fireEvent, screen } from "@testing-library/react-native";
 import type { GlobalSyncStatus } from "../../../context/SyncContext";
-import { renderConProveedores } from "../base/renderConProveedores";
+import { estiloPlano, renderConProveedores } from "../base/renderConProveedores";
+import { MIN_TOUCH_TARGET } from "../../../components/base/primitives";
 
 jest.mock("@react-native-async-storage/async-storage", () =>
   require("@react-native-async-storage/async-storage/jest/async-storage-mock")
@@ -117,6 +118,32 @@ describe("SyncStatusChip", () => {
     expect(onReingresar).not.toHaveBeenCalled();
   });
 
+  /**
+   * Hallazgo de la revision adversarial: `hitSlop` extiende el alto, pero no puede ensanchar
+   * por debajo del ancho real. En compacto el chip mide 32 px (medido en navegador), asi que
+   * un chip accionable y compacto quedaba con 32 pt de lado corto. Mismo defecto que #82
+   * corrigio en Chip con un ancho minimo.
+   */
+  it("el chip accionable garantiza 44 pt de lado corto tambien en compacto", () => {
+    situar({ status: "error" });
+    montar(<SyncStatusChip compacto testID="chip" />);
+
+    const chip = screen.getByTestId("chip");
+    const estilo = estiloPlano(chip.props.style);
+    const slop = chip.props.hitSlop;
+
+    expect(estilo.minWidth).toBe(MIN_TOUCH_TARGET);
+    expect((estilo.height as number) + slop.top + slop.bottom).toBe(MIN_TOUCH_TARGET);
+  });
+
+  it("el chip inerte no reclama area tactil que no usa", () => {
+    montar(<SyncStatusChip compacto testID="chip" />);
+
+    expect(estiloPlano(screen.getByTestId("chip").props.style).minWidth).toBeLessThan(
+      MIN_TOUCH_TARGET
+    );
+  });
+
   it("al docente invitado no le dice que esta sincronizado", () => {
     situar({ syncEnabled: false, status: "synced" });
     montar(<SyncStatusChip testID="chip" />);
@@ -186,6 +213,26 @@ describe("SaveStateLabel", () => {
     expect(screen.getByText("Guardado hace 2 minutos")).toBeTruthy();
   });
 
+  /**
+   * Hallazgo de la revision adversarial: con sesion de invitado renderizaba
+   * "Guardado - Guardado en este dispositivo" y lo anunciaba con la palabra repetida.
+   */
+  it("no tartamudea con el docente invitado", () => {
+    situar({ syncEnabled: false });
+    montar(<SaveStateLabel estado="guardado" testID="guardado" />);
+
+    expect(screen.getByText("Guardado")).toBeTruthy();
+    expect(screen.queryByText(/·/)).toBeNull();
+    expect(screen.getByTestId("guardado").props.accessibilityLabel).toBe("Guardado");
+  });
+
+  it("con el servidor caido tampoco repite que esta guardado", () => {
+    situar({ status: "error" });
+    montar(<SaveStateLabel estado="guardado" testID="guardado" />);
+
+    expect(screen.queryByText(/· Guardado/)).toBeNull();
+  });
+
   it("el fallo de guardado local es el unico caso que se presenta como error", () => {
     montar(<SaveStateLabel estado="error" testID="guardado" />);
 
@@ -194,7 +241,32 @@ describe("SaveStateLabel", () => {
 });
 
 describe("coherencia entre superficies", () => {
-  it("chip y etiqueta de guardado describen el mismo estado global sin divergir", () => {
+  it("chip y etiqueta de guardado nombran el mismo estado global con las mismas palabras", () => {
+    situar({ isOnline: false });
+    montar(
+      <>
+        <SyncStatusChip testID="chip" />
+        <SaveStateLabel estado="guardado" testID="guardado" />
+        <Text>ancla</Text>
+      </>
+    );
+
+    // Ambas leen la misma tabla: el complemento de la etiqueta usa literalmente el mismo
+    // nombre de estado que el chip muestra como titulo. No pueden divergir en un cambio
+    // de copy porque no hay dos copys.
+    expect(screen.getByText("Sin conexion")).toBeTruthy();
+    expect(screen.getByText("· Sin conexion")).toBeTruthy();
+    expect(screen.getByTestId("guardado").props.accessibilityLabel).toContain(
+      screen.getByTestId("chip").props.accessibilityLabel
+    );
+  });
+
+  /**
+   * Coherencia no es identidad: con el servidor caido, el chip titula "Guardado en este
+   * dispositivo" y la etiqueta de guardado calla su complemento, justamente para no repetir
+   * esa frase. Ambas siguen saliendo de la misma tabla.
+   */
+  it("coherencia no obliga a repetir la misma frase en las dos superficies", () => {
     situar({ status: "error" });
     montar(
       <>
@@ -204,11 +276,9 @@ describe("coherencia entre superficies", () => {
       </>
     );
 
-    const chip = screen.getByTestId("chip").props.accessibilityLabel as string;
-    const guardado = screen.getByTestId("guardado").props.accessibilityLabel as string;
-
-    // Ambas leen el mismo hook, asi que el titulo del estado global coincide literalmente.
-    expect(chip).toContain("Guardado en este dispositivo");
-    expect(guardado).toContain("Guardado en este dispositivo");
+    expect(screen.getByTestId("chip").props.accessibilityLabel).toContain(
+      "Guardado en este dispositivo"
+    );
+    expect(screen.getByTestId("guardado").props.accessibilityLabel).toBe("Guardado");
   });
 });

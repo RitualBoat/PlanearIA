@@ -73,6 +73,21 @@ Los 36 son el mismo error repetido: CORS del backend desplegado rechazando el or
 
 Efecto colateral util: confirma que desde este origen no se puede establecer sesion autenticada contra el backend, lo que sostiene la limitacion declarada abajo.
 
+## Revision adversarial
+
+Ejecutada el 2026-07-19 antes de archive, sobre los artefactos del change y el diff completo contra `development`. Veredicto: **PASS CON HUECOS**. Sin blockers. **Cuatro majors encontrados y corregidos**, todos invisibles para la suite en verde.
+
+| # | Sev | Hallazgo | Evidencia | Arreglo |
+| --- | --- | --- | --- | --- |
+| 1 | Major | `SaveStateLabel` tartamudeaba. Usaba `titulo` como complemento, pero tres de los siete estados se titulan "Guardado en este dispositivo", asi que con sesion de invitado renderizaba **"Guardado - Guardado en este dispositivo"** y lo anunciaba con la palabra repetida | Render real capturado en prueba desechable: `["Guardado","· Guardado en este dispositivo"]` | Campo propio `complementoGuardado` en la tabla, `null` para `local`, `sincronizado` y `sin-servidor`. Dos pruebas nuevas: ningun complemento empieza por "Guardado", y solo esos tres estados carecen de complemento |
+| 2 | Major | Area tactil por debajo del minimo. `hitSlop` extiende el alto pero no puede ensanchar por debajo del ancho real; en compacto el chip mide 32 px, asi que un chip **accionable y compacto** quedaba con 32 pt de lado corto, contra los 44 que exige la spec. Es el mismo defecto que #82 corrigio en `Chip` | Ancho de 32 px medido en navegador; `hitSlopToMinTarget(44, 28)` devuelve holgura horizontal 0 | `minWidth: 44` solo cuando hay accion. Prueba que verifica los 44 pt en ambos ejes en compacto accionable, y que el chip inerte no reclama area que no usa |
+| 3 | Major | La preferencia de reducir movimiento **no tenia ninguna prueba**, pese a ser un escenario de la spec. Escribir una que montara el chip habria sido vacua: rol, etiqueta y texto son identicos en las dos ramas, asi que pasaria aunque el componente ignorara la preferencia. Es el hallazgo de #82 sobre el `Skeleton` | Ausencia total de `reduceMotion` en las suites de sync | Se extrajo la decision a `duracionTransicionSync(reduceMotion)`, funcion pura. La prueba exige que ambas ramas **difieran** (`150` contra `null`), no que rendericen |
+| 4 | Major | El consumidor de referencia afirmaba algo falso. `SaveStateLabel` se alimentaba con `vm.isSaving ? "guardando" : "pendiente"`, asi que al abrir una plantilla que nadie habia tocado mostraba **"Cambios sin guardar"**. Es la misma clase de afirmacion falsa que este change existe para eliminar | Lectura del flujo: el editor no rastrea si el formulario esta sucio | La etiqueta se muestra solo mientras guarda. Consecuencia declarada: los estados `pendiente`, `guardado` y `error` de `SaveStateLabel` quedan sin consumidor de produccion hasta que exista un editor con autoguardado |
+
+Ademas, durante la implementacion el guardarrail de derivacion unica encontro por si mismo **dos duplicaciones reales** que habrian divergido: la frase de pendientes estaba re-derivada en `PendingBadge` y en el sufijo de la barra global. Se centralizo en `frasePendientes`.
+
+Comprobaciones que **no** produjeron hallazgo: aditividad verificada por diff (`src/sync/`, `PlaneacionesContext.tsx` y `package.json` sin cambios); la barra conserva sus tres disparadores y su `syncNow("manual")`; ningun estado de sincronizacion puede usar el tono de error porque el tipo `TonoSync` no lo admite; la tabla no importa React ni contextos en tiempo de ejecucion.
+
 ## Limitaciones
 
 **1. Los estados autenticados no se verificaron en navegador.** La precedencia hace que `syncEnabled === false` gane sobre todo, asi que en sesion de invitado el chip permanece en `local` haga lo que haga la red. Verificar en navegador los estados `sin-conexion`, `sesion-expirada`, `sincronizando`, `sin-servidor` y `pendiente` exige una sesion autenticada real, y el backend rechaza este origen por CORS. No se creo ninguna cuenta ni se usaron credenciales para forzarlo.

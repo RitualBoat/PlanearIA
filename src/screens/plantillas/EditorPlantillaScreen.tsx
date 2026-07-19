@@ -248,16 +248,19 @@ const EditorPlantillaScreen: React.FC = () => {
             </View>
 
             {/*
-              Este editor no tiene autoguardado: hasta que el docente pulsa guardar, sus
-              cambios solo viven en la pantalla. Decirlo es mas honesto que callarlo, y el
-              estado sale del mismo `isSaving` que ya gobierna los botones, sin inventar
+              Solo mientras guarda. Este editor no rastrea si el formulario esta sucio, asi
+              que mostrar "Cambios sin guardar" al abrir una plantilla que nadie ha tocado
+              afirmaria algo falso, que es justo lo que este change existe para eliminar.
+              El estado sale del mismo `isSaving` que ya gobierna los botones, sin inventar
               una maquina de guardado paralela.
             */}
-            <SaveStateLabel
-              estado={vm.isSaving ? "guardando" : "pendiente"}
-              style={styles.saveState}
-              testID="editor-plantilla-save-state"
-            />
+            {vm.isSaving ? (
+              <SaveStateLabel
+                estado="guardando"
+                style={styles.saveState}
+                testID="editor-plantilla-save-state"
+              />
+            ) : null}
 
             {/* Bottom actions */}
             <View style={styles.actionsRow}>

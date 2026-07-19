@@ -22,17 +22,26 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 /** Escala del catalogo de micro-interacciones 1.9.2 para el feedback de presion. */
 const PRESSED_SCALE = 0.97;
 
-export interface CardProps {
+interface CardBase {
   children: React.ReactNode;
   /** Nivel de elevacion. `flat` deja la tarjeta sin sombra, solo con borde. */
   elevation?: "flat" | "level1" | "level2" | "level3";
-  onPress?: () => void;
-  accessibilityLabel?: string;
-  accessibilityHint?: string;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 }
+
+/**
+ * Una tarjeta presionable exige etiqueta accesible; una pasiva no la admite.
+ *
+ * El tipo lo obliga en vez de confiar en la revision: una tarjeta con `onPress` y sin
+ * etiqueta se anuncia como boton sin nombre, y ese fallo es invisible mirando la pantalla.
+ */
+export type CardProps = CardBase &
+  (
+    | { onPress: () => void; accessibilityLabel: string; accessibilityHint?: string }
+    | { onPress?: undefined; accessibilityLabel?: never; accessibilityHint?: never }
+  );
 
 /**
  * Superficie contenedora con elevacion por token.

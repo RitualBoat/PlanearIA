@@ -46,7 +46,7 @@
 - [x] 6.1 Completar el barrel `src/components/base/index.ts` con los diez componentes y sus tipos publicos
 - [x] 6.2 Verificar que el change es aditivo: diff vacio en pantallas existentes, en los componentes legacy que se solapan, en los cuatro contextos protegidos y en `package.json`
 - [x] 6.3 Ejecutar la validacion completa: `npm run typecheck`, `npm run lint -- --quiet`, `npm test -- --runInBand` y `npm run qa:visual:check`
-- [ ] 6.4 Actualizar `TLDR.md` si el alcance, los archivos, el comportamiento o el resultado esperado cambiaron durante la implementacion
-- [ ] 6.5 Completar `readiness.json` con los enlaces de evidencia reales (issue, PR, revision adversarial, HTTP 200, breakpoints, Nielsen)
-- [ ] 6.6 Ejecutar la revision adversarial independiente y registrar su veredicto
+- [x] 6.4 Actualizar `TLDR.md` si el alcance, los archivos, el comportamiento o el resultado esperado cambiaron durante la implementacion
+- [x] 6.5 Completar `readiness.json` con los enlaces de evidencia reales (issue, PR, revision adversarial, HTTP 200, breakpoints, Nielsen)
+- [x] 6.6 Ejecutar la revision adversarial independiente y registrar su veredicto
 - [ ] 6.7 Ejecutar `npm run openspec:ready:archive -- --change componentes-base --run-local` y resolver cada FAIL antes de archivar

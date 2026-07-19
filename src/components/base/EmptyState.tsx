@@ -14,7 +14,12 @@ export interface EmptyStateProps {
   /** Sustituye el titulo por defecto de la variante cuando la pantalla tiene uno mejor. */
   titulo?: string;
   mensaje?: string;
-  accion?: { label: string; onPress: () => void };
+  /**
+   * Salida obligatoria. No es opcional a proposito: un estado sin salida deja al docente
+   * en un callejon, que es justo lo que este componente existe para evitar. Si de verdad
+   * no hay accion posible, la pantalla no deberia estar en este estado.
+   */
+  accion: { label: string; onPress: () => void };
   style?: StyleProp<ViewStyle>;
   testID?: string;
 }
@@ -55,17 +60,15 @@ const EmptyState: React.FC<EmptyStateProps> = ({
       <Text style={styles.titulo}>{titulo ?? preset.titulo}</Text>
       <Text style={styles.mensaje}>{mensaje ?? preset.mensaje}</Text>
 
-      {accion ? (
-        <View style={styles.accion}>
-          <Button
-            label={accion.label}
-            onPress={accion.onPress}
-            variant={variant === "empty" ? "primary" : "secondary"}
-            icon={preset.iconoAccion}
-            testID={testID ? `${testID}-accion` : undefined}
-          />
-        </View>
-      ) : null}
+      <View style={styles.accion}>
+        <Button
+          label={accion.label}
+          onPress={accion.onPress}
+          variant={variant === "empty" ? "primary" : "secondary"}
+          icon={preset.iconoAccion}
+          testID={testID ? `${testID}-accion` : undefined}
+        />
+      </View>
     </View>
   );
 };

@@ -154,6 +154,7 @@ const Chip: React.FC<ChipProps> = ({
       onFocus={onFocus}
       onBlur={onBlur}
       disabled={disabled}
+      // El ancho ya cumple por minWidth; hitSlop solo completa el eje vertical.
       hitSlop={hitSlopToMinTarget(MIN_TOUCH_TARGET, ALTO_VISUAL)}
       accessibilityRole="checkbox"
       accessibilityLabel={label}
@@ -176,6 +177,12 @@ const getStyles = ({ colors, scaled, highContrast }: ThemedStylesInput) =>
   StyleSheet.create({
     chip: {
       height: ALTO_VISUAL,
+      // El alto se compensa con hitSlop, pero el ancho no se puede calcular sin medir el
+      // texto: una etiqueta de dos letras daria una caja de ~38pt. Fijar el ancho minimo
+      // en 44 lo garantiza sin medir y sin danar la densidad, porque a lo ancho los chips
+      // ya suelen superarlo.
+      minWidth: MIN_TOUCH_TARGET,
+      alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: spacing.md,
       borderRadius: radii.pill,

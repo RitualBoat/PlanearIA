@@ -6,11 +6,11 @@ PlanearIA tiene tokens desde #80, pero nada entre ellos y las pantallas. Hoy 99 
 
 ## Como se construye
 
-Se crea `src/components/base/` con un archivo por componente y un barrel. Cada uno toma color, espaciado, tipografia y sombra de los tokens en runtime, mediante la fabrica de estilos que ya existe; ninguno importa la paleta estatica legacy. El shell queda fuera porque #81 ya lo entrego. Los componentes legacy que se solapan se conservan intactos: la migracion es un change posterior. No se instala ninguna dependencia nueva; las superficies translucidas usan el token de superposicion solido.
+Se crea `src/components/base/` con un archivo por componente y un barrel. Cada uno toma color, espaciado, tipografia y sombra de los tokens en runtime, mediante la fabrica de estilos que ya existe; ninguno importa la paleta estatica legacy. El shell queda fuera porque #81 ya lo entrego. Los componentes legacy que se solapan se conservan intactos: la migracion es un change posterior. No se instala ninguna dependencia nueva; las superficies translucidas usan el token de superposicion solido. El catalogo se alcanza desde una entrada en el hub Mas, tambien bajo modo desarrollo.
 
 ## Que comportamiento queda garantizado
 
-Los controles presentan y anuncian sus estados normal, presionado, deshabilitado y cargando. Un control deshabilitado no actua; uno cargando no repite su accion. Los cuatro estados de pantalla tienen componente con salida accionable. Todo control declara rol y etiqueta, ofrece area tactil de 44 puntos y muestra foco visible en web. Toda animacion sirve una variante estatica cuando el docente pide reducir movimiento. Ninguna pantalla existente cambia de aspecto.
+Los controles presentan y anuncian sus estados normal, presionado, deshabilitado y cargando. Un control deshabilitado no actua; uno cargando no repite su accion. Los cuatro estados de pantalla tienen componente, y la salida accionable es obligatoria por tipo, no opcional. Todo control declara rol y etiqueta, ofrece area tactil de 44 puntos y muestra foco visible en web, medido en 4.61 a 1. Toda animacion sirve una variante estatica bajo reduccion de movimiento. Ninguna pantalla existente cambia de aspecto.
 
 ## Como se organiza el trabajo
 

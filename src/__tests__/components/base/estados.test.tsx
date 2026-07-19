@@ -19,11 +19,14 @@ jest.mock("../../../themes/useReducedMotionPreference", () => ({
 
 const VARIANTES: EmptyStateVariant[] = ["empty", "error", "offline"];
 
+// Toda variante exige salida: el tipo de EmptyState la hace obligatoria.
+const ACCION = { label: "Reintentar", onPress: () => undefined };
+
 describe("EmptyState", () => {
   beforeEach(() => mockReduceMotion.mockReturnValue(false));
 
   it.each(VARIANTES)("la variante %s trae titulo y mensaje propios", (variant) => {
-    renderConProveedores(<EmptyState variant={variant} testID="estado" />);
+    renderConProveedores(<EmptyState variant={variant} accion={ACCION} testID="estado" />);
 
     // Cada variante rinde texto por defecto: un estado nunca queda como pantalla en blanco.
     expect(screen.getByTestId("estado")).toBeTruthy();
@@ -31,7 +34,7 @@ describe("EmptyState", () => {
 
   it("las tres variantes no comparten su copy", () => {
     const titulos = VARIANTES.map((variant) => {
-      const { unmount } = renderConProveedores(<EmptyState variant={variant} />);
+      const { unmount } = renderConProveedores(<EmptyState variant={variant} accion={ACCION} />);
       const textos = screen
         .getAllByText(/.+/)
         .map((nodo) => nodo.props.children)
@@ -58,7 +61,7 @@ describe("EmptyState", () => {
 
   it("permite sustituir el copy por defecto", () => {
     renderConProveedores(
-      <EmptyState variant="empty" titulo="Sin planeaciones" mensaje="Crea la primera" />
+      <EmptyState variant="empty" titulo="Sin planeaciones" mensaje="Crea la primera" accion={ACCION} />
     );
 
     expect(screen.getByText("Sin planeaciones")).toBeTruthy();
@@ -80,10 +83,21 @@ describe("Skeleton", () => {
     mockReduceMotion.mockReturnValue(true);
     renderConProveedores(<Skeleton testID="skeleton" />);
 
-    const skeleton = screen.getByTestId("skeleton");
-    // La variante estatica equivalente: mismo rol y misma etiqueta, sin animacion.
-    expect(skeleton.props.accessibilityRole).toBe("progressbar");
-    expect(skeleton.props.accessibilityLabel).toBe("Cargando");
+    const estatico = screen.getByTestId("skeleton");
+    // Sigue comunicando carga...
+    expect(estatico.props.accessibilityRole).toBe("progressbar");
+    // ...y no recibe estilo animado. Afirmar solo rol y etiqueta no distinguiria las dos
+    // ramas: son identicas en ambas, asi que la prueba pasaria aunque el reduce-motion
+    // se ignorara por completo.
+    const capasEstaticas = (estatico.props.style as unknown[]).length;
+
+    screen.unmount();
+    mockReduceMotion.mockReturnValue(false);
+    renderConProveedores(<Skeleton testID="skeleton" />);
+    const animado = screen.getByTestId("skeleton");
+    const capasAnimadas = (animado.props.style as unknown[]).length;
+
+    expect(capasAnimadas).toBeGreaterThan(capasEstaticas);
   });
 });
 

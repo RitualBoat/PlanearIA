@@ -56,6 +56,23 @@ La medicion en navegador encontro dos fallos que las pruebas unitarias no podian
 
 Nota metodologica: el foco programatico (`element.focus()`) **no** dispara `onFocus` en React Native Web; solo la tabulacion real lo hace. Una verificacion sintetica habria reportado el anillo como roto y una assercion sobre `accessibilityState` lo habria reportado como correcto: solo la interaccion real dio la respuesta buena.
 
+## Revision adversarial previa a archive (2026-07-19)
+
+Veredicto: **PASS CON HUECOS**. Sin blockers. Dos majors encontrados y corregidos durante la revision; cuatro minors aceptados y rastreados.
+
+| Severidad | Hallazgo | Resolucion |
+| --- | --- | --- |
+| Major | **Prueba de reduce-motion vacua.** La prueba del `Skeleton` afirmaba solo `accessibilityRole` y `accessibilityLabel`, que son **identicos** en la rama animada y en la estatica: habria pasado aunque el componente ignorara por completo la reduccion de movimiento. | Reescrita para comparar la rama estatica contra la animada y exigir que difieran; ahora sí falla si se ignora la preferencia. |
+| Major | **`EmptyState.accion` era opcional**, pero la spec exige que cada variante presente al menos una accion de salida. Un estado sin salida deja al docente en un callejon, que es justo lo que el componente existe para evitar. | `accion` pasa a ser obligatoria en el tipo. El compilador encontro tres llamadas sin salida en las pruebas. |
+| Minor | **`Card` presionable no exigia etiqueta accesible**: una tarjeta con `onPress` y sin `accessibilityLabel` se anuncia como boton sin nombre, fallo invisible mirando la pantalla. | El tipo se vuelve una union discriminada: `onPress` exige `accessibilityLabel`, y una tarjeta pasiva no admite ninguno de los dos. |
+| Minor | **El `hitSlop` del `Chip` asumia un ancho >= 44pt.** Una etiqueta de dos letras da una caja de ~38pt, por debajo del minimo en el eje horizontal. | `minWidth: 44` en el chip; el ancho ya no depende del largo del texto. Verificado en navegador: los tres chips miden 104pt de ancho. |
+| Minor | `Banner` declara `role="alert"` y contiene controles interactivos. | Aceptado: el rol describe correctamente la naturaleza del aviso y los controles conservan su propio rol y etiqueta. |
+| Minor | `Input` se apoya en el rol implicito de `TextInput` en vez de declararlo. | Aceptado: el rol implicito es correcto en ambas plataformas y declararlo no cambia el anuncio. |
+| Minor | Sin medicion de 60fps en Android de gama media (presupuesto 1.9.4). | Aceptado y documentado en Limitaciones: animaciones en worklets, de corta duracion y sin blur. |
+| Minor | La biblioteca aun no tiene consumidores de produccion. | Aceptado por diseno: este change la crea, no la adopta. Los contratos podran ajustarse con evidencia de uso en Ola 2. |
+
+Nota sobre el metodo: los dos majors salieron de atacar las **pruebas**, no el codigo. Una suite en verde no es evidencia de que verifique lo que dice verificar.
+
 ## Checklist Nielsen (acotado a la superficie del change)
 
 Umbral de bloqueo: severidad >= 3. **Ninguna heuristica alcanza severidad 3.**

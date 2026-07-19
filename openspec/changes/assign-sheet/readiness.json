@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "issue": 84,
+  "change": "assign-sheet",
+  "surfaces": [
+    "ui",
+    "sync"
+  ],
+  "validations": [
+    "openspec-strict",
+    "sync-tests"
+  ],
+  "qaVisualNivel": "N3",
+  "qaVisualJourneys": [
+    "arranque-y-alcance-del-shell",
+    "crear-planeacion-y-asignarla"
+  ],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/84"
+    },
+    {
+      "id": "pr-link",
+      "ref": "PENDIENTE: PR generado por opsx:finish tras archive."
+    },
+    {
+      "id": "adversarial-review",
+      "ref": "PENDIENTE: revision adversarial independiente previa a archive."
+    },
+    {
+      "id": "web-http-200",
+      "ref": "PENDIENTE: confirmar HTTP 200 de expo start --web antes de navegar."
+    },
+    {
+      "id": "playwright-breakpoints",
+      "ref": "PENDIENTE: QA visual N3 con Playwright MCP a 375/767/768/1279/1280 con medicion DOM."
+    },
+    {
+      "id": "nielsen",
+      "ref": "PENDIENTE: checklist Nielsen y anti-slop 1.9.3 en evidencia/README.md."
+    },
+    {
+      "id": "offline-reconnect",
+      "ref": "PENDIENTE: asignar sin conexion y verificar que la operacion queda encolada y sube sola al reconectar."
+    },
+    {
+      "id": "cross-device",
+      "ref": "PENDIENTE: verificar que la asignacion encolada llega al backend y sobrevive a un pull posterior."
+    },
+    {
+      "id": "no-local-loss",
+      "ref": "PENDIENTE: prueba de regresion de que una asignacion sobrevive a una reconciliacion con lista remota sin grupoId."
+    }
+  ],
+  "rollback": {
+    "strategy": "Change mayoritariamente aditivo. Agrega src/components/assign/ (AssignSheet y barrel), src/hooks/useAssignSheet.ts y sus pruebas. Modifica en su lugar dos archivos: AsignarRecursoScreen.tsx (adopta la hoja, pierde sus tres Modal ad-hoc y su pantalla de exito incondicional) y grupoAsignacionesService.ts (encola y corrige la clave de entregables, con firma publica intacta). No toca src/sync, el motor, esquemas, backend, filtrado por userId, configuracion remota ni dependencias. Las dos modificaciones son independientes y se pueden revertir por separado. Riesgo de datos en la reversion: las asignaciones ya encoladas antes del revert siguen en la cola del motor y se suben igual, porque el revert no toca la cola; lo que se pierde es la garantia hacia adelante, no el trabajo hecho. La correccion de clave es compatible en ambos sentidos: al revertir, el servicio vuelve a escribir en @planearia:tareas y lo escrito en el intervalo queda en @planearia:entregables, que es la clave que la app usa para leer, asi que sigue visible y asignado; solo regresa el defecto original. No se migra ni se borra dato alguno, y classroomRepository sigue fusionando la clave legacy.",
+    "verified": false
+  },
+  "adversarialReview": {
+    "ref": "PENDIENTE: revision adversarial independiente previa a archive."
+  },
+  "exceptions": []
+}

@@ -88,10 +88,13 @@ una pantalla vacia legitima.
 
 Para cada ancho del nivel que aplique:
 
-1. Ajustar el ancho de la ventana.
-2. **Disparar el evento de redimensionado** (ver 5.2). Sin esto la app conserva el layout anterior.
-3. Medir por DOM y estilos computados los criterios observables del journey.
-4. Capturar en `evidencia/capturas/<slug>-<ancho>.png`.
+1. Ajustar el ancho con `browser_resize` de Playwright MCP. Si mides desde el panel Browser, dispara
+   ademas el evento de redimensionado a mano (ver 5.2).
+2. **Medir en una llamada posterior**, nunca en el mismo tick: el re-render de React es asincrono.
+3. Medir por DOM y estilos computados los criterios observables del journey, excluyendo los subarboles
+   `aria-hidden` (ver 5.6).
+4. Navegar con clics reales de Playwright, no con eventos sinteticos (ver 5.5).
+5. Capturar en `evidencia/capturas/<slug>-<ancho>.png`.
 
 ### 4.3 Aplicar los checklists
 
@@ -114,38 +117,48 @@ Cita su salida en la evidencia `playwright-breakpoints` de `readiness.json`. **E
 que vuelve ejecutable el gate**: el perfil `ui` de `scripts/checkOpenSpecReadiness.mjs` ya exige esa
 clave, y ahora su contenido es verificable en vez de texto libre.
 
-## 5. Las cuatro trampas del entorno web
+## 5. Las trampas del entorno web
 
-Verificadas durante la QA de #79 y #81 (2026-07-17 y 2026-07-18). **Son pasos obligatorios, no
-anecdotas**: un runbook que ignora como falla la herramienta no es reproducible.
+Verificadas durante la QA de #79 y #81 (2026-07-17 y 2026-07-18) y **corregidas con la corrida de
+referencia de #85** (2026-07-19), que desmintio tres de ellas y anadio una. **Son pasos obligatorios,
+no anecdotas**: un runbook que ignora como falla la herramienta no es reproducible.
 
 ### 5.1 El bundler tarda en responder
 
 Si navegas antes del 200, capturas una pagina en blanco y la reportas como pantalla real.
 **Siempre confirma HTTP 200 antes de navegar.**
 
-### 5.2 Cambiar el ancho por CDP no emite el evento DOM `resize`
+### 5.2 Redimensionar por CDP crudo no emite el evento DOM `resize`
 
 **Es la mas peligrosa: produce evidencia que parece correcta y no lo es.**
 
-`resize_window` cambia `window.innerWidth`, pero no emite el evento `resize` del documento (probado:
-0 eventos en un contador tras redimensionar). Por eso `useWindowDimensions` de React Native Web no
-reacciona, y una pantalla ya montada **no reacomoda**: capturas el layout del ancho anterior creyendo
-que es el nuevo.
+El `resize_window` del panel Browser cambia `window.innerWidth`, pero no emite el evento `resize` del
+documento (probado: 0 eventos en un contador tras redimensionar). Por eso `useWindowDimensions` de
+React Native Web no reacciona, y una pantalla ya montada **no reacomoda**: capturas el layout del
+ancho anterior creyendo que es el nuevo.
 
 ```js
-// Tras cambiar el ancho, disparar el evento real:
+// Solo si redimensionas por CDP crudo, disparar el evento real:
 window.dispatchEvent(new Event("resize"));
 // Medir en una llamada POSTERIOR: el re-render de React es asincrono.
 ```
 
-Equivale a arrastrar el borde de la ventana a mano.
+**`browser_resize` de Playwright MCP NO tiene este problema** (comprobado el 2026-07-19: tras pasar de
+375 a 768 sin ningun disparo manual, el shell reacomodo a rail de 68 pt). Playwright usa
+`page.setViewportSize`, que si emite el evento. **Como el procedimiento prescribe Playwright MCP, el
+disparo manual no hace falta**; queda documentado para quien mida desde el panel Browser.
 
-### 5.3 La captura agota su tiempo en pantallas con animacion
+Lo que si aplica siempre: **medir en una llamada posterior al cambio de ancho**, porque el re-render
+de React es asincrono. Medir en el mismo tick devuelve el estado anterior.
 
-El renderer ocupado hace que el screenshot expire (30 s). No abandones la medicion ni la inventes:
-**mide por DOM y estilos computados**, que es numerico y exacto. La captura acompaña; no sustituye.
-Por eso N2 y N3 exigen medicion numerica ademas de capturas.
+### 5.3 Las capturas del panel Browser no funcionan en este proyecto
+
+El screenshot del panel Browser expira a los 30 s de forma consistente, en cualquier pantalla del
+shell, incluso tras esperar a que el renderer se asiente. **Usa Playwright MCP para capturar**
+(`browser_take_screenshot`), que es lo que este procedimiento prescribe.
+
+Independientemente de la herramienta: **mide por DOM y estilos computados**, que es numerico y exacto.
+La captura acompaña; no sustituye. Por eso N2 y N3 exigen medicion numerica ademas de capturas.
 
 ### 5.4 El ruido de consola preexistente
 
@@ -154,11 +167,36 @@ Navegar sin sesion autenticada produce respuestas `401` del backend desplegado (
 cuantas son atribuibles al change**; #81 registro 198 errores y demostro que el 100% eran 401 de
 polling sin sesion.
 
-### 5.5 Nota operativa
+### 5.5 Los clics sinteticos por JS no navegan en el shell
 
-Los clics por referencia o coordenada a veces no registran en controles de React Native Web; los
-clics sinteticos por JS (`pointerdown`/`mousedown`/`pointerup`/`mouseup`/`click` sobre el elemento)
-son mas fiables. Limpiar `localStorage` resetea onboarding y sesion.
+Los cinco destinos de la navegacion primaria son elementos `<a>`. Despachar la secuencia
+`pointerdown`/`mousedown`/`pointerup`/`mouseup`/`click` a mano **no dispara la navegacion**: el titulo
+del documento no cambia y el hub activo sigue igual (comprobado el 2026-07-19 sobre los cinco
+destinos). **Usa el clic real de Playwright** (`browser_click`), que ademas es mas fiel a lo que hace
+el docente.
+
+El sintoma es traicionero: la llamada "funciona" sin lanzar error y devuelve el estado anterior, que
+se parece mucho a haber medido demasiado pronto. Si un recorrido no avanza, descarta primero el tipo
+de clic.
+
+Los clics sinteticos si sirven para controles que no son anclas (por ejemplo, `SALTAR` del onboarding
+o los botones de los hubs), pero no hay razon para preferirlos teniendo el clic real.
+
+### 5.6 Medir el texto visible, no `body.innerText`
+
+React Navigation deja montadas las pantallas inactivas, marcadas con `aria-hidden="true"`.
+`document.body.innerText` **las incluye**: puedes estar en Office y leer el texto del Escritorio, y
+concluir que la navegacion no funciono. Excluye esos subarboles antes de medir:
+
+```js
+const c = document.body.cloneNode(true);
+c.querySelectorAll('[aria-hidden="true"]').forEach(n => n.remove());
+const visible = c.innerText;
+```
+
+### 5.7 Nota operativa
+
+Limpiar `localStorage` resetea onboarding y sesion; es como se recorre GJ0 desde el paso 1.
 
 ## 6. Contrato de evidencia
 

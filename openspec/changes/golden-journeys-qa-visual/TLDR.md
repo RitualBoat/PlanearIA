@@ -34,7 +34,7 @@ automatica lo detecta. Es la diferencia entre confiar en que alguien reviso y po
 Cinco bloques en orden. Primero el archivo de recorridos, con los cuatro definidos y dos reservados
 para mas adelante, verificando que cada pantalla mencionada exista de verdad en el codigo. Luego la
 revision automatica y sus casos de prueba, incluidos los que deben fallar. Despues el documento que
-explica el procedimiento, con las cuatro trampas del navegador que producen pruebas engañosas si se
+explica el procedimiento, con las trampas del navegador que producen pruebas engañosas si se
 ignoran. Enseguida ejecutamos el recorrido base sobre la aplicacion real en tres tamaños, con capturas
 verdaderas. Cierran las validaciones del proyecto y una revision critica independiente.
 

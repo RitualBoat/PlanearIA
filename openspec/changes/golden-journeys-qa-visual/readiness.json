@@ -21,7 +21,7 @@
     },
     {
       "id": "docs-verification",
-      "ref": "PENDIENTE: rutas citadas en el manifiesto verificadas contra src/navigation/routeManifest.ts; runbook registrado en Documentacion/03-validacion/README.md."
+      "ref": "Las 15 rutas citadas por los journeys verificadas contra src/navigation/routeManifest.ts por la afirmacion manifiesto-rutas de qa:visual:check (PASS). Runbook registrado como primera entrada de Reportes Vigentes en Documentacion/03-validacion/README.md. Runbook corregido tras la corrida real: las trampas 5.2, 5.3 y 5.5 heredadas resultaron inexactas para Playwright MCP y se anadio 5.6 (aria-hidden)."
     },
     {
       "id": "adversarial-review",
@@ -29,15 +29,15 @@
     },
     {
       "id": "web-http-200",
-      "ref": "PENDIENTE: expo start --web via .claude/launch.json (expo-web, puerto 8081) con HTTP 200 confirmado antes de navegar, para la corrida de referencia de GJ0."
+      "ref": "expo start --web en el puerto 8081 (perfil expo-web de .claude/launch.json); HTTP 200 confirmado con curl antes de navegar. El codigo servido es identico a development: git diff development -- src/ vacio en esta rama."
     },
     {
       "id": "playwright-breakpoints",
-      "ref": "PENDIENTE: corrida de referencia de GJ0 en 375/768/1280 (nivel N1) con medicion DOM y capturas reales, mas la salida de npm run qa:visual:check sobre la propia evidencia del change."
+      "ref": "Corrida de referencia de GJ0 con Playwright MCP el 2026-07-19 en 375/768/1280 (nivel N1): tablists=1 en los tres anchos, barra inferior 367x55 en y=753 a 375, rail 68x954 a 768 y sidebar 199x824 a 1280; toques 69x55, 68x58 y 199x54, todos >= 44 pt; aria-selected correcto en los cinco destinos. Los 7 pasos del journey recorridos con clics reales, incluida la pantalla legacy Contenido desde Office. Capturas reales en evidencia/capturas/. npm run qa:visual:check -- --change golden-journeys-qa-visual: PASS en las once afirmaciones. Nota honesta: un primer intento quedo sin capturas por bloqueo de herramienta y el checker fallo correctamente en evidencia-capturas; no se fabricaron capturas, se resolvio el bloqueo y se repitio el recorrido."
     },
     {
       "id": "nielsen",
-      "ref": "PENDIENTE: checklist Nielsen con severidad y checklist anti-slop 1.9.3 sobre la corrida de referencia; alcance declarado (evalua el shell recorrido por GJ0, no un rediseno de pantallas)."
+      "ref": "Checklist Nielsen del shell en evidencia/README.md: severidad maxima 0, ningun hallazgo >= 3. Checklist anti-slop 1.9.3: 7/7. Alcance declarado: evalua el shell recorrido por GJ0, no las pantallas internas. Consola: 28 errores, 100% respuestas 401 del backend por navegar sin sesion; cero atribuibles al change, que no toca src/."
     }
   ],
   "qaVisualNivel": "N1",
@@ -48,5 +48,8 @@
   "adversarialReview": {
     "ref": "PENDIENTE: revision adversarial independiente antes de archive."
   },
-  "exceptions": []
+  "exceptions": [],
+  "qaVisualJourneys": [
+    "arranque-y-alcance-del-shell"
+  ]
 }

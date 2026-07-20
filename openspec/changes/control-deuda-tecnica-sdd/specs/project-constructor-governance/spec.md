@@ -15,13 +15,13 @@ paquete del futuro upstream.
 
 #### Scenario: Bootstrap con perfil GitHub
 
-- **WHEN** un repositorio se genera con el perfil GitHub activo
-- **THEN** su politica de deuda queda sembrada con modo `required` y umbral 5
+- **WHEN** un repositorio se genera con el manifest del Project OS de GitHub presente
+- **THEN** su politica de deuda sembrada (modo `auto`) resuelve a `required` con umbral 5
 
 #### Scenario: Bootstrap sin GitHub
 
-- **WHEN** un repositorio se genera sin perfil GitHub
-- **THEN** su politica de deuda queda sembrada con modo `off` conservando el registro local como contrato
+- **WHEN** un repositorio se genera sin manifest del Project OS de GitHub
+- **THEN** su politica de deuda sembrada (modo `auto`) resuelve a `off` conservando el registro local como contrato
 
 #### Scenario: El proyecto ajusta su politica
 

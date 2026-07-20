@@ -31,6 +31,12 @@ export function planMarker(planId) {
   return `<!-- ${PLAN_MARKER_PREFIX}${planId} -->`;
 }
 
+// Neutraliza aperturas de comentario HTML en texto proveniente de items: un titulo que documente los
+// marcadores administrados no puede cortar el bloque ni hacer que un issue matchee el plan ajeno.
+function inert(value) {
+  return sanitize(value).replaceAll('<!--', '<! --');
+}
+
 // El modo auto resuelve segun exista el manifest de GitHub del proyecto: con Project OS configurado
 // el default recomendado es required; sin el, off. Nunca adivina por red.
 export function resolveMode(config, root) {
@@ -64,12 +70,12 @@ export function renderManagedBlock({ config, plan, items, evaluation }) {
     '',
   ];
   for (const item of sorted) {
-    lines.push(`- \`${item.id}\` [${item.severity}] (${item.category}, ${unitsFor(item, config)} unidad(es)) ${sanitize(item.title)}`);
-    lines.push(`  - Artefacto: ${sanitize(item.artifact)}`);
+    lines.push(`- \`${item.id}\` [${item.severity}] (${item.category}, ${unitsFor(item, config)} unidad(es)) ${inert(item.title)}`);
+    lines.push(`  - Artefacto: ${inert(item.artifact)}`);
     for (const evidence of item.evidence) {
-      lines.push(`  - Evidencia (${evidence.type}, ${evidence.date}): ${sanitize(evidence.ref)}`);
+      lines.push(`  - Evidencia (${evidence.type}, ${evidence.date}): ${inert(evidence.ref)}`);
     }
-    if (item.remediation) lines.push(`  - Remediacion candidata: ${sanitize(item.remediation)}`);
+    if (item.remediation) lines.push(`  - Remediacion candidata: ${inert(item.remediation)}`);
   }
   lines.push(
     '',
@@ -131,7 +137,10 @@ function findRemediationIssue({ runner, config, planId }) {
 
 // Sincronizacion idempotente: un issue por plan pausado, identificado por marcador. Reejecutar sin
 // cambios de estado no edita nada. Devuelve checks PASS/FAIL/WARN/SKIP sin falsos verdes.
-export function syncGithub({ root, config, registry, evaluation, runner = defaultRunner, log = () => {} }) {
+// `persistIssueRefs: false` evita escribir los backrefs en registry.json: postfinish corre sobre la
+// rama protegida ya mergeada y no debe dejar cambios sin commitear; el siguiente `debt:sync` en una
+// rama de trabajo los persiste.
+export function syncGithub({ root, config, registry, evaluation, runner = defaultRunner, log = () => {}, persistIssueRefs = true }) {
   const mode = resolveMode(config, root);
   const checks = [];
   if (mode === 'off') {
@@ -206,7 +215,15 @@ export function syncGithub({ root, config, registry, evaluation, runner = defaul
     }
   }
 
-  if (mutatedRegistry) writeJsonAtomic(registryPath(root), registry);
+  if (mutatedRegistry && persistIssueRefs) writeJsonAtomic(registryPath(root), registry);
+  if (mutatedRegistry && !persistIssueRefs) {
+    checks.push({
+      id: 'github-refs',
+      status: 'WARN',
+      summary: 'Hay referencias de issue nuevas sin persistir en registry.json (ejecucion post-merge sobre rama protegida).',
+      recovery: 'Ejecuta npm run debt:sync desde una rama de trabajo para persistir los backrefs via PR.',
+    });
+  }
   return { mode, checks, mutatedRegistry };
 }
 

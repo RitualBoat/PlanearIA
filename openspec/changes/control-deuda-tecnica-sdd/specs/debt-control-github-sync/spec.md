@@ -31,8 +31,10 @@ reanudacion del plan.
 
 ### Requirement: Los modos GitHub degradan de forma explicita sin falsos verdes
 
-La integracion GitHub SHALL soportar exactamente tres modos configurables: `required`, `advisory` y
-`off`. En `required`, la indisponibilidad de `gh`, la falta de autenticacion o un fallo de API SHALL
+La integracion GitHub SHALL soportar exactamente tres modos operativos: `required`, `advisory` y
+`off`. La configuracion SHALL admitir ademas el valor `auto`, que SHALL resolverse de forma
+determinista y sin red a `required` cuando existe el manifest local del Project OS de GitHub y a
+`off` en caso contrario; `auto` nunca es un cuarto comportamiento en runtime. En `required`, la indisponibilidad de `gh`, la falta de autenticacion o un fallo de API SHALL
 producir FAIL con recuperacion concreta. En `advisory`, la misma condicion SHALL producir WARN
 conservando el expediente local. En `off`, el motor SHALL reportar SKIP explicito y conservar solo el
 registro local. Ninguna condicion de indisponibilidad SHALL reportarse como PASS, y la ausencia de

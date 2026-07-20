@@ -23,7 +23,7 @@ tools/debt-control/            nucleo neutral reutilizable (futuro upstream MIT)
   src/constants.mjs            categorias, severidades, estados, exit codes, versiones de schema
   src/schema.mjs               validacion determinista de config/registry/assessment
   src/fingerprint.mjs          IDs estables (sha256 truncado de campos normalizados)
-  src/registry.mjs             carga/persistencia, ciclo de vida de items, dedupe, excepciones
+  src/store.mjs                carga/persistencia atomica de config, registry y assessments
   src/policy.mjs               presupuesto, triggers, pausa/reanudacion (funciones puras)
   src/capture.mjs              intake de assessments (mutacion explicita e idempotente)
   src/github.mjs               issue de remediacion idempotente; modos required/advisory/off

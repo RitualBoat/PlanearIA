@@ -114,8 +114,31 @@ export function runCli(argv, { cwd = process.cwd(), runner = defaultRunner, writ
         registry: state.registry,
         evaluation: state.evaluation,
         runner,
+        persistIssueRefs: command !== 'postfinish',
       });
-      const checks = command === 'postfinish' ? [...state.checks, ...sync.checks] : sync.checks;
+      let stateChecks = state.checks;
+      if (command === 'postfinish') {
+        // Una pausa ya reconocida (issue existente y sync sin cambios, o modos advisory/off con
+        // registro local) degrada a WARN visible: el cierre no debe fallar por deuda conocida en
+        // cada merge posterior. La primera deteccion (issue creado ahora) y todo fallo de sync en
+        // modo required conservan FAIL.
+        const syncFailed = sync.checks.some((entry) => entry.status === 'FAIL');
+        const createdNow = new Set(
+          sync.checks
+            .filter((entry) => entry.id.startsWith('github-issue-') && /creado/.test(entry.summary))
+            .map((entry) => entry.id.slice('github-issue-'.length)),
+        );
+        stateChecks = state.checks.map((entry) => {
+          if (!entry.id.startsWith('plan-') || entry.status !== 'FAIL') return entry;
+          if (syncFailed || createdNow.has(entry.id.slice('plan-'.length))) return entry;
+          return {
+            ...entry,
+            status: 'WARN',
+            summary: `${entry.summary} Pausa ya reconocida en el expediente (modo ${sync.mode}); el merge de este cierre no se revierte.`,
+          };
+        });
+      }
+      const checks = command === 'postfinish' ? [...stateChecks, ...sync.checks] : sync.checks;
       return emit(buildReport(command, checks, { githubMode: sync.mode, evaluation: state.evaluation }), args, write);
     }
 

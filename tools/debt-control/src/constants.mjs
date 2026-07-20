@@ -50,7 +50,14 @@ export const TRIGGERS = Object.freeze({
   EXPIRED_EXCEPTION: 'expired-exception',
   CRITICAL_TRANSVERSAL: 'critical-transversal',
   BLOCKER_MAJOR: 'blocker-major',
+  // No es un sexto disparador de saneamiento: mantiene la pausa cuando un flujo de saneamiento
+  // introdujo deuda confirmada nueva, implementando la condicion de reanudacion de la politica.
+  REMEDIATION_NEW_DEBT: 'remediation-new-debt',
 });
+
+// Horizonte maximo de una excepcion: una expiracion absurdamente lejana seria una excepcion
+// permanente de facto, que la politica prohibe.
+export const MAX_EXCEPTION_DAYS = 365;
 
 export const EXCEPTION_FIELDS = Object.freeze([
   'reason',

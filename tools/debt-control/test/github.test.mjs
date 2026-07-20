@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { checkState, syncGithub, planMarker, renderManagedBlock } from '../src/index.mjs';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+
+import { checkState, resolveMode, syncGithub, planMarker, renderManagedBlock } from '../src/index.mjs';
 import { NOW, readJson, tempCopy } from './helpers.mjs';
 
 function failingRunner() {
@@ -40,6 +43,16 @@ function makeMockGithub() {
   };
   return { issues, calls, runner };
 }
+
+test('el modo auto resuelve a required u off segun el manifest local, sin red', () => {
+  const root = tempCopy('github-off');
+  const config = { github: { mode: 'auto' } };
+  assert.equal(resolveMode(config, root), 'off');
+  mkdirSync(path.join(root, '.project-os/github'), { recursive: true });
+  writeFileSync(path.join(root, '.project-os/github/product-os.json'), '{}\n', 'utf8');
+  assert.equal(resolveMode(config, root), 'required');
+  assert.equal(resolveMode({ github: { mode: 'advisory' } }, root), 'advisory');
+});
 
 test('modo off reporta SKIP y no invoca gh', () => {
   const root = tempCopy('github-off');
@@ -120,4 +133,37 @@ test('el contenido hostil del registro queda como dato inerte del cuerpo', () =>
     evaluation: state.evaluation,
   });
   assert.ok(block.includes('$(rm -rf /)'));
+});
+
+test('un titulo con marcadores administrados no rompe la idempotencia del bloque', () => {
+  const root = tempCopy('github-required');
+  const state = checkState({ root, now: NOW });
+  state.registry.items[0].title = 'Deuda sobre <!-- debt-control:managed:end --> y <!-- debt-control:plan:plan-b -->';
+  const block = renderManagedBlock({
+    config: state.config,
+    plan: state.config.plans[0],
+    items: state.registry.items,
+    evaluation: state.evaluation,
+  });
+  // El unico END real del bloque es el ultimo renderizado, y el marcador del plan ajeno queda neutralizado.
+  assert.equal(block.indexOf('<!-- debt-control:managed:end -->'), block.lastIndexOf('<!-- debt-control:managed:end -->'));
+  assert.ok(!block.includes('<!-- debt-control:plan:plan-b -->'));
+  assert.ok(block.endsWith('<!-- debt-control:managed:end -->'));
+});
+
+test('persistIssueRefs=false no escribe registry.json y lo reporta como WARN', () => {
+  const root = tempCopy('github-required');
+  const state = checkState({ root, now: NOW });
+  const mock = makeMockGithub();
+  const before = JSON.stringify(readJson(root, '.project-os/debt/registry.json'));
+  const result = syncGithub({
+    root,
+    config: state.config,
+    registry: state.registry,
+    evaluation: state.evaluation,
+    runner: mock.runner,
+    persistIssueRefs: false,
+  });
+  assert.equal(JSON.stringify(readJson(root, '.project-os/debt/registry.json')), before);
+  assert.ok(result.checks.some((entry) => entry.id === 'github-refs' && entry.status === 'WARN'));
 });

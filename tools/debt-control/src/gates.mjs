@@ -1,6 +1,6 @@
 import { DEBT_CATEGORIES } from './constants.mjs';
-import { assessmentReflected } from './capture.mjs';
-import { evaluate, hasAllowlistedLabel, resolvePlanForLabels } from './policy.mjs';
+import { assessmentReflected, findMatchingItem } from './capture.mjs';
+import { evaluate, hasAllowlistedLabel, resolvePlanForLabels, resumeConditions } from './policy.mjs';
 import { check } from './report.mjs';
 import { formatErrors, validateAssessment } from './schema.mjs';
 import { DebtError, isConfigured, listAssessments, loadAssessment, loadConfig, loadRegistry } from './store.mjs';
@@ -10,7 +10,11 @@ const NOT_CONFIGURED = 'El motor de deuda no esta configurado (.project-os/debt/
 function loadState(root) {
   const config = loadConfig(root);
   const registry = loadRegistry(root, config);
-  return { config, registry };
+  const assessments = listAssessments(root);
+  const remediationFlows = new Set(
+    assessments.filter(({ assessment }) => assessment?.kind === 'remediation').map(({ flow }) => flow),
+  );
+  return { config, registry, assessments, remediationFlows };
 }
 
 // Gate pre-propose: bloquea nuevos changes de producto de un plan pausado. Con deuda transversal
@@ -26,8 +30,8 @@ export function preProposeGate({ root, labels = [], now = new Date() }) {
   } catch (error) {
     return check('debt-pre-propose', 'FAIL', error.message, error instanceof DebtError ? error.recovery : null);
   }
-  const { config, registry } = state;
-  const evaluation = evaluate({ config, registry, now });
+  const { config, registry, remediationFlows } = state;
+  const evaluation = evaluate({ config, registry, now, remediationFlows });
 
   if (hasAllowlistedLabel(config, labels)) {
     return check('debt-pre-propose', 'PASS', 'El issue lleva una label de saneamiento/seguridad/incidente/rollback permitida durante una pausa.');
@@ -61,8 +65,8 @@ export function preProposeGate({ root, labels = [], now = new Date() }) {
 }
 
 // Gate pre-archive: exige assessment del flujo (aunque sea clean) y bloquea Blockers/Majors del
-// flujo, deuda transversal critica global y deuda nueva sobre un plan pausado desde changes ajenos
-// al saneamiento.
+// flujo que sigan abiertos en el registro, deuda transversal critica global y deuda confirmada
+// nueva que quede abierta sobre un plan pausado, venga de un feature o del propio saneamiento.
 export function preArchiveGate({ root, change, now = new Date() }) {
   if (!isConfigured(root)) {
     return [check('debt-gate', 'SKIP', NOT_CONFIGURED)];
@@ -91,18 +95,37 @@ export function preArchiveGate({ root, change, now = new Date() }) {
   const confirmed = (assessment.candidates ?? []).filter(
     (candidate) => candidate.resolvedPreviously !== true && DEBT_CATEGORIES.includes(candidate.category),
   );
-  const blocking = confirmed.filter((candidate) => candidate.severity === 'blocker' || candidate.severity === 'major');
+  // El assessment es evidencia historica inmutable: si un Blocker/Major capturado ya fue resuelto o
+  // refutado despues (via un flujo de saneamiento), el estado vivo del registro manda y el archive
+  // no queda en deadlock permanente. Solo bloquea lo que sigue abierto.
+  const stillOpen = (candidate) => {
+    const item = candidate.category === 'duplicate'
+      ? registry.items.find((entry) => entry.id === candidate.duplicateOf)
+      : findMatchingItem(registry, candidate);
+    return !item || item.status === 'open';
+  };
+  const blocking = (assessment.candidates ?? []).filter((candidate) => {
+    if (candidate.resolvedPreviously === true) return false;
+    if (DEBT_CATEGORIES.includes(candidate.category)) {
+      return (candidate.severity === 'blocker' || candidate.severity === 'major') && stillOpen(candidate);
+    }
+    if (candidate.category === 'duplicate') {
+      const target = registry.items.find((entry) => entry.id === candidate.duplicateOf);
+      return Boolean(target && target.status === 'open' && (target.severity === 'blocker' || target.severity === 'major'));
+    }
+    return false;
+  });
   if (blocking.length) {
     checks.push(check(
       'debt-gate',
       'FAIL',
-      `El flujo confirma Blockers/Majors abiertos: ${blocking.map((candidate) => `${candidate.title} [${candidate.severity}]`).join('; ')}`,
-      'Corrige los hallazgos en este mismo change (spec primero si cambia comportamiento) o refutalos con evidencia antes de archivar.',
+      `El flujo confirma Blockers/Majors abiertos: ${blocking.map((candidate) => `${candidate.title} [${candidate.severity ?? 'duplicate'}]`).join('; ')}`,
+      'Corrige los hallazgos (spec primero si cambia comportamiento), resuelvelos via un flujo de saneamiento con evidencia o refutalos antes de archivar.',
     ));
     return checks;
   }
 
-  const evaluation = evaluate({ config, registry, now });
+  const evaluation = evaluate({ config, registry, now, remediationFlows: state.remediationFlows });
   if (evaluation.globalTriggers.length) {
     checks.push(check(
       'debt-gate',
@@ -113,20 +136,23 @@ export function preArchiveGate({ root, change, now = new Date() }) {
     return checks;
   }
 
-  if (assessment.kind !== 'remediation') {
-    const pausedWithNewDebt = confirmed.filter((candidate) => evaluation.plans[candidate.planOwner]?.paused);
-    if (pausedWithNewDebt.length) {
-      checks.push(check(
-        'debt-gate',
-        'FAIL',
-        `El change agrega deuda confirmada a un plan pausado: ${pausedWithNewDebt.map((candidate) => candidate.title).join('; ')}`,
-        'Un plan pausado solo admite saneamiento; resuelve la deuda o reclasifica el change como remediation con evidencia.',
-      ));
-      return checks;
-    }
+  // NO GENERAR MAS DEUDA TECNICA: ningun change (tampoco el de saneamiento) archiva deuda confirmada
+  // nueva sobre un plan pausado. La deuda descubierta durante el saneamiento se resuelve, se refuta o
+  // se acepta con excepcion valida antes de archivar.
+  const pausedWithNewDebt = confirmed.filter(
+    (candidate) => evaluation.plans[candidate.planOwner]?.paused && stillOpen(candidate),
+  );
+  if (pausedWithNewDebt.length) {
+    checks.push(check(
+      'debt-gate',
+      'FAIL',
+      `El change agrega deuda confirmada abierta a un plan pausado: ${pausedWithNewDebt.map((candidate) => candidate.title).join('; ')}`,
+      'Resuelve o refuta esa deuda (o registra una excepcion valida) antes de archivar: la regla NO GENERAR MAS DEUDA TECNICA aplica tambien al saneamiento.',
+    ));
+    return checks;
   }
 
-  checks.push(check('debt-gate', 'PASS', 'Sin Blockers/Majors del flujo ni deuda critica transversal abierta.'));
+  checks.push(check('debt-gate', 'PASS', 'Sin Blockers/Majors abiertos del flujo ni deuda critica transversal abierta.'));
   return checks;
 }
 
@@ -146,16 +172,19 @@ export function checkState({ root, now = new Date() }) {
       registry: null,
     };
   }
-  const { config, registry } = state;
-  const evaluation = evaluate({ config, registry, now });
+  const { config, registry, remediationFlows } = state;
+  const evaluation = evaluate({ config, registry, now, remediationFlows });
   const checks = [check('debt-config', 'PASS', `Politica y registro validos (${registry.items.length} item(s)).`)];
 
   for (const plan of Object.values(evaluation.plans)) {
     if (plan.paused) {
+      const pending = resumeConditions({ config, evaluation, planId: plan.id })
+        .filter((condition) => !condition.ok)
+        .map((condition) => condition.detail);
       checks.push(check(
         `plan-${plan.id}`,
         'FAIL',
-        `Plan pausado (${plan.budget}/${plan.threshold} unidades): ${plan.triggers.map((trigger) => trigger.detail).join('; ') || 'pausa por deuda transversal critica'}`,
+        `Plan pausado (${plan.budget}/${plan.threshold} unidades): ${plan.triggers.map((trigger) => trigger.detail).join('; ') || 'pausa por deuda transversal critica'}. Condiciones de reanudacion pendientes: ${pending.join('; ') || 'ninguna (reevalua tras sincronizar)'}.`,
         'Ejecuta el issue de saneamiento del plan; la reanudacion exige evidencia, no edicion del registro.',
       ));
     } else {

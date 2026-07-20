@@ -79,7 +79,7 @@ test('pre-archive: un Blocker/Major confirmado del flujo bloquea el archive', ()
   assert.match(gate.summary, /major/i);
 });
 
-test('pre-archive: deuda nueva sobre plan pausado falla salvo remediation', () => {
+test('pre-archive: deuda nueva abierta sobre plan pausado falla tambien en saneamiento', () => {
   const root = tempCopy('threshold-reached');
   const newDebt = {
     schemaVersion: 1,
@@ -105,9 +105,87 @@ test('pre-archive: deuda nueva sobre plan pausado falla salvo remediation', () =
   assert.equal(gate.status, 'FAIL');
   assert.match(gate.summary, /plan pausado/);
 
-  const remediation = { ...newDebt, kind: 'remediation' };
+  // NO GENERAR MAS DEUDA TECNICA: el flujo de saneamiento que confirma deuda nueva tampoco archiva.
+  const remediation = { ...newDebt, kind: 'remediation', candidates: [{ ...newDebt.candidates[0], title: 'Atajo descubierto durante saneamiento', artifact: 'src/otro-mas.mjs' }] };
   capture({ root, flow: 'saneamiento-pausa', input: remediation, now: NOW });
   const remediationResults = preArchiveGate({ root, change: 'saneamiento-pausa', now: NOW });
   const remediationGate = remediationResults.find((entry) => entry.id === 'debt-gate');
-  assert.equal(remediationGate.status, 'PASS');
+  assert.equal(remediationGate.status, 'FAIL');
+  assert.match(remediationGate.summary, /plan pausado/);
+
+  // Resolver esa deuda nueva en otro flujo de saneamiento desbloquea el archive del anterior.
+  const registry = readJson(root, '.project-os/debt/registry.json');
+  const nuevo = registry.items.find((item) => item.artifact === 'src/otro-mas.mjs');
+  capture({
+    root,
+    flow: 'saneamiento-cierra',
+    input: { schemaVersion: 1, date: '2026-07-20', kind: 'remediation', result: 'clean', candidates: [], resolves: [{ id: nuevo.id, evidence: 'atajo eliminado con tests' }] },
+    now: NOW,
+  });
+  const unlocked = preArchiveGate({ root, change: 'saneamiento-pausa', now: NOW });
+  assert.equal(unlocked.find((entry) => entry.id === 'debt-gate').status, 'PASS');
+});
+
+test('pre-archive: un Major capturado y luego resuelto no deja el archive en bloqueo permanente', () => {
+  const root = tempCopy('refuted-candidates');
+  const major = {
+    schemaVersion: 1,
+    date: '2026-07-20',
+    kind: 'feature',
+    result: 'debt',
+    candidates: [{
+      title: 'Boton muerto en pantalla X',
+      artifact: 'src/pantalla-x.mjs',
+      source: 'revision adversarial',
+      category: 'defect',
+      severity: 'major',
+      transversal: false,
+      critical: false,
+      planOwner: 'plan-a',
+      evidence: [{ type: 'repro', ref: 'click sin efecto', date: '2026-07-20' }],
+      verification: { method: 'reproduccion', result: 'el boton no responde', date: '2026-07-20' },
+    }],
+  };
+  capture({ root, flow: 'change-con-major', input: major, now: NOW });
+  const blocked = preArchiveGate({ root, change: 'change-con-major', now: NOW });
+  assert.equal(blocked.find((entry) => entry.id === 'debt-gate').status, 'FAIL');
+
+  const registry = readJson(root, '.project-os/debt/registry.json');
+  const item = registry.items.find((entry) => entry.artifact === 'src/pantalla-x.mjs');
+  capture({
+    root,
+    flow: 'saneamiento-major',
+    input: { schemaVersion: 1, date: '2026-07-20', kind: 'remediation', result: 'clean', candidates: [], resolves: [{ id: item.id, evidence: 'boton corregido; test de interaccion agregado' }] },
+    now: NOW,
+  });
+  const unlocked = preArchiveGate({ root, change: 'change-con-major', now: NOW });
+  assert.equal(unlocked.find((entry) => entry.id === 'debt-gate').status, 'PASS');
+});
+
+test('pre-archive: un duplicate de un Major abierto bloquea el archive de ese flujo', () => {
+  const root = tempCopy('major-immediate');
+  const registry = readJson(root, '.project-os/debt/registry.json');
+  const majorId = registry.items[0].id;
+  capture({
+    root,
+    flow: 'flujo-duplicado',
+    input: {
+      schemaVersion: 1,
+      date: '2026-07-20',
+      kind: 'feature',
+      result: 'clean',
+      candidates: [{
+        title: 'Reaparicion del hallazgo mayor',
+        artifact: 'src/example-aa02.mjs',
+        source: 'revision',
+        category: 'duplicate',
+        duplicateOf: majorId,
+        evidence: [{ type: 'review', ref: 'mismo sintoma', date: '2026-07-20' }],
+        verification: { method: 'comparacion con el registro', result: 'es el mismo hallazgo vigente', date: '2026-07-20' },
+      }],
+    },
+    now: NOW,
+  });
+  const results = preArchiveGate({ root, change: 'flujo-duplicado', now: NOW });
+  assert.equal(results.find((entry) => entry.id === 'debt-gate').status, 'FAIL');
 });

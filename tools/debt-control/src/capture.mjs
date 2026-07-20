@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 
-import { DEBT_CATEGORIES } from './constants.mjs';
+import { DEBT_CATEGORIES, MAX_EXCEPTION_DAYS } from './constants.mjs';
 import { contentHash, fingerprint } from './fingerprint.mjs';
 import { formatErrors, validateAssessment } from './schema.mjs';
 import {
@@ -24,8 +24,9 @@ function candidateId(candidate) {
 
 // Para deduplicar, un candidato refutado o resuelto-previamente debe encontrar el item vigente que
 // representa; su categoria describe el desenlace, no la identidad, asi que el ID se calcula con la
-// categoria de deuda del item existente cuando lo hay.
-function matchExisting(registry, candidate) {
+// categoria de deuda del item existente cuando lo hay. Exportada para que el gate de archive cruce
+// candidatos del assessment inmutable contra el estado vivo del registro.
+export function findMatchingItem(registry, candidate) {
   for (const category of [candidate.category, ...DEBT_CATEGORIES, 'optional-improvement']) {
     const id = fingerprint({ category, artifact: candidate.artifact, title: candidate.title });
     const item = registry.items.find((entry) => entry.id === id);
@@ -49,7 +50,7 @@ export function applyAssessmentToRegistry({ registry, assessment, now = new Date
   const changes = [];
 
   for (const candidate of assessment.candidates ?? []) {
-    const existing = matchExisting(registry, candidate);
+    const existing = findMatchingItem(registry, candidate);
 
     if (candidate.category === 'duplicate') {
       const target = registry.items.find((entry) => entry.id === candidate.duplicateOf);
@@ -144,6 +145,13 @@ export function applyAssessmentToRegistry({ registry, assessment, now = new Date
     if (item.status !== 'open' && item.status !== 'accepted-exception') {
       throw new DebtError(`El item ${entry.id} no esta abierto; no admite excepcion.`, {
         recovery: 'Solo items abiertos aceptan excepciones.',
+      });
+    }
+    const horizon = new Date(`${assessment.date}T00:00:00.000Z`);
+    horizon.setUTCDate(horizon.getUTCDate() + MAX_EXCEPTION_DAYS);
+    if (new Date(`${entry.expiresOn}T00:00:00.000Z`).getTime() > horizon.getTime()) {
+      throw new DebtError(`La excepcion de ${entry.id} expira mas alla de ${MAX_EXCEPTION_DAYS} dias; una excepcion permanente de facto no es admisible.`, {
+        recovery: `Usa una expiracion dentro de ${MAX_EXCEPTION_DAYS} dias y renuevala con nueva aprobacion si hace falta.`,
       });
     }
     const exception = {

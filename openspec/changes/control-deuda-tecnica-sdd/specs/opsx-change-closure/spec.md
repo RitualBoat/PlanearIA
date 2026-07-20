@@ -12,11 +12,19 @@ WARN SHALL reflejarse en la salida con su causa sin alterar el exit code. Ningun
 revertir el merge ya realizado ni presentarse como exito cuando no lo es. Si el motor no esta
 configurado, el cierre SHALL reportar la comprobacion como omitida de forma explicita.
 
-#### Scenario: Cierre con deuda que cruza el umbral
+#### Scenario: Cierre que detecta una pausa aun no reconocida
 
-- **WHEN** el merge remoto termina y el registro cruza un trigger de saneamiento
-- **THEN** el cierre reporta el trigger, sincroniza o nombra el issue de remediacion segun el modo
+- **WHEN** el merge remoto termina, un plan esta pausado y su expediente aun no lo refleja (el issue de
+  remediacion se crea en esta ejecucion o la sincronizacion requerida falla)
+- **THEN** el cierre reporta el trigger y el issue o el fallo de sincronizacion
 - **AND** termina con exit code distinto de cero explicando que el merge ya ocurrio y que sigue
+
+#### Scenario: Cierre con pausa ya reconocida
+
+- **WHEN** el merge remoto termina y los planes pausados ya tienen su expediente al dia (issue de
+  remediacion existente y sincronizacion sin cambios, o modos advisory/off con registro local)
+- **THEN** la comprobacion reporta la pausa como WARN visible con su causa
+- **AND** el cierre termina con exito sin presentar la pausa como resuelta
 
 #### Scenario: Cierre limpio
 

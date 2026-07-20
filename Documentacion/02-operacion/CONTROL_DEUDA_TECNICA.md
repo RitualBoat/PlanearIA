@@ -45,11 +45,19 @@ comparten veredicto (`PASS`/`FAIL`/`WARN`/`SKIP`), causa y recuperacion.
    `false-positive` o `duplicate`. Todo candidato exige `verification` con metodo, resultado y fecha:
    un warning de scanner sin reproducir no entra al registro ni autoriza correcciones automaticas.
 2. Escribe el assessment (ver `tools/debt-control/schema/assessment.schema.json`) y capturalo con
-   `debt:capture`. Un cierre sin hallazgos usa `result: "clean"` y `candidates: []`.
+   `debt:capture`. Un cierre sin hallazgos usa `result: "clean"` y `candidates: []`. Corrige los
+   Blockers/Majors del flujo ANTES de capturarlos como confirmados; si capturas uno, el assessment es
+   inmutable y el desbloqueo solo llega resolviendolo o refutandolo en el registro via un flujo de
+   saneamiento (`resolves`/`false-positive`), nunca editando la evidencia.
 3. `npm run openspec:ready:archive` ejecuta `debt-gate`: exige el assessment y falla con
-   Blockers/Majors abiertos del flujo o deuda transversal critica.
+   Blockers/Majors del flujo que sigan abiertos en el registro, deuda transversal critica o deuda
+   confirmada nueva abierta sobre un plan pausado (tambien en flujos de saneamiento).
 4. `npm run opsx:finish` ejecuta la red de seguridad `postfinish` tras el merge: recalcula el estado y
-   sincroniza el expediente GitHub. Un FAIL no des-mergea, pero el cierre no se reporta verde.
+   sincroniza el expediente GitHub sin persistir backrefs (corre sobre la rama protegida). La primera
+   deteccion de una pausa (issue creado en esa ejecucion) o un fallo de sync en modo `required`
+   producen FAIL con exit distinto de cero; una pausa ya reconocida se reporta como WARN visible y el
+   cierre termina. Los backrefs de issue se persisten despues con `npm run debt:sync` desde una rama
+   de trabajo.
 
 ## Politica (aprobada en #128)
 
@@ -68,13 +76,14 @@ issues con labels de la allowlist (`debt-remediation`, `security`, `incident`, `
 saneamiento (uno por plan, idempotente, marcador `<!-- debt-control:plan:<id> -->`) impone la regla
 NO GENERAR MAS DEUDA TECNICA y exige revisiones adversariales hasta resolver Blockers y Majors.
 
-La reanudacion exige todas estas condiciones, verificables con `debt:check`:
+La reanudacion exige todas estas condiciones; `debt:check` las lista una a una en cada plan pausado:
 
 - La deuda objetivo fue resuelta (`resolves` con evidencia), refutada (`false-positive`) o aceptada con
-  una excepcion valida (motivo, owner, aprobador, expiracion ISO, recuperacion).
+  una excepcion valida (motivo, owner, aprobador, expiracion ISO dentro de 365 dias, recuperacion).
 - El presupuesto del plan quedo bajo el umbral.
 - No quedan Blockers, Majors ni excepciones expiradas.
-- El assessment del flujo de saneamiento (`kind: "remediation"`) no confirma deuda nueva.
+- El saneamiento no introdujo deuda nueva: un item abierto nacido en un flujo `remediation` mantiene
+  la pausa (trigger `remediation-new-debt`) aunque el presupuesto haya bajado del umbral.
 
 ## Ruteo de issues a planes
 

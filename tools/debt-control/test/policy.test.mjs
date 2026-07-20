@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { evaluate, resolvePlanForLabels, hasAllowlistedLabel, unitsFor } from '../src/index.mjs';
+import { evaluate, resolvePlanForLabels, hasAllowlistedLabel, resumeConditions, unitsFor } from '../src/index.mjs';
 import { loadConfig, loadRegistry } from '../src/store.mjs';
 import { fixtureRoot, NOW } from './helpers.mjs';
 
@@ -82,6 +82,28 @@ test('cinco flujos con deuda residual disparan el trigger de flujos', () => {
   const evaluation = evaluate({ config, registry, now: NOW });
   assert.equal(evaluation.plans['plan-a'].flowsWithResidualDebt, 5);
   assert.ok(evaluation.plans['plan-a'].pausedBy.includes('flows-with-debt'));
+});
+
+test('deuda nueva nacida en un flujo de saneamiento mantiene la pausa aunque el presupuesto baje', () => {
+  const { config, registry } = stateOf('under-budget');
+  // Solo queda un item abierto (1 unidad, bajo el umbral), pero nacio en un flujo remediation.
+  registry.items = [registry.items[0]];
+  registry.items[0].occurrences = [{ flow: 'saneamiento-x', date: '2026-07-15' }];
+  const sinFlag = evaluate({ config, registry, now: NOW });
+  assert.equal(sinFlag.plans['plan-a'].paused, false);
+  const evaluation = evaluate({ config, registry, now: NOW, remediationFlows: new Set(['saneamiento-x']) });
+  assert.equal(evaluation.plans['plan-a'].paused, true);
+  assert.deepEqual(evaluation.plans['plan-a'].pausedBy, ['remediation-new-debt']);
+});
+
+test('resumeConditions reporta la condicion pendiente exacta', () => {
+  const { config, registry } = stateOf('under-budget');
+  registry.items = [registry.items[0]];
+  registry.items[0].occurrences = [{ flow: 'saneamiento-x', date: '2026-07-15' }];
+  const evaluation = evaluate({ config, registry, now: NOW, remediationFlows: new Set(['saneamiento-x']) });
+  const pending = resumeConditions({ config, evaluation, planId: 'plan-a' }).filter((condition) => !condition.ok);
+  assert.equal(pending.length, 1);
+  assert.match(pending[0].detail, /remediacion no introdujo deuda/);
 });
 
 test('ruteo por labels: primera label mapeada gana, default cubre el resto', () => {

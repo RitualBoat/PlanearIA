@@ -26,8 +26,9 @@ function isCriticalTransversal(item) {
 }
 
 // Evaluacion pura del registro contra la politica. No lee disco ni muta nada: el estado de pausa es
-// una funcion derivada, no un flag editable.
-export function evaluate({ config, registry, now = new Date() }) {
+// una funcion derivada, no un flag editable. `remediationFlows` (Set de nombres de flujo con
+// assessment kind=remediation) permite derivar si un saneamiento introdujo deuda nueva.
+export function evaluate({ config, registry, now = new Date(), remediationFlows = new Set() }) {
   const items = registry.items ?? [];
   const openDebt = items.filter(isOpenDebt);
   const expiredExceptions = items.filter(
@@ -60,6 +61,15 @@ export function evaluate({ config, registry, now = new Date() }) {
     }
     if (planExpired.length) {
       triggers.push({ id: TRIGGERS.EXPIRED_EXCEPTION, detail: `Excepciones vencidas: ${planExpired.map((item) => item.id).join(', ')}` });
+    }
+    // NO GENERAR MAS DEUDA TECNICA: un item abierto nacido en un flujo de saneamiento mantiene la
+    // pausa aunque el presupuesto haya bajado del umbral; la reanudacion no procede con deuda nueva.
+    const bornInRemediation = planOpen.filter((item) => remediationFlows.has(item.occurrences?.[0]?.flow));
+    if (bornInRemediation.length) {
+      triggers.push({
+        id: TRIGGERS.REMEDIATION_NEW_DEBT,
+        detail: `El saneamiento introdujo deuda nueva sin resolver: ${bornInRemediation.map((item) => item.id).join(', ')}`,
+      });
     }
 
     plans[plan.id] = {
@@ -114,34 +124,16 @@ export function hasAllowlistedLabel(config, labels) {
 }
 
 // Condiciones de reanudacion para reportarlas una a una; el plan reanuda cuando todas se cumplen.
-export function resumeConditions({ config, registry, evaluation, planId, remediationAssessment = null }) {
+// Derivadas de la misma evaluacion que decide la pausa, para que no puedan divergir.
+export function resumeConditions({ config, evaluation, planId }) {
   const plan = evaluation.plans[planId];
   if (!plan) return [{ ok: false, detail: `Plan desconocido: ${planId}` }];
-  const conditions = [];
-  conditions.push({
-    ok: !plan.triggers.some((trigger) => trigger.id === TRIGGERS.BLOCKER_MAJOR),
-    detail: 'Sin Blockers ni Majors abiertos del plan',
-  });
-  conditions.push({
-    ok: plan.budget < config.budget.threshold,
-    detail: `Presupuesto ${plan.budget} por debajo del umbral ${config.budget.threshold}`,
-  });
-  conditions.push({
-    ok: !plan.triggers.some((trigger) => trigger.id === TRIGGERS.EXPIRED_EXCEPTION),
-    detail: 'Sin excepciones expiradas',
-  });
-  conditions.push({
-    ok: evaluation.criticalTransversalIds.length === 0,
-    detail: 'Sin deuda transversal critica abierta',
-  });
-  if (remediationAssessment) {
-    const confirmed = (remediationAssessment.candidates ?? []).filter(
-      (candidate) => candidate.resolvedPreviously !== true && DEBT_CATEGORIES.includes(candidate.category),
-    );
-    conditions.push({
-      ok: confirmed.length === 0,
-      detail: 'La remediacion no introdujo deuda confirmada nueva',
-    });
-  }
-  return conditions;
+  const lacks = (id) => !plan.triggers.some((trigger) => trigger.id === id);
+  return [
+    { ok: lacks(TRIGGERS.BLOCKER_MAJOR), detail: 'Sin Blockers ni Majors abiertos del plan' },
+    { ok: plan.budget < config.budget.threshold, detail: `Presupuesto ${plan.budget} por debajo del umbral ${config.budget.threshold}` },
+    { ok: lacks(TRIGGERS.EXPIRED_EXCEPTION), detail: 'Sin excepciones expiradas' },
+    { ok: evaluation.criticalTransversalIds.length === 0, detail: 'Sin deuda transversal critica abierta' },
+    { ok: lacks(TRIGGERS.REMEDIATION_NEW_DEBT), detail: 'La remediacion no introdujo deuda confirmada nueva' },
+  ];
 }

@@ -1,12 +1,16 @@
 import { CHECK_STATUSES, EXIT_CODES } from './constants.mjs';
 
-// Misma redaccion de secretos que el gate de readiness: tokens, claves y credenciales embebidas en
-// URLs nunca llegan a issues, prompts ni logs.
+// Redaccion de secretos antes de emitir cualquier texto hacia prompts, issues o logs. Cubre palabras
+// clave con separador (=, : o espacio), prefijos de token conocidos (GitHub, AWS, JWT) y credenciales
+// embebidas en URLs. Preferimos redactar de mas a filtrar de menos.
 export function sanitize(value = '') {
   return String(value)
-    .replace(/(Bearer|token|secret|password|passwd|pwd|key)=?[A-Za-z0-9._~+/=-]+/gi, '$1=[redacted]')
+    .replace(/\b(gh[pousr]_|github_pat_)[A-Za-z0-9_]{8,}/g, '[redacted]')
+    .replace(/\bAKIA[0-9A-Z]{16}\b/g, '[redacted]')
+    .replace(/\beyJ[A-Za-z0-9_-]{10,}(?:\.[A-Za-z0-9_-]+){1,2}/g, '[redacted]')
+    .replace(/\b(Bearer|token|secret|password|passwd|pwd|api[-_]?key|key)([=:]\s*|\s+)[A-Za-z0-9._~+/=-]{6,}/gi, '$1$2[redacted]')
     .replace(/mongodb(\+srv)?:\/\/[^@\s]+@/gi, 'mongodb$1://[redacted]@')
-    .replace(/https?:\/\/[^@\s/]+@/gi, 'https://[redacted]@');
+    .replace(/(https?|postgres(?:ql)?|redis|amqp):\/\/[^@\s/]+@/gi, '$1://[redacted]@');
 }
 
 export function check(id, status, summary, recovery = null) {

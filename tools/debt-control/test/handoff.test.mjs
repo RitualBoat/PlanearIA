@@ -24,10 +24,11 @@ test('el prompt de relevo es reproducible y contiene las secciones obligatorias'
   assert.ok(prompt.includes('PENDIENTE: aun no existe issue de saneamiento'));
 });
 
-test('el prompt redacta secretos presentes en la evidencia', () => {
+test('el prompt redacta secretos presentes en la evidencia (formatos reales)', () => {
   const root = tempCopy('threshold-reached');
   const registry = readJson(root, '.project-os/debt/registry.json');
-  registry.items[0].evidence[0].ref = 'curl -H "Authorization: Bearer abc123SECRETO" https://user:pass@example.test/api';
+  registry.items[0].evidence[0].ref = 'curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.abcdef.ghijkl" https://user:pass@example.test/api';
+  registry.items[1].evidence[0].ref = 'gh auth con ghp_AbCdEf0123456789 y AKIAABCDEFGHIJKLMNOP; password: hunter2seguro';
   writeFileSync(path.join(root, '.project-os/debt/registry.json'), `${JSON.stringify(registry, null, 2)}\n`, 'utf8');
   const state = checkState({ root, now: NOW });
   const prompt = renderHandoff({
@@ -36,7 +37,10 @@ test('el prompt redacta secretos presentes en la evidencia', () => {
     evaluation: state.evaluation,
     planId: 'plan-a',
   });
-  assert.ok(!prompt.includes('abc123SECRETO'));
+  assert.ok(!prompt.includes('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'));
+  assert.ok(!prompt.includes('ghp_AbCdEf0123456789'));
+  assert.ok(!prompt.includes('AKIAABCDEFGHIJKLMNOP'));
+  assert.ok(!prompt.includes('hunter2seguro'));
   assert.ok(!prompt.includes('user:pass@'));
   assert.ok(prompt.includes('[redacted]'));
 });

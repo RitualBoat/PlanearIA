@@ -135,6 +135,23 @@ test('las excepciones se aplican via capture y quedan validadas', () => {
   assert.equal(state.evaluation.plans['plan-a'].budget, 0);
 });
 
+test('una excepcion con expiracion mas alla del horizonte maximo es rechazada', () => {
+  const root = tempCopy('second-run');
+  const input = readJson(root, 'input/assessment.json');
+  capture({ root, flow: 'change-uno', input, now: NOW });
+  const registry = readJson(root, '.project-os/debt/registry.json');
+  const id = registry.items[0].id;
+  const permanent = {
+    schemaVersion: 1,
+    date: '2026-07-20',
+    kind: 'remediation',
+    result: 'clean',
+    candidates: [],
+    exceptions: [{ id, reason: 'x', owner: 'x', approvedBy: 'x', expiresOn: '9999-12-31', recovery: 'x' }],
+  };
+  assert.throws(() => capture({ root, flow: 'excepcion-permanente', input: permanent, now: NOW }), /permanente de facto/);
+});
+
 test('el fingerprint es estable ante mayusculas y espacios', () => {
   const base = fingerprint({ category: 'technical-debt', artifact: 'src/parser.mjs', title: 'Atajo temporal en el parser' });
   const variant = fingerprint({ category: 'technical-debt', artifact: ' SRC/parser.mjs ', title: 'atajo  temporal en el PARSER' });

@@ -35,9 +35,13 @@ forma explicita, nunca como exito implicito.
 
 Cuando el motor de deuda esta configurado, el gate read-only de archive SHALL exigir un assessment
 valido del flujo, incluso con resultado `clean`, y SHALL fallar cuando el flujo tenga Blockers o
-Majors abiertos, cuando exista deuda transversal critica abierta o cuando un change ajeno al
-saneamiento agregue deuda confirmada nueva a un plan pausado. El gate SHALL seguir siendo read-only y
-SHALL NOT ejecutar contenido declarado por el registro de deuda.
+Majors que sigan abiertos en el registro, cuando exista deuda transversal critica abierta o cuando
+cualquier change (incluido el de saneamiento, por la regla NO GENERAR MAS DEUDA TECNICA) deje deuda
+confirmada nueva abierta sobre un plan pausado. Como el assessment es evidencia historica inmutable,
+el bloqueo SHALL evaluarse contra el estado vivo del registro: un Blocker o Major capturado y despues
+resuelto, refutado o aceptado con excepcion valida SHALL NOT dejar el archive en bloqueo permanente.
+El gate SHALL seguir siendo read-only y SHALL NOT ejecutar contenido declarado por el registro de
+deuda.
 
 #### Scenario: Cierre limpio
 
@@ -48,6 +52,12 @@ SHALL NOT ejecutar contenido declarado por el registro de deuda.
 
 - **WHEN** el assessment del change confirma un Blocker o Major abierto
 - **THEN** el gate de archive falla con el item, su evidencia y la recuperacion
+
+#### Scenario: Blocker capturado y despues resuelto
+
+- **WHEN** el assessment confirmo un Blocker o Major que un flujo de saneamiento posterior resolvio o
+  refuto con evidencia en el registro
+- **THEN** el gate de archive deja de bloquear sin editar la evidencia historica
 
 #### Scenario: Assessment ausente
 

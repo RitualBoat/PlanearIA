@@ -1,16 +1,19 @@
 {
   "schemaVersion": 1,
-  "items": [
+  "date": "2026-07-20",
+  "kind": "baseline",
+  "result": "debt",
+  "notes": "Baseline verificable de la deuda actual de PlanearIA (#128). Cada candidato fue reproducido o refutado con comandos del 2026-07-20; los historicos ya corregidos quedan como resolvedPreviously y no consumen presupuesto. El hueco de breakpoints de la review de #79 esta representado por el item de useWindowDimensions (issue #106), no como item aparte.",
+  "candidates": [
     {
-      "id": "debt-3d3ea5ba87ac",
       "title": "27 archivos consumen useWindowDimensions directo en vez de useBreakpoint",
-      "description": "27 archivos consumen useWindowDimensions directo en vez de useBreakpoint",
+      "artifact": "src/** (27 archivos; issue #106)",
+      "source": "review adversarial de breakpoints-reactivos (#79) y seguimiento #106",
       "category": "technical-debt",
       "severity": "minor",
       "transversal": false,
       "critical": false,
       "planOwner": "uxui-navegacion-global",
-      "artifact": "src/** (27 archivos; issue #106)",
       "consequence": "Dos fuentes de verdad de breakpoint conviven; una pantalla puede responder a un rango distinto del shell.",
       "remediation": "Ejecutar el issue #106: migrar los 27 consumidores a useBreakpoint.",
       "evidence": [
@@ -25,29 +28,21 @@
           "date": "2026-07-20"
         }
       ],
-      "occurrences": [
-        {
-          "flow": "baseline-planearia-2026-07",
-          "date": "2026-07-20"
-        }
-      ],
-      "issue": null,
-      "status": "open",
-      "exception": null,
-      "createdAt": "2026-07-20",
-      "updatedAt": "2026-07-20",
-      "resolution": null
+      "verification": {
+        "method": "conteo reproducible en el arbol actual",
+        "result": "27 archivos, coincide con el titulo del issue #106 abierto",
+        "date": "2026-07-20"
+      }
     },
     {
-      "id": "debt-b279f64f815b",
       "title": "Rollout de theming runtime incompleto: pantallas legacy en LEGACY_COLORS_ROLLOUT",
-      "description": "Rollout de theming runtime incompleto: pantallas legacy en LEGACY_COLORS_ROLLOUT",
+      "artifact": ".eslintrc.cjs#LEGACY_COLORS_ROLLOUT",
+      "source": "review adversarial de theming-runtime (#78, hallazgo H12a)",
       "category": "technical-debt",
       "severity": "minor",
       "transversal": false,
       "critical": false,
       "planOwner": "uxui-navegacion-global",
-      "artifact": ".eslintrc.cjs#LEGACY_COLORS_ROLLOUT",
       "consequence": "Las pantallas legacy congelan el tema al importar COLORS estatico; cambiar el tema no las repinta.",
       "remediation": "Politica D8 fix-on-touch: toda pantalla tocada sale de la lista; el registro del rollout vive en .eslintrc.cjs.",
       "evidence": [
@@ -57,29 +52,21 @@
           "date": "2026-07-20"
         }
       ],
-      "occurrences": [
-        {
-          "flow": "baseline-planearia-2026-07",
-          "date": "2026-07-20"
-        }
-      ],
-      "issue": null,
-      "status": "open",
-      "exception": null,
-      "createdAt": "2026-07-20",
-      "updatedAt": "2026-07-20",
-      "resolution": null
+      "verification": {
+        "method": "lectura del override vigente de ESLint",
+        "result": "la lista de rollout sigue poblada y la regla activa",
+        "date": "2026-07-20"
+      }
     },
     {
-      "id": "debt-5862d25288fa",
       "title": "expo-blur y fuente de marca diferidos en tokens-completos",
-      "description": "expo-blur y fuente de marca diferidos en tokens-completos",
+      "artifact": "package.json (sin expo-blur; fuente de marca no adoptada)",
+      "source": "review de tokens-completos (#80)",
       "category": "optional-improvement",
       "severity": "minor",
       "transversal": false,
       "critical": false,
       "planOwner": "uxui-navegacion-global",
-      "artifact": "package.json (sin expo-blur; fuente de marca no adoptada)",
       "consequence": "Sin costo actual: el fallback solido es el comportamiento aprobado hasta medir blur (regla 1.9.4).",
       "remediation": "Evaluar expo-blur solo tras medicion de performance segun la regla 1.9.4 del plan UX/UI.",
       "evidence": [
@@ -89,29 +76,21 @@
           "date": "2026-07-20"
         }
       ],
-      "occurrences": [
-        {
-          "flow": "baseline-planearia-2026-07",
-          "date": "2026-07-20"
-        }
-      ],
-      "issue": null,
-      "status": "open",
-      "exception": null,
-      "createdAt": "2026-07-20",
-      "updatedAt": "2026-07-20",
-      "resolution": null
+      "verification": {
+        "method": "lectura de la decision archivada y de package.json",
+        "result": "diferimiento deliberado documentado con criterio de activacion; no es incumplimiento",
+        "date": "2026-07-20"
+      }
     },
     {
-      "id": "debt-6c9672a48059",
       "title": "Decision de riesgo de xlsx pendiente (advisory high sin fix upstream)",
-      "description": "Decision de riesgo de xlsx pendiente (advisory high sin fix upstream)",
+      "artifact": "package.json#xlsx",
+      "source": "npm audit y plan harness Ola 3 (decision-riesgo-xlsx, OQ4)",
       "category": "decision-required",
       "severity": "minor",
       "transversal": false,
       "critical": false,
       "planOwner": "preparacion-operativa-sdd-harness",
-      "artifact": "package.json#xlsx",
       "consequence": "Un archivo malicioso importado puede congelar o comprometer la app docente; no hay mitigaciones de tamano/tiempo implementadas.",
       "remediation": "Ejecutar el change decision-riesgo-xlsx: mantener con mitigaciones, aislar, migrar o reemplazar, con owner y fecha.",
       "evidence": [
@@ -121,29 +100,21 @@
           "date": "2026-07-20"
         }
       ],
-      "occurrences": [
-        {
-          "flow": "baseline-planearia-2026-07",
-          "date": "2026-07-20"
-        }
-      ],
-      "issue": 129,
-      "status": "open",
-      "exception": null,
-      "createdAt": "2026-07-20",
-      "updatedAt": "2026-07-20",
-      "resolution": null
+      "verification": {
+        "method": "npm audit sobre el lockfile actual",
+        "result": "advisory high vigente sin fix disponible; la decision del plan sigue pendiente",
+        "date": "2026-07-20"
+      }
     },
     {
-      "id": "debt-d73a5844fae3",
       "title": "Advisories transitivas pendientes de la cadencia de dependencias Expo",
-      "description": "Advisories transitivas pendientes de la cadencia de dependencias Expo",
+      "artifact": "package-lock.json",
+      "source": "npm audit y plan harness Ola 3 (cadencia-dependencias-expo)",
       "category": "technical-debt",
       "severity": "minor",
       "transversal": false,
       "critical": false,
       "planOwner": "preparacion-operativa-sdd-harness",
-      "artifact": "package-lock.json",
       "consequence": "21 advisories (3 high: xlsx, ws, form-data; 17 moderate del arbol Expo) sin ventana de actualizacion definida; los parches compatibles no se aplican.",
       "remediation": "Ejecutar cadencia-dependencias-expo: separar parches compatibles de upgrades de SDK y fijar cadencia con rollback.",
       "evidence": [
@@ -153,29 +124,21 @@
           "date": "2026-07-20"
         }
       ],
-      "occurrences": [
-        {
-          "flow": "baseline-planearia-2026-07",
-          "date": "2026-07-20"
-        }
-      ],
-      "issue": 129,
-      "status": "open",
-      "exception": null,
-      "createdAt": "2026-07-20",
-      "updatedAt": "2026-07-20",
-      "resolution": null
+      "verification": {
+        "method": "npm audit sobre el lockfile actual",
+        "result": "advisories reproducidas; ninguna cadencia vigente las procesa",
+        "date": "2026-07-20"
+      }
     },
     {
-      "id": "debt-2887d890144e",
       "title": "Checks del harness en continue-on-error (paridad y gates sin bloquear)",
-      "description": "Checks del harness en continue-on-error (paridad y gates sin bloquear)",
+      "artifact": ".github/workflows/agent-harness-parity.yml",
+      "source": "plan harness Ola 2 (endurecer-harness-ci) y lectura del workflow",
       "category": "technical-debt",
       "severity": "minor",
       "transversal": false,
       "critical": false,
       "planOwner": "preparacion-operativa-sdd-harness",
-      "artifact": ".github/workflows/agent-harness-parity.yml",
       "consequence": "El drift reproducible del harness no bloquea PRs; se descubre tarde, durante changes de producto.",
       "remediation": "Ejecutar endurecer-harness-ci: retirar continue-on-error solo de los checks estabilizados con rollback documentado.",
       "evidence": [
@@ -185,29 +148,21 @@
           "date": "2026-07-20"
         }
       ],
-      "occurrences": [
-        {
-          "flow": "baseline-planearia-2026-07",
-          "date": "2026-07-20"
-        }
-      ],
-      "issue": 129,
-      "status": "open",
-      "exception": null,
-      "createdAt": "2026-07-20",
-      "updatedAt": "2026-07-20",
-      "resolution": null
+      "verification": {
+        "method": "lectura del workflow vigente",
+        "result": "los checks siguen en modo soft; el cutover documentado no se ha ejecutado",
+        "date": "2026-07-20"
+      }
     },
     {
-      "id": "debt-f466da64b58a",
       "title": "Mojibake vigente en codigo y tests de producto",
-      "description": "Mojibake vigente en codigo y tests de producto",
+      "artifact": "src/components/editor/sections/SeccionCurricular.tsx y 4+ archivos mas",
+      "source": "plan harness Ola 3 (baseline-knip-mojibake) y grep del arbol actual",
       "category": "technical-debt",
       "severity": "minor",
       "transversal": false,
       "critical": false,
       "planOwner": "preparacion-operativa-sdd-harness",
-      "artifact": "src/components/editor/sections/SeccionCurricular.tsx y 4+ archivos mas",
       "consequence": "Textos visibles al docente con codificacion rota (p.ej. InclusiA3n) y riesgo de que agentes propaguen la basura al editar.",
       "remediation": "Corregir los archivos afectados y proteger con un check simple de codificacion (parte de baseline-knip-mojibake).",
       "evidence": [
@@ -217,29 +172,21 @@
           "date": "2026-07-20"
         }
       ],
-      "occurrences": [
-        {
-          "flow": "baseline-planearia-2026-07",
-          "date": "2026-07-20"
-        }
-      ],
-      "issue": 129,
-      "status": "open",
-      "exception": null,
-      "createdAt": "2026-07-20",
-      "updatedAt": "2026-07-20",
-      "resolution": null
+      "verification": {
+        "method": "grep reproducible de patrones de doble codificacion",
+        "result": "5+ archivos de src con mojibake real en strings de producto y tests",
+        "date": "2026-07-20"
+      }
     },
     {
-      "id": "debt-cbe0188191b5",
       "title": "Suites con ruido de consola y warnings act() sin fallar",
-      "description": "Suites con ruido de consola y warnings act() sin fallar",
+      "artifact": "src/__tests__ (salida de Jest)",
+      "source": "plan harness Ola 2 (limpiar-senal-tests) y ejecucion de la suite sync",
       "category": "technical-debt",
       "severity": "minor",
       "transversal": false,
       "critical": false,
       "planOwner": "preparacion-operativa-sdd-harness",
-      "artifact": "src/__tests__ (salida de Jest)",
       "consequence": "El ruido esconde regresiones reales y gasta contexto de agentes al leer logs irrelevantes.",
       "remediation": "Ejecutar limpiar-senal-tests: espiar/restaurar logs esperados y hacer fallar console.error/warn inesperados.",
       "evidence": [
@@ -249,18 +196,68 @@
           "date": "2026-07-20"
         }
       ],
-      "occurrences": [
+      "verification": {
+        "method": "ejecucion real de la suite sync y lectura de su salida",
+        "result": "la suite pasa pero emite console.error no silenciado",
+        "date": "2026-07-20"
+      }
+    },
+    {
+      "title": "Doctor reportaba falso verde de GitNexus fuera de la raiz (#66)",
+      "artifact": "scripts/harnessDoctor.mjs",
+      "source": "issue #66 (tracking post-Ola 0)",
+      "category": "technical-debt",
+      "resolvedPreviously": true,
+      "evidence": [
         {
-          "flow": "baseline-planearia-2026-07",
+          "type": "archive",
+          "ref": "openspec/changes/archive/2026-07-16-fix-gitnexus-root-doctor y 2026-07-19-gitnexus-frescura-doctor (#112); issue #66 CLOSED",
           "date": "2026-07-20"
         }
       ],
-      "issue": 129,
-      "status": "open",
-      "exception": null,
-      "createdAt": "2026-07-20",
-      "updatedAt": "2026-07-20",
-      "resolution": null
+      "verification": {
+        "method": "revision de changes archivados y estado del issue",
+        "result": "corregido por #112: la frescura se clasifica por estados reales y el doctor falla cerrado",
+        "date": "2026-07-20"
+      }
+    },
+    {
+      "title": "expo-localization desalineado frente a la version esperada (#66)",
+      "artifact": "package.json#expo-localization",
+      "source": "issue #66 (tracking post-Ola 0)",
+      "category": "technical-debt",
+      "resolvedPreviously": true,
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "CI=1 npx expo install --check => Dependencies are up to date",
+          "date": "2026-07-20"
+        }
+      ],
+      "verification": {
+        "method": "verificacion de compatibilidad Expo sobre el arbol actual",
+        "result": "sin desalineaciones vigentes; la deuda de #66 quedo resuelta",
+        "date": "2026-07-20"
+      }
+    },
+    {
+      "title": "Salida de Knip como inventario de deuda actual",
+      "artifact": "knip (sin configuracion en el repo)",
+      "source": "plan harness Ola 3 (baseline-knip-mojibake)",
+      "category": "false-positive",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "no existe configuracion de Knip ni baseline reproducible en el repo; no hay hallazgos verificables que importar",
+          "date": "2026-07-20"
+        }
+      ],
+      "verification": {
+        "method": "busqueda de configuracion y resultados de Knip en el arbol actual",
+        "result": "sin baseline reproducible: los reportes futuros de Knip seran candidatos, no deuda automatica",
+        "date": "2026-07-20"
+      }
     }
-  ]
+  ],
+  "flow": "baseline-planearia-2026-07"
 }

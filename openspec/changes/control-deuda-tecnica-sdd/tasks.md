@@ -34,9 +34,9 @@
 
 ## 5. Baseline real de PlanearIA
 
-- [ ] 5.1 Auditar candidatos vigentes (npm audit, issue #66, warnings de suite, continue-on-error de CI, seguimientos de reviews archivadas, Knip/mojibake pendientes) reproduciendo cada uno con evidencia actual.
-- [ ] 5.2 Capturar el assessment `baseline` con el motor real: confirmados, refutados, resueltos-previamente y duplicados clasificados explicitamente.
-- [ ] 5.3 Ejecutar `debt:check`; si hay trigger, crear/reutilizar el issue de remediacion en modo required y documentar la pausa del plan afectado.
+- [x] 5.1 Auditar candidatos vigentes (npm audit, issue #66, warnings de suite, continue-on-error de CI, seguimientos de reviews archivadas, Knip/mojibake pendientes) reproduciendo cada uno con evidencia actual.
+- [x] 5.2 Capturar el assessment `baseline` con el motor real: confirmados, refutados, resueltos-previamente y duplicados clasificados explicitamente.
+- [x] 5.3 Ejecutar `debt:check`; si hay trigger, crear/reutilizar el issue de remediacion en modo required y documentar la pausa del plan afectado.
 
 ## 6. Validacion y cierre
 

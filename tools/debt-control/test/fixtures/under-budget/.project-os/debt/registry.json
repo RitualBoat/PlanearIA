@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "debt-bbbbbbbbbb01",
+      "title": "Hallazgo debt-bbbbbbbbbb01",
+      "description": "Hallazgo debt-bbbbbbbbbb01",
+      "category": "technical-debt",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "plan-a",
+      "artifact": "src/example-bb01.mjs",
+      "consequence": "Coste futuro verificable.",
+      "remediation": "Correccion acotada pendiente.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "npm test (salida adjunta)",
+          "date": "2026-07-01"
+        }
+      ],
+      "occurrences": [
+        {
+          "flow": "flow-1",
+          "date": "2026-07-01"
+        }
+      ],
+      "issue": null,
+      "status": "open",
+      "exception": null,
+      "createdAt": "2026-07-01",
+      "updatedAt": "2026-07-01",
+      "resolution": null
+    },
+    {
+      "id": "debt-bbbbbbbbbb02",
+      "title": "Hallazgo debt-bbbbbbbbbb02",
+      "description": "Hallazgo debt-bbbbbbbbbb02",
+      "category": "technical-debt",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "plan-a",
+      "artifact": "src/example-bb02.mjs",
+      "consequence": "Coste futuro verificable.",
+      "remediation": "Correccion acotada pendiente.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "npm test (salida adjunta)",
+          "date": "2026-07-01"
+        }
+      ],
+      "occurrences": [
+        {
+          "flow": "flow-1",
+          "date": "2026-07-01"
+        }
+      ],
+      "issue": null,
+      "status": "open",
+      "exception": null,
+      "createdAt": "2026-07-01",
+      "updatedAt": "2026-07-01",
+      "resolution": null
+    },
+    {
+      "id": "debt-bbbbbbbbbb03",
+      "title": "Hallazgo debt-bbbbbbbbbb03",
+      "description": "Hallazgo debt-bbbbbbbbbb03",
+      "category": "technical-debt",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "plan-a",
+      "artifact": "src/example-bb03.mjs",
+      "consequence": "Coste futuro verificable.",
+      "remediation": "Correccion acotada pendiente.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "npm test (salida adjunta)",
+          "date": "2026-07-01"
+        }
+      ],
+      "occurrences": [
+        {
+          "flow": "flow-1",
+          "date": "2026-07-01"
+        }
+      ],
+      "issue": null,
+      "status": "open",
+      "exception": null,
+      "createdAt": "2026-07-01",
+      "updatedAt": "2026-07-01",
+      "resolution": null
+    },
+    {
+      "id": "debt-bbbbbbbbbb04",
+      "title": "Hallazgo debt-bbbbbbbbbb04",
+      "description": "Hallazgo debt-bbbbbbbbbb04",
+      "category": "technical-debt",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "plan-a",
+      "artifact": "src/example-bb04.mjs",
+      "consequence": "Coste futuro verificable.",
+      "remediation": "Correccion acotada pendiente.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "npm test (salida adjunta)",
+          "date": "2026-07-01"
+        }
+      ],
+      "occurrences": [
+        {
+          "flow": "flow-1",
+          "date": "2026-07-01"
+        }
+      ],
+      "issue": null,
+      "status": "open",
+      "exception": null,
+      "createdAt": "2026-07-01",
+      "updatedAt": "2026-07-01",
+      "resolution": null
+    }
+  ]
+}

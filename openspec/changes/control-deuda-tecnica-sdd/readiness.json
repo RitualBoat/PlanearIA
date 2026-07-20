@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "issue": 128,
+  "change": "control-deuda-tecnica-sdd",
+  "surfaces": ["harness", "docs"],
+  "validations": ["openspec-strict", "harness-parity", "opsx-patch"],
+  "evidence": [],
+  "rollback": {
+    "strategy": "Revertir el PR del motor restaura los gates y el cierre previos: sin politica de deuda configurada todos los comandos reportan SKIP explicito. Los assessments, el registro y los issues creados no se borran; la integracion GitHub puede pasarse a advisory u off editando .project-os/debt/config.json mediante PR normal."
+  },
+  "adversarialReview": { "ref": null },
+  "exceptions": []
+}

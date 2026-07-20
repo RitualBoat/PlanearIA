@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "issue": 126,
+  "change": "publish-project-engineering-os",
+  "surfaces": [
+    "docs",
+    "harness"
+  ],
+  "validations": [
+    "openspec-strict",
+    "harness-parity",
+    "opsx-patch"
+  ],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/126"
+    },
+    {
+      "id": "master-plan",
+      "ref": "Documentacion/01-planes-maestros/PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md"
+    },
+    {
+      "id": "pre-propose",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/126#issuecomment-5019252373"
+    }
+  ],
+  "rollback": {
+    "strategy": "Antes de publicar, revertir el PR del change. Después de publicar, deprecar la versión defectuosa, publicar un patch y fijar consumidores a la última versión sana mediante PR normal. No reescribir tags/releases ni usar git reset --hard."
+  },
+  "adversarialReview": {
+    "ref": ""
+  },
+  "exceptions": []
+}

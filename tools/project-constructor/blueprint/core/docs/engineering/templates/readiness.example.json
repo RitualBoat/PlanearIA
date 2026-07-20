@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "1.0.0",
+  "issue": 1,
+  "change": "replace-with-kebab-case",
+  "surfaces": [
+    "documentation",
+    "harness-tooling"
+  ],
+  "validations": [
+    {
+      "id": "openspec-strict",
+      "status": "pending",
+      "evidence": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "critical-document-presence",
+      "status": "pending",
+      "evidence": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "relative-link-check",
+      "status": "pending",
+      "evidence": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "findability-two-hop-check",
+      "status": "pending",
+      "evidence": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "neutrality-check",
+      "status": "pending",
+      "evidence": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "constructor-tests",
+      "status": "pending",
+      "evidence": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "sync-check",
+      "status": "pending",
+      "evidence": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "capability-matrix-check",
+      "status": "pending",
+      "evidence": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "opsx-check",
+      "status": "pending",
+      "evidence": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "doctor-json-check",
+      "status": "pending",
+      "evidence": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "second-run-idempotence",
+      "status": "pending",
+      "evidence": null,
+      "justification": null,
+      "profileCondition": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "kind": "manual",
+      "status": "pending",
+      "ref": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "adversarial-review",
+      "kind": "manual",
+      "status": "pending",
+      "ref": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "qualitative-review-for-clarity-and-current-ownership",
+      "kind": "manual",
+      "status": "pending",
+      "ref": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "recorded-drift-decisions",
+      "kind": "manual",
+      "status": "pending",
+      "ref": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "review-of-declared-degradations",
+      "kind": "manual",
+      "status": "pending",
+      "ref": null,
+      "justification": null,
+      "profileCondition": null
+    },
+    {
+      "id": "recovery-rehearsal-for-one-transaction",
+      "kind": "manual",
+      "status": "pending",
+      "ref": null,
+      "justification": null,
+      "profileCondition": null
+    }
+  ],
+  "rollback": {
+    "strategy": "Replace with a bounded rollback that preserves unrelated work and evidence.",
+    "status": "pending",
+    "evidence": null,
+    "justification": null
+  },
+  "adversarialReview": {
+    "status": "pending",
+    "ref": null,
+    "blockers": 0,
+    "majors": 0
+  },
+  "exceptions": []
+}

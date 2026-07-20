@@ -1,0 +1,78 @@
+name: Project Constructor Advisory
+
+on:
+  pull_request:
+    branches:
+      - development
+    paths:
+      - "tools/project-constructor/**"
+      - "Documentacion/01-planes-maestros/PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md"
+      - "Documentacion/02-operacion/constructor-proyectos/**"
+      - ".github/workflows/project-constructor.yml"
+      - "package.json"
+      - "scripts/testProjectConstructorDocs.mjs"
+      - "openspec/changes/**/specs/project-constructor-*/**"
+  push:
+    branches:
+      - "feat/constructor-*"
+      - "codex/constructor-*"
+    paths:
+      - "tools/project-constructor/**"
+      - ".github/workflows/project-constructor.yml"
+      - "package.json"
+      - "scripts/testProjectConstructorDocs.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  constructor-advisory:
+    name: Advisory / ${{ matrix.os }} / Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            node: "20.20.0"
+          - os: ubuntu-latest
+            node: "22.22.0"
+          - os: windows-latest
+            node: "22.22.0"
+          - os: macos-latest
+            node: "22.22.0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: tools/project-constructor/package-lock.json
+
+      - name: Install constructor dependencies
+        run: npm ci --prefix tools/project-constructor
+
+      - name: Validate constructor package
+        run: npm run constructor:check
+
+      - name: Run constructor test suite
+        run: npm run constructor:test
+
+      - name: Verify empty-repository fixture
+        run: npm run constructor:fixture -- --json --evidence artifacts/constructor/fixture.json
+
+      - name: Inspect local package tarball
+        run: npm pack ./tools/project-constructor --dry-run --json
+
+      - name: Upload fixture evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: project-constructor-${{ matrix.os }}
+          path: artifacts/constructor/fixture.json
+          if-no-files-found: warn
+          retention-days: 14

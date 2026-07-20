@@ -1,0 +1,330 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-os.local/schema/readiness-policy.schema.json",
+  "title": "Project OS readiness policy v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "statusVocabulary",
+    "issueMarker",
+    "projectMembership",
+    "phases",
+    "exceptions",
+    "validationCatalog"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "statusVocabulary": {
+      "const": [
+        "PASS",
+        "FAIL",
+        "EXCEPTION"
+      ]
+    },
+    "issueMarker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start",
+        "end"
+      ],
+      "properties": {
+        "start": {
+          "const": "<!-- project-os-readiness:pre-propose"
+        },
+        "end": {
+          "const": "project-os-readiness:pre-propose -->"
+        }
+      }
+    },
+    "projectMembership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "projectManifest",
+        "projectTitlePointer",
+        "unverifiedStatus",
+        "exceptionField"
+      ],
+      "properties": {
+        "required": {
+          "const": true
+        },
+        "projectManifest": {
+          "const": ".project-os/github/product-os.json"
+        },
+        "projectTitlePointer": {
+          "const": "/project/title"
+        },
+        "unverifiedStatus": {
+          "const": "FAIL"
+        },
+        "exceptionField": {
+          "const": "project-membership"
+        }
+      }
+    },
+    "phases": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "propose",
+        "archive"
+      ],
+      "properties": {
+        "propose": {
+          "$ref": "#/$defs/propose"
+        },
+        "archive": {
+          "$ref": "#/$defs/archive"
+        }
+      }
+    },
+    "exceptions": {
+      "$ref": "#/$defs/exceptionPolicy"
+    },
+    "validationCatalog": {
+      "$ref": "#/$defs/validationCatalog"
+    }
+  },
+  "$defs": {
+    "propose": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requiredIssueState",
+        "requiredSections",
+        "requiredMetadataFields",
+        "requireDependenciesClosed",
+        "remoteUnverifiedStatus"
+      ],
+      "properties": {
+        "requiredIssueState": {
+          "const": "OPEN"
+        },
+        "requiredSections": {
+          "const": [
+            "## Historia Original",
+            "## Enriquecida"
+          ]
+        },
+        "requiredMetadataFields": {
+          "const": [
+            "schemaVersion",
+            "change",
+            "execution",
+            "dependencies",
+            "currentState",
+            "scope",
+            "observableCriteria",
+            "owner",
+            "risks",
+            "surfaces",
+            "manualInterventions",
+            "costLicenseReview",
+            "evidence",
+            "rollback",
+            "nonGoals",
+            "exceptions"
+          ]
+        },
+        "requireDependenciesClosed": {
+          "const": true
+        },
+        "remoteUnverifiedStatus": {
+          "const": "FAIL"
+        }
+      }
+    },
+    "archive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "changeRoot",
+        "requiredFiles",
+        "requiredSpecPattern",
+        "requiredMetadataFields",
+        "requiredValidationIds",
+        "requiredEvidenceIds",
+        "manualEvidenceIdsFromProfileCatalog",
+        "requireTasksComplete",
+        "requireIssueTraceability",
+        "requireAdversarialReview",
+        "remoteUnverifiedStatus"
+      ],
+      "properties": {
+        "changeRoot": {
+          "const": "openspec/changes"
+        },
+        "requiredFiles": {
+          "const": [
+            "proposal.md",
+            "design.md",
+            "tasks.md",
+            "TLDR.md",
+            "brownfield-baseline.md",
+            "readiness.json"
+          ]
+        },
+        "requiredSpecPattern": {
+          "const": "specs/*/spec.md"
+        },
+        "requiredMetadataFields": {
+          "const": [
+            "schemaVersion",
+            "issue",
+            "change",
+            "surfaces",
+            "validations",
+            "evidence",
+            "rollback",
+            "adversarialReview",
+            "exceptions"
+          ]
+        },
+        "requiredValidationIds": {
+          "const": [
+            "openspec-strict"
+          ]
+        },
+        "requiredEvidenceIds": {
+          "const": [
+            "issue-link",
+            "adversarial-review"
+          ]
+        },
+        "manualEvidenceIdsFromProfileCatalog": {
+          "const": true
+        },
+        "requireTasksComplete": {
+          "const": true
+        },
+        "requireIssueTraceability": {
+          "const": true
+        },
+        "requireAdversarialReview": {
+          "const": true
+        },
+        "remoteUnverifiedStatus": {
+          "const": "FAIL"
+        }
+      }
+    },
+    "exceptionPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowedFields",
+        "requiredFields",
+        "nonWaivable",
+        "expirationFormat",
+        "exceptionCountsAsPass"
+      ],
+      "properties": {
+        "allowedFields": {
+          "const": [
+            "project-membership",
+            "manual-evidence"
+          ]
+        },
+        "requiredFields": {
+          "const": [
+            "field",
+            "reason",
+            "owner",
+            "approvedBy",
+            "expiresOn",
+            "recovery"
+          ]
+        },
+        "nonWaivable": {
+          "const": [
+            "issue-identity",
+            "change-identity",
+            "artifact-integrity",
+            "tasks-complete",
+            "secrets",
+            "required-surface-evidence"
+          ]
+        },
+        "expirationFormat": {
+          "const": "YYYY-MM-DD"
+        },
+        "exceptionCountsAsPass": {
+          "const": false
+        }
+      }
+    },
+    "validationCatalog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "metadataMayDeclareCommands",
+        "profileSource",
+        "entries"
+      ],
+      "properties": {
+        "metadataMayDeclareCommands": {
+          "const": false
+        },
+        "profileSource": {
+          "const": ".project-os/profiles.json"
+        },
+        "entries": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/validationEntry"
+          }
+        }
+      }
+    },
+    "validationEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "profiles",
+        "runner"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "profiles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "ai",
+              "auth-security",
+              "backend-api",
+              "data-migration-sync",
+              "documentation",
+              "harness-tooling",
+              "infra-deploy",
+              "library-cli",
+              "ui"
+            ]
+          }
+        },
+        "runner": {
+          "enum": [
+            null,
+            "openspec-strict",
+            "constructor-sync-check",
+            "constructor-opsx-check",
+            "constructor-doctor-json"
+          ]
+        }
+      }
+    }
+  }
+}

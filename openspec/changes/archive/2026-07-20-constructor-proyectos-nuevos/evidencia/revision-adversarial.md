@@ -1,0 +1,83 @@
+# Revisión adversarial
+
+**Fecha:** 2026-07-19
+
+**Alcance:** issue #103 y change `constructor-proyectos-nuevos`.
+
+**Método:** pase separado desde contexto limpio sobre proposal, design, specs, tasks, implementación,
+fixtures, evidencia y diff. Se intentó refutar cada regla adversarial del issue.
+
+## Veredicto
+
+**PASS CON HUECOS.** No quedan Blockers ni Majors abiertos. La deuda de warnings/logs preexistentes de
+la suite raíz permanece como Minor rastreado y no se propaga al constructor. La matriz CI multi-SO quedó
+en PASS; el único gate externo pendiente es la decisión humana de merge.
+
+## Hallazgos corregidos
+
+| Severidad | Área | Hallazgo | Corrección y evidencia |
+| --- | --- | --- | --- |
+| Major | Bootstrap real | Prompt 00 invocaba un binario sin demostrar que el paquete estuviera instalado desde un artefacto verificable. | La fixture empaqueta, calcula SHA-256, instala el tarball en un runner temporal separado y ejecuta el bootstrap sobre un repositorio Git vacío. |
+| Major | Readiness | Placeholders y campos adicionales podían producir un falso verde. | Contratos exactos, rechazo de placeholders, validación fail-closed y pruebas negativas. |
+| Major | Secretos | Una asignación genérica como `token=valor` podía redactarse en salida sin bloquear metadata persistida. | Detección genérica en cualquier campo, permiso solo para referencias `${ENV_VAR}` y pruebas de regresión. |
+| Major | Doctor | El schema declarado no coincidía con la salida humana/JSON real. | Schema corregido al contrato `schemaVersion/verdict/counts/results`; tests de equivalencia y política de secretos sin falso positivo. |
+| Major | OpenSpec | La fixture asumía 15 workflows sintéticos; la CLI oficial fijada genera al menos las cinco familias requeridas y produjo 25 superficies en la fixture local. | Generación con OpenSpec 1.6.0, prueba sintética exacta de 25 y validación portable de globs/targets, ownership y `opsx-check` sin fijar un conteo por SO. |
+| Major | CI | El workflow no ejecutaba la suite negativa completa ni la fixture empaquetada. | CI ejecuta `constructor:check`, 48 tests, fixture, `npm pack --dry-run` y publica evidencia en Ubuntu/Windows/macOS. |
+| Major | Gate circular | `tasks.md` exigía archive/finish antes del pre-archive que requiere todas las tareas completas. | Archive, sync, PR y finish se clasifican como pasos posteriores al change, conforme a la convención vigente; el dry-run y gate sí permanecen verificables antes del archive. |
+| Major | Gate silencioso | El pre-archive pasó sus 14 controles pero emitió `DEP0190` porque el runner usaba `shell: true` para npm en Windows. | Runner explícito mediante `cmd.exe`, argumentos restringidos a la allowlist estática, cero `shell: true`, pruebas de resolución/inyección y gate repetido sin warning. |
+| Major | CI multi-SO | OpenSpec 1.6.0 emitió `✔ Setup complete` en GitHub Actions, mientras la fixture solo reconocía `√` y `✓`; Ubuntu y macOS fallaron aunque el bootstrap era correcto. | Clasificador extraído a módulo probado, nueva variante exacta `✔`, mutación que conserva el rechazo de stderr arbitrario y fixture local completa en PASS. |
+| Major | CI OPSX | La fixture exigía 25 superficies como número universal antes de ejecutar `opsx-check`; la CLI oficial materializó un conjunto distinto en runners y el diagnóstico no guardaba el plan. | Se validan invariantes estructurales y ownership, se conserva la prueba sintética exacta de 25, el payload se registra antes de fallar y `opsx-check` decide globs/targets obligatorios sin conteo mágico. |
+| Major | Runtime de Actions | La matriz terminó verde pero anotó que `setup-node@v4` y `upload-artifact@v4` dependían del runtime Node 20 retirado. | Actualizados a las versiones oficiales `@v6`, ambas sobre Node 24; no se usó la variable de escape que conserva runtime inseguro. |
+| Minor | Human overlay | La preservación fuera del bloque gestionado no tenía una prueba explícita. | Test que conserva contenido humano, actualiza el bloque y falla en conflicto si se edita el bloque gestionado. |
+| Minor | Stderr externo | OpenSpec escribe progreso normal por stderr y la fixture podía confundirlo con regresión. | Allowlist cerrada de diez señales normales; warnings, comandos desconocidos y archivos ausentes siguen fallando. |
+| Minor | Licencias | La guía manual no pedía evidencia observada de versión, licencia y SHA-256. | Paso manual ampliado con valor esperado/observado y hash del artefacto. |
+
+## Intentos de refutación que no prosperaron
+
+- **Copia PlanearIA:** el scanner de neutralidad y la fixture rechazan dominio docente, Expo, React,
+  MVVM, `userId`, breakpoints y proveedores dentro del núcleo.
+- **Configuración equivale a operación:** doctor separa config, startup, listing y smoke autenticado;
+  `SKIP`/`WARN` no se convierten en `PASS`.
+- **Instalación prematura:** el target instala únicamente OpenSpec fijado y el harness; todos los perfiles
+  de producto permanecen inactivos.
+- **Dependencia de agente/SO:** cinco adaptadores comparten una fuente canónica, degradan de forma
+  explícita y la lógica usa rutas/fin de línea deterministas.
+- **Múltiples fuentes de verdad:** blueprint canónico + state/ownership; los workflows OPSX conservan
+  ownership externo y los bloques humanos son overlays acotados.
+- **Ejecución parcial destructiva:** preflight antes de escribir, journal, backups, reanudación y rollback
+  hash-aware probados.
+- **Explosión de issues:** bootstrap solo genera diez payloads neutrales locales; no crea issues remotos.
+- **Trabajo humano ficticio:** OAuth, entrevistas, aprobaciones y merge son gates manuales, no changes
+  simulados.
+- **Graphify obligatorio:** siempre `SKIP` retirado/manual.
+- **Tests verdes igual a producto listo:** el cierre se limita explícitamente a Etapa A; discovery,
+  perfil técnico y producto siguen pendientes.
+
+## Hallazgos abiertos
+
+| Severidad | Área | Hallazgo | Tratamiento |
+| --- | --- | --- | --- |
+| Minor | Suite raíz | 116/116 suites y 815/815 tests pasan, pero existen warnings `act`/keys, Expo push y logs de sync preexistentes. | Registrado en auditoría, matriz de transferibilidad y gap G6. No se silencian ni se atribuyen al constructor; su corrección pertenece a changes de producto separados. |
+| Pregunta | Distribución | El paquete sigue privado y `UNLICENSED`; no se ha elegido licencia para publicarlo. | Mantener sin publicación hasta decisión humana explícita. |
+
+## Evidencia comprobada
+
+- `npm run constructor:test`: 48/48.
+- `npm run constructor:fixture -- --evidence artifacts/constructor/fixture.json`: PASS, segundo run sin
+  drift.
+- `npm pack ./tools/project-constructor --dry-run --json`: 94 archivos; tarball verificable.
+- `npm run test:constructor-docs`: 12 artefactos y 50 filas.
+- `npm run typecheck`, `npm run lint -- --quiet`, `git diff --check`: PASS.
+- `npm test -- --runInBand`: 116 suites y 815 tests PASS; ruido histórico clasificado.
+- `npm run openspec:validate` y strict del change: PASS.
+- `npm run gitnexus:diagnose`: índice fresco.
+- `npm run harness:doctor -- --json`: `ok=true`, cero FAIL.
+- GitHub Actions: runs
+  [29718552643](https://github.com/RitualBoat/PlanearIA/actions/runs/29718552643) y
+  [29718554338](https://github.com/RitualBoat/PlanearIA/actions/runs/29718554338) en SUCCESS para la matriz
+  Ubuntu/Windows/macOS; checks base del PR #125 también en SUCCESS.
+
+## Recomendación
+
+Mantener #125 en revisión manual. No ejecutar `opsx:finish` ni mergear hasta la autorización humana
+aplicable; el constructor puede continuar a Ola 1 solo después de cerrar esa transición.

@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "issue": 103,
+  "change": "constructor-proyectos-nuevos",
+  "surfaces": [
+    "docs",
+    "harness"
+  ],
+  "validations": [
+    "openspec-strict",
+    "harness-parity",
+    "opsx-patch"
+  ],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/103"
+    },
+    {
+      "id": "pr-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/pull/125"
+    },
+    {
+      "id": "adversarial-review",
+      "ref": "openspec/changes/constructor-proyectos-nuevos/evidencia/revision-adversarial.md"
+    },
+    {
+      "id": "docs-verification",
+      "ref": "openspec/changes/constructor-proyectos-nuevos/evidencia/verificacion-documental.md"
+    },
+    {
+      "id": "fixtures",
+      "ref": "artifacts/constructor/fixture.json"
+    },
+    {
+      "id": "implementation-validation",
+      "ref": "openspec/changes/constructor-proyectos-nuevos/evidencia/verificacion-implementacion.json"
+    },
+    {
+      "id": "closure-status",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/103#issuecomment-5018888568"
+    },
+    {
+      "id": "master-plan",
+      "ref": "Documentacion/01-planes-maestros/PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md"
+    }
+  ],
+  "rollback": {
+    "strategy": "En PlanearIA, revertir el commit o PR del change restaura scripts, docs y paquete sin tocar runtime o datos de producto. En un target generado, usar rollback con el transaction id: restaura backups y elimina solo archivos nuevos cuyo hash siga coincidiendo con el escrito por el constructor; cualquier edicion posterior queda en conflicto y nunca se descarta."
+  },
+  "adversarialReview": {
+    "ref": "openspec/changes/constructor-proyectos-nuevos/evidencia/revision-adversarial.md"
+  },
+  "exceptions": []
+}

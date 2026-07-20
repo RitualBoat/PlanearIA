@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "1.0.0",
+  "rules": [
+    {
+      "id": "universal",
+      "globs": [
+        "**/*"
+      ],
+      "instructions": [
+        "Preserve unrelated work and stop on overlapping changes.",
+        "Never expose secret values; document only environment variable names.",
+        "Use the active evidence profile and keep rollback proportional.",
+        "Do not mark work complete without observable evidence."
+      ]
+    },
+    {
+      "id": "documentation",
+      "globs": [
+        "**/*.md",
+        "docs/**/*"
+      ],
+      "instructions": [
+        "Keep claims linked to a current source of truth.",
+        "Use relative links and keep critical operational documents within two links of repository entry points.",
+        "Record drift explicitly instead of silently choosing between contradictory sources."
+      ]
+    },
+    {
+      "id": "governance",
+      "globs": [
+        ".project-os/**/*",
+        ".project-constructor/**/*",
+        "openspec/**/*",
+        ".github/**/*"
+      ],
+      "instructions": [
+        "Preserve declared ownership boundaries.",
+        "Use exact local tool versions and deterministic output.",
+        "Treat remote mutations and authentication as manual gates unless separately authorized."
+      ]
+    },
+    {
+      "id": "tests",
+      "globs": [
+        "**/*.test.*",
+        "**/*.spec.*",
+        "test/**/*",
+        "tests/**/*"
+      ],
+      "instructions": [
+        "Include a failing or negative case when behavior can regress.",
+        "Treat unexpected warnings or logs as evidence to classify.",
+        "Do not weaken assertions merely to make a suite pass."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "1.0.0",
+  "owner": "external-openspec",
+  "package": "@fission-ai/openspec",
+  "version": "1.6.0",
+  "localOnly": true,
+  "allowGlobalFallback": false,
+  "readOnlyVersionCommand": "npm exec --yes=false -- openspec --version",
+  "commands": {
+    "init": "npm exec --yes=false -- openspec init --tools codex,claude,cursor,github-copilot,opencode",
+    "update": "npm exec --yes=false -- openspec update",
+    "adapt": "node .project-constructor/runtime/bin/project-constructor.mjs opsx-adapt --target .",
+    "check": "node .project-constructor/runtime/bin/project-constructor.mjs opsx-check --target ."
+  },
+  "commandRewrite": {
+    "from": "openspec",
+    "to": "npm exec --yes=false -- openspec"
+  },
+  "generatedGlobs": [
+    ".claude/commands/opsx/*.md",
+    ".codex/skills/openspec-*/SKILL.md",
+    ".cursor/commands/opsx-*.md",
+    ".github/prompts/opsx-*.prompt.md",
+    ".opencode/commands/opsx-*.md"
+  ],
+  "generalRenderer": {
+    "mayGenerate": false,
+    "mayPatch": false,
+    "mayMove": false,
+    "mayDelete": false,
+    "mayRollback": false
+  },
+  "managedBlocks": [
+    {
+      "id": "project-os-propose",
+      "workflow": "propose",
+      "targets": [
+        ".claude/commands/opsx/propose.md",
+        ".codex/skills/openspec-propose/SKILL.md",
+        ".cursor/commands/opsx-propose.md",
+        ".github/prompts/opsx-propose.prompt.md",
+        ".opencode/commands/opsx-propose.md"
+      ],
+      "start": "<!-- PROJECT_OS_MANAGED:PROPOSE:START -->",
+      "end": "<!-- PROJECT_OS_MANAGED:PROPOSE:END -->",
+      "content": "### Project OS — DoR y artefactos humanos\n\nAntes de crear el change, confirma issue enriquecido e item del Project, alcance/no objetivos, dependencias, riesgos, evidencia, rollback, costos/licencias e intervenciones manuales. Ejecuta el gate DoR read-only configurado y no continúes ante FAIL. Después de proposal/design/specs/tasks, crea un único TLDR.md y brownfield-baseline.md acotado, además de readiness.json.",
+      "required": true
+    },
+    {
+      "id": "project-os-apply",
+      "workflow": "apply",
+      "targets": [
+        ".claude/commands/opsx/apply.md",
+        ".codex/skills/openspec-apply-change/SKILL.md",
+        ".cursor/commands/opsx-apply.md",
+        ".github/prompts/opsx-apply.prompt.md",
+        ".opencode/commands/opsx-apply.md"
+      ],
+      "start": "<!-- PROJECT_OS_MANAGED:APPLY:START -->",
+      "end": "<!-- PROJECT_OS_MANAGED:APPLY:END -->",
+      "content": "### Project OS — aplicación con evidencia\n\nImplementa tarea por tarea contra la spec aprobada. Marca [x] solo con evidencia verificable y actualiza TLDR.md o brownfield-baseline.md si cambia alcance, superficie, comportamiento o rollback. Si aparece una decisión material nueva, vuelve a NORMAL, actualiza los artefactos aprobados y después continúa.",
+      "required": true
+    },
+    {
+      "id": "project-os-archive",
+      "workflow": "archive",
+      "targets": [
+        ".claude/commands/opsx/archive.md",
+        ".codex/skills/openspec-archive-change/SKILL.md",
+        ".cursor/commands/opsx-archive.md",
+        ".github/prompts/opsx-archive.prompt.md",
+        ".opencode/commands/opsx-archive.md"
+      ],
+      "start": "<!-- PROJECT_OS_MANAGED:ARCHIVE:START -->",
+      "end": "<!-- PROJECT_OS_MANAGED:ARCHIVE:END -->",
+      "content": "### Project OS — DoD y revisión adversarial\n\nAntes de archivar, ejecuta el gate DoD/pre-archive read-only configurado, confirma readiness.json, tareas completas, evidencia proporcional, rollback y revisión adversarial independiente. No cierres con Blockers ni Majors, ni interpretes ausencia de checks como éxito. La CLI local de OpenSpec conserva ownership exclusivo de specs y del movimiento de archive.",
+      "required": true
+    }
+  ],
+  "onShapeDrift": "FAIL"
+}

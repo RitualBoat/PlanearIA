@@ -28,6 +28,7 @@ PlanearIA trabaja con contexto dirigido. Una IA no lee todo el repo: identifica 
 | Backend/auth/datos | `00-fundamentos/ARQUITECTURA.md`, `01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md`, `backend/README.md` | `backend:check`, aislamiento `userId` |
 | IA/LLM | `00-fundamentos/IA_CHATBOT_LLM.md`, `backend/lib/aiGateway.js`, reglas backend | Fallback proveedor, limites, confirmacion docente |
 | Plan Maestro nuevo | `01-planes-maestros/meta_guia_planes.md`, `00-fundamentos/ROADMAP_PLANES_MAESTROS.md` | Blueprint + backlog de changes, no fases tecnicas largas |
+| Preparar repositorio nuevo | [Plan](../01-planes-maestros/PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md), [índice](../02-operacion/constructor-proyectos/README.md), [Prompt 00](../02-operacion/constructor-proyectos/PROMPT_00_BOOTSTRAP_ENTORNO.md) | Bootstrap neutral, doctor, segundo run sin drift; ninguna pregunta de producto |
 | Referencia visual | `context/<modulo>-ground-truth/` y respaldo externo si hace falta | Ground truth citado en `design.md` |
 | Archivo/historia | Respaldo externo del usuario | Solo contexto historico si el usuario lo aporta; nunca fuente ejecutable |
 
@@ -70,5 +71,12 @@ Al cerrar un overhaul documental, comprobar que una IA puede responder con rutas
 4. Donde esta el ground truth para una pantalla de alta paridad?
 5. Donde se guarda la evidencia de QA?
 6. Que carpetas no son fuente ejecutable?
+7. Donde esta el runbook para preparar un repositorio sin producto?
+8. Que acciones del constructor requieren intervencion humana?
+9. Donde se distingue nucleo universal de perfiles condicionales?
 
 La respuesta aceptable debe llegar a las rutas correctas en menos de 3 saltos desde `AGENTS.md` o `CLAUDE.md`.
+
+Para las preguntas 7-9, la entrada canónica es el
+[índice del constructor](../02-operacion/constructor-proyectos/README.md); desde allí cada respuesta está a
+un enlace.

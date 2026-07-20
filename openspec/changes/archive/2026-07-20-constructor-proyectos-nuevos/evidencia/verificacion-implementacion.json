@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "change": "constructor-proyectos-nuevos",
+  "issue": 103,
+  "recordedOn": "2026-07-19",
+  "scope": "Ola 0 / Etapa A: núcleo universal sin producto",
+  "results": [
+    {
+      "id": "constructor-tests",
+      "status": "PASS",
+      "command": "npm run constructor:test",
+      "summary": "48 tests aprobados; 0 fallos; sin stderr inesperado atribuible al constructor."
+    },
+    {
+      "id": "empty-repository-fixture",
+      "status": "PASS",
+      "command": "npm run constructor:fixture -- --evidence artifacts/constructor/fixture.json",
+      "summary": "Bootstrap desde un repositorio Git vacío, paquete instalado desde tarball, 11 etapas aprobadas, contrato OPSX íntegro (25 superficies observadas localmente) y segundo run sin cambios.",
+      "evidence": "artifacts/constructor/fixture.json"
+    },
+    {
+      "id": "idempotence",
+      "status": "PASS",
+      "summary": "El segundo bootstrap y sync --check reportaron changedFiles=0.",
+      "blueprintSha256": "71fcfd8197efa193e053b73591873c4c12a21d136b683a1b19f2928ab245cb1c"
+    },
+    {
+      "id": "package-artifact",
+      "status": "PASS",
+      "command": "npm pack ./tools/project-constructor --dry-run --json",
+      "summary": "Tarball privado verificable: 96 archivos, 133981 bytes, 571084 bytes desempaquetados.",
+      "filename": "project-engineering-os-constructor-0.1.0.tgz",
+      "sha256": "3a32c297c748d976783697f72ea71d0d3b4b391aa6c0903c52e5c0f1d9806ee3"
+    },
+    {
+      "id": "documentation-contract",
+      "status": "PASS",
+      "command": "npm run test:constructor-docs",
+      "summary": "12 artefactos obligatorios y 50 filas de transferibilidad verificados."
+    },
+    {
+      "id": "openspec",
+      "status": "PASS",
+      "commands": [
+        "npm run openspec:check",
+        "npm run openspec:validate",
+        "npm exec --yes=false -- openspec validate constructor-proyectos-nuevos --strict --no-interactive"
+      ],
+      "summary": "OpenSpec local 1.6.0; 34/34 elementos válidos; change válido en modo strict; TLDR válido."
+    },
+    {
+      "id": "repository-static-checks",
+      "status": "PASS",
+      "commands": [
+        "npm run typecheck",
+        "npm run lint -- --quiet",
+        "git diff --check"
+      ],
+      "summary": "TypeScript, lint y whitespace sin errores."
+    },
+    {
+      "id": "openspec-readiness-runner",
+      "status": "PASS",
+      "commands": [
+        "npm run test:openspec-readiness",
+        "npm run openspec:ready:archive -- --change constructor-proyectos-nuevos --run-local"
+      ],
+      "summary": "Runner Windows sin shell:true, argumentos limitados a validaciones estáticas y gate repetido sin DEP0190."
+    },
+    {
+      "id": "openspec-init-output-portability",
+      "status": "PASS",
+      "commands": [
+        "node --test tools/project-constructor/test/fixture-output.test.mjs",
+        "npm run constructor:fixture -- --evidence artifacts/constructor/fixture.json"
+      ],
+      "summary": "Las variantes exactas √, ✓ y ✔ se aceptan en todos los SO; stderr adicional sigue fallando y la fixture completa conserva expectedProgress=true."
+    },
+    {
+      "id": "opsx-surface-portability",
+      "status": "PASS",
+      "commands": [
+        "npm run constructor:test",
+        "npm run constructor:fixture -- --evidence artifacts/constructor/fixture.json"
+      ],
+      "summary": "El gate multi-SO valida targets/globs obligatorios, consistencia de conteos, targets únicos, owner external-openspec y opsx-check sin FAIL; no usa un conteo mágico como sustituto del contrato."
+    },
+    {
+      "id": "repository-tests",
+      "status": "PASS_WITH_CLASSIFIED_BASELINE_NOISE",
+      "command": "npm test -- --runInBand",
+      "summary": "116 suites y 815 tests aprobados. Los warnings act/key, Expo push y logs de sync son preexistentes y están registrados en la auditoría, matriz y gap G6; no provienen del constructor."
+    },
+    {
+      "id": "doctor",
+      "status": "PASS_WITH_NON_BLOCKING_SIGNALS",
+      "commands": [
+        "npm run harness:doctor -- --json",
+        "doctor --json dentro de la fixture"
+      ],
+      "summary": "Doctor de PlanearIA: ok=true, PASS=8, FAIL=0, WARN=2, SKIP=1. Doctor de fixture: PASS=10, FAIL=0, WARN=3, SKIP=13. Los WARN corresponden a worktree del change, OAuth manual o capacidades todavía no autenticadas; Graphify es SKIP."
+    },
+    {
+      "id": "code-intelligence",
+      "status": "PASS",
+      "command": "npm run gitnexus:diagnose",
+      "summary": "Índice GitNexus fresco respecto al commit actual y verificación estructural aprobada."
+    }
+  ],
+  "externalEvidence": [
+    {
+      "id": "multi-os-ci",
+      "status": "PASS",
+      "summary": "Ubuntu Node 20.20/22.22, Windows 22.22 y macOS 22.22 aprobaron en eventos push y pull_request; checks base también en SUCCESS.",
+      "refs": [
+        "https://github.com/RitualBoat/PlanearIA/actions/runs/29718552643",
+        "https://github.com/RitualBoat/PlanearIA/actions/runs/29718554338"
+      ]
+    },
+    {
+      "id": "merge",
+      "status": "PENDING_MANUAL",
+      "reason": "Es una intervención humana posterior al archive y al CI requerido."
+    }
+  ],
+  "exceptions": []
+}

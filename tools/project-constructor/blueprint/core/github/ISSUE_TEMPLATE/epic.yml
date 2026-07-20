@@ -1,0 +1,49 @@
+name: Epic
+description: Group an outcome into bounded waves and dependencies.
+title: "[Epic] "
+labels:
+  - "epic"
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome and story
+    validations:
+      required: true
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Observable closure criteria
+    validations:
+      required: true
+  - type: textarea
+    id: waves
+    attributes:
+      label: Waves and dependencies
+      description: Materialize only the active and next wave as issues.
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and state
+    validations:
+      required: true
+  - type: textarea
+    id: rollback
+    attributes:
+      label: Rollback
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+    validations:
+      required: true

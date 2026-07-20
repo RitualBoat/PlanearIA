@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "1.0.0",
+  "change": "replace-with-kebab-case",
+  "execution": "versioned",
+  "dependencies": [],
+  "currentState": {
+    "summary": "Replace with verified current behavior and known drift.",
+    "sources": [
+      "Replace with a code, runtime, test, active spec, or operating-rule reference."
+    ]
+  },
+  "scope": [
+    "Replace with one observable in-scope outcome."
+  ],
+  "observableCriteria": [
+    "Replace with one criterion that can pass or fail."
+  ],
+  "owner": "Replace with accountable owner",
+  "risks": [
+    "Replace with one risk and keep its mitigation in the enriched issue."
+  ],
+  "surfaces": [
+    "documentation"
+  ],
+  "manualInterventions": [],
+  "costLicenseReview": {
+    "status": "pending",
+    "owner": "Replace with accountable owner",
+    "evidence": null,
+    "justification": "Complete the review or document why it is objectively not applicable before propose."
+  },
+  "evidence": {
+    "automatic": [
+      "openspec-strict"
+    ],
+    "manual": [
+      "Replace with the expected manual evidence."
+    ]
+  },
+  "rollback": {
+    "strategy": "Replace with a bounded reversal strategy.",
+    "trigger": "Replace with the observable rollback trigger.",
+    "recovery": "Replace with the recovery verification."
+  },
+  "nonGoals": [
+    "Replace with an explicit non-goal."
+  ],
+  "exceptions": []
+}

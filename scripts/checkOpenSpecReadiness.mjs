@@ -140,8 +140,25 @@ export function validateIssue(issue, { now = new Date() } = {}) {
   return { results, manifest };
 }
 
+export function resolveExecution(command, args, { platform = process.platform, comspec = process.env.ComSpec ?? "cmd.exe" } = {}) {
+  if (platform !== "win32" || command !== "npm") return { command, args };
+
+  // npm es un .cmd en Windows. Node ya no permite ejecutarlo sin shell y `shell: true` concatena
+  // argumentos de forma insegura (DEP0190). El gate solo ejecuta la allowlist LOCAL_VALIDATIONS:
+  // rechazamos cualquier argumento con metacaracteres y llamamos cmd.exe de forma explícita.
+  const safe = ["npm", ...args].map((value) => {
+    const text = String(value);
+    if (!/^[A-Za-z0-9@_./:=,+-]+$/.test(text)) {
+      throw new Error(`Argumento no seguro en validación local: ${text}`);
+    }
+    return text;
+  });
+  return { command: comspec, args: ["/d", "/s", "/c", safe.join(" ")] };
+}
+
 function run(command, args, { cwd = ROOT } = {}) {
-  const execution = spawnSync(command, args, { cwd, encoding: "utf8", shell: process.platform === "win32" && command === "npm" });
+  const resolved = resolveExecution(command, args);
+  const execution = spawnSync(resolved.command, resolved.args, { cwd, encoding: "utf8" });
   return { status: execution.status ?? 1, stdout: execution.stdout ?? "", stderr: execution.stderr ?? "", error: execution.error?.message ?? "" };
 }
 

@@ -6,6 +6,7 @@
   "validations": ["openspec-strict", "harness-parity", "opsx-patch"],
   "evidence": [
     { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/128" },
+    { "id": "pr-link", "ref": "https://github.com/RitualBoat/PlanearIA/pull/130" },
     { "id": "adversarial-review", "ref": "openspec/changes/control-deuda-tecnica-sdd/evidencia/revision-adversarial.md" },
     { "id": "docs-verification", "ref": "Documentacion/02-operacion/CONTROL_DEUDA_TECNICA.md enlazado desde context engineering y plan maestro harness; agent:harness:check 36 espejos en paridad" },
     { "id": "fixtures", "ref": "tools/debt-control/test/fixtures (10 escenarios, generador determinista sin drift); suite node --test 58/58" }

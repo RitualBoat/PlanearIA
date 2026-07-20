@@ -41,5 +41,5 @@
 ## 6. Validacion y cierre
 
 - [x] 6.1 Suite completa: `test:debt-control`, `test:openspec-readiness`, `test:opsx-finish`, `constructor:check` afectado, `npm run typecheck`, `npm run lint -- --quiet`, `agent:harness:check`, `agent:opsx:patch:check` y segundo run sin drift del motor.
-- [ ] 6.2 Actualizar TLDR.md si cambio el alcance; completar readiness.json con validaciones, evidencia, rollback y referencia de revision adversarial.
+- [x] 6.2 Actualizar TLDR.md si cambio el alcance; completar readiness.json con validaciones, evidencia, rollback y referencia de revision adversarial.
 - [x] 6.3 Revision adversarial independiente (contexto limpio); corregir Blockers/Majors antes de archive.

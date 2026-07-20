@@ -4,23 +4,33 @@ Este documento es una fotografia del codigo actual. No define la UX objetivo. Si
 
 Fuente tecnica de verdad:
 
+- `src/navigation/routeManifest.ts`
+- `src/navigation/AppShell.tsx`
 - `src/navigation/StackNavigator.tsx`
-- `src/navigation/AppTabsNavigator.tsx`
 - `src/screens/`
 - `src/context/`
 - `src/sync/`
 
-## Tabs Actuales
+## Hubs Actuales
 
-| Tab actual | Pantalla | Lectura vigente |
-| --- | --- | --- |
-| `FeedTab` | `FeedScreen` | Feed actual; posible futuro secundario o reorientacion a comunidad. |
-| `ContenidoTab` | `ContenidoScreen` | Hub transversal actual; debe revisarse para no competir con Office/Classroom. |
-| `GruposTab` | `ClassroomHomeScreen` | Entrada principal al Classroom funcional actual. |
-| `SocialTab` | `SocialScreen` | Contactos/perfiles; base para WhatsApp Docente. |
-| `ConfiguracionTab` | `CuentaScreen` | Cuenta, roles, sesiones, preferencias y accesibilidad base. |
+Desde el change `app-shell-navegacion` (#81) la navegacion primaria son cinco hubs, cada uno un stack con
+historial propio, sobre una raiz de nueve rutas.
 
-La estructura de tabs es provisional. El futuro plan UX/UI puede reemplazarla por dashboard, sidebar, home modular, tabs hibridas o navegacion por experiencias.
+| Hub | Ruta | Landing | Lectura vigente |
+| --- | --- | --- | --- |
+| Inicio | `InicioTab` | `Escritorio` | Ruta inicial de la app; dock hacia las demas experiencias. El Escritorio completo llega en Ola 2. |
+| Office | `OfficeTab` | `OfficeHome` | Planeaciones, recursos, plantillas y biblioteca transversal. |
+| Clases | `ClasesTab` | `ClassroomHome` | Entrada al Classroom funcional. |
+| Asistente | `AsistenteTab` | `AsistenteHome` | Espacio del Copiloto IA; la conversacion completa llega en Ola 3. |
+| Mas | `MasTab` | `MasHome` | Cuenta, perfil, comunicacion y comunidad. |
+
+Las cinco tabs anteriores (`FeedTab`, `ContenidoTab`, `GruposTab`, `SocialTab`, `ConfiguracionTab`) ya no
+existen como navegacion primaria. Ninguna pantalla se elimino: `Feed` y `Social` viven como rutas dentro de
+`MasTab`, `Contenido` dentro de `OfficeTab`, y `Cuenta` dentro de `MasTab`. Son superficies legacy
+alcanzables desde su hub, no destinos de diseno.
+
+Detalle completo por hub, rutas de raiz y reglas de navegacion cruzada:
+`Documentacion/04-referencia/MAPA_NAVEGACION_ACTUAL.md`.
 
 ## Experiencias Objetivo
 
@@ -73,10 +83,10 @@ La estructura de tabs es provisional. El futuro plan UX/UI puede reemplazarla po
 
 ## Deuda A Considerar En UX/UI Global
 
-- Definir navegacion objetivo.
-- Definir que pasa con `ContenidoTab`.
-- Decidir si Office Docente sera tab, hub, workspace o herramienta contextual.
-- Decidir si el Asistente IA sera tab, panel lateral, command palette o accion flotante contextual.
+- Definir la navegacion objetivo de cada experiencia interna (el shell y sus hubs ya estan resueltos por #81).
+- ~~Definir que pasa con `ContenidoTab`~~: resuelto por la decision D6. Su funcion pasa a la biblioteca dentro de Office (ruta `Contenido` en `OfficeTab`) mas el selector transversal Asignar/Adjuntar.
+- ~~Decidir si Office Docente sera tab, hub, workspace o herramienta contextual~~: resuelto por #81. Es el hub `OfficeTab`.
+- ~~Decidir si el Asistente IA sera tab, panel lateral, command palette o accion flotante contextual~~: resuelto por la decision D4. Es el hub `AsistenteTab`; su superficie conversacional llega con `asistente-ia-base` (Ola 3).
 - Decidir si WhatsApp Docente reemplaza Social/Chat/parte del Feed.
 - Decidir si Plantillas es global, parte de Office o parte de Canva.
 - Consolidar accesibilidad real y preferencias.

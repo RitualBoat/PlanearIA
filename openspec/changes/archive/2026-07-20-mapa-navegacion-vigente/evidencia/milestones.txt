@@ -1,0 +1,6 @@
+10 | UX/UI Ola 0 - Fundaciones | state=closed | open=0 closed=3
+11 | UX/UI Ola 1 - Shell y componentes | state=closed | open=0 closed=4
+#81 CLOSED
+#82 CLOSED
+#83 CLOSED
+#84 CLOSED

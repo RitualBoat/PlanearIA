@@ -53,9 +53,9 @@
       "nonGitEntries": []
     },
     "packageArtifact": {
-      "bytes": 133081,
+      "bytes": 133424,
       "filename": "project-engineering-os-constructor-0.1.0.tgz",
-      "sha256": "4a8038c356d71a3a88639435e3fc1f04d6f9172fb4f00dd34127abfea6bb0abf"
+      "sha256": "41b18275ea1c56ea0d3f42cceb578f666b45f123cb0e101bba571e0db957017d"
     },
     "packedRunnerInstall": {
       "stderrLines": 0,
@@ -63,7 +63,7 @@
       "warnings": []
     },
     "firstBootstrapRunner": {
-      "artifactSha256": "4a8038c356d71a3a88639435e3fc1f04d6f9172fb4f00dd34127abfea6bb0abf",
+      "artifactSha256": "41b18275ea1c56ea0d3f42cceb578f666b45f123cb0e101bba571e0db957017d",
       "source": "temporary-runner-from-verified-tarball"
     },
     "firstBootstrap": {
@@ -73,7 +73,7 @@
       "mode": "apply",
       "mutationPerformed": true,
       "plan": {
-        "blueprintHash": "71fcfd8197efa193e053b73591873c4c12a21d136b683a1b19f2928ab245cb1c",
+        "blueprintHash": "f34254911604196139476ea85d8851d8910d9fcd5658c819535720510107b8a8",
         "configurationHash": "3fc41ea72053531a4137c5612d9031089bcdb7751fc9bffb5f68d6ddb970075f",
         "externalOwnership": {
           "commands": {
@@ -96,7 +96,7 @@
         "rollbackPoint": "pre-bootstrap",
         "summary": {
           "conflicts": 0,
-          "creates": 158,
+          "creates": 159,
           "deletes": 0,
           "preserves": 0,
           "stateUpdate": true,
@@ -109,13 +109,13 @@
           "harness-capability-and-mcp-parity",
           "transaction-journal-and-state-schema"
         ],
-        "operationCount": 158
+        "operationCount": 159
       },
       "status": "APPLIED",
       "transaction": {
-        "changes": 159,
+        "changes": 160,
         "resumed": false,
-        "transactionId": "tx-2026-07-20T04-40-49-256Z-93a65404"
+        "transactionId": "tx-2026-07-20T05-01-02-817Z-a2403ba5"
       }
     },
     "installedRuntime": {
@@ -131,7 +131,7 @@
       "mode": "apply",
       "mutationPerformed": false,
       "plan": {
-        "blueprintHash": "71fcfd8197efa193e053b73591873c4c12a21d136b683a1b19f2928ab245cb1c",
+        "blueprintHash": "f34254911604196139476ea85d8851d8910d9fcd5658c819535720510107b8a8",
         "configurationHash": "3fc41ea72053531a4137c5612d9031089bcdb7751fc9bffb5f68d6ddb970075f",
         "externalOwnership": {
           "commands": {
@@ -151,12 +151,12 @@
         },
         "hasDrift": false,
         "migrations": [],
-        "rollbackPoint": "tx-2026-07-20T04-40-49-256Z-93a65404",
+        "rollbackPoint": "tx-2026-07-20T05-01-02-817Z-a2403ba5",
         "summary": {
           "conflicts": 0,
           "creates": 0,
           "deletes": 0,
-          "preserves": 158,
+          "preserves": 159,
           "stateUpdate": false,
           "updates": 0
         },
@@ -167,7 +167,7 @@
           "harness-capability-and-mcp-parity",
           "transaction-journal-and-state-schema"
         ],
-        "operationCount": 158
+        "operationCount": 159
       },
       "status": "IN_SYNC",
       "transaction": {
@@ -187,7 +187,7 @@
       "mode": "check",
       "mutationPerformed": false,
       "plan": {
-        "blueprintHash": "71fcfd8197efa193e053b73591873c4c12a21d136b683a1b19f2928ab245cb1c",
+        "blueprintHash": "f34254911604196139476ea85d8851d8910d9fcd5658c819535720510107b8a8",
         "configurationHash": "3fc41ea72053531a4137c5612d9031089bcdb7751fc9bffb5f68d6ddb970075f",
         "externalOwnership": {
           "commands": {
@@ -207,12 +207,12 @@
         },
         "hasDrift": false,
         "migrations": [],
-        "rollbackPoint": "tx-2026-07-20T04-40-49-256Z-93a65404",
+        "rollbackPoint": "tx-2026-07-20T05-01-02-817Z-a2403ba5",
         "summary": {
           "conflicts": 0,
           "creates": 0,
           "deletes": 0,
-          "preserves": 158,
+          "preserves": 159,
           "stateUpdate": false,
           "updates": 0
         },
@@ -223,7 +223,7 @@
           "harness-capability-and-mcp-parity",
           "transaction-journal-and-state-schema"
         ],
-        "operationCount": 158
+        "operationCount": 159
       },
       "status": "IN_SYNC"
     },
@@ -409,7 +409,7 @@
       "status": "APPLIED",
       "transaction": {
         "changes": 25,
-        "transactionId": "1784522484919-8836352c-5c71-42da-bbfc-476b4554366b"
+        "transactionId": "1784523671050-1d432ceb-8757-4e31-9685-b8925b864276"
       }
     },
     "opsxCheck": {
@@ -855,6 +855,7 @@
               ".project-constructor/runtime/src/distribution.mjs",
               ".project-constructor/runtime/src/doctor.mjs",
               ".project-constructor/runtime/src/errors.mjs",
+              ".project-constructor/runtime/src/fixture-output.mjs",
               ".project-constructor/runtime/src/github-plan.mjs",
               ".project-constructor/runtime/src/harness.mjs",
               ".project-constructor/runtime/src/hash.mjs",
@@ -904,7 +905,7 @@
               "conflicts": 0,
               "creates": 0,
               "deletes": 0,
-              "preserves": 158,
+              "preserves": 159,
               "stateUpdate": false,
               "updates": 0
             }

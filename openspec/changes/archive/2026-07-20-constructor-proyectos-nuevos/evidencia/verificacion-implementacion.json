@@ -9,7 +9,7 @@
       "id": "constructor-tests",
       "status": "PASS",
       "command": "npm run constructor:test",
-      "summary": "44 tests aprobados; 0 fallos; sin stderr inesperado atribuible al constructor."
+      "summary": "46 tests aprobados; 0 fallos; sin stderr inesperado atribuible al constructor."
     },
     {
       "id": "empty-repository-fixture",
@@ -28,9 +28,9 @@
       "id": "package-artifact",
       "status": "PASS",
       "command": "npm pack ./tools/project-constructor --dry-run --json",
-      "summary": "Tarball privado verificable: 94 archivos, 133081 bytes, 567311 bytes desempaquetados.",
+      "summary": "Tarball privado verificable: 96 archivos, 133424 bytes, 568840 bytes desempaquetados.",
       "filename": "project-engineering-os-constructor-0.1.0.tgz",
-      "sha256": "4a8038c356d71a3a88639435e3fc1f04d6f9172fb4f00dd34127abfea6bb0abf"
+      "sha256": "41b18275ea1c56ea0d3f42cceb578f666b45f123cb0e101bba571e0db957017d"
     },
     {
       "id": "documentation-contract",
@@ -66,6 +66,15 @@
         "npm run openspec:ready:archive -- --change constructor-proyectos-nuevos --run-local"
       ],
       "summary": "Runner Windows sin shell:true, argumentos limitados a validaciones estáticas y gate repetido sin DEP0190."
+    },
+    {
+      "id": "openspec-init-output-portability",
+      "status": "PASS",
+      "commands": [
+        "node --test tools/project-constructor/test/fixture-output.test.mjs",
+        "npm run constructor:fixture -- --evidence artifacts/constructor/fixture.json"
+      ],
+      "summary": "Las variantes exactas √, ✓ y ✔ se aceptan en todos los SO; stderr adicional sigue fallando y la fixture completa conserva expectedProgress=true."
     },
     {
       "id": "repository-tests",

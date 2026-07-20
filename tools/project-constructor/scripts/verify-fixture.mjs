@@ -12,6 +12,10 @@ import {
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  classifyCommandOutput,
+  classifyOpenSpecInitOutput,
+} from "../src/fixture-output.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
@@ -124,56 +128,6 @@ async function parseJsonOutput(response, label) {
   } catch {
     throw new Error(`${label} no produjo JSON válido: ${response.stdout}`);
   }
-}
-
-function classifyCommandOutput(response) {
-  const stdoutLines = response.stdout.split(/\r?\n/).filter(Boolean);
-  const stderrLines = response.stderr.split(/\r?\n/).filter(Boolean);
-  const warnings = [...stdoutLines, ...stderrLines].filter((line) => (
-    /\b(?:deprecated|warn|warning)\b/i.test(line)
-  ));
-  return {
-    stderrLines: stderrLines.length,
-    stdoutLines: stdoutLines.length,
-    warnings,
-  };
-}
-
-function classifyOpenSpecInitOutput(response) {
-  const expectedTools = [
-    "Codex",
-    "Claude Code",
-    "Cursor",
-    "GitHub Copilot",
-    "OpenCode",
-  ];
-  const normalize = (line) => line
-    .replace(/\u001B\[[0-9;]*m/g, "")
-    .trim();
-  const stdoutLines = response.stdout.split(/\r?\n/).map(normalize).filter(Boolean);
-  const stderrLines = response.stderr.split(/\r?\n/).map(normalize).filter(Boolean);
-  const allLines = [...stdoutLines, ...stderrLines];
-  const allowedProgress = new Set(expectedTools.flatMap((tool) => [
-    `- Setting up ${tool}...`,
-    `√ Setup complete for ${tool}`,
-    `✓ Setup complete for ${tool}`,
-  ]));
-  const unexpectedStderr = stderrLines.filter((line) => !allowedProgress.has(line));
-  const missingSignals = expectedTools.flatMap((tool) => {
-    const setup = allLines.includes(`- Setting up ${tool}...`);
-    const complete = allLines.includes(`√ Setup complete for ${tool}`)
-      || allLines.includes(`✓ Setup complete for ${tool}`);
-    return [
-      ...(setup ? [] : [`setup:${tool}`]),
-      ...(complete ? [] : [`complete:${tool}`]),
-    ];
-  });
-  return {
-    ...classifyCommandOutput(response),
-    expectedProgress: unexpectedStderr.length === 0 && missingSignals.length === 0,
-    missingSignals,
-    unexpectedStderr,
-  };
 }
 
 function compactCommandPayload(payload, { includeOperationTargets = false } = {}) {

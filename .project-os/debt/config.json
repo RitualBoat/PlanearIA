@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "budget": {
+    "threshold": 5,
+    "minorUnits": 1,
+    "escalatedMinorUnits": 2
+  },
+  "triggers": {
+    "flowsWithResidualDebt": 5,
+    "recurrenceFlows": 3
+  },
+  "github": {
+    "mode": "required",
+    "repo": "RitualBoat/PlanearIA",
+    "remediationLabel": "debt-remediation",
+    "issueTitlePrefix": "[Debt][Saneamiento]"
+  },
+  "plans": [
+    {
+      "id": "uxui-navegacion-global",
+      "title": "Plan UX/UI y Navegacion Global",
+      "doc": "Documentacion/01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md"
+    },
+    {
+      "id": "auth-seguridad-sesion-real",
+      "title": "Plan Auth, Seguridad y Sesion Real",
+      "doc": "Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md"
+    },
+    {
+      "id": "preparacion-operativa-sdd-harness",
+      "title": "Plan Preparacion Operativa SDD y Harness Solo-Dev",
+      "doc": "Documentacion/01-planes-maestros/PLAN_PREPARACION_OPERATIVA_SDD_HARNESS_SOLO_DEV.md"
+    },
+    {
+      "id": "constructor-proyectos-nuevos",
+      "title": "Plan Constructor de Proyectos Nuevos",
+      "doc": "Documentacion/01-planes-maestros/PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md"
+    }
+  ],
+  "planRouting": {
+    "labelMap": {
+      "ux-ui": "uxui-navegacion-global",
+      "infra": "preparacion-operativa-sdd-harness",
+      "testing": "preparacion-operativa-sdd-harness"
+    },
+    "default": "preparacion-operativa-sdd-harness"
+  },
+  "allowlistLabels": [
+    "debt-remediation",
+    "security",
+    "incident",
+    "rollback"
+  ],
+  "branchHint": "feat/<nombre-del-change> creada desde development actualizado"
+}

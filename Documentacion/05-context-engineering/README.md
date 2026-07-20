@@ -29,6 +29,7 @@ PlanearIA trabaja con contexto dirigido. Una IA no lee todo el repo: identifica 
 | IA/LLM | `00-fundamentos/IA_CHATBOT_LLM.md`, `backend/lib/aiGateway.js`, reglas backend | Fallback proveedor, limites, confirmacion docente |
 | Plan Maestro nuevo | `01-planes-maestros/meta_guia_planes.md`, `00-fundamentos/ROADMAP_PLANES_MAESTROS.md` | Blueprint + backlog de changes, no fases tecnicas largas |
 | Preparar repositorio nuevo | [Plan](../01-planes-maestros/PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md), [índice](../02-operacion/constructor-proyectos/README.md), [Prompt 00](../02-operacion/constructor-proyectos/PROMPT_00_BOOTSTRAP_ENTORNO.md) | Bootstrap neutral, doctor, segundo run sin drift; ninguna pregunta de producto |
+| Deuda tecnica / saneamiento | [Runbook Debt Control](../02-operacion/CONTROL_DEUDA_TECNICA.md), `.project-os/debt/`, `npm run debt:check` | Assessment por flujo, registro verificado, presupuesto y pausa por plan |
 | Referencia visual | `context/<modulo>-ground-truth/` y respaldo externo si hace falta | Ground truth citado en `design.md` |
 | Archivo/historia | Respaldo externo del usuario | Solo contexto historico si el usuario lo aporta; nunca fuente ejecutable |
 

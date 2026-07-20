@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-07-20",
+  "kind": "feature",
+  "result": "clean",
+  "candidates": [],
+  "notes": "Cierre del change control-deuda-tecnica-sdd (#128). La revision adversarial independiente reporto 2 Majors, 6 Minors y 3 Preguntas; los 11 hallazgos fueron corregidos dentro del mismo change antes de archive (ver openspec/changes/control-deuda-tecnica-sdd/evidencia/revision-adversarial.md) y quedaron cubiertos por tests (58/58 del motor, readiness y opsx-finish verdes). No queda deuda residual confirmada de este flujo; la deuda preexistente del repositorio vive en el baseline baseline-planearia-2026-07 y en el issue de saneamiento #129.",
+  "flow": "control-deuda-tecnica-sdd"
+}

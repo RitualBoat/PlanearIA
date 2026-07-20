@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "project-engineering-os/debt-control/registry",
+  "title": "Registro canonico de deuda (.project-os/debt/registry.json)",
+  "description": "Fuente canonica del estado actual. Los items nunca se eliminan: los cierres cambian status y registran resolution. La validacion ejecutable vive en src/schema.mjs.",
+  "type": "object",
+  "required": ["schemaVersion", "items"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "category", "severity", "status", "planOwner", "artifact", "evidence", "occurrences", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^debt-[0-9a-f]{12}$", "description": "Fingerprint estable de categoria+artefacto+titulo normalizados." },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "category": { "enum": ["defect", "technical-debt", "external-risk", "decision-required", "optional-improvement"] },
+          "severity": { "enum": ["blocker", "major", "minor"] },
+          "transversal": { "type": "boolean" },
+          "critical": { "type": "boolean", "description": "Con transversal=true pausa todos los planes." },
+          "planOwner": { "type": "string" },
+          "artifact": { "type": "string" },
+          "consequence": { "type": "string" },
+          "remediation": { "type": "string" },
+          "evidence": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["type", "ref", "date"] } },
+          "occurrences": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["flow", "date"] } },
+          "issue": { "type": ["integer", "null"] },
+          "status": { "enum": ["open", "resolved", "refuted", "duplicate", "accepted-exception"] },
+          "exception": {
+            "type": ["object", "null"],
+            "required": ["reason", "owner", "approvedBy", "expiresOn", "recovery"],
+            "properties": { "expiresOn": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" } }
+          },
+          "createdAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "updatedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "resolution": { "type": ["object", "null"], "required": ["flow", "evidence"] }
+        }
+      }
+    }
+  }
+}

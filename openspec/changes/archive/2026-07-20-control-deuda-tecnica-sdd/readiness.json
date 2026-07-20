@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "issue": 128,
+  "change": "control-deuda-tecnica-sdd",
+  "surfaces": ["harness", "docs"],
+  "validations": ["openspec-strict", "harness-parity", "opsx-patch"],
+  "evidence": [
+    { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/128" },
+    { "id": "pr-link", "ref": "https://github.com/RitualBoat/PlanearIA/pull/130" },
+    { "id": "adversarial-review", "ref": "openspec/changes/control-deuda-tecnica-sdd/evidencia/revision-adversarial.md" },
+    { "id": "docs-verification", "ref": "Documentacion/02-operacion/CONTROL_DEUDA_TECNICA.md enlazado desde context engineering y plan maestro harness; agent:harness:check 36 espejos en paridad" },
+    { "id": "fixtures", "ref": "tools/debt-control/test/fixtures (10 escenarios, generador determinista sin drift); suite node --test 58/58" }
+  ],
+  "rollback": {
+    "strategy": "Revertir el PR del motor restaura los gates y el cierre previos: sin politica de deuda configurada todos los comandos reportan SKIP explicito. Los assessments, el registro y los issues creados (#129) no se borran; la integracion GitHub puede pasarse a advisory u off editando .project-os/debt/config.json mediante PR normal."
+  },
+  "adversarialReview": { "ref": "openspec/changes/control-deuda-tecnica-sdd/evidencia/revision-adversarial.md (PASS tras corregir 2 Majors, 6 Minors y 3 Preguntas)" },
+  "exceptions": []
+}

@@ -208,4 +208,20 @@ if (KEEP_REMOTE) {
   ok(`rama remota conservada (--keep-remote): origin/${branch}`);
 }
 
+// Red de seguridad de deuda posterior al merge: recalcula el registro sobre el arbol ya integrado y
+// sincroniza el expediente GitHub segun su modo. Un FAIL aqui no des-mergea (el merge remoto ya
+// ocurrio), pero el cierre no puede reportarse verde con deuda bloqueante sin atender.
+ok('ejecutando la red de seguridad de deuda (debt-control postfinish)');
+const debt = spawnSync(process.execPath, ['tools/debt-control/bin/debt-control.mjs', 'postfinish'], {
+  encoding: 'utf8',
+  stdio: 'inherit',
+});
+if ((debt.status ?? 1) !== 0) {
+  abort(
+    `La red de seguridad de deuda reporto FAIL tras el merge del PR #${pullRequest.number}.\n` +
+      '  El merge ya ocurrio y no se revierte. Revisa el reporte anterior: el plan afectado queda\n' +
+      "  pausado y el siguiente paso es el issue de saneamiento ('npm run debt:check' para el detalle).",
+  );
+}
+
 console.log(`\n[opsx:finish] Listo. '${branch}' se cerro mediante PR en '${TARGET}'.\n`);

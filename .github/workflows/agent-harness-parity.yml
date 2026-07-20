@@ -52,3 +52,9 @@ jobs:
       - name: opsx workflows use the pinned CLI and no zombie command
         continue-on-error: true
         run: npm run agent:opsx:patch:check
+      - name: OpenSpec readiness gate tests (incluye gates de deuda)
+        continue-on-error: true
+        run: npm run test:openspec-readiness
+      - name: Debt control engine tests
+        continue-on-error: true
+        run: npm run test:debt-control

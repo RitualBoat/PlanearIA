@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-07-15",
+  "kind": "feature",
+  "result": "clean",
+  "candidates": [
+    {
+      "title": "Warning de scanner sobre dependencia X",
+      "artifact": "package.json#dependencia-x",
+      "source": "scanner",
+      "category": "false-positive",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "npm ls dependencia-x",
+          "date": "2026-07-15"
+        }
+      ],
+      "verification": {
+        "method": "reproduccion local",
+        "result": "la ruta reportada no existe en el arbol actual",
+        "date": "2026-07-15"
+      }
+    },
+    {
+      "title": "TODO historico ya corregido",
+      "artifact": "src/example-viejo.mjs",
+      "source": "comentario historico",
+      "category": "technical-debt",
+      "resolvedPreviously": true,
+      "evidence": [
+        {
+          "type": "diff",
+          "ref": "PR #90",
+          "date": "2026-07-15"
+        }
+      ],
+      "verification": {
+        "method": "lectura del codigo actual",
+        "result": "el TODO ya no existe",
+        "date": "2026-07-15"
+      }
+    }
+  ]
+}

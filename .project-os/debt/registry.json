@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "debt-3d3ea5ba87ac",
+      "title": "27 archivos consumen useWindowDimensions directo en vez de useBreakpoint",
+      "description": "27 archivos consumen useWindowDimensions directo en vez de useBreakpoint",
+      "category": "technical-debt",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "uxui-navegacion-global",
+      "artifact": "src/** (27 archivos; issue #106)",
+      "consequence": "Dos fuentes de verdad de breakpoint conviven; una pantalla puede responder a un rango distinto del shell.",
+      "remediation": "Ejecutar el issue #106: migrar los 27 consumidores a useBreakpoint.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "grep -rl useWindowDimensions src --include=*.tsx --include=*.ts | grep -v useBreakpoint | wc -l => 27",
+          "date": "2026-07-20"
+        },
+        {
+          "type": "issue",
+          "ref": "https://github.com/RitualBoat/PlanearIA/issues/106",
+          "date": "2026-07-20"
+        }
+      ],
+      "occurrences": [
+        {
+          "flow": "baseline-planearia-2026-07",
+          "date": "2026-07-20"
+        }
+      ],
+      "issue": null,
+      "status": "open",
+      "exception": null,
+      "createdAt": "2026-07-20",
+      "updatedAt": "2026-07-20",
+      "resolution": null
+    },
+    {
+      "id": "debt-b279f64f815b",
+      "title": "Rollout de theming runtime incompleto: pantallas legacy en LEGACY_COLORS_ROLLOUT",
+      "description": "Rollout de theming runtime incompleto: pantallas legacy en LEGACY_COLORS_ROLLOUT",
+      "category": "technical-debt",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "uxui-navegacion-global",
+      "artifact": ".eslintrc.cjs#LEGACY_COLORS_ROLLOUT",
+      "consequence": "Las pantallas legacy congelan el tema al importar COLORS estatico; cambiar el tema no las repinta.",
+      "remediation": "Politica D8 fix-on-touch: toda pantalla tocada sale de la lista; el registro del rollout vive en .eslintrc.cjs.",
+      "evidence": [
+        {
+          "type": "file",
+          "ref": ".eslintrc.cjs lineas 60-86: no-restricted-imports COLORS + lista LEGACY_COLORS_ROLLOUT con ~39 entradas",
+          "date": "2026-07-20"
+        }
+      ],
+      "occurrences": [
+        {
+          "flow": "baseline-planearia-2026-07",
+          "date": "2026-07-20"
+        }
+      ],
+      "issue": null,
+      "status": "open",
+      "exception": null,
+      "createdAt": "2026-07-20",
+      "updatedAt": "2026-07-20",
+      "resolution": null
+    },
+    {
+      "id": "debt-5862d25288fa",
+      "title": "expo-blur y fuente de marca diferidos en tokens-completos",
+      "description": "expo-blur y fuente de marca diferidos en tokens-completos",
+      "category": "optional-improvement",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "uxui-navegacion-global",
+      "artifact": "package.json (sin expo-blur; fuente de marca no adoptada)",
+      "consequence": "Sin costo actual: el fallback solido es el comportamiento aprobado hasta medir blur (regla 1.9.4).",
+      "remediation": "Evaluar expo-blur solo tras medicion de performance segun la regla 1.9.4 del plan UX/UI.",
+      "evidence": [
+        {
+          "type": "doc",
+          "ref": "openspec/changes/archive/2026-07-18-tokens-completos/design.md Decision 5: expo-blur diferido por escrito",
+          "date": "2026-07-20"
+        }
+      ],
+      "occurrences": [
+        {
+          "flow": "baseline-planearia-2026-07",
+          "date": "2026-07-20"
+        }
+      ],
+      "issue": null,
+      "status": "open",
+      "exception": null,
+      "createdAt": "2026-07-20",
+      "updatedAt": "2026-07-20",
+      "resolution": null
+    },
+    {
+      "id": "debt-6c9672a48059",
+      "title": "Decision de riesgo de xlsx pendiente (advisory high sin fix upstream)",
+      "description": "Decision de riesgo de xlsx pendiente (advisory high sin fix upstream)",
+      "category": "decision-required",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "preparacion-operativa-sdd-harness",
+      "artifact": "package.json#xlsx",
+      "consequence": "Un archivo malicioso importado puede congelar o comprometer la app docente; no hay mitigaciones de tamano/tiempo implementadas.",
+      "remediation": "Ejecutar el change decision-riesgo-xlsx: mantener con mitigaciones, aislar, migrar o reemplazar, con owner y fecha.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "npm audit --json: xlsx high, direct, fixAvailable false",
+          "date": "2026-07-20"
+        }
+      ],
+      "occurrences": [
+        {
+          "flow": "baseline-planearia-2026-07",
+          "date": "2026-07-20"
+        }
+      ],
+      "issue": 129,
+      "status": "open",
+      "exception": null,
+      "createdAt": "2026-07-20",
+      "updatedAt": "2026-07-20",
+      "resolution": null
+    },
+    {
+      "id": "debt-d73a5844fae3",
+      "title": "Advisories transitivas pendientes de la cadencia de dependencias Expo",
+      "description": "Advisories transitivas pendientes de la cadencia de dependencias Expo",
+      "category": "technical-debt",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "preparacion-operativa-sdd-harness",
+      "artifact": "package-lock.json",
+      "consequence": "21 advisories (3 high: xlsx, ws, form-data; 17 moderate del arbol Expo) sin ventana de actualizacion definida; los parches compatibles no se aplican.",
+      "remediation": "Ejecutar cadencia-dependencias-expo: separar parches compatibles de upgrades de SDK y fijar cadencia con rollback.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "npm audit --json: total 21 (1 low, 17 moderate, 3 high); ws y form-data con fixAvailable true; arbol expo requiere SDK 57 (semver major)",
+          "date": "2026-07-20"
+        }
+      ],
+      "occurrences": [
+        {
+          "flow": "baseline-planearia-2026-07",
+          "date": "2026-07-20"
+        }
+      ],
+      "issue": 129,
+      "status": "open",
+      "exception": null,
+      "createdAt": "2026-07-20",
+      "updatedAt": "2026-07-20",
+      "resolution": null
+    },
+    {
+      "id": "debt-2887d890144e",
+      "title": "Checks del harness en continue-on-error (paridad y gates sin bloquear)",
+      "description": "Checks del harness en continue-on-error (paridad y gates sin bloquear)",
+      "category": "technical-debt",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "preparacion-operativa-sdd-harness",
+      "artifact": ".github/workflows/agent-harness-parity.yml",
+      "consequence": "El drift reproducible del harness no bloquea PRs; se descubre tarde, durante changes de producto.",
+      "remediation": "Ejecutar endurecer-harness-ci: retirar continue-on-error solo de los checks estabilizados con rollback documentado.",
+      "evidence": [
+        {
+          "type": "file",
+          "ref": ".github/workflows/agent-harness-parity.yml: todos los pasos de checks declaran continue-on-error true y el encabezado documenta el cutover pendiente",
+          "date": "2026-07-20"
+        }
+      ],
+      "occurrences": [
+        {
+          "flow": "baseline-planearia-2026-07",
+          "date": "2026-07-20"
+        }
+      ],
+      "issue": 129,
+      "status": "open",
+      "exception": null,
+      "createdAt": "2026-07-20",
+      "updatedAt": "2026-07-20",
+      "resolution": null
+    },
+    {
+      "id": "debt-f466da64b58a",
+      "title": "Mojibake vigente en codigo y tests de producto",
+      "description": "Mojibake vigente en codigo y tests de producto",
+      "category": "technical-debt",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "preparacion-operativa-sdd-harness",
+      "artifact": "src/components/editor/sections/SeccionCurricular.tsx y 4+ archivos mas",
+      "consequence": "Textos visibles al docente con codificacion rota (p.ej. InclusiA3n) y riesgo de que agentes propaguen la basura al editar.",
+      "remediation": "Corregir los archivos afectados y proteger con un check simple de codificacion (parte de baseline-knip-mojibake).",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "grep -nE 'mojibake UTF-8 doble' src/components/editor/sections/SeccionCurricular.tsx linea 23: \"InclusiA3n\" (grep de patrones A-tilde)",
+          "date": "2026-07-20"
+        }
+      ],
+      "occurrences": [
+        {
+          "flow": "baseline-planearia-2026-07",
+          "date": "2026-07-20"
+        }
+      ],
+      "issue": 129,
+      "status": "open",
+      "exception": null,
+      "createdAt": "2026-07-20",
+      "updatedAt": "2026-07-20",
+      "resolution": null
+    },
+    {
+      "id": "debt-cbe0188191b5",
+      "title": "Suites con ruido de consola y warnings act() sin fallar",
+      "description": "Suites con ruido de consola y warnings act() sin fallar",
+      "category": "technical-debt",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "preparacion-operativa-sdd-harness",
+      "artifact": "src/__tests__ (salida de Jest)",
+      "consequence": "El ruido esconde regresiones reales y gasta contexto de agentes al leer logs irrelevantes.",
+      "remediation": "Ejecutar limpiar-senal-tests: espiar/restaurar logs esperados y hacer fallar console.error/warn inesperados.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "npm run test:sync -- --runInBand: 23 pass con lineas console.error en la salida",
+          "date": "2026-07-20"
+        }
+      ],
+      "occurrences": [
+        {
+          "flow": "baseline-planearia-2026-07",
+          "date": "2026-07-20"
+        }
+      ],
+      "issue": 129,
+      "status": "open",
+      "exception": null,
+      "createdAt": "2026-07-20",
+      "updatedAt": "2026-07-20",
+      "resolution": null
+    }
+  ]
+}

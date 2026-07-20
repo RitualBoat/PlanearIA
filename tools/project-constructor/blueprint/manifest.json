@@ -298,6 +298,15 @@
       "required": true
     },
     {
+      "id": "debt-policy",
+      "source": "core/project-os/debt-policy.json",
+      "target": ".project-os/debt/config.json",
+      "owner": "project",
+      "mode": "json",
+      "lineEndings": "lf",
+      "required": true
+    },
+    {
       "id": "discovery-issues",
       "source": "core/project-os/github/discovery-issues.json",
       "target": ".project-os/github/discovery-issues.json",

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { report, resolveExecution, summaryFor, validateArchive, validateIssue } from "./checkOpenSpecReadiness.mjs";
+import { debtArchiveChecks, debtProposeCheck, report, resolveExecution, summaryFor, validateArchive, validateIssue } from "./checkOpenSpecReadiness.mjs";
 
 const now = new Date("2026-07-15T12:00:00Z");
 const issueBody = `## Contexto\n\n## Historia Original\n\n## Enriquecida\n\n**No objetivos.**\n\n**Rollback.**\n\n<!-- openspec-readiness:pre-propose\n{"schemaVersion":1,"change":"sample-change","execution":"versioned","dependencies":[49],"currentState":"CodeGraph","surfaces":["docs","harness"],"manualIntervention":"none","exceptions":[]}\nopenspec-readiness:pre-propose -->`;
@@ -141,5 +141,86 @@ assert.equal(report(validateArchive({ root, change: "../escape", now, runCommand
 manifest.commands = ["dangerous command"];
 writeFileSync(path.join(changeRoot, "readiness.json"), JSON.stringify(manifest));
 assert.equal(report(validateArchive({ root, change: "sample-change", now, runCommand: healthyRun })).ok, false);
+
+// --- Gates de deuda integrados al checker ---
+//
+// Sin motor configurado, propose y archive reportan SKIP explicito (nunca PASS implicito) y el gate
+// sigue siendo utilizable en repos sin politica de deuda.
+delete manifest.commands;
+manifest.exceptions = [];
+manifest.evidence.push({ id: "fixtures", ref: "fixtures pass" });
+writeFileSync(path.join(changeRoot, "readiness.json"), JSON.stringify(manifest));
+const sinMotor = report(validateArchive({ root, change: "sample-change", now, runCommand: healthyRun }));
+assert.equal(sinMotor.ok, true);
+assert.ok(sinMotor.results.some((item) => item.id === "debt-gate" && item.status === "SKIP"));
+assert.equal(debtProposeCheck({ root, labels: [], now }).status, "SKIP");
+
+// Con motor configurado y plan pausado: propose bloquea la label ruteada, permite la allowlist y el
+// archive exige assessment del flujo.
+const debtDir = path.join(root, ".project-os", "debt");
+mkdirSync(path.join(debtDir, "assessments"), { recursive: true });
+const debtConfig = {
+  schemaVersion: 1,
+  budget: { threshold: 5, minorUnits: 1, escalatedMinorUnits: 2 },
+  triggers: { flowsWithResidualDebt: 5, recurrenceFlows: 3 },
+  github: { mode: "off" },
+  plans: [{ id: "plan-demo", title: "Plan Demo" }],
+  planRouting: { labelMap: { "ux-ui": "plan-demo" }, default: null },
+  allowlistLabels: ["debt-remediation"],
+};
+writeFileSync(path.join(debtDir, "config.json"), JSON.stringify(debtConfig));
+writeFileSync(path.join(debtDir, "registry.json"), JSON.stringify({
+  schemaVersion: 1,
+  items: [{
+    id: "debt-0123456789ab",
+    title: "Major abierto de demo",
+    description: "Major abierto de demo",
+    category: "defect",
+    severity: "major",
+    transversal: false,
+    critical: false,
+    planOwner: "plan-demo",
+    artifact: "src/demo.mjs",
+    consequence: "",
+    remediation: "",
+    evidence: [{ type: "repro", ref: "pasos", date: "2026-07-10" }],
+    occurrences: [{ flow: "flow-demo", date: "2026-07-10" }],
+    issue: null,
+    status: "open",
+    exception: null,
+    createdAt: "2026-07-10",
+    updatedAt: "2026-07-10",
+    resolution: null,
+  }],
+}));
+const bloqueado = debtProposeCheck({ root, labels: [{ name: "ux-ui" }], now });
+assert.equal(bloqueado.status, "FAIL");
+assert.match(bloqueado.summary, /pausado/);
+assert.equal(debtProposeCheck({ root, labels: [{ name: "ux-ui" }, { name: "debt-remediation" }], now }).status, "PASS");
+assert.equal(debtProposeCheck({ root, labels: [{ name: "sin-mapa" }], now }).status, "PASS");
+
+const sinAssessment = report(validateArchive({ root, change: "sample-change", now, runCommand: healthyRun }));
+assert.equal(sinAssessment.ok, false);
+assert.ok(sinAssessment.results.some((item) => item.id === "debt-gate" && item.status === "FAIL"));
+
+writeFileSync(path.join(debtDir, "assessments", "sample-change.json"), JSON.stringify({
+  schemaVersion: 1,
+  flow: "sample-change",
+  date: "2026-07-15",
+  kind: "feature",
+  result: "clean",
+  candidates: [],
+}));
+const conAssessment = report(validateArchive({ root, change: "sample-change", now, runCommand: healthyRun }));
+assert.equal(conAssessment.ok, true);
+assert.ok(conAssessment.results.some((item) => item.id === "debt-gate" && item.status === "PASS"));
+assert.equal(debtArchiveChecks({ root, change: "sample-change", now }).every((item) => item.status === "PASS"), true);
+
+// Un registro corrupto produce FAIL con recuperacion, nunca un verde por defecto.
+writeFileSync(path.join(debtDir, "registry.json"), "{corrupto");
+const corrupto = debtProposeCheck({ root, labels: [{ name: "ux-ui" }], now });
+assert.equal(corrupto.status, "FAIL");
+assert.ok(corrupto.remediation);
+
 rmSync(root, { recursive: true, force: true });
 process.stdout.write("OpenSpec readiness tests passed.\n");

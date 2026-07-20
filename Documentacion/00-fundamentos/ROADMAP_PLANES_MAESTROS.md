@@ -16,6 +16,7 @@ Este archivo define orden recomendado, estado y criterios de activacion. No reem
 | Plan | Archivo | Estado |
 | --- | --- | --- |
 | Meta Guia de Planes | `01-planes-maestros/meta_guia_planes.md` | Vigente como instructivo obligatorio (v3, SDD con OpenSpec). |
+| Constructor Reutilizable de Proyectos Nuevos | `01-planes-maestros/PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md` | ACTIVO (2026-07). Ola 0 limitada al nucleo universal sin producto; discovery y perfiles tecnicos permanecen lazy. |
 | Preparacion Operativa SDD y Harness Solo-Dev | `01-planes-maestros/PLAN_PREPARACION_OPERATIVA_SDD_HARNESS_SOLO_DEV.md` | ACTIVO (2026-07). Prerrequisito transversal just-in-time para UX/UI; corrige toolchain, gobernanza, feedback loops y gates manuales. |
 | UX/UI y Navegacion Global | `01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md` | ACTIVO (2026-07). Blueprint + backlog de changes por olas; primer plan en formato SDD. |
 | Auth, Seguridad y Sesion Real | `01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md` | Activo/en cierre. Automatizable casi completo; faltan email real o decision de diferir, datos sociales, validacion manual y GitHub Product OS. |
@@ -26,6 +27,14 @@ Este archivo define orden recomendado, estado y criterios de activacion. No reem
 | Storage Local SQLite y Migracion Offline | `01-planes-maestros/cerrados/PLAN_STORAGE_LOCAL_SQLITE_MIGRACION_OFFLINE (closed).md` | Cerrado como opt-in con rollback. |
 
 ## Siguiente Plan Recomendado
+
+### Meta. Constructor Reutilizable de Proyectos Nuevos (OLA 0 ACTIVA)
+
+Ejecutar `PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md` como trabajo meta separado del producto PlanearIA. La
+Ola 0 instala y prueba solo gobernanza, SDD, harness, doctor, CI, documentación y el paquete neutral
+de issues de discovery. No instala frameworks, bases de datos, cloud ni dependencias de producto.
+Las olas de discovery, perfil técnico e inicio de producto se activan únicamente en un repositorio
+nuevo y después de sus gates manuales.
 
 ### 0. Preparacion Operativa SDD y Harness Solo-Dev (ACTIVO)
 
@@ -77,6 +86,8 @@ Planes que si seguiran siendo documentos propios cuando toquen:
 
 | Trabajo | Activar cuando |
 | --- | --- |
+| Constructor de proyectos nuevos, Ola 0 | ACTIVO. Cerrar bootstrap vacío, idempotencia, rollback, doctor y paridad antes de activar discovery o perfiles. |
+| Constructor, olas 1+ | Solo tras cerrar Ola 0; se mantienen lazy y no crean issues anticipadamente. |
 | Preparacion Operativa SDD/Harness | ACTIVO. Cerrar R0/R1/R2 antes de las olas UX que los consumen; un change OpenSpec a la vez. |
 | UX/UI Global | ACTIVO. Decisiones tomadas: Office = tab/experiencia madre con NotasPLAN/CalcuPLAN/PresentaPLAN; Asistente = tab movil + panel acoplable web; Feed+Social = ConectaPLAN. |
 | Changes Ola 0 (fundaciones) | Ya: son prerequisito de toda pantalla nueva. |
@@ -90,6 +101,8 @@ Planes que si seguiran siendo documentos propios cuando toquen:
 
 ## GitHub Product OS
 
+- Mantener el issue meta del constructor y crear únicamente items de la ola activa y la siguiente; las
+  olas posteriores permanecen en el plan maestro.
 - Crear el epic de Preparacion Operativa y solo los Gates M + Ola 0 al inicio; agregar Ola 1 como
   siguiente tanda cuando Ola 0 este en curso/cierre.
 - Mantener epic/fases de Auth hasta cierre formal.
@@ -100,4 +113,4 @@ Planes que si seguiran siendo documentos propios cuando toquen:
 
 ## Version
 
-- Ultima actualizacion: 2026-07-14 (plan de preparacion operativa SDD/harness agregado como gate transversal de UX/UI).
+- Ultima actualizacion: 2026-07-19 (constructor reusable agregado como plan meta activo, limitado a Ola 0).

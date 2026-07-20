@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.0.0",
+  "skills": [
+    {
+      "id": "adversarial-review",
+      "enabled": false,
+      "description": "Attempt to refute the implementation and classify findings before closure.",
+      "instructions": [
+        "Review from an independent or clean context.",
+        "Classify findings as Blocker, Major, Minor, or Question.",
+        "Correct all Blockers and Majors before closure.",
+        "Use the adversarial checklist in AGENTS.md when the harness cannot invoke this skill."
+      ]
+    },
+    {
+      "id": "evidence-capture",
+      "enabled": false,
+      "description": "Collect automatic and manual evidence using the active profile.",
+      "instructions": [
+        "Read .project-os/profiles.json.",
+        "Run only validations from active profiles.",
+        "Attach evidence references to the issue or pull request.",
+        "Never convert missing, skipped, or cancelled evidence to PASS."
+      ]
+    },
+    {
+      "id": "issue-enrichment",
+      "enabled": false,
+      "description": "Enrich an issue without replacing its original text.",
+      "instructions": [
+        "Append context, observable criteria, dependencies, surfaces, risks, evidence, rollback, and non-goals.",
+        "Record owner, state, and manual gates.",
+        "Search for duplicates before proposing a change."
+      ]
+    }
+  ],
+  "policy": {
+    "activationRequiresDecision": true,
+    "essentialBehaviorMustExistInAgents": true,
+    "opsxOwner": "external-openspec",
+    "generalRendererMayGenerateOpsx": false
+  }
+}

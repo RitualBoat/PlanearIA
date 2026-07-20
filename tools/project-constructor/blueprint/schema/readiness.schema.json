@@ -1,0 +1,427 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-os.local/schema/readiness.schema.json",
+  "title": "Project OS change readiness metadata v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "issue",
+    "change",
+    "surfaces",
+    "validations",
+    "evidence",
+    "rollback",
+    "adversarialReview",
+    "exceptions"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "issue": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "change": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "surfaces": {
+      "$ref": "#/$defs/surfaces"
+    },
+    "validations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/validation"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
+    },
+    "rollback": {
+      "$ref": "#/$defs/rollback"
+    },
+    "adversarialReview": {
+      "$ref": "#/$defs/adversarialReview"
+    },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/exception"
+      }
+    }
+  },
+  "$defs": {
+    "surfaces": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "ai",
+          "auth-security",
+          "backend-api",
+          "data-migration-sync",
+          "documentation",
+          "harness-tooling",
+          "infra-deploy",
+          "library-cli",
+          "ui"
+        ]
+      }
+    },
+    "nullableText": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
+      ]
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "evidence",
+        "justification",
+        "profileCondition"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "passed",
+            "failed",
+            "not-applicable"
+          ]
+        },
+        "evidence": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "justification": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "profileCondition": {
+          "$ref": "#/$defs/nullableText"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "passed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "evidence": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "not-applicable"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "justification": {
+                "type": "string",
+                "minLength": 1
+              },
+              "profileCondition": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "status",
+        "ref",
+        "justification",
+        "profileCondition"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "kind": {
+          "enum": [
+            "automatic",
+            "manual"
+          ]
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "verified",
+            "failed",
+            "not-applicable"
+          ]
+        },
+        "ref": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "justification": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "profileCondition": {
+          "$ref": "#/$defs/nullableText"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "verified"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "ref": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "not-applicable"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "justification": {
+                "type": "string",
+                "minLength": 1
+              },
+              "profileCondition": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "strategy",
+        "status",
+        "evidence",
+        "justification"
+      ],
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "verified",
+            "not-applicable"
+          ]
+        },
+        "evidence": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "justification": {
+          "$ref": "#/$defs/nullableText"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "verified"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "evidence": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "not-applicable"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "justification": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "adversarialReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "ref",
+        "blockers",
+        "majors"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "pending",
+            "passed",
+            "failed"
+          ]
+        },
+        "ref": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "blockers": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "majors": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "passed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "blockers": {
+                "const": 0
+              },
+              "majors": {
+                "const": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "reason",
+        "owner",
+        "approvedBy",
+        "expiresOn",
+        "recovery"
+      ],
+      "properties": {
+        "field": {
+          "enum": [
+            "project-membership",
+            "manual-evidence"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approvedBy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expiresOn": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "recovery": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

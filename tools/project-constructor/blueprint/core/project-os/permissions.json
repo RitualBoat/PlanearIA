@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0.0",
+  "rules": [
+    {
+      "id": "allow-read-local",
+      "effect": "allow",
+      "commands": [
+        "read:workspace",
+        "git:status",
+        "validate:local",
+        "test:local"
+      ],
+      "reason": "Read-only inspection and local evidence are normal work inside the approved repository scope."
+    },
+    {
+      "id": "ask-external-authority",
+      "effect": "ask",
+      "commands": [
+        "auth:consent",
+        "github:write",
+        "git:push",
+        "branch-protection:change",
+        "merge",
+        "release"
+      ],
+      "reason": "Authentication and remote mutations grant authority or change shared state."
+    },
+    {
+      "id": "ask-cost-license",
+      "effect": "ask",
+      "commands": [
+        "service:purchase",
+        "paid-feature:enable",
+        "license:accept",
+        "secret:create-or-rotate"
+      ],
+      "reason": "Cost, legal terms, and secret lifecycle need attributable owner approval."
+    },
+    {
+      "id": "deny-destructive-history",
+      "effect": "deny",
+      "commands": [
+        "git:push-force",
+        "git:reset-hard",
+        "git:clean-force",
+        "unmerged-work:delete"
+      ],
+      "reason": "Destructive history and filesystem operations can discard work or recovery evidence."
+    },
+    {
+      "id": "deny-doctor-mutation",
+      "effect": "deny",
+      "commands": [
+        "doctor:install",
+        "doctor:repair",
+        "doctor:authenticate",
+        "doctor:update",
+        "doctor:reindex",
+        "doctor:start-process"
+      ],
+      "reason": "The doctor contract is strictly read-only."
+    },
+    {
+      "id": "deny-secret-disclosure",
+      "effect": "deny",
+      "commands": [
+        "secret:print-value",
+        "secret:commit",
+        "private-key:copy-to-evidence"
+      ],
+      "reason": "Evidence and generated configuration may name environment variables but never reveal values."
+    }
+  ],
+  "degradation": {
+    "unsupportedEnforcement": "documented",
+    "fallback": "AGENTS.md",
+    "mustNotClaimTechnicalEnforcement": true
+  }
+}

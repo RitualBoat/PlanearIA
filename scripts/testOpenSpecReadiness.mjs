@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { report, summaryFor, validateArchive, validateIssue } from "./checkOpenSpecReadiness.mjs";
+import { report, resolveExecution, summaryFor, validateArchive, validateIssue } from "./checkOpenSpecReadiness.mjs";
 
 const now = new Date("2026-07-15T12:00:00Z");
 const issueBody = `## Contexto\n\n## Historia Original\n\n## Enriquecida\n\n**No objetivos.**\n\n**Rollback.**\n\n<!-- openspec-readiness:pre-propose\n{"schemaVersion":1,"change":"sample-change","execution":"versioned","dependencies":[49],"currentState":"CodeGraph","surfaces":["docs","harness"],"manualIntervention":"none","exceptions":[]}\nopenspec-readiness:pre-propose -->`;
@@ -11,6 +11,21 @@ assert.equal(report(validateIssue(issue, { now })).ok, true);
 assert.equal(report(validateIssue({ ...issue, body: issueBody.replace("**Rollback.**", "") }, { now })).ok, false);
 assert.equal(report(validateIssue({ ...issue, projectItems: [] }, { now })).ok, false);
 assert.equal(report(validateIssue({ ...issue, dependencyStates: [{ number: 49, state: "OPEN" }] }, { now })).ok, false);
+
+const posixNpm = resolveExecution("npm", ["run", "agent:harness:check"], { platform: "linux" });
+assert.deepEqual(posixNpm, { command: "npm", args: ["run", "agent:harness:check"] });
+const windowsNpm = resolveExecution("npm", ["run", "agent:harness:check"], {
+  platform: "win32",
+  comspec: "C:\\Windows\\System32\\cmd.exe",
+});
+assert.deepEqual(windowsNpm, {
+  command: "C:\\Windows\\System32\\cmd.exe",
+  args: ["/d", "/s", "/c", "npm run agent:harness:check"],
+});
+assert.throws(
+  () => resolveExecution("npm", ["run", "safe & unsafe"], { platform: "win32" }),
+  /Argumento no seguro/,
+);
 
 // --- El resumen de cada linea debe describir el estado que reporta ---
 //

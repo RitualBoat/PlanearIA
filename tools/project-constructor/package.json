@@ -1,0 +1,27 @@
+{
+  "name": "project-engineering-os-constructor",
+  "version": "0.1.0",
+  "description": "Bootstrap neutral y reproducible de gobernanza de ingeniería para repositorios nuevos.",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": "^20.20.0 || >=22.22.0"
+  },
+  "bin": {
+    "project-constructor": "./bin/project-constructor.mjs"
+  },
+  "exports": {
+    ".": "./src/index.mjs",
+    "./blueprint": "./src/blueprint.mjs",
+    "./transactions": "./src/transaction.mjs"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0"
+  },
+  "scripts": {
+    "check": "node ./bin/project-constructor.mjs --help",
+    "opsx-check": "node ./bin/project-constructor.mjs opsx-check --target .",
+    "test": "node --test"
+  }
+}

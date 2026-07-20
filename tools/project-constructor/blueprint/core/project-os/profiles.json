@@ -1,0 +1,271 @@
+{
+  "schemaVersion": "1.0.0",
+  "active": [
+    "documentation",
+    "harness-tooling"
+  ],
+  "profiles": [
+    {
+      "id": "ai",
+      "active": false,
+      "activationRequires": "Approved technical decision describing provider boundaries, human review, data handling, limits, cost, and fallback.",
+      "automaticValidations": [
+        "provider-boundary-tests",
+        "error-and-limit-tests",
+        "secret-scan"
+      ],
+      "manualEvidence": [
+        "Human review path",
+        "Cost and provider decision",
+        "Sensitive-data assessment"
+      ],
+      "negativeCases": [
+        "Provider unavailable",
+        "Rate or budget limit reached",
+        "Unsafe or malformed output",
+        "Action rejected by human reviewer"
+      ],
+      "rollback": "Disable the feature path and revert provider configuration without losing user-owned data.",
+      "naConditions": [
+        "The approved scope contains no model-generated or model-interpreted behavior."
+      ],
+      "closureGate": "All outputs are reviewable, provider failures are bounded, secrets stay server-side, and cost limits are evidenced."
+    },
+    {
+      "id": "auth-security",
+      "active": false,
+      "activationRequires": "Approved threat model or security decision for identity, authorization, sensitive operations, and compliance.",
+      "automaticValidations": [
+        "authorization-tests",
+        "session-negative-tests",
+        "secret-scan",
+        "dependency-signal-review"
+      ],
+      "manualEvidence": [
+        "Threat model",
+        "Privilege review",
+        "Recovery-path verification"
+      ],
+      "negativeCases": [
+        "Unauthenticated request",
+        "Insufficient privilege",
+        "Expired or revoked session",
+        "Cross-tenant or cross-owner access attempt"
+      ],
+      "rollback": "Disable the affected entry point, revoke introduced credentials, and restore the previous authorization policy.",
+      "naConditions": [
+        "The approved change has no identity, authorization, sensitive data, or trust-boundary surface."
+      ],
+      "closureGate": "Threats, negative authorization cases, secret handling, and recovery evidence are complete."
+    },
+    {
+      "id": "backend-api",
+      "active": false,
+      "activationRequires": "Approved technical profile that introduces a backend, API, worker, or externally callable contract.",
+      "automaticValidations": [
+        "contract-tests",
+        "error-path-tests",
+        "compatibility-tests",
+        "observability-smoke"
+      ],
+      "manualEvidence": [
+        "Contract review",
+        "Operational smoke",
+        "Compatibility decision"
+      ],
+      "negativeCases": [
+        "Invalid input",
+        "Dependency timeout",
+        "Partial downstream failure",
+        "Backward-compatibility conflict"
+      ],
+      "rollback": "Restore the prior contract or route traffic to the last known-good version.",
+      "naConditions": [
+        "The approved change exposes no backend, worker, or API behavior."
+      ],
+      "closureGate": "Contracts, failures, compatibility, and operational evidence are verified."
+    },
+    {
+      "id": "data-migration-sync",
+      "active": false,
+      "activationRequires": "Approved data ownership, retention, migration, consistency, privacy, and recovery decision.",
+      "automaticValidations": [
+        "migration-forward-test",
+        "migration-rollback-test",
+        "data-integrity-test",
+        "concurrency-or-retry-tests"
+      ],
+      "manualEvidence": [
+        "Data-owner approval",
+        "Backup or restore rehearsal",
+        "Privacy and retention review"
+      ],
+      "negativeCases": [
+        "Interrupted migration",
+        "Duplicate or delayed event",
+        "Conflicting update",
+        "Restore from backup"
+      ],
+      "rollback": "Stop writes when needed, restore from the tested recovery point, and run integrity verification.",
+      "naConditions": [
+        "The approved change does not alter persisted data, schemas, migrations, replication, or synchronization."
+      ],
+      "closureGate": "Integrity, interruption, rollback, ownership, and retention evidence are complete."
+    },
+    {
+      "id": "documentation",
+      "active": true,
+      "activationRequires": "Universal core profile.",
+      "automaticValidations": [
+        "critical-document-presence",
+        "relative-link-check",
+        "findability-two-hop-check",
+        "neutrality-check"
+      ],
+      "manualEvidence": [
+        "Qualitative review for clarity and current ownership",
+        "Recorded drift decisions"
+      ],
+      "negativeCases": [
+        "Broken relative link",
+        "Contradictory active sources",
+        "Historical artifact treated as current policy",
+        "Product-specific default in universal guidance"
+      ],
+      "rollback": "Restore the previous versioned documents and rerun link and findability checks.",
+      "naConditions": [
+        "N/A is not allowed for the universal documentation profile."
+      ],
+      "closureGate": "Critical documents are current, linked within two hops, neutral, and free of unresolved ownership drift."
+    },
+    {
+      "id": "harness-tooling",
+      "active": true,
+      "activationRequires": "Universal core profile.",
+      "automaticValidations": [
+        "constructor-tests",
+        "sync-check",
+        "capability-matrix-check",
+        "doctor-json-check",
+        "second-run-idempotence"
+      ],
+      "manualEvidence": [
+        "Review of declared degradations",
+        "Recovery rehearsal for one transaction"
+      ],
+      "negativeCases": [
+        "Generated mirror drift",
+        "Preexisting unowned collision",
+        "Partial write",
+        "MCP subtable misclassified as a server",
+        "Missing check interpreted as success"
+      ],
+      "rollback": "Run hash-aware rollback for the explicit transaction or revert the constructor change.",
+      "naConditions": [
+        "N/A is not allowed for the universal harness-tooling profile."
+      ],
+      "closureGate": "Five harnesses match the capability matrix, the doctor has no unjustified FAIL, and a second run has no drift."
+    },
+    {
+      "id": "infra-deploy",
+      "active": false,
+      "activationRequires": "Approved environment, distribution, budget, availability, observability, and provider decision.",
+      "automaticValidations": [
+        "configuration-validation",
+        "deployment-dry-run-or-preview",
+        "health-check",
+        "rollback-command-check"
+      ],
+      "manualEvidence": [
+        "Budget and license approval",
+        "Environment smoke",
+        "Rollback or failover rehearsal"
+      ],
+      "negativeCases": [
+        "Missing required variable",
+        "Unavailable dependency",
+        "Failed deployment",
+        "Rollback after partial release"
+      ],
+      "rollback": "Return traffic and configuration to the last known-good release using the approved provider runbook.",
+      "naConditions": [
+        "The approved change has no environment, deployment, distribution, availability, or observability impact."
+      ],
+      "closureGate": "Cost, environment, health, observability, and rollback evidence are approved."
+    },
+    {
+      "id": "library-cli",
+      "active": false,
+      "activationRequires": "Approved compatibility, distribution, versioning, licensing, and migration policy for a library or CLI.",
+      "automaticValidations": [
+        "unit-and-contract-tests",
+        "package-artifact-test",
+        "multi-platform-smoke",
+        "backward-compatibility-test"
+      ],
+      "manualEvidence": [
+        "Public API review",
+        "License review",
+        "Install and rollback smoke"
+      ],
+      "negativeCases": [
+        "Invalid arguments or input",
+        "Unsupported runtime",
+        "Interrupted update",
+        "Older configuration or state"
+      ],
+      "rollback": "Reinstall the previous immutable artifact and migrate state only through a tested reverse path.",
+      "naConditions": [
+        "The approved change does not expose a reusable library, package, plugin, generator, or CLI."
+      ],
+      "closureGate": "Artifact, compatibility, licenses, migration, multi-platform behavior, and rollback are evidenced."
+    },
+    {
+      "id": "ui",
+      "active": false,
+      "activationRequires": "Approved user experience scope, accessibility target, ground truth, platforms, and visual evidence policy.",
+      "automaticValidations": [
+        "component-or-interaction-tests",
+        "accessibility-check",
+        "visual-check-when-configured",
+        "responsive-check-when-configured"
+      ],
+      "manualEvidence": [
+        "Ground-truth comparison",
+        "Keyboard and assistive-technology review",
+        "Loading, empty, error, and constrained-connectivity states"
+      ],
+      "negativeCases": [
+        "Missing or delayed content",
+        "Keyboard-only navigation",
+        "Reduced motion",
+        "Small and large viewport behavior"
+      ],
+      "rollback": "Restore the previous interaction and visual contract while preserving user data.",
+      "naConditions": [
+        "The approved change has no visible or interactive user interface."
+      ],
+      "closureGate": "Functional, accessibility, state, ground-truth, and platform evidence are approved.",
+      "conditionalSignals": [
+        {
+          "tool": "React Doctor",
+          "condition": "Only after an approved React-based technical profile and a stable advisory baseline."
+        },
+        {
+          "tool": "Playwright",
+          "condition": "Only when a web user interface and visual evidence policy exist."
+        },
+        {
+          "tool": "Figma",
+          "condition": "Only when it is an approved visual source of truth."
+        }
+      ]
+    }
+  ],
+  "activationPolicy": {
+    "implicitActivation": false,
+    "toolPresenceDoesNotActivateProfile": true,
+    "decisionArtifactRequiredForConditionalProfiles": true,
+    "naRequiresDeclaredConditionAndJustification": true
+  }
+}

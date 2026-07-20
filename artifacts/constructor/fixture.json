@@ -1,0 +1,1136 @@
+{
+  "schemaVersion": "1.0.0",
+  "result": "PASS",
+  "fixture": "empty-git-repository",
+  "commands": [
+    {
+      "id": "git-init",
+      "exitCode": 0
+    },
+    {
+      "id": "npm-pack",
+      "exitCode": 0
+    },
+    {
+      "id": "install-packed-runner",
+      "exitCode": 0
+    },
+    {
+      "id": "bootstrap-from-packed-tarball",
+      "exitCode": 0
+    },
+    {
+      "id": "bootstrap-second",
+      "exitCode": 0
+    },
+    {
+      "id": "sync-check",
+      "exitCode": 0
+    },
+    {
+      "id": "npm-ci",
+      "exitCode": 0
+    },
+    {
+      "id": "openspec-init-local",
+      "exitCode": 0
+    },
+    {
+      "id": "opsx-adapt",
+      "exitCode": 0
+    },
+    {
+      "id": "opsx-check",
+      "exitCode": 0
+    },
+    {
+      "id": "doctor-json",
+      "exitCode": 0
+    }
+  ],
+  "checks": {
+    "targetBeforeBootstrap": {
+      "nonGitEntries": []
+    },
+    "packageArtifact": {
+      "bytes": 133081,
+      "filename": "project-engineering-os-constructor-0.1.0.tgz",
+      "sha256": "4a8038c356d71a3a88639435e3fc1f04d6f9172fb4f00dd34127abfea6bb0abf"
+    },
+    "packedRunnerInstall": {
+      "stderrLines": 0,
+      "stdoutLines": 1,
+      "warnings": []
+    },
+    "firstBootstrapRunner": {
+      "artifactSha256": "4a8038c356d71a3a88639435e3fc1f04d6f9172fb4f00dd34127abfea6bb0abf",
+      "source": "temporary-runner-from-verified-tarball"
+    },
+    "firstBootstrap": {
+      "command": "bootstrap",
+      "exitCode": 0,
+      "incompleteTransaction": null,
+      "mode": "apply",
+      "mutationPerformed": true,
+      "plan": {
+        "blueprintHash": "71fcfd8197efa193e053b73591873c4c12a21d136b683a1b19f2928ab245cb1c",
+        "configurationHash": "3fc41ea72053531a4137c5612d9031089bcdb7751fc9bffb5f68d6ddb970075f",
+        "externalOwnership": {
+          "commands": {
+            "adapt": "node .project-constructor/runtime/bin/project-constructor.mjs opsx-adapt --target .",
+            "check": "node .project-constructor/runtime/bin/project-constructor.mjs opsx-check --target .",
+            "init": "npm exec --yes=false -- openspec init --tools codex,claude,cursor,github-copilot,opencode",
+            "update": "npm exec --yes=false -- openspec update"
+          },
+          "generatedGlobs": [
+            ".claude/commands/opsx/*.md",
+            ".codex/skills/openspec-*/SKILL.md",
+            ".cursor/commands/opsx-*.md",
+            ".github/prompts/opsx-*.prompt.md",
+            ".opencode/commands/opsx-*.md"
+          ],
+          "owner": "external-openspec"
+        },
+        "hasDrift": true,
+        "migrations": [],
+        "rollbackPoint": "pre-bootstrap",
+        "summary": {
+          "conflicts": 0,
+          "creates": 158,
+          "deletes": 0,
+          "preserves": 0,
+          "stateUpdate": true,
+          "updates": 0
+        },
+        "validations": [
+          "git-root-and-writability",
+          "blueprint-schema-and-sources",
+          "ownership-and-hashes",
+          "harness-capability-and-mcp-parity",
+          "transaction-journal-and-state-schema"
+        ],
+        "operationCount": 158
+      },
+      "status": "APPLIED",
+      "transaction": {
+        "changes": 159,
+        "resumed": false,
+        "transactionId": "tx-2026-07-20T04-40-49-256Z-93a65404"
+      }
+    },
+    "installedRuntime": {
+      "entrypoint": ".project-constructor/runtime/bin/project-constructor.mjs",
+      "path": ".project-constructor/runtime",
+      "exists": true,
+      "executionContract": "explicit-target-local-path"
+    },
+    "secondBootstrap": {
+      "command": "bootstrap",
+      "exitCode": 0,
+      "incompleteTransaction": null,
+      "mode": "apply",
+      "mutationPerformed": false,
+      "plan": {
+        "blueprintHash": "71fcfd8197efa193e053b73591873c4c12a21d136b683a1b19f2928ab245cb1c",
+        "configurationHash": "3fc41ea72053531a4137c5612d9031089bcdb7751fc9bffb5f68d6ddb970075f",
+        "externalOwnership": {
+          "commands": {
+            "adapt": "node .project-constructor/runtime/bin/project-constructor.mjs opsx-adapt --target .",
+            "check": "node .project-constructor/runtime/bin/project-constructor.mjs opsx-check --target .",
+            "init": "npm exec --yes=false -- openspec init --tools codex,claude,cursor,github-copilot,opencode",
+            "update": "npm exec --yes=false -- openspec update"
+          },
+          "generatedGlobs": [
+            ".claude/commands/opsx/*.md",
+            ".codex/skills/openspec-*/SKILL.md",
+            ".cursor/commands/opsx-*.md",
+            ".github/prompts/opsx-*.prompt.md",
+            ".opencode/commands/opsx-*.md"
+          ],
+          "owner": "external-openspec"
+        },
+        "hasDrift": false,
+        "migrations": [],
+        "rollbackPoint": "tx-2026-07-20T04-40-49-256Z-93a65404",
+        "summary": {
+          "conflicts": 0,
+          "creates": 0,
+          "deletes": 0,
+          "preserves": 158,
+          "stateUpdate": false,
+          "updates": 0
+        },
+        "validations": [
+          "git-root-and-writability",
+          "blueprint-schema-and-sources",
+          "ownership-and-hashes",
+          "harness-capability-and-mcp-parity",
+          "transaction-journal-and-state-schema"
+        ],
+        "operationCount": 158
+      },
+      "status": "IN_SYNC",
+      "transaction": {
+        "changes": 0,
+        "resumed": false,
+        "transactionId": null
+      }
+    },
+    "idempotence": {
+      "changedFiles": 0
+    },
+    "sync": {
+      "command": "sync",
+      "dryRun": true,
+      "exitCode": 0,
+      "incompleteTransaction": null,
+      "mode": "check",
+      "mutationPerformed": false,
+      "plan": {
+        "blueprintHash": "71fcfd8197efa193e053b73591873c4c12a21d136b683a1b19f2928ab245cb1c",
+        "configurationHash": "3fc41ea72053531a4137c5612d9031089bcdb7751fc9bffb5f68d6ddb970075f",
+        "externalOwnership": {
+          "commands": {
+            "adapt": "node .project-constructor/runtime/bin/project-constructor.mjs opsx-adapt --target .",
+            "check": "node .project-constructor/runtime/bin/project-constructor.mjs opsx-check --target .",
+            "init": "npm exec --yes=false -- openspec init --tools codex,claude,cursor,github-copilot,opencode",
+            "update": "npm exec --yes=false -- openspec update"
+          },
+          "generatedGlobs": [
+            ".claude/commands/opsx/*.md",
+            ".codex/skills/openspec-*/SKILL.md",
+            ".cursor/commands/opsx-*.md",
+            ".github/prompts/opsx-*.prompt.md",
+            ".opencode/commands/opsx-*.md"
+          ],
+          "owner": "external-openspec"
+        },
+        "hasDrift": false,
+        "migrations": [],
+        "rollbackPoint": "tx-2026-07-20T04-40-49-256Z-93a65404",
+        "summary": {
+          "conflicts": 0,
+          "creates": 0,
+          "deletes": 0,
+          "preserves": 158,
+          "stateUpdate": false,
+          "updates": 0
+        },
+        "validations": [
+          "git-root-and-writability",
+          "blueprint-schema-and-sources",
+          "ownership-and-hashes",
+          "harness-capability-and-mcp-parity",
+          "transaction-journal-and-state-schema"
+        ],
+        "operationCount": 158
+      },
+      "status": "IN_SYNC"
+    },
+    "harnesses": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      ".cursor/rules/project-os.mdc",
+      ".codex/config.toml",
+      ".github/copilot-instructions.md",
+      "OPENCODE.md"
+    ],
+    "discovery": {
+      "relative": ".project-os/github/discovery-issues.json",
+      "count": 10
+    },
+    "neutrality": {
+      "forbiddenPatterns": 5,
+      "productDependencies": 0
+    },
+    "findability": {
+      "expected": 8,
+      "missing": 0
+    },
+    "npmCi": {
+      "stderrLines": 0,
+      "stdoutLines": 1,
+      "warnings": []
+    },
+    "openspecInit": {
+      "stderrLines": 10,
+      "stdoutLines": 9,
+      "warnings": [],
+      "expectedProgress": true,
+      "missingSignals": [],
+      "unexpectedStderr": []
+    },
+    "opsxAdapt": {
+      "command": "opsx-adapt",
+      "exitCode": 0,
+      "mode": "apply",
+      "mutationPerformed": true,
+      "plan": {
+        "contractHash": "12d2d676eebf4bc5b5886191bed3ae21a89e991d86b6ca29b3406fe8fc5a970b",
+        "generatedFileCount": 25,
+        "summary": {
+          "conflicts": 0,
+          "creates": 0,
+          "deletes": 0,
+          "preserves": 0,
+          "stateUpdate": false,
+          "updates": 25
+        },
+        "operationCount": 25,
+        "operations": [
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".claude/commands/opsx/apply.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".claude/commands/opsx/archive.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".claude/commands/opsx/explore.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".claude/commands/opsx/propose.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".claude/commands/opsx/sync.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".codex/skills/openspec-apply-change/SKILL.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".codex/skills/openspec-archive-change/SKILL.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".codex/skills/openspec-explore/SKILL.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".codex/skills/openspec-propose/SKILL.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".codex/skills/openspec-sync-specs/SKILL.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".cursor/commands/opsx-apply.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".cursor/commands/opsx-archive.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".cursor/commands/opsx-explore.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".cursor/commands/opsx-propose.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".cursor/commands/opsx-sync.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".github/prompts/opsx-apply.prompt.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".github/prompts/opsx-archive.prompt.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".github/prompts/opsx-explore.prompt.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".github/prompts/opsx-propose.prompt.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".github/prompts/opsx-sync.prompt.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".opencode/commands/opsx-apply.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".opencode/commands/opsx-archive.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".opencode/commands/opsx-explore.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".opencode/commands/opsx-propose.md"
+          },
+          {
+            "operation": "update",
+            "owner": "external-openspec",
+            "target": ".opencode/commands/opsx-sync.md"
+          }
+        ]
+      },
+      "recoveredTransactions": [],
+      "status": "APPLIED",
+      "transaction": {
+        "changes": 25,
+        "transactionId": "1784522484919-8836352c-5c71-42da-bbfc-476b4554366b"
+      }
+    },
+    "opsxCheck": {
+      "checks": [
+        {
+          "cause": "25 archivos externos encontrados.",
+          "evidence": {
+            "count": 25
+          },
+          "id": "opsx.generated-files",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "Las superficies OPSX configuradas existen."
+        },
+        {
+          "cause": "1 entrada(s) inspeccionadas.",
+          "evidence": {
+            "journalCount": 1
+          },
+          "id": "opsx.transactions",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "Las transacciones OPSX están en estados terminales."
+        },
+        {
+          "cause": "Ownership externo preservado.",
+          "evidence": {
+            "generatedGlobs": [
+              ".claude/commands/opsx/*.md",
+              ".codex/skills/openspec-*/SKILL.md",
+              ".cursor/commands/opsx-*.md",
+              ".github/prompts/opsx-*.prompt.md",
+              ".opencode/commands/opsx-*.md"
+            ]
+          },
+          "id": "opsx.ownership",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El state del constructor no reclama rutas OPSX."
+        },
+        {
+          "cause": "package=@fission-ai/openspec, version=1.6.0",
+          "evidence": {
+            "allowGlobalFallback": false,
+            "localOnly": true,
+            "version": "1.6.0"
+          },
+          "id": "opsx.local-cli-contract",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El contrato exige OpenSpec local y fijado."
+        },
+        {
+          "cause": "@fission-ai/openspec@1.6.0",
+          "evidence": {
+            "bin": "node_modules/.bin/openspec.cmd",
+            "version": "1.6.0"
+          },
+          "id": "opsx.local-cli",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "OpenSpec local coincide con package.json, lockfile e instalación."
+        },
+        {
+          "cause": "No se detectó CLI bare.",
+          "evidence": {},
+          "id": "opsx.local-cli-references",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "Las referencias OPSX usan la CLI local fijada."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "ce584930298f5ac91243ca118de2c6dfb914a64072b3a8791523c04527edff00",
+            "path": ".claude/commands/opsx/propose.md"
+          },
+          "id": "opsx.block.project-os-propose..claude/commands/opsx/propose.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "ce584930298f5ac91243ca118de2c6dfb914a64072b3a8791523c04527edff00",
+            "path": ".codex/skills/openspec-propose/SKILL.md"
+          },
+          "id": "opsx.block.project-os-propose..codex/skills/openspec-propose/SKILL.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "ce584930298f5ac91243ca118de2c6dfb914a64072b3a8791523c04527edff00",
+            "path": ".cursor/commands/opsx-propose.md"
+          },
+          "id": "opsx.block.project-os-propose..cursor/commands/opsx-propose.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "ce584930298f5ac91243ca118de2c6dfb914a64072b3a8791523c04527edff00",
+            "path": ".github/prompts/opsx-propose.prompt.md"
+          },
+          "id": "opsx.block.project-os-propose..github/prompts/opsx-propose.prompt.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "ce584930298f5ac91243ca118de2c6dfb914a64072b3a8791523c04527edff00",
+            "path": ".opencode/commands/opsx-propose.md"
+          },
+          "id": "opsx.block.project-os-propose..opencode/commands/opsx-propose.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "d4528e875dd7c594d38c92bbbe5dbbc8268dab2628f446130c8d12306a8e1a73",
+            "path": ".claude/commands/opsx/apply.md"
+          },
+          "id": "opsx.block.project-os-apply..claude/commands/opsx/apply.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "d4528e875dd7c594d38c92bbbe5dbbc8268dab2628f446130c8d12306a8e1a73",
+            "path": ".codex/skills/openspec-apply-change/SKILL.md"
+          },
+          "id": "opsx.block.project-os-apply..codex/skills/openspec-apply-change/SKILL.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "d4528e875dd7c594d38c92bbbe5dbbc8268dab2628f446130c8d12306a8e1a73",
+            "path": ".cursor/commands/opsx-apply.md"
+          },
+          "id": "opsx.block.project-os-apply..cursor/commands/opsx-apply.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "d4528e875dd7c594d38c92bbbe5dbbc8268dab2628f446130c8d12306a8e1a73",
+            "path": ".github/prompts/opsx-apply.prompt.md"
+          },
+          "id": "opsx.block.project-os-apply..github/prompts/opsx-apply.prompt.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "d4528e875dd7c594d38c92bbbe5dbbc8268dab2628f446130c8d12306a8e1a73",
+            "path": ".opencode/commands/opsx-apply.md"
+          },
+          "id": "opsx.block.project-os-apply..opencode/commands/opsx-apply.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "c9fe66d1b064e2dd27bfa5491963d201532f6a0e29b87206110b08ace0974ac6",
+            "path": ".claude/commands/opsx/archive.md"
+          },
+          "id": "opsx.block.project-os-archive..claude/commands/opsx/archive.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "c9fe66d1b064e2dd27bfa5491963d201532f6a0e29b87206110b08ace0974ac6",
+            "path": ".codex/skills/openspec-archive-change/SKILL.md"
+          },
+          "id": "opsx.block.project-os-archive..codex/skills/openspec-archive-change/SKILL.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "c9fe66d1b064e2dd27bfa5491963d201532f6a0e29b87206110b08ace0974ac6",
+            "path": ".cursor/commands/opsx-archive.md"
+          },
+          "id": "opsx.block.project-os-archive..cursor/commands/opsx-archive.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "c9fe66d1b064e2dd27bfa5491963d201532f6a0e29b87206110b08ace0974ac6",
+            "path": ".github/prompts/opsx-archive.prompt.md"
+          },
+          "id": "opsx.block.project-os-archive..github/prompts/opsx-archive.prompt.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        },
+        {
+          "cause": "Delimitadores únicos y hash compatible.",
+          "evidence": {
+            "hash": "c9fe66d1b064e2dd27bfa5491963d201532f6a0e29b87206110b08ace0974ac6",
+            "path": ".opencode/commands/opsx-archive.md"
+          },
+          "id": "opsx.block.project-os-archive..opencode/commands/opsx-archive.md",
+          "remediation": null,
+          "status": "PASS",
+          "summary": "El bloque delimitado conserva su forma."
+        }
+      ],
+      "command": "opsx-check",
+      "exitCode": 0,
+      "mutationPerformed": false,
+      "schemaVersion": "1.0.0",
+      "status": "PASS"
+    },
+    "doctor": {
+      "schemaVersion": "1.0.0",
+      "verdict": "PASS",
+      "counts": {
+        "PASS": 10,
+        "FAIL": 0,
+        "WARN": 3,
+        "SKIP": 13
+      },
+      "results": [
+        {
+          "id": "runtime.node",
+          "profile": "universal",
+          "status": "PASS",
+          "summary": "Runtime Node compatible con el núcleo",
+          "cause": "Node v26.4.0 satisface ^20.20.0 || >=22.22.0.",
+          "remediation": "Instala una versión mantenida de Node compatible con ^20.20.0 || >=22.22.0 y vuelve a ejecutar el doctor.",
+          "evidence": {
+            "version": "v26.4.0"
+          }
+        },
+        {
+          "id": "runtime.package-manager",
+          "profile": "universal",
+          "status": "PASS",
+          "summary": "Package manager npm disponible",
+          "cause": "npm respondió al probe de versión.",
+          "remediation": "Restaura npm desde la misma distribución de Node; no uses el doctor para instalarlo.",
+          "evidence": {
+            "version": "11.17.0"
+          }
+        },
+        {
+          "id": "dependencies.lockfile",
+          "profile": "universal",
+          "status": "PASS",
+          "summary": "Lockfile reproducible presente",
+          "cause": "package-lock.json lockfileVersion 3 corresponde al paquete.",
+          "remediation": "Restaura el lockfile versionado y ejecuta npm ci fuera del doctor.",
+          "evidence": {
+            "lockfileVersion": 3
+          }
+        },
+        {
+          "id": "git.repository",
+          "profile": "universal",
+          "status": "PASS",
+          "summary": "Destino bajo control de Git",
+          "cause": "git rev-parse confirmó el repositorio.",
+          "remediation": "Inicializa o restaura Git manualmente antes del bootstrap.",
+          "evidence": {
+            "isWorkTree": true
+          }
+        },
+        {
+          "id": "git.working-tree",
+          "profile": "universal",
+          "status": "WARN",
+          "summary": "Working tree contiene cambios",
+          "cause": "Los cambios deben clasificarse antes de iniciar un change que se superponga.",
+          "remediation": "Conserva, aísla o registra los cambios manualmente; el doctor no limpia ni revierte archivos.",
+          "evidence": {
+            "paths": [
+              ".claude/",
+              ".codex/",
+              ".cursor/",
+              ".github/",
+              ".gitignore",
+              ".mcp.json",
+              ".opencode/",
+              ".project-constructor/",
+              ".project-os/",
+              "AGENTS.md",
+              "CLAUDE.md",
+              "OPENCODE.md",
+              "README.md",
+              "docs/",
+              "opencode.json",
+              "openspec/",
+              "package-lock.json",
+              "package.json"
+            ]
+          }
+        },
+        {
+          "id": "sdd.openspec-local",
+          "profile": "universal",
+          "status": "PASS",
+          "summary": "OpenSpec local fijado y resuelto",
+          "cause": "Manifiesto, lockfile e instalación resuelven OpenSpec 1.6.0.",
+          "remediation": "Restaura @fission-ai/openspec 1.6.0 y package-lock.json; ejecuta npm ci, nunca un fallback global o @latest.",
+          "evidence": {
+            "manifest": "1.6.0",
+            "lockfile": "1.6.0",
+            "installed": "1.6.0"
+          }
+        },
+        {
+          "id": "harness.parity",
+          "profile": "harness-tooling",
+          "status": "PASS",
+          "summary": "Fuente canónica y espejos administrados están en paridad",
+          "cause": "El plan read-only produjo cero drift y los hashes constructor-owned coinciden.",
+          "remediation": "Ejecuta project-constructor sync --check para obtener el diff; resuelve fuentes o colisiones y después ejecuta sync explícitamente.",
+          "evidence": {
+            "checked": [
+              ".claude/rules/project-os.md",
+              ".claude/settings.json",
+              ".claude/skills/project-os/SKILL.md",
+              ".codex/config.toml",
+              ".codex/skills/project-os/SKILL.md",
+              ".cursor/mcp.json",
+              ".cursor/rules/project-os.mdc",
+              ".github/ISSUE_TEMPLATE/change.yml",
+              ".github/ISSUE_TEMPLATE/config.yml",
+              ".github/ISSUE_TEMPLATE/discovery.yml",
+              ".github/ISSUE_TEMPLATE/epic.yml",
+              ".github/PULL_REQUEST_TEMPLATE.md",
+              ".github/copilot-instructions.md",
+              ".github/instructions/project-os.instructions.md",
+              ".github/workflows/project-constructor.yml",
+              ".mcp.json",
+              ".opencode/project-os.md",
+              ".opencode/skills/project-os/SKILL.md",
+              ".project-constructor/generated/harness-capabilities.json",
+              ".project-constructor/manifest.json",
+              ".project-constructor/runtime/bin/project-constructor.mjs",
+              ".project-constructor/runtime/blueprint/core/AGENTS.md",
+              ".project-constructor/runtime/blueprint/core/CLAUDE.md",
+              ".project-constructor/runtime/blueprint/core/OPENCODE.md",
+              ".project-constructor/runtime/blueprint/core/README.md",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/COMPATIBILITY_MATRIX.md",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/CONTEXT_ENGINEERING.md",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/EVIDENCE_PROFILES.md",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/GUIA_MANUAL_USUARIO.md",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/PROMPT_00_BOOTSTRAP_ENTORNO.md",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/PROMPT_01_DISCOVERY_PROYECTO.md",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/READINESS_GATES.md",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/README.md",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/ROLLBACK.md",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/RUNBOOK_BOOTSTRAP.md",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/SDD_WORKFLOW.md",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/SOURCES_OF_TRUTH.md",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/TOOLS_POLICY.md",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/templates/pre-propose-readiness.example.json",
+              ".project-constructor/runtime/blueprint/core/docs/engineering/templates/readiness.example.json",
+              ".project-constructor/runtime/blueprint/core/github/ISSUE_TEMPLATE/change.yml",
+              ".project-constructor/runtime/blueprint/core/github/ISSUE_TEMPLATE/config.yml",
+              ".project-constructor/runtime/blueprint/core/github/ISSUE_TEMPLATE/discovery.yml",
+              ".project-constructor/runtime/blueprint/core/github/ISSUE_TEMPLATE/epic.yml",
+              ".project-constructor/runtime/blueprint/core/github/PULL_REQUEST_TEMPLATE.md",
+              ".project-constructor/runtime/blueprint/core/github/workflows/project-constructor.yml",
+              ".project-constructor/runtime/blueprint/core/gitignore",
+              ".project-constructor/runtime/blueprint/core/harness/claude/project-os.md",
+              ".project-constructor/runtime/blueprint/core/harness/claude/settings.json",
+              ".project-constructor/runtime/blueprint/core/harness/codex/config.toml",
+              ".project-constructor/runtime/blueprint/core/harness/common/harness-capabilities.json",
+              ".project-constructor/runtime/blueprint/core/harness/common/mcp.json",
+              ".project-constructor/runtime/blueprint/core/harness/common/project-os-skill.md",
+              ".project-constructor/runtime/blueprint/core/harness/copilot/copilot-instructions.md",
+              ".project-constructor/runtime/blueprint/core/harness/copilot/project-os.instructions.md",
+              ".project-constructor/runtime/blueprint/core/harness/cursor/mcp.json",
+              ".project-constructor/runtime/blueprint/core/harness/cursor/project-os.mdc",
+              ".project-constructor/runtime/blueprint/core/harness/opencode/opencode.json",
+              ".project-constructor/runtime/blueprint/core/harness/opencode/project-os.md",
+              ".project-constructor/runtime/blueprint/core/openspec/OWNERSHIP.md",
+              ".project-constructor/runtime/blueprint/core/openspec/config.yaml",
+              ".project-constructor/runtime/blueprint/core/openspec/ownership.json",
+              ".project-constructor/runtime/blueprint/core/package-lock.json",
+              ".project-constructor/runtime/blueprint/core/package.json",
+              ".project-constructor/runtime/blueprint/core/project-constructor/config.json",
+              ".project-constructor/runtime/blueprint/core/project-os/github/discovery-issues.json",
+              ".project-constructor/runtime/blueprint/core/project-os/github/product-os.json",
+              ".project-constructor/runtime/blueprint/core/project-os/harness-capabilities.json",
+              ".project-constructor/runtime/blueprint/core/project-os/instructions.md",
+              ".project-constructor/runtime/blueprint/core/project-os/mcp.json",
+              ".project-constructor/runtime/blueprint/core/project-os/openspec-lock.json",
+              ".project-constructor/runtime/blueprint/core/project-os/path-rules.json",
+              ".project-constructor/runtime/blueprint/core/project-os/permissions.json",
+              ".project-constructor/runtime/blueprint/core/project-os/profiles.json",
+              ".project-constructor/runtime/blueprint/core/project-os/readiness-policy.json",
+              ".project-constructor/runtime/blueprint/core/project-os/skills.json",
+              ".project-constructor/runtime/blueprint/manifest.json",
+              ".project-constructor/runtime/blueprint/schema/config.schema.json",
+              ".project-constructor/runtime/blueprint/schema/doctor-result.schema.json",
+              ".project-constructor/runtime/blueprint/schema/harness-capabilities.schema.json",
+              ".project-constructor/runtime/blueprint/schema/manifest.schema.json",
+              ".project-constructor/runtime/blueprint/schema/pre-propose-readiness.schema.json",
+              ".project-constructor/runtime/blueprint/schema/profiles.schema.json",
+              ".project-constructor/runtime/blueprint/schema/readiness-policy.schema.json",
+              ".project-constructor/runtime/blueprint/schema/readiness.schema.json",
+              ".project-constructor/runtime/blueprint/schema/state.schema.json",
+              ".project-constructor/runtime/blueprint/schema/transaction.schema.json",
+              ".project-constructor/runtime/package.json",
+              ".project-constructor/runtime/src/blueprint.mjs",
+              ".project-constructor/runtime/src/cli.mjs",
+              ".project-constructor/runtime/src/commands.mjs",
+              ".project-constructor/runtime/src/constants.mjs",
+              ".project-constructor/runtime/src/diff.mjs",
+              ".project-constructor/runtime/src/distribution.mjs",
+              ".project-constructor/runtime/src/doctor.mjs",
+              ".project-constructor/runtime/src/errors.mjs",
+              ".project-constructor/runtime/src/github-plan.mjs",
+              ".project-constructor/runtime/src/harness.mjs",
+              ".project-constructor/runtime/src/hash.mjs",
+              ".project-constructor/runtime/src/index.mjs",
+              ".project-constructor/runtime/src/json.mjs",
+              ".project-constructor/runtime/src/opsx-adapt.mjs",
+              ".project-constructor/runtime/src/opsx-check.mjs",
+              ".project-constructor/runtime/src/paths.mjs",
+              ".project-constructor/runtime/src/plan.mjs",
+              ".project-constructor/runtime/src/preflight.mjs",
+              ".project-constructor/runtime/src/readiness.mjs",
+              ".project-constructor/runtime/src/report.mjs",
+              ".project-constructor/runtime/src/state.mjs",
+              ".project-constructor/runtime/src/transaction.mjs",
+              ".project-constructor/schema/config.schema.json",
+              ".project-constructor/schema/doctor-result.schema.json",
+              ".project-constructor/schema/harness-capabilities.schema.json",
+              ".project-constructor/schema/manifest.schema.json",
+              ".project-constructor/schema/pre-propose-readiness.schema.json",
+              ".project-constructor/schema/profiles.schema.json",
+              ".project-constructor/schema/readiness-policy.schema.json",
+              ".project-constructor/schema/readiness.schema.json",
+              ".project-constructor/schema/state.schema.json",
+              ".project-constructor/schema/transaction.schema.json",
+              "AGENTS.md",
+              "CLAUDE.md",
+              "OPENCODE.md",
+              "docs/engineering/COMPATIBILITY_MATRIX.md",
+              "docs/engineering/CONTEXT_ENGINEERING.md",
+              "docs/engineering/EVIDENCE_PROFILES.md",
+              "docs/engineering/GUIA_MANUAL_USUARIO.md",
+              "docs/engineering/PROMPT_00_BOOTSTRAP_ENTORNO.md",
+              "docs/engineering/PROMPT_01_DISCOVERY_PROYECTO.md",
+              "docs/engineering/READINESS_GATES.md",
+              "docs/engineering/README.md",
+              "docs/engineering/ROLLBACK.md",
+              "docs/engineering/RUNBOOK_BOOTSTRAP.md",
+              "docs/engineering/SDD_WORKFLOW.md",
+              "docs/engineering/SOURCES_OF_TRUTH.md",
+              "docs/engineering/TOOLS_POLICY.md",
+              "docs/engineering/templates/pre-propose-readiness.example.json",
+              "docs/engineering/templates/readiness.example.json",
+              "opencode.json"
+            ],
+            "mismatches": [],
+            "planSummary": {
+              "conflicts": 0,
+              "creates": 0,
+              "deletes": 0,
+              "preserves": 158,
+              "stateUpdate": false,
+              "updates": 0
+            }
+          }
+        },
+        {
+          "id": "profile.ui",
+          "profile": "ui",
+          "status": "SKIP",
+          "summary": "Perfil ui inactivo antes del discovery",
+          "cause": "El perfil requiere una decisión posterior al discovery.",
+          "remediation": "No actives el perfil hasta aprobar discovery, ADR, validaciones, casos negativos y rollback.",
+          "evidence": {
+            "active": false,
+            "catalog": ".project-os/profiles.json"
+          }
+        },
+        {
+          "id": "profile.backend-api",
+          "profile": "backend-api",
+          "status": "SKIP",
+          "summary": "Perfil backend-api inactivo antes del discovery",
+          "cause": "El perfil requiere una decisión posterior al discovery.",
+          "remediation": "No actives el perfil hasta aprobar discovery, ADR, validaciones, casos negativos y rollback.",
+          "evidence": {
+            "active": false,
+            "catalog": ".project-os/profiles.json"
+          }
+        },
+        {
+          "id": "profile.auth-security",
+          "profile": "auth-security",
+          "status": "SKIP",
+          "summary": "Perfil auth-security inactivo antes del discovery",
+          "cause": "El perfil requiere una decisión posterior al discovery.",
+          "remediation": "No actives el perfil hasta aprobar discovery, ADR, validaciones, casos negativos y rollback.",
+          "evidence": {
+            "active": false,
+            "catalog": ".project-os/profiles.json"
+          }
+        },
+        {
+          "id": "profile.data-migration-sync",
+          "profile": "data-migration-sync",
+          "status": "SKIP",
+          "summary": "Perfil data-migration-sync inactivo antes del discovery",
+          "cause": "El perfil requiere una decisión posterior al discovery.",
+          "remediation": "No actives el perfil hasta aprobar discovery, ADR, validaciones, casos negativos y rollback.",
+          "evidence": {
+            "active": false,
+            "catalog": ".project-os/profiles.json"
+          }
+        },
+        {
+          "id": "profile.ai",
+          "profile": "ai",
+          "status": "SKIP",
+          "summary": "Perfil ai inactivo antes del discovery",
+          "cause": "El perfil requiere una decisión posterior al discovery.",
+          "remediation": "No actives el perfil hasta aprobar discovery, ADR, validaciones, casos negativos y rollback.",
+          "evidence": {
+            "active": false,
+            "catalog": ".project-os/profiles.json"
+          }
+        },
+        {
+          "id": "profile.infra-deploy",
+          "profile": "infra-deploy",
+          "status": "SKIP",
+          "summary": "Perfil infra-deploy inactivo antes del discovery",
+          "cause": "El perfil requiere una decisión posterior al discovery.",
+          "remediation": "No actives el perfil hasta aprobar discovery, ADR, validaciones, casos negativos y rollback.",
+          "evidence": {
+            "active": false,
+            "catalog": ".project-os/profiles.json"
+          }
+        },
+        {
+          "id": "profile.library-cli",
+          "profile": "library-cli",
+          "status": "SKIP",
+          "summary": "Perfil library-cli inactivo antes del discovery",
+          "cause": "El perfil requiere una decisión posterior al discovery.",
+          "remediation": "No actives el perfil hasta aprobar discovery, ADR, validaciones, casos negativos y rollback.",
+          "evidence": {
+            "active": false,
+            "catalog": ".project-os/profiles.json"
+          }
+        },
+        {
+          "id": "mcp.configuration",
+          "profile": "harness-tooling",
+          "status": "PASS",
+          "summary": "Configuración MCP estructurada",
+          "cause": "Los servidores se obtuvieron del schema canónico sin secretos literales.",
+          "remediation": "Corrige .project-os/mcp.json; usa referencias de entorno y mantén Graphify fuera del MCP activo.",
+          "evidence": {
+            "source": ".project-os/mcp.json",
+            "servers": []
+          }
+        },
+        {
+          "id": "mcp.startup",
+          "profile": "harness-tooling",
+          "status": "SKIP",
+          "summary": "Startup/handshake MCP no ejecutado por el doctor",
+          "cause": "No existe evidencia opt-in vigente; la configuración por sí sola no prueba operación.",
+          "remediation": "Usa el runbook para ejecutar el smoke read-only separado y guardar su recibo redactado.",
+          "evidence": {
+            "expectedReceipt": ".project-constructor/evidence/mcp-startup.json"
+          }
+        },
+        {
+          "id": "mcp.tools-list",
+          "profile": "harness-tooling",
+          "status": "SKIP",
+          "summary": "Listado de herramientas MCP no ejecutado por el doctor",
+          "cause": "No existe evidencia opt-in vigente; la configuración por sí sola no prueba operación.",
+          "remediation": "Usa el runbook para ejecutar el smoke read-only separado y guardar su recibo redactado.",
+          "evidence": {
+            "expectedReceipt": ".project-constructor/evidence/mcp-tools.json"
+          }
+        },
+        {
+          "id": "mcp.auth-smoke",
+          "profile": "harness-tooling",
+          "status": "SKIP",
+          "summary": "Smoke autenticado MCP no ejecutado por el doctor",
+          "cause": "No existe evidencia opt-in vigente; la configuración por sí sola no prueba operación.",
+          "remediation": "Usa el runbook para ejecutar el smoke read-only separado y guardar su recibo redactado.",
+          "evidence": {
+            "expectedReceipt": ".project-constructor/evidence/mcp-smoke.json"
+          }
+        },
+        {
+          "id": "code-intelligence.gitnexus",
+          "profile": "harness-tooling",
+          "status": "SKIP",
+          "summary": "gitnexus no aplica antes de existir código indexable",
+          "cause": "El repositorio todavía contiene solo gobernanza/tooling.",
+          "remediation": "Activa el check solo cuando exista código y una política de indexación aprobada.",
+          "evidence": {
+            "codeIndexable": false
+          }
+        },
+        {
+          "id": "code-intelligence.codegraph",
+          "profile": "harness-tooling",
+          "status": "SKIP",
+          "summary": "codegraph no aplica antes de existir código indexable",
+          "cause": "El repositorio todavía contiene solo gobernanza/tooling.",
+          "remediation": "Activa el check solo cuando exista código y una política de indexación aprobada.",
+          "evidence": {
+            "codeIndexable": false
+          }
+        },
+        {
+          "id": "code-intelligence.graphify",
+          "profile": "harness-tooling",
+          "status": "SKIP",
+          "summary": "Graphify retirado del runtime activo",
+          "cause": "retirado/manual",
+          "remediation": "Ninguna; auditoría opcional fuera del bootstrap con instalación y rebuild explícitos.",
+          "evidence": {
+            "active": false
+          }
+        },
+        {
+          "id": "github.cli",
+          "profile": "universal",
+          "status": "PASS",
+          "summary": "GitHub CLI disponible",
+          "cause": "gh respondió al probe local de versión.",
+          "remediation": "Instala y autentica GitHub CLI manualmente antes de aplicar el plan Product OS.",
+          "evidence": {
+            "version": "gh version 2.96.0 (2026-07-02)"
+          }
+        },
+        {
+          "id": "github.project",
+          "profile": "universal",
+          "status": "WARN",
+          "summary": "GitHub Project no ejecutado por el doctor",
+          "cause": "No existe evidencia opt-in vigente; la configuración por sí sola no prueba operación.",
+          "remediation": "Usa el runbook para ejecutar el smoke read-only separado y guardar su recibo redactado.",
+          "evidence": {
+            "expectedReceipt": ".project-constructor/evidence/github-project.json"
+          }
+        },
+        {
+          "id": "ci.configuration",
+          "profile": "harness-tooling",
+          "status": "PASS",
+          "summary": "CI advisory declarada",
+          "cause": "Existe un workflow versionado del núcleo.",
+          "remediation": "Restaura el workflow advisory; no lo conviertas en blocking sin baseline y política explícita.",
+          "evidence": {
+            "workflow": ".github/workflows/project-constructor.yml"
+          }
+        },
+        {
+          "id": "ci.execution",
+          "profile": "harness-tooling",
+          "status": "WARN",
+          "summary": "Ejecución CI local no ejecutado por el doctor",
+          "cause": "No existe evidencia opt-in vigente; la configuración por sí sola no prueba operación.",
+          "remediation": "Usa el runbook para ejecutar el smoke read-only separado y guardar su recibo redactado.",
+          "evidence": {
+            "expectedReceipt": ".project-constructor/evidence/ci-local.json"
+          }
+        },
+        {
+          "id": "constructor.transactions",
+          "profile": "harness-tooling",
+          "status": "PASS",
+          "summary": "Los journals de transacción están en estado terminal",
+          "cause": "No se encontraron transacciones incompletas.",
+          "remediation": "Ejecuta rollback o reanuda el comando mutante de forma explícita; el doctor no repara.",
+          "evidence": {
+            "corruptJournals": [],
+            "incompleteTransactionIds": [],
+            "journalCount": 1
+          }
+        }
+      ]
+    }
+  },
+  "failure": null
+}

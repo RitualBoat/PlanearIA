@@ -44,6 +44,20 @@ Si hay contradiccion, gana este orden:
 | `05-context-engineering/` | Rutas de lectura para IA, carbonizacion Plan Maestro -> OpenSpec, ground truth y encontrabilidad. |
 | `06-diagramas/` | Diagramas Mermaid de arquitectura, app, CI/CD y sync. |
 
+## Constructor De Proyectos Nuevos
+
+Para preparar un repositorio nuevo sin preguntar todavía por el producto:
+
+1. [Plan maestro](01-planes-maestros/PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md).
+2. [Índice del constructor](02-operacion/constructor-proyectos/README.md).
+3. [Runbook](02-operacion/constructor-proyectos/RUNBOOK_CONSTRUCTOR.md).
+4. [Prompt 00](02-operacion/constructor-proyectos/PROMPT_00_BOOTSTRAP_ENTORNO.md).
+5. [Guía manual](02-operacion/constructor-proyectos/GUIA_MANUAL_USUARIO.md).
+
+La auditoria, matriz de transferibilidad, gaps, costos, compatibilidad y rollback están enlazados desde el
+índice del constructor. `PROMPT_01_DISCOVERY_PROYECTO` está diferido: el bootstrap no pregunta por la
+aplicación ni activa un stack.
+
 ## Flujo SDD Obligatorio
 
 ```text
@@ -85,5 +99,5 @@ Legacy, planes cerrados completos, evidencias historicas, referencias open sourc
 
 ## Version
 
-- Actualizado: 2026-07-06.
-- Version documental: 7.0, AI-Friendly Minimal Context.
+- Actualizado: 2026-07-19.
+- Version documental: 7.1, AI-Friendly Minimal Context.

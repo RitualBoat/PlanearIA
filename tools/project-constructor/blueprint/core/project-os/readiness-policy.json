@@ -1,0 +1,374 @@
+{
+  "schemaVersion": "1.0.0",
+  "statusVocabulary": [
+    "PASS",
+    "FAIL",
+    "EXCEPTION"
+  ],
+  "issueMarker": {
+    "start": "<!-- project-os-readiness:pre-propose",
+    "end": "project-os-readiness:pre-propose -->"
+  },
+  "projectMembership": {
+    "required": true,
+    "projectManifest": ".project-os/github/product-os.json",
+    "projectTitlePointer": "/project/title",
+    "unverifiedStatus": "FAIL",
+    "exceptionField": "project-membership"
+  },
+  "phases": {
+    "propose": {
+      "requiredIssueState": "OPEN",
+      "requiredSections": [
+        "## Historia Original",
+        "## Enriquecida"
+      ],
+      "requiredMetadataFields": [
+        "schemaVersion",
+        "change",
+        "execution",
+        "dependencies",
+        "currentState",
+        "scope",
+        "observableCriteria",
+        "owner",
+        "risks",
+        "surfaces",
+        "manualInterventions",
+        "costLicenseReview",
+        "evidence",
+        "rollback",
+        "nonGoals",
+        "exceptions"
+      ],
+      "requireDependenciesClosed": true,
+      "remoteUnverifiedStatus": "FAIL"
+    },
+    "archive": {
+      "changeRoot": "openspec/changes",
+      "requiredFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md",
+        "TLDR.md",
+        "brownfield-baseline.md",
+        "readiness.json"
+      ],
+      "requiredSpecPattern": "specs/*/spec.md",
+      "requiredMetadataFields": [
+        "schemaVersion",
+        "issue",
+        "change",
+        "surfaces",
+        "validations",
+        "evidence",
+        "rollback",
+        "adversarialReview",
+        "exceptions"
+      ],
+      "requiredValidationIds": [
+        "openspec-strict"
+      ],
+      "requiredEvidenceIds": [
+        "issue-link",
+        "adversarial-review"
+      ],
+      "manualEvidenceIdsFromProfileCatalog": true,
+      "requireTasksComplete": true,
+      "requireIssueTraceability": true,
+      "requireAdversarialReview": true,
+      "remoteUnverifiedStatus": "FAIL"
+    }
+  },
+  "exceptions": {
+    "allowedFields": [
+      "project-membership",
+      "manual-evidence"
+    ],
+    "requiredFields": [
+      "field",
+      "reason",
+      "owner",
+      "approvedBy",
+      "expiresOn",
+      "recovery"
+    ],
+    "nonWaivable": [
+      "issue-identity",
+      "change-identity",
+      "artifact-integrity",
+      "tasks-complete",
+      "secrets",
+      "required-surface-evidence"
+    ],
+    "expirationFormat": "YYYY-MM-DD",
+    "exceptionCountsAsPass": false
+  },
+  "validationCatalog": {
+    "metadataMayDeclareCommands": false,
+    "profileSource": ".project-os/profiles.json",
+    "entries": [
+      {
+        "id": "openspec-strict",
+        "profiles": [
+          "documentation",
+          "harness-tooling"
+        ],
+        "runner": "openspec-strict"
+      },
+      {
+        "id": "opsx-check",
+        "profiles": [
+          "harness-tooling"
+        ],
+        "runner": "constructor-opsx-check"
+      },
+      {
+        "id": "provider-boundary-tests",
+        "profiles": [
+          "ai"
+        ],
+        "runner": null
+      },
+      {
+        "id": "error-and-limit-tests",
+        "profiles": [
+          "ai"
+        ],
+        "runner": null
+      },
+      {
+        "id": "secret-scan",
+        "profiles": [
+          "ai",
+          "auth-security"
+        ],
+        "runner": null
+      },
+      {
+        "id": "authorization-tests",
+        "profiles": [
+          "auth-security"
+        ],
+        "runner": null
+      },
+      {
+        "id": "session-negative-tests",
+        "profiles": [
+          "auth-security"
+        ],
+        "runner": null
+      },
+      {
+        "id": "dependency-signal-review",
+        "profiles": [
+          "auth-security"
+        ],
+        "runner": null
+      },
+      {
+        "id": "contract-tests",
+        "profiles": [
+          "backend-api"
+        ],
+        "runner": null
+      },
+      {
+        "id": "error-path-tests",
+        "profiles": [
+          "backend-api"
+        ],
+        "runner": null
+      },
+      {
+        "id": "compatibility-tests",
+        "profiles": [
+          "backend-api"
+        ],
+        "runner": null
+      },
+      {
+        "id": "observability-smoke",
+        "profiles": [
+          "backend-api"
+        ],
+        "runner": null
+      },
+      {
+        "id": "migration-forward-test",
+        "profiles": [
+          "data-migration-sync"
+        ],
+        "runner": null
+      },
+      {
+        "id": "migration-rollback-test",
+        "profiles": [
+          "data-migration-sync"
+        ],
+        "runner": null
+      },
+      {
+        "id": "data-integrity-test",
+        "profiles": [
+          "data-migration-sync"
+        ],
+        "runner": null
+      },
+      {
+        "id": "concurrency-or-retry-tests",
+        "profiles": [
+          "data-migration-sync"
+        ],
+        "runner": null
+      },
+      {
+        "id": "critical-document-presence",
+        "profiles": [
+          "documentation"
+        ],
+        "runner": null
+      },
+      {
+        "id": "relative-link-check",
+        "profiles": [
+          "documentation"
+        ],
+        "runner": null
+      },
+      {
+        "id": "findability-two-hop-check",
+        "profiles": [
+          "documentation"
+        ],
+        "runner": null
+      },
+      {
+        "id": "neutrality-check",
+        "profiles": [
+          "documentation"
+        ],
+        "runner": null
+      },
+      {
+        "id": "constructor-tests",
+        "profiles": [
+          "harness-tooling"
+        ],
+        "runner": null
+      },
+      {
+        "id": "sync-check",
+        "profiles": [
+          "harness-tooling"
+        ],
+        "runner": "constructor-sync-check"
+      },
+      {
+        "id": "capability-matrix-check",
+        "profiles": [
+          "harness-tooling"
+        ],
+        "runner": null
+      },
+      {
+        "id": "doctor-json-check",
+        "profiles": [
+          "harness-tooling"
+        ],
+        "runner": "constructor-doctor-json"
+      },
+      {
+        "id": "second-run-idempotence",
+        "profiles": [
+          "harness-tooling"
+        ],
+        "runner": null
+      },
+      {
+        "id": "configuration-validation",
+        "profiles": [
+          "infra-deploy"
+        ],
+        "runner": null
+      },
+      {
+        "id": "deployment-dry-run-or-preview",
+        "profiles": [
+          "infra-deploy"
+        ],
+        "runner": null
+      },
+      {
+        "id": "health-check",
+        "profiles": [
+          "infra-deploy"
+        ],
+        "runner": null
+      },
+      {
+        "id": "rollback-command-check",
+        "profiles": [
+          "infra-deploy"
+        ],
+        "runner": null
+      },
+      {
+        "id": "unit-and-contract-tests",
+        "profiles": [
+          "library-cli"
+        ],
+        "runner": null
+      },
+      {
+        "id": "package-artifact-test",
+        "profiles": [
+          "library-cli"
+        ],
+        "runner": null
+      },
+      {
+        "id": "multi-platform-smoke",
+        "profiles": [
+          "library-cli"
+        ],
+        "runner": null
+      },
+      {
+        "id": "backward-compatibility-test",
+        "profiles": [
+          "library-cli"
+        ],
+        "runner": null
+      },
+      {
+        "id": "component-or-interaction-tests",
+        "profiles": [
+          "ui"
+        ],
+        "runner": null
+      },
+      {
+        "id": "accessibility-check",
+        "profiles": [
+          "ui"
+        ],
+        "runner": null
+      },
+      {
+        "id": "visual-check-when-configured",
+        "profiles": [
+          "ui"
+        ],
+        "runner": null
+      },
+      {
+        "id": "responsive-check-when-configured",
+        "profiles": [
+          "ui"
+        ],
+        "runner": null
+      }
+    ]
+  }
+}

@@ -50,3 +50,36 @@ export function classifyOpenSpecInitOutput(response) {
     unexpectedStderr,
   };
 }
+
+export function opsxAdaptInvariantFailures(payload) {
+  const plan = payload?.plan;
+  const generated = plan?.generatedFileCount;
+  const operations = Array.isArray(plan?.operations) ? plan.operations : [];
+  const updates = plan?.summary?.updates;
+  const preserves = plan?.summary?.preserves;
+  const failures = [];
+  if (!Number.isInteger(generated) || generated < 1) {
+    failures.push("generatedFileCount debe ser un entero positivo");
+  }
+  if (
+    !Number.isInteger(updates)
+    || !Number.isInteger(preserves)
+    || updates + preserves !== generated
+  ) {
+    failures.push("updates + preserves debe coincidir con generatedFileCount");
+  }
+  if (operations.length !== updates) {
+    failures.push("operations debe coincidir con summary.updates");
+  }
+  if (operations.some((operation) => operation.owner !== "external-openspec")) {
+    failures.push("todas las operaciones deben conservar owner external-openspec");
+  }
+  const targets = operations.map((operation) => operation.target);
+  if (targets.some((target) => typeof target !== "string" || target.length === 0)) {
+    failures.push("cada operación debe declarar un target");
+  }
+  if (new Set(targets).size !== targets.length) {
+    failures.push("los targets de operaciones deben ser únicos");
+  }
+  return failures;
+}

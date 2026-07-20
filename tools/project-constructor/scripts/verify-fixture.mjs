@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 import {
   classifyCommandOutput,
   classifyOpenSpecInitOutput,
+  opsxAdaptInvariantFailures,
 } from "../src/fixture-output.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -509,17 +510,13 @@ async function main() {
       );
       commands.push({ id: "opsx-adapt", exitCode: opsxAdapt.exitCode });
       const opsxAdaptPayload = await parseJsonOutput(opsxAdapt, "opsx-adapt");
-      if (
-        opsxAdaptPayload.plan?.generatedFileCount !== 25
-        || opsxAdaptPayload.plan?.operations?.some(
-          (operation) => operation.owner !== "external-openspec",
-        )
-      ) {
-        throw new Error("opsx-adapt no estabilizó exactamente las 25 superficies externas.");
-      }
       checks.opsxAdapt = compactCommandPayload(opsxAdaptPayload, {
         includeOperationTargets: true,
       });
+      const opsxAdaptFailures = opsxAdaptInvariantFailures(opsxAdaptPayload);
+      if (opsxAdaptFailures.length > 0) {
+        throw new Error(`opsx-adapt incumplió sus invariantes: ${opsxAdaptFailures.join("; ")}.`);
+      }
 
       const beforeOpsxCheck = await snapshot(target);
       const opsxCheck = await run(

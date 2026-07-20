@@ -9,13 +9,13 @@
       "id": "constructor-tests",
       "status": "PASS",
       "command": "npm run constructor:test",
-      "summary": "46 tests aprobados; 0 fallos; sin stderr inesperado atribuible al constructor."
+      "summary": "48 tests aprobados; 0 fallos; sin stderr inesperado atribuible al constructor."
     },
     {
       "id": "empty-repository-fixture",
       "status": "PASS",
       "command": "npm run constructor:fixture -- --evidence artifacts/constructor/fixture.json",
-      "summary": "Bootstrap desde un repositorio Git vacío, paquete instalado desde tarball, 11 etapas aprobadas, 25 superficies OPSX y segundo run sin cambios.",
+      "summary": "Bootstrap desde un repositorio Git vacío, paquete instalado desde tarball, 11 etapas aprobadas, contrato OPSX íntegro (25 superficies observadas localmente) y segundo run sin cambios.",
       "evidence": "artifacts/constructor/fixture.json"
     },
     {
@@ -28,9 +28,9 @@
       "id": "package-artifact",
       "status": "PASS",
       "command": "npm pack ./tools/project-constructor --dry-run --json",
-      "summary": "Tarball privado verificable: 96 archivos, 133424 bytes, 568840 bytes desempaquetados.",
+      "summary": "Tarball privado verificable: 96 archivos, 133981 bytes, 571084 bytes desempaquetados.",
       "filename": "project-engineering-os-constructor-0.1.0.tgz",
-      "sha256": "41b18275ea1c56ea0d3f42cceb578f666b45f123cb0e101bba571e0db957017d"
+      "sha256": "3a32c297c748d976783697f72ea71d0d3b4b391aa6c0903c52e5c0f1d9806ee3"
     },
     {
       "id": "documentation-contract",
@@ -75,6 +75,15 @@
         "npm run constructor:fixture -- --evidence artifacts/constructor/fixture.json"
       ],
       "summary": "Las variantes exactas √, ✓ y ✔ se aceptan en todos los SO; stderr adicional sigue fallando y la fixture completa conserva expectedProgress=true."
+    },
+    {
+      "id": "opsx-surface-portability",
+      "status": "PASS",
+      "commands": [
+        "npm run constructor:test",
+        "npm run constructor:fixture -- --evidence artifacts/constructor/fixture.json"
+      ],
+      "summary": "El gate multi-SO valida targets/globs obligatorios, consistencia de conteos, targets únicos, owner external-openspec y opsx-check sin FAIL; no usa un conteo mágico como sustituto del contrato."
     },
     {
       "id": "repository-tests",

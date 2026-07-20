@@ -37,8 +37,9 @@ pendientes dependen de publicar el PR: matriz CI multi-SO y merge autorizado.
 
 - OpenSpec es el único owner de sus workflows. El adaptador solo parchea bloques delimitados de Product
   OS y comandos locales; el renderer general no genera esos workflows.
-- La CLI oficial fijada produce 25 superficies OPSX en los cinco harnesses. La fixture dejó de asumir
-  una cifra sintética de 15.
+- La fixture local de la CLI oficial fijada produce 25 superficies OPSX en los cinco harnesses. La
+  validación multi-SO no fija ese número: exige las familias/targets del contrato, ownership externo,
+  consistencia del plan y `opsx-check` sin `FAIL`.
 - Graphify permanece retirado/manual y aparece como `SKIP`, nunca como requisito de doctor, bootstrap o
   CI.
 - La publicación del paquete permanece fuera de alcance: `private: true` y `UNLICENSED`.

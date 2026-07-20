@@ -21,11 +21,12 @@ un gate externo todavía pendiente de ejecutar en el PR.
 | Major | Readiness | Placeholders y campos adicionales podían producir un falso verde. | Contratos exactos, rechazo de placeholders, validación fail-closed y pruebas negativas. |
 | Major | Secretos | Una asignación genérica como `token=valor` podía redactarse en salida sin bloquear metadata persistida. | Detección genérica en cualquier campo, permiso solo para referencias `${ENV_VAR}` y pruebas de regresión. |
 | Major | Doctor | El schema declarado no coincidía con la salida humana/JSON real. | Schema corregido al contrato `schemaVersion/verdict/counts/results`; tests de equivalencia y política de secretos sin falso positivo. |
-| Major | OpenSpec | La fixture asumía 15 workflows sintéticos; la CLI oficial fijada genera 25 superficies. | Generación con OpenSpec 1.6.0, conteo oficial 25 y pruebas de ownership externo. |
-| Major | CI | El workflow no ejecutaba la suite negativa completa ni la fixture empaquetada. | CI ejecuta `constructor:check`, 46 tests, fixture, `npm pack --dry-run` y publica evidencia en Ubuntu/Windows/macOS. |
+| Major | OpenSpec | La fixture asumía 15 workflows sintéticos; la CLI oficial fijada genera al menos las cinco familias requeridas y produjo 25 superficies en la fixture local. | Generación con OpenSpec 1.6.0, prueba sintética exacta de 25 y validación portable de globs/targets, ownership y `opsx-check` sin fijar un conteo por SO. |
+| Major | CI | El workflow no ejecutaba la suite negativa completa ni la fixture empaquetada. | CI ejecuta `constructor:check`, 48 tests, fixture, `npm pack --dry-run` y publica evidencia en Ubuntu/Windows/macOS. |
 | Major | Gate circular | `tasks.md` exigía archive/finish antes del pre-archive que requiere todas las tareas completas. | Archive, sync, PR y finish se clasifican como pasos posteriores al change, conforme a la convención vigente; el dry-run y gate sí permanecen verificables antes del archive. |
 | Major | Gate silencioso | El pre-archive pasó sus 14 controles pero emitió `DEP0190` porque el runner usaba `shell: true` para npm en Windows. | Runner explícito mediante `cmd.exe`, argumentos restringidos a la allowlist estática, cero `shell: true`, pruebas de resolución/inyección y gate repetido sin warning. |
 | Major | CI multi-SO | OpenSpec 1.6.0 emitió `✔ Setup complete` en GitHub Actions, mientras la fixture solo reconocía `√` y `✓`; Ubuntu y macOS fallaron aunque el bootstrap era correcto. | Clasificador extraído a módulo probado, nueva variante exacta `✔`, mutación que conserva el rechazo de stderr arbitrario y fixture local completa en PASS. |
+| Major | CI OPSX | La fixture exigía 25 superficies como número universal antes de ejecutar `opsx-check`; la CLI oficial materializó un conjunto distinto en runners y el diagnóstico no guardaba el plan. | Se validan invariantes estructurales y ownership, se conserva la prueba sintética exacta de 25, el payload se registra antes de fallar y `opsx-check` decide globs/targets obligatorios sin conteo mágico. |
 | Minor | Human overlay | La preservación fuera del bloque gestionado no tenía una prueba explícita. | Test que conserva contenido humano, actualiza el bloque y falla en conflicto si se edita el bloque gestionado. |
 | Minor | Stderr externo | OpenSpec escribe progreso normal por stderr y la fixture podía confundirlo con regresión. | Allowlist cerrada de diez señales normales; warnings, comandos desconocidos y archivos ausentes siguen fallando. |
 | Minor | Licencias | La guía manual no pedía evidencia observada de versión, licencia y SHA-256. | Paso manual ampliado con valor esperado/observado y hash del artefacto. |
@@ -61,7 +62,7 @@ un gate externo todavía pendiente de ejecutar en el PR.
 
 ## Evidencia comprobada
 
-- `npm run constructor:test`: 46/46.
+- `npm run constructor:test`: 48/48.
 - `npm run constructor:fixture -- --evidence artifacts/constructor/fixture.json`: PASS, segundo run sin
   drift.
 - `npm pack ./tools/project-constructor --dry-run --json`: 94 archivos; tarball verificable.

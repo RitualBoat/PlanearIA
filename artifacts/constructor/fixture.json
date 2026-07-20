@@ -53,9 +53,9 @@
       "nonGitEntries": []
     },
     "packageArtifact": {
-      "bytes": 133424,
+      "bytes": 133981,
       "filename": "project-engineering-os-constructor-0.1.0.tgz",
-      "sha256": "41b18275ea1c56ea0d3f42cceb578f666b45f123cb0e101bba571e0db957017d"
+      "sha256": "3a32c297c748d976783697f72ea71d0d3b4b391aa6c0903c52e5c0f1d9806ee3"
     },
     "packedRunnerInstall": {
       "stderrLines": 0,
@@ -63,7 +63,7 @@
       "warnings": []
     },
     "firstBootstrapRunner": {
-      "artifactSha256": "41b18275ea1c56ea0d3f42cceb578f666b45f123cb0e101bba571e0db957017d",
+      "artifactSha256": "3a32c297c748d976783697f72ea71d0d3b4b391aa6c0903c52e5c0f1d9806ee3",
       "source": "temporary-runner-from-verified-tarball"
     },
     "firstBootstrap": {
@@ -73,7 +73,7 @@
       "mode": "apply",
       "mutationPerformed": true,
       "plan": {
-        "blueprintHash": "f34254911604196139476ea85d8851d8910d9fcd5658c819535720510107b8a8",
+        "blueprintHash": "463c5e0742c3e4fa30472273d5839ae4e652a63e9771100d5a2edd26d05b38c5",
         "configurationHash": "3fc41ea72053531a4137c5612d9031089bcdb7751fc9bffb5f68d6ddb970075f",
         "externalOwnership": {
           "commands": {
@@ -115,7 +115,7 @@
       "transaction": {
         "changes": 160,
         "resumed": false,
-        "transactionId": "tx-2026-07-20T05-01-02-817Z-a2403ba5"
+        "transactionId": "tx-2026-07-20T05-10-19-152Z-05213457"
       }
     },
     "installedRuntime": {
@@ -131,7 +131,7 @@
       "mode": "apply",
       "mutationPerformed": false,
       "plan": {
-        "blueprintHash": "f34254911604196139476ea85d8851d8910d9fcd5658c819535720510107b8a8",
+        "blueprintHash": "463c5e0742c3e4fa30472273d5839ae4e652a63e9771100d5a2edd26d05b38c5",
         "configurationHash": "3fc41ea72053531a4137c5612d9031089bcdb7751fc9bffb5f68d6ddb970075f",
         "externalOwnership": {
           "commands": {
@@ -151,7 +151,7 @@
         },
         "hasDrift": false,
         "migrations": [],
-        "rollbackPoint": "tx-2026-07-20T05-01-02-817Z-a2403ba5",
+        "rollbackPoint": "tx-2026-07-20T05-10-19-152Z-05213457",
         "summary": {
           "conflicts": 0,
           "creates": 0,
@@ -187,7 +187,7 @@
       "mode": "check",
       "mutationPerformed": false,
       "plan": {
-        "blueprintHash": "f34254911604196139476ea85d8851d8910d9fcd5658c819535720510107b8a8",
+        "blueprintHash": "463c5e0742c3e4fa30472273d5839ae4e652a63e9771100d5a2edd26d05b38c5",
         "configurationHash": "3fc41ea72053531a4137c5612d9031089bcdb7751fc9bffb5f68d6ddb970075f",
         "externalOwnership": {
           "commands": {
@@ -207,7 +207,7 @@
         },
         "hasDrift": false,
         "migrations": [],
-        "rollbackPoint": "tx-2026-07-20T05-01-02-817Z-a2403ba5",
+        "rollbackPoint": "tx-2026-07-20T05-10-19-152Z-05213457",
         "summary": {
           "conflicts": 0,
           "creates": 0,
@@ -409,7 +409,7 @@
       "status": "APPLIED",
       "transaction": {
         "changes": 25,
-        "transactionId": "1784523671050-1d432ceb-8757-4e31-9685-b8925b864276"
+        "transactionId": "1784524227675-48da9003-e876-4548-a88f-105f9995667c"
       }
     },
     "opsxCheck": {

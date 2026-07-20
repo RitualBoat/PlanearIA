@@ -10,7 +10,7 @@
 
 - Issue #103 y su item en PlanearIA Product OS permanecen activos y sin duplicado.
 - Paquete privado `project-engineering-os-constructor` 0.1.0 implementado y probado.
-- 46/46 tests del constructor y fixture desde repositorio Git vacío en PASS.
+- 48/48 tests del constructor y fixture desde repositorio Git vacío en PASS.
 - Segundo bootstrap y `sync --check` sin drift; rollback y reanudación ensayados.
 - OpenSpec strict, paridad de 36 espejos, parche OPSX, typecheck y lint en PASS.
 - Revisión adversarial: `PASS CON HUECOS`, con cero Blockers y cero Majors abiertos.

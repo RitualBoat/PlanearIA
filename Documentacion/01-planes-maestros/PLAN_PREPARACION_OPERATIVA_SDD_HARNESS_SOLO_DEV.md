@@ -575,8 +575,10 @@ Crear estos issues cuando Ola 0 este en curso/cierre. Son la siguiente ola, no t
 - **Paridad:** funcional.
 - **Ground truth:** issue #128 (politica aprobada), `openspec/specs/debt-control-*`.
 - **Depende de:** `constructor-proyectos-nuevos` (#103, archivado).
-- **Estado:** en curso mediante el change `control-deuda-tecnica-sdd`; bloquea #126 (publicacion open
-  source) hasta cerrar su flujo SDD y resolver cualquier saneamiento que active el baseline.
+- **Estado:** archivado (2026-07-20) en `openspec/changes/archive/2026-07-20-control-deuda-tecnica-sdd`;
+  PR #130 mergeado. El baseline agoto el presupuesto de este plan (5/5 unidades): el plan queda PAUSADO
+  por el motor de deuda y su saneamiento vive en el issue #129, que debe resolverse antes de retomar
+  #126 (publicacion open source).
 - **Notas:** runbook en `Documentacion/02-operacion/CONTROL_DEUDA_TECNICA.md`. El motor es neutral y se
   extraera al nucleo de Project Engineering OS en #126.
 

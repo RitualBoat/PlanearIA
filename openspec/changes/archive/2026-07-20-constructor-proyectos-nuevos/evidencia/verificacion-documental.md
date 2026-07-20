@@ -6,9 +6,9 @@
 
 ## Resultado
 
-**PASS CON HUECOS EXTERNOS.** Los documentos, contratos y enlaces internos requeridos están presentes,
-son neutrales y se encuentran desde los índices principales en dos saltos o menos. Las únicas evidencias
-pendientes dependen de publicar el PR: matriz CI multi-SO y merge autorizado.
+**PASS CON GATE MANUAL.** Los documentos, contratos y enlaces internos requeridos están presentes, son
+neutrales y se encuentran desde los índices principales en dos saltos o menos. La matriz CI multi-SO está
+en PASS; únicamente permanece pendiente la revisión/decisión humana de merge.
 
 ## Evidencia mecánica
 
@@ -59,7 +59,8 @@ Las pruebas de integración inyectan fallo parcial, reanudan la transacción y e
 rollback restaura backups, elimina únicamente archivos nuevos cuyo hash coincide y conserva como
 conflicto cualquier edición humana posterior.
 
-## Señal pendiente
+## Evidencia remota
 
-La CI del constructor está declarada como advisory con matriz Ubuntu, Windows y macOS. Su ejecución
-real se verificará en el PR; hasta entonces no se declara paridad multi-SO observada.
+La CI advisory del constructor pasó en Ubuntu Node 20.20/22.22, Windows 22.22 y macOS 22.22, tanto en el
+evento `push` como en `pull_request`. Los checks base TypeScript, ESLint, Jest, backend, React Doctor y
+paridad también terminaron en SUCCESS. El PR #125 permanece draft y el merge no está autorizado.

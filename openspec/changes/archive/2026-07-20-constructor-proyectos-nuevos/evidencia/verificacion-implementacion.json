@@ -107,14 +107,19 @@
       "summary": "Índice GitNexus fresco respecto al commit actual y verificación estructural aprobada."
     }
   ],
-  "pendingExternalEvidence": [
+  "externalEvidence": [
     {
       "id": "multi-os-ci",
-      "reason": "La matriz Ubuntu/Windows/macOS solo puede observarse después de publicar la rama y crear el PR.",
-      "gate": "No interpretar ausencia de checks como éxito; esperar resultados reales antes de merge."
+      "status": "PASS",
+      "summary": "Ubuntu Node 20.20/22.22, Windows 22.22 y macOS 22.22 aprobaron en eventos push y pull_request; checks base también en SUCCESS.",
+      "refs": [
+        "https://github.com/RitualBoat/PlanearIA/actions/runs/29718552643",
+        "https://github.com/RitualBoat/PlanearIA/actions/runs/29718554338"
+      ]
     },
     {
       "id": "merge",
+      "status": "PENDING_MANUAL",
       "reason": "Es una intervención humana posterior al archive y al CI requerido."
     }
   ],

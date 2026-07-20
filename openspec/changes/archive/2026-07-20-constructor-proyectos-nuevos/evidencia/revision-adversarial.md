@@ -10,8 +10,8 @@ fixtures, evidencia y diff. Se intentó refutar cada regla adversarial del issue
 ## Veredicto
 
 **PASS CON HUECOS.** No quedan Blockers ni Majors abiertos. La deuda de warnings/logs preexistentes de
-la suite raíz permanece como Minor rastreado y no se propaga al constructor. La matriz CI multi-SO es
-un gate externo todavía pendiente de ejecutar en el PR.
+la suite raíz permanece como Minor rastreado y no se propaga al constructor. La matriz CI multi-SO quedó
+en PASS; el único gate externo pendiente es la decisión humana de merge.
 
 ## Hallazgos corregidos
 
@@ -58,7 +58,6 @@ un gate externo todavía pendiente de ejecutar en el PR.
 | --- | --- | --- | --- |
 | Minor | Suite raíz | 116/116 suites y 815/815 tests pasan, pero existen warnings `act`/keys, Expo push y logs de sync preexistentes. | Registrado en auditoría, matriz de transferibilidad y gap G6. No se silencian ni se atribuyen al constructor; su corrección pertenece a changes de producto separados. |
 | Pregunta | Distribución | El paquete sigue privado y `UNLICENSED`; no se ha elegido licencia para publicarlo. | Mantener sin publicación hasta decisión humana explícita. |
-| Gate | CI | Falta observar la matriz Ubuntu/Windows/macOS en GitHub Actions. | Publicar PR, esperar checks reales y no mergear por ausencia de checks. |
 
 ## Evidencia comprobada
 
@@ -72,8 +71,12 @@ un gate externo todavía pendiente de ejecutar en el PR.
 - `npm run openspec:validate` y strict del change: PASS.
 - `npm run gitnexus:diagnose`: índice fresco.
 - `npm run harness:doctor -- --json`: `ok=true`, cero FAIL.
+- GitHub Actions: runs
+  [29718552643](https://github.com/RitualBoat/PlanearIA/actions/runs/29718552643) y
+  [29718554338](https://github.com/RitualBoat/PlanearIA/actions/runs/29718554338) en SUCCESS para la matriz
+  Ubuntu/Windows/macOS; checks base del PR #125 también en SUCCESS.
 
 ## Recomendación
 
-Continuar al gate pre-archive. Publicar el PR después del archive, esperar la matriz CI real y reservar el
-merge para la autorización manual aplicable.
+Mantener #125 en revisión manual. No ejecutar `opsx:finish` ni mergear hasta la autorización humana
+aplicable; el constructor puede continuar a Ola 1 solo después de cerrar esa transición.

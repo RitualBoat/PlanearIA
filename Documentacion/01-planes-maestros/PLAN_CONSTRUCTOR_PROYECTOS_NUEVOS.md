@@ -1,6 +1,6 @@
 # Plan Maestro: Constructor reutilizable de proyectos nuevos
 
-> **Estado:** activo, Ola 0 en cierre; implementación y evidencia local completas, pre-archive pendiente.
+> **Estado:** activo, Ola 0 en revisión manual; archive y CI completos, merge pendiente.
 > **Issue/Epic:** [#103](https://github.com/RitualBoat/PlanearIA/issues/103).
 > **Change:** `openspec/changes/constructor-proyectos-nuevos/`.
 > **Snapshot de evidencia:** 2026-07-19.
@@ -14,8 +14,10 @@
 - Segundo bootstrap y `sync --check` sin drift; rollback y reanudación ensayados.
 - OpenSpec strict, paridad de 36 espejos, parche OPSX, typecheck y lint en PASS.
 - Revisión adversarial: `PASS CON HUECOS`, con cero Blockers y cero Majors abiertos.
-- Pendiente: gate pre-archive, archive, PR y matriz CI real multi-SO. El merge requiere el gate humano
-  aplicable.
+- Pre-archive y archive completos; PR draft
+  [#125](https://github.com/RitualBoat/PlanearIA/pull/125) limpio hacia `development`.
+- Matriz CI real en PASS: Ubuntu Node 20.20/22.22, Windows 22.22, macOS 22.22 y checks base.
+- Pendiente únicamente: revisión/aprobación manual y merge mediante `opsx:finish`.
 
 ## 1. Objetivo y visión
 

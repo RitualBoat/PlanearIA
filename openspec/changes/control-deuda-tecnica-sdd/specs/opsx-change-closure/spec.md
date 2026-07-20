@@ -6,9 +6,10 @@
 
 Cuando el motor de deuda esta configurado, el comando de cierre SHALL ejecutar, despues de confirmar
 el merge remoto y actualizar el target local, una comprobacion final de deuda que recalcula el estado
-del registro y sincroniza el expediente GitHub segun el modo configurado. Un resultado FAIL o WARN de
-esta comprobacion SHALL reflejarse en la salida y en el exit code del cierre con causa y recuperacion,
-sin revertir el merge ya realizado y sin presentarse jamas como exito. Si el motor no esta
+del registro y sincroniza el expediente GitHub segun el modo configurado. Un resultado FAIL de esta
+comprobacion SHALL reflejarse en la salida y en el exit code del cierre con causa y recuperacion; un
+WARN SHALL reflejarse en la salida con su causa sin alterar el exit code. Ningun resultado SHALL
+revertir el merge ya realizado ni presentarse como exito cuando no lo es. Si el motor no esta
 configurado, el cierre SHALL reportar la comprobacion como omitida de forma explicita.
 
 #### Scenario: Cierre con deuda que cruza el umbral

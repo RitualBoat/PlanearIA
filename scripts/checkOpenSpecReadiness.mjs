@@ -5,8 +5,13 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
+import { preArchiveGate, preProposeGate } from "../tools/debt-control/src/index.mjs";
+
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const STATUS = new Set(["PASS", "FAIL", "EXCEPTION"]);
+// SKIP existe para verificaciones opcionales declaradas como omitidas (p.ej. motor de deuda sin
+// configurar). Nunca se usa para convertir un fallo en silencio: solo la ausencia de configuracion
+// completa produce SKIP, y el texto siempre nombra la causa.
+const STATUS = new Set(["PASS", "FAIL", "EXCEPTION", "SKIP"]);
 const ISSUE_MARKER_START = "<!-- openspec-readiness:pre-propose";
 const ISSUE_MARKER_END = "openspec-readiness:pre-propose -->";
 const EXCEPTION_FIELDS = new Set(["project-membership", "manual-evidence"]);
@@ -223,6 +228,29 @@ function requiredForSurfaces(surfaces) {
   return { validations, evidence };
 }
 
+// Adapta los checks del motor de deuda (PASS/FAIL/WARN/SKIP) al vocabulario del gate. Los gates de
+// deuda no emiten WARN; cualquier estado no reconocido degrada a FAIL para no fabricar verdes.
+export function mapDebtCheck(entry) {
+  const status = entry.status === "PASS" || entry.status === "SKIP" ? entry.status : "FAIL";
+  return result(entry.id, status, entry.summary, entry.recovery ?? null);
+}
+
+export function debtProposeCheck({ root = ROOT, labels = [], now = new Date() } = {}) {
+  try {
+    return mapDebtCheck(preProposeGate({ root, labels, now }));
+  } catch (error) {
+    return result("debt-pre-propose", "FAIL", `El gate de deuda no pudo evaluarse: ${sanitize(error.message)}`, "Revisa .project-os/debt/ y corrige la configuracion o el registro.");
+  }
+}
+
+export function debtArchiveChecks({ root = ROOT, change, now = new Date() } = {}) {
+  try {
+    return preArchiveGate({ root, change, now }).map(mapDebtCheck);
+  } catch (error) {
+    return [result("debt-gate", "FAIL", `El gate de deuda no pudo evaluarse: ${sanitize(error.message)}`, "Revisa .project-os/debt/ y corrige la configuracion o el registro.")];
+  }
+}
+
 export function validateArchive({ root = ROOT, change, now = new Date(), runCommand = run, runLocal = false } = {}) {
   const results = [];
   let changeRoot;
@@ -286,11 +314,15 @@ export function validateArchive({ root = ROOT, change, now = new Date(), runComm
       addRequired(results, `local-${id}`, execution.status === 0, { pass: `${id} terminó correctamente.`, fail: `${id} falló${detail ? `: ${detail}` : "."}` }, `Ejecuta y corrige ${command} ${args.join(" ")}.`, { now });
     }
   }
+
+  for (const debtResult of debtArchiveChecks({ root, change, now })) {
+    results.push(debtResult);
+  }
   return { results, manifest };
 }
 
 function fetchIssue(issueNumber, runCommand = run) {
-  const execution = runCommand("gh", ["issue", "view", String(issueNumber), "--json", "number,state,body,projectItems"]);
+  const execution = runCommand("gh", ["issue", "view", String(issueNumber), "--json", "number,state,body,projectItems,labels"]);
   if (execution.status !== 0) throw new Error(`No se pudo consultar el issue: ${sanitize(`${execution.stderr}${execution.error}`).slice(-240)}`);
   const issue = parseJson(execution.stdout, "gh issue view");
   const manifest = issueManifest(issue.body ?? "");
@@ -329,7 +361,12 @@ if (import.meta.url === `file:///${process.argv[1].replaceAll("\\", "/")}`) {
   const args = parseArgs(process.argv.slice(2));
   let output;
   try {
-    if (args.phase === "propose" && /^\d+$/.test(args.issue ?? "")) output = report(validateIssue(fetchIssue(args.issue)));
+    if (args.phase === "propose" && /^\d+$/.test(args.issue ?? "")) {
+      const issue = fetchIssue(args.issue);
+      const validation = validateIssue(issue);
+      validation.results.push(debtProposeCheck({ labels: issue.labels ?? [] }));
+      output = report(validation);
+    }
     else if (args.phase === "archive" && args.change) output = report(validateArchive({ change: args.change, runLocal: args.runLocal }));
     else throw new Error("Uso: node scripts/checkOpenSpecReadiness.mjs --phase propose --issue <n> | --phase archive --change <kebab-case> [--run-local] [--json]");
     process.stdout.write(`${args.json ? JSON.stringify(output, null, 2) : formatReport(output)}\n`);

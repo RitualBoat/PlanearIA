@@ -562,6 +562,24 @@ Crear estos issues cuando Ola 0 este en curso/cierre. Son la siguiente ola, no t
 - **Estado:** pendiente.
 - **Labels:** `change`, `legacy`, `testing`.
 
+#### Change: `control-deuda-tecnica-sdd`
+
+- **Issue:** [#128](https://github.com/RitualBoat/PlanearIA/issues/128)
+- **Historia:** Como desarrollador unico asistido por agentes, quiero que todo hallazgo residual de un
+  flujo SDD sea clasificado, verificado, registrado y gobernado mediante gates, para impedir que
+  advertencias olvidadas acumulen deuda silenciosa y recibir una ruta guiada de saneamiento.
+- **Criterios de aceptacion:** motor neutral en `tools/debt-control/` con registro canonico en
+  `.project-os/debt/`; gates de deuda en pre-propose y archive; red de seguridad post-finish; issue de
+  saneamiento idempotente por plan (GitHub `required` en PlanearIA); prompts de relevo deterministas;
+  baseline verificable de la deuda actual.
+- **Paridad:** funcional.
+- **Ground truth:** issue #128 (politica aprobada), `openspec/specs/debt-control-*`.
+- **Depende de:** `constructor-proyectos-nuevos` (#103, archivado).
+- **Estado:** en curso mediante el change `control-deuda-tecnica-sdd`; bloquea #126 (publicacion open
+  source) hasta cerrar su flujo SDD y resolver cualquier saneamiento que active el baseline.
+- **Notas:** runbook en `Documentacion/02-operacion/CONTROL_DEUDA_TECNICA.md`. El motor es neutral y se
+  extraera al nucleo de Project Engineering OS en #126.
+
 #### Change: `presupuesto-deuda-por-contacto`
 
 - **Issue sugerido:** `[Architecture] Aplicar presupuesto de deuda a pantallas tocadas`

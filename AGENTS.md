@@ -99,7 +99,7 @@ Reglas:
   propose para todo change SDD no trivial. Solo un hotfix trivial autorizado explicitamente puede saltarlo.
 - El issue se enriquece antes de proponer.
 - Antes de `propose`, ejecutar `npm run openspec:ready:propose -- --issue <n>`; el issue debe declarar metadata de readiness, dependencias, contexto, rollback, superficies y excepciones temporales justificadas.
-- Antes de `archive`, ejecutar `npm run openspec:ready:archive -- --change <nombre> --run-local`; el change debe tener `readiness.json`, tareas completas, evidencia proporcional, rollback y revisión adversarial. El gate es read-only y reporta `PASS`, `FAIL` o `EXCEPTION`.
+- Antes de `archive`, ejecutar `npm run openspec:ready:archive -- --change <nombre> --run-local`; el change debe tener `readiness.json`, tareas completas, evidencia proporcional, rollback y revisión adversarial. El gate es read-only y reporta `PASS`, `FAIL`, `EXCEPTION` o `SKIP` (SKIP solo declara una verificación opcional omitida con causa, nunca silencia un fallo).
 - Las excepciones solo aplican a campos permitidos, requieren motivo, owner, aprobador, expiración ISO y recuperación; nunca silencian identidad, integridad de artefactos ni tareas pendientes.
 - Un change grande a la vez.
 - `proposal.md` define why/what/no objetivos.
@@ -113,6 +113,29 @@ Reglas:
 - Archivar es `npm run opsx:archive -- <change>`, unico owner del paso: verifica la rama, corre el gate de readiness, clasifica si las deltas ya estan aplicadas, delega a la CLI la escritura de specs y el movimiento del directorio, y commitea la salida en la rama del change. Previsualiza con `npm run opsx:archive:dry`. Reejecutarlo sobre un change ya archivado es no-op.
 - La CLI de OpenSpec es el unico escritor de `openspec/specs/` durante el archive. No ejecutar `/opsx:sync` antes de archivar un change que se va a archivar en ese momento: la CLI aplica las mismas deltas y aborta al reencontrar una requirement `ADDED` existente. Tampoco mover el directorio del change a mano. Una sincronizacion parcial aborta el archive nombrando la requirement discrepante.
 - Tras archivar, cerrar la rama del change con `npm run opsx:finish`: publica la rama, crea o reutiliza un PR hacia `development`, espera los checks requeridos y ordena el merge a GitHub. Nunca hace push directo al target protegido; tras confirmar el merge remoto actualiza `development` local y borra la rama local. Previsualiza con `npm run opsx:finish:dry`.
+
+## Debt Control Loop
+
+Los hallazgos residuales de un flujo SDD no se dejan como avisos: se clasifican, verifican y gobiernan
+con el motor de deuda (`tools/debt-control/`, estado en `.project-os/debt/`, runbook en
+`Documentacion/02-operacion/CONTROL_DEUDA_TECNICA.md`).
+
+- Todo cierre SDD captura un assessment (`npm run debt:capture -- --flow <change> --input <archivo>`),
+  incluso con resultado `clean`. El gate de archive lo exige y falla con Blockers/Majors abiertos.
+- Las siete categorias canonicas son `defect`, `technical-debt`, `external-risk`, `decision-required`,
+  `optional-improvement`, `false-positive` y `duplicate`. Warnings, TODOs y salidas de scanners son
+  candidatos: nunca se vuelven deuda ni autorizan correcciones sin verificacion con evidencia vigente.
+- Presupuesto por plan: Minor 1 unidad, Minor recurrente/transversal 2, umbral 5. Disparan saneamiento:
+  presupuesto >= 5, cinco flujos con deuda residual, el mismo hallazgo en tres flujos, una excepcion
+  vencida, deuda transversal critica o cualquier Blocker/Major verificado.
+- La pausa afecta solo al plan duenio (todos los planes solo ante deuda transversal critica) y se deriva
+  del registro: no hay flag editable y borrar el registro no reanuda nada. El pre-propose bloquea
+  changes de producto de un plan pausado; solo admite labels de saneamiento/seguridad/incidente/rollback.
+- GitHub en modos `required` (PlanearIA), `advisory` u `off`, con un issue de saneamiento idempotente
+  por plan que impone NO GENERAR MAS DEUDA TECNICA. Indisponibilidad produce FAIL/WARN/SKIP segun el
+  modo, nunca un PASS falso.
+- `npm run debt:check` es read-only; solo `debt:capture` y `debt:sync` mutan estado. `npm run
+  debt:handoff -- --plan <id>` genera el prompt de relevo y recomienda mismo chat o chat nuevo.
 
 Skills utiles por agente:
 

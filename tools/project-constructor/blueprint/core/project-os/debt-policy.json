@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "budget": {
+    "threshold": 5,
+    "minorUnits": 1,
+    "escalatedMinorUnits": 2
+  },
+  "triggers": {
+    "flowsWithResidualDebt": 5,
+    "recurrenceFlows": 3
+  },
+  "github": {
+    "mode": "auto",
+    "remediationLabel": "debt-remediation",
+    "issueTitlePrefix": "[Debt][Saneamiento]",
+    "projectManifest": ".project-os/github/product-os.json"
+  },
+  "plans": [
+    {
+      "id": "product-roadmap",
+      "title": "Roadmap del producto",
+      "doc": "docs/plan-maestro.md"
+    }
+  ],
+  "planRouting": {
+    "labelMap": {},
+    "default": "product-roadmap"
+  },
+  "allowlistLabels": [
+    "debt-remediation",
+    "security",
+    "incident",
+    "rollback"
+  ]
+}

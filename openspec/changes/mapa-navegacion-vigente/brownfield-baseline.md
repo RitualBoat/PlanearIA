@@ -11,6 +11,12 @@ Registra unicamente la superficie que este change toca. No inventaria la aplicac
   changes de Ola 1, OQ2 y riesgo R4).
 - `Documentacion/02-operacion/GITHUB_PRODUCT_OS.md` (estado del milestone `UX/UI Ola 1`, lineas `:67` y
   `:134-135`).
+- `Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md` (seccion 7, solo nombres de ruta).
+  **Incorporado durante el apply, no previsto en el propose.** La verificacion de tabs legacy demostro que
+  el documento describia cinco flujos autenticados vigentes a traves de `ConfiguracionTab`, ruta que no
+  existe desde #81, lo que hacia inalcanzable el criterio de aceptacion del issue y contradecia la spec de
+  este change ("ningun documento activo"). La correccion se limita a sustituir nombres de ruta y anadir una
+  nota fechada; no altera flujos, decisiones, estimaciones ni alcance del plan de Auth.
 
 Ninguna superficie de codigo, backend, tests, configuracion ni UI. `src/navigation/` se lee como fuente y
 no se modifica.
@@ -93,8 +99,13 @@ corregirla.
 
 ## Fuera de alcance
 
-- `Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md:551-557` (flujos por
-  `ConfiguracionTab`): plan maestro distinto y activo; se deriva a issue propio.
+- Todo `PLAN_AUTH_SEGURIDAD_SESION_REAL.md` salvo los nombres de ruta de su seccion 7: sus flujos,
+  decisiones, fases y alcance pertenecen a su propio plan y no se tocan. Sus 24 rutas de repositorio
+  citadas y ya rotas antes de este change (`backend/api/*.js`, `src/hooks/useAuthGate.ts`,
+  `src/services/auth/authTypes.ts`, `src/services/classroom/classroomRepositoryFactory.ts`,
+  `backend/lib/roles.js`, `backend/lib/httpSecurity.js`, `backend/lib/databaseIndexes.js`,
+  `src/navigation/AppTabsNavigator.tsx` y tres documentos de `context/infraestructura-ground-truth/`)
+  se derivan a issue propio; verificadas como preexistentes contra `git show HEAD`.
 - `Documentacion/02-operacion/CAMBIOS_SYNC_OFFLINE_2026-06.md:108,122`: registro fechado, historico.
 - `.eslintrc.cjs:104` (entrada de rollout para `src/components/FloatingActionIcons.tsx`, ya borrado): es
   codigo, no documentacion; se deriva a issue propio.

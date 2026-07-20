@@ -39,8 +39,8 @@ derivan a issues propios los pendientes que quedan fuera de alcance.
 ## Resumen integral del change
 
 Es un change puramente documental que pone al dia la descripcion de la navegacion de PlanearIA para que
-sirva de entrada confiable al trabajo de Figma. Toca cuatro archivos de documentacion y ninguna linea de
+sirva de entrada confiable al trabajo de Figma. Toca cinco archivos de documentacion y ninguna linea de
 codigo. Corrige tres cosas: un mapa que describe una app que ya no existe, un plan maestro que se lee como
 si fuera el estado real del proyecto, y un documento de operacion que declara abierto un milestone
-cerrado. Amplia el alcance original del issue con un archivo mas, porque sin el no se puede cumplir lo
-pedido. Si algo sale mal, revertir el commit deja todo como estaba.
+cerrado. Amplio el alcance original con dos archivos mas, porque la verificacion demostro que sin ellos no
+se cumplia lo pedido. Si algo sale mal, revertir el commit deja todo como estaba.

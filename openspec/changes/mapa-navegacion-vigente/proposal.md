@@ -65,9 +65,14 @@ ni ninguno de sus escenarios.
   Si alguna edicion tocara `.agents/`, se regenera el harness con `npm run agent:harness:sync`.
 - **Dependencias:** #81 (cerrado) aporta el codigo que el mapa describe. #86 (Figma) es el consumidor
   aguas abajo que motiva la urgencia.
-- **Fuera de alcance, derivado a issues propios:** `PLAN_AUTH_SEGURIDAD_SESION_REAL.md:551-557`
-  (flujos por `ConfiguracionTab`, plan distinto), `CAMBIOS_SYNC_OFFLINE_2026-06.md` (registro fechado,
-  historico por naturaleza) y `.eslintrc.cjs:104` (entrada de rollout para un archivo borrado; es codigo).
+- **Incorporado durante el apply:** `Documentacion/01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md`,
+  seccion 7, solo nombres de ruta. La verificacion demostro que describia cinco flujos autenticados
+  vigentes por `ConfiguracionTab`, haciendo inalcanzable el criterio de aceptacion del issue. Ver
+  `evidencia/verificacion-docs.md` seccion 5.
+- **Fuera de alcance, derivado a issues propios:** las 24 rutas de repositorio ya rotas en
+  `PLAN_AUTH_SEGURIDAD_SESION_REAL.md` (preexistentes, verificadas contra `git show HEAD`),
+  `CAMBIOS_SYNC_OFFLINE_2026-06.md` (registro fechado, historico por naturaleza) y `.eslintrc.cjs:104`
+  (entrada de rollout para un archivo borrado; es codigo).
 
 ## No objetivos
 

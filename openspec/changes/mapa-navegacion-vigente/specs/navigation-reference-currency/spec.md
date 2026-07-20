@@ -6,8 +6,11 @@
 implementada, coincidiendo con `src/navigation/AppShell.tsx`, `src/navigation/routeManifest.ts` y
 `RootStackParamList`. SHALL declarar en su encabezado que es un documento derivado de
 `src/navigation/routeManifest.ts`, que se actualiza cuando ese archivo cambia, y que no define la
-navegacion objetivo. SHALL citar unicamente archivos fuente existentes. SHALL NOT presentar como vigente
-ninguna estructura de navegacion que el codigo ya no contenga.
+navegacion objetivo. Todo archivo citado **como fuente de verdad** SHALL existir en el repositorio; un
+archivo eliminado solo puede citarse dentro de una afirmacion que declare su eliminacion. SHALL NOT
+presentar como vigente ninguna estructura de navegacion que el codigo ya no contenga. El mapa SHALL
+registrar ademas las diferencias conocidas entre lo implementado y la navegacion objetivo del plan
+maestro, para que un prototipo no tome una por la otra.
 
 #### Scenario: Un agente prepara frames de Figma a partir del mapa
 
@@ -15,6 +18,7 @@ ninguna estructura de navegacion que el codigo ya no contenga.
 - **THEN** encuentra los cinco hubs implementados (`InicioTab`, `OfficeTab`, `ClasesTab`, `AsistenteTab`, `MasTab`) con su titulo, su ruta y su pantalla de aterrizaje
 - **AND** cada archivo citado como fuente existe en el repositorio
 - **AND** el encabezado le indica que el documento describe lo implementado y no lo planeado
+- **AND** encuentra registradas las diferencias conocidas entre lo implementado y el objetivo del plan, con el change que cierra cada una
 
 #### Scenario: El contrato de rutas cambia despues de este change
 

@@ -63,8 +63,8 @@ No se renombran por estetica: el historial y los enlaces existentes tienen prior
 
 | Estado | Milestones | Regla operativa |
 | --- | --- | --- |
-| Cerrados historicos | `Ciclo 0 - Reorientacion y GitHub`, `Ciclo 1 - Plan Classroom`, `Ciclo 2 - Fundacion Classroom`, `Ciclo 3 - Infraestructura Local y CI`, `Readiness Ola 0`, `UX/UI Ola 0 - Fundaciones` | Mantener sus issues como evidencia; reabrir solo si una referencia activa fue omitida. |
-| Activos o diferidos | `Ciclo 3 - UX/Navegacion Global`, `UX/UI Ola 1 - Shell y componentes`, `Ciclo 4 - Auth y Seguridad`, `Readiness Gate M` | Conservar abiertos mientras el plan UX/UI, el cierre Auth o los gates #46/#47 sigan vigentes. `Ciclo 3 - UX/Navegacion Global` agrupa el trabajo transversal del plan UX/UI (ver "Seguimiento del plan UX/UI"). |
+| Cerrados historicos | `Ciclo 0 - Reorientacion y GitHub`, `Ciclo 1 - Plan Classroom`, `Ciclo 2 - Fundacion Classroom`, `Ciclo 3 - Infraestructura Local y CI`, `Readiness Ola 0`, `UX/UI Ola 0 - Fundaciones`, `UX/UI Ola 1 - Shell y componentes` | Mantener sus issues como evidencia; reabrir solo si una referencia activa fue omitida. |
+| Activos o diferidos | `Ciclo 3 - UX/Navegacion Global`, `Ciclo 4 - Auth y Seguridad`, `Readiness Gate M` | Conservar abiertos mientras el plan UX/UI, el cierre Auth o los gates #46/#47 sigan vigentes. `Ciclo 3 - UX/Navegacion Global` agrupa el trabajo transversal del plan UX/UI (ver "Seguimiento del plan UX/UI"). |
 
 Antes de una mutacion, capturar `Project`, issues y milestones; repetir la consulta
 despues. Si el estado cambia de forma concurrente, detenerse y revisar la decision en vez
@@ -133,6 +133,10 @@ Es la plantilla reutilizable para todas las olas del plan
 Estado inicial tras el change `product-os-epic-uxui` (2026-07-17): epic #101 con #78-#89 como
 sub-issues; `UX/UI Ola 0 - Fundaciones` cerrado (#78-#80); `UX/UI Ola 1 - Shell y componentes`
 abierto (#81-#84); `Ciclo 3 - UX/Navegacion Global` con #85-#89.
+
+Estado posterior (2026-07-19): `UX/UI Ola 1 - Shell y componentes` cerrado con #81-#84 cerrados,
+siguiendo el paso (4) de activacion de ola. El epic #101 sigue abierto porque el plan UX/UI continua
+en `Ciclo 3 - UX/Navegacion Global`.
 
 Ejemplo recomendado para Classroom:
 

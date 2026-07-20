@@ -548,13 +548,19 @@ La seccion actual de Cuenta debe evolucionar a:
 
 - Entrada principal no autenticada: `StackNavigator` -> `Login`.
 - Entradas secundarias: `Registro`, `RecuperarContrasena`, `Onboarding` -> login/invitado.
-- Entrada autenticada: `MainTabs` -> `ConfiguracionTab` -> `CuentaScreen`.
+> **Nombres de ruta actualizados (2026-07-19, issue #111).** El change `app-shell-navegacion` (#81)
+> sustituyo `ConfiguracionTab` por el hub `MasTab`, que contiene `Cuenta`. Se corrigen aqui unicamente los
+> nombres de ruta para que no contradigan
+> `Documentacion/04-referencia/MAPA_NAVEGACION_ACTUAL.md`; los flujos, decisiones y alcance de este plan no
+> cambian.
+
+- Entrada autenticada: `MainTabs` -> `MasTab` -> `Cuenta` (`CuentaScreen`).
 - Crear cuenta: `Login` -> `Registro` -> `MainTabs`.
 - Recuperar contrasena: `Login` -> `RecuperarContrasena` -> `Login`.
-- Editar perfil: `ConfiguracionTab` -> `EditarPerfil` -> volver a `ConfiguracionTab`.
-- Cambiar contrasena: `ConfiguracionTab` -> `RecuperarContrasena` o futuro flujo autenticado -> volver a Cuenta/Login.
-- Administrar roles: `ConfiguracionTab` -> `AdminRoles` solo para roles permitidos.
-- Sesiones iniciadas: `ConfiguracionTab` -> futura pantalla `SesionesActivas` -> volver a Cuenta.
+- Editar perfil: `MasTab` -> `EditarPerfil` -> volver a `Cuenta`.
+- Cambiar contrasena: `MasTab` -> `RecuperarContrasena` o futuro flujo autenticado -> volver a Cuenta/Login.
+- Administrar roles: `MasTab` -> `AdminRoles` solo para roles permitidos.
+- Sesiones iniciadas: `MasTab` -> `SesionesActivas` -> volver a Cuenta.
 - Logout: `CuentaScreen` -> limpiar sesion -> reset navigation a `Login`.
 - Guest: `Login` -> `MainTabs` local-only -> acciones protegidas usan `useAuthGate`.
 - Rutas legacy: no eliminar durante primeras fases; agregar guards antes de ocultar.

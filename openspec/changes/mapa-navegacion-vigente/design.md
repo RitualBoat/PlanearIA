@@ -137,6 +137,24 @@ correcto en su fecha, asi que se conserva y se le agrega el estado posterior en 
 *Verificacion:* `gh api repos/RitualBoat/PlanearIA/milestones?state=all` devuelve milestone 11
 `UX/UI Ola 1 - Shell y componentes state=closed open=0 closed=4`, con #81-#84 cerrados.
 
+### D10. `PLAN_AUTH_SEGURIDAD_SESION_REAL.md` entra durante el apply, solo en nombres de ruta
+
+*Decision tomada durante la implementacion, no en el propose.* La verificacion de tabs legacy demostro que
+su seccion 7 describe cinco flujos autenticados vigentes a traves de `ConfiguracionTab`, ruta inexistente
+desde #81. El propose lo habia declarado fuera de alcance por pertenecer a otro plan maestro.
+
+*Por que se revierte esa decision:* el criterio de aceptacion del issue ("una busqueda no presenta las
+cinco tabs legacy como navegacion primaria vigente") y la spec de este change ("SHALL NOT presentar ... en
+ningun documento activo") son ambos inalcanzables dejandolo. Ademas es el escenario exacto que el change
+existe para evitar: un documento activo enviando a Figma hacia una ruta que no existe.
+
+*Como se acota:* se sustituyen nombres de ruta y se anade una nota fechada que declara la sustitucion y su
+origen. No se tocan flujos, decisiones, fases, estimaciones ni alcance del plan de Auth. Sus 24 rutas de
+repositorio ya rotas antes de este change quedan fuera y se derivan a issue propio.
+
+*Alternativa descartada:* estrechar la spec a "los documentos nombrados en el issue". Habria hecho pasar
+el gate a costa de dejar en pie el defecto que el issue pide cerrar.
+
 ### D9. Las inconsistencias de codigo halladas al transcribir se derivan, no se corrigen
 
 Si al escribir el mapa aparece una inconsistencia en `src/`, se registra con archivo y linea y se deriva a

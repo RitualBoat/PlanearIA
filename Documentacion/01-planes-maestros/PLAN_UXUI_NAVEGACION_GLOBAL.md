@@ -12,6 +12,13 @@
 > **Origen:** auditoria UX/UI 2026-07 (bloques 1-5, sesion de discovery con Claude).
 > **Insumo IHC:** `Documentacion/00-fundamentos/IHC_DISCOVERY_DOCENTE.md`.
 
+> **Plan y snapshot, no estado operativo.** Este documento es el blueprint del redisenio y una fotografia
+> de su fecha de redaccion. El **estado operativo real** (que esta hecho, en curso o pendiente) se rastrea
+> en el epic [`#101`](https://github.com/RitualBoat/PlanearIA/issues/101) y sus milestones `UX/UI Ola N`.
+> Los campos **Estado** de cada change en este documento son intencion de planificacion, **no autoridad de
+> estado**: ante una discrepancia, GitHub manda. Las estimaciones, paridades y dependencias registradas
+> aqui son historicas y no se reescriben.
+
 ---
 
 ## 1. Blueprint
@@ -104,7 +111,7 @@ herramientas familiares, no en controles nuevos.
 | R1 | Tokens estaticos: tema/daltonismo no se propagan | 3-4 | Change `theming-runtime` primero (Ola 0). |
 | R2 | Responsive no reactivo (`Dimensions.get`) | 2-3 | Change `breakpoints-reactivos` (Ola 0). |
 | R3 | Rutas legacy y modernas coexisten (grupos/ vs classroom/) | 2 | Cada change de Ola 3 declara la ruta moderna y redirige la legacy. |
-| R4 | `FloatingActionIcons` = segunda navegacion paralela | 2 | Se integra al TopBar del AppShell o se retira (decidir en `app-shell-navegacion`). |
+| R4 (RESUELTO 2026-07-18) | `FloatingActionIcons` = segunda navegacion paralela | 2 | Mitigacion ejecutada en `app-shell-navegacion`: se integro al TopBar y se retiro el componente. Ver OQ2. |
 | R5 | Mojibake UTF-8 en fuentes | 1 | Normalizar al tocar cada archivo. |
 | R6 | Asistente IA requiere backend nuevo (conversaciones, adjuntos, jobs persistibles) | Alcance | Changes `asistente-ia-base` y `asistente-ia-2plano` lo dimensionan como backend+UI, no solo pantalla. |
 | R7 | Editor tentap: comportamiento web vs nativo incierto | 2-3 | Spike dentro de `notasplan-editor` antes de comprometer diseno. |
@@ -304,8 +311,10 @@ de datos definido por `MAPA_DDD_ESTRATEGICO_LIGERO.md`.
   (placeholder temporal); pantallas actuales siguen accesibles desde los nuevos hubs; decidir destino de
   `FloatingActionIcons` (integrar a TopBar o retirar).
 - **Paridad:** funcional. **Ground truth:** wireframe Figma del shell (3 breakpoints).
-- **Depende de:** `theming-runtime`, `breakpoints-reactivos`. **Estado:** pendiente.
+- **Depende de:** `theming-runtime`, `breakpoints-reactivos`. **Estado:** archivado 2026-07-18 (issue #81).
 - **Notas:** el change mas delicado de navegacion; migracion por reapuntado, sin borrar rutas.
+  El destino de `FloatingActionIcons` se resolvio integrandolo al TopBar y retirando el componente
+  (design.md 3.5 del change archivado); ver OQ2 y R4.
 
 #### Change: `componentes-base`
 
@@ -314,7 +323,7 @@ de datos definido por `MAPA_DDD_ESTRATEGICO_LIGERO.md`.
   reinventar estilos.
 - **Criterio de aceptacion:** componentes con normal/pressed/disabled/loading, `accessibilityRole/Label`,
   toque >=44pt, foco visible en web; documentados con previews.
-- **Paridad:** funcional. **Depende de:** `tokens-completos`. **Estado:** pendiente.
+- **Paridad:** funcional. **Depende de:** `tokens-completos`. **Estado:** archivado 2026-07-19 (issue #82).
 
 #### Change: `sync-status-ui`
 
@@ -322,7 +331,7 @@ de datos definido por `MAPA_DDD_ESTRATEGICO_LIGERO.md`.
   conexion, con el mismo lenguaje visual en toda la app y sin mensajes alarmantes.
 - **Criterio de aceptacion:** SyncStatusChip global (idle/syncing/synced/offline/error/authError desde
   `SyncContext`), SaveStateLabel en editores, PendingBadge, textos tranquilizadores actuales conservados.
-- **Paridad:** funcional. **Depende de:** `componentes-base`. **Estado:** pendiente.
+- **Paridad:** funcional. **Depende de:** `componentes-base`. **Estado:** archivado 2026-07-19 (issue #83).
 
 #### Change: `assign-sheet`
 
@@ -330,7 +339,7 @@ de datos definido por `MAPA_DDD_ESTRATEGICO_LIGERO.md`.
   "Adjuntar" con el mismo selector, sin descargar ni copiar nada.
 - **Criterio de aceptacion:** un solo componente sobre `SYNC_ENTITIES` (clase/unidad/actividad);
   operacion encolada offline; usado por al menos un flujo real al cerrar.
-- **Paridad:** funcional. **Depende de:** `componentes-base`. **Estado:** pendiente.
+- **Paridad:** funcional. **Depende de:** `componentes-base`. **Estado:** archivado 2026-07-19 (issue #84).
 
 ### Hitos pre-Ola 2: prototipo Figma e IHC (manuales)
 
@@ -554,7 +563,12 @@ Open questions:
 
 - OQ1: nombres finales de DisenaPLAN/AsistePLAN/ConectaPLAN/AgendaPLAN/ReportaPLAN ("de momento asi",
   revisar antes de Ola 3).
-- OQ2: destino de `FloatingActionIcons` (se decide en `app-shell-navegacion`).
+- OQ2 (RESUELTO 2026-07-18): destino de `FloatingActionIcons` (se decidio en `app-shell-navegacion`).
+  - **Decision:** integrar al TopBar **y** retirar el componente flotante. Ver
+    `openspec/changes/archive/2026-07-18-app-shell-navegacion/design.md` seccion 3.5.
+  - **Resultado verificable:** `src/components/FloatingActionIcons.tsx` eliminado (commit `2e5acfb`); sus
+    tres afordancias (notificaciones con badge, ayuda, menu de cuenta) viven en `src/navigation/AppTopBar.tsx`
+    con toque >=44pt, colores desde el tema en runtime y foco visible en web.
 - OQ3: politica de privacidad de datos de alumnos hacia proveedores IA cloud (se decide en la spec de
   `asistente-ia-base`; minimo: avisar que se envia y a que tipo de proveedor).
 - OQ4: comunidad publica (muro) futura: fuera de este plan; reevaluar tras ConectaPLAN.

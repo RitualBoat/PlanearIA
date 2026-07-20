@@ -11,22 +11,24 @@
     },
     {
       "id": "pr-link",
-      "ref": "PENDIENTE: se completa en opsx:finish con el PR hacia development"
+      "ref": "https://github.com/RitualBoat/PlanearIA/pull/124"
     },
     {
       "id": "adversarial-review",
-      "ref": "PENDIENTE: evidencia/revision-adversarial.md"
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/111#issuecomment-5018112148 y openspec/changes/mapa-navegacion-vigente/evidencia/revision-adversarial.md"
     },
     {
       "id": "docs-verification",
-      "ref": "PENDIENTE: evidencia/verificacion-docs.md (busqueda de tabs legacy, enlaces relativos y comparacion contra routeManifest.ts)"
+      "ref": "openspec/changes/mapa-navegacion-vigente/evidencia/verificacion-docs.md (comparacion bidireccional mapa <-> routeManifest.ts con 0 fallos y dos mutaciones de control, busqueda de tabs legacy, y 154 referencias de enlaces comprobadas)"
     }
   ],
   "rollback": {
     "strategy": "Cambio puramente documental sin migracion ni estado intermedio: git revert del commit del change restaura los cuatro archivos de Documentacion a su contenido previo. Ningun consumidor automatizado parsea estos documentos (las skills ux-ui-design solo los listan como lectura), asi que el revert no deja consumidores rotos. No se toca src/, backend/, tests ni configuracion, por lo que no hay nada que revertir fuera de Documentacion y del propio directorio del change."
   },
   "adversarialReview": {
-    "ref": "PENDIENTE: evidencia/revision-adversarial.md"
+    "ref": "https://github.com/RitualBoat/PlanearIA/issues/111#issuecomment-5018112148",
+    "veredicto": "PASS CON HUECOS",
+    "resumen": "Un Major (contradiccion hacia #86: el Asistente implementado como hub a pantalla completa vs la decision D4 que lo quiere como panel acoplable en web/tablet) y dos Minor corregidos dentro del change. Hueco rastreado: deuda documental preexistente de PLAN_AUTH_SEGURIDAD_SESION_REAL.md, derivada a #122."
   },
   "exceptions": []
 }

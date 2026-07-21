@@ -47,10 +47,19 @@ function okJson(data: unknown) {
 }
 
 describe("gruposService sync (web/offline-flaky)", () => {
+  // Los servicios/motor de sync registran su operacion normal via logger en
+  // __DEV__; es ruido esperado, se espia y restaura por test.
+  let logSpy: jest.SpyInstance;
+
   beforeEach(async () => {
+    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     Object.keys(storage).forEach((key) => delete storage[key]);
     await guardarGrupos([]);
     mockApiRequest.mockReset();
+  });
+
+  afterEach(() => {
+    logSpy.mockRestore();
   });
 
   it("pushes a new group to the backend even when NetInfo says offline", async () => {

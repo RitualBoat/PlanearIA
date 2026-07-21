@@ -41,10 +41,19 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
 }));
 
 describe("gruposService", () => {
+  // Los servicios/motor de sync registran su operacion normal via logger en
+  // __DEV__; es ruido esperado, se espia y restaura por test.
+  let logSpy: jest.SpyInstance;
+
   beforeEach(async () => {
+    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     Object.keys(storage).forEach((key) => delete storage[key]);
     await guardarGrupos([]);
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    logSpy.mockRestore();
   });
 
   it("persiste un grupo nuevo en AsyncStorage", async () => {

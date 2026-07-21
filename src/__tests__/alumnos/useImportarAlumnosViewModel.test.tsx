@@ -84,8 +84,12 @@ describe("useImportarAlumnosViewModel", () => {
     mockSetItem.mockResolvedValue(undefined);
   });
 
-  it("inicia en estado idle", () => {
+  it("inicia en estado idle", async () => {
     const { result } = renderHook(() => useImportarAlumnosViewModel(), { wrapper });
+
+    // AlumnosProvider carga su estado persistido al montar; sin este flush la
+    // actualizacion inicial resuelve fuera de act().
+    await act(async () => {});
 
     expect(result.current.uiState).toBe("idle");
     expect(result.current.result).toBeNull();

@@ -224,11 +224,14 @@
         }
       ],
       "issue": 129,
-      "status": "open",
+      "status": "resolved",
       "exception": null,
       "createdAt": "2026-07-20",
       "updatedAt": "2026-07-20",
-      "resolution": null
+      "resolution": {
+        "flow": "sanear-senal-tests-y-codificacion",
+        "evidence": "Mojibake corregido en los 5 archivos verificados (2 de producto: SeccionCurricular.tsx InclusiA3n->Inclusion con codificacion correcta, ExportarPlaneacionScreen.tsx 11 cadenas; 3 de tests). Check determinista scripts/checkSourceEncoding.mjs (lead byte A-tilde/A-circ + continuacion huerfana + secuencias documentadas, sobre texto decodificado UTF-8) cableado como gate permanente en src/__tests__/harness/sourceEncoding.test.ts. node scripts/checkSourceEncoding.mjs => 'Sin doble codificacion UTF-8 en src' con exit 0. Fixture positivo detecta 6 lineas; fixture negativo con repertorio espanol completo (acentos, enies, signos de apertura, simbolos, emoji) => cero hallazgos, sin falsos positivos."
+      }
     },
     {
       "id": "debt-cbe0188191b5",
@@ -256,11 +259,14 @@
         }
       ],
       "issue": 129,
-      "status": "open",
+      "status": "resolved",
       "exception": null,
       "createdAt": "2026-07-20",
       "updatedAt": "2026-07-20",
-      "resolution": null
+      "resolution": {
+        "flow": "sanear-senal-tests-y-codificacion",
+        "evidence": "Guardia de consola Jest activa via setupFilesAfterEnv (jest.setup.consoleGuard.ts + src/__tests__/helpers/consoleSignal.ts): console.error/warn inesperados rompen el test y una allowance declarada no consumida tambien falla. Warnings act() reales corregidos en src/__tests__/grupos/useDetalleGrupoViewModel.test.tsx envolviendo el montaje en act(async () => {}), no allowlisteados (spec test-console-signal-guard). Corrida completa npm test -- --runInBand => 118 suites / 827 tests verdes, cero lineas console.error/warn no declaradas en la salida. Pruebas de la propia guardia: src/__tests__/harness/consoleSignalGuard.test.ts, 5 escenarios verdes."
+      }
     }
   ]
 }

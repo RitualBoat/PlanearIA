@@ -93,7 +93,7 @@ describe("ExportarPlaneacionScreen", () => {
   it("renderiza secciones principales", () => {
     const { getByText } = render(<ExportarPlaneacionScreen />);
 
-    expect(getByText("Exportar PlaneaciÃ³n")).toBeTruthy();
+    expect(getByText("Exportar Planeación")).toBeTruthy();
     expect(getByText("Seleccionar formato")).toBeTruthy();
     expect(getByText("Opciones de contenido")).toBeTruthy();
     expect(getByText("Vista previa")).toBeTruthy();
@@ -101,7 +101,7 @@ describe("ExportarPlaneacionScreen", () => {
     expect(getByText("Compartir")).toBeTruthy();
   });
 
-  it("muestra flujo visual de generaciÃ³n y Ã©xito", async () => {
+  it("muestra flujo visual de generación y éxito", async () => {
     const { getByText, queryByText } = render(<ExportarPlaneacionScreen />);
 
     fireEvent.press(getByText("Exportar"));
@@ -111,7 +111,7 @@ describe("ExportarPlaneacionScreen", () => {
     await waitFor(
       () => {
         expect(queryByText("Generando archivo...")).toBeNull();
-        expect(getByText("Â¡PlaneaciÃ³n exportada!")).toBeTruthy();
+        expect(getByText("¡Planeación exportada!")).toBeTruthy();
       },
       {
         timeout: 3000,
@@ -130,7 +130,7 @@ describe("ExportarPlaneacionScreen", () => {
     await waitFor(
       () => {
         expect(exportPlaneacionToDocx).toHaveBeenCalled();
-        expect(getByText("Â¡PlaneaciÃ³n exportada!")).toBeTruthy();
+        expect(getByText("¡Planeación exportada!")).toBeTruthy();
       },
       { timeout: 3000 }
     );
@@ -143,7 +143,7 @@ describe("ExportarPlaneacionScreen", () => {
 
     await waitFor(
       () => {
-        expect(getByText("Â¡PlaneaciÃ³n exportada!")).toBeTruthy();
+        expect(getByText("¡Planeación exportada!")).toBeTruthy();
       },
       { timeout: 3000 }
     );

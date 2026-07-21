@@ -25,32 +25,33 @@ const ACCION = { label: "Reintentar", onPress: () => undefined };
 describe("EmptyState", () => {
   beforeEach(() => mockReduceMotion.mockReturnValue(false));
 
-  it.each(VARIANTES)("la variante %s trae titulo y mensaje propios", (variant) => {
-    renderConProveedores(<EmptyState variant={variant} accion={ACCION} testID="estado" />);
+  it.each(VARIANTES)("la variante %s trae titulo y mensaje propios", async (variant) => {
+    await renderConProveedores(<EmptyState variant={variant} accion={ACCION} testID="estado" />);
 
     // Cada variante rinde texto por defecto: un estado nunca queda como pantalla en blanco.
     expect(screen.getByTestId("estado")).toBeTruthy();
   });
 
-  it("las tres variantes no comparten su copy", () => {
-    const titulos = VARIANTES.map((variant) => {
-      const { unmount } = renderConProveedores(<EmptyState variant={variant} accion={ACCION} />);
+  it("las tres variantes no comparten su copy", async () => {
+    const titulos: string[] = [];
+    for (const variant of VARIANTES) {
+      const { unmount } = await renderConProveedores(<EmptyState variant={variant} accion={ACCION} />);
       const textos = screen
         .getAllByText(/.+/)
         .map((nodo) => nodo.props.children)
         .join(" | ");
       unmount();
-      return textos;
-    });
+      titulos.push(textos);
+    }
 
     // Reutilizar el copy dejaria al docente sin saber si el problema es suyo, de la red
     // o del servidor.
     expect(new Set(titulos).size).toBe(VARIANTES.length);
   });
 
-  it("ofrece una salida accionable en cada variante", () => {
+  it("ofrece una salida accionable en cada variante", async () => {
     const onPress = jest.fn();
-    renderConProveedores(
+    await renderConProveedores(
       <EmptyState variant="offline" accion={{ label: "Reintentar", onPress }} testID="estado" />
     );
 
@@ -59,8 +60,8 @@ describe("EmptyState", () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it("permite sustituir el copy por defecto", () => {
-    renderConProveedores(
+  it("permite sustituir el copy por defecto", async () => {
+    await renderConProveedores(
       <EmptyState variant="empty" titulo="Sin planeaciones" mensaje="Crea la primera" accion={ACCION} />
     );
 
@@ -70,18 +71,18 @@ describe("EmptyState", () => {
 });
 
 describe("Skeleton", () => {
-  it("se anuncia como carga en curso", () => {
+  it("se anuncia como carga en curso", async () => {
     mockReduceMotion.mockReturnValue(false);
-    renderConProveedores(<Skeleton testID="skeleton" />);
+    await renderConProveedores(<Skeleton testID="skeleton" />);
 
     const skeleton = screen.getByTestId("skeleton");
     expect(skeleton.props.accessibilityRole).toBe("progressbar");
     expect(skeleton.props.accessibilityLabel).toBe("Cargando");
   });
 
-  it("bajo reduce-motion se presenta sin pulso pero sigue comunicando carga", () => {
+  it("bajo reduce-motion se presenta sin pulso pero sigue comunicando carga", async () => {
     mockReduceMotion.mockReturnValue(true);
-    renderConProveedores(<Skeleton testID="skeleton" />);
+    await renderConProveedores(<Skeleton testID="skeleton" />);
 
     const estatico = screen.getByTestId("skeleton");
     // Sigue comunicando carga...
@@ -93,7 +94,7 @@ describe("Skeleton", () => {
 
     screen.unmount();
     mockReduceMotion.mockReturnValue(false);
-    renderConProveedores(<Skeleton testID="skeleton" />);
+    await renderConProveedores(<Skeleton testID="skeleton" />);
     const animado = screen.getByTestId("skeleton");
     const capasAnimadas = (animado.props.style as unknown[]).length;
 
@@ -102,9 +103,9 @@ describe("Skeleton", () => {
 });
 
 describe("Banner", () => {
-  it("se anuncia como alerta y muestra su accion", () => {
+  it("se anuncia como alerta y muestra su accion", async () => {
     const onPress = jest.fn();
-    renderConProveedores(
+    await renderConProveedores(
       <Banner
         tone="warning"
         titulo="Cambios sin sincronizar"
@@ -118,9 +119,9 @@ describe("Banner", () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it("expone el descarte con etiqueta propia", () => {
+  it("expone el descarte con etiqueta propia", async () => {
     const onDismiss = jest.fn();
-    renderConProveedores(<Banner titulo="Aviso" onDismiss={onDismiss} testID="banner" />);
+    await renderConProveedores(<Banner titulo="Aviso" onDismiss={onDismiss} testID="banner" />);
 
     fireEvent.press(screen.getByLabelText("Descartar aviso"));
 
@@ -129,23 +130,23 @@ describe("Banner", () => {
 });
 
 describe("Toast", () => {
-  it("no monta nada cuando no es visible", () => {
-    renderConProveedores(<Toast visible={false} mensaje="Guardado" testID="toast" />);
+  it("no monta nada cuando no es visible", async () => {
+    await renderConProveedores(<Toast visible={false} mensaje="Guardado" testID="toast" />);
 
     expect(screen.queryByTestId("toast")).toBeNull();
   });
 
-  it("se anuncia como region viva cuando aparece", () => {
-    renderConProveedores(<Toast visible mensaje="Guardado" testID="toast" />);
+  it("se anuncia como region viva cuando aparece", async () => {
+    await renderConProveedores(<Toast visible mensaje="Guardado" testID="toast" />);
 
     const toast = screen.getByTestId("toast");
     expect(toast.props.accessibilityRole).toBe("alert");
     expect(screen.getByText("Guardado")).toBeTruthy();
   });
 
-  it("descarta al presionar su boton de cerrar", () => {
+  it("descarta al presionar su boton de cerrar", async () => {
     const onDismiss = jest.fn();
-    renderConProveedores(
+    await renderConProveedores(
       <Toast visible mensaje="Guardado" onDismiss={onDismiss} testID="toast" />
     );
 
@@ -156,9 +157,9 @@ describe("Toast", () => {
 });
 
 describe("Sheet", () => {
-  it("cierra al tocar el fondo", () => {
+  it("cierra al tocar el fondo", async () => {
     const onClose = jest.fn();
-    renderConProveedores(
+    await renderConProveedores(
       <Sheet visible titulo="Filtros" onClose={onClose} testID="sheet">
         <></>
       </Sheet>
@@ -172,9 +173,9 @@ describe("Sheet", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("expone un cierre etiquetado en el encabezado", () => {
+  it("expone un cierre etiquetado en el encabezado", async () => {
     const onClose = jest.fn();
-    renderConProveedores(
+    await renderConProveedores(
       <Sheet visible titulo="Filtros" onClose={onClose} testID="sheet">
         <></>
       </Sheet>

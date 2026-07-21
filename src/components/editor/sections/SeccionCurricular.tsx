@@ -20,7 +20,7 @@ const CAMPOS_FORMATIVOS = [
 ];
 
 const EJES_ARTICULADORES = [
-  "InclusiÃ³n",
+  "Inclusión",
   "Pensamiento critico",
   "Interculturalidad critica",
   "Igualdad de genero",

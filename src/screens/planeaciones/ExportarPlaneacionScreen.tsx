@@ -111,7 +111,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
     if (options.datosGenerales) labels.push("Datos generales");
     if (options.curricular) labels.push("Elementos curriculares");
     if (options.sesiones) labels.push("Sesiones");
-    if (options.evaluacion) labels.push("EvaluaciÃ³n");
+    if (options.evaluacion) labels.push("Evaluación");
     if (options.observaciones) labels.push("Observaciones");
     if (options.firmas) labels.push("Firmas");
     return labels;
@@ -123,7 +123,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
 
   const handleExportar = async () => {
     if (!planeacion) {
-      showMessage("Exportar", "No se encontrÃ³ la planeaciÃ³n para exportar.");
+      showMessage("Exportar", "No se encontró la planeación para exportar.");
       return;
     }
 
@@ -160,7 +160,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
     try {
       const isAvailable = await Sharing.isAvailableAsync();
       if (!isAvailable) {
-        showMessage("Compartir", "Compartir no estÃ¡ disponible en este dispositivo.");
+        showMessage("Compartir", "Compartir no está disponible en este dispositivo.");
         return;
       }
 
@@ -169,10 +169,10 @@ const ExportarPlaneacionScreen: React.FC = () => {
           selectedFormat === "pdf"
             ? "application/pdf"
             : "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        dialogTitle: "Compartir planeaciÃ³n",
+        dialogTitle: "Compartir planeación",
       });
     } catch {
-      showMessage("Compartir", "No se pudo abrir el menÃº de compartir.");
+      showMessage("Compartir", "No se pudo abrir el menú de compartir.");
     }
   };
 
@@ -208,7 +208,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
             </Pressable>
 
             <View style={styles.headerTitleWrap}>
-              <Text style={styles.headerTitle}>Exportar PlaneaciÃ³n</Text>
+              <Text style={styles.headerTitle}>Exportar Planeación</Text>
               <Text style={styles.headerSubtitle}>Genera y comparte en distintos formatos</Text>
             </View>
 
@@ -285,7 +285,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
                   <Switch value={options.sesiones} onValueChange={() => toggleOption("sesiones")} />
                 </View>
                 <View style={styles.switchRow}>
-                  <Text style={styles.switchText}>Incluir rÃºbrica/evaluaciÃ³n</Text>
+                  <Text style={styles.switchText}>Incluir rúbrica/evaluación</Text>
                   <Switch
                     value={options.evaluacion}
                     onValueChange={() => toggleOption("evaluacion")}
@@ -358,7 +358,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
                 <View style={styles.previewBody}>
                   <MaterialIcons name="description" size={42} color={COLORS.primary} />
                   <Text style={styles.previewBodyText}>
-                    El documento se generarÃ¡ con formato profesional listo para compartir o
+                    El documento se generará con formato profesional listo para compartir o
                     imprimir.
                   </Text>
                 </View>
@@ -429,9 +429,9 @@ const ExportarPlaneacionScreen: React.FC = () => {
             <View style={styles.successIconWrap}>
               <MaterialIcons name="check" size={34} color={COLORS.surface} />
             </View>
-            <Text style={styles.successTitle}>Â¡PlaneaciÃ³n exportada!</Text>
+            <Text style={styles.successTitle}>¡Planeación exportada!</Text>
             <Text style={styles.successSubtitle}>
-              El archivo {selectedFormat.toUpperCase()} se generÃ³ correctamente y estÃ¡ listo para
+              El archivo {selectedFormat.toUpperCase()} se generó correctamente y está listo para
               usarse.
             </Text>
 
@@ -443,7 +443,7 @@ const ExportarPlaneacionScreen: React.FC = () => {
                     `Planeacion_${planeacion?.datosGenerales?.asignatura || "sin_asignatura"}.${selectedFormat}`}
                 </Text>
                 <Text style={styles.fileCardMeta}>
-                  {(exportedFileSize || estimatedSize) + " â€¢ Creado ahora mismo"}
+                  {(exportedFileSize || estimatedSize) + " • Creado ahora mismo"}
                 </Text>
               </View>
             </View>

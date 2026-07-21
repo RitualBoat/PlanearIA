@@ -54,11 +54,20 @@ jest.mock("../../sync/config/apiConfig", () => ({
 // ─── Suite de pruebas ─────────────────────────────────────────────────────────
 
 describe("offlineSyncFlow", () => {
+  // Los servicios/motor de sync registran su operacion normal via logger en
+  // __DEV__; es ruido esperado, se espia y restaura por test.
+  let logSpy: jest.SpyInstance;
+
   beforeEach(async () => {
+    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     jest.clearAllMocks();
     await AsyncStorage.clear();
     mockIsConnected = true;
     mockFetch.mockReset();
+  });
+
+  afterEach(() => {
+    logSpy.mockRestore();
   });
 
   it("retiene operaciones en cola local mientras no hay conexion", async () => {

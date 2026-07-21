@@ -157,6 +157,9 @@
     "roots": [
       "<rootDir>/src"
     ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.consoleGuard.ts"
+    ],
     "modulePathIgnorePatterns": [
       "<rootDir>/context/referencias-opensource",
       "<rootDir>/context/planeaciones-ground-truth/referencias-opensource"

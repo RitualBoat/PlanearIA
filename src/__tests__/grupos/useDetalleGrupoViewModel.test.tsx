@@ -79,6 +79,14 @@ jest.mock("../../services/grupoExportService", () => ({
   exportarGrupoArchivo: (...args: unknown[]) => mockExportarGrupoArchivo(...args),
 }));
 
+// El ViewModel dispara reloadDetalleData() en un useEffect al montar; sin
+// esperar esa carga dentro de act(), React emite warnings act() reales.
+const renderViewModel = async () => {
+  const utils = renderHook(() => useDetalleGrupoViewModel());
+  await act(async () => {});
+  return utils;
+};
+
 describe("useDetalleGrupoViewModel", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -102,7 +110,7 @@ describe("useDetalleGrupoViewModel", () => {
   });
 
   it("exporta grupo en el formato solicitado", async () => {
-    const { result } = renderHook(() => useDetalleGrupoViewModel());
+    const { result } = await renderViewModel();
 
     await act(async () => {
       await result.current.reloadDetalleData();
@@ -124,8 +132,8 @@ describe("useDetalleGrupoViewModel", () => {
     );
   });
 
-  it("carga notas guardadas del grupo", () => {
-    const { result } = renderHook(() => useDetalleGrupoViewModel());
+  it("carga notas guardadas del grupo", async () => {
+    const { result } = await renderViewModel();
 
     expect(result.current.grupoNotas).toBe("Nota inicial");
     expect(result.current.notasEstado).toBe("sin-cambios");
@@ -133,7 +141,7 @@ describe("useDetalleGrupoViewModel", () => {
   });
 
   it("guarda notas del grupo y actualiza estado", async () => {
-    const { result } = renderHook(() => useDetalleGrupoViewModel());
+    const { result } = await renderViewModel();
 
     act(() => {
       result.current.setGrupoNotas("Nueva observación del grupo");
@@ -155,8 +163,8 @@ describe("useDetalleGrupoViewModel", () => {
     expect(result.current.notasEstado).toBe("guardado");
   });
 
-  it("descarta cambios en notas y restaura valor guardado", () => {
-    const { result } = renderHook(() => useDetalleGrupoViewModel());
+  it("descarta cambios en notas y restaura valor guardado", async () => {
+    const { result } = await renderViewModel();
 
     act(() => {
       result.current.setGrupoNotas("Texto temporal");
@@ -173,7 +181,7 @@ describe("useDetalleGrupoViewModel", () => {
   });
 
   it("requiere confirmación antes de eliminar", async () => {
-    const { result } = renderHook(() => useDetalleGrupoViewModel());
+    const { result } = await renderViewModel();
 
     act(() => {
       result.current.openDeleteModal();
@@ -188,7 +196,7 @@ describe("useDetalleGrupoViewModel", () => {
   });
 
   it("elimina el grupo y navega a la lista cuando se confirma", async () => {
-    const { result } = renderHook(() => useDetalleGrupoViewModel());
+    const { result } = await renderViewModel();
 
     act(() => {
       result.current.openDeleteModal();
@@ -204,7 +212,7 @@ describe("useDetalleGrupoViewModel", () => {
   });
 
   it("agrega alumnos existentes seleccionados al grupo", async () => {
-    const { result } = renderHook(() => useDetalleGrupoViewModel());
+    const { result } = await renderViewModel();
 
     await act(async () => {
       await result.current.reloadDetalleData();
@@ -229,7 +237,7 @@ describe("useDetalleGrupoViewModel", () => {
   });
 
   it("crea y agrega un nuevo alumno al grupo", async () => {
-    const { result } = renderHook(() => useDetalleGrupoViewModel());
+    const { result } = await renderViewModel();
 
     await act(async () => {
       await result.current.reloadDetalleData();
@@ -259,7 +267,7 @@ describe("useDetalleGrupoViewModel", () => {
   });
 
   it("desvincula alumno del grupo sin eliminarlo del sistema", async () => {
-    const { result } = renderHook(() => useDetalleGrupoViewModel());
+    const { result } = await renderViewModel();
 
     await act(async () => {
       await result.current.reloadDetalleData();
@@ -284,7 +292,7 @@ describe("useDetalleGrupoViewModel", () => {
   });
 
   it("actualiza contador del grupo al quitar alumno", async () => {
-    const { result } = renderHook(() => useDetalleGrupoViewModel());
+    const { result } = await renderViewModel();
 
     await act(async () => {
       await result.current.reloadDetalleData();

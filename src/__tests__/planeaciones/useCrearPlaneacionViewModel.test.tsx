@@ -54,8 +54,12 @@ describe("useCrearPlaneacionViewModel", () => {
     mockCrear.mockResolvedValue(undefined);
   });
 
-  it("abre modal de nivel y navega al editor al seleccionar nivel", () => {
+  it("abre modal de nivel y navega al editor al seleccionar nivel", async () => {
     const { result } = renderHook(() => useCrearPlaneacionViewModel());
+
+    // El ViewModel ejecuta efectos async al montar; sin este flush su
+    // actualizacion inicial resuelve fuera de act().
+    await act(async () => {});
 
     act(() => {
       result.current.handleCrearDesdeCero();
@@ -260,8 +264,12 @@ describe("useCrearPlaneacionViewModel", () => {
     );
   });
 
-  it("expone metadata de plantillas base para galeria local", () => {
+  it("expone metadata de plantillas base para galeria local", async () => {
     const { result } = renderHook(() => useCrearPlaneacionViewModel());
+
+    // Mismo flush de los efectos async iniciales del ViewModel.
+    await act(async () => {});
+
     const baseSection = result.current.sections.find((section) => section.id === "base");
 
     expect(baseSection).toBeTruthy();

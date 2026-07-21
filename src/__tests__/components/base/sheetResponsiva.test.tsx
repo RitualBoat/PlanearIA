@@ -43,9 +43,9 @@ jest.mock("../../../hooks/useBreakpoint", () => {
   };
 });
 
-function renderEnAncho(width: number) {
+async function renderEnAncho(width: number) {
   mockAnchoSimulado = width;
-  renderConProveedores(
+  await renderConProveedores(
     <Sheet visible titulo="Filtros" onClose={() => undefined} testID="sheet">
       <></>
     </Sheet>
@@ -57,9 +57,9 @@ function estiloDe(testID: string) {
 }
 
 describe("Sheet: forma por breakpoint", () => {
-  it.each([375, 767])("a %ipx es hoja inferior a ancho completo", (width) => {
+  it.each([375, 767])("a %ipx es hoja inferior a ancho completo", async (width) => {
     expect(getBreakpoint(width)).toBe("mobile");
-    renderEnAncho(width);
+    await renderEnAncho(width);
 
     const panel = estiloDe("sheet-panel");
     expect(panel.width).toBe("100%");
@@ -74,9 +74,9 @@ describe("Sheet: forma por breakpoint", () => {
     expect(raiz.justifyContent).toBe("flex-end");
   });
 
-  it.each([768, 1279, 1280])("a %ipx es dialogo centrado de 520px", (width) => {
+  it.each([768, 1279, 1280])("a %ipx es dialogo centrado de 520px", async (width) => {
     expect(getBreakpoint(width)).not.toBe("mobile");
-    renderEnAncho(width);
+    await renderEnAncho(width);
 
     const panel = estiloDe("sheet-panel");
     expect(panel.width).toBe(520);

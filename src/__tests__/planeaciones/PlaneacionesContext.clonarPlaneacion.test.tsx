@@ -52,9 +52,18 @@ describe("PlaneacionesContext.clonarPlaneacion", () => {
     campoFormativo: "Pensamiento matemático",
   };
 
+  // Clonar encola operaciones de sync que el logger registra en __DEV__;
+  // es ruido esperado, se espia y restaura por test.
+  let logSpy: jest.SpyInstance;
+
   beforeEach(() => {
+    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     jest.clearAllMocks();
     contextRef.current = null;
+  });
+
+  afterEach(() => {
+    logSpy.mockRestore();
   });
 
   it("crea copia con ID distinto, nombre con '(Copia)' y estado independiente", async () => {

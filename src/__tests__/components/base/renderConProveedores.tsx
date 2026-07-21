@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react-native";
+import { act, render } from "@testing-library/react-native";
 import type { RenderResult } from "@testing-library/react-native";
 import { ThemeProvider } from "../../../context/ThemeContext";
 import { FontSizeProvider } from "../../../context/FontSizeContext";
@@ -24,10 +24,17 @@ const Proveedores: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </ThemeProvider>
 );
 
-export function renderConProveedores(ui: React.ReactElement): RenderResult {
+export async function renderConProveedores(ui: React.ReactElement): Promise<RenderResult> {
   // Se pasa como `wrapper` y no como arbol envolvente: asi el `rerender` que devuelve RTL
   // vuelve a montar dentro de los proveedores. Envolver a mano los pierde en el rerender.
-  return render(ui, { wrapper: Proveedores });
+  const result = render(ui, { wrapper: Proveedores });
+  // Los cuatro proveedores cargan sus preferencias persistidas (AsyncStorage) en un
+  // efecto al montar. Sin este flush, esa actualizacion inicial de estado resuelve
+  // fuera de act() y React emite un warning act() que no senala ningun defecto del
+  // componente probado. Solo cubre la carga inicial: actualizaciones posteriores
+  // del componente siguen exigiendo su propio act()/waitFor.
+  await act(async () => {});
+  return result;
 }
 
 /** Aplana el estilo que RN entrega como arreglo anidado, para poder afirmar sobre el. */

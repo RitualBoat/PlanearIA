@@ -4,9 +4,23 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NotificacionesProvider } from "../../context/NotificacionesContext";
 import { ThemeProvider } from "../../context/ThemeContext";
 import { NotificacionesScreen } from "../../screens/notificaciones/NotificacionesScreen";
+import { expectConsoleWarn } from "../helpers/consoleSignal";
 
 jest.mock("@expo/vector-icons/MaterialIcons", () => "MaterialIcons");
 jest.mock("../../components/AnimatedTopPill", () => "AnimatedTopPill");
+
+// expo-notifications emite dos warnings del SDK fuera de nuestro control en
+// el entorno de test: uno al importar el modulo (push remota fuera de Expo
+// Go) y otro al pedir token (requiere dispositivo fisico). La suite verifica
+// el comportamiento de la bandeja, no el registro push; se simula la
+// superficie minima que el provider y su servicio consumen.
+jest.mock("expo-notifications", () => ({
+  setNotificationHandler: jest.fn(),
+  getPermissionsAsync: jest.fn().mockResolvedValue({ status: "granted" }),
+  requestPermissionsAsync: jest.fn().mockResolvedValue({ status: "granted" }),
+  getExpoPushTokenAsync: jest.fn().mockResolvedValue({ data: "mock-push-token" }),
+  addNotificationReceivedListener: jest.fn(() => ({ remove: jest.fn() })),
+}));
 
 jest.mock("react-native-safe-area-context", () => {
   const React = require("react");
@@ -57,9 +71,22 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
 }));
 
 describe("NotificacionesIntegration - Integration Tests", () => {
+  // El registro de push token del provider escribe un log de exito en
+  // __DEV__; es ruido esperado, se espia y restaura por test.
+  let logSpy: jest.SpyInstance;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     Object.keys(mockStore).forEach((key) => delete mockStore[key]);
+    // expo-notifications avisa que el push nativo requiere dispositivo fisico:
+    // warning del SDK fuera de nuestro control al montar el provider en el
+    // entorno de test; no se puede eliminar sin mockear el modulo entero.
+    expectConsoleWarn("Must use physical device for native push notifications");
+  });
+
+  afterEach(() => {
+    logSpy.mockRestore();
   });
 
   const renderScreen = () => {

@@ -21,21 +21,21 @@ jest.mock("../../context/PlaneacionesContext", () => ({
   }),
 }));
 
-describe("useListaPlaneacionesViewModel - eliminaciÃ³n", () => {
+describe("useListaPlaneacionesViewModel - eliminación", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockPlaneaciones = [
       {
         id: "p1",
         nivelAcademico: NivelAcademico.PRIMARIA,
-        asignatura: "MatemÃ¡ticas",
-        grado: "3Â°",
+        asignatura: "Matemáticas",
+        grado: "3°",
       },
       {
         id: "p2",
         nivelAcademico: NivelAcademico.SECUNDARIA,
         asignatura: "Historia",
-        grado: "1Â°",
+        grado: "1°",
       },
     ];
 
@@ -58,7 +58,7 @@ describe("useListaPlaneacionesViewModel - eliminaciÃ³n", () => {
     });
   });
 
-  it("muestra diÃ¡logo de confirmaciÃ³n al eliminar", () => {
+  it("muestra diálogo de confirmación al eliminar", () => {
     const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(jest.fn());
     const { result } = renderHook(() => useListaPlaneacionesViewModel());
 
@@ -138,7 +138,7 @@ describe("useListaPlaneacionesViewModel - eliminaciÃ³n", () => {
     });
   });
 
-  it("aplica bÃºsqueda por asignatura", async () => {
+  it("aplica búsqueda por asignatura", async () => {
     const { result } = renderHook(() => useListaPlaneacionesViewModel());
 
     act(() => {
@@ -155,7 +155,7 @@ describe("useListaPlaneacionesViewModel - eliminaciÃ³n", () => {
     });
   });
 
-  it("navega a pantalla de exportaciÃ³n", () => {
+  it("navega a pantalla de exportación", () => {
     const { result } = renderHook(() => useListaPlaneacionesViewModel());
 
     act(() => {

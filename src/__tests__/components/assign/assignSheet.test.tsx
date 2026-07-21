@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, waitFor } from "@testing-library/react-native";
+import { act, fireEvent, waitFor } from "@testing-library/react-native";
 import { renderConProveedores } from "../base/renderConProveedores";
 import AssignSheet from "../../../components/assign/AssignSheet";
 import type { PresentacionSync } from "../../../hooks/syncPresentation";
@@ -66,8 +66,8 @@ jest.mock("../../../hooks/useSyncPresentation", () => ({
 
 const ELEMENTO = { id: 1, titulo: "Guia de fracciones", tipo: "recurso" as const };
 
-const montar = (props: Partial<React.ComponentProps<typeof AssignSheet>> = {}) =>
-  renderConProveedores(
+const montar = async (props: Partial<React.ComponentProps<typeof AssignSheet>> = {}) =>
+  await renderConProveedores(
     <AssignSheet
       visible
       elementos={[ELEMENTO]}
@@ -84,13 +84,16 @@ describe("AssignSheet", () => {
     mockPresentacion = PRESENTACION_BASE;
   });
 
-  it("no permite confirmar mientras no hay clase elegida", () => {
-    const { getByTestId } = montar();
+  it("no permite confirmar mientras no hay clase elegida", async () => {
+    const { getByTestId } = await montar();
+    // La carga async de destinos resuelve tras el montaje; sin este flush su
+    // actualizacion de estado cae fuera de act().
+    await act(async () => {});
     expect(getByTestId("hoja-confirmar").props.accessibilityState.disabled).toBe(true);
   });
 
   it("anuncia la eleccion sin depender del color", async () => {
-    const { getByTestId } = montar();
+    const { getByTestId } = await montar();
 
     const clase = getByTestId("hoja-clase-1");
     expect(clase.props.accessibilityState.checked).toBe(false);
@@ -102,7 +105,7 @@ describe("AssignSheet", () => {
   });
 
   it("nombra el destino en la confirmacion y no una formula generica", async () => {
-    const { getByTestId } = montar();
+    const { getByTestId } = await montar();
 
     fireEvent.press(getByTestId("hoja-clase-1"));
     await waitFor(() => expect(getByTestId("hoja-unidad-u1")).toBeTruthy());
@@ -117,7 +120,7 @@ describe("AssignSheet", () => {
 
   it("no escribe nada si el docente cierra sin confirmar", async () => {
     const onClose = jest.fn();
-    const { getByTestId } = montar({ onClose });
+    const { getByTestId } = await montar({ onClose });
 
     fireEvent.press(getByTestId("hoja-clase-1"));
     await waitFor(() => expect(getByTestId("hoja-clase-1").props.accessibilityState.checked).toBe(true));
@@ -134,7 +137,7 @@ describe("AssignSheet", () => {
       tono: "aviso",
       titulo: "Guardado en este dispositivo",
     };
-    const { getByTestId } = montar();
+    const { getByTestId } = await montar();
 
     expect(getByTestId("hoja-offline")).toBeTruthy();
     fireEvent.press(getByTestId("hoja-clase-1"));
@@ -151,7 +154,7 @@ describe("AssignSheet", () => {
       estado: "sin-conexion",
       titulo: "Guardado en este dispositivo",
     };
-    const { getByTestId, getByText } = montar();
+    const { getByTestId, getByText } = await montar();
 
     fireEvent.press(getByTestId("hoja-clase-1"));
     // Confirmar sigue bloqueado mientras cargan los destinos: presionar antes seria un
@@ -167,11 +170,13 @@ describe("AssignSheet", () => {
     ).toBeTruthy();
   });
 
-  it("ofrece una salida cuando el docente no tiene ninguna clase", () => {
+  it("ofrece una salida cuando el docente no tiene ninguna clase", async () => {
     mockGrupos = [];
     const onCrearClase = jest.fn();
-    const { getByTestId, getByText } = montar({ onCrearClase });
+    const { getByTestId, getByText } = await montar({ onCrearClase });
 
+    // Mismo flush de la carga async de destinos.
+    await act(async () => {});
     expect(getByTestId("hoja-vacio")).toBeTruthy();
     fireEvent.press(getByText("Crear clase"));
     expect(onCrearClase).toHaveBeenCalled();

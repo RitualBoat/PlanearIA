@@ -13,18 +13,18 @@ import { MIN_TOUCH_TARGET } from "../../../components/base/primitives";
 import { renderConProveedores, estiloPlano } from "./renderConProveedores";
 
 describe("Button", () => {
-  it("ejecuta su accion una sola vez cuando esta habilitado", () => {
+  it("ejecuta su accion una sola vez cuando esta habilitado", async () => {
     const onPress = jest.fn();
-    renderConProveedores(<Button label="Guardar" onPress={onPress} testID="btn" />);
+    await renderConProveedores(<Button label="Guardar" onPress={onPress} testID="btn" />);
 
     fireEvent.press(screen.getByTestId("btn"));
 
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it("no ejecuta su accion cuando esta deshabilitado y lo anuncia", () => {
+  it("no ejecuta su accion cuando esta deshabilitado y lo anuncia", async () => {
     const onPress = jest.fn();
-    renderConProveedores(<Button label="Guardar" onPress={onPress} disabled testID="btn" />);
+    await renderConProveedores(<Button label="Guardar" onPress={onPress} disabled testID="btn" />);
 
     fireEvent.press(screen.getByTestId("btn"));
 
@@ -32,9 +32,9 @@ describe("Button", () => {
     expect(screen.getByTestId("btn").props.accessibilityState).toMatchObject({ disabled: true });
   });
 
-  it("bloquea la accion mientras carga y se anuncia como ocupado", () => {
+  it("bloquea la accion mientras carga y se anuncia como ocupado", async () => {
     const onPress = jest.fn();
-    renderConProveedores(<Button label="Guardar" onPress={onPress} loading testID="btn" />);
+    await renderConProveedores(<Button label="Guardar" onPress={onPress} loading testID="btn" />);
 
     fireEvent.press(screen.getByTestId("btn"));
 
@@ -48,16 +48,16 @@ describe("Button", () => {
   });
 
 
-  it("declara rol y etiqueta accesibles", () => {
-    renderConProveedores(<Button label="Guardar planeacion" onPress={jest.fn()} testID="btn" />);
+  it("declara rol y etiqueta accesibles", async () => {
+    await renderConProveedores(<Button label="Guardar planeacion" onPress={jest.fn()} testID="btn" />);
 
     const boton = screen.getByTestId("btn");
     expect(boton.props.accessibilityRole).toBe("button");
     expect(boton.props.accessibilityLabel).toBe("Guardar planeacion");
   });
 
-  it("cubre el area tactil minima de 44 puntos", () => {
-    renderConProveedores(<Button label="Guardar" onPress={jest.fn()} testID="btn" />);
+  it("cubre el area tactil minima de 44 puntos", async () => {
+    await renderConProveedores(<Button label="Guardar" onPress={jest.fn()} testID="btn" />);
 
     const estilo = estiloPlano(screen.getByTestId("btn").props.style);
     expect(estilo.minHeight).toBe(MIN_TOUCH_TARGET);
@@ -65,8 +65,8 @@ describe("Button", () => {
 });
 
 describe("Input", () => {
-  it("asocia el error al control para la tecnologia de asistencia", () => {
-    renderConProveedores(
+  it("asocia el error al control para la tecnologia de asistencia", async () => {
+    await renderConProveedores(
       <Input label="Nombre del grupo" error="Este campo es obligatorio" testID="campo" />
     );
 
@@ -76,8 +76,8 @@ describe("Input", () => {
     );
   });
 
-  it("muestra la ayuda cuando no hay error y la oculta cuando lo hay", () => {
-    const { rerender } = renderConProveedores(
+  it("muestra la ayuda cuando no hay error y la oculta cuando lo hay", async () => {
+    const { rerender } = await renderConProveedores(
       <Input label="Nombre" ayuda="Como lo veran tus alumnos" testID="campo" />
     );
     expect(screen.getByText("Como lo veran tus alumnos")).toBeTruthy();
@@ -89,16 +89,16 @@ describe("Input", () => {
     expect(screen.getByText("Muy corto")).toBeTruthy();
   });
 
-  it("no es editable cuando esta deshabilitado", () => {
-    renderConProveedores(<Input label="Nombre" disabled testID="campo" />);
+  it("no es editable cuando esta deshabilitado", async () => {
+    await renderConProveedores(<Input label="Nombre" disabled testID="campo" />);
 
     const control = screen.getByTestId("campo-textinput");
     expect(control.props.editable).toBe(false);
     expect(control.props.accessibilityState).toMatchObject({ disabled: true });
   });
 
-  it("cubre el area tactil minima de 44 puntos", () => {
-    renderConProveedores(<Input label="Nombre" testID="campo" />);
+  it("cubre el area tactil minima de 44 puntos", async () => {
+    await renderConProveedores(<Input label="Nombre" testID="campo" />);
 
     // El minimo vive en el contenedor del campo, hermano del label.
     const contenedor = screen.getByTestId("campo");
@@ -108,8 +108,8 @@ describe("Input", () => {
 });
 
 describe("Chip", () => {
-  it("reporta su estado de seleccion", () => {
-    renderConProveedores(<Chip label="Matematicas" selected onPress={jest.fn()} testID="chip" />);
+  it("reporta su estado de seleccion", async () => {
+    await renderConProveedores(<Chip label="Matematicas" selected onPress={jest.fn()} testID="chip" />);
 
     expect(screen.getByTestId("chip").props.accessibilityState).toMatchObject({
       selected: true,
@@ -118,8 +118,8 @@ describe("Chip", () => {
   });
 
 
-  it("extiende el area tactil sin cambiar el tamano visual", () => {
-    renderConProveedores(<Chip label="Matematicas" onPress={jest.fn()} testID="chip" />);
+  it("extiende el area tactil sin cambiar el tamano visual", async () => {
+    await renderConProveedores(<Chip label="Matematicas" onPress={jest.fn()} testID="chip" />);
 
     const chip = screen.getByTestId("chip");
     const estilo = estiloPlano(chip.props.style);
@@ -133,9 +133,9 @@ describe("Chip", () => {
     );
   });
 
-  it("no ejecuta su accion cuando esta deshabilitado", () => {
+  it("no ejecuta su accion cuando esta deshabilitado", async () => {
     const onPress = jest.fn();
-    renderConProveedores(
+    await renderConProveedores(
       <Chip label="Matematicas" onPress={onPress} disabled testID="chip" />
     );
 
@@ -144,8 +144,8 @@ describe("Chip", () => {
     expect(onPress).not.toHaveBeenCalled();
   });
 
-  it("expone el descarte con etiqueta propia", () => {
-    renderConProveedores(
+  it("expone el descarte con etiqueta propia", async () => {
+    await renderConProveedores(
       <Chip label="Matematicas" onDismiss={jest.fn()} testID="chip" />
     );
 

@@ -1,5 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 import { useAssignSheet, type ElementoAsignable } from "../../hooks/useAssignSheet";
+import { expectConsoleError } from "../helpers/consoleSignal";
 
 /**
  * ViewModel del selector transversal (change assign-sheet, #84).
@@ -258,6 +259,8 @@ describe("useAssignSheet", () => {
 
   it("ofrece reintentar cuando falla la carga de destinos", async () => {
     mockGetUnidades.mockRejectedValueOnce(new Error("sin datos"));
+    // El hook registra el fallo de carga que este test provoca a proposito.
+    expectConsoleError(/No se pudieron cargar los destinos/);
     const { result } = montar();
 
     await act(async () => {

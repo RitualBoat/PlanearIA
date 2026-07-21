@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "flow": "sanear-senal-tests-y-codificacion",
+  "date": "2026-07-20",
+  "kind": "remediation",
+  "result": "clean",
+  "candidates": [],
+  "resolves": [
+    {
+      "id": "debt-cbe0188191b5",
+      "evidence": "Guardia de consola Jest activa via setupFilesAfterEnv (jest.setup.consoleGuard.ts + src/__tests__/helpers/consoleSignal.ts): console.error/warn inesperados rompen el test y una allowance declarada no consumida tambien falla. Warnings act() reales corregidos en src/__tests__/grupos/useDetalleGrupoViewModel.test.tsx envolviendo el montaje en act(async () => {}), no allowlisteados (spec test-console-signal-guard). Corrida completa npm test -- --runInBand => 118 suites / 827 tests verdes, cero lineas console.error/warn no declaradas en la salida. Pruebas de la propia guardia: src/__tests__/harness/consoleSignalGuard.test.ts, 5 escenarios verdes."
+    },
+    {
+      "id": "debt-f466da64b58a",
+      "evidence": "Mojibake corregido en los 5 archivos verificados (2 de producto: SeccionCurricular.tsx InclusiA3n->Inclusion con codificacion correcta, ExportarPlaneacionScreen.tsx 11 cadenas; 3 de tests). Check determinista scripts/checkSourceEncoding.mjs (lead byte A-tilde/A-circ + continuacion huerfana + secuencias documentadas, sobre texto decodificado UTF-8) cableado como gate permanente en src/__tests__/harness/sourceEncoding.test.ts. node scripts/checkSourceEncoding.mjs => 'Sin doble codificacion UTF-8 en src' con exit 0. Fixture positivo detecta 6 lineas; fixture negativo con repertorio espanol completo (acentos, enies, signos de apertura, simbolos, emoji) => cero hallazgos, sin falsos positivos."
+    }
+  ],
+  "notes": "Cierre remediation de la Ola 1 del epic de saneamiento #129 (change sanear-senal-tests-y-codificacion, issue #132). Resuelve debt-cbe0188191b5 (ruido de consola/act() en ~18 suites) y debt-f466da64b58a (mojibake en codigo y tests). Sin candidatos confirmados nuevos: la revision adversarial independiente no reporto Blockers ni Majors. Observaciones fuera de alcance registradas en la revision (texto sin acento no-mojibake en EJES_ARTICULADORES; el check cubre solo src/) no constituyen deuda de este flujo. Validaciones de cierre verdes: typecheck, lint --quiet, test:debt-control (58/58), agent:harness:check, agent:opsx:patch:check."
+}

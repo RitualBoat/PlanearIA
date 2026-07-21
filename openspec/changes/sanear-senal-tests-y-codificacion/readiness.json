@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "issue": 132,
+  "change": "sanear-senal-tests-y-codificacion",
+  "surfaces": ["harness"],
+  "validations": ["openspec-strict", "harness-parity", "opsx-patch"],
+  "evidence": [
+    { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/132" },
+    { "id": "pr-link", "ref": "PENDIENTE: se completa al abrir el PR" },
+    { "id": "adversarial-review", "ref": "Revision adversarial de cierre: veredicto PASS, 0 Blockers / 0 Majors / 4 Minors rastreados; publicada en https://github.com/RitualBoat/PlanearIA/issues/132" },
+    { "id": "fixtures", "ref": "src/__tests__/harness/fixtures/encoding/ (positivo y negativo) + pruebas de la guardia en src/__tests__/harness/consoleSignalGuard.test.tsx" }
+  ],
+  "rollback": {
+    "strategy": "Revertir el PR del change: retira la guardia de Jest, el check de codificacion y las correcciones de texto sin tocar datos ni contratos. Si la guardia produce falsos positivos en CI, se desactiva por flag documentado en un PR de correccion posterior; nunca se silencia en silencio."
+  },
+  "adversarialReview": {
+    "ref": "Veredicto PASS (0 Blockers / 0 Majors / 4 Minors rastreados) en el comentario de revision adversarial de https://github.com/RitualBoat/PlanearIA/issues/132"
+  },
+  "exceptions": []
+}

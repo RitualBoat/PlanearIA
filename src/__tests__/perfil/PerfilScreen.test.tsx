@@ -46,13 +46,14 @@ jest.mock("../../context/AuthContext", () => ({
 
 jest.mock("../../context/PlaneacionesContext", () => ({
   usePlaneaciones: () => ({
-    planeaciones: [{ temaSesion: "Fracciones", nivel: "Primaria" }],
+    // La pantalla usa key={p.id}: el mock debe reflejar la forma real.
+    planeaciones: [{ id: "p1", temaSesion: "Fracciones", nivel: "Primaria" }],
   }),
 }));
 
 jest.mock("../../context/GruposContext", () => ({
   useGruposContext: () => ({
-    grupos: [{ nombre: "3ro A", alumnos: [{ id: "a1" }] }],
+    grupos: [{ id: "g1", nombre: "3ro A", alumnos: [{ id: "a1" }] }],
   }),
 }));
 

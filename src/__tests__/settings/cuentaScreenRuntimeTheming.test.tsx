@@ -50,6 +50,11 @@ jest.mock("../../context/AuthContext", () => ({
   PREFERENCIAS_DEFAULT: {},
 }));
 
+// El glow animado (JS-driven, ~1.5s) sigue disparando actualizaciones de
+// Animated.View despues de cada test; no interviene en lo que esta suite
+// afirma (tokens de tema y contraste), igual que en NotificacionesIntegration.
+jest.mock("../../components/AnimatedTopPill", () => "AnimatedTopPill");
+
 const renderScreen = () =>
   render(
     <ThemeProvider>

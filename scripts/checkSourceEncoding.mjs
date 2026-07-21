@@ -15,6 +15,7 @@
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 const SCAN_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx"]);
 const DEFAULT_EXCLUDES = ["node_modules", path.join("src", "__tests__", "harness", "fixtures")];
@@ -70,7 +71,11 @@ export function findEncodingIssues(root = "src", { excludes = DEFAULT_EXCLUDES }
   return findings;
 }
 
-if (import.meta.url === `file:///${process.argv[1].replaceAll("\\", "/")}`) {
+// Deteccion de entrypoint independiente de plataforma: en POSIX process.argv[1]
+// empieza con "/" y el antiguo `file:///${...}` producia cuatro barras, por lo
+// que el bloque CLI nunca corria en Linux/CI y el gate pasaba vacio. pathToFileURL
+// normaliza en Windows y POSIX por igual.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const root = process.argv[2] ?? "src";
   const findings = findEncodingIssues(root);
   if (findings.length) {

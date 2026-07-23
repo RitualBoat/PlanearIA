@@ -3,8 +3,10 @@ name: Agent Harness Parity
 # Verifica que los espejos por harness (project-owned) sigan en paridad con la fuente unica en .agents/
 # y con .mcp.json, y que los workflows opsx usen la CLI local sin el comando zombi upstream.
 #
-# Arranque SUAVE: continue-on-error de momento (alerta, no bloquea). Cutover a hard-fail una vez estable:
-# quitar `continue-on-error: true` de los pasos de checks. Ver design.md D9.
+# Los siete checks tenían `continue-on-error` durante el arranque suave. Su baseline verde y las
+# pruebas de entrypoints en Windows/Linux permiten el cutover: el inventario final de advisories es cero.
+# Si uno necesita volver a advisory, su paso debe declarar señal, causa, owner, recuperación y condición
+# concreta de cutover; la ausencia de ejecución nunca equivale a éxito.
 #
 # Nota: la regeneracion completa (`npm run agent:opsx:update` seguida de revision de diff) se corre en
 # local por fragilidad cross-platform de EOL. En CI validamos de forma determinista la CLI, los artefactos
@@ -25,8 +27,12 @@ concurrency:
 
 jobs:
   parity:
-    name: Harness parity (soft)
-    runs-on: ubuntu-latest
+    name: Harness parity (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -38,23 +44,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Pinned OpenSpec CLI and artifacts are valid
-        continue-on-error: true
         run: npm run openspec:check
       - name: OpenSpec diagnostics report actionable failures
-        continue-on-error: true
         run: npm run test:openspec-cli
       - name: Generated mirrors in parity with .agents/ source
-        continue-on-error: true
         run: npm run agent:harness:check
       - name: MCP server names parity (.mcp.json vs codex/cursor)
-        continue-on-error: true
         run: npm run mcp:parity
       - name: opsx workflows use the pinned CLI and no zombie command
-        continue-on-error: true
         run: npm run agent:opsx:patch:check
       - name: OpenSpec readiness gate tests (incluye gates de deuda)
-        continue-on-error: true
         run: npm run test:openspec-readiness
       - name: Debt control engine tests
-        continue-on-error: true
         run: npm run test:debt-control
+      - name: CLI entrypoints execute as real processes
+        run: npm run test:harness:cli

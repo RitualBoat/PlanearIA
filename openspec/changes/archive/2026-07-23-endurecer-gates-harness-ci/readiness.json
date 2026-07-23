@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "issue": 136,
+  "change": "endurecer-gates-harness-ci",
+  "surfaces": ["harness"],
+  "validations": ["openspec-strict", "harness-parity", "opsx-patch"],
+  "evidence": [
+    { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/136" },
+    { "id": "pr-link", "ref": "Pendiente: se completa al crear el PR del change." },
+    { "id": "adversarial-review", "ref": "openspec/changes/endurecer-gates-harness-ci/evidencia/02-revision-adversarial.md" },
+    { "id": "fixtures", "ref": "openspec/changes/endurecer-gates-harness-ci/evidencia/01-baseline-y-validacion-local.md; .project-os/debt/assessments/endurecer-gates-harness-ci.json" }
+  ],
+  "rollback": {
+    "strategy": "Revertir el PR restaura los guards, scripts de Jest y el workflow anteriores. Si un check estabilizado resulta inestable, un PR de corrección puede reintroducir únicamente su advisory con causa, owner, recuperación y condición de cutover; nunca modifica branch protection ni silencia la señal."
+  },
+  "adversarialReview": {
+    "ref": "openspec/changes/endurecer-gates-harness-ci/evidencia/02-revision-adversarial.md"
+  },
+  "exceptions": []
+}

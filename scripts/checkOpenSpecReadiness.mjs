@@ -3,7 +3,7 @@
 import { existsSync, lstatSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { preArchiveGate, preProposeGate } from "../tools/debt-control/src/index.mjs";
 
@@ -357,7 +357,7 @@ function parseArgs(argv) {
   return { phase: valueAfter("--phase"), issue: valueAfter("--issue"), change: valueAfter("--change"), json: argv.includes("--json"), runLocal: argv.includes("--run-local") };
 }
 
-if (import.meta.url === `file:///${process.argv[1].replaceAll("\\", "/")}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const args = parseArgs(process.argv.slice(2));
   let output;
   try {

@@ -3,7 +3,6 @@
 ## Purpose
 TBD - created by archiving change single-source-agent-harness. Update Purpose after archive.
 ## Requirements
-
 ### Requirement: DoR/DoD guidance survives harness regeneration
 
 The source instructions under `.agents` SHALL communicate the explicit Definition of Ready and Done gates. Generated root mirrors SHALL derive that guidance from the source, while the post-update OpenSpec patch SHALL insert and verify equivalent guidance in generated propose and archive workflows.
@@ -11,6 +10,7 @@ The source instructions under `.agents` SHALL communicate the explicit Definitio
 #### Scenario: Source and workflow regeneration
 - **WHEN** a maintainer runs the harness sync and OpenSpec update/patch commands
 - **THEN** the root mirrors and propose/archive workflows retain the readiness guidance without manual edits to generated destinations
+
 ### Requirement: Fuente unica neutral define la configuracion de todos los harnesses
 La configuracion canonica de harness SHALL residir en `.agents/` (instrucciones raiz, workflows opsx, reglas por path, skills, permisos) y en `.mcp.json` (canon MCP). Todo archivo por harness SHALL ser un artefacto generado desde esa fuente, nunca editado a mano como fuente de verdad.
 
@@ -34,19 +34,31 @@ El generador `scripts/syncAgentHarness.mjs` SHALL producir salida identica byte 
 - **THEN** el generador normaliza los fines de linea para no producir un diff espurio
 
 ### Requirement: El gate CI detecta drift de paridad
-El workflow CI `agent-harness-parity.yml` SHALL ejecutar el generador en modo `--check` mas la validacion de paridad de nombres de MCP, y SHALL fallar (o alertar, en modo suave) cuando un espejo difiera de su fuente.
+El workflow CI `agent-harness-parity.yml` SHALL ejecutar el generador en modo `--check`, la validación de paridad de nombres de MCP y las comprobaciones de OpenSpec, deuda y CLI de harness en Windows y Linux. SHALL fallar cuando un espejo difiera de su fuente, un comando no se ejecute o una prueba de entrypoint quede vacía. Un paso SHALL usar `continue-on-error` únicamente si el workflow declara para esa señal la causa, owner, recuperación y condición concreta de cutover; la ausencia de un check SHALL NOT interpretarse como éxito.
 
 #### Scenario: Espejo desfasado en un PR
 - **WHEN** un PR contiene un espejo que difiere de su fuente
-- **THEN** `--check` termina con codigo distinto de cero e imprime el diff
+- **THEN** `--check` termina con código distinto de cero e imprime el diff
+- **AND** el job de CI no continúa como éxito por `continue-on-error`
 
 #### Scenario: Arranque suave
-- **WHEN** el gate esta en su modo suave inicial (`continue-on-error`)
-- **THEN** un drift detectado se reporta como anotacion no bloqueante en vez de bloquear el merge
+- **WHEN** el gate está en su modo suave inicial (`continue-on-error`)
+- **THEN** un drift detectado se reporta como anotación no bloqueante en vez de bloquear el merge
+- **AND** el paso declara la señal, causa, owner, recuperación y condición concreta de cutover
+
+#### Scenario: Check estable bloquea el PR
+- **WHEN** una comprobación con baseline verde termina con código distinto de cero en Windows o Linux
+- **THEN** el job de paridad falla en ese sistema
+- **AND** la ejecución no se reporta como éxito por ausencia de salida o de comando
+
+#### Scenario: Advisory excepcional documentado
+- **WHEN** un check conserva temporalmente `continue-on-error`
+- **THEN** su paso declara la señal, causa, owner, recuperación y condición concreta para retirar el advisory
+- **AND** el workflow conserva la salida y el código de la comprobación como evidencia visible
 
 #### Scenario: Todo en paridad
-- **WHEN** todos los espejos coinciden con sus fuentes
-- **THEN** `--check` termina con codigo cero
+- **WHEN** todos los espejos y comprobaciones del harness coinciden con sus contratos en Windows y Linux
+- **THEN** cada job de la matriz termina con código cero
 
 ### Requirement: Paridad de MCP entre harnesses
 `.codex/config.toml` y `.cursor/mcp.json` SHALL exponer los mismos nombres de server que `.mcp.json` (Codex MAY conservar servers extra), y la paridad SHALL ser validada por `scripts/testMcpServers.mjs`.
@@ -158,4 +170,16 @@ Las fuentes canónicas de instrucciones de PlanearIA y el parche determinista po
 - **WHEN** un mantenedor ajusta la guía TLDR en una fuente bajo `.agents/` o en el parche canónico de workflows
 - **THEN** regenera los destinos con los comandos del repositorio
 - **AND** no edita manualmente `AGENTS.md`, `CLAUDE.md` ni los comandos generados por un harness
+
+### Requirement: Los entrypoints críticos se prueban como procesos reales
+El repositorio SHALL ejecutar pruebas de proceso para `checkOpenSpecReadiness.mjs`, `checkOpenSpecTldr.mjs`, `gitNexusFts.mjs` y `harnessDoctor.mjs`. Las pruebas SHALL verificar un marcador semántico de cada CLI y SHALL fallar ante salida vacía, código inesperado o falta de ejecución del bloque principal.
+
+#### Scenario: Runner Windows y POSIX ejecutan el bloque CLI
+- **WHEN** la matriz de paridad invoca la prueba de entrypoints en Windows y Linux
+- **THEN** cada script produce su reporte esperado desde un proceso hijo
+- **AND** ninguna comprobación se limita a importar helpers
+
+#### Scenario: Guard vacío detectado por prueba negativa
+- **WHEN** el resultado simulado de un CLI no contiene salida ni evidencia de ejecución
+- **THEN** la prueba de entrypoints falla explícitamente
 

@@ -5,12 +5,17 @@ TBD - created by archiving change resolver-riesgo-y-cadencia-dependencias. Updat
 ## Requirements
 ### Requirement: Cadencia documentada con tres buckets
 
-El repositorio SHALL incluir un ADR de cadencia de dependencias que clasifique cada advisory abierta en exactamente uno de tres buckets: (1) parche compatible aplicable via `overrides`, (2) advisory sin fix upstream aceptada con excepcion valida, (3) upgrade mayor condicionado al proximo Expo SDK. El ADR MUST declarar owner, frecuencia de revision y estrategia de rollback.
+El repositorio SHALL incluir un ADR de cadencia que clasifique cada advisory o riesgo abierto en uno de tres buckets. Para SheetJS, el ADR MUST enlazar el item canónico `debt-770acc1e9d53`, mantener revisión mensual y documentar recuperación, mientras que estado y expiración SHALL provenir únicamente del registro de deuda.
 
 #### Scenario: El ADR clasifica el estado vigente
 
 - **WHEN** se lee el ADR de cadencia
-- **THEN** enumera las advisories del arbol Expo diferidas al proximo SDK y los parches aplicados via overrides, cada uno en su bucket, con owner y frecuencia
+- **THEN** enlaza el item y excepción canónicos, declara owner y frecuencia, y no mantiene una expiración alternativa editable
+
+#### Scenario: Vencimiento sin solución activa recuperación
+
+- **WHEN** la excepción vence sin aislamiento o fix aprobado
+- **THEN** se abre un PR normal para desactivar import `.xlsx`, conservando CSV, exportación, assessment, item y notices
 
 ### Requirement: Parches compatibles via overrides sin audit fix ni bump de SDK
 
@@ -28,19 +33,29 @@ Las advisories de dev/build/CLI con fix del mismo major SHALL aplicarse fijando 
 
 ### Requirement: Lockfile reproducible
 
-Tras aplicar el change, el arbol de dependencias SHALL ser reproducible: `npm ci` regenera `node_modules` desde el lockfile sin drift en una segunda ejecucion, y cada entrada de fuente no-registro (tarball CDN) declara `resolved` e `integrity`.
+Tras aplicar el change, el árbol de dependencias SHALL ser reproducible: `npm ci` instalará `xlsx@0.20.3` desde el tarball vendorizado mediante `file:` sin descargar ese paquete del CDN, y una segunda ejecución no modificará package ni lockfile.
 
 #### Scenario: Segundo run sin drift
 
 - **WHEN** se ejecuta `npm ci` dos veces sobre el lockfile del change
-- **THEN** ambas ejecuciones producen el mismo arbol y no modifican el lockfile
+- **THEN** ambas ejecuciones producen el mismo árbol y no modifican package ni lockfile
+
+#### Scenario: Instalación de xlsx no depende del CDN
+
+- **WHEN** se inspeccionan `package.json`, lockfile y el árbol instalado
+- **THEN** `xlsx` resuelve a la copia vendorizada `0.20.3` y no a una URL remota
 
 ### Requirement: Ningun verde falso por riesgo aceptado
 
-El change SHALL no declarar limpio ningun scanner por el solo hecho de aceptar o diferir un riesgo. Toda advisory que no se corrige MUST quedar enumerada en el ADR (bucket 2 o 3) o registrada con excepcion valida en el motor de deuda.
+El change SHALL producir un assessment `kind: remediation` con `result: debt` para el riesgo residual verificado, y SHALL aplicar una excepción válida en el mismo flujo. Aceptar el riesgo MUST NOT convertir el assessment en `clean` ni borrar evidencia histórica.
 
 #### Scenario: Advisory diferida queda trazada, no silenciada
 
-- **WHEN** una advisory del arbol Expo se difiere al proximo SDK
-- **THEN** aparece listada en el ADR con su bucket y no se suprime del reporte de `npm audit`
+- **WHEN** una advisory o riesgo queda diferido mediante una excepción válida
+- **THEN** permanece enumerado en el ADR o registro canónico y no se suprime de la evidencia que lo detectó
+
+#### Scenario: Riesgo aceptado queda trazado
+
+- **WHEN** se captura el assessment de la corrección
+- **THEN** el item `debt-770acc1e9d53` queda `accepted-exception` hasta `2026-10-31` y el assessment de #133 conserva su hash
 

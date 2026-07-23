@@ -1,11 +1,11 @@
 /**
  * Gate permanente de integridad de codificacion (spec: source-encoding-integrity).
  *
- * Ejercita el CLI real scripts/checkSourceEncoding.mjs via execFileSync:
+ * Ejercita el CLI real scripts/checkSourceEncoding.mjs via spawnSync:
  * asi se prueba el contrato completo (codigo de salida y reporte archivo:linea)
  * sin depender de transforms de Jest para .mjs.
  */
-import { execFileSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import path from "node:path";
 
 const SCRIPT = path.resolve(__dirname, "../../../scripts/checkSourceEncoding.mjs");
@@ -17,16 +17,12 @@ interface CliResult {
 }
 
 function runCheck(root: string): CliResult {
-  try {
-    const stdout = execFileSync(process.execPath, [SCRIPT, root], { encoding: "utf8" });
-    return { status: 0, output: stdout };
-  } catch (error) {
-    const execError = error as { status?: number; stdout?: string; stderr?: string };
-    return {
-      status: execError.status ?? 1,
-      output: `${execError.stdout ?? ""}${execError.stderr ?? ""}`,
-    };
-  }
+  const execution = spawnSync(process.execPath, [SCRIPT, root], { encoding: "utf8" });
+  if (execution.error) throw execution.error;
+  return {
+    status: execution.status ?? 1,
+    output: `${execution.stdout ?? ""}${execution.stderr ?? ""}`,
+  };
 }
 
 describe("checkSourceEncoding", () => {
@@ -39,6 +35,7 @@ describe("checkSourceEncoding", () => {
     expect(result.output).toContain("mojibake.sample.tsx:9");
     expect(result.output).toContain("mojibake.sample.tsx:10");
     expect(result.output).toContain("mojibake.sample.tsx:11");
+    expect(result.output.match(/mojibake\.sample\.tsx:\d+/g)).toHaveLength(6);
   });
 
   it("acepta el fixture negativo con el repertorio legitimo del espanol", () => {

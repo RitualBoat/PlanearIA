@@ -2,6 +2,7 @@
 
 import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 export function findMissingTldrs(changesDir) {
   if (!existsSync(changesDir)) return [];
@@ -31,7 +32,7 @@ export function run({ root = process.cwd() } = {}) {
   return { changesDir, missing, ok: missing.length === 0 };
 }
 
-if (import.meta.url === `file:///${process.argv[1].replaceAll("\\", "/")}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const report = run();
   if (!report.ok) {
     console.error(formatFailure(report.missing));

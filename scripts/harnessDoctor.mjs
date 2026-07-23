@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { OAUTH_INTERACTIVE_REQUIRED } from './lib/mcpFailureClassification.mjs';
 import { STALE, UNCLASSIFIABLE, classifyIndexFreshness } from './gitNexusFts.mjs';
 
@@ -22,12 +22,27 @@ function loadConfig(root) {
   return JSON.parse(readFileSync(path.join(root, 'harness-doctor.config.json'), 'utf8'));
 }
 
+const WINDOWS_BATCH_TOKEN = /^[A-Za-z0-9_./:\\=@,+-]+$/;
+
+export function buildWindowsBatchCommand(command, args) {
+  const tokens = [command, ...args].map(String);
+  if (!tokens.every((token) => WINDOWS_BATCH_TOKEN.test(token))) {
+    throw new Error('El doctor rechazo un token inseguro para cmd.exe.');
+  }
+  return tokens.join(' ');
+}
+
 function execute(command, args, { cwd = ROOT } = {}) {
-  const execution = spawnSync(command, args, {
+  const isWindowsBatch = process.platform === 'win32' && /\.(cmd|bat)$/i.test(command);
+  // Node 26 advierte por `shell: true` cuando recibe argumentos separados. Los comandos del doctor
+  // usan tokens sin metacaracteres de cmd.exe; invocar cmd.exe explícitamente conserva npm.cmd en
+  // Windows sin shell implícito ni ocultar su warning de seguridad.
+  const resolvedCommand = isWindowsBatch ? (process.env.ComSpec ?? 'cmd.exe') : command;
+  const resolvedArgs = isWindowsBatch ? ['/d', '/s', '/c', buildWindowsBatchCommand(command, args)] : args;
+  const execution = spawnSync(resolvedCommand, resolvedArgs, {
     cwd,
     encoding: 'utf8',
-    // Windows requires a shell to execute npm.cmd. Every command/argument in this runner is fixed in source.
-    shell: process.platform === 'win32' && /\.(cmd|bat)$/i.test(command),
+    shell: false,
   });
   return { status: execution.status ?? 1, stdout: execution.stdout ?? '', stderr: execution.stderr ?? '', error: execution.error?.message ?? '' };
 }
@@ -163,12 +178,18 @@ function checkExpo(run, npm) {
   return execution.status === 0 ? result('expo-compatibility', 'PASS', 'Las dependencias Expo son compatibles con la version instalada.') : commandFailure('expo-compatibility', 'La compatibilidad Expo', execution, 'Ejecuta npm exec --yes=false -- expo install --check y alinea solo las dependencias recomendadas por el SDK actual.');
 }
 
-export function runDoctor({ root = ROOT, config = loadConfig(root), run = execute, npm = npmCommand() } = {}) {
+export function runDoctor({ root = ROOT, config = loadConfig(root), run = execute, npm = npmCommand(), entrypointTest = false } = {}) {
+  const remoteMcpChecks = entrypointTest
+    ? [
+      result('codegraph', 'FAIL', 'CodeGraph MCP no se verificó por el runner determinista de --entrypoint-test.', 'Repite sin --entrypoint-test para obtener el diagnóstico operativo real.'),
+      result('mcp-smoke', 'FAIL', 'El smoke MCP no se verificó por el runner determinista de --entrypoint-test.', 'Repite sin --entrypoint-test para obtener el diagnóstico operativo real.'),
+    ]
+    : [checkCodeGraph(run, npm), checkMcpSmoke(run, npm, config)];
   const checks = [
-    checkNodeNpm(run, npm), checkGit(run), checkOpenSpec(run, npm), checkProjects(run, config), checkGitNexus(run, npm, config), checkCodeGraph(run, npm),
+    checkNodeNpm(run, npm), checkGit(run), checkOpenSpec(run, npm), checkProjects(run, config), checkGitNexus(run, npm, config),
     checkScript(run, npm, 'harness-parity', ['run', 'agent:harness:check'], 'Los espejos del harness estan en paridad.', 'Ejecuta npm run agent:harness:sync y revisa el diff generado.'),
     checkScript(run, npm, 'mcp-parity', ['run', 'mcp:parity'], 'Los MCP activos estan en paridad.', 'Ejecuta npm run agent:harness:sync y corrige el MCP activo indicado.'),
-    checkMcpSmoke(run, npm, config), checkExpo(run, npm), ...config.retiredTools.map((tool) => result(tool.id, tool.status, tool.summary, tool.remediation)),
+    ...remoteMcpChecks, checkExpo(run, npm), ...config.retiredTools.map((tool) => result(tool.id, tool.status, tool.summary, tool.remediation)),
   ];
   checks.sort((left, right) => config.checkOrder.indexOf(left.id) - config.checkOrder.indexOf(right.id));
   const counts = Object.fromEntries([...STATUS].map((status) => [status, checks.filter((check) => check.status === status).length]));
@@ -184,8 +205,30 @@ export function formatReport(report) {
   return lines.join('\n');
 }
 
-if (import.meta.url === `file:///${process.argv[1].replaceAll('\\', '/')}`) {
-  const report = runDoctor();
-  process.stdout.write(`${process.argv.includes('--json') ? JSON.stringify(report, null, 2) : formatReport(report)}\n`);
-  process.exitCode = report.ok ? 0 : 1;
+function entrypointTestRun() {
+  return {
+    status: 1,
+    stdout: '',
+    stderr: 'Verificación operativa omitida por --entrypoint-test.',
+    error: '',
+  };
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  if (process.argv.includes('--help')) {
+    process.stdout.write('Usage: node scripts/harnessDoctor.mjs [--json] [--entrypoint-test]\n');
+  } else {
+    try {
+      const entrypointTest = process.argv.includes('--entrypoint-test');
+      const report = runDoctor({
+        run: entrypointTest ? entrypointTestRun : execute,
+        entrypointTest,
+      });
+      process.stdout.write(`${process.argv.includes('--json') ? JSON.stringify(report, null, 2) : formatReport(report)}\n`);
+      process.exitCode = report.ok ? 0 : 1;
+    } catch (error) {
+      process.stderr.write(`harness-doctor: FAIL - ${error.message}\n`);
+      process.exitCode = 2;
+    }
+  }
 }

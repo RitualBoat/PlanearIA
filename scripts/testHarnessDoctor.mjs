@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { runDoctor } from './harnessDoctor.mjs';
+import { buildWindowsBatchCommand, runDoctor } from './harnessDoctor.mjs';
 import { OAUTH_INTERACTIVE_REQUIRED, UNCLASSIFIED_FAILURE, classifyFailure, configuredEndpoint } from './lib/mcpFailureClassification.mjs';
 
 const config = {
@@ -26,6 +26,9 @@ function smokeReport(results) {
 
 const healthyResults = [{ name: 'codegraph', ok: true }, { name: 'figma', ok: true, note: FIGMA_NOTE }];
 const mcpReport = smokeReport(healthyResults);
+
+assert.equal(buildWindowsBatchCommand('npm.cmd', ['run', 'openspec:check']), 'npm.cmd run openspec:check');
+assert.throws(() => buildWindowsBatchCommand('npm.cmd', ['run', 'mcp:test&whoami']), /token inseguro/);
 
 // Salidas reales del CLI fijado, capturadas el 2026-07-19 (evidencia 02-cadenas-estado.txt).
 const FRESH_STATUS = 'Repository: C:\\repo\nIndexed commit: 1d4dcb0\nCurrent commit: 1d4dcb0\nStatus: ✅ up-to-date';

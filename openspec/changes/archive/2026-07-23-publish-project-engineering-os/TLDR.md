@@ -24,12 +24,12 @@ upstream, npm y rollback sanos.
 
 ## Las tareas llegaron a una release pública y un cutover reversible
 
-El upstream público nació por allowlist y sus tres PR protegidos quedaron fusionados. `v0.1.1` publicó el
-mismo tarball en GitHub y npm mediante Trusted Publishing, checksum común y provenance SLSA. Una fixture
-externa verificó instalación desde registry, OpenSpec/OPSX, doctor, deuda e idempotencia. PlanearIA fijó
-`0.1.1`, reemplazó suites duplicadas por smokes consumidores y retiró las copias editables sin mover su
-estado ni su harness. `0.1.0` queda como prerelease no consumible y la reserva `0.0.0` se depreca
-explícitamente al cerrar el gate manual.
+El upstream público nació por allowlist y PRs protegidos. `v0.1.1` fue la primera release consumible;
+`v0.1.2` cerró un falso verde de EOL y `v0.1.3` eliminó drift de metadata posterior al upgrade. GitHub y
+npm publican el mismo tarball mediante Trusted Publishing, checksum común y provenance SLSA. Fixtures
+externas verificaron bootstrap, actualización, rollback, OpenSpec/OPSX, doctor, deuda e idempotencia.
+PlanearIA fijó `0.1.4`, usa smokes consumidores y retiró copias editables sin mover estado ni harness.
+`0.1.0` queda como prerelease no consumible y la reserva `0.0.0` se depreca al cerrar el gate manual.
 
 ## Resumen integral del change
 

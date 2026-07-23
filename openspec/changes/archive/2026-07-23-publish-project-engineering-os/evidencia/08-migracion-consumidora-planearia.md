@@ -4,7 +4,7 @@ Fecha: 2026-07-23.
 
 ## Cutover
 
-- `create-project-engineering-os` está fijado exactamente a `0.1.1` en manifest y lockfile.
+- `create-project-engineering-os` está fijado exactamente a `0.1.4` en manifest y lockfile.
 - `debt:*`, readiness y post-finish consumen el paquete público.
 - `test:project-os-contract` verifica versión, dos bins, exports, help, bootstrap, segundo run, sync/check,
   doctor, debt check y los diez issues neutrales.
@@ -37,3 +37,13 @@ No se ejecutó `npm audit fix`, no se ocultó la advisory y no se subió Expo SD
 La reversión de este cutover es un PR que revierte el commit de adopción y restaura temporalmente el
 snapshot embebido desde Git. No borra assessments ni usa `git reset --hard`. Cuando exista una segunda
 release sana, el rollback normal será fijar la anterior exacta y repetir smokes.
+
+Ensayo ejecutado en worktree desechable desde el commit `3897d93`:
+
+- `git revert --no-commit 3897d93` convergió exactamente al árbol padre;
+- comparación completa contra `3897d93^`: cero diff;
+- runtime restaurado: constructor 48/48 y debt-control 58/58;
+- readiness integrado: PASS;
+- la fixture se retiró con `git worktree remove`; no se alteró la rama del change.
+
+El ensayo demuestra el contenido de una reversión por PR sin crear un falso rollback a `0.1.0`.

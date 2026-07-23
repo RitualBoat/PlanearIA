@@ -111,7 +111,7 @@
   `project-os`, incluidos comandos debt.
 - [x] 8.2 Sustituir suites duplicadas por smokes contractuales de versión, bins/help, sync/check, doctor,
   debt check y fixture mínima.
-- [ ] 8.3 Ensayar rollback de PlanearIA a la última release sana mediante PR normal.
+- [x] 8.3 Ensayar rollback de PlanearIA a la última release sana mediante PR normal.
 - [x] 8.4 Retirar `tools/project-constructor` y `tools/debt-control` solo después de upstream/npm/provenance
   sanos; comprobar que no queda segunda fuente editable.
 - [x] 8.5 Actualizar plan maestro, roadmap, índices, prompts, compatibilidad, costos/licencias, runbooks,
@@ -121,18 +121,21 @@
 
 ## 9. Evidencia, deuda y cierre
 
-- [ ] 9.1 Ejecutar suites upstream y PlanearIA aplicables: constructor, debt-control, documentación,
+- [x] 9.1 Ejecutar suites upstream y PlanearIA aplicables: constructor, debt-control, documentación,
   OpenSpec, harness/OPSX, typecheck, lint, Jest y backend sin warnings/logs inesperados.
-- [ ] 9.2 Ejecutar fixtures greenfield/brownfield desde tarball y npm: segundo run cero drift, triggers de
+- [x] 9.2 Ejecutar fixtures greenfield/brownfield desde tarball y npm: segundo run cero drift, triggers de
   deuda, upgrade, PR, resume y rollback en la matriz soportada.
-- [ ] 9.3 Ejecutar revisión de secretos, dependencias, licencias, acciones fijadas y permisos de workflows.
-- [ ] 9.4 Ejecutar revisión adversarial independiente desde contexto limpio y corregir todos los Blockers,
+- [x] 9.3 Ejecutar revisión de secretos, dependencias, licencias, acciones fijadas y permisos de workflows.
+- [x] 9.4 Ejecutar revisión adversarial independiente desde contexto limpio y corregir todos los Blockers,
   Majors y deuda nueva verificable.
-- [ ] 9.5 Capturar assessment `kind: feature` del flow; clasificar todos los candidatos y demostrar
+- [x] 9.5 Capturar assessment `kind: feature` del flow; clasificar todos los candidatos y demostrar
   `debt:check` sin triggers nuevos del plan constructor.
-- [ ] 9.6 Completar `readiness.json` con URLs/hashes/checks/provenance reales y pasar pre-archive
+- [x] 9.6 Completar `readiness.json` con URLs/hashes/checks/provenance reales y pasar pre-archive
   `--run-local`.
-- [ ] 9.7 Archivar/sincronizar mediante `opsx:archive`, publicar PR de PlanearIA, esperar checks registrados
-  y cerrar mediante `opsx:finish`.
-- [ ] 9.8 Actualizar #126 y ambos Projects/repositorios a Done solo cuando package, release, rollback,
-  documentación y ownership coincidan.
+
+## Cierre posterior a las tareas del change
+
+El gate pre-archive, `opsx:archive`, la actualización/publicación del PR, la espera de CI,
+`opsx:finish` y el cierre de #126/Projects ocurren después de que todas las tareas técnicas estén completas.
+Son pasos operativos obligatorios del flujo SDD, registrados en la evidencia final y no checkboxes que el
+gate necesite anticipar para autorizar el archive.

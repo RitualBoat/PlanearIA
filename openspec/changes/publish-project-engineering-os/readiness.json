@@ -25,6 +25,10 @@
       "ref": "Gate local PASS 10/10 sobre development@2ef9a46; evidencia remota final pendiente."
     },
     {
+      "id": "pr-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/pull/140 (draft pre-apply)"
+    },
+    {
       "id": "pre-apply-review",
       "ref": "openspec/changes/publish-project-engineering-os/evidencia/revision-adversarial-pre-apply.md"
     },

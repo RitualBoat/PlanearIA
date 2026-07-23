@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "issue": 133,
+  "change": "resolver-riesgo-y-cadencia-dependencias",
+  "surfaces": ["harness"],
+  "validations": ["openspec-strict", "harness-parity", "opsx-patch"],
+  "evidence": [
+    { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/133" },
+    { "id": "pr-link", "ref": "PENDIENTE: se completa al abrir el PR" },
+    { "id": "adversarial-review", "ref": "PENDIENTE: veredicto de la revision adversarial de cierre, publicado en https://github.com/RitualBoat/PlanearIA/issues/133" },
+    { "id": "fixtures", "ref": "src/__tests__ fixtures negativos de importacion (archivo enorme, buffer invalido, guardia de prototipo) mas evidencia npm audit antes/despues y npx expo install --check" }
+  ],
+  "rollback": {
+    "strategy": "Revertir el PR del change restaura xlsx@0.18.5, retira el bloque overrides y el ADR de cadencia sin tocar datos ni contratos de import/export. Si un override rompe Metro/jest/Expo se retira ese override puntual en un PR de correccion; si el tope de tamano produce falsos positivos se ajusta el umbral en un PR documentado, nunca se silencia en silencio."
+  },
+  "adversarialReview": {
+    "ref": "PENDIENTE: veredicto y clasificacion de hallazgos en el comentario de revision adversarial de https://github.com/RitualBoat/PlanearIA/issues/133"
+  },
+  "exceptions": []
+}

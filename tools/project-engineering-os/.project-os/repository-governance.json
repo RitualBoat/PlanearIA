@@ -23,8 +23,8 @@
   ],
   "ruleset": {
     "requiresPullRequest": true,
-    "requiredApprovals": 1,
-    "requiresCodeOwnerReview": true,
+    "requiredApprovals": 0,
+    "requiresCodeOwnerReview": false,
     "requiresConversationResolution": true,
     "requiredChecks": [
       "CI / required"

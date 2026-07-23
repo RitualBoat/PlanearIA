@@ -35,6 +35,13 @@ Fuentes primarias:
 - https://docs.github.com/en/actions/reference/security/secure-use
 - https://docs.github.com/en/actions/tutorials/publish-packages
 
+## Ajuste para mantenedor único
+
+La protección de `main` exige PR, `CI / required`, conversaciones resueltas y bloquea force-push/borrado.
+No exige un approval de GitHub que el único mantenedor no puede otorgarse a sí mismo. La aprobación humana
+se conserva en #126; contribuciones externas sí requieren revisión del mantenedor. Esta decisión es
+reversible cuando exista un segundo revisor activo.
+
 ## Gate
 
 El source local puede continuar. La publicación npm no puede ejecutarse hasta que el usuario complete la

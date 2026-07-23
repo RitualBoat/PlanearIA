@@ -17,7 +17,7 @@ import { fileURLToPath } from "node:url";
 import { preArchiveGate, preProposeGate } from "create-project-engineering-os/debt";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const EXPECTED_VERSION = "0.1.1";
+const EXPECTED_VERSION = "0.1.4";
 const PACKAGE_ROOT = path.join(ROOT, "node_modules", "create-project-engineering-os");
 const CLI = path.join(PACKAGE_ROOT, "bin", "project-os.mjs");
 const OPEN_SPEC_ROOT = path.join(ROOT, "node_modules", "@fission-ai", "openspec");

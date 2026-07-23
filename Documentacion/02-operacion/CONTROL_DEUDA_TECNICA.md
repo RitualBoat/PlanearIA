@@ -2,7 +2,7 @@
 
 > **Estado:** vigente.
 > **Uso:** runbook del motor de control de deuda tecnica para flujos SDD.
-> **Fuente de verdad:** `create-project-engineering-os@0.1.1` (motor upstream),
+> **Fuente de verdad:** `create-project-engineering-os@0.1.4` (motor upstream),
 > `.project-os/debt/` (estado consumidor), specs
 > `openspec/specs/debt-control-*`.
 > **No usar para:** convertir warnings en deuda sin verificacion, o "reanudar" planes editando el registro.

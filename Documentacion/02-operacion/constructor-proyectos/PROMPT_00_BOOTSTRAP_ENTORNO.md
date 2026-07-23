@@ -29,7 +29,7 @@ LÍMITES
 FUENTES
 
 1. Lee AGENTS.md si existe.
-2. Usa `create-project-engineering-os@0.1.1`; verifica npm, licencia MIT, provenance y checksum de la
+2. Usa `create-project-engineering-os@0.1.4`; verifica npm, licencia MIT, provenance y checksum de la
    release. No uses una versión flotante.
 3. Lee el runbook y la guía manual distribuidos con ese paquete.
 4. Trata el CLI como única fuente ejecutable. Los prompts y documentos solo lo orquestan.
@@ -44,15 +44,15 @@ aparece una decisión nueva.
 PROCEDIMIENTO
 
 1. Confirma la raíz Git, rama, writability y estado del working tree con acciones read-only.
-2. Verifica que npm resuelve exactamente `create-project-engineering-os@0.1.1` y registra integridad y
+2. Verifica que npm resuelve exactamente `create-project-engineering-os@0.1.4` y registra integridad y
    provenance sin imprimir credenciales.
 3. Si el repositorio contiene archivos, previsualiza:
 
-   npx --yes create-project-engineering-os@0.1.1 bootstrap --target . --dry-run
+   npx --yes create-project-engineering-os@0.1.4 bootstrap --target . --dry-run
 
    Revisa las colisiones. Después ejecuta:
 
-   npx --yes create-project-engineering-os@0.1.1 bootstrap --target .
+   npx --yes create-project-engineering-os@0.1.4 bootstrap --target .
    npm ci
 
 4. Revisa antes de aceptar cualquier escritura:

@@ -135,7 +135,7 @@
     "@typescript-eslint/parser": "^8.57.2",
     "babel-preset-expo": "~54.0.10",
     "baseline-browser-mapping": "^2.11.1",
-    "create-project-engineering-os": "0.1.1",
+    "create-project-engineering-os": "0.1.4",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",

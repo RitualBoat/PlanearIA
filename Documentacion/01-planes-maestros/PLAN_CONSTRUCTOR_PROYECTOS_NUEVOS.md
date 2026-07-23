@@ -1,10 +1,10 @@
 # Plan Maestro: Constructor reutilizable de proyectos nuevos
 
-> **Estado:** activo como blueprint; Ola 0 cerrada y distribución pública `0.1.1` operativa.
+> **Estado:** activo como blueprint; Ola 0 cerrada y distribución pública `0.1.4` operativa.
 > **Issues:** núcleo [#103](https://github.com/RitualBoat/PlanearIA/issues/103) y distribución
 > [#126](https://github.com/RitualBoat/PlanearIA/issues/126).
 > **Upstream:** [`RitualBoat/project-engineering-os`](https://github.com/RitualBoat/project-engineering-os).
-> **Paquete:** [`create-project-engineering-os@0.1.1`](https://www.npmjs.com/package/create-project-engineering-os/v/0.1.1).
+> **Paquete:** [`create-project-engineering-os@0.1.4`](https://www.npmjs.com/package/create-project-engineering-os/v/0.1.4).
 > **Change de distribución:** `openspec/changes/publish-project-engineering-os/`.
 > **Snapshot de evidencia:** 2026-07-23.
 > **Owner:** RitualBoat.
@@ -14,6 +14,13 @@
 - El núcleo privado de #103 se publicó por allowlist, sin historial ni dominio de PlanearIA.
 - `v0.1.1` es la primera release consumible: GitHub Release y npm comparten el SHA-256
   `9a164870a923605b81c84d505a98e2f1d6eb85e34e40a3aa11e6b88d7cbcec22`.
+- `v0.1.2` es la release estable fijada: impide falsos verdes de empaquetado por EOL y conserva un
+  tarball idéntico en GitHub/npm con SHA-256
+  `7070014e12ac484bbcda495fe3c33b1accd179bd710b10fa70e8e43ea5454d3a`.
+- `v0.1.3` corrigió el drift de metadata posterior al upgrade; GitHub/npm compartieron SHA-256
+  `b6520d4d1df55b2e356e149be87497c66ec12560c3d88a631c10934d928f8438`.
+- `v0.1.4` permite cerrar un feature que captura deuda preexistente y persiste el backref del issue aun
+  ante consistencia eventual de GitHub; GitHub/npm/provenance comparten identidad verificable.
 - npm publica mediante Trusted Publisher OIDC; el paquete expone procedencia SLSA verificable.
 - CI upstream es requerida en Ubuntu, Windows y macOS con Node 20.20/22.22.
 - Una fixture externa ejecutó `npx`, `npm ci` dos veces, bootstrap, OpenSpec/OPSX, doctor y debt check;
@@ -165,8 +172,8 @@ entra al doctor, paridad, CI ni bootstrap.
 | D6 | OPSX conserva ownership de la CLI oficial de OpenSpec. | D6 y D7. |
 | D7 | Doctor por evidencia; startup, listing y auth no se infieren desde config. | D9. |
 | D8 | Solo documentación y harness/tooling activos antes del discovery. | D8. |
-| D9 | CI upstream requerida tras baseline estable; checks del proyecto generado nacen advisory. | CI `v0.1.1`. |
-| D10 | MIT, npm público y GitHub Release; Trusted Publishing OIDC sin token persistente. | #126 y release `v0.1.1`. |
+| D9 | CI upstream requerida tras baseline estable; checks del proyecto generado nacen advisory. | CI `v0.1.4`. |
+| D10 | MIT, npm público y GitHub Release; Trusted Publishing OIDC sin token persistente. | #126 y release `v0.1.4`. |
 | D11 | Specs completas y evolución pertenecen al upstream; PlanearIA mantiene contrato consumidor fijado. | Spec `project-constructor-consumer-updates`. |
 
 ## 7. Open questions
@@ -218,7 +225,7 @@ La Ola 0 se cierra solo si:
 | 1. Discovery | Ejecución de `PROMPT_01_DISCOVERY_PROYECTO`, entrevista, visión y paquete de issues activos | Ola 0 cerrada | Issue se crea al activar la ola |
 | 2. Perfil técnico | alternativas, ADR, dependencias fijadas, doctor/CI específicos | Discovery aprobado | Backlog en este plan |
 | 3. Inicio de producto | visión versionada, DDD ligero, plan, epic, olas y primer change vertical | Perfil técnico operativo | Backlog en este plan |
-| 4. Distribución | paquete npm/GitHub Release, provenance, soporte y migraciones | licencia/canal aprobados | #126, `v0.1.1` |
+| 4. Distribución | paquete npm/GitHub Release, provenance, soporte y migraciones | licencia/canal aprobados | #126, `v0.1.4` |
 
 Solo se crean issues para la ola activa y la siguiente. El resto permanece aquí para evitar ruido.
 
@@ -288,7 +295,7 @@ Procedimiento completo:
 - migraciones explícitas y probadas; nunca heurísticas.
 - npm y GitHub Release publican el mismo tarball y checksum.
 - trusted publishing usa OIDC, environment protegido y tag protegido; no depende de token npm persistente.
-- PlanearIA fija `0.1.1`; toda actualización posterior muestra diff y entra por PR.
+- PlanearIA fija `0.1.4`; toda actualización posterior muestra diff y entra por PR.
 - una release defectuosa se depreca y reemplaza con patch; nunca se reetiqueta ni se sobreescribe.
 - upgrade deliberado de OpenSpec, regeneración OPSX por su CLI y checker separado.
 

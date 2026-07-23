@@ -12,7 +12,7 @@ publicación se activa sin aprobación humana.
 
 | Componente | Uso en Ola 0 | Costo esperado | Licencia/condición | Lock-in | Decisión |
 | --- | --- | --- | --- | --- | --- |
-| Constructor `0.1.1` | npm público + GitHub Release | Sin compra para instalar/publicar con el plan vigente | MIT; notices incluidos | Bajo; formatos abiertos y CLI local | Publicado con provenance |
+| Constructor `0.1.4` | npm público + GitHub Release | Sin compra para instalar/publicar con el plan vigente | MIT; notices incluidos | Bajo; formatos abiertos y CLI local | Publicado con provenance |
 | Node | Runtime local | Sin compra por ejecución local | Ver licencia upstream antes de redistribuir binarios | Bajo | No empaquetar Node |
 | OpenSpec `1.6.0` | SDD local fijado | Sin API key | [MIT](https://github.com/Fission-AI/OpenSpec) | Medio por formato/workflows | Adaptador y rollback |
 | Ajv `8.20.0` | Validación de schemas en desarrollo/CI | Sin API key | [MIT](https://www.npmjs.com/package/ajv/v/8.20.0) | Bajo; JSON Schema 2020-12 es formato abierto | `devDependency` exacta; no runtime del proyecto |

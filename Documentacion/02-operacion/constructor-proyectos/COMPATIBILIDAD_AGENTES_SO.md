@@ -1,6 +1,6 @@
 # Compatibilidad por agente y sistema operativo
 
-> **Estado:** soporte estable del núcleo en la matriz de `v0.1.1`.
+> **Estado:** soporte estable del núcleo en la matriz de `v0.1.4`.
 
 ## 1. Capacidades por harness
 
@@ -41,7 +41,7 @@ Estados permitidos en la matriz machine-readable: `native`, `generated`, `docume
 
 ## 4. Evidencia actual
 
-- Upstream `v0.1.1` ejecutó 122 tests y fixture en Ubuntu, Windows y macOS con Node 20.20/22.22.
+- Upstream `v0.1.4` ejecutó 124 tests y fixture en Ubuntu, Windows y macOS con Node 20.20/22.22.
 - `main` exige `CI / required`; la ausencia de checks no cuenta como éxito.
 - La fixture externa desde npm ejecutó `npm ci` dos veces sin drift, verificó firmas/attestations,
   inicializó OpenSpec, adaptó OPSX, obtuvo doctor `PASS` con 0 `FAIL` y tercer bootstrap `IN_SYNC`.

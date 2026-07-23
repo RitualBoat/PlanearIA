@@ -1,7 +1,7 @@
 # Constructor reutilizable de proyectos
 
 > **Estado:** distribución pública operativa.
-> **Release consumible:** `create-project-engineering-os@0.1.1`.
+> **Release consumible:** `create-project-engineering-os@0.1.4`.
 > **Upstream:** [`RitualBoat/project-engineering-os`](https://github.com/RitualBoat/project-engineering-os).
 > **Issue de distribución:** [#126](https://github.com/RitualBoat/PlanearIA/issues/126).
 
@@ -10,15 +10,15 @@
 Para una persona que crea un repositorio nuevo:
 
 1. leer el
-   [README amigable del upstream](https://github.com/RitualBoat/project-engineering-os/tree/v0.1.1#readme);
-2. ejecutar `npx --yes create-project-engineering-os@0.1.1 bootstrap --target .`;
+   [README amigable del upstream](https://github.com/RitualBoat/project-engineering-os/tree/v0.1.4#readme);
+2. ejecutar `npx --yes create-project-engineering-os@0.1.4 bootstrap --target .`;
 3. instalar el lockfile generado con `npm ci`;
 4. inicializar OpenSpec y adaptar sus archivos OPSX según
    [el runbook](RUNBOOK_CONSTRUCTOR.md);
 5. ejecutar sync/check, doctor y debt check;
 6. completar los gates humanos de [la guía manual](GUIA_MANUAL_USUARIO.md);
 7. usar el
-   [Prompt 01 fijado en `v0.1.1`](https://github.com/RitualBoat/project-engineering-os/blob/v0.1.1/docs/prompts/PROMPT_01_DISCOVERY_PROYECTO.md)
+   [Prompt 01 fijado en `v0.1.4`](https://github.com/RitualBoat/project-engineering-os/blob/v0.1.4/docs/prompts/PROMPT_01_DISCOVERY_PROYECTO.md)
    solo después de aprobar Etapa A.
 
 El [Prompt 00](PROMPT_00_BOOTSTRAP_ENTORNO.md) prepara el entorno y no pregunta por el producto.
@@ -37,7 +37,7 @@ El Prompt 01 es un handoff inerte durante bootstrap; su ejecución pertenece a d
 ## Ownership vigente
 
 - El paquete, blueprint, schemas, tests completos, prompts canónicos y migraciones pertenecen al upstream.
-- PlanearIA fija `0.1.1`, conserva sus specs de contrato consumidor y ejecuta smokes de integración.
+- PlanearIA fija `0.1.4`, conserva sus specs de contrato consumidor y ejecuta smokes de integración.
 - `.project-os/debt/` sigue siendo estado e historia propios de PlanearIA; no se mueve al upstream.
 - `.agents/` sigue siendo la fuente del harness específico de PlanearIA.
 - OpenSpec sigue siendo el único owner de sus workflows OPSX generados.

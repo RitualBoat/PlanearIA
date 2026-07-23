@@ -282,18 +282,18 @@ function validatePrompt00() {
   });
 
   const exactBootstrap =
-    /^\s*npx --yes create-project-engineering-os@0\.1\.1 bootstrap --target \.$/m;
+    /^\s*npx --yes create-project-engineering-os@0\.1\.4 bootstrap --target \.$/m;
   const exactDryRun =
-    /^\s*npx --yes create-project-engineering-os@0\.1\.1 bootstrap --target \. --dry-run$/m;
+    /^\s*npx --yes create-project-engineering-os@0\.1\.4 bootstrap --target \. --dry-run$/m;
   if (!exactBootstrap.test(content) || !exactDryRun.test(content)) {
-    fail(`${relative(PROMPT_00)} no fija bootstrap y dry-run públicos en 0.1.1`);
+    fail(`${relative(PROMPT_00)} no fija bootstrap y dry-run públicos en 0.1.4`);
   }
   if (!/^\s*npm ci\s*$/m.test(content)) {
     fail(`${relative(PROMPT_00)} no instala el lockfile con npm ci`);
   }
   if (
-    /create-project-engineering-os@(?!0\.1\.1\b)(?:latest|next|beta|[^\s`]+)/i.test(content)
-    || /^\s*npx\s+(?!--yes create-project-engineering-os@0\.1\.1\b)/im.test(content)
+    /create-project-engineering-os@(?!0\.1\.4\b)(?:latest|next|beta|[^\s`]+)/i.test(content)
+    || /^\s*npx\s+(?!--yes create-project-engineering-os@0\.1\.4\b)/im.test(content)
   ) {
     fail(`${relative(PROMPT_00)} conserva una versión flotante o un npx fuera del contrato aprobado`);
   }

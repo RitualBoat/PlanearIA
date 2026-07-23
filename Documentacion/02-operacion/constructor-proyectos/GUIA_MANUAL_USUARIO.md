@@ -25,9 +25,9 @@
 **Acción:**
 
 1. Abrir npm y GitHub Release del mismo tag.
-2. Confirmar versión exacta `0.1.1`, provenance e integridad.
+2. Confirmar versión exacta `0.1.4`, provenance e integridad.
 3. Comparar el SHA-256 publicado:
-   `9a164870a923605b81c84d505a98e2f1d6eb85e34e40a3aa11e6b88d7cbcec22`.
+   `b6520d4d1df55b2e356e149be87497c66ec12560c3d88a631c10934d928f8438`.
 4. Revisar MIT y notices.
 5. Confirmar que npm y GitHub contienen el mismo tarball.
 

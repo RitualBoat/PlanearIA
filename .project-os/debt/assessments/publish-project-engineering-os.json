@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "flow": "publish-project-engineering-os",
+  "date": "2026-07-23",
+  "kind": "feature",
+  "result": "debt",
+  "candidates": [
+    {
+      "title": "React effects sin cleanup verificable en componentes y ViewModels",
+      "artifact": "src/components/AnimatedTopPill.tsx:72; src/hooks/useContenidoViewModel.ts:181; src/screens/planeaciones/DocEditorScreen.tsx:268",
+      "source": "React Doctor full 0.9.1, regla effect-needs-cleanup; el mismo conjunto fue dejado como seguimiento en el baseline histórico de #38.",
+      "category": "technical-debt",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "uxui-navegacion-global",
+      "consequence": "Suscripciones o recursos de efectos pueden conservarse tras un unmount y causar fugas o comportamiento duplicado en recorridos de UI.",
+      "remediation": "Crear un change de saneamiento UX/UI que haga explícita la cleanup de cada efecto, añada pruebas de montaje/desmontaje y deje React Doctor full sin estos tres errores.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "npx react-doctor@latest --scope full --json --json-compact --no-score --no-dead-code --no-supply-chain (2026-07-23): effect-needs-cleanup en las tres rutas.",
+          "date": "2026-07-23"
+        },
+        {
+          "type": "issue",
+          "ref": "https://github.com/RitualBoat/PlanearIA/issues/38",
+          "date": "2026-07-07"
+        }
+      ],
+      "verification": {
+        "method": "Escaneo full reproducible y lectura directa de los tres efectos señalados; el scope changed 100/100 prueba que #126 no los introdujo.",
+        "result": "confirmed",
+        "date": "2026-07-23"
+      }
+    },
+    {
+      "title": "SyncContext muta refs durante render",
+      "artifact": "src/context/SyncContext.tsx:83-86",
+      "source": "React Doctor full 0.9.1, regla refs durante render; seguimiento histórico de #38.",
+      "category": "technical-debt",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "uxui-navegacion-global",
+      "consequence": "Las cuatro escrituras de refs durante render pueden romper las garantías de replay/concurrencia de React y hacer que el estado observado por sync no corresponda al commit visible.",
+      "remediation": "Crear un change de saneamiento UX/UI que mueva la sincronización de refs a un efecto o a una estructura segura, cubra render/replay y elimine los cuatro diagnósticos.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "npx react-doctor@latest --scope full --json --json-compact --no-score --no-dead-code --no-supply-chain (2026-07-23): cuatro diagnostics de ref write en SyncContext.tsx:83-86.",
+          "date": "2026-07-23"
+        },
+        {
+          "type": "issue",
+          "ref": "https://github.com/RitualBoat/PlanearIA/issues/38",
+          "date": "2026-07-07"
+        }
+      ],
+      "verification": {
+        "method": "Escaneo full reproducible y lectura directa de SyncContext; el scope changed 100/100 prueba que #126 no cambió esa ruta.",
+        "result": "confirmed",
+        "date": "2026-07-23"
+      }
+    },
+    {
+      "title": "Actualizadores de estado impuros en editor y reto",
+      "artifact": "src/hooks/useDocEditorViewModel.ts:146,264,275; src/screens/feed/RetoResolucionScreen.tsx:76",
+      "source": "React Doctor full 0.9.1, regla impure state update; seguimiento histórico de #38.",
+      "category": "technical-debt",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "uxui-navegacion-global",
+      "consequence": "Los setters con efectos laterales pueden ejecutarse más de una vez bajo replay y dejar historial, dirty-state o temporizadores inconsistentes.",
+      "remediation": "Crear un change de saneamiento UX/UI que separe side effects de los updaters, pruebe undo/redo y temporizador, y elimine los cuatro diagnósticos en React Doctor full.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "npx react-doctor@latest --scope full --json --json-compact --no-score --no-dead-code --no-supply-chain (2026-07-23): cuatro diagnostics de actualizador impuro en las rutas indicadas.",
+          "date": "2026-07-23"
+        },
+        {
+          "type": "issue",
+          "ref": "https://github.com/RitualBoat/PlanearIA/issues/38",
+          "date": "2026-07-07"
+        }
+      ],
+      "verification": {
+        "method": "Escaneo full reproducible y lectura directa de los setters; el scope changed 100/100 prueba que #126 no cambió esas rutas.",
+        "result": "confirmed",
+        "date": "2026-07-23"
+      }
+    }
+  ],
+  "notes": "Assessment obligatorio del feature #126. Los tres hallazgos son deuda real y preexistente de UX/UI, no regresiones del constructor: la migración consumidora cambió solo tooling/documentación y React Doctor scope changed obtuvo 100/100. Se capturan para que el motor aplique su presupuesto y genere saneamiento idempotente en el plan dueño."
+}

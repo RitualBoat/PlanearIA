@@ -1,7 +1,7 @@
 # Runbook del constructor
 
 > **Alcance:** Etapa A, núcleo universal sin producto.
-> **Release fijada:** `create-project-engineering-os@0.1.1`.
+> **Release fijada:** `create-project-engineering-os@0.1.4`.
 > **No hace:** elegir stack, instalar frameworks, crear código de producto ni abrir OAuth.
 
 ## 1. Resultado esperado
@@ -25,18 +25,18 @@ No usar `@latest`, instalación global, un fork desconocido ni una URL sin check
 Desde la raíz del repositorio destino:
 
 ```bash
-npx --yes create-project-engineering-os@0.1.1 bootstrap --target .
+npx --yes create-project-engineering-os@0.1.4 bootstrap --target .
 npm ci
 npm run openspec:init
 npm run project-os:opsx:adapt
 ```
 
 El primer comando valida Git, colisiones y runtime antes de escribir; genera un lockfile con OpenSpec
-`1.6.0` y el constructor `0.1.1`; crea journals solo al mutar; materializa los cinco harnesses y diez
+`1.6.0` y el constructor `0.1.4`; crea journals solo al mutar; materializa los cinco harnesses y diez
 issues neutrales. `npm ci` instala exactamente el lockfile. La CLI oficial de OpenSpec genera OPSX y
 `opsx-adapt` añade únicamente los bloques delimitados del constructor.
 
-Si falta el binario, el nombre no resuelve a `0.1.1`, existe una colisión o el preflight falla, detenerse.
+Si falta el binario, el nombre no resuelve a `0.1.4`, existe una colisión o el preflight falla, detenerse.
 No usar `--force` ni recrear templates desde una conversación.
 
 ## 4. Verificación local
@@ -67,7 +67,7 @@ autenticado son evidencias separadas.
 ## 5. Segundo run e idempotencia
 
 ```bash
-npx --yes create-project-engineering-os@0.1.1 bootstrap --target .
+npx --yes create-project-engineering-os@0.1.4 bootstrap --target .
 npm run project-os:sync:check
 ```
 
@@ -89,7 +89,7 @@ Bootstrap nunca abre OAuth, compra servicios ni cambia branch protection.
 
 ## 7. Evidencia mínima
 
-- versión `0.1.1`, integridad npm y SHA-256 de release;
+- versión `0.1.4`, integridad npm y SHA-256 de release;
 - Node/npm y OpenSpec local;
 - primer bootstrap y segundo `IN_SYNC`;
 - doctor JSON redactado;
@@ -99,8 +99,8 @@ Bootstrap nunca abre OAuth, compra servicios ni cambia branch protection.
 - perfiles activos/inactivos;
 - prueba de rollback pertinente.
 
-La release `v0.1.1` usa el mismo tarball en npm y GitHub Release, SHA-256
-`9a164870a923605b81c84d505a98e2f1d6eb85e34e40a3aa11e6b88d7cbcec22`.
+La release `v0.1.4` usa el mismo tarball en npm y GitHub Release, SHA-256
+`b6520d4d1df55b2e356e149be87497c66ec12560c3d88a631c10934d928f8438`.
 
 ## 8. Recuperación e incidentes
 

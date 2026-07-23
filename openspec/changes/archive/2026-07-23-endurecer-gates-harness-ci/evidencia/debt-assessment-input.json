@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "flow": "endurecer-gates-harness-ci",
+  "date": "2026-07-23",
+  "kind": "remediation",
+  "result": "clean",
+  "candidates": [],
+  "resolves": [
+    {
+      "id": "debt-2887d890144e",
+      "evidence": "Los siete continue-on-error del workflow agent-harness-parity.yml fueron retirados tras baseline verde; la matriz cubre Windows y Linux; scripts/testHarnessCliEntrypoints.mjs prueba los cuatro entrypoints como procesos y falla ante salida vacía. Evidencia completa: openspec/changes/endurecer-gates-harness-ci/evidencia/01-baseline-y-validacion-local.md."
+    }
+  ],
+  "notes": "Assessment de remediación para #136 y la Ola 3 de #129. Los cuatro guards POSIX fueron corregidos con pathToFileURL; baseline-browser-mapping, Web Storage experimental, salida del fixture y DEP0190 fueron reproducidos y corregidos/capturados localmente. npm audit conserva 1 low, 20 moderate, 0 high/critical; no se ejecutó npm audit fix ni se modificó Expo, SheetJS, notices, assessments previos o la excepción debt-770acc1e9d53. No quedan candidatos verificables de este flujo."
+}

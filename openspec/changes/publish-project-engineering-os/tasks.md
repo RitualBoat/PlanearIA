@@ -99,24 +99,24 @@
   protección de rama/tags y environment antes del import.
 - [x] 7.4 Subir export por `feat/initial-release`, crear/reutilizar PR, esperar CI y corregir Blockers/Majors
   antes de mergear.
-- [ ] 7.5 Crear tag y GitHub Release con tarball/checksum ligados al merge protegido.
-- [ ] 7.6 Realizar primera publicación npm aprobada, configurar trusted publisher y verificar provenance;
+- [x] 7.5 Crear tag y GitHub Release con tarball/checksum ligados al merge protegido.
+- [x] 7.6 Realizar primera publicación npm aprobada, configurar trusted publisher y verificar provenance;
   revocar cualquier credencial temporal.
-- [ ] 7.7 Ejecutar instalación `npx` desde el registry en fixture externa limpia y comparar identidad con
+- [x] 7.7 Ejecutar instalación `npx` desde el registry en fixture externa limpia y comparar identidad con
   GitHub Release.
 
 ## 8. Migración reversible de PlanearIA
 
-- [ ] 8.1 Añadir `create-project-engineering-os` como dependencia exacta y adaptar scripts raíz a
+- [x] 8.1 Añadir `create-project-engineering-os` como dependencia exacta y adaptar scripts raíz a
   `project-os`, incluidos comandos debt.
-- [ ] 8.2 Sustituir suites duplicadas por smokes contractuales de versión, bins/help, sync/check, doctor,
+- [x] 8.2 Sustituir suites duplicadas por smokes contractuales de versión, bins/help, sync/check, doctor,
   debt check y fixture mínima.
 - [ ] 8.3 Ensayar rollback de PlanearIA a la última release sana mediante PR normal.
-- [ ] 8.4 Retirar `tools/project-constructor` y `tools/debt-control` solo después de upstream/npm/provenance
+- [x] 8.4 Retirar `tools/project-constructor` y `tools/debt-control` solo después de upstream/npm/provenance
   sanos; comprobar que no queda segunda fuente editable.
-- [ ] 8.5 Actualizar plan maestro, roadmap, índices, prompts, compatibilidad, costos/licencias, runbooks,
+- [x] 8.5 Actualizar plan maestro, roadmap, índices, prompts, compatibilidad, costos/licencias, runbooks,
   incidentes y estrategia de actualización.
-- [ ] 8.6 Documentar que las specs locales son contrato consumidor fijado y que upstream gobierna la
+- [x] 8.6 Documentar que las specs locales son contrato consumidor fijado y que upstream gobierna la
   evolución del paquete.
 
 ## 9. Evidencia, deuda y cierre

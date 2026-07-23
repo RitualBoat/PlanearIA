@@ -1,23 +1,25 @@
 # Plan Maestro: Constructor reutilizable de proyectos nuevos
 
-> **Estado:** activo, Ola 0 en revisión manual; archive y CI completos, merge pendiente.
-> **Issue/Epic:** [#103](https://github.com/RitualBoat/PlanearIA/issues/103).
-> **Change:** `openspec/changes/constructor-proyectos-nuevos/`.
-> **Snapshot de evidencia:** 2026-07-19.
+> **Estado:** activo como blueprint; Ola 0 cerrada y distribución pública `0.1.1` operativa.
+> **Issues:** núcleo [#103](https://github.com/RitualBoat/PlanearIA/issues/103) y distribución
+> [#126](https://github.com/RitualBoat/PlanearIA/issues/126).
+> **Upstream:** [`RitualBoat/project-engineering-os`](https://github.com/RitualBoat/project-engineering-os).
+> **Paquete:** [`create-project-engineering-os@0.1.1`](https://www.npmjs.com/package/create-project-engineering-os/v/0.1.1).
+> **Change de distribución:** `openspec/changes/publish-project-engineering-os/`.
+> **Snapshot de evidencia:** 2026-07-23.
 > **Owner:** RitualBoat.
 
 ## Estado de la Ola 0
 
-- Issue #103 y su item en PlanearIA Product OS permanecen activos y sin duplicado.
-- Paquete privado `project-engineering-os-constructor` 0.1.0 implementado y probado.
-- 48/48 tests del constructor y fixture desde repositorio Git vacío en PASS.
-- Segundo bootstrap y `sync --check` sin drift; rollback y reanudación ensayados.
-- OpenSpec strict, paridad de 36 espejos, parche OPSX, typecheck y lint en PASS.
-- Revisión adversarial: `PASS CON HUECOS`, con cero Blockers y cero Majors abiertos.
-- Pre-archive y archive completos; PR draft
-  [#125](https://github.com/RitualBoat/PlanearIA/pull/125) limpio hacia `development`.
-- Matriz CI real en PASS: Ubuntu Node 20.20/22.22, Windows 22.22, macOS 22.22 y checks base.
-- Pendiente únicamente: revisión/aprobación manual y merge mediante `opsx:finish`.
+- El núcleo privado de #103 se publicó por allowlist, sin historial ni dominio de PlanearIA.
+- `v0.1.1` es la primera release consumible: GitHub Release y npm comparten el SHA-256
+  `9a164870a923605b81c84d505a98e2f1d6eb85e34e40a3aa11e6b88d7cbcec22`.
+- npm publica mediante Trusted Publisher OIDC; el paquete expone procedencia SLSA verificable.
+- CI upstream es requerida en Ubuntu, Windows y macOS con Node 20.20/22.22.
+- Una fixture externa ejecutó `npx`, `npm ci` dos veces, bootstrap, OpenSpec/OPSX, doctor y debt check;
+  el segundo y tercer bootstrap quedaron `IN_SYNC`.
+- PlanearIA consume la versión exacta y conserva únicamente contrato, estado y smokes; el runtime
+  evoluciona en upstream.
 
 ## 1. Objetivo y visión
 
@@ -74,13 +76,13 @@ transferible en
 | Prompts/skills/scripts | Fácil acceso desde agentes | Salida no determinista si contienen templates | Adaptadores del CLI |
 | Híbrida | Combina motor verificable con entradas humanas | Exige ownership estricto | **Elegida** |
 
-El CLI se aloja inicialmente bajo `tools/project-constructor/`, usa APIs estándar de Node y permanece
-privado/`UNLICENSED` durante Ola 0. No se publica ni se concede licencia sin decisión del propietario.
+El CLI se aloja en el upstream público, usa APIs estándar de Node y se distribuye bajo MIT como
+`create-project-engineering-os`. PlanearIA fija una versión exacta; no conserva una copia editable.
 
 ### 4.1 Blueprint objetivo
 
 ```text
-tools/project-constructor/
+create-project-engineering-os@<version>/
   blueprint/
     core/
     profiles/
@@ -163,18 +165,18 @@ entra al doctor, paridad, CI ni bootstrap.
 | D6 | OPSX conserva ownership de la CLI oficial de OpenSpec. | D6 y D7. |
 | D7 | Doctor por evidencia; startup, listing y auth no se infieren desde config. | D9. |
 | D8 | Solo documentación y harness/tooling activos antes del discovery. | D8. |
-| D9 | CI advisory hasta baseline estable y decisión explícita. | D10. |
-| D10 | Paquete privado/`UNLICENSED`; distribución pública diferida. | D2 y D11. |
+| D9 | CI upstream requerida tras baseline estable; checks del proyecto generado nacen advisory. | CI `v0.1.1`. |
+| D10 | MIT, npm público y GitHub Release; Trusted Publishing OIDC sin token persistente. | #126 y release `v0.1.1`. |
+| D11 | Specs completas y evolución pertenecen al upstream; PlanearIA mantiene contrato consumidor fijado. | Spec `project-constructor-consumer-updates`. |
 
 ## 7. Open questions
 
-- nombre público, registry, firma y licencia de distribución;
 - si se ofrece un template repository generado desde el blueprint;
-- umbral medible para promover CI advisory a blocking;
 - mecanismo remoto para aplicar `github-plan` después de aprobación;
 - política de soporte y migraciones cuando existan dos versiones mayores instaladas.
 
-Estas preguntas no bloquean la fixture local de Ola 0, pero sí la distribución.
+Estas preguntas no bloquean la release ni el bootstrap actual. Se resuelven en changes upstream
+independientes; no autorizan servicios pagados ni mutaciones remotas.
 
 ## 8. Definition of Ready
 
@@ -216,15 +218,16 @@ La Ola 0 se cierra solo si:
 | 1. Discovery | Ejecución de `PROMPT_01_DISCOVERY_PROYECTO`, entrevista, visión y paquete de issues activos | Ola 0 cerrada | Issue se crea al activar la ola |
 | 2. Perfil técnico | alternativas, ADR, dependencias fijadas, doctor/CI específicos | Discovery aprobado | Backlog en este plan |
 | 3. Inicio de producto | visión versionada, DDD ligero, plan, epic, olas y primer change vertical | Perfil técnico operativo | Backlog en este plan |
-| 4. Distribución | paquete publicado o template generado, firma, soporte y migraciones | licencia/canal aprobados | Gate manual |
+| 4. Distribución | paquete npm/GitHub Release, provenance, soporte y migraciones | licencia/canal aprobados | #126, `v0.1.1` |
 
 Solo se crean issues para la ola activa y la siguiente. El resto permanece aquí para evitar ruido.
 
 ## 11. Backlog de changes
 
-### Ola 0 activa
+### Ola 0 cerrada
 
-- `constructor-proyectos-nuevos`: alcance completo del núcleo universal.
+- `constructor-proyectos-nuevos`: núcleo universal.
+- `publish-project-engineering-os`: distribución pública y migración consumidora.
 
 ### Ola 1, crear después del cierre de Ola 0
 
@@ -235,7 +238,7 @@ Solo se crean issues para la ola activa y la siguiente. El resto permanece aquí
 
 - `activar-perfil-tecnico-inicial`.
 - `crear-blueprint-producto-y-primer-change`.
-- `distribuir-constructor-versionado`.
+- `evaluar-template-repository-generado`, solo si aporta una entrada adicional sin crear otra fuente.
 
 ## 12. Gates manuales
 
@@ -283,8 +286,10 @@ Procedimiento completo:
 - `state.json` registra versión, schema y SHA-256 del paquete probado.
 - runtime antiguo rechaza estado futuro.
 - migraciones explícitas y probadas; nunca heurísticas.
-- Ola 0 usa `npm pack` local y paquete privado.
-- publicación, firma y template remoto requieren gate de licencia/distribución.
+- npm y GitHub Release publican el mismo tarball y checksum.
+- trusted publishing usa OIDC, environment protegido y tag protegido; no depende de token npm persistente.
+- PlanearIA fija `0.1.1`; toda actualización posterior muestra diff y entra por PR.
+- una release defectuosa se depreca y reemplaza con patch; nunca se reetiqueta ni se sobreescribe.
 - upgrade deliberado de OpenSpec, regeneración OPSX por su CLI y checker separado.
 
 ## 16. Criterio de cierre

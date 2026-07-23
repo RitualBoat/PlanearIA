@@ -5,22 +5,28 @@ on:
     branches:
       - development
     paths:
-      - "tools/project-constructor/**"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/testProjectEngineeringOsConsumer.mjs"
+      - "scripts/testProjectConstructorDocs.mjs"
+      - "scripts/checkOpenSpecReadiness.mjs"
+      - "scripts/opsxFinishChange.mjs"
       - "Documentacion/01-planes-maestros/PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md"
       - "Documentacion/02-operacion/constructor-proyectos/**"
+      - "Documentacion/02-operacion/CONTROL_DEUDA_TECNICA.md"
       - ".github/workflows/project-constructor.yml"
-      - "package.json"
-      - "scripts/testProjectConstructorDocs.mjs"
       - "openspec/changes/**/specs/project-constructor-*/**"
   push:
     branches:
-      - "feat/constructor-*"
-      - "codex/constructor-*"
+      - "codex/publish-project-engineering-os"
     paths:
-      - "tools/project-constructor/**"
-      - ".github/workflows/project-constructor.yml"
       - "package.json"
+      - "package-lock.json"
+      - "scripts/testProjectEngineeringOsConsumer.mjs"
       - "scripts/testProjectConstructorDocs.mjs"
+      - "scripts/checkOpenSpecReadiness.mjs"
+      - "scripts/opsxFinishChange.mjs"
+      - ".github/workflows/project-constructor.yml"
   workflow_dispatch:
 
 permissions:
@@ -44,35 +50,22 @@ jobs:
             node: "22.22.0"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: ${{ matrix.node }}
           cache: npm
-          cache-dependency-path: tools/project-constructor/package-lock.json
 
-      - name: Install constructor dependencies
-        run: npm ci --prefix tools/project-constructor
+      - name: Install exact consumer dependency
+        run: npm ci
 
-      - name: Validate constructor package
-        run: npm run constructor:check
+      - name: Verify public package consumer contract
+        run: npm run test:project-os-contract
 
-      - name: Run constructor test suite
-        run: npm run constructor:test
+      - name: Validate pinned consumer documentation
+        run: npm run test:constructor-docs
 
-      - name: Verify empty-repository fixture
-        run: npm run constructor:fixture -- --json --evidence artifacts/constructor/fixture.json
-
-      - name: Inspect local package tarball
-        run: npm pack ./tools/project-constructor --dry-run --json
-
-      - name: Upload fixture evidence
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: project-constructor-${{ matrix.os }}
-          path: artifacts/constructor/fixture.json
-          if-no-files-found: warn
-          retention-days: 14
+      - name: Verify PlanearIA debt state through public CLI
+        run: npm run debt:check

@@ -1,170 +1,128 @@
 # Runbook del constructor
 
 > **Alcance:** Etapa A, núcleo universal sin producto.
-> **Estado:** contrato objetivo de Ola 0; no declarar operativo hasta que la fixture esté verde.
-> **Entrada humana:** ruta a un tarball local aprobado y su SHA-256.
+> **Release fijada:** `create-project-engineering-os@0.1.1`.
+> **No hace:** elegir stack, instalar frameworks, crear código de producto ni abrir OAuth.
 
 ## 1. Resultado esperado
 
-Al terminar, el repositorio nuevo contiene gobernanza, OpenSpec local, harness, templates, Product OS
-declarativo, doctor, CI del constructor y documentación. No contiene código de producto, stack elegido,
-framework, base de datos, proveedor cloud, offline, sync, IA ni respuestas de discovery.
+El repositorio nuevo queda bajo Git y contiene gobernanza, OpenSpec local, harnesses, templates,
+Product OS declarativo, doctor, Debt Control Loop y documentación. Los perfiles de UI, backend, auth,
+datos/sync, IA, infraestructura y librería permanecen inactivos.
 
 ## 2. Prerrequisitos
 
 - repositorio Git nuevo y escribible;
 - working tree sin trabajo ajeno;
-- Node compatible con la versión fijada de OpenSpec;
-- npm disponible;
-- tarball local del constructor generado y validado por la release;
-- hash SHA-256 esperado del tarball;
-- GitHub CLI solo si se aplicará Product OS remoto.
+- Node `^20.20.0 || >=22.22.0` y npm;
+- acceso de lectura a npm;
+- GitHub CLI solo si después se aplicará Product OS remoto.
 
-No usar `@latest`, instalación global ni una URL de paquete no verificada.
+No usar `@latest`, instalación global, un fork desconocido ni una URL sin checksum.
 
-## 3. Preflight humano
+## 3. Bootstrap público
 
-1. Confirmar la ruta absoluta del repositorio destino.
-2. Ejecutar `git status --short --branch`.
-3. Verificar que cualquier archivo existente sea intencional.
-4. Comparar el SHA-256 del tarball con la evidencia de release.
-5. Confirmar que no se va a preguntar por el producto.
-6. Si existe una colisión, detenerse; no usar `--force`.
-
-## 4. Bootstrap
-
-Materializar el tarball verificado en un runner temporal fuera del destino y ejecutar el binario por ruta
-explícita:
+Desde la raíz del repositorio destino:
 
 ```bash
-npm install --prefix "<RUNNER_TEMP_FUERA_DEL_REPO>" --ignore-scripts --no-audit --no-fund "<TARBALL_LOCAL_APROBADO>"
-node "<RUNNER_TEMP_FUERA_DEL_REPO>/node_modules/project-engineering-os-constructor/bin/project-constructor.mjs" bootstrap --target .
-```
-
-El comando debe:
-
-- validar Git, escritura, colisiones y versión;
-- mostrar el plan de rutas y owners;
-- instalar `.project-os/` y `.project-constructor/`;
-- declarar OpenSpec local fijado y su lockfile reproducible;
-- generar los cinco adaptadores del harness;
-- generar templates y manifiesto Product OS sin mutar GitHub;
-- dejar perfiles de producto inactivos;
-- crear journal solo si efectúa cambios;
-- terminar sin preguntas de discovery.
-
-Si el binario no existe, resuelve fuera del runner o la versión/hash no coincide, detenerse. No
-precalentar caché, consultar registry ni recrear templates desde el prompt.
-
-Materializar la dependencia de gobernanza exacta:
-
-```bash
+npx --yes create-project-engineering-os@0.1.1 bootstrap --target .
 npm ci
+npm run openspec:init
+npm run project-os:opsx:adapt
 ```
 
-`npm ci` debe resolver únicamente las dependencias fijadas en el lockfile generado. No sustituirlo por una
-instalación global o flotante.
+El primer comando valida Git, colisiones y runtime antes de escribir; genera un lockfile con OpenSpec
+`1.6.0` y el constructor `0.1.1`; crea journals solo al mutar; materializa los cinco harnesses y diez
+issues neutrales. `npm ci` instala exactamente el lockfile. La CLI oficial de OpenSpec genera OPSX y
+`opsx-adapt` añade únicamente los bloques delimitados del constructor.
 
-## 5. Verificación local
+Si falta el binario, el nombre no resuelve a `0.1.1`, existe una colisión o el preflight falla, detenerse.
+No usar `--force` ni recrear templates desde una conversación.
 
-Ejecutar desde la raíz:
+## 4. Verificación local
 
 ```bash
-npm run constructor:sync:check
-npm run constructor:doctor
-npm run constructor:doctor:json
-npm run constructor:github-plan
+npm run project-os:sync:check
+npm run project-os:opsx:check
+npm run project-os:doctor
+npm run project-os:doctor:json
+npm run debt:check
+npm run project-os:github-plan
 ```
 
-Comprobar:
+Gate:
 
-- `sync --check` con exit `0` y sin diff;
-- formatos humano/JSON con los mismos IDs y estados;
-- `Graphify` como `SKIP retirado/manual`;
-- perfiles condicionales como `SKIP`, no `PASS`;
-- variables solo por nombre/presencia;
-- startup, tool listing y auth MCP separados de la configuración;
-- ninguna instalación, OAuth, reparación o reindexado causada por doctor;
-- `github-plan` sin mutaciones.
+- sync `IN_SYNC`, cero create/update/delete/conflict;
+- OPSX `PASS` y OpenSpec local fijado;
+- doctor con `verdict: PASS` y cero `FAIL`;
+- `WARN` y `SKIP` conservan causa y recuperación;
+- Graphify es `SKIP retirado/manual`;
+- perfiles de producto son `SKIP`, no `PASS`;
+- debt check pasa sin items creados por bootstrap;
+- github-plan muestra operaciones y no muta GitHub.
 
-## 6. Segundo run e idempotencia
+Doctor no instala, autentica, repara, actualiza ni reindexa. Config MCP, startup, tool listing y smoke
+autenticado son evidencias separadas.
 
-Capturar `git status` y hashes, ejecutar de nuevo:
+## 5. Segundo run e idempotencia
 
 ```bash
-npm run constructor:bootstrap
-npm run constructor:sync:check
+npx --yes create-project-engineering-os@0.1.1 bootstrap --target .
+npm run project-os:sync:check
 ```
 
-El segundo bootstrap debe informar cero operaciones materiales. Cualquier cambio de archivo, lockfile o
-metadata es un fallo de idempotencia salvo migración/version explícitamente distinta.
+El bootstrap debe devolver `IN_SYNC`, sin transacción nueva. Un diff inesperado es fallo; conservar
+estado y journals para diagnóstico.
 
-## 7. GitHub Product OS
+## 6. GitHub Product OS
 
-`github-plan` produce operaciones propuestas. La aplicación real requiere:
+`npm run project-os:github-plan` genera un plan. Aplicarlo requiere:
 
 1. autenticar `gh` manualmente;
-2. verificar repositorio, owner y scopes sin mostrar token;
+2. verificar owner, repositorio y scopes sin mostrar token;
 3. revisar create/reuse/update/conflict;
-4. aprobar labels, campos, estados, Project y estrategia de ramas;
-5. aplicar mediante el procedimiento remoto aprobado;
-6. volver a ejecutar doctor read-only.
+4. aprobar labels, campos, Project y protección;
+5. ejecutar la operación remota aprobada;
+6. guardar URLs/IDs y volver a correr el doctor read-only.
 
-Bootstrap nunca debe abrir OAuth ni activar branch protection.
+Bootstrap nunca abre OAuth, compra servicios ni cambia branch protection.
 
-## 8. Evidencia mínima
+## 7. Evidencia mínima
 
-Guardar en issue/PR, nunca con secretos:
+- versión `0.1.1`, integridad npm y SHA-256 de release;
+- Node/npm y OpenSpec local;
+- primer bootstrap y segundo `IN_SYNC`;
+- doctor JSON redactado;
+- OPSX y debt check;
+- paquete de diez issues neutrales;
+- github-plan y aprobación humana;
+- perfiles activos/inactivos;
+- prueba de rollback pertinente.
 
-- versión y SHA-256 del constructor;
-- versión Node/npm y OpenSpec local;
-- resumen del primer bootstrap;
-- diff cero del segundo run;
-- salida JSON del doctor redactada;
-- `github-plan` y aprobación humana;
-- URL del Project y resultado de protección;
-- lista de perfiles activos/inactivos;
-- rollback/journal probado en fixture.
+La release `v0.1.1` usa el mismo tarball en npm y GitHub Release, SHA-256
+`9a164870a923605b81c84d505a98e2f1d6eb85e34e40a3aa11e6b88d7cbcec22`.
 
-## 9. Recuperación rápida
+## 8. Recuperación e incidentes
 
-| Síntoma | Acción |
+| Síntoma | Recuperación |
 | --- | --- |
-| Colisión antes de escribir | Preservar archivo, cambiar destino o aprobar adopción versionada. |
-| Journal incompleto | Elegir `resume` o `rollback`; doctor solo reporta. |
-| Archivo editado después | No sobrescribir; resolver owner manualmente. |
-| OpenSpec local ausente | Restaurar manifest/lockfile e instalar fijado; no usar global. |
-| GitNexus stale | Ejecutar recuperación documentada fuera del doctor y verificar después. |
-| OAuth requerido | Usar el smoke opt-in manual; no repetir doctor como autenticador. |
+| Colisión antes de escribir | Preservar archivo y resolver ownership; no usar `--force`. |
+| Journal incompleto | Elegir resume/rollback con la misma versión; doctor solo reporta. |
+| Archivo editado después | Detener rollback de esa ruta y resolver manualmente. |
+| OpenSpec ausente | Restaurar manifest/lockfile y `npm ci`; nunca usar global. |
+| GitNexus stale | Ejecutar su runbook de reparación fuera del doctor. |
+| OAuth requerido | Ejecutar el smoke manual opt-in y guardar recibo redactado. |
 | Graphify ausente | Ninguna acción; `SKIP` esperado. |
+| Release defectuosa | Deprecarla y publicar patch; no reetiquetar ni sobreescribir. |
 
-Detalle: [Actualización y rollback](ACTUALIZACION_Y_ROLLBACK.md).
+Conservar versión, hashes, journals y diff antes de recuperar. Un secreto expuesto se revoca en el
+proveedor y se redacta de la evidencia.
 
-## 10. Gate para discovery
+## 9. Gate para discovery
 
-Discovery puede comenzar únicamente cuando:
+Discovery comienza únicamente con bootstrap e idempotencia probados, doctor sin `FAIL`, OpenSpec/OPSX
+sanos, Product OS/gates manuales aplicables verificados, perfiles técnicos inactivos y aprobación humana.
+Entonces se usa Prompt 01 en una tarea independiente. No preguntar “qué stack quieres” durante Etapa A.
 
-- bootstrap e idempotencia están probados;
-- `sync --check` pasa;
-- doctor no contiene `FAIL` no justificado;
-- Product OS y gates manuales aplicables están verificados;
-- no hay perfiles técnicos activos;
-- el usuario aprueba ejecutar Prompt 01 en una ola posterior.
-
-No preguntar “qué stack quieres” durante este runbook.
-
-## 11. Incidentes del constructor
-
-Un incidente es cualquier ejecución que deje ownership ambiguo, archivos parciales, pérdida aparente de
-overlay, secretos en salida o mutación externa no aprobada.
-
-1. Detener nuevas ejecuciones y conservar journal, versión y hashes.
-2. No borrar temporales ni “limpiar” Git hasta capturar evidencia.
-3. Clasificar: seguridad/secreto, integridad de archivos, estado remoto o disponibilidad.
-4. Si hubo secreto, revocarlo por el canal del proveedor y redactar la evidencia.
-5. Elegir `resume` o `rollback` solo después de identificar la transacción.
-6. Verificar `sync --check`, doctor y diff.
-7. Registrar causa raíz, alcance, recuperación y acción preventiva en issue.
-
-Un deploy de producto es `N/A` en Etapa A. Cuando se active un perfil de infraestructura deberá añadir su
-propio runbook de deploy e incidentes sin reemplazar este procedimiento del constructor.
+Detalle de upgrades y reversión:
+[Actualización y rollback](ACTUALIZACION_Y_ROLLBACK.md).

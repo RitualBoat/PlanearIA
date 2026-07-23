@@ -1,6 +1,6 @@
 # Compatibilidad por agente y sistema operativo
 
-> **Estado:** contrato objetivo; cada celda debe probarse en fixtures antes de declarar soporte estable.
+> **Estado:** soporte estable del núcleo en la matriz de `v0.1.1`.
 
 ## 1. Capacidades por harness
 
@@ -30,7 +30,7 @@ Estados permitidos en la matriz machine-readable: `native`, `generated`, `docume
 
 | Superficie | Windows | macOS | Linux | Gate |
 | --- | --- | --- | --- | --- |
-| Node CLI | Objetivo soportado | Objetivo soportado | Objetivo soportado | Node mínimo y tests |
+| Node CLI | Soportado | Soportado | Soportado | Node mínimo y tests |
 | Rutas | `path`/URL, sin asumir `/` | Igual | Igual | Fixtures con espacios y unicode |
 | Escritura | temporal + rename | temporal + rename | temporal + rename | fallo inyectado |
 | Fin de línea | LF canónico | LF canónico | LF canónico | salida byte a byte |
@@ -39,13 +39,15 @@ Estados permitidos en la matriz machine-readable: `native`, `generated`, `docume
 | Symlinks/permisos | No requeridos por el core | No requeridos | No requeridos | fixture sin privilegios |
 | GitHub | `gh` opcional/manual | Igual | Igual | smoke read-only |
 
-## 4. Evidencia actual y pendiente
+## 4. Evidencia actual
 
-- PlanearIA prueba localmente en Windows.
-- `agent:harness:check` actual pasa con 36 mirrors, pero valida el harness de PlanearIA, no el constructor.
-- Linux, macOS y Windows deben ejecutar la misma fixture en CI advisory antes de declararse estables.
-- la CI advisory conserva fallos visibles: no usa `continue-on-error`; la promoción a check requerido pertenece a branch protection y exige señal estable.
-- no se declara paridad solo porque el archivo existe; cada degradación requiere aserción.
+- Upstream `v0.1.1` ejecutó 122 tests y fixture en Ubuntu, Windows y macOS con Node 20.20/22.22.
+- `main` exige `CI / required`; la ausencia de checks no cuenta como éxito.
+- La fixture externa desde npm ejecutó `npm ci` dos veces sin drift, verificó firmas/attestations,
+  inicializó OpenSpec, adaptó OPSX, obtuvo doctor `PASS` con 0 `FAIL` y tercer bootstrap `IN_SYNC`.
+- PlanearIA conserva su propio `agent:harness:check`; valida sus espejos específicos, no reemplaza CI
+  upstream.
+- No se declara paridad solo porque el archivo existe; cada degradación tiene aserción.
 
 ## 5. Política de soporte
 

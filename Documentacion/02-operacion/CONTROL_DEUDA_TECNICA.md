@@ -2,7 +2,8 @@
 
 > **Estado:** vigente.
 > **Uso:** runbook del motor de control de deuda tecnica para flujos SDD.
-> **Fuente de verdad:** `tools/debt-control/` (motor), `.project-os/debt/` (estado), specs
+> **Fuente de verdad:** `create-project-engineering-os@0.1.1` (motor upstream),
+> `.project-os/debt/` (estado consumidor), specs
 > `openspec/specs/debt-control-*`.
 > **No usar para:** convertir warnings en deuda sin verificacion, o "reanudar" planes editando el registro.
 > **Issue de origen:** [#128](https://github.com/RitualBoat/PlanearIA/issues/128).
@@ -18,7 +19,7 @@ afectado, crea o reutiliza un issue de saneamiento y guia al solo dev sobre como
 
 | Pieza | Ruta | Rol |
 | --- | --- | --- |
-| Motor neutral | `tools/debt-control/` | CLI y libreria reutilizable (futuro nucleo de Project Engineering OS via #126) |
+| Motor neutral | `create-project-engineering-os/debt` | CLI y librería pública fijada; evolución en upstream |
 | Politica local | `.project-os/debt/config.json` | Umbrales, planes, ruteo por labels, modo GitHub (`required` en PlanearIA) |
 | Registro canonico | `.project-os/debt/registry.json` | Fuente unica del estado actual; los items nunca se borran |
 | Assessments | `.project-os/debt/assessments/<flujo>.json` | Evidencia historica inmutable por flujo SDD |
@@ -32,7 +33,7 @@ npm run debt:check                 # read-only: presupuesto, triggers y pausas p
 npm run debt:capture -- --flow <change> --input <archivo.json>   # muta: captura el assessment del flujo
 npm run debt:sync                  # muta: sincroniza issues de saneamiento segun github.mode
 npm run debt:handoff -- --plan <id> [--phase <fase>] [--context ok|degraded]  # read-only: prompt de relevo
-npm run test:debt-control          # suite node --test del motor
+npm run test:project-os-contract   # smoke consumidor; la suite completa vive en upstream
 ```
 
 Solo `debt:capture` y `debt:sync` escriben; todo lo demas es read-only. Las salidas humana y JSON
@@ -44,7 +45,8 @@ comparten veredicto (`PASS`/`FAIL`/`WARN`/`SKIP`), causa y recuperacion.
    `defect`, `technical-debt`, `external-risk`, `decision-required`, `optional-improvement`,
    `false-positive` o `duplicate`. Todo candidato exige `verification` con metodo, resultado y fecha:
    un warning de scanner sin reproducir no entra al registro ni autoriza correcciones automaticas.
-2. Escribe el assessment (ver `tools/debt-control/schema/assessment.schema.json`) y capturalo con
+2. Escribe el assessment (ver
+   `node_modules/create-project-engineering-os/schema/debt/assessment.schema.json`) y captúralo con
    `debt:capture`. Un cierre sin hallazgos usa `result: "clean"` y `candidates: []`. Corrige los
    Blockers/Majors del flujo ANTES de capturarlos como confirmados; si capturas uno, el assessment es
    inmutable y el desbloqueo solo llega resolviendolo o refutandolo en el registro via un flujo de

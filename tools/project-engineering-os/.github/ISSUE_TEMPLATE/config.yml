@@ -1,9 +1,0 @@
-blank_issues_enabled: false
-contact_links:
-  - name: Reporte privado de seguridad
-    url: https://github.com/RitualBoat/project-engineering-os/security/advisories/new
-    about: No publiques detalles explotables en un issue.
-  - name: Soporte
-    url: https://github.com/RitualBoat/project-engineering-os/blob/main/SUPPORT.md
-    about: Consulta requisitos y datos para pedir ayuda.
-

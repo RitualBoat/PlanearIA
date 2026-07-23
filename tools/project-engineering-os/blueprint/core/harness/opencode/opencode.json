@@ -1,7 +1,0 @@
-{
-  "instructions": [
-    "AGENTS.md",
-    ".opencode/project-os.md"
-  ],
-  "mcp": {{PROJECT_OS_MCP}}
-}

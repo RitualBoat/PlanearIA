@@ -1,6 +1,6 @@
 # Costos, licencias, secretos y herramientas de análisis
 
-> **Snapshot:** 2026-07-19. Precios, planes y licencias se vuelven a verificar al activar o distribuir.
+> **Snapshot:** 2026-07-23. Precios, planes y licencias se vuelven a verificar al activar servicios.
 
 ## 1. Decisión económica de Ola 0
 
@@ -12,7 +12,7 @@ publicación se activa sin aprobación humana.
 
 | Componente | Uso en Ola 0 | Costo esperado | Licencia/condición | Lock-in | Decisión |
 | --- | --- | --- | --- | --- | --- |
-| Constructor | Tarball local privado | Sin cargo de registry | `private: true`, `UNLICENSED` | Bajo mientras use formatos abiertos | No publicar |
+| Constructor `0.1.1` | npm público + GitHub Release | Sin compra para instalar/publicar con el plan vigente | MIT; notices incluidos | Bajo; formatos abiertos y CLI local | Publicado con provenance |
 | Node | Runtime local | Sin compra por ejecución local | Ver licencia upstream antes de redistribuir binarios | Bajo | No empaquetar Node |
 | OpenSpec `1.6.0` | SDD local fijado | Sin API key | [MIT](https://github.com/Fission-AI/OpenSpec) | Medio por formato/workflows | Adaptador y rollback |
 | Ajv `8.20.0` | Validación de schemas en desarrollo/CI | Sin API key | [MIT](https://www.npmjs.com/package/ajv/v/8.20.0) | Bajo; JSON Schema 2020-12 es formato abierto | `devDependency` exacta; no runtime del proyecto |
@@ -33,8 +33,9 @@ el exceso; los repositorios públicos con runners estándar y los self-hosted ti
 No codificar cifras como garantía: revisar la
 [página de billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions) al activar.
 
-npm documenta que `private: true` impide publicación accidental y que `UNLICENSED` no concede derechos de
-uso: [package.json](https://docs.npmjs.com/files/package.json/).
+El upstream conserva `LICENSE` MIT, `THIRD_PARTY_NOTICES.md`, lockfile y release checksums. npm publica
+mediante Trusted Publisher OIDC ligado al workflow `release.yml` y environment `npm-publish`; no se
+almacena un token de publicación de larga duración.
 
 ## 3. Política de secretos
 
@@ -88,8 +89,8 @@ Graphify no pertenece al runtime activo. Su estado esperado es `SKIP retirado/ma
 
 Requieren decisión humana:
 
-- asignar licencia al constructor;
-- publicar en npm/GitHub Releases;
+- cambiar la licencia MIT;
+- publicar una release npm/GitHub nueva;
 - activar un plan pagado o marketplace;
 - exceder cuota de Actions;
 - habilitar scanner con costo/licencia especial;

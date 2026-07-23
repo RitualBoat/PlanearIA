@@ -1,102 +1,91 @@
 # Actualización y rollback
 
-## 1. Contrato de versión
+## 1. Contrato
 
-El constructor usa SemVer para paquete y schema. El estado instalado registra:
+El paquete y el schema usan SemVer. `state.json` registra versión, schema, owners, hashes y transacciones.
+Un runtime antiguo rechaza schema futuro; una migración desconocida falla antes de escribir.
 
-- `constructorVersion`;
-- `schemaVersion`;
-- SHA-256 del paquete probado;
-- owners y hashes por ruta;
-- transacción aplicada;
-- migraciones completadas.
+El upstream es la única fuente del runtime. Un proyecto consumidor fija una versión exacta en
+`package.json` y `package-lock.json`; nunca usa `@latest`.
 
-Un runtime antiguo debe rechazar un schema futuro. Una migración no reconocida falla antes de escribir.
-
-## 2. Preparar una actualización
-
-1. Verificar release, licencia y SHA-256.
-2. Leer changelog y migraciones.
-3. Confirmar working tree limpio o aislar cambios.
-4. Ejecutar el nuevo CLI en modo `sync --check`.
-5. Revisar rutas, owners, perfiles, migraciones y rollback.
-6. Resolver colisiones antes del apply.
-7. Crear commit/punto de recuperación ordinario; no usar `git reset --hard`.
-
-## 3. Aplicar
+## 2. Comprobar una actualización
 
 ```bash
-npm install --prefix "<RUNNER_TEMP_FUERA_DEL_REPO>" --ignore-scripts --no-audit --no-fund "<NUEVO_TARBALL_LOCAL>"
-node "<RUNNER_TEMP_FUERA_DEL_REPO>/node_modules/project-engineering-os-constructor/bin/project-constructor.mjs" sync --target .
-npm run constructor:sync:check
-npm run constructor:doctor:json
+npx --yes create-project-engineering-os@<VERSION_EXACTA> upgrade --target . --check
 ```
 
-La aplicación debe calcular todas las salidas antes de escribir, crear backups de rutas reemplazadas,
-registrar archivos nuevos, escribir mediante temporal + rename y actualizar `state.json` al final.
+Antes de aplicar:
 
-## 4. Fallo parcial
+1. verificar GitHub Release, npm provenance, checksum, licencia y changelog;
+2. confirmar working tree limpio o aislar cambios;
+3. revisar diff, owners, migraciones, perfiles y rollback;
+4. resolver colisiones;
+5. crear una rama/PR normal; no usar `git reset --hard`.
 
-Si queda journal incompleto:
-
-- no ejecutar otro generador ni editar `state.json`;
-- revisar operaciones completadas y hashes;
-- elegir una sola ruta: reanudar la misma versión o rollback de esa transacción;
-- si hubo edición humana posterior, clasificar el conflicto antes de continuar;
-- adjuntar evidencia al issue si afecta un change versionado.
-
-Reanudar debe converger byte a byte con una ejecución limpia y no duplicar bloques.
-
-## 5. Rollback
+## 3. Aplicar por PR
 
 ```bash
-npm run constructor:rollback -- --transaction "<ID>"
-npm run constructor:sync:check
+npx --yes create-project-engineering-os@<VERSION_EXACTA> upgrade --target . --apply
+npm ci
+npm run project-os:opsx:check
+npm run project-os:sync:check
+npm run project-os:doctor:json
+npm run debt:check
 ```
 
-Rollback:
+También puede usarse `--open-pr`; crea o reutiliza una rama y PR, pero nunca mergea ni empuja a la rama
+protegida. La aplicación calcula el plan antes de escribir, usa temporal + rename y actualiza el state al
+final.
 
-- restaura backups registrados;
-- elimina archivos nuevos solo si conservan el hash escrito;
-- no toca `.git`;
-- no borra archivos no owned;
-- se detiene por ruta si detecta edición posterior;
-- conserva un reporte humano/JSON.
+## 4. Fallo parcial y rollback de transacción
 
-No ejecutar `git reset --hard`, borrado recursivo ni limpieza global como recuperación.
+Si existe journal incompleto, no editar `state.json` ni ejecutar otro generador. Elegir una sola ruta:
+reanudar con la misma versión o revertir la transacción.
 
-## 6. Rollback de OpenSpec
+```bash
+npx --yes create-project-engineering-os@<VERSION_INSTALADA> rollback \
+  --target . --transaction "<ID>"
+npm run project-os:sync:check
+```
 
-OpenSpec es owner de OPSX. Para un upgrade:
+Rollback restaura backups y elimina archivos nuevos solo si conservan el hash escrito. No toca `.git`,
+no borra archivos no owned y se detiene ante edición posterior.
 
-1. cambiar versión exacta mediante change;
-2. actualizar lockfile;
-3. ejecutar CLI oficial para regenerar;
-4. ejecutar checker OPSX separado;
-5. ejecutar harness check;
-6. revertir el commit del upgrade si falla.
+## 5. Rollback de versión consumidora
 
-El renderer general nunca reconstruye OPSX ni ejecuta `/opsx:sync` antes del archive que aplicará las mismas
-deltas.
+La reversión normal fija la última release sana conocida mediante PR:
 
-## 7. Rollback de perfiles
+```bash
+npm install --save-dev --save-exact create-project-engineering-os@<ULTIMA_SANA>
+npm ci
+npm run project-os:sync:check
+npm run project-os:doctor:json
+```
 
-Desactivar un perfil requiere:
+Si aún no existe una release sana anterior —`0.1.1` es la primera consumible— el rollback de PlanearIA es
+revertir por PR el commit de adopción y restaurar temporalmente el snapshot embebido preservado en Git.
+No se usa `0.1.0`: tuvo GitHub Release, pero no publicación npm consumible.
 
-- decisión registrada;
-- lista de archivos/dependencias que el perfil posee;
-- evidencia de que otro perfil no los consume;
-- reversión de validaciones y secretos requeridos;
-- no eliminar datos ni infraestructura sin runbook específico.
+Una versión pública defectuosa:
 
-Los perfiles inactivos de Ola 0 no necesitan rollback porque no instalan dependencias de producto.
+- se depreca con un mensaje de recuperación;
+- recibe un patch nuevo;
+- no se despublica salvo incidente legal/seguridad que lo exija;
+- nunca se reetiqueta ni sobrescribe.
 
-## 8. Validación posterior
+## 6. OpenSpec, perfiles y estado
 
-- segundo `sync --check` sin drift;
-- doctor humano y JSON equivalentes;
-- fixture relevante verde;
-- ninguna pérdida de overlay humano;
+- OpenSpec conserva ownership de OPSX; su CLI regenera y `opsx-check` valida.
+- Desactivar perfiles requiere decisión, dependencias/archivos owner y evidencia de no consumo.
+- `.project-os/debt/` y sus assessments nunca se borran al cambiar runtime.
+- Specs locales describen el contrato de la versión fijada; las specs upstream gobiernan evolución.
+
+## 7. Gate posterior
+
+- segundo sync/check sin drift;
+- doctor humano/JSON coherente y cero `FAIL`;
+- fixture y casos negativos verdes;
+- ninguna pérdida de overlay;
 - OPSX bajo su owner;
-- perfiles esperados;
-- Project/issue actualizado si la actualización fue versionada.
+- package/lock/state con la misma versión;
+- PR/checks/issue actualizados.

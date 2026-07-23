@@ -29,7 +29,8 @@ LÍMITES
 FUENTES
 
 1. Lee AGENTS.md si existe.
-2. Localiza el tarball/paquete del constructor aprobado, su versión, licencia y SHA-256.
+2. Usa `create-project-engineering-os@0.1.1`; verifica npm, licencia MIT, provenance y checksum de la
+   release. No uses una versión flotante.
 3. Lee el runbook y la guía manual distribuidos con ese paquete.
 4. Trata el CLI como única fuente ejecutable. Los prompts y documentos solo lo orquestan.
 5. Los workflows OPSX pertenecen a la CLI local fijada de OpenSpec, no al renderer general.
@@ -43,15 +44,16 @@ aparece una decisión nueva.
 PROCEDIMIENTO
 
 1. Confirma la raíz Git, rama, writability y estado del working tree con acciones read-only.
-2. Verifica localmente la versión y SHA-256 del paquete aprobado.
-3. Crea un runner temporal fuera del repositorio y materializa ahí únicamente el tarball verificado:
+2. Verifica que npm resuelve exactamente `create-project-engineering-os@0.1.1` y registra integridad y
+   provenance sin imprimir credenciales.
+3. Si el repositorio contiene archivos, previsualiza:
 
-   npm install --prefix "<RUNNER_TEMP_FUERA_DEL_REPO>" --ignore-scripts --no-audit --no-fund "<TARBALL_LOCAL_APROBADO>"
+   npx --yes create-project-engineering-os@0.1.1 bootstrap --target . --dry-run
 
-   Confirma que la instalación resolvió el mismo artefacto/hash. Ejecuta después una sola invocación inicial
-   por ruta explícita, sin `npx`, registry ni fallback global:
+   Revisa las colisiones. Después ejecuta:
 
-   node "<RUNNER_TEMP_FUERA_DEL_REPO>/node_modules/project-engineering-os-constructor/bin/project-constructor.mjs" bootstrap --target .
+   npx --yes create-project-engineering-os@0.1.1 bootstrap --target .
+   npm ci
 
 4. Revisa antes de aceptar cualquier escritura:
    - ruta;
@@ -61,15 +63,19 @@ PROCEDIMIENTO
    - colisiones;
    - rollback.
 5. Si hay una colisión no owned, detente sin sobrescribir y presenta recuperación.
-6. Ejecuta `npm ci` para materializar exclusivamente OpenSpec local desde el lockfile fijado. No uses una
+6. `npm ci` materializa exclusivamente OpenSpec local desde el lockfile fijado. No uses una
    instalación global ni una versión flotante.
-7. Verifica que solo estén activos los perfiles documentation y harness-tooling.
-8. Ejecuta:
+7. Genera OPSX solo mediante OpenSpec local y adapta sus bloques delimitados:
 
-   npm run constructor:sync:check
-   npm run constructor:doctor
-   npm run constructor:doctor:json
-   npm run constructor:github-plan
+   npm exec --yes=false -- openspec init --tools codex,claude,cursor,github-copilot,opencode
+   npm run project-os:opsx:adapt
+
+8. Verifica que solo estén activos los perfiles documentation y harness-tooling. Ejecuta:
+
+   npm run project-os:check
+   npm run project-os:doctor
+   npm run project-os:doctor:json
+   npm run project-os:github-plan
 
 9. Interpreta PASS/FAIL/WARN/SKIP por evidencia:
    - configuración MCP no demuestra startup;
@@ -77,7 +83,7 @@ PROCEDIMIENTO
    - tools/list no demuestra autenticación;
    - el doctor nunca ejecuta el smoke autenticado;
    - un check ausente no es éxito.
-10. Ejecuta `npm run constructor:bootstrap` y después `npm run constructor:sync:check`. Deben producir cero
+10. Ejecuta `npm run project-os:bootstrap` y después `npm run project-os:check`. Deben producir cero
     cambios inesperados.
 11. Comprueba que AGENTS.md contiene el núcleo aunque el agente no soporte skills o MCP.
 12. Comprueba paridad/degradación declarada para Codex, Claude Code, Cursor, OpenCode y GitHub Copilot.
@@ -106,8 +112,7 @@ EVIDENCIA FINAL
 
 Entrega:
 
-- versión/SHA-256 del constructor y versiones Node/npm/OpenSpec;
-- ruta temporal del runner y prueba de que se instaló desde el tarball verificado fuera del destino;
+- versión/integridad/provenance/SHA-256 del constructor y versiones Node/npm/OpenSpec;
 - archivos y owners creados;
 - resultado del primer bootstrap;
 - prueba de segundo run sin drift;

@@ -1,8 +1,0 @@
-node_modules/
-.project-constructor/transactions/
-.project-constructor/**/*.tmp
-.project-constructor/evidence/private/
-.env
-.env.*
-!.env.example
-*.log

@@ -22,19 +22,19 @@ categorías, assessments inmutables, presupuesto, excepciones, gates y GitHub co
 sin trigger. Doctor y `--check` son read-only. PlanearIA no elimina sus runtimes embebidos hasta demostrar
 upstream, npm y rollback sanos.
 
-## Las tareas avanzan de un release candidate al cutover reversible
+## Las tareas llegaron a una release pública y un cutover reversible
 
-El corte, allowlist, package, deuda, stores, doctor, upgrade, docs, CI y supply chain ya están implementados
-y el tarball local pasa 119 tests, fixture externa, neutralidad, licencias y dry-run de publicación. El
-siguiente gate crea el repo protegido e importa el export por PR. Tras probar tag, checksum, npm y
-provenance, PlanearIA adopta la versión exacta, ejecuta smokes, ensaya rollback y solo entonces retira las
-copias editables. El cierre captura deuda y exige revisión adversarial.
+El upstream público nació por allowlist y sus tres PR protegidos quedaron fusionados. `v0.1.1` publicó el
+mismo tarball en GitHub y npm mediante Trusted Publishing, checksum común y provenance SLSA. Una fixture
+externa verificó instalación desde registry, OpenSpec/OPSX, doctor, deuda e idempotencia. PlanearIA fijó
+`0.1.1`, reemplazó suites duplicadas por smokes consumidores y retiró las copias editables sin mover su
+estado ni su harness. `0.1.0` queda como prerelease no consumible y la reserva `0.0.0` se depreca
+explícitamente al cerrar el gate manual.
 
 ## Resumen integral del change
 
-`publish-project-engineering-os` convierte tooling interno maduro en un producto open source utilizable por
-solo developers sin propagar PlanearIA. La arquitectura reduce drift mediante una única release, conserva
-evidencia histórica y falla de forma explícita ante CI, OIDC, ownership o migraciones inciertos. La
-publicación remota no ocurre durante propose: depende de gates humanos y evidencia del mismo tarball. Al
-terminar, cualquier persona podrá bootstrapear y actualizar un proyecto con npm/npx, y PlanearIA será un
-consumidor normal con rollback por PR.
+`publish-project-engineering-os` convierte tooling interno maduro en un producto MIT utilizable por solo
+developers sin propagar PlanearIA. Una única release gobierna constructor y deuda; state y assessments
+permanecen en cada consumidor. CI multiplataforma, checksums, provenance, fixtures e idempotencia impiden
+falsos verdes. PlanearIA ya consume la versión exacta y revierte por PR. El cierre restante ejecuta QA
+completa, ensayo de rollback, revisión adversarial, assessment, archive y merge del PR consumidor.

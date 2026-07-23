@@ -24,14 +24,16 @@
 
 **Acción:**
 
-1. Obtener tarball del canal aprobado.
-2. Comparar versión y SHA-256.
-3. Revisar licencia.
-4. Confirmar que el paquete es el artefacto probado.
+1. Abrir npm y GitHub Release del mismo tag.
+2. Confirmar versión exacta `0.1.1`, provenance e integridad.
+3. Comparar el SHA-256 publicado:
+   `9a164870a923605b81c84d505a98e2f1d6eb85e34e40a3aa11e6b88d7cbcec22`.
+4. Revisar MIT y notices.
+5. Confirmar que npm y GitHub contienen el mismo tarball.
 
 **Verificación:** hash coincide con release.
 
-**Evidencia:** versión, SHA-256, origen y decisión de licencia. No adjuntar credenciales del registry.
+**Evidencia:** versión, SHA-256, URLs, provenance y decisión de licencia. No adjuntar credenciales.
 
 ## 3. Aprobar el plan de archivos
 
@@ -93,8 +95,8 @@ revisiones.
 
 **Evidencia:** JSON/captura de reglas sin token y decisión aprobada.
 
-**Nota PlanearIA:** `development` está protegida en el snapshot; `main` devolvió `404 Branch not protected`.
-El constructor parametriza la política y no copia esa situación.
+**Nota:** el upstream usa `main` protegida y tags `v*`; PlanearIA usa `development`. El constructor
+parametriza la política y no copia ninguna de las dos.
 
 ## 8. Autorizar un smoke MCP autenticado
 

@@ -55,7 +55,7 @@ jobs:
         run: npm run agent:opsx:patch:check
       - name: OpenSpec readiness gate tests (incluye gates de deuda)
         run: npm run test:openspec-readiness
-      - name: Debt control engine tests
-        run: npm run test:debt-control
+      - name: Public Project OS consumer contract
+        run: npm run test:project-os-contract
       - name: CLI entrypoints execute as real processes
         run: npm run test:harness:cli

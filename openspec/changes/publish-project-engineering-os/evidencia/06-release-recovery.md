@@ -52,7 +52,10 @@ silenciosos y evitar una futura retirada.
 - Export canónico PlanearIA/upstream: PASS, hash
   `60759e9bca1a2e7072b275b37399bec3387c956db5a39872319acda92daad823`.
 
-## Condición de cierre
+## Cierre de la recuperación
 
-No continuar con la migración consumidora hasta que `v0.1.1` tenga GitHub Release, npm artifact,
-checksum y provenance verificables y el PR #3 haya pasado toda la matriz obligatoria.
+El PR #3 pasó las seis combinaciones de CI y el agregador requerido; se fusionó en
+`cae44279f57d48bb1fa4a42682ae22c11eb82ac1`. `v0.1.1` se creó desde ese merge y el run
+`https://github.com/RitualBoat/project-engineering-os/actions/runs/30037017279` publicó correctamente
+GitHub Release y npm mediante Trusted Publishing. La identidad exacta y la fixture de registry están en
+`07-release-v0.1.1-y-registry.md`.

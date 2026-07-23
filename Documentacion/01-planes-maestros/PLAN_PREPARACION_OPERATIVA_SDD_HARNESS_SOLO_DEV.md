@@ -568,7 +568,7 @@ Crear estos issues cuando Ola 0 este en curso/cierre. Son la siguiente ola, no t
 - **Historia:** Como desarrollador unico asistido por agentes, quiero que todo hallazgo residual de un
   flujo SDD sea clasificado, verificado, registrado y gobernado mediante gates, para impedir que
   advertencias olvidadas acumulen deuda silenciosa y recibir una ruta guiada de saneamiento.
-- **Criterios de aceptacion:** motor neutral en `tools/debt-control/` con registro canonico en
+- **Criterios de aceptacion:** motor neutral hoy distribuido en `create-project-engineering-os`, con registro canonico en
   `.project-os/debt/`; gates de deuda en pre-propose y archive; red de seguridad post-finish; issue de
   saneamiento idempotente por plan (GitHub `required` en PlanearIA); prompts de relevo deterministas;
   baseline verificable de la deuda actual.
@@ -579,8 +579,8 @@ Crear estos issues cuando Ola 0 este en curso/cierre. Son la siguiente ola, no t
   PR #130 mergeado. El baseline agoto el presupuesto de este plan (5/5 unidades): el plan queda PAUSADO
   por el motor de deuda y su saneamiento vive en el issue #129, que debe resolverse antes de retomar
   #126 (publicacion open source).
-- **Notas:** runbook en `Documentacion/02-operacion/CONTROL_DEUDA_TECNICA.md`. El motor es neutral y se
-  extraera al nucleo de Project Engineering OS en #126.
+- **Notas:** runbook en `Documentacion/02-operacion/CONTROL_DEUDA_TECNICA.md`. La extracción se completó
+  en #126; PlanearIA fija la release pública y conserva su estado local.
 
 #### Change: `presupuesto-deuda-por-contacto`
 

@@ -211,8 +211,9 @@ if (KEEP_REMOTE) {
 // Red de seguridad de deuda posterior al merge: recalcula el registro sobre el arbol ya integrado y
 // sincroniza el expediente GitHub segun su modo. Un FAIL aqui no des-mergea (el merge remoto ya
 // ocurrio), pero el cierre no puede reportarse verde con deuda bloqueante sin atender.
-ok('ejecutando la red de seguridad de deuda (debt-control postfinish)');
-const debt = spawnSync(process.execPath, ['tools/debt-control/bin/debt-control.mjs', 'postfinish'], {
+ok('ejecutando la red de seguridad de deuda (project-os debt postfinish)');
+const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+const debt = spawnSync(npmCommand, ['run', 'debt:postfinish', '--silent'], {
   encoding: 'utf8',
   stdio: 'inherit',
 });

@@ -4,7 +4,7 @@
 
 El repositorio SHALL incluir un ADR de cadencia que clasifique cada advisory o riesgo abierto en uno de tres buckets. Para SheetJS, el ADR MUST enlazar el item canónico `debt-770acc1e9d53`, mantener revisión mensual y documentar recuperación, mientras que estado y expiración SHALL provenir únicamente del registro de deuda.
 
-#### Scenario: El ADR clasifica el estado vigente sin duplicarlo
+#### Scenario: El ADR clasifica el estado vigente
 
 - **WHEN** se lee el ADR de cadencia
 - **THEN** enlaza el item y excepción canónicos, declara owner y frecuencia, y no mantiene una expiración alternativa editable
@@ -31,6 +31,11 @@ Tras aplicar el change, el árbol de dependencias SHALL ser reproducible: `npm c
 ### Requirement: Ningun verde falso por riesgo aceptado
 
 El change SHALL producir un assessment `kind: remediation` con `result: debt` para el riesgo residual verificado, y SHALL aplicar una excepción válida en el mismo flujo. Aceptar el riesgo MUST NOT convertir el assessment en `clean` ni borrar evidencia histórica.
+
+#### Scenario: Advisory diferida queda trazada, no silenciada
+
+- **WHEN** una advisory o riesgo queda diferido mediante una excepción válida
+- **THEN** permanece enumerado en el ADR o registro canónico y no se suprime de la evidencia que lo detectó
 
 #### Scenario: Riesgo aceptado queda trazado
 

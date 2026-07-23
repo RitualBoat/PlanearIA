@@ -28,7 +28,7 @@ Tras aplicar el change, el árbol de dependencias SHALL ser reproducible: `npm c
 - **WHEN** se inspeccionan `package.json`, lockfile y el árbol instalado
 - **THEN** `xlsx` resuelve a la copia vendorizada `0.20.3` y no a una URL remota
 
-### Requirement: Ningún verde falso por riesgo aceptado
+### Requirement: Ningun verde falso por riesgo aceptado
 
 El change SHALL producir un assessment `kind: remediation` con `result: debt` para el riesgo residual verificado, y SHALL aplicar una excepción válida en el mismo flujo. Aceptar el riesgo MUST NOT convertir el assessment en `clean` ni borrar evidencia histórica.
 

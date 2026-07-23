@@ -1,0 +1,106 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing protected SemVer tag, for example v0.1.0
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Release / build exact artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout protected tag
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.tag }}
+      - name: Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.22.0
+          cache: npm
+      - name: Install
+        run: npm ci --ignore-scripts
+      - name: Validate tag and source
+        run: |
+          node scripts/validate-release.mjs --tag "${{ inputs.tag }}"
+          npm run check
+          node scripts/check-version-available.mjs
+      - name: Pack once and smoke exact tarball
+        run: node scripts/pack-release.mjs --output release
+      - name: Upload immutable candidate
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-candidate
+          path: release/
+          if-no-files-found: error
+          retention-days: 7
+
+  github-release:
+    name: Release / GitHub
+    needs: [build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout metadata
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.tag }}
+      - name: Download exact candidate
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-candidate
+          path: release
+      - name: Verify checksum
+        run: node scripts/verify-release.mjs release
+      - name: Create immutable GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ inputs.tag }}" release/* --verify-tag --generate-notes
+
+  npm:
+    name: Release / npm trusted publishing
+    needs: [build, github-release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: npm-publish
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout identity
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.tag }}
+      - name: Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.22.0
+          registry-url: https://registry.npmjs.org
+      - name: Use provenance-capable npm
+        run: npm install --global npm@11.5.1
+      - name: Download exact candidate
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-candidate
+          path: release
+      - name: Verify OIDC identity and checksum
+        run: |
+          node scripts/validate-release.mjs --tag "${{ inputs.tag }}" --remote
+          node scripts/verify-release.mjs release
+      - name: Publish exact tarball without token fallback
+        run: npm publish release/*.tgz --access public --provenance
+      - name: Verify registry provenance
+        run: node scripts/verify-provenance.mjs
+

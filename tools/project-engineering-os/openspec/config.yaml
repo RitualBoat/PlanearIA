@@ -1,0 +1,14 @@
+schema: spec-driven
+context: |
+  Project Engineering OS is a public MIT package for universal repository governance.
+  Runtime, blueprint, schemas, debt control and release automation are owned upstream.
+rules:
+  proposal:
+    - Define why, scope, non-goals, risk and rollback.
+  design:
+    - Record compatibility, ownership, cost, license and recovery.
+  specs:
+    - Use SHALL and observable WHEN/THEN scenarios.
+  tasks:
+    - Mark complete only with evidence.
+

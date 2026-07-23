@@ -24,11 +24,11 @@ upstream, npm y rollback sanos.
 
 ## Las tareas avanzan de un release candidate al cutover reversible
 
-Primero se fija el corte y la allowlist; después se unifican package, debt commands, stores, doctor y
-upgrade. Luego se construyen docs, CI y supply chain. Un gate verifica nombres, licencias, autenticación y
-release candidate antes de crear el repo o publicar. Tras probar tag, tarball, checksum y provenance,
-PlanearIA adopta la versión exacta, ejecuta smokes, ensaya rollback y solo entonces retira las copias
-editables. El cierre captura deuda y exige revisión adversarial.
+El corte, allowlist, package, deuda, stores, doctor, upgrade, docs, CI y supply chain ya están implementados
+y el tarball local pasa 119 tests, fixture externa, neutralidad, licencias y dry-run de publicación. El
+siguiente gate crea el repo protegido e importa el export por PR. Tras probar tag, checksum, npm y
+provenance, PlanearIA adopta la versión exacta, ejecuta smokes, ensaya rollback y solo entonces retira las
+copias editables. El cierre captura deuda y exige revisión adversarial.
 
 ## Resumen integral del change
 

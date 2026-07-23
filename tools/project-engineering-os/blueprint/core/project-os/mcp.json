@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "1.0.0",
+  "servers": [],
+  "optionalCatalog": [
+    {
+      "id": "github",
+      "enabled": false,
+      "purpose": "Read repository, issue, pull request, and Project state.",
+      "secretEnvRefs": [
+        "GITHUB_TOKEN"
+      ],
+      "activationGate": "Approve scopes and complete authenticated smoke manually."
+    },
+    {
+      "id": "documentation",
+      "enabled": false,
+      "purpose": "Read current official library and tool documentation.",
+      "secretEnvRefs": [],
+      "activationGate": "Record the selected provider and license."
+    },
+    {
+      "id": "structural-code-intelligence",
+      "enabled": false,
+      "purpose": "Map architecture, call paths, dependencies, and impact.",
+      "secretEnvRefs": [],
+      "activationGate": "Confirm the index is fresh and the tool is appropriate for the selected stack."
+    },
+    {
+      "id": "line-source-intelligence",
+      "enabled": false,
+      "purpose": "Provide line-level source when structural intelligence is unavailable or incomplete.",
+      "secretEnvRefs": [],
+      "activationGate": "Use only as fallback or for exact editable source."
+    }
+  ],
+  "policy": {
+    "secrets": "environment-references-only",
+    "overlaysMayReplaceUniversalIds": false,
+    "configurationIsNotStartupEvidence": true,
+    "startupIsNotToolListingEvidence": true,
+    "toolListingIsNotAuthenticatedSmokeEvidence": true,
+    "doctorMayStartServers": false
+  },
+  "evidenceReceipts": {
+    "startup": ".project-constructor/evidence/mcp-startup.json",
+    "toolListing": ".project-constructor/evidence/mcp-tools.json",
+    "authenticatedSmoke": ".project-constructor/evidence/mcp-smoke.json"
+  }
+}

@@ -1,0 +1,57 @@
+name: Discovery
+description: Capture a product question and evidence without selecting technology first.
+title: "[Discovery] "
+labels:
+  - "type:discovery"
+body:
+  - type: textarea
+    id: story
+    attributes:
+      label: Historia
+      description: Describe the user or owner, need, and intended outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto y evidencia actual
+      description: Separate verified facts, hypotheses, constraints, and open questions.
+    validations:
+      required: true
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Criterios observables
+      description: List outcomes that another person can verify.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencias y gates
+      description: Include issue IDs and human approvals, or state none.
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidencia esperada
+      description: Name automatic and manual evidence.
+    validations:
+      required: true
+  - type: dropdown
+    id: state
+    attributes:
+      label: Estado inicial
+      options:
+        - Inbox
+        - Ready
+        - Blocked
+    validations:
+      required: true

@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-os.local/schema/transaction.schema.json",
+  "title": "Project constructor transaction journal v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "blueprintHash",
+    "command",
+    "configurationHash",
+    "id",
+    "journalFormatVersion",
+    "lastError",
+    "operations",
+    "state",
+    "status"
+  ],
+  "properties": {
+    "blueprintHash": {
+      "$ref": "#/$defs/hash"
+    },
+    "command": {
+      "enum": [
+        "bootstrap",
+        "sync"
+      ]
+    },
+    "configurationHash": {
+      "$ref": "#/$defs/hash"
+    },
+    "id": {
+      "$ref": "#/$defs/transactionId"
+    },
+    "journalFormatVersion": {
+      "const": 1
+    },
+    "lastError": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code",
+            "message"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "minLength": 1
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/operation"
+      }
+    },
+    "state": {
+      "$ref": "#/$defs/stateOperation"
+    },
+    "status": {
+      "enum": [
+        "applying",
+        "completed",
+        "failed",
+        "rolling-back",
+        "rolled-back"
+      ]
+    }
+  },
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "nullableHash": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/hash"
+        }
+      ]
+    },
+    "nullablePath": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+        }
+      ]
+    },
+    "transactionId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$"
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "afterHash",
+        "backup",
+        "beforeHash",
+        "operation",
+        "owner",
+        "source",
+        "status",
+        "target"
+      ],
+      "properties": {
+        "afterHash": {
+          "$ref": "#/$defs/nullableHash"
+        },
+        "backup": {
+          "$ref": "#/$defs/nullablePath"
+        },
+        "beforeHash": {
+          "$ref": "#/$defs/nullableHash"
+        },
+        "operation": {
+          "enum": [
+            "create",
+            "delete",
+            "update"
+          ]
+        },
+        "owner": {
+          "enum": [
+            "constructor",
+            "human-overlay",
+            "project"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/nullablePath"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "applied",
+            "rolled-back"
+          ]
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+        }
+      }
+    },
+    "stateOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "afterHash",
+        "backup",
+        "beforeHash",
+        "status"
+      ],
+      "properties": {
+        "afterHash": {
+          "$ref": "#/$defs/nullableHash"
+        },
+        "backup": {
+          "$ref": "#/$defs/nullablePath"
+        },
+        "beforeHash": {
+          "$ref": "#/$defs/nullableHash"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "not-required",
+            "applied",
+            "rolled-back"
+          ]
+        }
+      }
+    }
+  }
+}

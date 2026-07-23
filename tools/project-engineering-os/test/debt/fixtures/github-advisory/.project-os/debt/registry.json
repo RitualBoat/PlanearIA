@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "debt-aaaaaaaaaa02",
+      "title": "Hallazgo debt-aaaaaaaaaa02",
+      "description": "Hallazgo debt-aaaaaaaaaa02",
+      "category": "technical-debt",
+      "severity": "major",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "plan-a",
+      "artifact": "src/example-aa02.mjs",
+      "consequence": "Coste futuro verificable.",
+      "remediation": "Correccion acotada pendiente.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "npm test (salida adjunta)",
+          "date": "2026-07-01"
+        }
+      ],
+      "occurrences": [
+        {
+          "flow": "flow-1",
+          "date": "2026-07-01"
+        }
+      ],
+      "issue": null,
+      "status": "open",
+      "exception": null,
+      "createdAt": "2026-07-01",
+      "updatedAt": "2026-07-01",
+      "resolution": null
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  matrix:
+    name: CI / ${{ matrix.os }} / Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: [20.20.0, 22.22.0]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - name: Install
+        run: npm ci --ignore-scripts
+      - name: Validate
+        run: npm run check
+      - name: Tarball fixture
+        run: npm run fixture -- --skip-install
+
+  required:
+    name: CI / required
+    if: ${{ always() }}
+    needs: [matrix]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Reject absent, failed, cancelled or skipped matrix
+        env:
+          MATRIX_RESULT: ${{ needs.matrix.result }}
+        run: |
+          test "$MATRIX_RESULT" = "success" || {
+            echo "Required matrix result is $MATRIX_RESULT"
+            exit 1
+          }
+

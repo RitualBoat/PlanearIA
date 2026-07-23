@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-os.local/schema/state.schema.json",
+  "title": "Installed Project Engineering OS state v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "stateFormatVersion",
+    "schemaVersion",
+    "packageName",
+    "packageVersion",
+    "blueprintHash",
+    "configurationHash",
+    "packageHash",
+    "packageHashAlgorithm",
+    "activeProfiles",
+    "files",
+    "lastTransaction"
+  ],
+  "properties": {
+    "stateFormatVersion": {
+      "const": 2
+    },
+    "schemaVersion": {
+      "$ref": "#/$defs/semver"
+    },
+    "packageName": {
+      "const": "create-project-engineering-os"
+    },
+    "packageVersion": {
+      "$ref": "#/$defs/semver"
+    },
+    "blueprintHash": {
+      "$ref": "#/$defs/hash"
+    },
+    "configurationHash": {
+      "$ref": "#/$defs/hash"
+    },
+    "packageHash": {
+      "$ref": "#/$defs/hash"
+    },
+    "packageHashAlgorithm": {
+      "const": "sha256-tree-v1"
+    },
+    "activeProfiles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      }
+    },
+    "files": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/relativePath"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/fileRecord"
+      }
+    },
+    "lastTransaction": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/transactionId"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "semver": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "nullableHash": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/hash"
+        }
+      ]
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    },
+    "transactionId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$"
+    },
+    "fileRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hash",
+        "id",
+        "owner",
+        "source",
+        "sourceHash"
+      ],
+      "properties": {
+        "hash": {
+          "$ref": "#/$defs/nullableHash"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "enum": [
+            "constructor",
+            "human-overlay",
+            "external-openspec",
+            "project"
+          ]
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "sourceHash": {
+          "$ref": "#/$defs/nullableHash"
+        },
+        "managedHash": {
+          "$ref": "#/$defs/hash"
+        },
+        "orphaned": {
+          "type": "boolean"
+        },
+        "present": {
+          "type": "boolean"
+        },
+        "seeded": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

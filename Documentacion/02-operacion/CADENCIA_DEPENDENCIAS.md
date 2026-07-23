@@ -56,6 +56,16 @@ Aplicado en #133 (todas high, dev/build/CLI, no se empaquetan al runtime):
 | brace-expansion (1.x) | `<1.1.16` | `brace-expansion@1` -> 1.1.16 | eslint / minimatch@3 |
 | brace-expansion (5.x) | `>=3.0.0 <5.0.7` | `brace-expansion@5` -> 5.0.7 | typescript-eslint / minimatch@10 |
 | fast-uri | `<=3.1.3` | 3.1.4 | expo-dev-client / ajv |
+| postcss | `<=8.5.11` | 8.5.22 | @expo/metro-config; override deliberado sobre `~8.4.32` |
+
+`postcss` se añadió durante #126 el 2026-07-23 cuando `npm audit` incorporó
+[GHSA-6g55-p6wh-862q](https://github.com/advisories/GHSA-6g55-p6wh-862q) (lectura arbitraria de
+archivos, high). La versión parcheada mínima es 8.5.12; 8.5.10 también había corregido
+[GHSA-qx2v-qp2m-jg93](https://github.com/advisories/GHSA-qx2v-qp2m-jg93);
+se fijó 8.5.22, último parche disponible del mismo major, con licencia MIT y los mismos engines
+compatibles. Aunque `@expo/metro-config@54.0.17` declara `~8.4.32`, el override no cambia Expo SDK y
+queda condicionado a typecheck, lint, Jest, backend, build web y `expo install --check`. Rollback:
+retirar solo este override mediante PR y reabrir el riesgo; nunca declarar el scanner verde.
 
 Pendientes de revision mensual (compatible-fix, dev/build; no aplicados en #133 para no desestabilizar
 el tooling pineado a SDK 54, que valida `expo install --check`): `@babel/core` (low), `@expo/mcp-tunnel`,
@@ -91,10 +101,10 @@ Riesgos sin un parche de version que los cierre, aceptados con rationale y monit
 Advisories cuyo unico fix es un semver major del arbol Expo. Se difieren al change de upgrade de SDK
 (fuera de alcance de #133). Enumeradas, no silenciadas.
 
-Estado 2026-07-22 (14 moderate, todas gated por `expo@57` / `expo-dev-client@57` /
+Estado 2026-07-23 (13 moderate, todas gated por `expo@57` / `expo-dev-client@57` /
 `expo-notifications@57` / `jest-expo@57`): `@expo/cli`, `@expo/config`, `@expo/config-plugins`,
 `@expo/metro-config`, `expo`, `expo-asset`, `expo-constants`, `expo-dev-client`, `expo-manifests`,
-`expo-notifications`, `jest-expo`, `postcss`, `uuid`, `xcode`. Todas son tooling dev/build/CLI o
+`expo-notifications`, `jest-expo`, `uuid`, `xcode`. Todas son tooling dev/build/CLI o
 runtime que solo se mueve con el bump de SDK; no se corrigen con overrides sin romper SDK 54.
 
 ## Dependencia xlsx (fuera del registro npm)
@@ -110,6 +120,8 @@ revision mensual: comprobar nuevas versiones en cdn.sheetjs.com y advisories apl
 - Antes (2026-07-22): `npm audit` 28 advisories = 7 high, 20 moderate, 1 low.
 - Despues: 21 advisories = 0 high, 20 moderate, 1 low. Se eliminaron `xlsx` (upgrade CDN) y las 6 high
   transitivas (overrides). Las moderate/low restantes quedan en buckets 1 y 3.
+- Revisión 2026-07-23 durante #126: una advisory nueva de `postcss` elevó temporalmente el reporte a
+  21 = 1 high, 19 moderate, 1 low. El override 8.5.22 lo dejó en 20 = 0 high, 19 moderate, 1 low.
 - `npx expo install --check`: "Dependencies are up to date" antes y despues (Expo SDK 54 intacto).
 - Lockfile reproducible: `npm ci` no produce drift en un segundo run.
 

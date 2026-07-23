@@ -5,7 +5,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { preArchiveGate, preProposeGate } from "../tools/debt-control/src/index.mjs";
+import { preArchiveGate, preProposeGate } from "create-project-engineering-os/debt";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 // SKIP existe para verificaciones opcionales declaradas como omitidas (p.ej. motor de deuda sin

@@ -13,8 +13,8 @@ const CONTEXT_INDEX = path.join(DOCS_ROOT, "05-context-engineering", "README.md"
 const PROMPT_00 = path.join(CONSTRUCTOR_DOCS, "PROMPT_00_BOOTSTRAP_ENTORNO.md");
 const PROMPT_01 = path.join(
   ROOT,
-  "tools",
-  "project-constructor",
+  "node_modules",
+  "create-project-engineering-os",
   "blueprint",
   "core",
   "docs",
@@ -281,36 +281,21 @@ function validatePrompt00() {
     }
   });
 
-  const cliLines = lines
-    .map((line, index) => ({ line, lineNumber: index + 1 }))
-    .filter(({ line }) => /\bproject-constructor\b/.test(line));
-  const allowedInitial = cliLines.filter(({ line }) =>
-    /^\s*node\s+"<RUNNER_TEMP_FUERA_DEL_REPO>\/node_modules\/project-engineering-os-constructor\/bin\/project-constructor\.mjs"\s+bootstrap\s+--target\s+\.$/.test(
-      line,
-    ),
-  );
-
-  if (allowedInitial.length !== 1) {
-    fail(
-      `${relative(PROMPT_00)} debe contener exactamente una invocación inicial por ruta explícita; encontró ${allowedInitial.length}`,
-    );
+  const exactBootstrap =
+    /^\s*npx --yes create-project-engineering-os@0\.1\.4 bootstrap --target \.$/m;
+  const exactDryRun =
+    /^\s*npx --yes create-project-engineering-os@0\.1\.4 bootstrap --target \. --dry-run$/m;
+  if (!exactBootstrap.test(content) || !exactDryRun.test(content)) {
+    fail(`${relative(PROMPT_00)} no fija bootstrap y dry-run públicos en 0.1.4`);
   }
-  for (const entry of cliLines) {
-    if (!allowedInitial.includes(entry)) {
-      fail(
-        `${relative(PROMPT_00)}:${entry.lineNumber} contiene project-constructor fuera de la invocación inicial`,
-      );
-    }
-  }
-  if (!/npm install --prefix "<RUNNER_TEMP_FUERA_DEL_REPO>" --ignore-scripts --no-audit --no-fund/.test(content)) {
-    fail(`${relative(PROMPT_00)} no materializa el tarball en un runner temporal sin scripts`);
+  if (!/^\s*npm ci\s*$/m.test(content)) {
+    fail(`${relative(PROMPT_00)} no instala el lockfile con npm ci`);
   }
   if (
-    lines.some((line) =>
-      /^\s*(?:npx\b|npm exec\s+--yes=true\b|npm exec\b.*--package\b)/i.test(line),
-    )
+    /create-project-engineering-os@(?!0\.1\.4\b)(?:latest|next|beta|[^\s`]+)/i.test(content)
+    || /^\s*npx\s+(?!--yes create-project-engineering-os@0\.1\.4\b)/im.test(content)
   ) {
-    fail(`${relative(PROMPT_00)} conserva una ruta con descarga implícita o fallback de paquete`);
+    fail(`${relative(PROMPT_00)} conserva una versión flotante o un npx fuera del contrato aprobado`);
   }
 }
 
@@ -357,9 +342,8 @@ function validatePrompt01Handoff() {
     fail(`${relative(DOCUMENTATION_INDEX)} no declara PROMPT_01_DISCOVERY_PROYECTO explícitamente diferido`);
   }
   if (
-    !/PROMPT_01_DISCOVERY_PROYECTO[^\r\n]{0,180}(?:inerte|Ola 1)/i.test(
-      constructorIndex,
-    )
+    !/PROMPT_01_DISCOVERY_PROYECTO/i.test(constructorIndex)
+    || !/(?:handoff\s+inerte|ejecución pertenece a discovery)/i.test(constructorIndex)
   ) {
     fail(`${relative(path.join(CONSTRUCTOR_DOCS, "README.md"))} no separa el handoff inerte de su ejecución en Ola 1`);
   }
@@ -369,10 +353,10 @@ function validatePrompt01Handoff() {
   if (!/^\| 1\. Discovery \| Ejecución de `PROMPT_01_DISCOVERY_PROYECTO`/m.test(plan)) {
     fail(`${relative(PLAN)} no ubica la ejecución de PROMPT_01_DISCOVERY_PROYECTO en Ola 1`);
   }
-  if (!/independiente de Prompt 00/i.test(prompt01) || !/Etapa A/i.test(prompt01)) {
+  if (!/(?:tarea|chat)\s+independiente/i.test(prompt01) || !/Etapa A/i.test(prompt01)) {
     fail(`${relative(PROMPT_01)} no declara independencia y gate de Etapa A`);
   }
-  if (!/(?:detente|no continúes|no continuar)/i.test(prompt01)) {
+  if (!/(?:detente|no continúes|no continuar|no entrevistes)/i.test(prompt01)) {
     fail(`${relative(PROMPT_01)} no falla de forma cerrada ante un gate de Etapa A incompleto`);
   }
 }

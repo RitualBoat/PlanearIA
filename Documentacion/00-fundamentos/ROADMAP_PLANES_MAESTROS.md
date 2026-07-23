@@ -16,7 +16,7 @@ Este archivo define orden recomendado, estado y criterios de activacion. No reem
 | Plan | Archivo | Estado |
 | --- | --- | --- |
 | Meta Guia de Planes | `01-planes-maestros/meta_guia_planes.md` | Vigente como instructivo obligatorio (v3, SDD con OpenSpec). |
-| Constructor Reutilizable de Proyectos Nuevos | `01-planes-maestros/PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md` | ACTIVO (2026-07). Ola 0 limitada al nucleo universal sin producto; discovery y perfiles tecnicos permanecen lazy. |
+| Constructor Reutilizable de Proyectos Nuevos | `01-planes-maestros/PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md` | ACTIVO como blueprint (2026-07). Ola 0 y distribución pública `0.1.4` completadas; discovery y perfiles técnicos permanecen lazy por proyecto. |
 | Preparacion Operativa SDD y Harness Solo-Dev | `01-planes-maestros/PLAN_PREPARACION_OPERATIVA_SDD_HARNESS_SOLO_DEV.md` | ACTIVO (2026-07). Prerrequisito transversal just-in-time para UX/UI; corrige toolchain, gobernanza, feedback loops y gates manuales. |
 | UX/UI y Navegacion Global | `01-planes-maestros/PLAN_UXUI_NAVEGACION_GLOBAL.md` | ACTIVO (2026-07). Blueprint + backlog de changes por olas; primer plan en formato SDD. |
 | Auth, Seguridad y Sesion Real | `01-planes-maestros/PLAN_AUTH_SEGURIDAD_SESION_REAL.md` | Activo/en cierre. Automatizable casi completo; faltan email real o decision de diferir, datos sociales, validacion manual y GitHub Product OS. |
@@ -28,11 +28,12 @@ Este archivo define orden recomendado, estado y criterios de activacion. No reem
 
 ## Siguiente Plan Recomendado
 
-### Meta. Constructor Reutilizable de Proyectos Nuevos (OLA 0 ACTIVA)
+### Meta. Constructor Reutilizable de Proyectos Nuevos (OLA 0 CERRADA)
 
 Ejecutar `PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md` como trabajo meta separado del producto PlanearIA. La
 Ola 0 instala y prueba solo gobernanza, SDD, harness, doctor, CI, documentación y el paquete neutral
-de issues de discovery. No instala frameworks, bases de datos, cloud ni dependencias de producto.
+de issues de discovery. Está publicada como `create-project-engineering-os@0.1.4`, sin frameworks,
+bases de datos, cloud ni dependencias de producto.
 Las olas de discovery, perfil técnico e inicio de producto se activan únicamente en un repositorio
 nuevo y después de sus gates manuales.
 

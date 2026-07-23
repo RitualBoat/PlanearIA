@@ -1,0 +1,608 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-23",
+  "sourceCommit": "267e9accaa1d6787b79083678b1b8a5aea6c276a",
+  "sources": [
+    {
+      "owner": "constructor-runtime",
+      "root": "tools/project-constructor",
+      "files": [
+        {
+          "path": "tools/project-constructor/bin/project-constructor.mjs",
+          "sha256": "594857b35180a232f81ccb942aab20f8da07883bd9142ec3761a1e4413b63c45"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/AGENTS.md",
+          "sha256": "09a3ac69d5e019d698116d7f48e3310b5bbbe2a0d9d7afb386f2a6f04286e205"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/CLAUDE.md",
+          "sha256": "ca4145f3279e022f768cf21acb5eaf64b7c7b3b298d119472d6d0829afdb18f0"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/COMPATIBILITY_MATRIX.md",
+          "sha256": "e4ab8bc286440dec8a720326feccc25e433b69c4f127da220056691925a9f28b"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/CONTEXT_ENGINEERING.md",
+          "sha256": "5456844ad4fc1cbcf0962bdcf87f76264c0aa7df13c2936146a4ac732db8b42e"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/EVIDENCE_PROFILES.md",
+          "sha256": "1f7e3a12762e61c6b8b18b13325a7be931bd882becab3873dd5f5444d341dd6c"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/GUIA_MANUAL_USUARIO.md",
+          "sha256": "89d2158a1d09c2c88aadb85e3516737750070afc9dee948f819ac6475707585e"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/PROMPT_00_BOOTSTRAP_ENTORNO.md",
+          "sha256": "57ebc0165c681080a90522bc27df62d0eaf327962a9b595a0d79cf7c1e422d70"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/PROMPT_01_DISCOVERY_PROYECTO.md",
+          "sha256": "ca7aa55ad9ca5c7b214a3602d798b7635e7c2fdfff23077745ae7ef4a1bc8c08"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/READINESS_GATES.md",
+          "sha256": "e0eaa4b8e9ecafc9d5bd85575919d16dbe90bb92bf4217368b561bb34f479874"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/README.md",
+          "sha256": "67a278f89dd946aae342fd90e5e29d57389f75cb2fc47fc3ea765145f6646d90"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/ROLLBACK.md",
+          "sha256": "1cf0ab771ad93c5f88a7608728dbc6d4b640eff1288522672a75f84bb62e5101"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/RUNBOOK_BOOTSTRAP.md",
+          "sha256": "91a5828a96b56346f014391f3575a11a9803e8f515de986890d46d035cd4a9cc"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/SDD_WORKFLOW.md",
+          "sha256": "bbda7583680801a20d954d2149c9d1b0dc2f49837fd4c385fa198814a3e3a166"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/SOURCES_OF_TRUTH.md",
+          "sha256": "9db81d23396f720083000124eb417e9be94081836721048a85526674f1f452e2"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/templates/pre-propose-readiness.example.json",
+          "sha256": "5ece5f952d2496a4ae943e28b582c750686c3257f5df996c3881e9914afb1a7f"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/templates/readiness.example.json",
+          "sha256": "4fbf72678998164f4a8f8d640d090d263c3a23b1ac632d93b383ed76ba0a7bf8"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/docs/engineering/TOOLS_POLICY.md",
+          "sha256": "02c249491c436082a55cce091e7f063ccc76f0c167efd2888cf617cf74ee0f6a"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/github/ISSUE_TEMPLATE/change.yml",
+          "sha256": "9443533ef4a6bb1f5b99d8c65470b42ec8e5a64e30b9b0af33986956af65f93f"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/github/ISSUE_TEMPLATE/config.yml",
+          "sha256": "eee911e733af65cfd3ab8edab19c41c112381cd7f690d227c4622aae9c03fb77"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/github/ISSUE_TEMPLATE/discovery.yml",
+          "sha256": "b5cde84c1368d48e597557a5726de2000d0f67742477a4a6ebee97649d4b5a22"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/github/ISSUE_TEMPLATE/epic.yml",
+          "sha256": "dc08bc25a831b9c3a9061bfbd8d8d2f33f6a1deb0d6b3dc0eca2458b72a74a62"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/github/PULL_REQUEST_TEMPLATE.md",
+          "sha256": "90b83faa879ce8733b7687e975d1a1f25808010fb24a50afb3d4faf20bc322bb"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/github/workflows/project-constructor.yml",
+          "sha256": "d77efef50a1762f21ebad81f68a33877355f8a835e3a7901f5660edca781e832"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/gitignore",
+          "sha256": "ea143bae57e73aecd03cf58119d174b76572834a2f216016127bb9df5db9f89a"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/harness/claude/project-os.md",
+          "sha256": "f42b39affe898d393c33530e9d4e3bda051bafc37d149b73154db20f926e4d94"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/harness/claude/settings.json",
+          "sha256": "e3566b3a06430868d71e9287dfd6c6c520a3da027aabea01951d407ee131dc2f"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/harness/codex/config.toml",
+          "sha256": "ebb421d3f6022cac1f2e4b0a1f0f4be360812db84418394fe3fd79cab680c617"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/harness/common/harness-capabilities.json",
+          "sha256": "42552757ed9c5f51ed4d608d518256ee6dfdd3746047ef76d9ade1ede99401cd"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/harness/common/mcp.json",
+          "sha256": "b2aeb64c0dce5a1c5ce505b08b642a2cc23946ba878307dfdba66a03942ba4be"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/harness/common/project-os-skill.md",
+          "sha256": "879d5d7ed35b0c52b30a420e81628c4b916bfb972b23c62f4503d231d2a84f49"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/harness/copilot/copilot-instructions.md",
+          "sha256": "7d9fd1f89f023e07de0249036b82944920ae9844ab682649d860a67b8eb83e89"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/harness/copilot/project-os.instructions.md",
+          "sha256": "58f2bdc2260ffd2e764b1715f52d10c251970e797de3d82ea3e88091a715d107"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/harness/cursor/mcp.json",
+          "sha256": "b2aeb64c0dce5a1c5ce505b08b642a2cc23946ba878307dfdba66a03942ba4be"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/harness/cursor/project-os.mdc",
+          "sha256": "b1078bd6318b3d448b728974f579b2701a42d4bafbf8e7fa9097f080c9483667"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/harness/opencode/opencode.json",
+          "sha256": "30fbccdd7c5a3a88f6c0d8d405cbd81d38708ca585f6811a7fb55d6a68d23e41"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/harness/opencode/project-os.md",
+          "sha256": "38e53f2fd28db66f2b215f8b30837425804f33d988e546788657f0bf08b5b00f"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/OPENCODE.md",
+          "sha256": "68f72ddc48457725a4d22af537ce9804b18180dba1fc064b361bcade286dbe21"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/openspec/config.yaml",
+          "sha256": "9add00acdb4d4ae49a06faa93c88ab39e4a91a5f13108ef1fd970cace6c405ac"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/openspec/ownership.json",
+          "sha256": "e61a4916785df613c82680118592912eac6410c87bb2db60884253d5478a15de"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/openspec/OWNERSHIP.md",
+          "sha256": "f9570d8ec08d9e99dcd49ecd4481b738999531fc53cd4e4624d91e7c28000092"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/package-lock.json",
+          "sha256": "283fffc5a0184d5164001200043973450814e8454bfc3ce7762177344a3fb3a8"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/package.json",
+          "sha256": "3a8cfb1a5dc0bd8a65bac756f5fcdc992e048a973523ca6802f4cd5d7c2426ab"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/project-constructor/config.json",
+          "sha256": "373cdf879773338fc3f746016fa3dc20b33ac5fa8db0215b92df20786d5bc802"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/project-os/debt-policy.json",
+          "sha256": "75500d50689833eba291e34cce229a3b4831d4b82c6a2bccaa1580a6f987b421"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/project-os/github/discovery-issues.json",
+          "sha256": "24d0287f703d8751ed23fd89226d6df3d5c487775f628d25d53f17fdc4516181"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/project-os/github/product-os.json",
+          "sha256": "73febb828e81f5244fba9f3f8adbf31f97ce5b91ebb2cb6989b152f831be94fd"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/project-os/harness-capabilities.json",
+          "sha256": "68c95819deee14d3fb099cce68798560a3c8488851cb3fe2cd2bdcd9ad073ccb"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/project-os/instructions.md",
+          "sha256": "27bcb5070e56b38e77518496df2d01daabd0934b2baffe9a1388bd1da59e42c2"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/project-os/mcp.json",
+          "sha256": "6afca9c26a48fcbdb6596a71172ea03db2f16e3e6ba27214d6ddeb26aea2fd84"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/project-os/openspec-lock.json",
+          "sha256": "00edb6c136842a3dafc12816432c4b48b083d7f6ab087537c34320545becef10"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/project-os/path-rules.json",
+          "sha256": "bb8941101b5e9c4419ec3e9fe0967e0f498d0ac889c2950317277bac21c5cd01"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/project-os/permissions.json",
+          "sha256": "08c5b98f584c4e7a5f635c4dd3642dccf44f377efa32f13c26089029fd68711a"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/project-os/profiles.json",
+          "sha256": "c7229844ce0a67f7396b8d0b0d7407431a4f9ddf1b33d75a9505cc5704f4fc06"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/project-os/readiness-policy.json",
+          "sha256": "c034ecd0800e2360d68eb97c3b13e0a1d3c87e9fa8bb4de2357ca59dbbf9f442"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/project-os/skills.json",
+          "sha256": "8afc0d50af950bd56940507ce1657178969589bec7761d5656ad19e0d32f94d3"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/core/README.md",
+          "sha256": "664f7b7e48e2428f953cea2e26d3c3c7f9aca0fd0471365876248e32dffaa5a8"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/manifest.json",
+          "sha256": "205acb604ba83cebaed06642c7d778c3292ede2a1ba24e903a6b25a760874738"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/schema/config.schema.json",
+          "sha256": "6645bce99bca0cd2ce24f6c0ae64f4392dacb9edc410727dcae1dd665fce82ba"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/schema/doctor-result.schema.json",
+          "sha256": "d0551c3d65caa0fe2bc4a93c9b6a5593e71aebffa26ab7842b95ae6177d8af3a"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/schema/harness-capabilities.schema.json",
+          "sha256": "6335a36e104bd3b7c6c4b603b9fed21cc24d05952fbe482d9b69f20e71d7c495"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/schema/manifest.schema.json",
+          "sha256": "d125072a6b7f9099edf26581c132a44285e3d786805866b7ea634f9deb4bb3ad"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/schema/pre-propose-readiness.schema.json",
+          "sha256": "412dc77cb036f625c9e35848edc03614f2958c6c97eca27d8d60997e81af4039"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/schema/profiles.schema.json",
+          "sha256": "15d3f6054a3f5c5b8379ae4a03b6a3870bfdb4043a15361eb714c3eba60813a3"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/schema/readiness-policy.schema.json",
+          "sha256": "8069c3c5e5fb72c4dfbaa35653b417a1c021fb7a30b8290ba704ab31f31618fe"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/schema/readiness.schema.json",
+          "sha256": "d4d7b3988bd0859b4594dcdd07b98e8060688687510a8c5bfa0bd7205b0dadcd"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/schema/state.schema.json",
+          "sha256": "2189407595b795924dffce642f9338f875d8346f8a1728e611aa2ef272f5567f"
+        },
+        {
+          "path": "tools/project-constructor/blueprint/schema/transaction.schema.json",
+          "sha256": "ea4586002549ee8e2b1c3ba5d17cfa7b8fd548c268f267501b479dbe80138fd4"
+        },
+        {
+          "path": "tools/project-constructor/package-lock.json",
+          "sha256": "915dfa34c74ccbd7e72593d7052cf14728f33929cb509caffedda63596272abc"
+        },
+        {
+          "path": "tools/project-constructor/package.json",
+          "sha256": "2e379d6ee05eed907d2e9fca3e26fa45deb69c65d9d1e4241fb047d148738ab0"
+        },
+        {
+          "path": "tools/project-constructor/scripts/verify-fixture.mjs",
+          "sha256": "7fa0bed4d0cd0b4112edd15a70184530a8ab86cb8d8e7d566626c32507ace1e8"
+        },
+        {
+          "path": "tools/project-constructor/src/blueprint.mjs",
+          "sha256": "c90854bb3977a8d4b79887fac7aa63999c07b4f11937eada9e0988426ce2e60c"
+        },
+        {
+          "path": "tools/project-constructor/src/cli.mjs",
+          "sha256": "20e3fe947fa87f8562514de26ab113bda5f3a343e94cc5ff2349a8c374007f7d"
+        },
+        {
+          "path": "tools/project-constructor/src/commands.mjs",
+          "sha256": "3c65ff7417ef33c2a191f725d70535f5f8bcb3cc2670a07faa78fdd21d110cd5"
+        },
+        {
+          "path": "tools/project-constructor/src/constants.mjs",
+          "sha256": "9e05fc6a7cff9447aa7c6f35ddf5b9f128ec2a222a346b7c1b57f1a1f69191f9"
+        },
+        {
+          "path": "tools/project-constructor/src/diff.mjs",
+          "sha256": "3bde82cc66705da6705f2ba08e17d90e2cb7f8952b2726ed156139b571372d4c"
+        },
+        {
+          "path": "tools/project-constructor/src/distribution.mjs",
+          "sha256": "145da140a86d20d696673f4f9170c1b4b7f15a4128e266a6174c37cf851c7000"
+        },
+        {
+          "path": "tools/project-constructor/src/doctor.mjs",
+          "sha256": "db79784df3e0c1b36f5bc5bb8a4f69d74b88bd521921f7f75d0d2ada647461e4"
+        },
+        {
+          "path": "tools/project-constructor/src/errors.mjs",
+          "sha256": "6062c14125cce862bc3e091015becc1b9a59cea6c08548a508486c41fc5e0556"
+        },
+        {
+          "path": "tools/project-constructor/src/fixture-output.mjs",
+          "sha256": "c61b5b46df63f2f216bfc82ee54b262225a0c1a9b733665624b6b76e8a266280"
+        },
+        {
+          "path": "tools/project-constructor/src/github-plan.mjs",
+          "sha256": "c2b734e86fa33d495413a6131d38abcf3772796d527c25da5f288aee03affd0a"
+        },
+        {
+          "path": "tools/project-constructor/src/harness.mjs",
+          "sha256": "0b8d47b6b45669a83a1a54107b35d7a5eef4db559fc75445d234fa4783bde644"
+        },
+        {
+          "path": "tools/project-constructor/src/hash.mjs",
+          "sha256": "e12051bef8a91340273afd38a00d17d2df9ab3956dc27092d932ed385b34fdb0"
+        },
+        {
+          "path": "tools/project-constructor/src/index.mjs",
+          "sha256": "e87af1b708d88916ba76c5ed149cded4f6ecadec13261599fd911f8f95358d0c"
+        },
+        {
+          "path": "tools/project-constructor/src/json.mjs",
+          "sha256": "ae461b30d628f896c4b45738eac4213d5574baacdc00a223c555a4a6747d1234"
+        },
+        {
+          "path": "tools/project-constructor/src/opsx-adapt.mjs",
+          "sha256": "5ff9177bc77382cb3f76825c8e4fa99eccd5680cc0df8a3128cd744eaa248736"
+        },
+        {
+          "path": "tools/project-constructor/src/opsx-check.mjs",
+          "sha256": "e5ac8678fbacd2fef7fb6e36b953f781d709369419db694bcc498d6da966126b"
+        },
+        {
+          "path": "tools/project-constructor/src/paths.mjs",
+          "sha256": "64e8ed5ac34dd2e79064f5d9c7088d7a3cf353fe7715d3141bb3f6e39781c176"
+        },
+        {
+          "path": "tools/project-constructor/src/plan.mjs",
+          "sha256": "31199ddb42b9d3be7f2ee15e9274f6d10cf72bddf7dcd683566788d50fa78b7d"
+        },
+        {
+          "path": "tools/project-constructor/src/preflight.mjs",
+          "sha256": "4092065d9a6b95c33b5384986e134839665e264fd2f53a66170f49c62344fbb5"
+        },
+        {
+          "path": "tools/project-constructor/src/readiness.mjs",
+          "sha256": "4d34268affa4a46618ff984aded8fb59cfe7247a0a5ca7eb25a7166b82078491"
+        },
+        {
+          "path": "tools/project-constructor/src/report.mjs",
+          "sha256": "483562930f9d3d9b3e814556f4ae34fc01719faedb08f508a30ea73717ad5faa"
+        },
+        {
+          "path": "tools/project-constructor/src/state.mjs",
+          "sha256": "0c7d056628d493c3779faa654f745530002e4438777833e244fa7c2e7dd93fad"
+        },
+        {
+          "path": "tools/project-constructor/src/transaction.mjs",
+          "sha256": "f6ceeceff21410ae96307ca5836018d7e76cb29a937229f1927048d0fe547461"
+        },
+        {
+          "path": "tools/project-constructor/test/constructor.integration.test.mjs",
+          "sha256": "36e891a32e7a07b395fcbbd9a892d0d0e37b10f3e3c3cbe32139c279763830d8"
+        },
+        {
+          "path": "tools/project-constructor/test/doctor.test.mjs",
+          "sha256": "0e0aa3756376fd0e4994856b843ace77238cdd7389661d0fa367d07e0c67be98"
+        },
+        {
+          "path": "tools/project-constructor/test/fixture-output.test.mjs",
+          "sha256": "a3d9ad42aa91dec1f4263ba6bc93d0d212e3f7468f866556335b8b6ee65b266e"
+        },
+        {
+          "path": "tools/project-constructor/test/readiness.test.mjs",
+          "sha256": "cac7d427ba038fad2debc820569e869d85f26816d299b3bbfcd6e79f013c4317"
+        }
+      ]
+    },
+    {
+      "owner": "debt-runtime",
+      "root": "tools/debt-control",
+      "files": [
+        {
+          "path": "tools/debt-control/bin/debt-control.mjs",
+          "sha256": "10bcca395698ea96637a1c729834ad7d9040924d05a413a01231cc29adaeb0fe"
+        },
+        {
+          "path": "tools/debt-control/package.json",
+          "sha256": "f1b1034f476cd2747b6348ce82b15952039910c80ae4b7baa8b0dee08a00ac67"
+        },
+        {
+          "path": "tools/debt-control/schema/assessment.schema.json",
+          "sha256": "e9289378bc9eea349e345020ad4ba2641ea06061c1de5ee7344235af41e480df"
+        },
+        {
+          "path": "tools/debt-control/schema/config.schema.json",
+          "sha256": "47d19bf49b08c64288ca8b28fd6be1346a8f4222b1a781fdee9f58d9537486eb"
+        },
+        {
+          "path": "tools/debt-control/schema/registry.schema.json",
+          "sha256": "dc6f2cbc4630d67f370c132fb4e91968eb64acc00957480d9b79d3af6a1f4bcb"
+        },
+        {
+          "path": "tools/debt-control/scripts/generate-fixtures.mjs",
+          "sha256": "f7a1be5a6511cad5fbdcfb21efda96f1cac324e49b3b4c5f1fe36837809c106c"
+        },
+        {
+          "path": "tools/debt-control/src/capture.mjs",
+          "sha256": "33b3f066a2d5b2843cd2c0058a251555bd7ce4e80bcdc758ce82c4b495e80047"
+        },
+        {
+          "path": "tools/debt-control/src/cli.mjs",
+          "sha256": "17b31da7d8ea1136cd3771352ee340e0947319721f13bd48bdff57467cfe3f1e"
+        },
+        {
+          "path": "tools/debt-control/src/constants.mjs",
+          "sha256": "6e5ec2685070015c2e099089abdd3a8b892bb8e3afa782bbb8bfcbe5d18be3f0"
+        },
+        {
+          "path": "tools/debt-control/src/fingerprint.mjs",
+          "sha256": "504c5ca6bf1a94d16988829aaff91f48e8d00653540192407c1dda3788fd8d6c"
+        },
+        {
+          "path": "tools/debt-control/src/gates.mjs",
+          "sha256": "7290892222850d39c0ec5ce020c1d540751e578dc5d3e475ce927b3779f9f6b6"
+        },
+        {
+          "path": "tools/debt-control/src/github.mjs",
+          "sha256": "0ff09ebc6c16bdaab3c0dab30af230ac422be5f537d0b1d2efd4455d5a50ce63"
+        },
+        {
+          "path": "tools/debt-control/src/handoff.mjs",
+          "sha256": "6a6485deba3402534c8aedb018f811151302ef7959bfa91746b91ca9a1c550b6"
+        },
+        {
+          "path": "tools/debt-control/src/index.mjs",
+          "sha256": "cd97898103202fa3a73c2e33d78078de1b2380fe58a1b4744236202321d8bbd9"
+        },
+        {
+          "path": "tools/debt-control/src/policy.mjs",
+          "sha256": "f0287c3cffc07531c161c3657319293c894a2b0050696467584dbbf65d1cdc12"
+        },
+        {
+          "path": "tools/debt-control/src/report.mjs",
+          "sha256": "60d21fea017703456d3b79d87f78978147f04f326cbc4f984e8913ad2795c6f5"
+        },
+        {
+          "path": "tools/debt-control/src/schema.mjs",
+          "sha256": "c42b9a7d761afea25a0915801de5b6c83c381375ab69e8aba67ce38fbd374d26"
+        },
+        {
+          "path": "tools/debt-control/src/store.mjs",
+          "sha256": "5cfa98f8aad8e7380fe3f8d1a735ce791e3af678cc35edb561e13d5f84574fa2"
+        },
+        {
+          "path": "tools/debt-control/test/capture.test.mjs",
+          "sha256": "193dc6ef53f8d9df2ffe53aae7bf2a2e5ceb17cf602617fb24379ae49ac20f13"
+        },
+        {
+          "path": "tools/debt-control/test/cli.test.mjs",
+          "sha256": "a5310b2d8f5a9eeadf92924be5b1a5d7efa5f0273114f95976ab2e4d8b23695b"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/expired-exception/.project-os/debt/config.json",
+          "sha256": "bd69f07bf0721a6f4bcb3ced3c4e37b970f3eafa11eb280b8237dfb8bfd4fe9f"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/expired-exception/.project-os/debt/registry.json",
+          "sha256": "614c96af8021b6ef489f445733c5c652ce86495335f8e96d9c676dca88b8341f"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/github-advisory/.project-os/debt/config.json",
+          "sha256": "055222e4cf7f4965bd93a42208698e0347f6f0ca26eb86b913357ea4b04753ab"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/github-advisory/.project-os/debt/registry.json",
+          "sha256": "2b1b2e3ea5f42963eff4318212cc4e54ed0c6fc73794b4912f556ec389bf78b0"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/github-off/.project-os/debt/config.json",
+          "sha256": "bd69f07bf0721a6f4bcb3ced3c4e37b970f3eafa11eb280b8237dfb8bfd4fe9f"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/github-off/.project-os/debt/registry.json",
+          "sha256": "07f19795cc8dd87d93f6cf253f94fa9d3977f4e353af7582eea9e9d378fbc5a7"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/github-required/.project-os/debt/config.json",
+          "sha256": "91f10894f4e99a18638a4f5152b413c1910450e10c6f0ca83b7f6163cf9c1699"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/github-required/.project-os/debt/registry.json",
+          "sha256": "8244af04be522d063d8e898a76fe283c0fbeb6f10aec684517823879534f74d9"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/major-immediate/.project-os/debt/config.json",
+          "sha256": "bd69f07bf0721a6f4bcb3ced3c4e37b970f3eafa11eb280b8237dfb8bfd4fe9f"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/major-immediate/.project-os/debt/registry.json",
+          "sha256": "c12c228fd3cb07e9917668912970ddc156685704b48ea9235e8020cd8cba0287"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/refuted-candidates/.project-os/debt/config.json",
+          "sha256": "bd69f07bf0721a6f4bcb3ced3c4e37b970f3eafa11eb280b8237dfb8bfd4fe9f"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/refuted-candidates/.project-os/debt/registry.json",
+          "sha256": "30b8d4f2cc37a9c3399aba84c8fdf5a3c34705dcc37f6eca8e26da79db84bde7"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/refuted-candidates/input/assessment.json",
+          "sha256": "77e4c8811018813ef7d3d0ec45a60500ae1e6bee86aa298b7e47ce7fa56c5878"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/repeated-finding/.project-os/debt/config.json",
+          "sha256": "bd69f07bf0721a6f4bcb3ced3c4e37b970f3eafa11eb280b8237dfb8bfd4fe9f"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/repeated-finding/.project-os/debt/registry.json",
+          "sha256": "c726d1a4eb682b047c63adf567726b1606a11d64b1e5b6eaee20cc4d16e2e3a3"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/second-run/.project-os/debt/config.json",
+          "sha256": "bd69f07bf0721a6f4bcb3ced3c4e37b970f3eafa11eb280b8237dfb8bfd4fe9f"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/second-run/.project-os/debt/registry.json",
+          "sha256": "30b8d4f2cc37a9c3399aba84c8fdf5a3c34705dcc37f6eca8e26da79db84bde7"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/second-run/input/assessment.json",
+          "sha256": "224c63e3294358a7b793ca62820457e6aef0d9baa046c2d95f543c5cb36663bc"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/threshold-reached/.project-os/debt/config.json",
+          "sha256": "bd69f07bf0721a6f4bcb3ced3c4e37b970f3eafa11eb280b8237dfb8bfd4fe9f"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/threshold-reached/.project-os/debt/registry.json",
+          "sha256": "cb5f0091f8a7baaba1b0d8b310498d3dba4318e2f733d1e3d5fcf7c722c5dbf6"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/under-budget/.project-os/debt/config.json",
+          "sha256": "bd69f07bf0721a6f4bcb3ced3c4e37b970f3eafa11eb280b8237dfb8bfd4fe9f"
+        },
+        {
+          "path": "tools/debt-control/test/fixtures/under-budget/.project-os/debt/registry.json",
+          "sha256": "5595c57da945cadeee548fd1cdd7981b7099260abceebc80464627ecc01891e1"
+        },
+        {
+          "path": "tools/debt-control/test/gates.test.mjs",
+          "sha256": "45bdbb5473248311bb5ae9e541535a276b16f0b121575a439a83562e39c8edbc"
+        },
+        {
+          "path": "tools/debt-control/test/github.test.mjs",
+          "sha256": "3b36c2c873533a0274e89f0a1d6cccea3300144103b9a5bb21defa3d8904c747"
+        },
+        {
+          "path": "tools/debt-control/test/handoff.test.mjs",
+          "sha256": "7087f0e09846e613b77dd839f83045abeee84c9037ad16cb111b957e4311cddf"
+        },
+        {
+          "path": "tools/debt-control/test/helpers.mjs",
+          "sha256": "dda763aaa1fc01ecd0b37ddcf48698887498422ce875b02b72daf908cdb9fca5"
+        },
+        {
+          "path": "tools/debt-control/test/policy.test.mjs",
+          "sha256": "f0bb212086876c89259c087bfc706538fb5e8e54554064c9d0bdaa0585495b86"
+        },
+        {
+          "path": "tools/debt-control/test/schema.test.mjs",
+          "sha256": "f211ea7703ff0eb1286893bcf863fd48bc3fff9085f733253e138b35ca9dea5b"
+        }
+      ]
+    }
+  ],
+  "transition": {
+    "candidate": "tools/project-engineering-os",
+    "direction": "embedded-sources-to-clean-public-upstream",
+    "freeze": "Only a critical correction may change either source root before cutover; it must be ported forward and recorded."
+  }
+}

@@ -1,0 +1,1 @@
+{"schemaVersion":1,"flow":"normalizar-debt-advisory-ci","date":"2026-07-23","kind":"remediation","result":"clean","candidates":[],"notes":"La corrección no introduce deuda: conserva la ejecución y el warning de debt:check; no altera policy ni registry."}

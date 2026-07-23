@@ -1,0 +1,236 @@
+{
+  "schemaVersion": "1.0.0",
+  "result": "PASS",
+  "fixture": "empty-git-repository",
+  "commands": [
+    {
+      "id": "git-init",
+      "exitCode": 0
+    },
+    {
+      "id": "npm-pack",
+      "exitCode": 0
+    },
+    {
+      "id": "install-packed-runner",
+      "exitCode": 0
+    },
+    {
+      "id": "bootstrap-from-packed-tarball",
+      "exitCode": 0
+    },
+    {
+      "id": "bootstrap-second",
+      "exitCode": 0
+    },
+    {
+      "id": "sync-check",
+      "exitCode": 0
+    }
+  ],
+  "checks": {
+    "targetBeforeBootstrap": {
+      "nonGitEntries": []
+    },
+    "packageArtifact": {
+      "bytes": 153699,
+      "filename": "create-project-engineering-os-0.1.0.tgz",
+      "sha256": "3218332644c948e9d221be9644c3121c64aae03a6eab1ceb0a2dad62d26bea59"
+    },
+    "packedRunnerInstall": {
+      "stderrLines": 0,
+      "stdoutLines": 1,
+      "warnings": []
+    },
+    "firstBootstrapRunner": {
+      "artifactSha256": "3218332644c948e9d221be9644c3121c64aae03a6eab1ceb0a2dad62d26bea59",
+      "source": "temporary-runner-from-verified-tarball"
+    },
+    "firstBootstrap": {
+      "command": "bootstrap",
+      "exitCode": 0,
+      "incompleteTransaction": null,
+      "mode": "apply",
+      "mutationPerformed": true,
+      "plan": {
+        "blueprintHash": "7d5e8b8d3b35ab0c49f88d94a5fe5b74bba0d2de98810d1093b0c61ffcbf9780",
+        "configurationHash": "3fc41ea72053531a4137c5612d9031089bcdb7751fc9bffb5f68d6ddb970075f",
+        "externalOwnership": {
+          "commands": {
+            "adapt": "project-os opsx-adapt --target .",
+            "check": "project-os opsx-check --target .",
+            "init": "npm exec --yes=false -- openspec init --tools codex,claude,cursor,github-copilot,opencode",
+            "update": "npm exec --yes=false -- openspec update"
+          },
+          "generatedGlobs": [
+            ".claude/commands/opsx/*.md",
+            ".codex/skills/openspec-*/SKILL.md",
+            ".cursor/commands/opsx-*.md",
+            ".github/prompts/opsx-*.prompt.md",
+            ".opencode/commands/opsx-*.md"
+          ],
+          "owner": "external-openspec"
+        },
+        "hasDrift": true,
+        "migrations": [],
+        "rollbackPoint": "pre-bootstrap",
+        "summary": {
+          "conflicts": 0,
+          "creates": 74,
+          "deletes": 0,
+          "preserves": 0,
+          "stateUpdate": true,
+          "updates": 0
+        },
+        "validations": [
+          "git-root-and-writability",
+          "blueprint-schema-and-sources",
+          "ownership-and-hashes",
+          "harness-capability-and-mcp-parity",
+          "transaction-journal-and-state-schema"
+        ],
+        "operationCount": 74
+      },
+      "status": "APPLIED",
+      "transaction": {
+        "changes": 75,
+        "resumed": false,
+        "transactionId": "tx-2026-07-23T15-36-37-414Z-98fd9778"
+      }
+    },
+    "installedRuntime": {
+      "entrypoint": null,
+      "path": ".project-constructor/runtime",
+      "exists": false,
+      "executionContract": "exact-package-dependency"
+    },
+    "secondBootstrap": {
+      "command": "bootstrap",
+      "exitCode": 0,
+      "incompleteTransaction": null,
+      "mode": "apply",
+      "mutationPerformed": false,
+      "plan": {
+        "blueprintHash": "7d5e8b8d3b35ab0c49f88d94a5fe5b74bba0d2de98810d1093b0c61ffcbf9780",
+        "configurationHash": "3fc41ea72053531a4137c5612d9031089bcdb7751fc9bffb5f68d6ddb970075f",
+        "externalOwnership": {
+          "commands": {
+            "adapt": "project-os opsx-adapt --target .",
+            "check": "project-os opsx-check --target .",
+            "init": "npm exec --yes=false -- openspec init --tools codex,claude,cursor,github-copilot,opencode",
+            "update": "npm exec --yes=false -- openspec update"
+          },
+          "generatedGlobs": [
+            ".claude/commands/opsx/*.md",
+            ".codex/skills/openspec-*/SKILL.md",
+            ".cursor/commands/opsx-*.md",
+            ".github/prompts/opsx-*.prompt.md",
+            ".opencode/commands/opsx-*.md"
+          ],
+          "owner": "external-openspec"
+        },
+        "hasDrift": false,
+        "migrations": [],
+        "rollbackPoint": "tx-2026-07-23T15-36-37-414Z-98fd9778",
+        "summary": {
+          "conflicts": 0,
+          "creates": 0,
+          "deletes": 0,
+          "preserves": 74,
+          "stateUpdate": false,
+          "updates": 0
+        },
+        "validations": [
+          "git-root-and-writability",
+          "blueprint-schema-and-sources",
+          "ownership-and-hashes",
+          "harness-capability-and-mcp-parity",
+          "transaction-journal-and-state-schema"
+        ],
+        "operationCount": 74
+      },
+      "status": "IN_SYNC",
+      "transaction": {
+        "changes": 0,
+        "resumed": false,
+        "transactionId": null
+      }
+    },
+    "idempotence": {
+      "changedFiles": 0
+    },
+    "sync": {
+      "command": "sync",
+      "dryRun": true,
+      "exitCode": 0,
+      "incompleteTransaction": null,
+      "mode": "check",
+      "mutationPerformed": false,
+      "plan": {
+        "blueprintHash": "7d5e8b8d3b35ab0c49f88d94a5fe5b74bba0d2de98810d1093b0c61ffcbf9780",
+        "configurationHash": "3fc41ea72053531a4137c5612d9031089bcdb7751fc9bffb5f68d6ddb970075f",
+        "externalOwnership": {
+          "commands": {
+            "adapt": "project-os opsx-adapt --target .",
+            "check": "project-os opsx-check --target .",
+            "init": "npm exec --yes=false -- openspec init --tools codex,claude,cursor,github-copilot,opencode",
+            "update": "npm exec --yes=false -- openspec update"
+          },
+          "generatedGlobs": [
+            ".claude/commands/opsx/*.md",
+            ".codex/skills/openspec-*/SKILL.md",
+            ".cursor/commands/opsx-*.md",
+            ".github/prompts/opsx-*.prompt.md",
+            ".opencode/commands/opsx-*.md"
+          ],
+          "owner": "external-openspec"
+        },
+        "hasDrift": false,
+        "migrations": [],
+        "rollbackPoint": "tx-2026-07-23T15-36-37-414Z-98fd9778",
+        "summary": {
+          "conflicts": 0,
+          "creates": 0,
+          "deletes": 0,
+          "preserves": 74,
+          "stateUpdate": false,
+          "updates": 0
+        },
+        "validations": [
+          "git-root-and-writability",
+          "blueprint-schema-and-sources",
+          "ownership-and-hashes",
+          "harness-capability-and-mcp-parity",
+          "transaction-journal-and-state-schema"
+        ],
+        "operationCount": 74
+      },
+      "status": "IN_SYNC"
+    },
+    "harnesses": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      ".cursor/rules/project-os.mdc",
+      ".codex/config.toml",
+      ".github/copilot-instructions.md",
+      "OPENCODE.md"
+    ],
+    "discovery": {
+      "relative": ".project-os/github/discovery-issues.json",
+      "count": 10
+    },
+    "neutrality": {
+      "forbiddenPatterns": 5,
+      "productDependencies": 0
+    },
+    "findability": {
+      "expected": 8,
+      "missing": 0
+    },
+    "doctor": {
+      "skipped": true,
+      "cause": "--skip-install"
+    }
+  },
+  "failure": null
+}

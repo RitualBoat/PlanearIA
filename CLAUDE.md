@@ -101,7 +101,7 @@ Reglas:
 ## Debt Control Loop
 
 Los hallazgos residuales de un flujo SDD no se dejan como avisos: se clasifican, verifican y gobiernan
-con el motor de deuda (`tools/debt-control/`, estado en `.project-os/debt/`, runbook en
+con el motor de deuda (`create-project-engineering-os` fijado, estado en `.project-os/debt/`, runbook en
 `Documentacion/02-operacion/CONTROL_DEUDA_TECNICA.md`).
 
 - Todo cierre SDD captura un assessment (`npm run debt:capture -- --flow <change> --input <archivo>`),

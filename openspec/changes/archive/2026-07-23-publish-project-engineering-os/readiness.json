@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "issue": 126,
+  "change": "publish-project-engineering-os",
+  "surfaces": [
+    "docs",
+    "harness"
+  ],
+  "validations": [
+    "openspec-strict",
+    "harness-parity",
+    "opsx-patch"
+  ],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/126"
+    },
+    {
+      "id": "master-plan",
+      "ref": "Documentacion/01-planes-maestros/PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md"
+    },
+    {
+      "id": "pre-propose",
+      "ref": "Gate local PASS 10/10 sobre development@2ef9a46; evidencia remota final pendiente."
+    },
+    {
+      "id": "pr-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/pull/140 (consumer cutover v0.1.4; awaiting archive/finish)"
+    },
+    {
+      "id": "pre-apply-review",
+      "ref": "openspec/changes/publish-project-engineering-os/evidencia/revision-adversarial-pre-apply.md"
+    },
+    {
+      "id": "adversarial-review",
+      "ref": "openspec/changes/publish-project-engineering-os/evidencia/revision-adversarial-final.md (PASS; upstream #8/#9 corregidos y deuda UX/UI capturada)."
+    },
+    {
+      "id": "docs-verification",
+      "ref": "npm run test:constructor-docs PASS (12 artefactos, 50 filas, enlaces y contratos válidos); evidencias 08 y 11."
+    },
+    {
+      "id": "fixtures",
+      "ref": "evidencia/09-release-v0.1.2-eol-guard.md, evidencia/10-release-v0.1.3-upgrade-convergence.md y evidencia/11-release-v0.1.4-debt-gate.md: bootstrap, segundo run, upgrade, rollback y tarball/npm verificables."
+    },
+    {
+      "id": "release",
+      "ref": "Upstream #9 merged 4560656599e9a0fa9f128f4da9c8a770311fdab4; v0.1.4 GitHub Release/npm/provenance workflow 30043434297, SHA-256 9f5096abf42ab178d1231e20fd3c84652ccdf864874495f97d4ea4cfa9e92e4a; evidencia/11-release-v0.1.4-debt-gate.md."
+    }
+  ],
+  "rollback": {
+    "strategy": "Antes de publicar, revertir el PR del change. Después, deprecar una versión defectuosa y publicar un patch; nunca reusar ni reetiquetar. PlanearIA vuelve por PR a la última release sana. Rollback preserva assessments y no usa git reset --hard."
+  },
+  "adversarialReview": {
+    "ref": "openspec/changes/publish-project-engineering-os/evidencia/revision-adversarial-final.md (PASS; 0 Blockers/0 Majors)."
+  },
+  "exceptions": []
+}

@@ -7,14 +7,14 @@
   "evidence": [
     { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/133" },
     { "id": "pr-link", "ref": "PENDIENTE: se completa al abrir el PR" },
-    { "id": "adversarial-review", "ref": "PENDIENTE: veredicto de la revision adversarial de cierre, publicado en https://github.com/RitualBoat/PlanearIA/issues/133" },
-    { "id": "fixtures", "ref": "src/__tests__ fixtures negativos de importacion (archivo enorme, buffer invalido, guardia de prototipo) mas evidencia npm audit antes/despues y npx expo install --check" }
+    { "id": "adversarial-review", "ref": "Revision adversarial de cierre: veredicto PASS, 0 Blockers / 0 Majors / 3 Minors rastreados; publicada en https://github.com/RitualBoat/PlanearIA/issues/133#issuecomment-5053492821" },
+    { "id": "fixtures", "ref": "src/__tests__/services/spreadsheetImport.test.ts (tope de tamano, CFB truncado, workbook valido, guardia de prototipo) y src/__tests__/harness/spreadsheetDependency.test.ts (XLSX.version >= 0.20.2, lockfile CDN+integrity); npm audit antes 28/7high, despues 21/0high; npx expo install --check up to date" }
   ],
   "rollback": {
     "strategy": "Revertir el PR del change restaura xlsx@0.18.5, retira el bloque overrides y el ADR de cadencia sin tocar datos ni contratos de import/export. Si un override rompe Metro/jest/Expo se retira ese override puntual en un PR de correccion; si el tope de tamano produce falsos positivos se ajusta el umbral en un PR documentado, nunca se silencia en silencio."
   },
   "adversarialReview": {
-    "ref": "PENDIENTE: veredicto y clasificacion de hallazgos en el comentario de revision adversarial de https://github.com/RitualBoat/PlanearIA/issues/133"
+    "ref": "Veredicto PASS (0 Blockers / 0 Majors / 3 Minors rastreados) en https://github.com/RitualBoat/PlanearIA/issues/133#issuecomment-5053492821"
   },
   "exceptions": []
 }

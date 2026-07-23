@@ -25,9 +25,9 @@
 
 ## 5. Cierre
 
-- [ ] 5.1 `npm run typecheck` y `npm run lint -- --quiet` verdes.
-- [ ] 5.2 `npm run test:debt-control` y `npm run agent:harness:check` verdes (superficie harness); `npm run openspec:validate` verde.
-- [ ] 5.3 Reproducibilidad: `npm ci` dos veces sin drift en el lockfile (segundo run sin cambios). Evidencia: `git status` limpio del lockfile tras el segundo `npm ci`.
-- [ ] 5.4 Revision adversarial independiente documentada en el issue #133 con veredicto y clasificacion de hallazgos; cero Blockers/Majors.
+- [x] 5.1 `npm run typecheck` exit 0 y `npm run lint -- --quiet` exit 0. Ademas `npm test -- --runInBand` => 120 suites / 837 tests verdes sin ruido de consola no declarado.
+- [x] 5.2 `npm run test:debt-control` 58/58; `npm run agent:harness:check` "OK (36 mirrors in parity)"; `npm run openspec:validate` 44 passed / 0 failed + TLDR OK.
+- [x] 5.3 Reproducibilidad: `npm ci` x2, ambos exit 0, `package-lock.json` con md5 identico en los tres snapshots (before=ci1=ci2 = 0ddfa5c31eed2cc130fe88948c9ec1db). Sin drift.
+- [x] 5.4 Revision adversarial independiente (skill adversarial-review): veredicto PASS, 0 Blockers / 0 Majors / 3 Minors rastreados (residual de parseo, 7 compatible-fix agendados, refs de readiness). Publicada en https://github.com/RitualBoat/PlanearIA/issues/133#issuecomment-5053492821
 - [ ] 5.5 Assessment `kind: remediation` capturado con `npm run debt:capture` resolviendo `debt-6c9672a48059` y `debt-d73a5844fae3` con evidencia, sin candidatos confirmados nuevos.
 - [ ] 5.6 `npm run openspec:ready:archive -- --change resolver-riesgo-y-cadencia-dependencias --run-local` en PASS y `readiness.json` completo.

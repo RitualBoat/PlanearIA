@@ -18,7 +18,7 @@ for (const href of links) {
   }
 }
 for (const command of [
-  'npx --yes create-project-engineering-os@0.1.0 bootstrap --target .',
+  'npx --yes create-project-engineering-os@0.1.1 bootstrap --target .',
   'project-os upgrade --target . --check',
   'project-os debt check --root .',
   'project-os rollback --target . --transaction <id>',
@@ -44,4 +44,3 @@ if (failures.length > 0) {
 } else {
   process.stdout.write(`PASS docs ${links.length} README links\n`);
 }
-

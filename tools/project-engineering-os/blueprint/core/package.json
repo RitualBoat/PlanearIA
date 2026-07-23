@@ -35,6 +35,6 @@
   },
   "devDependencies": {
     "@fission-ai/openspec": "1.6.0",
-    "create-project-engineering-os": "0.1.0"
+    "create-project-engineering-os": "0.1.1"
   }
 }

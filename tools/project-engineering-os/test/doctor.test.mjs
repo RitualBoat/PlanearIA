@@ -79,7 +79,7 @@ async function createHealthyFixture(t, { graphify = false, literalSecret = false
     private: true,
     devDependencies: {
       "@fission-ai/openspec": "1.6.0",
-      "create-project-engineering-os": "0.1.0",
+      "create-project-engineering-os": "0.1.1",
     },
   });
   await json(root, "package-lock.json", {
@@ -90,13 +90,13 @@ async function createHealthyFixture(t, { graphify = false, literalSecret = false
         name: "fixture-project",
         devDependencies: {
           "@fission-ai/openspec": "1.6.0",
-          "create-project-engineering-os": "0.1.0",
+          "create-project-engineering-os": "0.1.1",
         },
       },
       "node_modules/@fission-ai/openspec": { version: "1.6.0" },
       "node_modules/create-project-engineering-os": {
         name: "create-project-engineering-os",
-        version: "0.1.0",
+        version: "0.1.1",
       },
     },
   });
@@ -106,13 +106,13 @@ async function createHealthyFixture(t, { graphify = false, literalSecret = false
   });
   await json(root, "node_modules/create-project-engineering-os/package.json", {
     name: "create-project-engineering-os",
-    version: "0.1.0",
+    version: "0.1.1",
   });
   const agents = "# Universal agent guide\n";
   await write(root, "AGENTS.md", agents);
   await json(root, ".project-constructor/state.json", {
     packageName: "create-project-engineering-os",
-    packageVersion: "0.1.0",
+    packageVersion: "0.1.1",
     schemaVersion: "1.0.0",
     files: [{ target: "AGENTS.md", owner: "constructor", hash: hash(agents) }],
   });

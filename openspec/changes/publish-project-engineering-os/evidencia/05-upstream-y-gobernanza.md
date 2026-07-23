@@ -50,6 +50,19 @@ Fuentes oficiales:
 - `https://docs.npmjs.com/trusted-publishers/`
 - `https://docs.npmjs.com/generating-provenance-statements/`
 
+El gate se resolvió con la cuenta `ritualboat`, 2FA `auth-and-writes` mediante WebAuthn y sin copiar
+contraseñas, códigos, tokens o URLs de autenticación a Git. La reserva `0.0.0` publicó únicamente LICENSE,
+README y metadata:
+
+- shasum: `f847de4b93bf623c14484ef1b3fb5fca79e9ad16`;
+- integridad y metadata verificadas desde el registry;
+- Trusted Publisher: GitHub Actions, `RitualBoat/project-engineering-os`, `release.yml`,
+  environment `npm-publish`, permiso `publish`;
+- relación npm: `0b6b6c8e-49cd-49e4-8d42-bb03415bb4c3`.
+
+El tag protegido `v0.1.0` apunta a `5532f76425e03b4217306d62c2ac140a8fbc67d2`. El workflow de release
+inició en `https://github.com/RitualBoat/project-engineering-os/actions/runs/30036132915`.
+
 ## CI del import
 
 Al registrar esta evidencia aprobaron Ubuntu Node 20/22, Windows Node 20 y macOS Node 20. Windows Node 22

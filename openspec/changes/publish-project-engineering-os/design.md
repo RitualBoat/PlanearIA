@@ -139,6 +139,10 @@ calcula SHA-256 y lo adjunta a GitHub Release. La publicación npm consume el mi
 Tag, `package.json`, changelog, asset y registry deben compartir versión y commit. Una versión existente no
 se reutiliza ni se sobrescribe. Los source archives automáticos de GitHub no son el artefacto contractual.
 
+La recuperación de un run parcial no mueve el tag ni sobrescribe assets: compara tarball, manifest y
+checksum existentes byte por byte antes de reusar la GitHub Release. Los paths pasados a `npm publish`
+deben comenzar por `./` para que npm los interprete como filesystem y no como shorthand GitHub.
+
 ### D7. Trusted Publishing actual, separado del soporte de consumidores
 
 La publicación estable usa npm Trusted Publishing con runner GitHub-hosted, `contents: read`,
@@ -240,6 +244,8 @@ producto nuevo. Código y dominio del consumidor usan la licencia que su owner d
   seguro sin token persistente.
 - [Release npm incorrecta] → Dry-run, smoke del mismo tarball, gate humano, deprecación y patch; no
   reutilizar versión.
+- [GitHub Release creada pero npm no publicado] → Marcar la release parcial como prerelease, conservar
+  tag/assets como evidencia y publicar un patch nuevo; nunca mover el tag.
 - [Acción comprometida] → SHA completo, permisos mínimos, Dependabot/renovación deliberada.
 - [Upgrade daña trabajo humano] → Ownership/hashes, dry-run, colisión bloqueante, journal, resume/rollback.
 - [Deuda crea demasiados issues] → Un issue idempotente por plan y solo ante triggers configurados.

@@ -91,7 +91,7 @@
 
 ## 7. Gate remoto e import inicial
 
-- [ ] 7.1 Revalidar nombres, copyright/notices, sesiones GitHub/npm, scopes, costo y aprobación previa sin
+- [x] 7.1 Revalidar nombres, copyright/notices, sesiones GitHub/npm, scopes, costo y aprobación previa sin
   imprimir credenciales.
 - [x] 7.2 Generar seed mínimo y export allowlisted desde el SHA de corte; demostrar que el export coincide
   con el release candidate.

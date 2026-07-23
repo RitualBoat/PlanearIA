@@ -61,7 +61,7 @@ test('package contract rechaza bin ausente y licencia incompatible', async () =>
 
 test('release verifier rejects an altered tarball', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'project-os-release-negative-'));
-  const filename = 'create-project-engineering-os-0.1.0.tgz';
+  const filename = 'create-project-engineering-os-0.1.1.tgz';
   const tarballPath = path.join(root, filename);
   const original = Buffer.from('verified tarball fixture');
   const digest = sha256(original);
@@ -71,7 +71,7 @@ test('release verifier rejects an altered tarball', async () => {
     `${JSON.stringify({
       schemaVersion: 1,
       package: 'create-project-engineering-os',
-      version: '0.1.0',
+      version: '0.1.1',
       commit: 'a'.repeat(40),
       tarball: filename,
       sha256: digest,
@@ -85,4 +85,3 @@ test('release verifier rejects an altered tarball', async () => {
   await writeFile(tarballPath, Buffer.from('altered tarball fixture'));
   await assert.rejects(verifyRelease(root), /Checksum divergente/);
 });
-

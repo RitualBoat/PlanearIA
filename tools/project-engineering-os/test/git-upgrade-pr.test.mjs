@@ -82,7 +82,7 @@ test('--open-pr crea una rama acotada y reutiliza un PR abierto', async () => {
     targetRoot: '/fixture',
   });
 
-  assert.equal(output.branch, 'chore/project-os-v0.1.0');
+  assert.equal(output.branch, 'chore/project-os-v0.1.1');
   assert.equal(output.baseBranch, 'main');
   assert.deepEqual(output.pullRequest, {
     created: false,
@@ -94,7 +94,7 @@ test('--open-pr crea una rama acotada y reutiliza un PR abierto', async () => {
       call[0] === 'git'
       && call[1] === 'switch'
       && call[2] === '-c'
-      && call[3] === 'chore/project-os-v0.1.0'
+      && call[3] === 'chore/project-os-v0.1.1'
     )),
     true,
   );

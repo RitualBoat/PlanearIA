@@ -27,6 +27,16 @@ for (const workflowRoot of workflowRoots) {
     if (!/^permissions:/m.test(content)) failures.push(`${label}: permissions missing`);
   }
 }
+const releaseWorkflow = await readFile(path.join(root, '.github', 'workflows', 'release.yml'), 'utf8');
+if (!releaseWorkflow.includes('npm publish ./release/*.tgz --access public --provenance')) {
+  failures.push('.github/workflows/release.yml: tarball path must be explicitly relative');
+}
+if (
+  !releaseWorkflow.includes('gh release view "${{ inputs.tag }}"')
+  || !releaseWorkflow.includes('cmp release/*.tgz existing-release/*.tgz')
+) {
+  failures.push('.github/workflows/release.yml: existing release recovery missing');
+}
 if (failures.length > 0) {
   process.stderr.write(`FAIL workflows: ${failures.join(', ')}\n`);
   process.exitCode = 1;

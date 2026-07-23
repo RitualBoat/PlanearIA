@@ -15,7 +15,7 @@ Requiere Git, npm y Node `^20.20.0 || >=22.22.0`.
 mkdir mi-proyecto
 cd mi-proyecto
 git init
-npx --yes create-project-engineering-os@0.1.0 bootstrap --target .
+npx --yes create-project-engineering-os@0.1.1 bootstrap --target .
 npm ci
 npm exec --yes=false -- openspec init --tools codex,claude,cursor,github-copilot,opencode
 npm run project-os:opsx:adapt
@@ -32,8 +32,8 @@ licencia para el producto.
 Trabaja desde una rama y un árbol limpio:
 
 ```sh
-npx --yes create-project-engineering-os@0.1.0 bootstrap --target . --dry-run
-npx --yes create-project-engineering-os@0.1.0 bootstrap --target .
+npx --yes create-project-engineering-os@0.1.1 bootstrap --target . --dry-run
+npx --yes create-project-engineering-os@0.1.1 bootstrap --target .
 npm ci
 npm run project-os:check
 ```
@@ -117,4 +117,3 @@ Reporta vulnerabilidades de forma privada según [SECURITY.md](SECURITY.md). Par
 Project Engineering OS es una base de trabajo, no una certificación de que el producto sea correcto,
 seguro o listo para producción. MVVM, React, Expo, Playwright, offline/sync, IA y cloud son perfiles
 condicionales que solo deben activarse después del discovery y una decisión versionada.
-

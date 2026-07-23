@@ -113,6 +113,18 @@ nombre del asset, checksum y versión del registry SHALL coincidir.
 - **THEN** el pipeline falla por identidad divergente
 - **AND** no publica ninguna de las copias
 
+#### Scenario: Recuperación tras GitHub Release parcial
+
+- **WHEN** un run anterior creó la GitHub Release pero falló antes de publicar npm
+- **THEN** la recuperación conserva tag y assets inmutables y compara tarball, manifest y checksum
+- **AND** solo reutiliza la release si los bytes coinciden para el mismo tag
+
+#### Scenario: Path de tarball ambiguo
+
+- **WHEN** el comando de npm no recibe un path filesystem explícito con prefijo `./`
+- **THEN** la validación falla antes del publish
+- **AND** no permite que npm lo interprete como package spec o shorthand GitHub
+
 #### Scenario: Versión ya existente
 
 - **WHEN** npm o GitHub ya contienen la versión solicitada

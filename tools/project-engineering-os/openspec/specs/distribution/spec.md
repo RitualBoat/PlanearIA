@@ -13,6 +13,18 @@ and provenance. It SHALL NOT rebuild between GitHub and npm publication.
 - **THEN** it packs and tests one tarball
 - **AND** both publication jobs consume that exact artifact and checksum
 
+#### Scenario: A release retry finds existing immutable assets
+
+- **WHEN** a previous run created the GitHub Release but stopped before npm publication
+- **THEN** recovery verifies the existing tarball, manifest and checksum byte for byte
+- **AND** publishes only when they match the newly validated candidate for the same immutable tag
+
+#### Scenario: npm receives the local tarball
+
+- **WHEN** the workflow invokes `npm publish`
+- **THEN** the tarball argument is an explicitly relative filesystem path
+- **AND** CI rejects a package-spec or GitHub-shorthand interpretation
+
 ### Requirement: Public exports are neutral
 
 The public tree SHALL be generated from an allowlist and SHALL reject consumer-specific domain rules,

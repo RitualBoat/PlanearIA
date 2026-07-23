@@ -308,7 +308,7 @@ test("bootstrap prepara un repositorio Git vacío sin copiar un runtime editable
     false,
   );
   const consumerPackage = await readJson(path.join(baselineRoot, "package.json"));
-  assert.equal(consumerPackage.devDependencies["create-project-engineering-os"], "0.1.0");
+  assert.equal(consumerPackage.devDependencies["create-project-engineering-os"], "0.1.1");
   assert.equal(await exists(path.join(baselineRoot, "AGENTS.md")), true);
   assert.equal(await exists(path.join(baselineRoot, "openspec", "config.yaml")), true);
   assert.equal(baselineBootstrap.plan.externalOwnership.owner, "external-openspec");
@@ -1072,7 +1072,7 @@ test("upgrade es determinista, preserva deuda y admite rollback explícito", { t
   const firstPayload = parseJson(firstCheck, "upgrade --check inicial");
   assert.equal(firstCheck.exitCode, 1);
   assert.equal(firstPayload.status, "DRIFT");
-  assert.equal(firstPayload.targetVersion, "0.1.0");
+  assert.equal(firstPayload.targetVersion, "0.1.1");
   assert.equal(firstPayload.mutationPerformed, false);
   assert.deepEqual(await exactSnapshot(target), beforeCheck);
 
@@ -1091,14 +1091,14 @@ test("upgrade es determinista, preserva deuda y admite rollback explícito", { t
   assert.equal(
     (await readJson(path.join(target, "package.json")))
       .devDependencies["create-project-engineering-os"],
-    "0.1.0",
+    "0.1.1",
   );
   assert.equal(
     (await readJson(path.join(target, "package-lock.json")))
       .packages["node_modules/create-project-engineering-os"].version,
-    "0.1.0",
+    "0.1.1",
   );
-  assert.equal((await readJson(path.join(target, stateRelative))).packageVersion, "0.1.0");
+  assert.equal((await readJson(path.join(target, stateRelative))).packageVersion, "0.1.1");
   assert.deepEqual(await targetHashes(target, debtTargets), debtBefore);
 
   const converged = await runInstalled(target, "upgrade", ["--check"]);

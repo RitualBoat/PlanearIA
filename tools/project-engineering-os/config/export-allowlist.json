@@ -14,6 +14,7 @@
     "test"
   ],
   "rootFiles": [
+    ".gitattributes",
     ".gitignore",
     ".nvmrc",
     "AGENTS.md",

@@ -5,13 +5,20 @@
 El sistema SHALL publicar `RitualBoat/project-engineering-os` como fuente canónica bajo licencia MIT. El
 tree público SHALL limitarse mediante allowlist a runtime, blueprint, schemas, documentación, tests y
 automatización propios del Engineering OS, y SHALL NOT contener código, secretos, datos, nombres, paths o
-reglas de dominio de PlanearIA.
+reglas de dominio de PlanearIA. La identidad de texto SHALL usar hashes canónicos LF y el repositorio
+SHALL declarar una política de checkout LF para evitar drift falso entre sistemas operativos.
 
 #### Scenario: Export inicial revisado
 
 - **WHEN** se genera el tree de import desde el SHA de corte
 - **THEN** cada ruta corresponde a la allowlist y tiene owner/licencia identificados
 - **AND** el check de neutralidad y secretos termina en `PASS`
+
+#### Scenario: Checkout multiplataforma con finales de línea distintos
+
+- **WHEN** un checkout cambia únicamente LF por CRLF en archivos de texto
+- **THEN** la identidad canónica del export permanece igual
+- **AND** una alteración distinta de finales de línea continúa bloqueando el release
 
 #### Scenario: Término específico detectado
 

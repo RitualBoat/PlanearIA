@@ -63,14 +63,30 @@ async function inventory(base, files) {
   const records = [];
   for (const relative of files) {
     const content = await readFile(path.join(base, ...relative.split('/')));
-    const digest = createHash('sha256').update(content).digest('hex');
-    records.push({ path: relative, sha256: digest, bytes: content.byteLength });
+    const canonical = canonicalContent(content);
+    const digest = createHash('sha256').update(canonical).digest('hex');
+    records.push({
+      path: relative,
+      sha256: digest,
+      bytes: content.byteLength,
+      canonicalBytes: canonical.byteLength,
+    });
     hash.update(relative);
     hash.update('\0');
     hash.update(digest);
     hash.update('\n');
   }
-  return { files: records, treeHash: hash.digest('hex') };
+  return {
+    files: records,
+    treeHash: hash.digest('hex'),
+    hashPolicy: 'text-lf-v1',
+  };
+}
+
+function canonicalContent(content) {
+  return content.includes(0)
+    ? content
+    : Buffer.from(content.toString('utf8').replace(/\r\n?/g, '\n'), 'utf8');
 }
 
 const sourceFiles = await collect(root);
@@ -82,7 +98,7 @@ if (outputArg) {
   for (const relative of existingFiles) {
     const expected = sourceByPath.get(relative);
     const observed = createHash('sha256')
-      .update(await readFile(path.join(target, ...relative.split('/'))))
+      .update(canonicalContent(await readFile(path.join(target, ...relative.split('/')))))
       .digest('hex');
     if (!expected || expected.sha256 !== observed) {
       throw new Error(`El destino contiene contenido divergente: ${relative}`);

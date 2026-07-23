@@ -80,6 +80,10 @@ Se excluyen historia, configuración, evidencia, secretos, rutas y términos de 
 público debe tener owner, fuente y licencia. El SHA de corte queda trazado en ADR/changelog, pero no se
 transfiere el historial completo.
 
+La identidad del export normaliza texto a LF antes de calcular hashes y el upstream fija
+`* text=auto eol=lf` en `.gitattributes`. Así un checkout de Windows no crea drift falso, mientras una
+alteración de contenido distinta de finales de línea sigue bloqueando la comparación.
+
 Alternativas descartadas: hacer público PlanearIA; `git filter-branch` del monorepo; mantener dos trees
 editables.
 

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { mkdtemp, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -36,10 +36,22 @@ test('seed, export completo y segundo run convergen sin drift', async () => {
   assert.equal(full.status, 0, full.stderr);
   const fullPayload = JSON.parse(full.stdout);
   assert.equal(fullPayload.mode, 'export');
+  assert.equal(fullPayload.hashPolicy, 'text-lf-v1');
+  assert.match(
+    await readFile(path.join(target, '.gitattributes'), 'utf8'),
+    /\* text=auto eol=lf/,
+  );
 
   const checked = await run(['--check', target]);
   assert.equal(checked.status, 0, checked.stderr);
   assert.equal(JSON.parse(checked.stdout).treeHash, fullPayload.treeHash);
+
+  const readmePath = path.join(target, 'README.md');
+  const readme = await readFile(readmePath, 'utf8');
+  await writeFile(readmePath, readme.replace(/\r?\n/g, '\r\n'));
+  const crossPlatform = await run(['--check', target]);
+  assert.equal(crossPlatform.status, 0, crossPlatform.stderr);
+  assert.equal(JSON.parse(crossPlatform.stdout).treeHash, fullPayload.treeHash);
 
   const second = await run(['--output', target]);
   assert.equal(second.status, 0, second.stderr);
@@ -54,4 +66,3 @@ test('check rechaza un archivo público alterado', async () => {
   assert.notEqual(checked.status, 0);
   assert.match(checked.stderr, /Export divergente/);
 });
-

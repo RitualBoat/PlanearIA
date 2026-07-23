@@ -95,7 +95,7 @@
   imprimir credenciales.
 - [x] 7.2 Generar seed mínimo y export allowlisted desde el SHA de corte; demostrar que el export coincide
   con el release candidate.
-- [ ] 7.3 Crear `RitualBoat/project-engineering-os` público con seed, registrar SHA y activar/verificar
+- [x] 7.3 Crear `RitualBoat/project-engineering-os` público con seed, registrar SHA y activar/verificar
   protección de rama/tags y environment antes del import.
 - [ ] 7.4 Subir export por `feat/initial-release`, crear/reutilizar PR, esperar CI y corregir Blockers/Majors
   antes de mergear.

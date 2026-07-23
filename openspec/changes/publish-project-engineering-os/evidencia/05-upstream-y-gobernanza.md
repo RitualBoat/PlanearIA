@@ -34,11 +34,43 @@ Fecha de verificación: 2026-07-23.
 - La primera publicación no se ejecutará hasta resolver el gate de identidad npm y comprobar el contrato
   de trusted publishing/provenance. La ausencia de sesión se registra como bloqueo manual, no como PASS.
 
+La documentación oficial vigente confirma que `npm trust` exige 2FA y que el paquete ya exista en el
+registry. Por ello el bootstrap previsto es:
+
+1. autenticación interactiva local fuera de Git y logs;
+2. publicación única `0.0.0` como reserva no consumible;
+3. configuración del trusted publisher para `RitualBoat/project-engineering-os`,
+   `release.yml` y environment `npm-publish`;
+4. publicación estable `0.1.0` exclusivamente con OIDC desde GitHub Actions;
+5. deprecación explícita de `0.0.0` y revocación/cierre de la sesión temporal.
+
+Fuentes oficiales:
+
+- `https://docs.npmjs.com/cli/v11/commands/npm-trust/`
+- `https://docs.npmjs.com/trusted-publishers/`
+- `https://docs.npmjs.com/generating-provenance-statements/`
+
 ## CI del import
 
 Al registrar esta evidencia aprobaron Ubuntu Node 20/22, Windows Node 20 y macOS Node 20. Windows Node 22
 y macOS Node 22 permanecían en ejecución. El agregador requerido aún no había concluido; el PR no se
 considera listo para merge hasta que aparezca `CI / required` en verde.
+
+La matriz terminó después con las seis combinaciones y `CI / required` en `PASS`. El PR #1 se fusionó
+mediante la rama protegida en `0fc29c51ef11e7a7a3eb285f66828607b0d21640`.
+
+El primer checkout posterior al merge descubrió un falso drift de finales de línea en Windows. Se
+clasificó como Major pre-release, se corrigió en fuente y spec con identidad canónica LF,
+`.gitattributes` y fixture CRLF, y se abrió el PR protegido #2:
+`https://github.com/RitualBoat/project-engineering-os/pull/2`. No se creará tag hasta que su matriz y
+agregador estén verdes.
+
+El PR #2 terminó con seis checks de matriz y `CI / required` en `PASS`, y se fusionó por la rama
+protegida en `5532f76425e03b4217306d62c2ac140a8fbc67d2`. Un checkout fresco posterior produjo:
+
+```json
+{"result":"PASS","mode":"check","treeHash":"621c4cad9aed3189bdfc580afd23c713aa33ecc83530ca04e4554e6072f27133","hashPolicy":"text-lf-v1"}
+```
 
 ## Recuperación
 

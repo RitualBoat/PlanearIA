@@ -97,7 +97,7 @@
   con el release candidate.
 - [x] 7.3 Crear `RitualBoat/project-engineering-os` público con seed, registrar SHA y activar/verificar
   protección de rama/tags y environment antes del import.
-- [ ] 7.4 Subir export por `feat/initial-release`, crear/reutilizar PR, esperar CI y corregir Blockers/Majors
+- [x] 7.4 Subir export por `feat/initial-release`, crear/reutilizar PR, esperar CI y corregir Blockers/Majors
   antes de mergear.
 - [ ] 7.5 Crear tag y GitHub Release con tarball/checksum ligados al merge protegido.
 - [ ] 7.6 Realizar primera publicación npm aprobada, configurar trusted publisher y verificar provenance;

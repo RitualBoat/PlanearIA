@@ -78,6 +78,7 @@
     "test:project-os-contract": "node scripts/testProjectEngineeringOsConsumer.mjs",
     "constructor:check": "npm run test:project-os-contract && node scripts/testProjectConstructorDocs.mjs",
     "test:constructor-docs": "node scripts/testProjectConstructorDocs.mjs",
+    "test:constructor-advisory": "node scripts/testProjectConstructorAdvisory.mjs",
     "test:opsx-finish": "node scripts/testOpsxFinish.mjs",
     "test:opsx-archive": "node scripts/testOpsxArchive.mjs",
     "sheetjs:verify": "node scripts/verifySheetJsVendor.mjs",

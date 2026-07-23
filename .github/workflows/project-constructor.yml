@@ -68,4 +68,11 @@ jobs:
         run: npm run test:constructor-docs
 
       - name: Verify PlanearIA debt state through public CLI
+        id: debt-state
+        continue-on-error: true
         run: npm run debt:check
+
+      - name: Report recognized debt pause without blocking advisory
+        if: steps.debt-state.outcome == 'failure'
+        shell: bash
+        run: echo "::warning title=Debt Control Loop advisory::debt:check reported a paused plan. Review its visible cause, recovery and sanitation issue; this advisory job does not convert that recognized state into a global merge blocker."

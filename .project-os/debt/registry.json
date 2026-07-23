@@ -273,6 +273,44 @@
         "flow": "sanear-senal-tests-y-codificacion",
         "evidence": "Guardia de consola Jest activa via setupFilesAfterEnv (jest.setup.consoleGuard.ts + src/__tests__/helpers/consoleSignal.ts): console.error/warn inesperados rompen el test y una allowance declarada no consumida tambien falla. Warnings act() reales corregidos en src/__tests__/grupos/useDetalleGrupoViewModel.test.tsx envolviendo el montaje en act(async () => {}), no allowlisteados (spec test-console-signal-guard). Corrida completa npm test -- --runInBand => 118 suites / 827 tests verdes, cero lineas console.error/warn no declaradas en la salida. Pruebas de la propia guardia: src/__tests__/harness/consoleSignalGuard.test.ts, 5 escenarios verdes."
       }
+    },
+    {
+      "id": "debt-770acc1e9d53",
+      "title": "Cuelgue sincronico de SheetJS ante xlsx ZIP corrupto",
+      "description": "Cuelgue sincronico de SheetJS ante xlsx ZIP corrupto",
+      "category": "external-risk",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "preparacion-operativa-sdd-harness",
+      "artifact": "src/services/spreadsheetImport.ts#XLSX.read",
+      "consequence": "Un archivo .xlsx ZIP corrupto seleccionado por el docente puede bloquear sincronicamente el hilo JS y obligar a reiniciar la app.",
+      "remediation": "Revisar mensualmente fixes o aislamiento multiplataforma; al vencer sin solucion, desactivar import .xlsx mediante PR normal conservando CSV y exportacion.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "npm run sheetjs:reproduce-hang: el padre supervisa XLSX.read en un proceso hijo, confirma timeout a 1000 ms y lo termina de forma controlada",
+          "date": "2026-07-23"
+        }
+      ],
+      "occurrences": [
+        {
+          "flow": "corregir-riesgo-supply-chain-sheetjs",
+          "date": "2026-07-23"
+        }
+      ],
+      "issue": null,
+      "status": "accepted-exception",
+      "exception": {
+        "reason": "riesgo de congelamiento síncrono sin fix upstream ni aislamiento multiplataforma aprobado; archivo seleccionado manualmente y preview antes de confirmar.",
+        "owner": "RitualBoat",
+        "approvedBy": "RitualBoat",
+        "expiresOn": "2026-10-31",
+        "recovery": "desactivar import `.xlsx` mediante PR normal al vencer sin solución, conservando CSV y exportación."
+      },
+      "createdAt": "2026-07-23",
+      "updatedAt": "2026-07-23",
+      "resolution": null
     }
   ]
 }

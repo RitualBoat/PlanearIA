@@ -2,16 +2,16 @@ import * as DocumentPicker from "expo-document-picker";
 import * as XLSX from "xlsx";
 
 // Endurecimiento de la ruta de LECTURA de archivos no confiables (issue #133).
-// Las advisories historicas de SheetJS eran de parseo; el build parcheado (>= 0.20.2)
-// las corrige, y este tope acota el blast radius de cualquier futuro fallo de parseo
-// y del simple agotamiento de recursos por archivos enormes. La exportacion no pasa
-// por aqui: opera sobre datos propios de la app.
+// El build 0.20.3 corrige las advisories conocidas y el tope evita agotar recursos
+// con archivos enormes. Ninguna de las dos medidas puede interrumpir un bloqueo
+// sincrono dentro de XLSX.read; ese riesgo residual se gobierna en el registro de deuda.
+// La exportacion no pasa por aqui: opera sobre datos propios de la app.
 export const MAX_IMPORT_BYTES = 5 * 1024 * 1024; // 5 MB
 
 export const SUPPORTED_IMPORT_EXTENSIONS = ["csv", "xlsx", "xls"] as const;
 
-// Error de dominio de la importacion: mensaje accionable para la UI, nunca una
-// excepcion sin capturar ni un cuelgue.
+// Error de dominio para fallos que lanzan una excepcion. Un bloqueo sincrono del
+// parser no devuelve el control a JavaScript y, por tanto, no entra en este contrato.
 export class SpreadsheetImportError extends Error {
   constructor(message: string) {
     super(message);
@@ -41,8 +41,7 @@ const parseWorkbookToRows = (arrayBuffer: ArrayBuffer): Record<string, unknown>[
   try {
     workbook = XLSX.read(arrayBuffer, { type: "array" });
   } catch {
-    // Un archivo corrupto o que no es una hoja de calculo produce un error
-    // controlado, no una excepcion sin capturar que cuelgue la pantalla.
+    // Solo las excepciones lanzadas se convierten en un error controlado.
     throw new SpreadsheetImportError("El archivo no es una hoja de calculo valida.");
   }
 

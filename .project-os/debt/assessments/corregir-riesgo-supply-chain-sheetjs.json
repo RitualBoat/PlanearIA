@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "flow": "corregir-riesgo-supply-chain-sheetjs",
+  "date": "2026-07-23",
+  "kind": "remediation",
+  "result": "debt",
+  "candidates": [
+    {
+      "title": "Cuelgue sincronico de SheetJS ante xlsx ZIP corrupto",
+      "artifact": "src/services/spreadsheetImport.ts#XLSX.read",
+      "source": "revision adversarial y reproduccion aislada posterior al cierre de #133",
+      "category": "external-risk",
+      "severity": "minor",
+      "transversal": false,
+      "critical": false,
+      "planOwner": "preparacion-operativa-sdd-harness",
+      "consequence": "Un archivo .xlsx ZIP corrupto seleccionado por el docente puede bloquear sincronicamente el hilo JS y obligar a reiniciar la app.",
+      "remediation": "Revisar mensualmente fixes o aislamiento multiplataforma; al vencer sin solucion, desactivar import .xlsx mediante PR normal conservando CSV y exportacion.",
+      "evidence": [
+        {
+          "type": "command",
+          "ref": "npm run sheetjs:reproduce-hang: el padre supervisa XLSX.read en un proceso hijo, confirma timeout a 1000 ms y lo termina de forma controlada",
+          "date": "2026-07-23"
+        }
+      ],
+      "verification": {
+        "method": "reproduccion en proceso hijo con timeout y terminacion controlada",
+        "result": "confirmed",
+        "date": "2026-07-23"
+      }
+    }
+  ],
+  "exceptions": [
+    {
+      "id": "debt-770acc1e9d53",
+      "reason": "riesgo de congelamiento síncrono sin fix upstream ni aislamiento multiplataforma aprobado; archivo seleccionado manualmente y preview antes de confirmar.",
+      "owner": "RitualBoat",
+      "approvedBy": "RitualBoat",
+      "expiresOn": "2026-10-31",
+      "recovery": "desactivar import `.xlsx` mediante PR normal al vencer sin solución, conservando CSV y exportación."
+    }
+  ],
+  "notes": "Corrección de #137: captura el riesgo residual omitido en #133 sin modificar su assessment histórico. La excepción es temporal y el registro canónico gobierna estado y expiración."
+}

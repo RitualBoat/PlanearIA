@@ -170,7 +170,7 @@ export type RootStackParamList = {
   };
   Notificaciones: undefined;
   Ayuda: undefined;
-  Terminos: { tab?: "terminos" | "privacidad" } | undefined;
+  Terminos: { tab?: "terminos" | "privacidad" | "licencias" } | undefined;
 };
 
 /**

@@ -190,3 +190,25 @@ Para cualquier duda o comentario respecto a estos Términos y Condiciones:
 Correo electrónico: contacto@planearia.app
 
 Fecha de última actualización: 1 de abril de 2026.`;
+
+export const LICENCIAS_TERCEROS = `LICENCIAS DE TERCEROS
+
+PlanearIA incorpora software de terceros. Estas licencias no cambian la licencia propia de PlanearIA.
+
+SheetJS Community Edition -- https://sheetjs.com/
+
+Copyright (C) 2012-present   SheetJS LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+El texto completo y la metadata verificable del artefacto se conservan en THIRD_PARTY_NOTICES.md y vendor/sheetjs/.`;

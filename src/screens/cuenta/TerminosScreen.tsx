@@ -2,18 +2,35 @@ import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { NavigationProp, RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { FONT_SIZES } from "../../../types";
-import { AVISO_PRIVACIDAD, TERMINOS_CONDICIONES } from "../../utils/legalTexts";
+import type { RootStackParamList } from "../../navigation/types";
+import {
+  AVISO_PRIVACIDAD,
+  LICENCIAS_TERCEROS,
+  TERMINOS_CONDICIONES,
+} from "../../utils/legalTexts";
 import { useAppTheme } from "../../themes/useAppTheme";
 import { ThemedStylesInput } from "../../themes/types";
 
-type TabKey = "terminos" | "privacidad";
+type TabKey = "terminos" | "privacidad" | "licencias";
+
+const LEGAL_TABS: ReadonlyArray<{ key: TabKey; label: string }> = [
+  { key: "terminos", label: "Términos y Condiciones" },
+  { key: "privacidad", label: "Aviso de Privacidad" },
+  { key: "licencias", label: "Licencias de terceros" },
+];
+
+const LEGAL_CONTENT: Record<TabKey, string> = {
+  terminos: TERMINOS_CONDICIONES,
+  privacidad: AVISO_PRIVACIDAD,
+  licencias: LICENCIAS_TERCEROS,
+};
 
 const TerminosScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const route = useRoute<any>();
-  const initialTab: TabKey = route.params?.tab === "privacidad" ? "privacidad" : "terminos";
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, "Terminos">>();
+  const initialTab: TabKey = route.params?.tab ?? "terminos";
   const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
 
   const { colors, isDark, scaled, highContrast } = useAppTheme();
@@ -22,7 +39,7 @@ const TerminosScreen: React.FC = () => {
     [colors, isDark, scaled, highContrast]
   );
 
-  const content = activeTab === "terminos" ? TERMINOS_CONDICIONES : AVISO_PRIVACIDAD;
+  const content = LEGAL_CONTENT[activeTab];
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -33,6 +50,8 @@ const TerminosScreen: React.FC = () => {
         <Pressable
           onPress={() => navigation.goBack()}
           style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.6 }]}
+          accessibilityRole="button"
+          accessibilityLabel="Volver"
         >
           <MaterialIcons name="arrow-back" size={24} color={colors.text} />
         </Pressable>
@@ -42,30 +61,25 @@ const TerminosScreen: React.FC = () => {
 
       {/* Tabs */}
       <View style={styles.tabBar}>
-        <Pressable
-          style={({ pressed }) => [
-            styles.tab,
-            activeTab === "terminos" && styles.tabActive,
-            pressed && { opacity: 0.6 },
-          ]}
-          onPress={() => setActiveTab("terminos")}
-        >
-          <Text style={[styles.tabText, activeTab === "terminos" && styles.tabTextActive]}>
-            Términos y Condiciones
-          </Text>
-        </Pressable>
-        <Pressable
-          style={({ pressed }) => [
-            styles.tab,
-            activeTab === "privacidad" && styles.tabActive,
-            pressed && { opacity: 0.6 },
-          ]}
-          onPress={() => setActiveTab("privacidad")}
-        >
-          <Text style={[styles.tabText, activeTab === "privacidad" && styles.tabTextActive]}>
-            Aviso de Privacidad
-          </Text>
-        </Pressable>
+        {LEGAL_TABS.map(({ key, label }) => {
+          const selected = activeTab === key;
+          return (
+            <Pressable
+              key={key}
+              style={({ pressed }) => [
+                styles.tab,
+                selected && styles.tabActive,
+                pressed && { opacity: 0.6 },
+              ]}
+              onPress={() => setActiveTab(key)}
+              accessibilityRole="tab"
+              accessibilityLabel={label}
+              accessibilityState={{ selected }}
+            >
+              <Text style={[styles.tabText, selected && styles.tabTextActive]}>{label}</Text>
+            </Pressable>
+          );
+        })}
       </View>
 
       {/* Content */}
@@ -97,8 +111,10 @@ const getStyles = ({ colors, scaled, highContrast }: ThemedStylesInput) =>
       borderBottomColor: highContrast ? colors.borderStrong : colors.borderLight,
     },
     backBtn: {
-      width: 32,
-      padding: 4,
+      width: 44,
+      height: 44,
+      alignItems: "center",
+      justifyContent: "center",
     },
     headerTitle: {
       fontSize: scaled(FONT_SIZES.large),
@@ -113,8 +129,10 @@ const getStyles = ({ colors, scaled, highContrast }: ThemedStylesInput) =>
     },
     tab: {
       flex: 1,
+      minHeight: 44,
       paddingVertical: 12,
       alignItems: "center",
+      justifyContent: "center",
       borderBottomWidth: 2,
       borderBottomColor: "transparent",
     },
@@ -124,6 +142,7 @@ const getStyles = ({ colors, scaled, highContrast }: ThemedStylesInput) =>
     tabText: {
       fontSize: scaled(FONT_SIZES.small),
       fontWeight: "600",
+      textAlign: "center",
       // "Contraste alto": refuerza el texto de la pestana inactiva usando solo tokens.
       color: highContrast ? colors.text : colors.textSecondary,
     },

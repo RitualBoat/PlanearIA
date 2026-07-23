@@ -77,12 +77,14 @@ Riesgos sin un parche de version que los cierre, aceptados con rationale y monit
     servidor. Peor caso: congelamiento del hilo JS que obliga a reiniciar la app. La importacion es
     preview-antes-de-confirmar, por lo que **no hay perdida de datos**. La advisory grave (prototype
     pollution, CVE-2023-30533, que podia corromper el estado de la app) SI queda corregida por 0.20.3.
-  - **Mitigaciones vigentes:** tope de tamano de 5 MB antes de parsear (`src/services/spreadsheetImport.ts`)
-    que acota el agotamiento por archivos grandes; wrapper que convierte un parseo que lanza en error
-    controlado; preview-antes-de-confirmar.
-  - **Monitoreo/salida:** revisar releases de SheetJS (cdn.sheetjs.com) en cada ciclo; si aparece un
-    parseo acotable por tiempo/worker barato, adoptarlo; si el riesgo escala, evaluar retirar el import
-    de `.xlsx` no confiable en un change propio.
+  - **Registro canonico:** `debt-770acc1e9d53` en `.project-os/debt/registry.json`. El estado y la
+    expiracion de su excepcion se consultan solo ahi; este ADR no mantiene una segunda fecha editable.
+  - **Mitigaciones vigentes:** tope de 5 MB para no parsear archivos grandes; conversion a error de
+    dominio solo cuando el parser lanza; seleccion manual y preview antes de confirmar. El tope y
+    `try/catch` no interrumpen un bucle sincrono dentro de `XLSX.read`.
+  - **Monitoreo/salida:** revisar mensualmente releases de SheetJS y la excepcion canonica. Si vence
+    sin fix o aislamiento multiplataforma aprobado, desactivar import `.xlsx` mediante PR normal,
+    conservando CSV, exportacion, assessment, item, excepcion y notices.
 
 ### Bucket 3 - Upgrade mayor condicionado al proximo Expo SDK
 
@@ -97,8 +99,9 @@ runtime que solo se mueve con el bump de SDK; no se corrigen con overrides sin r
 
 ## Dependencia xlsx (fuera del registro npm)
 
-`xlsx` se instala desde el tarball oficial `https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz`
-(Apache-2.0), fijado por `resolved` + `integrity` en `package-lock.json`. El registro npm quedo
+`xlsx` se instala desde la copia vendorizada `vendor/sheetjs/xlsx-0.20.3.tgz`, descargada del tarball
+oficial `https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz` y fijada por SHA-256, metadata e
+`integrity` en `package-lock.json`. El registro npm quedo
 congelado en 0.18.5 (SheetJS abandono el registro). El monitoreo de esta dependencia entra en la
 revision mensual: comprobar nuevas versiones en cdn.sheetjs.com y advisories aplicables.
 
@@ -112,8 +115,8 @@ revision mensual: comprobar nuevas versiones en cdn.sheetjs.com y advisories apl
 
 ## Rollback
 
-- Revertir el PR de #133 restaura `xlsx@0.18.5`, retira el bloque `overrides` y este ADR sin tocar datos
-  ni contratos de import/export.
+- El rollback de esta correccion nunca borra el assessment, item, excepcion ni notices. Si vendoring
+  falla, un PR normal puede restaurar temporalmente HTTPS con `integrity`; nunca una version vulnerable.
 - Si un override rompe Metro/jest/Expo, se retira ese override puntual en un PR de correccion y el
   paquete pasa a bucket 3 o a excepcion documentada; nunca se silencia en silencio.
 - Si el tope de tamano de importacion produce falsos positivos, se ajusta el umbral en un PR documentado.

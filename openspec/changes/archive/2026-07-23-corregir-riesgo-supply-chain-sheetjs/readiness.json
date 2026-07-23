@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "issue": 137,
+  "change": "corregir-riesgo-supply-chain-sheetjs",
+  "surfaces": ["docs", "harness", "ui"],
+  "validations": ["openspec-strict", "harness-parity", "opsx-patch"],
+  "evidence": [
+    { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/137" },
+    { "id": "pr-link", "ref": "El owner local opsx:finish crea o reutiliza el PR tras archivar; issue canónico https://github.com/RitualBoat/PlanearIA/issues/137" },
+    { "id": "adversarial-review", "ref": "evidencia/revision-adversarial.md: PASS, 0 Blockers, 0 Majors" },
+    { "id": "docs-verification", "ref": "THIRD_PARTY_NOTICES.md; Documentacion/02-operacion/CADENCIA_DEPENDENCIAS.md; Documentacion/README.md" },
+    { "id": "fixtures", "ref": "evidencia/validacion-tecnica.md; src/__tests__/harness/spreadsheetDependency.test.ts; scripts/reproduceSheetJsHang.mjs" },
+    { "id": "web-http-200", "ref": "evidencia/playwright.md: http://127.0.0.1:8081 respondió HTTP 200 antes de navegar" },
+    { "id": "playwright-breakpoints", "ref": "evidencia/playwright/mobile-390x844.png; evidencia/playwright/tablet-1024x768.png; evidencia/playwright/web-1440x900.png" },
+    { "id": "nielsen", "ref": "evidencia/playwright.md" }
+  ],
+  "rollback": {
+    "strategy": "Preservar assessment, item, excepción y notices. Si vendoring falla, un PR normal restaura temporalmente HTTPS con integrity. Si la UI falla, un PR reduce la presentación a texto accesible. Al vencer sin solución, un PR desactiva import .xlsx y conserva CSV y exportación; nunca restaura una versión vulnerable."
+  },
+  "adversarialReview": {
+    "ref": "evidencia/revision-adversarial.md: PASS, 0 Blockers, 0 Majors"
+  },
+  "exceptions": []
+}

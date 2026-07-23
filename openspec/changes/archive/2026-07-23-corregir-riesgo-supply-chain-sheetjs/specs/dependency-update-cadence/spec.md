@@ -1,8 +1,5 @@
-# dependency-update-cadence Specification
+## MODIFIED Requirements
 
-## Purpose
-TBD - created by archiving change resolver-riesgo-y-cadencia-dependencias. Update Purpose after archive.
-## Requirements
 ### Requirement: Cadencia documentada con tres buckets
 
 El repositorio SHALL incluir un ADR de cadencia que clasifique cada advisory o riesgo abierto en uno de tres buckets. Para SheetJS, el ADR MUST enlazar el item canónico `debt-770acc1e9d53`, mantener revisión mensual y documentar recuperación, mientras que estado y expiración SHALL provenir únicamente del registro de deuda.
@@ -16,20 +13,6 @@ El repositorio SHALL incluir un ADR de cadencia que clasifique cada advisory o r
 
 - **WHEN** la excepción vence sin aislamiento o fix aprobado
 - **THEN** se abre un PR normal para desactivar import `.xlsx`, conservando CSV, exportación, assessment, item y notices
-
-### Requirement: Parches compatibles via overrides sin audit fix ni bump de SDK
-
-Las advisories de dev/build/CLI con fix del mismo major SHALL aplicarse fijando la version parcheada mediante `overrides` en `package.json`, sin ejecutar `npm audit fix`/`--force` y sin elevar la version de Expo SDK. La compatibilidad MUST verificarse con typecheck, lint, tests afectados y `npx expo install --check`.
-
-#### Scenario: Las 6 high transitivas quedan parcheadas por overrides
-
-- **WHEN** se ejecuta `npm audit` despues del change
-- **THEN** las advisories high transitivas cubiertas por overrides ya no aparecen y `npx expo install --check` sigue reportando dependencias al dia
-
-#### Scenario: Expo SDK 54 permanece intacto
-
-- **WHEN** se compara el arbol Expo antes y despues del change
-- **THEN** la version de Expo SDK no cambia y ningun override eleva un paquete Expo a un major nuevo
 
 ### Requirement: Lockfile reproducible
 
@@ -58,4 +41,3 @@ El change SHALL producir un assessment `kind: remediation` con `result: debt` pa
 
 - **WHEN** se captura el assessment de la corrección
 - **THEN** el item `debt-770acc1e9d53` queda `accepted-exception` hasta `2026-10-31` y el assessment de #133 conserva su hash
-

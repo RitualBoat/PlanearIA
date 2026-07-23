@@ -7,6 +7,9 @@
 
 PlanearIA es una suite docente offline-first. La documentacion esta organizada para que una IA encuentre rapido el contexto correcto, preserve reglas criticas y ejecute cambios pequenos con evidencia.
 
+Las licencias y atribuciones del software incorporado se consultan en
+[`../THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md).
+
 ## Lectura Rapida
 
 Leer en este orden para trabajo significativo:

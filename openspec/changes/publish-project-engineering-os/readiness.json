@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "issue": 126,
+  "change": "publish-project-engineering-os",
+  "surfaces": [
+    "docs",
+    "harness"
+  ],
+  "validations": [
+    "openspec-strict",
+    "harness-parity",
+    "opsx-patch"
+  ],
+  "evidence": [
+    {
+      "id": "issue-link",
+      "ref": "https://github.com/RitualBoat/PlanearIA/issues/126"
+    },
+    {
+      "id": "master-plan",
+      "ref": "Documentacion/01-planes-maestros/PLAN_CONSTRUCTOR_PROYECTOS_NUEVOS.md"
+    },
+    {
+      "id": "pre-propose",
+      "ref": "Gate local PASS 10/10 sobre development@2ef9a46; evidencia remota final pendiente."
+    },
+    {
+      "id": "pre-apply-review",
+      "ref": "openspec/changes/publish-project-engineering-os/evidencia/revision-adversarial-pre-apply.md"
+    },
+    {
+      "id": "release",
+      "ref": "Pendiente: repo, PR upstream, tag, tarball, checksum, npm y provenance se completan durante apply."
+    }
+  ],
+  "rollback": {
+    "strategy": "Antes de publicar, revertir el PR del change. Después, deprecar una versión defectuosa y publicar un patch; nunca reusar ni reetiquetar. PlanearIA vuelve por PR a la última release sana. Rollback preserva assessments y no usa git reset --hard."
+  },
+  "adversarialReview": {
+    "ref": ""
+  },
+  "exceptions": []
+}

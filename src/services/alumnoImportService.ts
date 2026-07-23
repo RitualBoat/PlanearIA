@@ -1,8 +1,7 @@
 import * as DocumentPicker from "expo-document-picker";
-import * as XLSX from "xlsx";
 import type { Alumno, Carrera } from "../../types";
+import { assertSupportedFile, readSpreadsheetRows } from "./spreadsheetImport";
 
-const SUPPORTED_EXTENSIONS = ["csv", "xlsx", "xls"] as const;
 const VALID_CARRERAS: Carrera[] = ["ISC", "IGE", "ARQ", "ITICS"];
 
 export interface AlumnoImportRowDraft {
@@ -143,51 +142,13 @@ export const buildAlumnoFromDraft = (
   };
 };
 
-const parseWorkbookToRows = (arrayBuffer: ArrayBuffer): Record<string, unknown>[] => {
-  const workbook = XLSX.read(arrayBuffer, { type: "array" });
-  const firstSheetName = workbook.SheetNames[0];
-
-  if (!firstSheetName) {
-    return [];
-  }
-
-  const sheet = workbook.Sheets[firstSheetName];
-  return XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
-    defval: "",
-  });
-};
-
-const getFileExtension = (fileName: string): string => {
-  const ext = fileName.split(".").pop()?.toLowerCase();
-  return ext || "";
-};
-
-const assertSupportedFile = (fileName: string): void => {
-  const ext = getFileExtension(fileName);
-  if (!SUPPORTED_EXTENSIONS.includes(ext as (typeof SUPPORTED_EXTENSIONS)[number])) {
-    throw new Error("Formato no soportado. Usa .csv o .xlsx");
-  }
-};
-
-const readAssetAsArrayBuffer = async (
-  asset: DocumentPicker.DocumentPickerAsset
-): Promise<ArrayBuffer> => {
-  const response = await fetch(asset.uri);
-  if (!response.ok) {
-    throw new Error("No se pudo leer el archivo seleccionado.");
-  }
-
-  return response.arrayBuffer();
-};
-
 export const parseAlumnosFromAsset = async (
   asset: DocumentPicker.DocumentPickerAsset
 ): Promise<AlumnoImportResult> => {
   const fileName = asset.name || "alumnos.csv";
   assertSupportedFile(fileName);
 
-  const arrayBuffer = await readAssetAsArrayBuffer(asset);
-  const rows = parseWorkbookToRows(arrayBuffer);
+  const rows = await readSpreadsheetRows(asset);
 
   const validRows: AlumnoImportRowDraft[] = [];
   const errorRows: AlumnoImportErrorRow[] = [];

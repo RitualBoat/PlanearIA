@@ -128,11 +128,14 @@
         }
       ],
       "issue": 129,
-      "status": "open",
+      "status": "resolved",
       "exception": null,
       "createdAt": "2026-07-20",
-      "updatedAt": "2026-07-20",
-      "resolution": null
+      "updatedAt": "2026-07-23",
+      "resolution": {
+        "flow": "resolver-riesgo-y-cadencia-dependencias",
+        "evidence": "Decision de riesgo de xlsx tomada y ejecutada (entrevista 2026-07-22, aprobada: actualizar a build parcheado + endurecer). xlsx 0.18.5 -> 0.20.3 desde el tarball oficial cdn.sheetjs.com, fijado por resolved+integrity (sha512) en el lockfile, licencia Apache-2.0. Corrige en la fuente CVE-2023-30533 (prototype pollution) y CVE-2024-22363 (ReDoS), ambas de lectura: npm audit deja de listar xlsx (28/7high antes -> 27/6high tras el upgrade; 'xlsx in report: NO (cleared)'), sin supresion (no hay .npmrc audit ni .nsprc/audit-ci; version parcheada real). Endurecimiento de la ruta de lectura no confiable en src/services/spreadsheetImport.ts (tope de 5 MB sobre asset.size y byteLength antes de parsear; wrapper que convierte un parseo que lanza en error controlado), cableado en alumnoImportService.ts y grupoImportService.ts; export sin cambios. Tests: src/__tests__/services/spreadsheetImport.test.ts (8) y src/__tests__/harness/spreadsheetDependency.test.ts (XLSX.version>=0.20.2 y lockfile CDN+integrity); import/export y suite completa verdes (120 suites/837 tests). Riesgo residual explicito (no introducido por el change; preexistente en 0.18.5 igual o peor): XLSX.read cuelga sincronicamente ante un .xlsx ZIP-deflate corrupto de ~14 bytes; aceptado y monitoreado en Documentacion/02-operacion/CADENCIA_DEPENDENCIAS.md bucket 2 con modelo de amenaza (archivo seleccionado por el docente, sin perdida de datos por preview-antes-de-confirmar; la advisory grave de prototype pollution SI queda corregida) y mitigaciones (tope de tamano, wrapper, preview). Revision adversarial PASS (0 Blockers/0 Majors) en https://github.com/RitualBoat/PlanearIA/issues/133#issuecomment-5053492821."
+      }
     },
     {
       "id": "debt-d73a5844fae3",
@@ -160,11 +163,14 @@
         }
       ],
       "issue": 129,
-      "status": "open",
+      "status": "resolved",
       "exception": null,
       "createdAt": "2026-07-20",
-      "updatedAt": "2026-07-20",
-      "resolution": null
+      "updatedAt": "2026-07-23",
+      "resolution": {
+        "flow": "resolver-riesgo-y-cadencia-dependencias",
+        "evidence": "Cadencia de dependencias fijada y parches compatibles aplicados. package.json#overrides dirigidos por major para las 6 high transitivas dev/build/CLI (no se empaquetan al runtime): ws@6->6.2.4, ws@7->7.5.11 (8.x intacto), form-data->4.0.6, js-yaml@3->3.15.0, js-yaml@4->4.3.0, shell-quote->1.10.0, brace-expansion@1->1.1.16, brace-expansion@5->5.0.7, fast-uri->3.1.4; versiones confirmadas con npm view, todas parche del mismo major y licencias permisivas existentes (MIT/BSD-3-Clause), sin npm audit fix y sin dependencias nuevas. npm audit 28 (7 high) -> 21 (0 high); 'remaining high/critical: NONE'. npx expo install --check 'Dependencies are up to date' antes y despues (expo@54.0.36 intacto; sin major accidental: react/react-native/jest/eslint sin cambio). Lockfile reproducible: npm ci x2, ambos exit 0, package-lock.json con md5 identico (sin drift). ADR Documentacion/02-operacion/CADENCIA_DEPENDENCIAS.md con tres buckets (parche compatible/overrides, riesgo aceptado y monitoreado, upgrade mayor gated por Expo SDK), revision mensual, owner preparacion-operativa-sdd-harness y rollback; enumera las 14 moderate SDK-gated (fix solo via expo@57/expo-dev-client@57/expo-notifications@57/jest-expo@57, fuera de alcance) y los 7 compatible-fix agendados (6 moderate + 1 low de tooling Expo entangled), sin silenciar ninguno. typecheck, lint --quiet, test:debt-control 58/58, agent:harness:check (36 mirrors), openspec:validate 44/0 verdes."
+      }
     },
     {
       "id": "debt-2887d890144e",

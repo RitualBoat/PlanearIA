@@ -131,3 +131,10 @@ con `kind: "baseline"`: cada candidato historico fue reproducido y clasificado; 
 quedaron como `resolvedPreviously` y los no verificables como `false-positive` con evidencia. Solo la
 deuda confirmada consume presupuesto. Si el baseline activa un trigger, el issue de saneamiento del
 plan afectado se crea automaticamente (modo `required`) y ese plan queda pausado hasta remediar.
+
+## Ver tambien
+
+- [Cadencia de Dependencias y Advisories](CADENCIA_DEPENDENCIAS.md): ADR que clasifica cada advisory de
+  `npm audit` en tres buckets (parche compatible via overrides, riesgo aceptado y monitoreado, upgrade
+  mayor gated por Expo SDK), fija la ventana de revision mensual y prohibe `npm audit fix`. Owner del
+  plan `preparacion-operativa-sdd-harness`; origen en el saneamiento #133.

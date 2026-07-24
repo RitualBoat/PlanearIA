@@ -56,6 +56,9 @@ Cada `[x]` requiere evidencia de comando. No usar `react-doctor` autofix.
 - [x] 4.5 `npm run agent:harness:check` (36 mirrors) y `npm run openspec:validate` (51/0, TLDR OK) verdes.
   `test:debt-control` no existe como script en el repo (tests internos del motor
   `create-project-engineering-os`, no afectados por cambios de app); la paridad la cubre `agent:harness:check`.
-- [ ] 4.6 Revision adversarial (contexto limpio) PASS con 0 Blockers / 0 Majors; registrar referencia.
-- [ ] 4.7 Assessment `kind: remediation`, `result: clean` que resuelve los tres IDs con evidencia.
-- [ ] 4.8 `npm run openspec:ready:archive -- --change sanear-correctitud-react-uxui --run-local`: PASS.
+- [x] 4.6 Revision adversarial (contexto limpio) PASS con 0 Blockers / 0 Majors (1 Minor rastreado).
+  Referencia: https://github.com/RitualBoat/PlanearIA/issues/143#issuecomment-5074377978.
+- [x] 4.7 Assessment `kind: remediation`, `result: clean` que resuelve los tres IDs con evidencia.
+  `npm run debt:capture` PASS: resolved debt-9be074c6e888, debt-d6e2309f9e15, debt-ff7731773cc5.
+  El presupuesto del plan bajo de 5/5 a 2/5 (por debajo del umbral).
+- [x] 4.8 `npm run openspec:ready:archive -- --change sanear-correctitud-react-uxui --run-local`: PASS.

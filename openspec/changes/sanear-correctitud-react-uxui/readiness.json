@@ -7,7 +7,7 @@
   "evidence": [
     { "id": "issue-link", "ref": "https://github.com/RitualBoat/PlanearIA/issues/143" },
     { "id": "pr-link", "ref": "PENDIENTE: se completa al abrir el PR" },
-    { "id": "adversarial-review", "ref": "PENDIENTE: se completa con el veredicto de la revision adversarial de cierre" },
+    { "id": "adversarial-review", "ref": "Veredicto PASS (0 Blockers / 0 Majors / 1 Minor rastreado) en https://github.com/RitualBoat/PlanearIA/issues/143#issuecomment-5074377978" },
     { "id": "offline-reconnect", "ref": "npm run test:sync -- --runInBand verde: cubre offline -> reconexion sin cambio de comportamiento; el change no altera el flujo de datos de sync, solo mueve la sincronizacion de refs de render a un efecto post-commit." },
     { "id": "cross-device", "ref": "Sin cambios en el motor de sync, colas ni storage (src/sync intacto): el push/pull entre dispositivos conserva su contrato; verificado por test:sync y por lectura de diff (SyncContext no cambia syncAllEntities ni syncNow)." },
     { "id": "no-local-loss", "ref": "El change no toca AsyncStorage, claves @planearia:* ni el modelo de datos; las escrituras de refs no persisten estado. Prueba de SyncContext confirma que syncNow observa el estado committeado; sin ruta que descarte datos locales." }
@@ -16,7 +16,7 @@
     "strategy": "Revertir el PR del change restaura el codigo previo de los seis archivos y elimina los tests nuevos, sin tocar datos, sync ni contratos. Si el efecto post-commit de SyncContext introdujera una regresion de frescura de estado, se revierte ese archivo puntual en un PR de correccion (los otros cinco fixes son independientes). Ningun cambio toca almacenamiento persistente, asi que no hay migracion que revertir."
   },
   "adversarialReview": {
-    "ref": "PENDIENTE: se completa con el veredicto (PASS, 0 Blockers / 0 Majors) de la revision adversarial de cierre"
+    "ref": "Veredicto PASS (0 Blockers / 0 Majors / 1 Minor rastreado) en https://github.com/RitualBoat/PlanearIA/issues/143#issuecomment-5074377978"
   },
   "exceptions": []
 }

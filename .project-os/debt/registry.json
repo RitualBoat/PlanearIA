@@ -346,11 +346,14 @@
         }
       ],
       "issue": 141,
-      "status": "open",
+      "status": "resolved",
       "exception": null,
       "createdAt": "2026-07-23",
-      "updatedAt": "2026-07-23",
-      "resolution": null
+      "updatedAt": "2026-07-24",
+      "resolution": {
+        "flow": "sanear-correctitud-react-uxui",
+        "evidence": "Los tres efectos con cleanup no verificable quedan con cleanup reconocible por React Doctor sin cambiar comportamiento ni silenciar la regla. Causa raiz: effect-needs-cleanup dispara sobre .addListener/.addEventListener DENTRO de un useEffect y la version instalada no reconoce el retorno de un unsubscribe bare para esas APIs. Solucion: mover cada subscripcion a un helper de modulo (mismo patron que src/sync subscribeConnectivity, que ya no dispara la regla): subscribeIsOffline (useContenidoViewModel.ts, NetInfo), subscribeFocus (AnimatedTopPill.tsx, navigation focus) y subscribeBeforeRemove (DocEditorScreen.tsx, beforeRemove). El efecto retorna/usa el unsubscribe como cleanup. React Doctor full: 3 effect-needs-cleanup -> 0. Tests de montaje/desmontaje: src/__tests__/components/AnimatedTopPill.test.tsx (2: detiene la animacion y da de baja el listener de focus al desmontar; sin navegador no falla) y src/__tests__/contenido/useContenidoViewModel.test.tsx (da de baja el listener de NetInfo al desmontar). Sin eslint-disable ni ignore de scanner en el diff. Nota (Minor rastreado en la revision adversarial): DocEditorScreen usa el mismo patron `return unsubscribe` probado en los otros dos y confirmado por React Doctor; no tiene test de unmount dedicado por el alto costo de montar la pantalla completa. Revision adversarial PASS en https://github.com/RitualBoat/PlanearIA/issues/143#issuecomment-5074377978."
+      }
     },
     {
       "id": "debt-9be074c6e888",
@@ -383,11 +386,14 @@
         }
       ],
       "issue": 141,
-      "status": "open",
+      "status": "resolved",
       "exception": null,
       "createdAt": "2026-07-23",
-      "updatedAt": "2026-07-23",
-      "resolution": null
+      "updatedAt": "2026-07-24",
+      "resolution": {
+        "flow": "sanear-correctitud-react-uxui",
+        "evidence": "SyncContext dejo de mutar refs durante render. Las cuatro asignaciones (isOnlineRef/syncEnabledRef/statusRef/authErrorRef) se movieron a un unico useEffect post-commit con deps [isOnline, syncEnabled, status, authError], declarado como el PRIMER efecto (src/context/SyncContext.tsx:196), antes de connectivity/startup/login, de modo que los refs quedan frescos dentro del mismo commit flush antes de que startup/login llamen syncNow. Se conserva el patron latest-value ref: syncNow mantiene deps estables [refreshPendingCount, showNotice], no se recrea ni re-suscribe interval/foreground/connectivity. React Doctor full: 4 no-ref-current-in-render -> 0 (SyncContext sin diagnosticos). Tests nuevos src/__tests__/context/SyncContext.test.tsx (2): (a) no recrea syncNow ni re-suscribe conectividad/AppState al cambiar estado; (b) syncNow observa el estado de conectividad committeado (offline -> corta antes de sincronizar; online -> ejecuta el ciclo), distinguiendo estado fresco de obsoleto. npm run test:sync -- --runInBand 23/23 verde: el motor de sync (src/sync), colas y storage no se tocan, sin perdida local. Revision adversarial PASS en https://github.com/RitualBoat/PlanearIA/issues/143#issuecomment-5074377978."
+      }
     },
     {
       "id": "debt-ff7731773cc5",
@@ -420,11 +426,14 @@
         }
       ],
       "issue": 141,
-      "status": "open",
+      "status": "resolved",
       "exception": null,
       "createdAt": "2026-07-23",
-      "updatedAt": "2026-07-23",
-      "resolution": null
+      "updatedAt": "2026-07-24",
+      "resolution": {
+        "flow": "sanear-correctitud-react-uxui",
+        "evidence": "Los cuatro actualizadores de estado impuros quedan puros. useDocEditorViewModel.ts: la maquina de historial (present=documento, past, future, isDirty) se reemplazo por un useReducer puro (historyReducer) con acciones update/undo/redo/reset/markSaved; el timestamp fechaModificacion se pasa en el action (determinista, no getNow() dentro del updater); boot/hidratacion (dispatch reset x2), autoguardado y guardarDocumento (dispatch markSaved) quedan cableados sin cambiar el contrato observable (documento/isDirty/canUndo/canRedo/undo/redo intactos). RetoResolucionScreen.tsx: el updater de setTimeLeft quedo puro (prev<=1?0:prev-1) y el clearInterval salio a un efecto separado que observa timeLeft===0. React Doctor full: 4 no-impure-state-updater -> 0; ademas se eliminaron 9 warnings no-side-effect-in-state-updater-function co-localizados (warnings 199 -> 190, sin nuevos). Tests: src/__tests__/hooks/useDocEditorViewModel.test.tsx (5: aplica cambio/dirty/undo habilitado; undo restaura y redo reaplica; no-op no crea historial; limite de 30 entradas; correctitud bajo React.StrictMode/doble invocacion) y src/__tests__/feed/RetoResolucionScreen.test.tsx (+3: cuenta atras, se detiene en cero sin negativo, limpia el intervalo al desmontar). Revision adversarial PASS (comparacion linea a linea de cada transicion contra el original) en https://github.com/RitualBoat/PlanearIA/issues/143#issuecomment-5074377978."
+      }
     }
   ]
 }

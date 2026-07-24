@@ -69,22 +69,25 @@ const RetoResolucionScreen: React.FC<RetoResolucionScreenProps> = ({ route, navi
   const [timeLeft, setTimeLeft] = useState(tiempoLimite ? tiempoLimite * 60 : 0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Timer
+  // Timer: the updater stays pure and only computes the next value. Stopping the
+  // interval at zero is a side effect, handled by the separate effect below.
   useEffect(() => {
     if (!tiempoLimite) return;
     timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          if (timerRef.current) clearInterval(timerRef.current);
-          return 0;
-        }
-        return prev - 1;
-      });
+      setTimeLeft((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [tiempoLimite]);
+
+  // Stop the countdown once it reaches zero, outside the state updater.
+  useEffect(() => {
+    if (timeLeft === 0 && timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, [timeLeft]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);

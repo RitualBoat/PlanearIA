@@ -158,6 +158,11 @@ const matchFecha = (fecha: string, filtro: FiltroFecha): boolean => {
   }
 };
 
+// Subscription boundary outside any effect body (same shape as src/sync subscribeConnectivity),
+// so the effect can return a clean unsubscribe that owns the NetInfo listener on unmount.
+const subscribeIsOffline = (onOffline: (offline: boolean) => void): (() => void) =>
+  NetInfo.addEventListener((state) => onOffline(state.isConnected === false));
+
 // ─── Hook ───
 
 export const useContenidoViewModel = (): ContenidoViewModel => {
@@ -178,12 +183,7 @@ export const useContenidoViewModel = (): ContenidoViewModel => {
   const [isError, setIsError] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
 
-  useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      setIsOffline(state.isConnected === false);
-    });
-    return () => unsubscribe();
-  }, []);
+  useEffect(() => subscribeIsOffline(setIsOffline), []);
 
   const retryLoad = useCallback(() => {
     setIsError(false);

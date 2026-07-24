@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
@@ -65,6 +65,72 @@ const isEvaluacionFilled = (evaluacion?: InstrumentoEvaluacion): boolean => {
   return hasCriteria || hasScale;
 };
 
+const HISTORY_LIMIT = 30;
+
+interface HistoryState {
+  present: PlaneacionDocumento;
+  past: PlaneacionDocumento[];
+  future: PlaneacionDocumento[];
+  isDirty: boolean;
+}
+
+type HistoryAction =
+  | {
+      type: "update";
+      updater: (current: PlaneacionDocumento) => PlaneacionDocumento;
+      trackHistory: boolean;
+      now: string;
+    }
+  | { type: "undo" }
+  | { type: "redo" }
+  | { type: "reset"; document: PlaneacionDocumento }
+  | { type: "markSaved" };
+
+// Pure history machine (present + undo/redo stacks + dirty flag). Every transition is a
+// side-effect-free computation, so React can invoke the reducer more than once (replay /
+// StrictMode) without repeating side effects or corrupting the history.
+const historyReducer = (state: HistoryState, action: HistoryAction): HistoryState => {
+  switch (action.type) {
+    case "update": {
+      const next = action.updater(state.present);
+      if (next === state.present) return state;
+      const stamped = { ...next, fechaModificacion: action.now };
+      if (!action.trackHistory) {
+        return { ...state, present: stamped, isDirty: true };
+      }
+      const past = [...state.past, state.present];
+      if (past.length > HISTORY_LIMIT) past.shift();
+      return { present: stamped, past, future: [], isDirty: true };
+    }
+    case "undo": {
+      if (state.past.length === 0) return state;
+      const previous = state.past[state.past.length - 1];
+      return {
+        present: previous,
+        past: state.past.slice(0, -1),
+        future: [state.present, ...state.future].slice(0, HISTORY_LIMIT),
+        isDirty: true,
+      };
+    }
+    case "redo": {
+      if (state.future.length === 0) return state;
+      const [next, ...rest] = state.future;
+      return {
+        present: next,
+        past: [...state.past, state.present].slice(-HISTORY_LIMIT),
+        future: rest,
+        isDirty: true,
+      };
+    }
+    case "reset":
+      return { present: action.document, past: [], future: [], isDirty: false };
+    case "markSaved":
+      return { ...state, isDirty: false };
+    default:
+      return state;
+  }
+};
+
 export interface DocEditorViewModel {
   documento: PlaneacionDocumento;
   isLoading: boolean;
@@ -105,20 +171,25 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
   const routeInstanceKey = route.key;
   const userId = String(usuario?.id ?? "guest");
 
-  const [documento, setDocumento] = useState<PlaneacionDocumento>(() =>
-    buildPlaneacionDocumentoBase({
-      nivelAcademico: targetNivel || NivelAcademico.PRIMARIA,
-      userId: String(usuario?.id ?? "guest"),
-      usuario: usuario || undefined,
+  const [history, dispatch] = useReducer(
+    historyReducer,
+    undefined,
+    (): HistoryState => ({
+      present: buildPlaneacionDocumentoBase({
+        nivelAcademico: targetNivel || NivelAcademico.PRIMARIA,
+        userId: String(usuario?.id ?? "guest"),
+        usuario: usuario || undefined,
+      }),
+      past: [],
+      future: [],
+      isDirty: false,
     })
   );
+  const { present: documento, past, future, isDirty } = history;
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
   const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
   const [activeSectionId, setActiveSectionId] = useState<DocSectionId>("info_institucional");
-  const [past, setPast] = useState<PlaneacionDocumento[]>([]);
-  const [future, setFuture] = useState<PlaneacionDocumento[]>([]);
   const isHydratingRef = useRef(true);
   const lastDraftSerializedRef = useRef("");
 
@@ -132,27 +203,9 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
     return `${DOC_DRAFT_PREFIX}:${ref}`;
   }, [mode, routeInstanceKey, sourceDocId, sourcePlantillaId, targetNivel]);
 
-  const pushHistory = (current: PlaneacionDocumento) => {
-    setPast((prev) => {
-      const next = [...prev, current];
-      if (next.length > 30) next.shift();
-      return next;
-    });
-    setFuture([]);
-  };
-
   const updateDoc = useCallback(
     (updater: (current: PlaneacionDocumento) => PlaneacionDocumento, trackHistory = true) => {
-      setDocumento((current) => {
-        const next = updater(current);
-        if (next === current) return current;
-        if (trackHistory) pushHistory(current);
-        setIsDirty(true);
-        return {
-          ...next,
-          fechaModificacion: getNow(),
-        };
-      });
+      dispatch({ type: "update", updater, trackHistory, now: getNow() });
     },
     []
   );
@@ -183,7 +236,7 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
         }
       }
 
-      setDocumento(ensureDocumentoContenidoRaw(nextDocument));
+      dispatch({ type: "reset", document: ensureDocumentoContenidoRaw(nextDocument) });
 
       const draft = parseWithFallback<PlaneacionDocumento | null>(await AsyncStorage.getItem(draftKey), null);
       if (
@@ -191,17 +244,14 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
         (draft.id === sourceDocId || draft.plantillaId === sourcePlantillaId || mode === "crear")
       ) {
         const hydratedDraft = ensureDocumentoContenidoRaw(draft);
-        setDocumento(hydratedDraft);
+        dispatch({ type: "reset", document: hydratedDraft });
         lastDraftSerializedRef.current = JSON.stringify(hydratedDraft);
       } else {
         const hydratedDoc = ensureDocumentoContenidoRaw(nextDocument);
-        setDocumento(hydratedDoc);
+        dispatch({ type: "reset", document: hydratedDoc });
         lastDraftSerializedRef.current = JSON.stringify(hydratedDoc);
       }
 
-      setPast([]);
-      setFuture([]);
-      setIsDirty(false);
       setDraftSavedAt(null);
       isHydratingRef.current = false;
       setIsLoading(false);
@@ -249,7 +299,7 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
       }
       await AsyncStorage.removeItem(draftKey);
       lastDraftSerializedRef.current = "";
-      setIsDirty(false);
+      dispatch({ type: "markSaved" });
       setDraftSavedAt(getNow());
       if (options?.salir) {
         // DocEditor vive en la raiz; la biblioteca, dentro del hub Office.
@@ -261,26 +311,12 @@ export const useDocEditorViewModel = (): DocEditorViewModel => {
   }, [actualizar, crear, documento, draftKey, navigation, obtenerDocumento]);
 
   const undo = useCallback(() => {
-    setPast((prevPast) => {
-      if (prevPast.length === 0) return prevPast;
-      const previous = prevPast[prevPast.length - 1];
-      setFuture((prevFuture) => [documento, ...prevFuture].slice(0, 30));
-      setDocumento(previous);
-      setIsDirty(true);
-      return prevPast.slice(0, -1);
-    });
-  }, [documento]);
+    dispatch({ type: "undo" });
+  }, []);
 
   const redo = useCallback(() => {
-    setFuture((prevFuture) => {
-      if (prevFuture.length === 0) return prevFuture;
-      const [next, ...rest] = prevFuture;
-      setPast((prevPast) => [...prevPast, documento].slice(-30));
-      setDocumento(next);
-      setIsDirty(true);
-      return rest;
-    });
-  }, [documento]);
+    dispatch({ type: "redo" });
+  }, []);
 
   const sectionsProgress: DocSectionProgress[] = useMemo(() => {
     return [

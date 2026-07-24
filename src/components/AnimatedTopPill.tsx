@@ -23,6 +23,13 @@ interface AnimatedTopPillProps {
   children?: React.ReactNode;
 }
 
+// Focus subscription lives outside the effect body so the effect returns a clean cleanup
+// that owns the listener (when a navigator is present) plus the glow animation.
+const subscribeFocus = (
+  navigation: React.ContextType<typeof NavigationContext>,
+  onFocus: () => void
+): (() => void) | undefined => navigation?.addListener("focus", onFocus);
+
 const AnimatedTopPill: React.FC<AnimatedTopPillProps> = ({
   title,
   subtitle = "",
@@ -72,16 +79,11 @@ const AnimatedTopPill: React.FC<AnimatedTopPillProps> = ({
   React.useEffect(() => {
     runGlow();
 
-    if (!navigation) {
-      return () => {
-        glowAnimationRef.current?.stop();
-        glowAnimationRef.current = null;
-      };
-    }
-
-    const unsubscribeFocus = navigation.addListener("focus", runGlow);
+    // The focus subscription lives in a module helper so the effect body has no raw
+    // addListener; the single cleanup owns the listener (when present) and the animation.
+    const unsubscribeFocus = subscribeFocus(navigation, runGlow);
     return () => {
-      unsubscribeFocus();
+      unsubscribeFocus?.();
       glowAnimationRef.current?.stop();
       glowAnimationRef.current = null;
     };

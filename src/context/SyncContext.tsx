@@ -80,10 +80,6 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const authErrorRef = useRef(authError);
   const runningRef = useRef(false);
   const noticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  isOnlineRef.current = isOnline;
-  syncEnabledRef.current = syncEnabled;
-  statusRef.current = status;
-  authErrorRef.current = authError;
 
   const dismissNotice = useCallback(() => setNotice(null), []);
 
@@ -192,6 +188,17 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
     },
     [refreshPendingCount, showNotice]
   );
+
+  // Keep the latest-value refs in sync with committed state. Writing them in an effect
+  // (never during render) means a discarded or replayed render cannot leak into what
+  // syncNow observes. Declared before the startup/login effects so the refs are fresh
+  // within the same commit flush, before those effects call syncNow.
+  useEffect(() => {
+    isOnlineRef.current = isOnline;
+    syncEnabledRef.current = syncEnabled;
+    statusRef.current = status;
+    authErrorRef.current = authError;
+  }, [isOnline, syncEnabled, status, authError]);
 
   // Connectivity transitions: offline banner + reconnect-and-sync
   useEffect(() => {

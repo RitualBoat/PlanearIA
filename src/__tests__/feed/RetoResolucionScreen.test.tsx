@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react-native";
+import { render, fireEvent, act } from "@testing-library/react-native";
 import RetoResolucionScreen from "../../screens/feed/RetoResolucionScreen";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -114,5 +114,54 @@ describe("RetoResolucionScreen", () => {
   it("muestra título por defecto cuando no hay params", () => {
     const { getByText } = render(<RetoResolucionScreen navigation={mockNavigation} />);
     expect(getByText("Resolver Reto")).toBeTruthy();
+  });
+
+  it("el temporizador cuenta hacia atras (updater puro)", () => {
+    const { getByText } = render(
+      <RetoResolucionScreen
+        route={{ params: { titulo: "Reto", tiempoLimite: 1 } }}
+        navigation={mockNavigation}
+      />
+    );
+    expect(getByText("⏱️ 01:00")).toBeTruthy();
+
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    expect(getByText("⏱️ 00:59")).toBeTruthy();
+  });
+
+  it("el temporizador se detiene en cero sin quedar negativo", () => {
+    const { getByText } = render(
+      <RetoResolucionScreen
+        route={{ params: { titulo: "Reto", tiempoLimite: 1 } }}
+        navigation={mockNavigation}
+      />
+    );
+
+    act(() => {
+      jest.advanceTimersByTime(60000);
+    });
+    expect(getByText("⏱️ 00:00")).toBeTruthy();
+
+    // El intervalo ya se limpio fuera del updater: avanzar mas no lo vuelve negativo.
+    act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+    expect(getByText("⏱️ 00:00")).toBeTruthy();
+  });
+
+  it("limpia el intervalo al desmontar", () => {
+    const clearSpy = jest.spyOn(global, "clearInterval");
+    const { unmount } = render(
+      <RetoResolucionScreen
+        route={{ params: { titulo: "Reto", tiempoLimite: 1 } }}
+        navigation={mockNavigation}
+      />
+    );
+
+    unmount();
+    expect(clearSpy).toHaveBeenCalled();
+    clearSpy.mockRestore();
   });
 });

@@ -56,6 +56,7 @@ jest.mock("../../context/PlantillasContext", () => ({
   }),
 }));
 
+import NetInfo from "@react-native-community/netinfo";
 import { useContenidoViewModel } from "../../hooks/useContenidoViewModel";
 
 const makeDocumento = (overrides: Partial<PlaneacionDocumento> = {}): PlaneacionDocumento => {
@@ -173,6 +174,18 @@ describe("useContenidoViewModel", () => {
     mockRecursos = [];
     mockEntregables = [];
     mockPlantillas = [];
+  });
+
+  it("da de baja el listener de conectividad de NetInfo al desmontar", () => {
+    const unsubscribe = jest.fn();
+    (NetInfo.addEventListener as jest.Mock).mockReturnValueOnce(unsubscribe);
+
+    const { unmount } = renderHook(() => useContenidoViewModel());
+    expect(NetInfo.addEventListener).toHaveBeenCalledTimes(1);
+    expect(unsubscribe).not.toHaveBeenCalled();
+
+    unmount();
+    expect(unsubscribe).toHaveBeenCalledTimes(1);
   });
 
   it("agrega todos los tipos de contenido", () => {

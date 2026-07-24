@@ -16,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { useNavigation } from "@react-navigation/native";
+import type { EventArg, NavigationAction } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { EditorBridge } from "@10play/tentap-editor";
 import type { AppRoutesParamList } from "../../navigation/StackNavigator";
@@ -43,6 +44,15 @@ import type { InstrumentoEvaluacion } from "../../../types/planeacionV2";
 import { setGlobalKeyboardDismissHandler } from "../../utils/keyboardDismissController";
 
 type Nav = StackNavigationProp<AppRoutesParamList, "DocEditor">;
+type BeforeRemoveEvent = EventArg<"beforeRemove", true, { action: NavigationAction }>;
+
+// beforeRemove subscription lives outside the effect body (like src/sync subscribeConnectivity)
+// so the effect returns a clean unsubscribe that owns the navigation guard listener on unmount.
+const subscribeBeforeRemove = (
+  navigation: Nav,
+  handler: (event: BeforeRemoveEvent) => void
+): (() => void) => navigation.addListener("beforeRemove", handler);
+
 type PageFormat = "a4" | "carta";
 type LogoSlotId = "tecnm" | "institucion";
 
@@ -266,7 +276,7 @@ const DocEditorScreen: React.FC = () => {
   }, [isWeb, vm.isDirty]);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener("beforeRemove", (event) => {
+    const handleBeforeRemove = (event: BeforeRemoveEvent) => {
       if (!vm.isDirty || skipUnsavedPromptRef.current) return;
       (event as { preventDefault?: () => void }).preventDefault?.();
 
@@ -290,11 +300,11 @@ const DocEditorScreen: React.FC = () => {
           { text: "Salir sin guardar", style: "destructive", onPress: continueNavigation },
         ]
       );
-    });
-
-    return () => {
-      unsubscribe();
     };
+
+    // The subscription lives in a module helper so the effect body has no raw addListener;
+    // the returned unsubscribe is the cleanup that owns the listener.
+    return subscribeBeforeRemove(navigation, handleBeforeRemove);
   }, [isWeb, navigation, vm.isDirty]);
 
   const showSaveFeedback = useCallback((message: string) => {
